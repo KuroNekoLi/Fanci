@@ -8,8 +8,8 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.cmoney.fanci"
-        minSdk 21
+        applicationId "com.cmoney.kolfanci"
+        minSdk 24
         targetSdk 33
         versionCode 1
         versionName "1.0.0"
@@ -24,14 +24,26 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue 'string', 'cm_server_url', '"https://www.cmoney.tw/"'
+        }
+
+        debug {
+            debuggable true
+            applicationIdSuffix = '.debug'
+            versionNameSuffix '-debug'
+            resValue 'string', 'cm_server_url', '"https://outpost.cmoney.tw/"'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += [
+                "-Xjvm-default=all"
+        ]
     }
     buildFeatures {
         compose true
@@ -60,8 +72,34 @@ dependencies {
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation "androidx.compose.ui:ui-viewbinding:$compose_ui_version"
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
     implementation 'androidx.compose.material:material:1.2.1'
     implementation "androidx.navigation:navigation-compose:$nav_version"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.23.1"
+
+    //==================== Coil ====================
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+    //=============== Log ===============
+    implementation 'com.github.zhaokaiqiang.klog:library:1.6.0'
+
+    //=============== CMoney ===============
+    implementation 'com.cmoney.analytics:analytics-user:5.0.0'
+    releaseImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
+    debugImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
+
+    implementation('com.cmoney.xlab:login:1.0.11')
+
+    implementation('com.cmoney.xlab:ratingview:1.1.8') { // 導入模組
+        exclude group: 'androidx.constraintlayout', module: 'constraintlayout'
+        // 忽略constraintlayout版本，使模組版本不要影響到app
+    }
+    implementation 'com.cmoney.remoteconfig:remoteconfig-android:5.0.0'
+
+    //=============== Flurry ===============
+    implementation 'com.flurry.android:analytics:13.1.0'
+
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

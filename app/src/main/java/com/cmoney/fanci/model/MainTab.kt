@@ -1,6 +1,7 @@
-package com.cmoney.fanci
+package com.cmoney.fanci.model
 
 import androidx.annotation.DrawableRes
+import com.cmoney.fanci.R
 
 sealed class MainTab(
     val title: String,

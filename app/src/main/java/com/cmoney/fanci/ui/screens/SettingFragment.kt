@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.view
+package com.cmoney.fanci.ui.screens
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

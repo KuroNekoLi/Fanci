@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.cmoney.fanci.ui.view.HomeFragment"
+        android:name="com.cmoney.fanci.ui.screens.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_social"
-        android:name="com.cmoney.fanci.ui.view.SocialFragment"
+        android:name="com.cmoney.fanci.ui.screens.SocialFragment"
         android:label="Social"
         tools:layout="@layout/fragment_social" />
 
     <fragment
         android:id="@+id/navigation_setting"
-        android:name="com.cmoney.fanci.ui.view.SettingFragment"
+        android:name="com.cmoney.fanci.ui.screens.SettingFragment"
         android:label="Setting"
         tools:layout="@layout/fragment_setting" />
 
