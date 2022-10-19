@@ -13,7 +13,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -27,11 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.screens.shared.ChannelBar
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FollowScreen(viewModel: FollowViewModel = viewModel()) {
+fun FollowScreen(
+    viewModel: FollowViewModel = viewModel(),
+    onChannelClick: ((channelBar: ChannelBar) -> Unit)?
+) {
     val followCategoryList = viewModel.followData.observeAsState(emptyList())
 
     Surface(
@@ -137,7 +140,9 @@ fun FollowScreen(viewModel: FollowViewModel = viewModel()) {
                         }
 
                         items(followCategoryList.value) { category ->
-                            CategoryScreen(followCategory = category)
+                            CategoryScreen(followCategory = category) {
+                                onChannelClick?.invoke(it)
+                            }
                         }
                     }
                 }
@@ -149,5 +154,7 @@ fun FollowScreen(viewModel: FollowViewModel = viewModel()) {
 @Preview(showBackground = true)
 @Composable
 fun FollowScreenPreview() {
-    FollowScreen()
+    FollowScreen {
+
+    }
 }

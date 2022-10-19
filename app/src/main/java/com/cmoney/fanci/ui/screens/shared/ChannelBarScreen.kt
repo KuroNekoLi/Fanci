@@ -20,9 +20,11 @@ data class ChannelBar(
 )
 
 @Composable
-fun ChannelBarScreen(channelBar: ChannelBar) {
+fun ChannelBarScreen(channelBar: ChannelBar, onClick: (channelBar: ChannelBar) -> Unit) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = {
+            onClick.invoke(channelBar)
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
@@ -34,9 +36,13 @@ fun ChannelBarScreen(channelBar: ChannelBar) {
             modifier = Modifier
                 .fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
-        ){
-            Row{
-                Icon(painterResource(id = channelBar.icon), contentDescription = null, tint = White_494D54)
+        ) {
+            Row {
+                Icon(
+                    painterResource(id = channelBar.icon),
+                    contentDescription = null,
+                    tint = White_494D54
+                )
                 Spacer(modifier = Modifier.width(14.dp))
                 ChannelText(channelBar.channelTitle)
             }
@@ -52,5 +58,7 @@ fun ChannelBarScreenPreview() {
             icon = R.drawable.message,
             channelTitle = "\uD83D\uDC4F｜歡迎新朋友"
         )
-    )
+    ) {
+
+    }
 }

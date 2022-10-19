@@ -3,7 +3,6 @@ package com.cmoney.fanci.ui.screens.follow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,12 +18,17 @@ data class FollowCategory(
 )
 
 @Composable
-fun CategoryScreen(followCategory: FollowCategory) {
+fun CategoryScreen(
+    followCategory: FollowCategory,
+    onChannelClick: (channelBar: ChannelBar) -> Unit
+) {
     Column {
         CategoryText(text = followCategory.categoryTitle)
         Spacer(modifier = Modifier.height(10.dp))
         followCategory.channelList.forEach { channelBar ->
-            ChannelBarScreen(channelBar = channelBar)
+            ChannelBarScreen(channelBar = channelBar) {
+                onChannelClick.invoke(it)
+            }
         }
     }
 }
@@ -50,5 +54,7 @@ fun CategoryScreenPreview() {
                 )
             )
         )
-    )
+    ){
+
+    }
 }

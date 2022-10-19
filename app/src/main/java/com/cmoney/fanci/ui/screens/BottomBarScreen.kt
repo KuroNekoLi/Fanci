@@ -1,10 +1,16 @@
 package com.cmoney.fanci.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -14,10 +20,34 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.model.MainTab
 import com.cmoney.fanci.model.mainTabItems
-import com.cmoney.fanci.ui.theme.Black_14171C
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.White_494D54
+
+/**
+ * 根據不同 Route 決定BottomBar 是否出現
+ */
+@Composable
+fun BottomBarController(navController: NavHostController) {
+    var showBottomBar by rememberSaveable { mutableStateOf(true) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    showBottomBar = when (navBackStackEntry?.destination?.route) {
+        MainTab.FOLLOW.route -> true
+        MainTab.NOTIFY.route -> true
+        MainTab.MY.route -> true
+        MainTab.EXPLORE.route -> true
+        else -> false
+    }
+
+    AnimatedVisibility(
+        visible = showBottomBar,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        BottomBar(navController)
+    }
+}
 
 @Composable
 fun BottomBar(navController: NavHostController) {
