@@ -9,12 +9,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.MyAppNavHost
 import com.cmoney.fanci.ui.screens.BottomBarController
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +37,15 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val systemUiController = rememberSystemUiController()
+    val statusBarColor = MaterialTheme.colors.background
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = statusBarColor,
+            darkIcons = false
+        )
+    }
+
     Scaffold(
         bottomBar = {
             BottomBarController(navController)

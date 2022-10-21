@@ -44,13 +44,13 @@ fun FanciTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable 
         LightColorPalette
     }
 
-    val systemUiController = rememberSystemUiController()
-    SideEffect {
-        systemUiController.setStatusBarColor(
-            color = colors.background,
-            darkIcons = false
-        )
-    }
+//    val systemUiController = rememberSystemUiController()
+//    SideEffect {
+//        systemUiController.setStatusBarColor(
+//            color = colors.background,
+//            darkIcons = false
+//        )
+//    }
 
     MaterialTheme(
         colors = colors,

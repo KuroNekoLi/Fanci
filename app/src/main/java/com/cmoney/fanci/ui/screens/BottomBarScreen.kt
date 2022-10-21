@@ -40,13 +40,17 @@ fun BottomBarController(navController: NavHostController) {
         else -> false
     }
 
-    AnimatedVisibility(
-        visible = showBottomBar,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
-    ) {
+    if (showBottomBar) {
         BottomBar(navController)
     }
+
+//    AnimatedVisibility(
+//        visible = showBottomBar,
+//        enter = slideInVertically(initialOffsetY = { it }),
+//        exit = slideOutVertically(targetOffsetY = { it })
+//    ) {
+//        BottomBar(navController)
+//    }
 }
 
 @Composable

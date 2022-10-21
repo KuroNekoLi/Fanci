@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.common.BlueCircleDot
 import com.cmoney.fanci.ui.common.GroupText
 import com.cmoney.fanci.ui.theme.Black_14171C
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
@@ -30,7 +31,8 @@ fun GroupHeaderScreen(followGroup: FollowGroup, modifier: Modifier, visibleAvata
 
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically) {
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Column(modifier = Modifier.weight(1f)) {
             Image(
                 painter = painterResource(id = R.drawable.fanci),
@@ -57,35 +59,13 @@ fun GroupHeaderScreen(followGroup: FollowGroup, modifier: Modifier, visibleAvata
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(3.8.dp)
-                            .clip(CircleShape)
-                            .background(Blue_4F70E5)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .size(3.8.dp)
-                            .clip(CircleShape)
-                            .background(Blue_4F70E5)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .size(3.8.dp)
-                            .clip(CircleShape)
-                            .background(Blue_4F70E5)
-                    )
-                }
+                BlueCircleDot()
             }
             AnimatedVisibility(
                 visible = visibleAvatar
-            ){
+            ) {
                 AsyncImage(
-                    model = "https://picsum.photos/400/400",
+                    model = followGroup.groupAvatar,
                     modifier = Modifier
                         .size(55.dp)
                         .aspectRatio(1f)

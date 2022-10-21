@@ -35,7 +35,7 @@ fun FollowScreen(
     viewModel: FollowViewModel = viewModel(),
     onChannelClick: ((channelBar: ChannelBar) -> Unit)?
 ) {
-    val followCategoryList = viewModel.followData.observeAsState(emptyList())
+    val followCategoryList = viewModel.followData.observeAsState()
 
     Surface(
         modifier = Modifier
@@ -127,21 +127,25 @@ fun FollowScreen(
                     ) {
 
                         stickyHeader {
-                            GroupHeaderScreen(
-                                FollowGroup(
-                                    groupName = "社團名稱",
-                                    groupAvatar = "https://i.pinimg.com/474x/60/5d/31/605d318d7f932e3ebd1d672e5bff9229.jpg"
-                                ),
-                                modifier = Modifier.background(
-                                    MaterialTheme.colors.onSecondary
-                                ),
-                                visibleAvatar
-                            )
+                            followCategoryList.value?.let {
+                                GroupHeaderScreen(
+                                    FollowGroup(
+                                        groupName = it.groupName,
+                                        groupAvatar = it.avatar
+                                    ),
+                                    modifier = Modifier.background(
+                                        MaterialTheme.colors.onSecondary
+                                    ),
+                                    visibleAvatar
+                                )
+                            }
                         }
 
-                        items(followCategoryList.value) { category ->
-                            CategoryScreen(followCategory = category) {
-                                onChannelClick?.invoke(it)
+                        followCategoryList.value?.let {
+                            items(it.category) { category ->
+                                CategoryScreen(followCategory = category) {
+                                    onChannelClick?.invoke(it)
+                                }
                             }
                         }
                     }

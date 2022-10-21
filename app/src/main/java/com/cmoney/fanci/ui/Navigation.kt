@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
 import com.cmoney.fanci.model.MainTab
 import com.cmoney.fanci.model.mainTabItems
+import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.socks.library.KLog
 
@@ -32,6 +33,7 @@ fun MyAppNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: MainTab = MainTab.FOLLOW
 ) {
+    //test
     var pos by remember { mutableStateOf(0) }
 
     val actions = remember(navController) { MainActions(navController) }
@@ -43,11 +45,14 @@ fun MyAppNavHost(
     ) {
         //test
         composable("channel/{channelId}") { backStackEntry ->
-            val test = backStackEntry.arguments?.getString("channelId")
-            KLog.i("Warren", test.orEmpty())
-            AndroidViewBinding(MyFragmentLayoutBinding::inflate) {
-            }
+            val channelId = backStackEntry.arguments?.getString("channelId")
+            ChatRoomScreen(channelId, navController)
         }
+
+        composable("profile") { backStackEntry ->
+
+        }
+
 
         mainTabItems.forEach { mainTab ->
             when (mainTab) {
