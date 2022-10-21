@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.chat
+package com.cmoney.fanci.ui.screens.shared
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -17,18 +17,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.theme.Color_B3FB9304
 
 @Composable
 fun ChatUsrAvatarScreen(
-    avatar: String = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
-    nickName: String = "Hello",
+    user: ChatMessageModel.User,
     nickNameColor: Color = Color_B3FB9304,
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         AsyncImage(
-            model = avatar,
+            model = user.avatar,
             modifier = Modifier
                 .size(30.dp)
                 .clip(CircleShape),
@@ -38,7 +38,7 @@ fun ChatUsrAvatarScreen(
         )
 
         Text(
-            text = nickName,
+            text = user.nickname,
             modifier = Modifier.padding(start = 10.dp),
             fontSize = 14.sp,
             color = nickNameColor
@@ -49,5 +49,8 @@ fun ChatUsrAvatarScreen(
 @Preview(showBackground = true)
 @Composable
 fun ChatUsrAvatarScreenPreview() {
-    ChatUsrAvatarScreen()
+    ChatUsrAvatarScreen(user = ChatMessageModel.User(
+        avatar = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
+        nickname = "Hello"
+    ))
 }

@@ -32,11 +32,13 @@ fun MessageIGScreen(
             .background(Black_181C23)
     ) {
         Column(modifier = Modifier
+            .width(230.dp)
             .padding(10.dp)) {
             AsyncImage(
                 model = thumbnail,
                 modifier = Modifier
-                    .size(230.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
                     .clip(RoundedCornerShape(6.dp)),
                 contentScale = ContentScale.Crop,
                 contentDescription = null,

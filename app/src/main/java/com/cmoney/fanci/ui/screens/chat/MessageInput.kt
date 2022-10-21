@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.screens.shared.ChannelBar
 import com.cmoney.fanci.ui.theme.Black_202327
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.White_494D54
@@ -26,7 +27,9 @@ import com.cmoney.fanci.ui.theme.White_494D54
  * 聊天室 輸入匡
  */
 @Composable
-fun MessageInput() {
+fun MessageInput(
+    onMessageSend: (text: String) -> Unit
+) {
     val inputValue = remember { mutableStateOf(TextFieldValue()) }
 
     Row(
@@ -74,7 +77,10 @@ fun MessageInput() {
         )
 
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = {
+                onMessageSend.invoke(textState)
+                textState = ""
+            },
             modifier = Modifier
                 .padding(top = 10.dp, bottom = 10.dp, end = 16.dp)
                 .size(41.dp)
@@ -93,5 +99,7 @@ fun MessageInput() {
 @Preview(showBackground = true)
 @Composable
 fun MessageInputPreview() {
-    MessageInput()
+    MessageInput {
+
+    }
 }

@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,14 +26,19 @@ fun ChatRoomScreen(channelId: String?, navController: NavHostController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.Bottom
         ) {
+
+            var messageSend by remember { mutableStateOf("") }
+
             MessageScreen(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp, start = 24.dp, end = 24.dp)
+                    .padding(top = 10.dp, start = 24.dp, end = 24.dp, bottom = 5.dp)
                     .weight(1f)
             )
 
-            MessageInput()
+            MessageInput {
+                messageSend = it
+            }
         }
     }
 }

@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     val systemUiController = rememberSystemUiController()
-    val statusBarColor = MaterialTheme.colors.background
+    val statusBarColor = MaterialTheme.colors.primary
     SideEffect {
         systemUiController.setStatusBarColor(
             color = statusBarColor,

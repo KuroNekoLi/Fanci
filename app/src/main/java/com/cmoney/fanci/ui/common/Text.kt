@@ -9,6 +9,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.ui.theme.White_767A7F
+import com.cmoney.fanci.ui.theme.White_BBBCBF
 import com.cmoney.fanci.ui.theme.White_C7C7C7
 import com.cmoney.fanci.ui.theme.White_DDDEDF
 
@@ -91,6 +92,36 @@ fun EmojiText(text: String, modifier: Modifier = Modifier) {
         style = TextStyle(
             fontSize = 14.sp,
             color = White_C7C7C7
+        ),
+        modifier = modifier
+    )
+}
+
+/**
+ * 聊天 回覆 title
+ */
+@Composable
+fun ReplyTitleText(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = TextStyle(
+            fontSize = 12.sp,
+            color = White_BBBCBF
+        ),
+        modifier = modifier
+    )
+}
+
+/**
+ * 聊天 回覆 content
+ */
+@Composable
+fun ReplyText(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = TextStyle(
+            fontSize = 14.sp,
+            color = White_BBBCBF
         ),
         modifier = modifier
     )
