@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.MainScreen
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
 import com.cmoney.fanci.model.MainTab
 import com.cmoney.fanci.model.mainTabItems
@@ -28,31 +29,46 @@ class MainActions(navController: NavHostController) {
  * 決定頁面跳轉路徑
  */
 @Composable
-fun MyAppNavHost(
+fun MyAppNavHost(navController: NavHostController) {
+    val actions = remember(navController) { MainActions(navController) }
+
+    NavHost(
+        navController = navController,
+        startDestination = "main",
+        modifier = Modifier,
+    ) {
+        composable("main") {
+            MainScreen(actions)
+        }
+        //頻道頁面
+        composable("channel/{channelId}") { backStackEntry ->
+            val channelId = backStackEntry.arguments?.getString("channelId")
+            ChatRoomScreen(channelId, navController)
+        }
+    }
+}
+
+/**
+ * Tab 路徑
+ */
+@Composable
+fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    actions: MainActions,
     startDestination: MainTab = MainTab.FOLLOW
 ) {
     //test
     var pos by remember { mutableStateOf(0) }
-
-    val actions = remember(navController) { MainActions(navController) }
 
     NavHost(
         navController = navController,
         startDestination = startDestination.route,
         modifier = modifier,
     ) {
-        //test
-        composable("channel/{channelId}") { backStackEntry ->
-            val channelId = backStackEntry.arguments?.getString("channelId")
-            ChatRoomScreen(channelId, navController)
-        }
-
         composable("profile") { backStackEntry ->
 
         }
-
 
         mainTabItems.forEach { mainTab ->
             when (mainTab) {

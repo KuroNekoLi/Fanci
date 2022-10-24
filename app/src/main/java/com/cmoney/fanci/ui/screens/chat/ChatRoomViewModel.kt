@@ -244,7 +244,7 @@ class ChatRoomViewModel : ViewModel() {
         )
     }
 
-    fun replyMessage(message: ChatMessageModel?) {
+    fun replyMessage(message: ChatMessageModel) {
         KLog.i(TAG, "replyMessage click:$message")
 
         val orgList = _message.value.orEmpty().toMutableList()

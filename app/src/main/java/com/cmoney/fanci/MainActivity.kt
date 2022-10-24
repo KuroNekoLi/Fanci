@@ -13,7 +13,9 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.ui.MainActions
 import com.cmoney.fanci.ui.MyAppNavHost
+import com.cmoney.fanci.ui.MainNavHost
 import com.cmoney.fanci.ui.screens.BottomBarController
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -27,7 +29,7 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background,
                 ) {
-                    MainScreen()
+                    MyAppNavHost(rememberNavController())
                 }
             }
         }
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(mainAction: MainActions) {
     val navController = rememberNavController()
     val systemUiController = rememberSystemUiController()
     val statusBarColor = MaterialTheme.colors.primary
@@ -51,9 +53,10 @@ fun MainScreen() {
             BottomBarController(navController)
         }
     ) { innerPadding ->
-        MyAppNavHost(
+        MainNavHost(
             navController = navController,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            actions = mainAction
         )
     }
 }
@@ -61,5 +64,5 @@ fun MainScreen() {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    MainScreen()
+    MainScreen(MainActions(rememberNavController()))
 }

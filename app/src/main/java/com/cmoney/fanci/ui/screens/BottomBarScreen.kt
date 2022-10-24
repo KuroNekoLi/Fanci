@@ -40,9 +40,9 @@ fun BottomBarController(navController: NavHostController) {
         else -> false
     }
 
-    if (showBottomBar) {
+//    if (showBottomBar) {
         BottomBar(navController)
-    }
+//    }
 
 //    AnimatedVisibility(
 //        visible = showBottomBar,
