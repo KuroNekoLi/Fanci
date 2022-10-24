@@ -5,14 +5,21 @@ import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
+import com.cmoney.fanci.ui.screens.shared.bottomSheet.InteractBottomSheet
 
-fun Activity.showInteractDialogBottomSheet() {
+/**
+ * Show 聊天室 互動彈窗
+ */
+fun Activity.showInteractDialogBottomSheet(message: ChatMessageModel, onReplyClick: () -> Unit) {
     val viewGroup = this.findViewById(android.R.id.content) as ViewGroup
     viewGroup.addView(
         ComposeView(viewGroup.context).apply {
             setContent {
-                BottomSheetWrapper(viewGroup, this)
+                InteractBottomSheet(viewGroup, this, message) {
+                    onReplyClick.invoke()
+                }
             }
         }
     )
@@ -43,7 +50,7 @@ private fun addContentToView(
     viewGroup.addView(
         ComposeView(viewGroup.context).apply {
             setContent {
-//                BottomSheetWrapper(wrapWithBottomSheetUI, viewGroup, this, content, onCloseEvent)
+                BottomSheetWrapper(wrapWithBottomSheetUI, viewGroup, this, content)
             }
         }
     )

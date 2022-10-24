@@ -42,13 +42,13 @@ fun MessageScreen(
             followCategoryList.value?.apply {
                 items(this) { message ->
                     MessageContentScreen(message) {
-                        showInteractDialog(activity, message)
+                        showInteractDialog(activity, message, viewModel)
                     }
                 }
             }
         }
 
-        LaunchedEffect(true) {
+        LaunchedEffect(followCategoryList.value?.size) {
             CoroutineScope(Dispatchers.Main).launch {
                 listState.scrollToItem(index = followCategoryList.value?.size ?: 0)
             }
@@ -59,10 +59,16 @@ fun MessageScreen(
 /**
  * 互動式 彈窗
  */
-fun showInteractDialog(activity: Activity, message: ChatMessageModel) {
+fun showInteractDialog(
+    activity: Activity,
+    message: ChatMessageModel,
+    viewModel: ChatRoomViewModel
+) {
     val TAG = "MessageScreen"
     KLog.i(TAG, "showInteractDialog:$message")
-    activity.showInteractDialogBottomSheet()
+    activity.showInteractDialogBottomSheet(message) {
+        viewModel.replyMessage(message)
+    }
 }
 
 @Preview(showBackground = true)

@@ -7,17 +7,18 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.shared.InteractDialogScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomSheetWrapper(
-    wrapWithBottomSheetUI: Boolean,
+fun InteractBottomSheet(
     parent: ViewGroup,
     composeView: ComposeView,
-    content: @Composable (() -> Unit) -> Unit
+    message: ChatMessageModel,
+    onReplyClick: () -> Unit
 ) {
     val TAG = parent::class.java.simpleName
     val coroutineScope = rememberCoroutineScope()
@@ -34,16 +35,7 @@ fun BottomSheetWrapper(
         sheetBackgroundColor = Color.Transparent,
         sheetState = modalBottomSheetState,
         sheetContent = {
-            when {
-                wrapWithBottomSheetUI -> {
-                    BottomSheetUIWrapper(coroutineScope, modalBottomSheetState) { content {
-                        animateHideBottomSheet(coroutineScope, modalBottomSheetState)
-                    } }
-                }
-                else -> content {
-                    animateHideBottomSheet(coroutineScope, modalBottomSheetState)
-                }
-            }
+            InteractDialogScreen(coroutineScope, modalBottomSheetState, onReplyClick)
         }
     ) {}
 

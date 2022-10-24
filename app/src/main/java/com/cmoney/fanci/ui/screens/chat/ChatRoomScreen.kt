@@ -8,12 +8,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.theme.FanciTheme
 
 @Composable
-fun ChatRoomScreen(channelId: String?, navController: NavHostController) {
+fun ChatRoomScreen(
+    channelId: String?, navController: NavHostController,
+    viewModel: ChatRoomViewModel = viewModel()
+) {
     Scaffold(
         topBar = {
             ChatRoomTopBarScreen(navController)
@@ -38,6 +42,7 @@ fun ChatRoomScreen(channelId: String?, navController: NavHostController) {
 
             MessageInput {
                 messageSend = it
+                viewModel.messageInput(it)
             }
         }
     }

@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
+import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
 class ChatRoomViewModel : ViewModel() {
+    private val TAG = ChatRoomViewModel::class.java.simpleName
 
     private val _message = MutableLiveData<List<ChatMessageModel>>()
     val message: LiveData<List<ChatMessageModel>> = _message
@@ -240,6 +242,54 @@ class ChatRoomViewModel : ViewModel() {
                 )
             ),
         )
+    }
+
+    fun replyMessage(message: ChatMessageModel?) {
+        KLog.i(TAG, "replyMessage click:$message")
+
+        val orgList = _message.value.orEmpty().toMutableList()
+        orgList.add(
+            ChatMessageModel(
+                poster = ChatMessageModel.User(
+                    avatar = "https://picsum.photos/102/102",
+                    nickname = "TIGER"
+                ),
+                publishTime = 1666234733000,
+                message = ChatMessageModel.Message(
+                    reply = null,
+                    text = "純文字Reply",
+                    media = null,
+                    emoji = null
+                )
+            ),
+        )
+
+        _message.value = orgList
+    }
+
+    /**
+     * 輸入文字
+     */
+    fun messageInput(text: String) {
+        if (text.isNotEmpty()) {
+            val orgList = _message.value.orEmpty().toMutableList()
+            orgList.add(
+                ChatMessageModel(
+                    poster = ChatMessageModel.User(
+                        avatar = "https://picsum.photos/102/102",
+                        nickname = "TIGER"
+                    ),
+                    publishTime = System.currentTimeMillis(),
+                    message = ChatMessageModel.Message(
+                        reply = null,
+                        text = text,
+                        media = null,
+                        emoji = null
+                    )
+                ),
+            )
+            _message.value = orgList
+        }
     }
 
 }
