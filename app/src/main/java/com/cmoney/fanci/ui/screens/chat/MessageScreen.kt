@@ -1,6 +1,6 @@
 package com.cmoney.fanci.ui.screens.chat
 
-import androidx.compose.foundation.layout.Arrangement
+import android.app.Activity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,10 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cmoney.fanci.extension.showInteractDialogBottomSheet
+import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,14 +34,16 @@ fun MessageScreen(
         color = MaterialTheme.colors.surface,
         modifier = modifier,
     ) {
+        val activity = LocalContext.current as Activity
         val followCategoryList = viewModel.message.observeAsState()
-
         val listState = rememberLazyListState()
 
         LazyColumn(state = listState) {
             followCategoryList.value?.apply {
                 items(this) { message ->
-                    MessageContentScreen(message)
+                    MessageContentScreen(message) {
+                        showInteractDialog(activity, message)
+                    }
                 }
             }
         }
@@ -49,6 +54,15 @@ fun MessageScreen(
             }
         }
     }
+}
+
+/**
+ * 互動式 彈窗
+ */
+fun showInteractDialog(activity: Activity, message: ChatMessageModel) {
+    val TAG = "MessageScreen"
+    KLog.i(TAG, "showInteractDialog:$message")
+    activity.showInteractDialogBottomSheet()
 }
 
 @Preview(showBackground = true)

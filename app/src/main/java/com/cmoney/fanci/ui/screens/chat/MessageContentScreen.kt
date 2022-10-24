@@ -7,7 +7,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,16 +19,23 @@ import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.White_494D54
 import com.google.accompanist.flowlayout.FlowRow
-import com.socks.library.KLog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * 聊天內容
  */
 @Composable
-fun MessageContentScreen(messageModel: ChatMessageModel, modifier: Modifier = Modifier) {
+fun MessageContentScreen(
+    messageModel: ChatMessageModel,
+    modifier: Modifier = Modifier,
+    onMsgLongClick: () -> Unit
+) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 40.dp)
     val defaultColor = MaterialTheme.colors.surface
+    var longTap by remember { mutableStateOf(false) }
     var backgroundColor by remember { mutableStateOf(defaultColor) }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = modifier
         .fillMaxWidth()
@@ -38,11 +44,18 @@ fun MessageContentScreen(messageModel: ChatMessageModel, modifier: Modifier = Mo
             detectTapGestures(
                 onPress = {
                     tryAwaitRelease()
+                    longTap = false
                     backgroundColor = defaultColor
                 },
                 onLongPress = {
+                    longTap = true
                     backgroundColor = White_494D54
-                    // TODO:
+                    coroutineScope.launch {
+                        delay(300)
+                        if (longTap) {
+                            onMsgLongClick.invoke()
+                        }
+                    }
                 }
             )
         }) {
@@ -197,6 +210,8 @@ fun MessageContentScreenPreview() {
                     )
                 )
             )
-        )
+        ) {
+
+        }
     }
 }
