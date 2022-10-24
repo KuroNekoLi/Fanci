@@ -1,16 +1,11 @@
 package com.cmoney.fanci.ui.screens.chat
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.common.ChatMessageText
@@ -19,6 +14,9 @@ import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
 import com.google.accompanist.flowlayout.FlowRow
 
+/**
+ * 聊天內容
+ */
 @Composable
 fun MessageContentScreen(messageModel: ChatMessageModel) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 40.dp)
@@ -69,18 +67,9 @@ fun MessageContentScreen(messageModel: ChatMessageModel) {
                     )
                 }
                 is ChatMessageModel.Media.Image -> {
-                    // TODO: 調整成N張圖片, 縮成一張
-                    AsyncImage(
-                        model = mediaContent.image.first(),
-                        modifier = Modifier
-                            .padding(start = 40.dp, top = 10.dp)
-                            .size(205.dp)
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(10.dp)),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        alignment = Alignment.TopCenter,
-                        placeholder = painterResource(id = R.drawable.resource_default)
+                    MessageImageScreen(
+                        images = mediaContent.image,
+                        modifier = Modifier.padding(start = 40.dp, top = 10.dp)
                     )
                 }
             }

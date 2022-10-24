@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- *
+ * 聊天室 區塊
  */
 @Composable
 fun MessageScreen(
