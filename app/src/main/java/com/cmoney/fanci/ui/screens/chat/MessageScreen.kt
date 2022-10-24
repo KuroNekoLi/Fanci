@@ -35,7 +35,7 @@ fun MessageScreen(
 
         val listState = rememberLazyListState()
 
-        LazyColumn(state = listState, verticalArrangement = Arrangement.spacedBy(25.dp)) {
+        LazyColumn(state = listState) {
             followCategoryList.value?.apply {
                 items(this) { message ->
                     MessageContentScreen(message)

@@ -32,7 +32,7 @@ fun ChatRoomScreen(channelId: String?, navController: NavHostController) {
             MessageScreen(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp, start = 24.dp, end = 24.dp, bottom = 5.dp)
+                    .padding(bottom = 5.dp)
                     .weight(1f)
             )
 
