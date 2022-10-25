@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cmoney.fanci.extension.findActivity
 import com.cmoney.fanci.extension.showInteractDialogBottomSheet
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -34,7 +35,7 @@ fun MessageScreen(
         color = MaterialTheme.colors.surface,
         modifier = modifier,
     ) {
-        val activity = LocalContext.current as Activity
+        val context = LocalContext.current
         val followCategoryList = viewModel.message.observeAsState()
         val listState = rememberLazyListState()
 
@@ -42,7 +43,7 @@ fun MessageScreen(
             followCategoryList.value?.apply {
                 items(this) { message ->
                     MessageContentScreen(message) {
-                        showInteractDialog(activity, message, viewModel)
+                        showInteractDialog(context.findActivity(), message, viewModel)
                     }
                 }
             }

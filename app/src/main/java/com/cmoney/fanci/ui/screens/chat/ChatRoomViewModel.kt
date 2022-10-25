@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.chat
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,9 @@ class ChatRoomViewModel : ViewModel() {
 
     private val _message = MutableLiveData<List<ChatMessageModel>>()
     val message: LiveData<List<ChatMessageModel>> = _message
+
+    private val _imageAttach = MutableLiveData<List<Uri>>()
+    val imageAttach: LiveData<List<Uri>> = _imageAttach
 
     init {
         viewModelScope.launch {
@@ -289,6 +293,27 @@ class ChatRoomViewModel : ViewModel() {
                 ),
             )
             _message.value = orgList
+        }
+    }
+
+    /**
+     * 回覆 附加 圖片
+     */
+    fun attachImage(uri: Uri) {
+        KLog.i(TAG, "attachImage:$uri")
+        val imageList = _imageAttach.value.orEmpty().toMutableList()
+        imageList.add(uri)
+        _imageAttach.value = imageList
+    }
+
+    /**
+     * 移除 附加 圖片
+     */
+    fun removeAttach(uri: Uri) {
+        KLog.i(TAG, "removeAttach:$uri")
+        val imageList = _imageAttach.value.orEmpty().toMutableList()
+        _imageAttach.value = imageList.filter {
+            it != uri
         }
     }
 

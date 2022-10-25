@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -78,7 +79,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.23.1"
     implementation "com.google.accompanist:accompanist-flowlayout:0.25.1"
-
+    implementation "com.google.accompanist:accompanist-permissions:0.27.0"
+    
     //==================== Coil ====================
     implementation("io.coil-kt:coil-compose:2.2.2")
 
@@ -100,7 +102,6 @@ dependencies {
 
     //=============== Flurry ===============
     implementation 'com.flurry.android:analytics:13.1.0'
-
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
