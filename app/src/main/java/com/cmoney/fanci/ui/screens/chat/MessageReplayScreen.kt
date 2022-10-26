@@ -18,8 +18,6 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 fun MessageReplayScreen(reply: ChatMessageModel.Reply, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(9.dp))
-            .background(Black_181C23)
     ) {
         Column(
             modifier = Modifier.padding(
@@ -44,7 +42,10 @@ fun MessageReplayScreenPreview() {
             ChatMessageModel.Reply(
                 replyUser = ChatMessageModel.User(avatar = "", nickname = "阿修羅"),
                 text = "內容內容內容內容內容內容"
-            )
+            ),
+            modifier = Modifier
+                .clip(RoundedCornerShape(9.dp))
+                .background(Black_181C23)
         )
     }
 }

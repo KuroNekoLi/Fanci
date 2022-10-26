@@ -3,10 +3,12 @@ package com.cmoney.fanci.ui.screens.chat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -16,6 +18,7 @@ import com.cmoney.fanci.ui.common.ChatMessageText
 import com.cmoney.fanci.ui.common.ChatTimeText
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
+import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.White_494D54
 import com.google.accompanist.flowlayout.FlowRow
@@ -73,7 +76,11 @@ fun MessageContentScreen(
             }
             //Reply
             messageModel.message.reply?.apply {
-                MessageReplayScreen(this, modifier = contentPaddingModifier)
+                MessageReplayScreen(
+                    this, modifier = contentPaddingModifier
+                        .clip(RoundedCornerShape(9.dp))
+                        .background(Black_181C23)
+                )
             }
 
             //內文

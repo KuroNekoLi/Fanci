@@ -14,10 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cmoney.fanci.R
-import com.cmoney.fanci.model.ChatMessageModel
-import com.cmoney.fanci.ui.screens.chat.ChatRoomViewModel
 import com.cmoney.fanci.ui.theme.Black_14171C
 import com.cmoney.fanci.ui.theme.Black_1B2129
 import com.cmoney.fanci.ui.theme.White_BBBCBF

@@ -18,27 +18,22 @@ import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.socks.library.KLog
 
-
-class MainActions(navController: NavHostController) {
-    val channelPage: (String) -> Unit = { url ->
-        navController.navigate("channel/$url")
-    }
-}
-
 /**
  * 決定頁面跳轉路徑
  */
 @Composable
-fun MyAppNavHost(navController: NavHostController) {
-    val actions = remember(navController) { MainActions(navController) }
-
+fun MyAppNavHost(
+    navController: NavHostController,
+    mainNavController: NavHostController,
+    channelPage: (String) -> Unit
+) {
     NavHost(
         navController = navController,
         startDestination = "main",
         modifier = Modifier,
     ) {
         composable("main") {
-            MainScreen(actions)
+            MainScreen(mainNavController, channelPage)
         }
         //頻道頁面
         composable("channel/{channelId}") { backStackEntry ->
@@ -55,8 +50,8 @@ fun MyAppNavHost(navController: NavHostController) {
 fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    actions: MainActions,
-    startDestination: MainTab = MainTab.FOLLOW
+    startDestination: MainTab = MainTab.FOLLOW,
+    channelPage: (String) -> Unit
 ) {
     //test
     var pos by remember { mutableStateOf(0) }
@@ -82,7 +77,7 @@ fun MainNavHost(
                     composable(MainTab.FOLLOW.route) {
                         FollowScreen {
                             KLog.i("Warren", "click callback.")
-                            actions.channelPage("123")
+                            channelPage("123")
                         }
                     }
                 }

@@ -1,8 +1,5 @@
 package com.cmoney.fanci.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -28,6 +25,7 @@ import com.cmoney.fanci.ui.theme.White_494D54
 /**
  * 根據不同 Route 決定BottomBar 是否出現
  */
+@Deprecated("no used.")
 @Composable
 fun BottomBarController(navController: NavHostController) {
     var showBottomBar by rememberSaveable { mutableStateOf(true) }
@@ -40,9 +38,7 @@ fun BottomBarController(navController: NavHostController) {
         else -> false
     }
 
-//    if (showBottomBar) {
-        BottomBar(navController)
-//    }
+    BottomBarScreen(navController)
 
 //    AnimatedVisibility(
 //        visible = showBottomBar,
@@ -54,7 +50,7 @@ fun BottomBarController(navController: NavHostController) {
 }
 
 @Composable
-fun BottomBar(navController: NavHostController) {
+fun BottomBarScreen(navController: NavHostController) {
     Column {
         Spacer(
             modifier = Modifier
@@ -104,6 +100,5 @@ fun BottomBar(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun BottomBarPreview() {
-    val navController = rememberNavController()
-    BottomBar(navController)
+    BottomBarScreen(rememberNavController())
 }

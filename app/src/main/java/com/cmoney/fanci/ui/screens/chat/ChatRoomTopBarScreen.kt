@@ -24,7 +24,7 @@ import com.cmoney.fanci.ui.screens.shared.CenterTopAppBar
 import com.socks.library.KLog
 
 @Composable
-fun ChatRoomTopBarScreen(navController: NavHostController) {
+fun ChatRoomTopBarScreen(navController: NavHostController, moreClick: () -> Unit) {
     val TAG = "ChatRoomTopBarScreen"
     CenterTopAppBar(
         leading = {
@@ -44,6 +44,7 @@ fun ChatRoomTopBarScreen(navController: NavHostController) {
                     .padding(end = 16.dp)
                     .clickable {
                         KLog.i(TAG, "more click")
+                        moreClick.invoke()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -56,5 +57,7 @@ fun ChatRoomTopBarScreen(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun ChatRoomTopBarScreenPreview() {
-    ChatRoomTopBarScreen(rememberNavController())
+    ChatRoomTopBarScreen(rememberNavController()){
+
+    }
 }

@@ -42,7 +42,8 @@ import java.io.File
  */
 @Composable
 fun MessageInput(
-    onMessageSend: (text: String) -> Unit
+    onMessageSend: (text: String) -> Unit,
+    onAttach: (Uri) -> Unit
 ) {
     val openDialog = remember { mutableStateOf(false) }
 
@@ -115,7 +116,9 @@ fun MessageInput(
     if (openDialog.value) {
         chooseImagePickDialog(onDismiss = {
             openDialog.value = false
-        })
+        }) {
+            onAttach.invoke(it)
+        }
     }
 }
 
@@ -126,7 +129,7 @@ fun MessageInput(
 @Composable
 private fun chooseImagePickDialog(
     onDismiss: () -> Unit,
-    viewModel: ChatRoomViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    onAttach: (Uri) -> Unit,
 ) {
     val TAG = "chooseImagePickDialog"
 
@@ -140,7 +143,7 @@ private fun chooseImagePickDialog(
             if (it.resultCode == Activity.RESULT_OK) {
                 it.data?.data?.let { uri ->
                     KLog.i(TAG, "get uri:$uri")
-                    viewModel.attachImage(uri)
+                    onAttach.invoke(uri)
                     onDismiss.invoke()
                 }
             }
@@ -151,7 +154,7 @@ private fun chooseImagePickDialog(
             if (it.resultCode == Activity.RESULT_OK) {
                 captureUri?.let { uri ->
                     KLog.i(TAG, "get uri:$uri")
-                    viewModel.attachImage(uri)
+                    onAttach.invoke(uri)
                     onDismiss.invoke()
                 }
             }
@@ -224,7 +227,5 @@ private fun getCaptureUri(context: Context): Uri {
 @Preview(showBackground = true)
 @Composable
 fun MessageInputPreview() {
-    MessageInput {
-
-    }
+    MessageInput({},{})
 }

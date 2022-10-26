@@ -98,7 +98,7 @@ fun EmojiText(text: String, modifier: Modifier = Modifier) {
 }
 
 /**
- * 聊天 回覆 title
+ * 聊天 回覆 content title
  */
 @Composable
 fun ReplyTitleText(text: String, modifier: Modifier = Modifier) {
@@ -124,5 +124,39 @@ fun ReplyText(text: String, modifier: Modifier = Modifier) {
             color = White_BBBCBF
         ),
         modifier = modifier
+    )
+}
+
+/**
+ * 聊天 回覆 title
+ */
+@Composable
+fun ReplyChatTitleText(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = TextStyle(
+            fontSize = 12.sp,
+            color = Color.White
+        ),
+        modifier = modifier,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+/**
+ * 聊天 回覆
+ */
+@Composable
+fun ReplyChatText(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = TextStyle(
+            fontSize = 14.sp,
+            color = Color.White
+        ),
+        modifier = modifier,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
     )
 }

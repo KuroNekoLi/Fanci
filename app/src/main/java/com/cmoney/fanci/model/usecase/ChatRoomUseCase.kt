@@ -1,31 +1,11 @@
-package com.cmoney.fanci.ui.screens.chat
+package com.cmoney.fanci.model.usecase
 
-import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
-import com.socks.library.KLog
-import kotlinx.coroutines.launch
 
-class ChatRoomViewModel : ViewModel() {
-    private val TAG = ChatRoomViewModel::class.java.simpleName
+class ChatRoomUseCase {
 
-    private val _message = MutableLiveData<List<ChatMessageModel>>()
-    val message: LiveData<List<ChatMessageModel>> = _message
-
-    private val _imageAttach = MutableLiveData<List<Uri>>()
-    val imageAttach: LiveData<List<Uri>> = _imageAttach
-
-    init {
-        viewModelScope.launch {
-            _message.value = createMockMessage()
-        }
-    }
-
-    private fun createMockMessage(): List<ChatMessageModel> {
+    fun createMockMessage(): List<ChatMessageModel> {
         return listOf(
             ChatMessageModel(
                 poster = ChatMessageModel.User(
@@ -246,75 +226,6 @@ class ChatRoomViewModel : ViewModel() {
                 )
             ),
         )
-    }
-
-    fun replyMessage(message: ChatMessageModel) {
-        KLog.i(TAG, "replyMessage click:$message")
-
-        val orgList = _message.value.orEmpty().toMutableList()
-        orgList.add(
-            ChatMessageModel(
-                poster = ChatMessageModel.User(
-                    avatar = "https://picsum.photos/102/102",
-                    nickname = "TIGER"
-                ),
-                publishTime = 1666234733000,
-                message = ChatMessageModel.Message(
-                    reply = null,
-                    text = "純文字Reply",
-                    media = null,
-                    emoji = null
-                )
-            ),
-        )
-
-        _message.value = orgList
-    }
-
-    /**
-     * 輸入文字
-     */
-    fun messageInput(text: String) {
-        if (text.isNotEmpty()) {
-            val orgList = _message.value.orEmpty().toMutableList()
-            orgList.add(
-                ChatMessageModel(
-                    poster = ChatMessageModel.User(
-                        avatar = "https://picsum.photos/102/102",
-                        nickname = "TIGER"
-                    ),
-                    publishTime = System.currentTimeMillis(),
-                    message = ChatMessageModel.Message(
-                        reply = null,
-                        text = text,
-                        media = null,
-                        emoji = null
-                    )
-                ),
-            )
-            _message.value = orgList
-        }
-    }
-
-    /**
-     * 回覆 附加 圖片
-     */
-    fun attachImage(uri: Uri) {
-        KLog.i(TAG, "attachImage:$uri")
-        val imageList = _imageAttach.value.orEmpty().toMutableList()
-        imageList.add(uri)
-        _imageAttach.value = imageList
-    }
-
-    /**
-     * 移除 附加 圖片
-     */
-    fun removeAttach(uri: Uri) {
-        KLog.i(TAG, "removeAttach:$uri")
-        val imageList = _imageAttach.value.orEmpty().toMutableList()
-        _imageAttach.value = imageList.filter {
-            it != uri
-        }
     }
 
 }
