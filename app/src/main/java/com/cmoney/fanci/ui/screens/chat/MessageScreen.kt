@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,6 +18,7 @@ import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.findActivity
 import com.cmoney.fanci.extension.showInteractDialogBottomSheet
 import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +33,8 @@ fun MessageScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     listState: LazyListState = rememberLazyListState(),
     message: List<ChatMessageModel>,
-    onReply: (ChatMessageModel) -> Unit
+    coroutineScope: CoroutineScope,
+    onInteractClick: (MessageInteract) -> Unit
 ) {
     Surface(
         color = MaterialTheme.colors.surface,
@@ -41,10 +44,10 @@ fun MessageScreen(
         LazyColumn(state = listState) {
             if (message.isNotEmpty()) {
                 items(message) { message ->
-                    MessageContentScreen(message) {
-                        showInteractDialog(context.findActivity(), message) {
-                            onReply.invoke(it)
-                        }
+                    MessageContentScreen(
+                        messageModel = message,
+                        coroutineScope = coroutineScope) {
+                        showInteractDialog(context.findActivity(), message, onInteractClick)
                     }
                 }
             }
@@ -64,13 +67,11 @@ fun MessageScreen(
 fun showInteractDialog(
     activity: Activity,
     message: ChatMessageModel,
-    onReply: (ChatMessageModel) -> Unit
+    onInteractClick: (MessageInteract) -> Unit
 ) {
     val TAG = "MessageScreen"
     KLog.i(TAG, "showInteractDialog:$message")
-    activity.showInteractDialogBottomSheet(message) {
-        onReply.invoke(message)
-    }
+    activity.showInteractDialogBottomSheet(message, onInteractClick)
 }
 
 @Preview(showBackground = true)
@@ -78,6 +79,7 @@ fun showInteractDialog(
 fun MessageScreenPreview() {
     FanciTheme {
         MessageScreen(
+            coroutineScope = rememberCoroutineScope(),
             message = listOf(
                 ChatMessageModel(
                     poster = ChatMessageModel.User(

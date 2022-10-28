@@ -1,6 +1,7 @@
 package com.cmoney.fanci.ui.screens.chat
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +23,8 @@ import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.White_494D54
 import com.google.accompanist.flowlayout.FlowRow
+import com.socks.library.KLog
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -32,18 +35,18 @@ import kotlinx.coroutines.launch
 fun MessageContentScreen(
     messageModel: ChatMessageModel,
     modifier: Modifier = Modifier,
-    onMsgLongClick: () -> Unit
+    coroutineScope: CoroutineScope,
+    onMsgLongClick: (ChatMessageModel) -> Unit,
 ) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 40.dp)
     val defaultColor = MaterialTheme.colors.surface
     var longTap by remember { mutableStateOf(false) }
     var backgroundColor by remember { mutableStateOf(defaultColor) }
-    val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = modifier
         .fillMaxWidth()
         .background(backgroundColor)
-        .pointerInput(Unit) {
+        .pointerInput(messageModel) {
             detectTapGestures(
                 onPress = {
                     tryAwaitRelease()
@@ -55,13 +58,14 @@ fun MessageContentScreen(
                     backgroundColor = White_494D54
                     coroutineScope.launch {
                         delay(300)
-                        if (longTap) {
-                            onMsgLongClick.invoke()
+                        if (longTap && !messageModel.message.isRecycle) {
+                            onMsgLongClick.invoke(messageModel)
                         }
                     }
                 }
             )
-        }) {
+        }
+    ) {
         Column(
             modifier = modifier
                 .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
@@ -74,69 +78,76 @@ fun MessageContentScreen(
                 //發文時間
                 ChatTimeText(messageModel.displayTime)
             }
-            //Reply
-            messageModel.message.reply?.apply {
-                MessageReplayScreen(
-                    this, modifier = contentPaddingModifier
-                        .clip(RoundedCornerShape(9.dp))
-                        .background(Black_181C23)
-                )
+
+            //收回
+            if (messageModel.message.isRecycle) {
+                MessageRecycleScreen(modifier = contentPaddingModifier)
             }
+            else {
+                //Reply
+                messageModel.message.reply?.apply {
+                    MessageReplayScreen(
+                        this, modifier = contentPaddingModifier
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(Black_181C23)
+                    )
+                }
 
-            //內文
-            ChatMessageText(
-                modifier = contentPaddingModifier,
-                text = messageModel.message.text
-            )
+                //內文
+                ChatMessageText(
+                    modifier = contentPaddingModifier,
+                    text = messageModel.message.text
+                )
 
-            messageModel.message.media?.forEach { mediaContent ->
-                when (mediaContent) {
-                    is ChatMessageModel.Media.Article -> {
-                        MessageArticleScreen(
-                            modifier = contentPaddingModifier,
-                            thumbnail = mediaContent.thumbnail,
-                            channel = mediaContent.from,
-                            title = mediaContent.title
-                        )
-                    }
-                    is ChatMessageModel.Media.Instagram -> {
-                        MessageIGScreen(
-                            modifier = contentPaddingModifier,
-                            thumbnail = mediaContent.thumbnail,
-                            channel = mediaContent.channel,
-                            title = mediaContent.title
-                        )
-                    }
-                    is ChatMessageModel.Media.Youtube -> {
-                        MessageYTScreen(
-                            modifier = contentPaddingModifier,
-                            thumbnail = mediaContent.thumbnail,
-                            channel = mediaContent.channel,
-                            title = mediaContent.title
-                        )
-                    }
-                    is ChatMessageModel.Media.Image -> {
-                        MessageImageScreen(
-                            images = mediaContent.image,
-                            modifier = Modifier.padding(start = 40.dp, top = 10.dp)
-                        )
+                messageModel.message.media?.forEach { mediaContent ->
+                    when (mediaContent) {
+                        is ChatMessageModel.Media.Article -> {
+                            MessageArticleScreen(
+                                modifier = contentPaddingModifier,
+                                thumbnail = mediaContent.thumbnail,
+                                channel = mediaContent.from,
+                                title = mediaContent.title
+                            )
+                        }
+                        is ChatMessageModel.Media.Instagram -> {
+                            MessageIGScreen(
+                                modifier = contentPaddingModifier,
+                                thumbnail = mediaContent.thumbnail,
+                                channel = mediaContent.channel,
+                                title = mediaContent.title
+                            )
+                        }
+                        is ChatMessageModel.Media.Youtube -> {
+                            MessageYTScreen(
+                                modifier = contentPaddingModifier,
+                                thumbnail = mediaContent.thumbnail,
+                                channel = mediaContent.channel,
+                                title = mediaContent.title
+                            )
+                        }
+                        is ChatMessageModel.Media.Image -> {
+                            MessageImageScreen(
+                                images = mediaContent.image,
+                                modifier = Modifier.padding(start = 40.dp, top = 10.dp)
+                            )
+                        }
                     }
                 }
-            }
 
-            //Emoji
-            messageModel.message.emoji?.apply {
-                FlowRow(
-                    modifier = contentPaddingModifier.fillMaxWidth(),
-                    crossAxisSpacing = 10.dp
-                ) {
-                    this.forEach { emoji ->
-                        EmojiCountScreen(
-                            modifier = Modifier
-                                .padding(end = 10.dp),
-                            emojiResource = emoji.resource,
-                            countText = emoji.count.toString()
-                        )
+                //Emoji
+                messageModel.message.emoji?.apply {
+                    FlowRow(
+                        modifier = contentPaddingModifier.fillMaxWidth(),
+                        crossAxisSpacing = 10.dp
+                    ) {
+                        this.forEach { emoji ->
+                            EmojiCountScreen(
+                                modifier = Modifier
+                                    .padding(end = 10.dp),
+                                emojiResource = emoji.resource,
+                                countText = emoji.count.toString()
+                            )
+                        }
                     }
                 }
             }
@@ -149,13 +160,15 @@ fun MessageContentScreen(
 fun MessageContentScreenPreview() {
     FanciTheme {
         MessageContentScreen(
-            ChatMessageModel(
+            coroutineScope = rememberCoroutineScope(),
+            messageModel = ChatMessageModel(
                 poster = ChatMessageModel.User(
                     avatar = "https://picsum.photos/100/100",
                     nickname = "Warren"
                 ),
                 publishTime = 1666334733,
                 message = ChatMessageModel.Message(
+                    isRecycle = false,
                     reply = ChatMessageModel.Reply(
                         replyUser = ChatMessageModel.User(avatar = "", nickname = "阿修羅"),
                         text = "內容內容內容內容內容內容"

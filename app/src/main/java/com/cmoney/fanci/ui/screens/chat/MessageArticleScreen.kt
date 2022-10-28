@@ -59,6 +59,7 @@ fun MessageArticleScreen(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
         }
 
     }

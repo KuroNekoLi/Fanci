@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
+import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -33,7 +34,7 @@ class ChatRoomViewModel() : ViewModel() {
     /**
      * 點擊 回覆
      */
-    fun replyMessage(message: ChatMessageModel) {
+    private fun replyMessage(message: ChatMessageModel) {
         KLog.i(TAG, "replyMessage click:$message")
 
         uiState = uiState.copy(
@@ -103,6 +104,46 @@ class ChatRoomViewModel() : ViewModel() {
         KLog.i(TAG, "removeReply:$reply")
         uiState = uiState.copy(
             replyMessage = null
+        )
+    }
+
+    /**
+     * 點擊 互動彈窗
+     */
+    fun onInteractClick(messageInteract: MessageInteract) {
+        KLog.i(TAG, "onInteractClick:$messageInteract")
+        when (messageInteract) {
+            is MessageInteract.Announcement -> TODO()
+            is MessageInteract.Copy -> TODO()
+            is MessageInteract.Delete -> TODO()
+            is MessageInteract.HideUser -> TODO()
+            is MessageInteract.Recycle -> {
+                recycleMessage(messageInteract.message)
+            }
+            is MessageInteract.Reply -> replyMessage(messageInteract.message)
+            is MessageInteract.Report -> TODO()
+        }
+
+    }
+
+    /**
+     *  回收 訊息
+     */
+    private fun recycleMessage(message: ChatMessageModel) {
+        KLog.i(TAG, "recycleMessage:$message")
+        val orgMessage = uiState.message.toMutableList()
+        uiState = uiState.copy(
+            message = orgMessage.map { chatModel ->
+                if (chatModel == message) {
+                    chatModel.copy(
+                        message = chatModel.message.copy(
+                            isRecycle = true
+                        )
+                    )
+                } else {
+                    chatModel
+                }
+            }
         )
     }
 

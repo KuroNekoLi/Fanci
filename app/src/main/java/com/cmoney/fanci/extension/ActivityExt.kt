@@ -8,18 +8,21 @@ import androidx.fragment.app.Fragment
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.InteractBottomSheet
+import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 
 /**
  * Show 聊天室 互動彈窗
  */
-fun Activity.showInteractDialogBottomSheet(message: ChatMessageModel, onReplyClick: () -> Unit) {
+fun Activity.showInteractDialogBottomSheet(
+    message: ChatMessageModel,
+    onInteractClick: (MessageInteract) -> Unit
+) {
+    //todo remove issue
     val viewGroup = this.findViewById(android.R.id.content) as ViewGroup
     viewGroup.addView(
         ComposeView(viewGroup.context).apply {
             setContent {
-                InteractBottomSheet(viewGroup, this, message) {
-                    onReplyClick.invoke()
-                }
+                InteractBottomSheet(viewGroup, this, message, onInteractClick)
             }
         }
     )

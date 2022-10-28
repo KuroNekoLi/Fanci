@@ -227,5 +227,8 @@ private fun getCaptureUri(context: Context): Uri {
 @Preview(showBackground = true)
 @Composable
 fun MessageInputPreview() {
-    MessageInput({},{})
+    MessageInput(
+        {},
+        {}
+    )
 }

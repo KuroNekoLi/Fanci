@@ -15,6 +15,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.Black_14171C
 import com.cmoney.fanci.ui.theme.Black_1B2129
 import com.cmoney.fanci.ui.theme.White_BBBCBF
@@ -27,7 +29,8 @@ import kotlinx.coroutines.launch
 fun InteractDialogScreen(
     coroutineScope: CoroutineScope,
     modalBottomSheetState: ModalBottomSheetState,
-    onReplyClick: () -> Unit
+    message: ChatMessageModel,
+    onInteractClick: (MessageInteract) -> Unit
 ) {
     val emojiLit = listOf(
         R.drawable.emoji_angry,
@@ -67,23 +70,37 @@ fun InteractDialogScreen(
 
             FeatureText(R.drawable.reply, "回覆") {
                 onClose(coroutineScope, modalBottomSheetState)
-                onReplyClick.invoke()
+                onInteractClick.invoke(MessageInteract.Reply(message))
+            }
+
+            FeatureText(R.drawable.recycle, "收回訊息") {
+                onClose(coroutineScope, modalBottomSheetState)
+                onInteractClick.invoke(MessageInteract.Recycle(message))
             }
 
             FeatureText(R.drawable.copy, "複製訊息") {
                 onClose(coroutineScope, modalBottomSheetState)
+                onInteractClick.invoke(MessageInteract.Copy(message))
             }
 
             FeatureText(R.drawable.top, "置頂訊息") {
                 onClose(coroutineScope, modalBottomSheetState)
+                onInteractClick.invoke(MessageInteract.Announcement(message))
             }
 
-            FeatureText(R.drawable.report, "檢舉") {
+            FeatureText(R.drawable.hide, "隱藏此用戶的所有內容") {
                 onClose(coroutineScope, modalBottomSheetState)
+                onInteractClick.invoke(MessageInteract.HideUser(message))
+            }
+
+            FeatureText(R.drawable.report, "向管理員檢舉此用戶") {
+                onClose(coroutineScope, modalBottomSheetState)
+                onInteractClick.invoke(MessageInteract.Report(message))
             }
 
             FeatureText(R.drawable.delete, "刪除訊息") {
                 onClose(coroutineScope, modalBottomSheetState)
+                onInteractClick.invoke(MessageInteract.Delete(message))
             }
         }
     }
@@ -153,8 +170,21 @@ fun InteractDialogScreenPreview() {
             confirmStateChange = {
                 it != ModalBottomSheetValue.HalfExpanded
             }
+        ),
+        message = ChatMessageModel(
+            poster = ChatMessageModel.User(
+                avatar = "https://picsum.photos/102/102",
+                nickname = "TIGER"
+            ),
+            publishTime = 1666234733000,
+            message = ChatMessageModel.Message(
+                reply = null,
+                text = "純文字",
+                media = null,
+                emoji = null
+            )
         )
-    ){
+    ) {
 
     }
 }

@@ -12,13 +12,40 @@ import com.cmoney.fanci.ui.screens.shared.InteractDialogScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+/**
+ * 互動 彈窗總類
+ */
+sealed class MessageInteract(message: ChatMessageModel) {
+    //回覆
+    data class Reply(val message: ChatMessageModel) : MessageInteract(message)
+
+    //收回
+    data class Recycle(val message: ChatMessageModel) : MessageInteract(message)
+
+    //複製
+    data class Copy(val message: ChatMessageModel) : MessageInteract(message)
+
+    //置頂
+    data class Announcement(val message: ChatMessageModel) : MessageInteract(message)
+
+    //隱藏用戶
+    data class HideUser(val message: ChatMessageModel) : MessageInteract(message)
+
+    //檢舉用戶
+    data class Report(val message: ChatMessageModel) : MessageInteract(message)
+
+    //刪除
+    data class Delete(val message: ChatMessageModel) : MessageInteract(message)
+}
+
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun InteractBottomSheet(
     parent: ViewGroup,
     composeView: ComposeView,
     message: ChatMessageModel,
-    onReplyClick: () -> Unit
+    onInteractClick: (MessageInteract) -> Unit
 ) {
     val TAG = parent::class.java.simpleName
     val coroutineScope = rememberCoroutineScope()
@@ -35,7 +62,7 @@ fun InteractBottomSheet(
         sheetBackgroundColor = Color.Transparent,
         sheetState = modalBottomSheetState,
         sheetContent = {
-            InteractDialogScreen(coroutineScope, modalBottomSheetState, onReplyClick)
+            InteractDialogScreen(coroutineScope, modalBottomSheetState, message, onInteractClick)
         }
     ) {}
 
