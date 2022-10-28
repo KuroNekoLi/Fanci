@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -104,6 +105,9 @@ dependencies {
     implementation 'com.flurry.android:analytics:13.1.0'
 
     implementation "androidx.work:work-runtime-ktx:2.7.1"
+
+    //=============== SnackBar ===============
+    implementation 'com.radusalagean:info-bar-compose:1.0.0'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

@@ -7,5 +7,5 @@ import org.koin.dsl.module
 
 val viewModule = module {
     viewModel { FollowViewModel() }
-    viewModel { ChatRoomViewModel() }
+    viewModel { ChatRoomViewModel(get()) }
 }

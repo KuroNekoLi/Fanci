@@ -11,9 +11,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainScreen
+import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
+import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.MainTab
 import com.cmoney.fanci.model.mainTabItems
+import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
 import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.socks.library.KLog
@@ -25,20 +28,34 @@ import com.socks.library.KLog
 fun MyAppNavHost(
     navController: NavHostController,
     mainNavController: NavHostController,
-    channelPage: (String) -> Unit
+    route: (MainStateHolder.Route) -> Unit
 ) {
     NavHost(
-        navController = navController,
+        navController = mainNavController,
         startDestination = "main",
         modifier = Modifier,
     ) {
         composable("main") {
-            MainScreen(mainNavController, channelPage)
+            MainScreen(navController, route)
         }
         //頻道頁面
         composable("channel/{channelId}") { backStackEntry ->
             val channelId = backStackEntry.arguments?.getString("channelId")
-            ChatRoomScreen(channelId, navController)
+            ChatRoomScreen(channelId, mainNavController, route)
+        }
+
+        //公告訊息
+        composable("announce") { backStackEntry ->
+            val message =
+                mainNavController.previousBackStackEntry?.savedStateHandle?.get<ChatMessageModel>("message")
+            message?.let {
+                AnnouncementScreen(
+                    navController = mainNavController,
+                    message = message,
+                    onConfirm = {
+
+                    })
+            }
         }
     }
 }
@@ -51,7 +68,7 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: MainTab = MainTab.FOLLOW,
-    channelPage: (String) -> Unit
+    route: (MainStateHolder.Route) -> Unit
 ) {
     //test
     var pos by remember { mutableStateOf(0) }
@@ -77,7 +94,7 @@ fun MainNavHost(
                     composable(MainTab.FOLLOW.route) {
                         FollowScreen {
                             KLog.i("Warren", "click callback.")
-                            channelPage("123")
+                            route.invoke(MainStateHolder.Route.Channel("123"))
                         }
                     }
                 }

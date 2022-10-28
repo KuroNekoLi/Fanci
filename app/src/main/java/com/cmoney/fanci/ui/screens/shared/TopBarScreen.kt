@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.chat
+package com.cmoney.fanci.ui.screens.shared
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,12 +20,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.common.BlueCircleDot
-import com.cmoney.fanci.ui.screens.shared.CenterTopAppBar
 import com.socks.library.KLog
 
 @Composable
-fun ChatRoomTopBarScreen(navController: NavHostController, moreClick: () -> Unit) {
-    val TAG = "ChatRoomTopBarScreen"
+fun TopBarScreen(
+    navController: NavHostController,
+    title: String,
+    moreEnable: Boolean,
+    moreClick: () -> Unit
+) {
+    val TAG = "TopBarScreen"
     CenterTopAppBar(
         leading = {
             IconButton(onClick = {
@@ -34,7 +38,7 @@ fun ChatRoomTopBarScreen(navController: NavHostController, moreClick: () -> Unit
                 Icon(Icons.Filled.ArrowBack, null)
             }
         },
-        title = { Text("\uD83D\uDC57｜金針菇穿什麼", fontSize = 17.sp, color = Color.White) },
+        title = { Text(title, fontSize = 17.sp, color = Color.White) },
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = Color.White,
         trailing = {
@@ -43,12 +47,16 @@ fun ChatRoomTopBarScreen(navController: NavHostController, moreClick: () -> Unit
                     .size(width = 35.dp, height = 35.dp)
                     .padding(end = 16.dp)
                     .clickable {
-                        KLog.i(TAG, "more click")
-                        moreClick.invoke()
+                        if (moreEnable) {
+                            KLog.i(TAG, "more click")
+                            moreClick.invoke()
+                        }
                     },
                 contentAlignment = Alignment.Center
             ) {
-                BlueCircleDot()
+                if (moreEnable) {
+                    BlueCircleDot()
+                }
             }
         }
     )
@@ -57,7 +65,11 @@ fun ChatRoomTopBarScreen(navController: NavHostController, moreClick: () -> Unit
 @Preview(showBackground = true)
 @Composable
 fun ChatRoomTopBarScreenPreview() {
-    ChatRoomTopBarScreen(rememberNavController()){
+    TopBarScreen(
+        rememberNavController(),
+        title = "Test",
+        moreEnable = false
+    ) {
 
     }
 }

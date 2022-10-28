@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
                     MyAppNavHost(
                         mainState.navController,
                         mainState.mainNavController,
-                        mainState.channelPage
+                        mainState.route
                     )
                 }
             }
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainScreen(
     mainNavController: NavHostController,
-    channelPage: (String) -> Unit
+    route: (MainStateHolder.Route) -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -53,7 +53,7 @@ fun MainScreen(
         MainNavHost(
             navController = mainNavController,
             modifier = Modifier.padding(innerPadding),
-            channelPage = channelPage
+            route = route
         )
     }
 }
