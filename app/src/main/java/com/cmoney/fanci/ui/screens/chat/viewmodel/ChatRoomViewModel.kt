@@ -27,7 +27,8 @@ data class ChatRoomUiState(
     val snackBarMessage: CustomMessage? = null,
     val announceMessage: ChatMessageModel? = null,
     val hideUserMessage: ChatMessageModel? = null,
-    val deleteMessage: ChatMessageModel? = null
+    val deleteMessage: ChatMessageModel? = null,
+    val reportUser: ChatMessageModel? = null
 )
 
 class ChatRoomViewModel(val context: Context) : ViewModel() {
@@ -135,8 +136,18 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
                 recycleMessage(messageInteract.message)
             }
             is MessageInteract.Reply -> replyMessage(messageInteract.message)
-            is MessageInteract.Report -> TODO()
+            is MessageInteract.Report -> reportUser(messageInteract.message)
         }
+    }
+
+    /**
+     * 檢舉 用戶
+     */
+    private fun reportUser(message: ChatMessageModel) {
+        KLog.i(TAG, "reportUser:$message")
+        uiState = uiState.copy(
+            reportUser = message
+        )
     }
 
     /**
@@ -268,6 +279,33 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
                 textString = "成功刪除訊息！",
                 textColor = Color.White,
                 iconRes = R.drawable.delete,
+                iconColor = White_767A7F,
+                backgroundColor = White_494D54
+            )
+        )
+    }
+
+    /**
+     * 關閉 檢舉用戶 彈窗
+     */
+    fun onReportUserDialogDismiss() {
+        uiState = uiState.copy(
+            reportUser = null
+        )
+    }
+
+    // TODO:
+    /**
+     * 檢舉 用戶
+     */
+    fun onReportUser(reason: String) {
+        KLog.i(TAG, "onReportUser:$reason")
+        uiState = uiState.copy(
+            reportUser = null,
+            snackBarMessage = CustomMessage(
+                textString = "檢舉成立！",
+                textColor = Color.White,
+                iconRes = R.drawable.report,
                 iconColor = White_767A7F,
                 backgroundColor = White_494D54
             )

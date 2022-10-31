@@ -124,7 +124,7 @@ fun DeleteMessageDialogScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun HideUserDialogScreenPreview() {
+fun DeleteMessageDialogScreenPreview() {
     DeleteMessageDialogScreen(
         ChatRoomUseCase.textType,
         onConfirm = {},

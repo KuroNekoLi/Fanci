@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.chat
+package com.cmoney.fanci.ui.screens.chat.dialog
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

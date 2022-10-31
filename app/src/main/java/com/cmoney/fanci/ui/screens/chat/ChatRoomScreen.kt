@@ -17,6 +17,8 @@ import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.viewmodel.ChatRoomViewModelFactory
 import com.cmoney.fanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
+import com.cmoney.fanci.ui.screens.chat.dialog.HideUserDialogScreen
+import com.cmoney.fanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.fanci.ui.screens.chat.state.rememberChatRoomState
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -114,12 +116,23 @@ fun ChatRoomScreen(
         }
 
         //Alert Dialog
+        //檢舉用戶
+        uiState.reportUser?.apply {
+            ReportUserDialogScreen(user = this.poster,
+                onConfirm = {
+                    viewModel.onReportUser(it)
+                }
+            ) {
+                viewModel.onReportUserDialogDismiss()
+            }
+        }
+
         //刪除訊息 彈窗
         uiState.deleteMessage?.apply {
             DeleteMessageDialogScreen(chatMessageModel = this,
-            onConfirm = {
-                viewModel.onDeleteClick(it)
-            }) {
+                onConfirm = {
+                    viewModel.onDeleteClick(it)
+                }) {
                 viewModel.onDeleteMessageDialogDismiss()
             }
         }
@@ -134,7 +147,9 @@ fun ChatRoomScreen(
         }
 
         //SnackBar
-        FanciSnackBarScreen(message = uiState.snackBarMessage) {
+        FanciSnackBarScreen(
+            modifier = Modifier.padding(bottom = 70.dp),
+            message = uiState.snackBarMessage) {
             viewModel.snackBarDismiss()
         }
 
