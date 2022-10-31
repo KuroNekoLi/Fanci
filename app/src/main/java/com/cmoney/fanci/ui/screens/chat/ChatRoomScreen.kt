@@ -11,8 +11,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainStateHolder
+import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.viewmodel.ChatRoomViewModelFactory
 import com.cmoney.fanci.ui.screens.chat.state.rememberChatRoomState
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
@@ -37,6 +39,11 @@ fun ChatRoomScreen(
 
     val stateHolder = rememberChatRoomState(navController = navController)
 
+    //Screen Callback like onActivityResult
+    val bundle = navController.currentBackStackEntryAsState().value
+
+    KLog.i(TAG, "bundle:$bundle")
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         scaffoldState = stateHolder.scaffoldState,
@@ -57,6 +64,20 @@ fun ChatRoomScreen(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.Bottom
         ) {
+            //公告訊息
+            bundle?.apply {
+                this.arguments?.apply {
+                    val announceModel = this.getParcelable<ChatMessageModel>(AnnounceBundleKey)
+                    announceModel?.apply {
+                        MessageAnnounceScreen(
+                            this,
+                            modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
+                        )
+                    }
+                }
+            }
+
+            //訊息 內文
             MessageScreen(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,16 +89,19 @@ fun ChatRoomScreen(
                 viewModel.onInteractClick(it)
             }
 
+            //回覆
             uiState.replyMessage?.apply {
                 ChatReplyScreen(this) {
                     viewModel.removeReply(it)
                 }
             }
 
+            //附加圖片
             MessageAttachImageScreen(uiState.imageAttach) {
                 viewModel.removeAttach(it)
             }
 
+            //輸入匡
             MessageInput(
                 onMessageSend = {
                     viewModel.messageInput(it)
@@ -86,6 +110,15 @@ fun ChatRoomScreen(
                     viewModel.attachImage(it)
                 }
             )
+        }
+
+        //Alert Dialog
+        uiState.hideUserMessage?.apply {
+            HideUserDialogScreen(
+                this.poster
+            ) {
+                viewModel.hideUserDialogDismiss()
+            }
         }
 
         //SnackBar

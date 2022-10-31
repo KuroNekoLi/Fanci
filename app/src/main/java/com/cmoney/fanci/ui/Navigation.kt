@@ -13,9 +13,11 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainScreen
 import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
+import com.cmoney.fanci.extension.goBackWithParams
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.MainTab
 import com.cmoney.fanci.model.mainTabItems
+import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
 import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
 import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
@@ -53,7 +55,10 @@ fun MyAppNavHost(
                     navController = mainNavController,
                     message = message,
                     onConfirm = {
-
+                        KLog.i("announce", "click:$it")
+                        mainNavController.goBackWithParams {
+                            putParcelable(AnnounceBundleKey, it)
+                        }
                     })
             }
         }

@@ -25,7 +25,8 @@ data class ChatRoomUiState(
     val replyMessage: ChatMessageModel.Reply? = null,
     val message: List<ChatMessageModel> = emptyList(),
     val snackBarMessage: CustomMessage? = null,
-    val announceMessage: ChatMessageModel? = null
+    val announceMessage: ChatMessageModel? = null,
+    val hideUserMessage: ChatMessageModel? = null
 )
 
 class ChatRoomViewModel(val context: Context) : ViewModel() {
@@ -128,7 +129,7 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
                 copyMessage(messageInteract.message)
             }
             is MessageInteract.Delete -> TODO()
-            is MessageInteract.HideUser -> TODO()
+            is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
             is MessageInteract.Recycle -> {
                 recycleMessage(messageInteract.message)
             }
@@ -136,6 +137,16 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
             is MessageInteract.Report -> TODO()
         }
 
+    }
+
+    /**
+     * 隱藏 用戶
+     */
+    private fun hideUserMessage(message: ChatMessageModel) {
+        KLog.i(TAG, "hideUserMessage:$message")
+        uiState = uiState.copy(
+            hideUserMessage = message
+        )
     }
 
     /**
@@ -212,6 +223,15 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
     fun routeDone() {
         uiState = uiState.copy(
             announceMessage = null
+        )
+    }
+
+    /**
+     * 關播 隱藏用戶彈窗
+     */
+    fun hideUserDialogDismiss() {
+        uiState = uiState.copy(
+            hideUserMessage = null
         )
     }
 }

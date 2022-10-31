@@ -20,6 +20,8 @@ import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.White_BBBCBF
 
+const val AnnounceBundleKey = "AnnounceBundleKey"
+
 /**
  * 設定 公告 訊息
  */
@@ -66,7 +68,7 @@ fun AnnouncementScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "這則訊息公告後，將會覆蓋上一則公告", color = White_BBBCBF, fontSize = 17.sp
+                        text = "這則訊息公告後，將會覆蓋上一則公告", color = White_BBBCBF, fontSize = 16.sp
                     )
 
                     Spacer(modifier = Modifier.height(17.dp))
