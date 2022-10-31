@@ -64,22 +64,46 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
     fun messageInput(text: String) {
         if (text.isNotEmpty()) {
             val orgList = uiState.message.toMutableList()
-            orgList.add(
-                ChatMessageModel(
-                    poster = ChatMessageModel.User(
-                        avatar = "https://picsum.photos/102/102",
-                        nickname = "TIGER"
+
+            //如果是回覆 訊息
+            uiState.replyMessage?.apply {
+                orgList.add(
+                    ChatMessageModel(
+                        poster = ChatMessageModel.User(
+                            avatar = "https://picsum.photos/110/110",
+                            nickname = "TIGER"
+                        ),
+                        publishTime = System.currentTimeMillis(),
+                        message = ChatMessageModel.Message(
+                            reply = ChatMessageModel.Reply(
+                                replyUser = this.replyUser,
+                                text = this.text
+                            ),
+                            text = text,
+                            media = null,
+                            emoji = null
+                        )
                     ),
-                    publishTime = System.currentTimeMillis(),
-                    message = ChatMessageModel.Message(
-                        reply = null,
-                        text = text,
-                        media = null,
-                        emoji = null
-                    )
-                ),
-            )
-            uiState = uiState.copy(message = orgList)
+                )
+            } ?: kotlin.run {
+                orgList.add(
+                    ChatMessageModel(
+                        poster = ChatMessageModel.User(
+                            avatar = "https://picsum.photos/110/110",
+                            nickname = "TIGER"
+                        ),
+                        publishTime = System.currentTimeMillis(),
+                        message = ChatMessageModel.Message(
+                            reply = null,
+                            text = text,
+                            media = null,
+                            emoji = null
+                        )
+                    ),
+                )
+            }
+
+            uiState = uiState.copy(message = orgList, replyMessage = null)
         }
     }
 

@@ -44,7 +44,7 @@ class ChatRoomUseCase {
     companion object MockData {
         val textType = ChatMessageModel(
             poster = ChatMessageModel.User(
-                avatar = "https://picsum.photos/102/102",
+                avatar = "https://picsum.photos/110/110",
                 nickname = "TIGER"
             ),
             publishTime = 1666234733000,
