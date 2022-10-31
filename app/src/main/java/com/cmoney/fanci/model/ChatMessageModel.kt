@@ -29,11 +29,12 @@ data class ChatMessageModel(
 
     @Parcelize
     data class Message(
-        val reply: Reply?,
+        val reply: Reply? = null,
         val text: String,               //內文
-        val media: List<Media>?,        //多媒體
-        val emoji: List<Emoji>?,        //Emoji List
-        val isRecycle: Boolean = false  //是否被回收
+        val media: List<Media>? = emptyList(),        //多媒體
+        val emoji: List<Emoji>? = emptyList(),        //Emoji List
+        val isRecycle: Boolean = false, //是否被回收
+        val isHideUser: Boolean = false //該用戶是否隱藏
     ): Parcelable
 
     /**

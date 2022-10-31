@@ -335,4 +335,55 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
             )
         )
     }
+
+    // TODO:
+    /**
+     * 確定 隱藏 用戶
+     */
+    fun onHideUserConfirm(user: ChatMessageModel.User) {
+        val message = uiState.message.toMutableList()
+        val newMessage = message.map { chatMessageModel ->
+            if (chatMessageModel.poster == user) {
+                val fixMessage = chatMessageModel.message.copy(
+                    isHideUser = true
+                )
+
+                chatMessageModel.copy(
+                    message = fixMessage,
+                )
+            } else {
+                chatMessageModel
+            }
+        }
+
+        uiState = uiState.copy(
+            message = newMessage,
+            hideUserMessage = null
+        )
+    }
+
+    /**
+     * 解除 隱藏 用戶
+     */
+    fun onMsgDismissHide(userModel: ChatMessageModel) {
+        val message = uiState.message.toMutableList()
+        val newMessage = message.map { chatMessageModel ->
+            if (chatMessageModel.poster == userModel.poster) {
+                val fixMessage = chatMessageModel.message.copy(
+                    isHideUser = false
+                )
+
+                chatMessageModel.copy(
+                    message = fixMessage,
+                )
+            } else {
+                chatMessageModel
+            }
+        }
+
+        uiState = uiState.copy(
+            message = newMessage,
+            hideUserMessage = null
+        )
+    }
 }

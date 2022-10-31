@@ -34,7 +34,8 @@ fun MessageScreen(
     listState: LazyListState = rememberLazyListState(),
     message: List<ChatMessageModel>,
     coroutineScope: CoroutineScope,
-    onInteractClick: (MessageInteract) -> Unit
+    onInteractClick: (MessageInteract) -> Unit,
+    onMsgDismissHide: (ChatMessageModel) -> Unit
 ) {
     Surface(
         color = MaterialTheme.colors.surface,
@@ -46,9 +47,14 @@ fun MessageScreen(
                 items(message) { message ->
                     MessageContentScreen(
                         messageModel = message,
-                        coroutineScope = coroutineScope) {
-                        showInteractDialog(context.findActivity(), message, onInteractClick)
-                    }
+                        coroutineScope = coroutineScope,
+                        onMsgLongClick = {
+                            showInteractDialog(context.findActivity(), message, onInteractClick)
+                        },
+                        onMsgDismissHide = {
+                            onMsgDismissHide.invoke(it)
+                        }
+                    )
                 }
             }
         }
@@ -82,7 +88,8 @@ fun MessageScreenPreview() {
             coroutineScope = rememberCoroutineScope(),
             message = listOf(
                 ChatRoomUseCase.allMessageType
-            )
+            ),
+            onInteractClick = {}
         ) {
 
         }

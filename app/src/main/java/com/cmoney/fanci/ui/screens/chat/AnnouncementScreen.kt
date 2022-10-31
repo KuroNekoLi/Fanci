@@ -52,7 +52,8 @@ fun AnnouncementScreen(
             MessageContentScreen(
                 modifier = Modifier
                     .weight(1f),
-                messageModel = message
+                messageModel = message,
+                onMsgLongClick = {}
             ) {
 
             }

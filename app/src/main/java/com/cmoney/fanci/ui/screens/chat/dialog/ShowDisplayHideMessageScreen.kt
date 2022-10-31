@@ -22,19 +22,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
-import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
-import com.cmoney.fanci.ui.theme.Black_181C23
-import com.cmoney.fanci.ui.theme.Color_CB4A4A
+import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.theme.White_262C34
 import com.cmoney.fanci.ui.theme.White_BBBCBF
 
-/**
- * 隱藏用戶 彈窗
- */
 @Composable
-fun HideUserDialogScreen(
-    user: ChatMessageModel.User,
-    onConfirm: (ChatMessageModel.User) -> Unit,
+fun ShowDisplayHideMessageScreen(
+    chatMessageModel: ChatMessageModel,
+    onConfirm: (ChatMessageModel) -> Unit,
     onDismiss: () -> Unit
 ) {
     val openDialog = remember { mutableStateOf(true) }
@@ -60,21 +55,7 @@ fun HideUserDialogScreen(
                             contentDescription = null
                         )
                         Spacer(modifier = Modifier.width(9.dp))
-                        Text(text = "隱藏此用戶的所有內容", fontSize = 19.sp, color = Color.White)
-                    }
-                    Spacer(modifier = Modifier.height(25.dp))
-                    Text(text = "該用戶在社團內發布的所有內容\n將會自動為你隱藏", fontSize = 17.sp, color = Color.White)
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(Black_181C23)
-                            .padding(start = 12.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        ChatUsrAvatarScreen(user)
+                        Text(text = "內容已自動為你隱藏", fontSize = 19.sp, color = Color.White)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
@@ -85,10 +66,8 @@ fun HideUserDialogScreen(
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color.Transparent
                         ),
-                        onClick = {
-                            onConfirm.invoke(user)
-                        }) {
-                        Text(text = "確定隱藏", fontSize = 16.sp, color = Color_CB4A4A)
+                        onClick = { onConfirm.invoke(chatMessageModel) }) {
+                        Text(text = "顯示訊息", fontSize = 16.sp, color = Color.White)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
@@ -103,7 +82,7 @@ fun HideUserDialogScreen(
                             openDialog.value = false
                             onDismiss.invoke()
                         }) {
-                        Text(text = "取消", fontSize = 16.sp, color = Color.White)
+                        Text(text = "返回", fontSize = 16.sp, color = Color.White)
                     }
                 }
             }
@@ -113,13 +92,10 @@ fun HideUserDialogScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun HideUserDialogScreenPreview() {
-    HideUserDialogScreen(
-        ChatMessageModel.User(
-            avatar = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
-            nickname = "Hello"
-        ),
+fun ShowDisplayHideMessageScreenPreview() {
+    ShowDisplayHideMessageScreen(
+        chatMessageModel = ChatRoomUseCase.allMessageType,
+        {},
         {}
-    ) {
-    }
+    )
 }

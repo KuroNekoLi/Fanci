@@ -87,10 +87,14 @@ fun ChatRoomScreen(
                     .padding(bottom = 5.dp)
                     .weight(1f),
                 message = uiState.message,
-                coroutineScope = stateHolder.scope
-            ) {
-                viewModel.onInteractClick(it)
-            }
+                coroutineScope = stateHolder.scope,
+                onInteractClick = {
+                    viewModel.onInteractClick(it)
+                },
+                onMsgDismissHide = {
+                    viewModel.onMsgDismissHide(it)
+                }
+            )
 
             //回覆
             uiState.replyMessage?.apply {
@@ -140,7 +144,10 @@ fun ChatRoomScreen(
         //隱藏用戶 彈窗
         uiState.hideUserMessage?.apply {
             HideUserDialogScreen(
-                this.poster
+                this.poster,
+                onConfirm = {
+                    viewModel.onHideUserConfirm(it)
+                }
             ) {
                 viewModel.onHideUserDialogDismiss()
             }
@@ -149,7 +156,8 @@ fun ChatRoomScreen(
         //SnackBar
         FanciSnackBarScreen(
             modifier = Modifier.padding(bottom = 70.dp),
-            message = uiState.snackBarMessage) {
+            message = uiState.snackBarMessage
+        ) {
             viewModel.snackBarDismiss()
         }
 

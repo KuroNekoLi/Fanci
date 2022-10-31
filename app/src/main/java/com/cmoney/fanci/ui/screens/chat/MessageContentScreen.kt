@@ -35,6 +35,7 @@ fun MessageContentScreen(
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onMsgLongClick: (ChatMessageModel) -> Unit,
+    onMsgDismissHide: (ChatMessageModel) -> Unit
 ) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 40.dp)
     val defaultColor = MaterialTheme.colors.surface
@@ -69,81 +70,89 @@ fun MessageContentScreen(
                 .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
                 .fillMaxWidth()
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                //大頭貼
-                ChatUsrAvatarScreen(messageModel.poster)
-                Spacer(modifier = Modifier.width(10.dp))
-                //發文時間
-                ChatTimeText(messageModel.displayTime)
-            }
-
-            //收回
-            if (messageModel.message.isRecycle) {
-                MessageRecycleScreen(modifier = contentPaddingModifier)
+            //隱藏用戶
+            if (messageModel.message.isHideUser) {
+                MessageHideUserScreen(chatMessageModel = messageModel){
+                    onMsgDismissHide.invoke(it)
+                }
             } else {
-                //Reply
-                messageModel.message.reply?.apply {
-                    MessageReplayScreen(
-                        this, modifier = contentPaddingModifier
-                            .clip(RoundedCornerShape(9.dp))
-                            .background(Black_181C23)
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    //大頭貼
+                    ChatUsrAvatarScreen(messageModel.poster)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    //發文時間
+                    ChatTimeText(messageModel.displayTime)
                 }
 
-                //內文
-                ChatMessageText(
-                    modifier = contentPaddingModifier,
-                    text = messageModel.message.text
-                )
+                //收回
+                if (messageModel.message.isRecycle) {
+                    MessageRecycleScreen(modifier = contentPaddingModifier)
+                } else {
 
-                messageModel.message.media?.forEach { mediaContent ->
-                    when (mediaContent) {
-                        is ChatMessageModel.Media.Article -> {
-                            MessageArticleScreen(
-                                modifier = contentPaddingModifier,
-                                thumbnail = mediaContent.thumbnail,
-                                channel = mediaContent.from,
-                                title = mediaContent.title
-                            )
-                        }
-                        is ChatMessageModel.Media.Instagram -> {
-                            MessageIGScreen(
-                                modifier = contentPaddingModifier,
-                                thumbnail = mediaContent.thumbnail,
-                                channel = mediaContent.channel,
-                                title = mediaContent.title
-                            )
-                        }
-                        is ChatMessageModel.Media.Youtube -> {
-                            MessageYTScreen(
-                                modifier = contentPaddingModifier,
-                                thumbnail = mediaContent.thumbnail,
-                                channel = mediaContent.channel,
-                                title = mediaContent.title
-                            )
-                        }
-                        is ChatMessageModel.Media.Image -> {
-                            MessageImageScreen(
-                                images = mediaContent.image,
-                                modifier = Modifier.padding(start = 40.dp, top = 10.dp)
-                            )
+                    //Reply
+                    messageModel.message.reply?.apply {
+                        MessageReplayScreen(
+                            this, modifier = contentPaddingModifier
+                                .clip(RoundedCornerShape(9.dp))
+                                .background(Black_181C23)
+                        )
+                    }
+
+                    //內文
+                    ChatMessageText(
+                        modifier = contentPaddingModifier,
+                        text = messageModel.message.text
+                    )
+
+                    messageModel.message.media?.forEach { mediaContent ->
+                        when (mediaContent) {
+                            is ChatMessageModel.Media.Article -> {
+                                MessageArticleScreen(
+                                    modifier = contentPaddingModifier,
+                                    thumbnail = mediaContent.thumbnail,
+                                    channel = mediaContent.from,
+                                    title = mediaContent.title
+                                )
+                            }
+                            is ChatMessageModel.Media.Instagram -> {
+                                MessageIGScreen(
+                                    modifier = contentPaddingModifier,
+                                    thumbnail = mediaContent.thumbnail,
+                                    channel = mediaContent.channel,
+                                    title = mediaContent.title
+                                )
+                            }
+                            is ChatMessageModel.Media.Youtube -> {
+                                MessageYTScreen(
+                                    modifier = contentPaddingModifier,
+                                    thumbnail = mediaContent.thumbnail,
+                                    channel = mediaContent.channel,
+                                    title = mediaContent.title
+                                )
+                            }
+                            is ChatMessageModel.Media.Image -> {
+                                MessageImageScreen(
+                                    images = mediaContent.image,
+                                    modifier = Modifier.padding(start = 40.dp, top = 10.dp)
+                                )
+                            }
                         }
                     }
-                }
 
-                //Emoji
-                messageModel.message.emoji?.apply {
-                    FlowRow(
-                        modifier = contentPaddingModifier.fillMaxWidth(),
-                        crossAxisSpacing = 10.dp
-                    ) {
-                        this.forEach { emoji ->
-                            EmojiCountScreen(
-                                modifier = Modifier
-                                    .padding(end = 10.dp),
-                                emojiResource = emoji.resource,
-                                countText = emoji.count.toString()
-                            )
+                    //Emoji
+                    messageModel.message.emoji?.apply {
+                        FlowRow(
+                            modifier = contentPaddingModifier.fillMaxWidth(),
+                            crossAxisSpacing = 10.dp
+                        ) {
+                            this.forEach { emoji ->
+                                EmojiCountScreen(
+                                    modifier = Modifier
+                                        .padding(end = 10.dp),
+                                    emojiResource = emoji.resource,
+                                    countText = emoji.count.toString()
+                                )
+                            }
                         }
                     }
                 }
@@ -158,7 +167,8 @@ fun MessageContentScreenPreview() {
     FanciTheme {
         MessageContentScreen(
             coroutineScope = rememberCoroutineScope(),
-            messageModel = ChatRoomUseCase.allMessageType
+            messageModel = ChatRoomUseCase.allMessageType,
+            onMsgLongClick = {}
         ) {
 
         }
