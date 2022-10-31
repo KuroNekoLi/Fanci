@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.viewmodel.ChatRoomViewModelFactory
+import com.cmoney.fanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.fanci.ui.screens.chat.state.rememberChatRoomState
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -113,11 +114,22 @@ fun ChatRoomScreen(
         }
 
         //Alert Dialog
+        //刪除訊息 彈窗
+        uiState.deleteMessage?.apply {
+            DeleteMessageDialogScreen(chatMessageModel = this,
+            onConfirm = {
+                viewModel.onDeleteClick(it)
+            }) {
+                viewModel.onDeleteMessageDialogDismiss()
+            }
+        }
+
+        //隱藏用戶 彈窗
         uiState.hideUserMessage?.apply {
             HideUserDialogScreen(
                 this.poster
             ) {
-                viewModel.hideUserDialogDismiss()
+                viewModel.onHideUserDialogDismiss()
             }
         }
 

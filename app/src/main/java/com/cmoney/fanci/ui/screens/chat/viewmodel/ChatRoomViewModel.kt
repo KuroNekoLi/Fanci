@@ -26,7 +26,8 @@ data class ChatRoomUiState(
     val message: List<ChatMessageModel> = emptyList(),
     val snackBarMessage: CustomMessage? = null,
     val announceMessage: ChatMessageModel? = null,
-    val hideUserMessage: ChatMessageModel? = null
+    val hideUserMessage: ChatMessageModel? = null,
+    val deleteMessage: ChatMessageModel? = null
 )
 
 class ChatRoomViewModel(val context: Context) : ViewModel() {
@@ -128,7 +129,7 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
             is MessageInteract.Copy -> {
                 copyMessage(messageInteract.message)
             }
-            is MessageInteract.Delete -> TODO()
+            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
             is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
             is MessageInteract.Recycle -> {
                 recycleMessage(messageInteract.message)
@@ -136,7 +137,16 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
             is MessageInteract.Reply -> replyMessage(messageInteract.message)
             is MessageInteract.Report -> TODO()
         }
+    }
 
+    /**
+     * 刪除 訊息
+     */
+    private fun deleteMessage(message: ChatMessageModel) {
+        KLog.i(TAG, "deleteMessage:$message")
+        uiState = uiState.copy(
+            deleteMessage = message
+        )
     }
 
     /**
@@ -227,11 +237,40 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
     }
 
     /**
-     * 關播 隱藏用戶彈窗
+     * 關閉 隱藏用戶彈窗
      */
-    fun hideUserDialogDismiss() {
+    fun onHideUserDialogDismiss() {
         uiState = uiState.copy(
             hideUserMessage = null
+        )
+    }
+
+    /**
+     * 關閉 刪除訊息 彈窗
+     */
+    fun onDeleteMessageDialogDismiss() {
+        uiState = uiState.copy(
+            deleteMessage = null
+        )
+    }
+
+    /**
+     * 確定 刪除 訊息
+     */
+    fun onDeleteClick(chatMessageModel: ChatMessageModel) {
+        KLog.i(TAG, "onDeleteClick:$chatMessageModel")
+        uiState = uiState.copy(
+            message = uiState.message.filter {
+                it != chatMessageModel
+            },
+            deleteMessage = null,
+            snackBarMessage = CustomMessage(
+                textString = "成功刪除訊息！",
+                textColor = Color.White,
+                iconRes = R.drawable.delete,
+                iconColor = White_767A7F,
+                backgroundColor = White_494D54
+            )
         )
     }
 }
