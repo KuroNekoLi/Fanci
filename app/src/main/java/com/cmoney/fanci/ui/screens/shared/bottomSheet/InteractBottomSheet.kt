@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import com.cmoney.fanci.model.ChatMessageModel
-import com.cmoney.fanci.ui.screens.shared.InteractDialogScreen
+import com.cmoney.fanci.ui.screens.chat.dialog.InteractDialogScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -16,6 +16,9 @@ import kotlinx.coroutines.launch
  * 互動 彈窗總類
  */
 sealed class MessageInteract(message: ChatMessageModel) {
+    //Emoji
+    data class EmojiClick(val message: ChatMessageModel, val emojiResId: Int) : MessageInteract(message)
+
     //回覆
     data class Reply(val message: ChatMessageModel) : MessageInteract(message)
 

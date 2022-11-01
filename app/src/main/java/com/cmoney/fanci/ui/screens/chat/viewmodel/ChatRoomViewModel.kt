@@ -79,9 +79,7 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
                                 replyUser = this.replyUser,
                                 text = this.text
                             ),
-                            text = text,
-                            media = null,
-                            emoji = null
+                            text = text
                         )
                     ),
                 )
@@ -95,9 +93,7 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
                         publishTime = System.currentTimeMillis(),
                         message = ChatMessageModel.Message(
                             reply = null,
-                            text = text,
-                            media = null,
-                            emoji = null
+                            text = text
                         )
                     ),
                 )
@@ -161,6 +157,10 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
             }
             is MessageInteract.Reply -> replyMessage(messageInteract.message)
             is MessageInteract.Report -> reportUser(messageInteract.message)
+            is MessageInteract.EmojiClick -> onEmojiClick(
+                messageInteract.message,
+                messageInteract.emojiResId
+            )
         }
     }
 
@@ -201,7 +201,7 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
         KLog.i(TAG, "announceMessage:$messageModel")
         val noEmojiMessage = messageModel.copy(
             message = messageModel.message.copy(
-                emoji = null
+                emoji = emptyList()
             )
         )
         uiState = uiState.copy(
@@ -388,22 +388,36 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
     }
 
     /**
-     * 點擊 訊息內的 Emoji
+     * 點擊 Emoji
      */
     fun onEmojiClick(model: ChatMessageModel, resourceId: Int) {
         KLog.i(TAG, "onEmojiClick.")
-        val replaceEmoji = model.message.emoji?.map {
-            if (it.resource == resourceId) {
-                return@map it.copy(count = it.count.plus(1))
+
+        val orgEmojiList = model.message.emoji.toMutableList()
+
+        model.message.emoji.find {
+            it.resource == resourceId
+        }.apply {
+            this?.apply {
+                val countEmoji = copy(
+                    count = count.plus(1)
+                )
+                orgEmojiList[orgEmojiList.indexOf(this)] = countEmoji
+            } ?: kotlin.run {
+                orgEmojiList.add(
+                    ChatMessageModel.Emoji(
+                        resource = resourceId,
+                        count = 1
+                    )
+                )
             }
-            it
         }
 
         val message = uiState.message.toMutableList()
         val newMessage = message.map { chatMessageModel ->
             if (chatMessageModel.message == model.message) {
                 val fixMessage = chatMessageModel.message.copy(
-                    emoji = replaceEmoji
+                    emoji = orgEmojiList
                 )
                 chatMessageModel.copy(
                     message = fixMessage,

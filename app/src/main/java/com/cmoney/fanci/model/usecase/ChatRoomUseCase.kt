@@ -50,9 +50,7 @@ class ChatRoomUseCase {
             publishTime = 1666234733000,
             message = ChatMessageModel.Message(
                 reply = null,
-                text = "純文字",
-                media = null,
-                emoji = null
+                text = "純文字"
             )
         )
 
@@ -102,8 +100,7 @@ class ChatRoomUseCase {
                         title = "【奢華挑戰】在紐約一天花10萬台幣! 頂級享受讓阿滴感動到哭\uD83D\uDE2D @黃大謙 @HOOK",
                         thumbnail = "https://img.youtube.com/vi/1J3WdNYCm5M/0.jpg"
                     )
-                ),
-                emoji = null
+                )
             )
         )
 

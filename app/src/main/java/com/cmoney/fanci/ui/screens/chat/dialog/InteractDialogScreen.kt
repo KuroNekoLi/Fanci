@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.shared
+package com.cmoney.fanci.ui.screens.chat.dialog
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.*
@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.Black_14171C
 import com.cmoney.fanci.ui.theme.Black_1B2129
@@ -62,7 +63,10 @@ fun InteractDialogScreen(
                     .horizontalScroll(rememberScrollState())
             ) {
                 emojiLit.forEach {
-                    EmojiIcon(it)
+                    EmojiIcon(it) { resId ->
+                        onClose(coroutineScope, modalBottomSheetState)
+                        onInteractClick.invoke(MessageInteract.EmojiClick(message, resId))
+                    }
                 }
             }
 
@@ -114,7 +118,7 @@ fun onClose(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomSh
 }
 
 @Composable
-private fun EmojiIcon(@DrawableRes resId: Int) {
+private fun EmojiIcon(@DrawableRes resId: Int, onClick: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .padding(end = 10.dp)
@@ -122,8 +126,8 @@ private fun EmojiIcon(@DrawableRes resId: Int) {
             .clip(CircleShape)
             .background(Black_14171C)
             .clickable {
-                // TODO:  
                 KLog.i("EmojiIcon", "EmojiIcon click")
+                onClick.invoke(resId)
             },
         contentAlignment = Alignment.Center
     ) {
@@ -171,19 +175,7 @@ fun InteractDialogScreenPreview() {
                 it != ModalBottomSheetValue.HalfExpanded
             }
         ),
-        message = ChatMessageModel(
-            poster = ChatMessageModel.User(
-                avatar = "https://picsum.photos/102/102",
-                nickname = "TIGER"
-            ),
-            publishTime = 1666234733000,
-            message = ChatMessageModel.Message(
-                reply = null,
-                text = "純文字",
-                media = null,
-                emoji = null
-            )
-        )
+        message = ChatRoomUseCase.textType
     ) {
 
     }

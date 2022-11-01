@@ -7,7 +7,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import com.cmoney.fanci.ui.screens.shared.InteractDialogScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
