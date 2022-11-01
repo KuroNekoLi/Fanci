@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.chat.viewmodel
 
+import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -8,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.R
@@ -31,8 +33,10 @@ data class ChatRoomUiState(
     val reportUser: ChatMessageModel? = null
 )
 
-class ChatRoomViewModel(val context: Context) : ViewModel() {
+class ChatRoomViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG = ChatRoomViewModel::class.java.simpleName
+
+    private val context = getApplication<Application>().applicationContext
 
     var uiState by mutableStateOf(ChatRoomUiState())
         private set

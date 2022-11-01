@@ -16,9 +16,14 @@ import org.koin.android.ext.android.getKoin
 import org.koin.core.context.loadKoinModules
 
 class MyApplication : XLoginApplication() {
+    companion object {
+        lateinit var instance: MyApplication
+            private set
+    }
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         FirebaseApp.initializeApp(this)
 
         if (!BuildConfig.DEBUG) {

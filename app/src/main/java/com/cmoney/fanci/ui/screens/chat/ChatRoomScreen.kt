@@ -14,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainStateHolder
+import com.cmoney.fanci.MyApplication
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.viewmodel.ChatRoomViewModelFactory
 import com.cmoney.fanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
@@ -33,7 +34,7 @@ fun ChatRoomScreen(
     route: (MainStateHolder.Route) -> Unit,
     viewModel: ChatRoomViewModel = viewModel(
         factory =
-        ChatRoomViewModelFactory(LocalContext.current)
+        ChatRoomViewModelFactory(MyApplication.instance)
     )
 ) {
     val TAG = "ChatRoomScreen"
