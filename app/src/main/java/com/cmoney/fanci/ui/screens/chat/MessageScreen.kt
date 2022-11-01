@@ -35,7 +35,8 @@ fun MessageScreen(
     message: List<ChatMessageModel>,
     coroutineScope: CoroutineScope,
     onInteractClick: (MessageInteract) -> Unit,
-    onMsgDismissHide: (ChatMessageModel) -> Unit
+    onMsgDismissHide: (ChatMessageModel) -> Unit,
+    onEmojiClick: (ChatMessageModel, Int) -> Unit
 ) {
     Surface(
         color = MaterialTheme.colors.surface,
@@ -48,13 +49,19 @@ fun MessageScreen(
                     MessageContentScreen(
                         messageModel = message,
                         coroutineScope = coroutineScope,
-                        onMsgLongClick = {
-                            showInteractDialog(context.findActivity(), message, onInteractClick)
-                        },
-                        onMsgDismissHide = {
-                            onMsgDismissHide.invoke(it)
+                    ) {
+                        when (it) {
+                            is MessageContentCallback.EmojiClick -> {
+                                onEmojiClick.invoke(it.message, it.resourceId)
+                            }
+                            is MessageContentCallback.LongClick -> {
+                                showInteractDialog(context.findActivity(), message, onInteractClick)
+                            }
+                            is MessageContentCallback.MsgDismissHideClick -> {
+                                onMsgDismissHide.invoke(message)
+                            }
                         }
-                    )
+                    }
                 }
             }
         }
@@ -89,9 +96,10 @@ fun MessageScreenPreview() {
             message = listOf(
                 ChatRoomUseCase.allMessageType
             ),
-            onInteractClick = {}
-        ) {
-
-        }
+            onInteractClick = {},
+            onMsgDismissHide = {},
+            onEmojiClick = { _, _ ->
+            }
+        )
     }
 }

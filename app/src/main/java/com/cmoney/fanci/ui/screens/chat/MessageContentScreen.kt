@@ -26,6 +26,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+sealed class MessageContentCallback {
+    data class LongClick(val message: ChatMessageModel) : MessageContentCallback()
+    data class MsgDismissHideClick(val message: ChatMessageModel) : MessageContentCallback()
+    data class EmojiClick(val message: ChatMessageModel, val resourceId: Int) : MessageContentCallback()
+}
+
 /**
  * 聊天內容
  */
@@ -34,8 +40,7 @@ fun MessageContentScreen(
     messageModel: ChatMessageModel,
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    onMsgLongClick: (ChatMessageModel) -> Unit,
-    onMsgDismissHide: (ChatMessageModel) -> Unit
+    onMessageContentCallback: (MessageContentCallback) -> Unit
 ) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 40.dp)
     val defaultColor = MaterialTheme.colors.surface
@@ -58,7 +63,9 @@ fun MessageContentScreen(
                     coroutineScope.launch {
                         delay(300)
                         if (longTap && !messageModel.message.isRecycle) {
-                            onMsgLongClick.invoke(messageModel)
+                            onMessageContentCallback.invoke(
+                                MessageContentCallback.LongClick(messageModel)
+                            )
                         }
                     }
                 }
@@ -72,8 +79,8 @@ fun MessageContentScreen(
         ) {
             //隱藏用戶
             if (messageModel.message.isHideUser) {
-                MessageHideUserScreen(chatMessageModel = messageModel){
-                    onMsgDismissHide.invoke(it)
+                MessageHideUserScreen(chatMessageModel = messageModel) {
+                    onMessageContentCallback.invoke(MessageContentCallback.MsgDismissHideClick(it))
                 }
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -88,7 +95,6 @@ fun MessageContentScreen(
                 if (messageModel.message.isRecycle) {
                     MessageRecycleScreen(modifier = contentPaddingModifier)
                 } else {
-
                     //Reply
                     messageModel.message.reply?.apply {
                         MessageReplayScreen(
@@ -105,38 +111,7 @@ fun MessageContentScreen(
                     )
 
                     messageModel.message.media?.forEach { mediaContent ->
-                        when (mediaContent) {
-                            is ChatMessageModel.Media.Article -> {
-                                MessageArticleScreen(
-                                    modifier = contentPaddingModifier,
-                                    thumbnail = mediaContent.thumbnail,
-                                    channel = mediaContent.from,
-                                    title = mediaContent.title
-                                )
-                            }
-                            is ChatMessageModel.Media.Instagram -> {
-                                MessageIGScreen(
-                                    modifier = contentPaddingModifier,
-                                    thumbnail = mediaContent.thumbnail,
-                                    channel = mediaContent.channel,
-                                    title = mediaContent.title
-                                )
-                            }
-                            is ChatMessageModel.Media.Youtube -> {
-                                MessageYTScreen(
-                                    modifier = contentPaddingModifier,
-                                    thumbnail = mediaContent.thumbnail,
-                                    channel = mediaContent.channel,
-                                    title = mediaContent.title
-                                )
-                            }
-                            is ChatMessageModel.Media.Image -> {
-                                MessageImageScreen(
-                                    images = mediaContent.image,
-                                    modifier = Modifier.padding(start = 40.dp, top = 10.dp)
-                                )
-                            }
-                        }
+                        MediaContent(contentPaddingModifier, mediaContent)
                     }
 
                     //Emoji
@@ -151,12 +126,59 @@ fun MessageContentScreen(
                                         .padding(end = 10.dp),
                                     emojiResource = emoji.resource,
                                     countText = emoji.count.toString()
-                                )
+                                ) {
+                                    onMessageContentCallback.invoke(
+                                        MessageContentCallback.EmojiClick(
+                                            messageModel,
+                                            it
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
+
                 }
             }
+        }
+    }
+}
+
+/**
+ * 多媒體 型態
+ */
+@Composable
+private fun MediaContent(modifier: Modifier, media: ChatMessageModel.Media) {
+    when (media) {
+        is ChatMessageModel.Media.Article -> {
+            MessageArticleScreen(
+                modifier = modifier,
+                thumbnail = media.thumbnail,
+                channel = media.from,
+                title = media.title
+            )
+        }
+        is ChatMessageModel.Media.Instagram -> {
+            MessageIGScreen(
+                modifier = modifier,
+                thumbnail = media.thumbnail,
+                channel = media.channel,
+                title = media.title
+            )
+        }
+        is ChatMessageModel.Media.Youtube -> {
+            MessageYTScreen(
+                modifier = modifier,
+                thumbnail = media.thumbnail,
+                channel = media.channel,
+                title = media.title
+            )
+        }
+        is ChatMessageModel.Media.Image -> {
+            MessageImageScreen(
+                images = media.image,
+                modifier = Modifier.padding(start = 40.dp, top = 10.dp)
+            )
         }
     }
 }
@@ -168,7 +190,6 @@ fun MessageContentScreenPreview() {
         MessageContentScreen(
             coroutineScope = rememberCoroutineScope(),
             messageModel = ChatRoomUseCase.allMessageType,
-            onMsgLongClick = {}
         ) {
 
         }

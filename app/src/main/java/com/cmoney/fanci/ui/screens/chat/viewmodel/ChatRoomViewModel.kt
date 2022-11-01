@@ -386,4 +386,36 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
             hideUserMessage = null
         )
     }
+
+    /**
+     * 點擊 訊息內的 Emoji
+     */
+    fun onEmojiClick(model: ChatMessageModel, resourceId: Int) {
+        KLog.i(TAG, "onEmojiClick.")
+        val replaceEmoji = model.message.emoji?.map {
+            if (it.resource == resourceId) {
+                return@map it.copy(count = it.count.plus(1))
+            }
+            it
+        }
+
+        val message = uiState.message.toMutableList()
+        val newMessage = message.map { chatMessageModel ->
+            if (chatMessageModel.message == model.message) {
+                val fixMessage = chatMessageModel.message.copy(
+                    emoji = replaceEmoji
+                )
+                chatMessageModel.copy(
+                    message = fixMessage,
+                )
+            } else {
+                chatMessageModel
+            }
+        }
+
+        uiState = uiState.copy(
+            message = newMessage,
+            hideUserMessage = null
+        )
+    }
 }

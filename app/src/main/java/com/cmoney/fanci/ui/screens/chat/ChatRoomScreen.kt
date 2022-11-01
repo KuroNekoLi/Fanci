@@ -93,6 +93,9 @@ fun ChatRoomScreen(
                 },
                 onMsgDismissHide = {
                     viewModel.onMsgDismissHide(it)
+                },
+                onEmojiClick = { model, resourceId ->
+                    viewModel.onEmojiClick(model, resourceId)
                 }
             )
 

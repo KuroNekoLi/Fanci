@@ -3,6 +3,7 @@ package com.cmoney.fanci.ui.screens.shared
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -20,11 +21,15 @@ import com.cmoney.fanci.ui.theme.White_262C34
 fun EmojiCountScreen(
     @DrawableRes emojiResource: Int,
     countText: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (Int) -> Unit
 ) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(6.dp))
+            .clickable {
+                onClick.invoke(emojiResource)
+            }
             .background(White_262C34)
     ) {
         Row(
@@ -46,5 +51,5 @@ fun EmojiCountScreen(
 @Preview(showBackground = true)
 @Composable
 fun EmojiCountScreenPreview() {
-    EmojiCountScreen(R.drawable.emoji_happiness, "123")
+    EmojiCountScreen(R.drawable.emoji_happiness, "123"){}
 }
