@@ -5,107 +5,102 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
+import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
 import com.cmoney.fanci.ui.screens.shared.ChannelBar
+import com.cmoney.fanci.ui.theme.Black_282A2D
+import com.cmoney.fanci.ui.theme.Black_99000000
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FollowScreen(
-    viewModel: FollowViewModel = viewModel(),
+    followScreenState: FollowScreenState = rememberFollowScreenState(),
     onChannelClick: ((channelBar: ChannelBar) -> Unit)?
 ) {
-    val followCategoryList = viewModel.followData.observeAsState()
+    val followCategoryList = followScreenState.viewModel.followData.observeAsState()
 
-    Surface(
+    Scaffold(
         modifier = Modifier
-            .fillMaxSize(),
-        color = MaterialTheme.colors.surface
-    ) {
-        val configuration = LocalConfiguration.current
-        val screenHeight = configuration.screenHeightDp.dp
-        val screenWidth = configuration.screenWidthDp.dp
-
-        // ToolBar 最大向上位移量
-        val maxUpPx = with(LocalDensity.current) { screenWidth.roundToPx().toFloat() + 10 }
-        // ToolBar 最小向上位移量
-        val minUpPx = 0f
-
-        // 偏移折叠工具栏上移高度
-        val imageOffsetHeightPx = remember { mutableStateOf(0f) }
-
-        //Space Height
-        val maxSpaceUpPx = with(LocalDensity.current) { 190.dp.roundToPx().toFloat() }
-        val spaceOffsetHeightPx = remember { mutableStateOf(maxSpaceUpPx) }
-
-        var visibleAvatar by remember { mutableStateOf(false) }
-
-        val nestedScrollConnection = remember {
-            object : NestedScrollConnection {
-                override fun onPreScroll(
-                    available: Offset,
-                    source: NestedScrollSource
-                ): Offset {
-                    val delta = available.y
-
-                    //位移偏差值
-                    val offsetVariable = 2.2f
-                    val newOffset = imageOffsetHeightPx.value + delta * offsetVariable
-                    imageOffsetHeightPx.value = newOffset.coerceIn(-maxUpPx, -minUpPx)
-
-                    val newSpaceOffset = spaceOffsetHeightPx.value + delta
-                    spaceOffsetHeightPx.value = newSpaceOffset.coerceIn(0f, maxSpaceUpPx)
-
-                    //是否顯示 大頭貼
-                    visibleAvatar = spaceOffsetHeightPx.value <= 10f
-
-                    return Offset.Zero
-                }
+            .fillMaxSize()
+            .background(MaterialTheme.colors.surface),
+        scaffoldState = followScreenState.scaffoldState,
+        drawerContent = {
+            DrawerMenuScreen(modifier = Modifier.width(105.dp)) {
+                followScreenState.closeDrawer()
             }
-        }
-
+        },
+        drawerBackgroundColor = Color.Transparent,
+        drawerElevation = 0.dp,
+        drawerScrimColor = Black_99000000
+    ) { innerPadding ->
         Box(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
-                .nestedScroll(nestedScrollConnection)
+                .nestedScroll(followScreenState.nestedScrollConnection)
         ) {
-            AsyncImage(
-                alignment = Alignment.TopCenter,
-                model = "https://picsum.photos/400/400",
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .offset {
-                        IntOffset(x = 0, y = imageOffsetHeightPx.value.roundToInt()) //设置偏移量
-                    },
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                placeholder = painterResource(id = R.drawable.resource_default)
-            )
+            ) {
+                //Cover Image
+                AsyncImage(
+                    alignment = Alignment.TopCenter,
+                    model = "https://picsum.photos/400/400",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .offset {
+                            IntOffset(
+                                x = 0,
+                                y = followScreenState.imageOffsetHeightPx.value.roundToInt()
+                            ) //设置偏移量
+                        },
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    placeholder = painterResource(id = R.drawable.resource_default)
+                )
+
+                //Menu
+                Box(
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .size(45.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Black_282A2D)
+                        .clickable {
+                            followScreenState.openDrawer()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.menu),
+                        contentDescription = null
+                    )
+
+                }
+            }
 
             Column {
                 Spacer(modifier = Modifier.height(
-                    with(LocalDensity.current) { spaceOffsetHeightPx.value.toDp() }
+                    with(LocalDensity.current) { followScreenState.spaceOffsetHeightPx.value.toDp() }
                 ))
                 Card(
                     modifier = Modifier
@@ -136,7 +131,7 @@ fun FollowScreen(
                                     modifier = Modifier.background(
                                         MaterialTheme.colors.onSecondary
                                     ),
-                                    visibleAvatar
+                                    followScreenState.visibleAvatar
                                 )
                             }
                         }

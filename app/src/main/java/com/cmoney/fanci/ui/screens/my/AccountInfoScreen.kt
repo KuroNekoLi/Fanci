@@ -49,7 +49,7 @@ fun AccountInfoScreen(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.width(17.dp))
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "頭像與替稱", fontSize = 17.sp, color = White_BBBCBF
+                    text = "頭像與暱稱", fontSize = 17.sp, color = White_BBBCBF
                 )
                 Image(
                     painter = painterResource(id = R.drawable.next),
