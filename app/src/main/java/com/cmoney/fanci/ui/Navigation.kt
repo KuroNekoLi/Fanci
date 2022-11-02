@@ -90,8 +90,8 @@ fun MainNavHost(
 
         mainTabItems.forEach { mainTab ->
             when (mainTab) {
-                MainTab.EXPLORE -> {
-                    composable(MainTab.EXPLORE.route) {
+                MainTab.ACTIVITY -> {
+                    composable(MainTab.ACTIVITY.route) {
                         AndroidViewBinding(MyFragmentLayoutBinding::inflate) {
                         }
                     }
@@ -111,6 +111,13 @@ fun MainNavHost(
                 }
                 MainTab.NOTIFY -> {
                     composable(MainTab.NOTIFY.route) {
+                        PageDisplay(MainTab.NOTIFY.title, pos) {
+                            pos += 1
+                        }
+                    }
+                }
+                MainTab.MARKET -> {
+                    composable(MainTab.MARKET.route) {
                         PageDisplay(MainTab.NOTIFY.title, pos) {
                             pos += 1
                         }

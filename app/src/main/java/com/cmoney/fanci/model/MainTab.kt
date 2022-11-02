@@ -9,21 +9,27 @@ sealed class MainTab(
     val route: String
 ) {
     object FOLLOW : MainTab(
-        title = "追蹤",
+        title = "社團",
         icon = R.drawable.follow,
         "follow"
     )
 
     object NOTIFY : MainTab(
-        title = "通知",
+        title = "聊天",
         icon = R.drawable.notify,
         "notify"
     )
 
-    object EXPLORE : MainTab(
-        title = "探索",
+    object ACTIVITY : MainTab(
+        title = "活動",
         icon = R.drawable.explore,
         "explore"
+    )
+
+    object MARKET : MainTab(
+        title = "商城",
+        icon = R.drawable.market,
+        "market"
     )
 
     object MY : MainTab(
@@ -36,6 +42,7 @@ sealed class MainTab(
 val mainTabItems = listOf(
     MainTab.FOLLOW,
     MainTab.NOTIFY,
-    MainTab.EXPLORE,
+    MainTab.ACTIVITY,
+    MainTab.MARKET,
     MainTab.MY
 )

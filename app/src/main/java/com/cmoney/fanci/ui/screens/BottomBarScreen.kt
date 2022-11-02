@@ -34,7 +34,7 @@ fun BottomBarController(navController: NavHostController) {
         MainTab.FOLLOW.route -> true
         MainTab.NOTIFY.route -> true
         MainTab.MY.route -> true
-        MainTab.EXPLORE.route -> true
+        MainTab.ACTIVITY.route -> true
         else -> false
     }
 
