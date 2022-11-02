@@ -6,22 +6,18 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainStateHolder
-import com.cmoney.fanci.MyApplication
 import com.cmoney.fanci.model.ChatMessageModel
-import com.cmoney.fanci.model.viewmodel.ChatRoomViewModelFactory
 import com.cmoney.fanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.fanci.ui.screens.chat.dialog.HideUserDialogScreen
 import com.cmoney.fanci.ui.screens.chat.dialog.ReportUserDialogScreen
+import com.cmoney.fanci.ui.screens.chat.state.ChatRoomState
 import com.cmoney.fanci.ui.screens.chat.state.rememberChatRoomState
-import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -32,16 +28,11 @@ fun ChatRoomScreen(
     channelId: String?,
     navController: NavHostController,
     route: (MainStateHolder.Route) -> Unit,
-    viewModel: ChatRoomViewModel = viewModel(
-        factory =
-        ChatRoomViewModelFactory(MyApplication.instance)
-    )
+    stateHolder: ChatRoomState = rememberChatRoomState(navController = navController)
 ) {
     val TAG = "ChatRoomScreen"
 
-    val uiState = viewModel.uiState
-
-    val stateHolder = rememberChatRoomState(navController = navController)
+    val uiState = stateHolder.viewModel.uiState
 
     //Screen Callback like onActivityResult
     val bundle = navController.currentBackStackEntryAsState().value
@@ -90,35 +81,35 @@ fun ChatRoomScreen(
                 message = uiState.message,
                 coroutineScope = stateHolder.scope,
                 onInteractClick = {
-                    viewModel.onInteractClick(it)
+                    stateHolder.viewModel.onInteractClick(it)
                 },
                 onMsgDismissHide = {
-                    viewModel.onMsgDismissHide(it)
+                    stateHolder.viewModel.onMsgDismissHide(it)
                 },
                 onEmojiClick = { model, resourceId ->
-                    viewModel.onEmojiClick(model, resourceId)
+                    stateHolder.viewModel.onEmojiClick(model, resourceId)
                 }
             )
 
             //回覆
             uiState.replyMessage?.apply {
                 ChatReplyScreen(this) {
-                    viewModel.removeReply(it)
+                    stateHolder.viewModel.removeReply(it)
                 }
             }
 
             //附加圖片
             MessageAttachImageScreen(uiState.imageAttach) {
-                viewModel.removeAttach(it)
+                stateHolder.viewModel.removeAttach(it)
             }
 
             //輸入匡
             MessageInput(
                 onMessageSend = {
-                    viewModel.messageInput(it)
+                    stateHolder.viewModel.messageInput(it)
                 },
                 onAttach = {
-                    viewModel.attachImage(it)
+                    stateHolder.viewModel.attachImage(it)
                 }
             )
         }
@@ -128,10 +119,10 @@ fun ChatRoomScreen(
         uiState.reportUser?.apply {
             ReportUserDialogScreen(user = this.poster,
                 onConfirm = {
-                    viewModel.onReportUser(it)
+                    stateHolder.viewModel.onReportUser(it)
                 }
             ) {
-                viewModel.onReportUserDialogDismiss()
+                stateHolder.viewModel.onReportUserDialogDismiss()
             }
         }
 
@@ -139,9 +130,9 @@ fun ChatRoomScreen(
         uiState.deleteMessage?.apply {
             DeleteMessageDialogScreen(chatMessageModel = this,
                 onConfirm = {
-                    viewModel.onDeleteClick(it)
+                    stateHolder.viewModel.onDeleteClick(it)
                 }) {
-                viewModel.onDeleteMessageDialogDismiss()
+                stateHolder.viewModel.onDeleteMessageDialogDismiss()
             }
         }
 
@@ -150,10 +141,10 @@ fun ChatRoomScreen(
             HideUserDialogScreen(
                 this.poster,
                 onConfirm = {
-                    viewModel.onHideUserConfirm(it)
+                    stateHolder.viewModel.onHideUserConfirm(it)
                 }
             ) {
-                viewModel.onHideUserDialogDismiss()
+                stateHolder.viewModel.onHideUserDialogDismiss()
             }
         }
 
@@ -162,14 +153,14 @@ fun ChatRoomScreen(
             modifier = Modifier.padding(bottom = 70.dp),
             message = uiState.snackBarMessage
         ) {
-            viewModel.snackBarDismiss()
+            stateHolder.viewModel.snackBarDismiss()
         }
 
         //Route
         //跳轉 公告 page
         uiState.announceMessage?.apply {
             route.invoke(MainStateHolder.Route.Announce(this))
-            viewModel.routeDone()
+            stateHolder.viewModel.routeDone()
         }
     }
 }

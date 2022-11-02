@@ -21,6 +21,7 @@ import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
 import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
 import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
+import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.socks.library.KLog
 
 /**
@@ -105,9 +106,7 @@ fun MainNavHost(
                 }
                 MainTab.MY -> {
                     composable(MainTab.MY.route) {
-                        PageDisplay(MainTab.MY.title, pos) {
-                            pos += 1
-                        }
+                        MyScreen()
                     }
                 }
                 MainTab.NOTIFY -> {

@@ -26,36 +26,42 @@ import com.socks.library.KLog
 fun TopBarScreen(
     navController: NavHostController,
     title: String,
+    leadingEnable: Boolean = true,
+    trailingEnable: Boolean = true,
     moreEnable: Boolean,
-    moreClick: () -> Unit
+    moreClick: (() -> Unit)?
 ) {
     val TAG = "TopBarScreen"
     CenterTopAppBar(
         leading = {
-            IconButton(onClick = {
-                navController.popBackStack()
-            }) {
-                Icon(Icons.Filled.ArrowBack, null)
+            if (leadingEnable) {
+                IconButton(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Icon(Icons.Filled.ArrowBack, null)
+                }
             }
         },
         title = { Text(title, fontSize = 17.sp, color = Color.White) },
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = Color.White,
         trailing = {
-            Box(
-                modifier = Modifier
-                    .size(width = 35.dp, height = 35.dp)
-                    .padding(end = 16.dp)
-                    .clickable {
-                        if (moreEnable) {
-                            KLog.i(TAG, "more click")
-                            moreClick.invoke()
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                if (moreEnable) {
-                    BlueCircleDot()
+            if (trailingEnable) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 35.dp, height = 35.dp)
+                        .padding(end = 16.dp)
+                        .clickable {
+                            if (moreEnable) {
+                                KLog.i(TAG, "more click")
+                                moreClick?.invoke()
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (moreEnable) {
+                        BlueCircleDot()
+                    }
                 }
             }
         }

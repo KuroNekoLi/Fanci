@@ -5,19 +5,19 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.model.viewmodel.ChatRoomViewModelFactory
+import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import kotlinx.coroutines.CoroutineScope
 
 class ChatRoomState(
     val navController: NavHostController,
     val scope: CoroutineScope,
-    val scaffoldState: ScaffoldState
+    val scaffoldState: ScaffoldState,
+    val viewModel: ChatRoomViewModel,
 ) {
-
-    suspend fun showRecycleMessageSnackBar() {
-        scaffoldState.snackbarHostState.showSnackbar(message = "訊息收回成功！")
-    }
 
 }
 
@@ -25,7 +25,11 @@ class ChatRoomState(
 fun rememberChatRoomState(
     navController: NavHostController = rememberNavController(),
     scope: CoroutineScope = rememberCoroutineScope(),
-    scaffoldState: ScaffoldState = rememberScaffoldState()
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    viewModel: ChatRoomViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory =
+        ChatRoomViewModelFactory(LocalContext.current)
+    )
 ) = remember {
-    ChatRoomState(navController, scope, scaffoldState)
+    ChatRoomState(navController, scope, scaffoldState, viewModel)
 }
