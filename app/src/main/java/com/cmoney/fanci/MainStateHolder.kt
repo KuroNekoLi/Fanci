@@ -19,12 +19,15 @@ class MainStateHolder(
 
     val route: (Route) -> Unit = {
         when (it) {
-            is Route.Channel -> mainNavController.navigate("channel/${it.channelId}")
+            is Route.Channel -> mainNavController.navigate(it.route)
             is Route.Announce -> {
                 mainNavController.currentBackStackEntry?.savedStateHandle?.apply {
                     set("message", it.message)
                 }
-                mainNavController.navigate("announce")
+                mainNavController.navigate(it.route)
+            }
+            is Route.UserInfo -> {
+                mainNavController.navigate(it.route)
             }
         }
     }
@@ -40,13 +43,23 @@ class MainStateHolder(
         }
     }
 
-    sealed class Route {
-        data class Channel(val channelId: String) : Route()
+    sealed class Route(route: String) {
+        companion object {
+            val Channel = "channel"
+            val Announce = "announce"
+            val UserInfo = "userInfo"
+        }
 
-        data class Announce(val message: ChatMessageModel) : Route()
+        data class Channel(val channelId: String, val route: String = "$Channel/${channelId}") :
+            Route(route)
+
+        data class Announce(val message: ChatMessageModel, val route: String = Announce) :
+            Route(route)
+
+        data class UserInfo(val route: String = UserInfo) : Route(route)
     }
-
 }
+
 
 @Composable
 fun rememberMainState(

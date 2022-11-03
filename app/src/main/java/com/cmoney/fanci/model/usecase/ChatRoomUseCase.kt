@@ -66,9 +66,9 @@ class ChatRoomUseCase {
                 media = listOf(
                     ChatMessageModel.Media.Image(
                         image = listOf(
-                            "https://picsum.photos/500/500",
-                            "https://picsum.photos/400/400",
-                            "https://picsum.photos/300/300"
+                            "https://picsum.photos/${(100..400).random()}/${(100..400).random()}",
+                            "https://picsum.photos/${(100..400).random()}/${(100..400).random()}",
+                            "https://picsum.photos/${(100..400).random()}/${(100..400).random()}"
                         )
                     )
                 ),

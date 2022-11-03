@@ -7,6 +7,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.MainStateHolder
+import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 
 class MyScreenState(
@@ -14,6 +16,7 @@ class MyScreenState(
     val scope: CoroutineScope,
     val scaffoldState: ScaffoldState
 ) {
+    private val TAG = MyScreenState::class.java.simpleName
 
 }
 

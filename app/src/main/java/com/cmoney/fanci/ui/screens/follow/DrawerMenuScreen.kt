@@ -24,13 +24,13 @@ fun DrawerMenuScreen(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Column(
         modifier = modifier
             .background(Black_282A2D)
-            .padding(20.dp),
+            .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 5.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
         LazyColumn(modifier = Modifier.weight(1f).padding(bottom = 5.dp)) {
             items(13) {
                 AsyncImage(
-                    model = "https://picsum.photos/100/100",
+                    model = "https://picsum.photos/${(100..400).random()}/${(100..400).random()}",
                     modifier = Modifier
                         .size(55.dp)
                         .aspectRatio(1f)
@@ -55,7 +55,7 @@ fun DrawerMenuScreen(modifier: Modifier = Modifier, onClick: () -> Unit) {
         ) {
             Image(painter = painterResource(id = R.drawable.bell), contentDescription = null)
         }
-        Spacer(modifier = Modifier.height(17.dp))
+        Spacer(modifier = Modifier.height(7.dp))
 
         Box(
             modifier = Modifier
@@ -66,7 +66,7 @@ fun DrawerMenuScreen(modifier: Modifier = Modifier, onClick: () -> Unit) {
         ) {
             Image(painter = painterResource(id = R.drawable.search), contentDescription = null)
         }
-        Spacer(modifier = Modifier.height(17.dp))
+        Spacer(modifier = Modifier.height(7.dp))
 
         Box(
             modifier = Modifier

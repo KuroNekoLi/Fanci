@@ -21,7 +21,9 @@ import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
 import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
 import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
+import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
+import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
 import com.socks.library.KLog
 
 /**
@@ -42,13 +44,13 @@ fun MyAppNavHost(
             MainScreen(navController, route)
         }
         //頻道頁面
-        composable("channel/{channelId}") { backStackEntry ->
+        composable("${MainStateHolder.Route.Channel}/{channelId}") { backStackEntry ->
             val channelId = backStackEntry.arguments?.getString("channelId")
             ChatRoomScreen(channelId, mainNavController, route)
         }
 
         //公告訊息
-        composable("announce") { backStackEntry ->
+        composable(MainStateHolder.Route.Announce) { _ ->
             val message =
                 mainNavController.previousBackStackEntry?.savedStateHandle?.get<ChatMessageModel>("message")
             message?.let {
@@ -62,6 +64,11 @@ fun MyAppNavHost(
                         }
                     })
             }
+        }
+
+        //設定個人資料
+        composable(MainStateHolder.Route.UserInfo) {
+            UserInfoSettingScreen(mainNavController)
         }
     }
 }
@@ -84,10 +91,6 @@ fun MainNavHost(
         startDestination = startDestination.route,
         modifier = modifier,
     ) {
-        composable("profile") { backStackEntry ->
-
-        }
-
         mainTabItems.forEach { mainTab ->
             when (mainTab) {
                 MainTab.ACTIVITY -> {
@@ -99,14 +102,19 @@ fun MainNavHost(
                 MainTab.FOLLOW -> {
                     composable(MainTab.FOLLOW.route) {
                         FollowScreen {
-                            KLog.i("Warren", "click callback.")
                             route.invoke(MainStateHolder.Route.Channel("123"))
                         }
                     }
                 }
                 MainTab.MY -> {
                     composable(MainTab.MY.route) {
-                        MyScreen()
+                        MyScreen {
+                            when (it) {
+                                MyCallback.ChangeAvatar -> {
+                                    route.invoke(MainStateHolder.Route.UserInfo())
+                                }
+                            }
+                        }
                     }
                 }
                 MainTab.NOTIFY -> {

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.screens.shared.camera.ChooseImagePickDialog
 import com.cmoney.fanci.ui.theme.Black_202327
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.White_494D54
@@ -114,114 +115,12 @@ fun MessageInput(
     }
 
     if (openDialog.value) {
-        chooseImagePickDialog(onDismiss = {
+        ChooseImagePickDialog(onDismiss = {
             openDialog.value = false
         }) {
             onAttach.invoke(it)
         }
     }
-}
-
-/**
- * 附加圖片 Dialog
- */
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-private fun chooseImagePickDialog(
-    onDismiss: () -> Unit,
-    onAttach: (Uri) -> Unit,
-) {
-    val TAG = "chooseImagePickDialog"
-
-    val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
-
-    val externalPermissionState =
-        rememberPermissionState(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-
-    val choosePhotoResult =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                it.data?.data?.let { uri ->
-                    KLog.i(TAG, "get uri:$uri")
-                    onAttach.invoke(uri)
-                    onDismiss.invoke()
-                }
-            }
-        }
-
-    val captureResult =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                captureUri?.let { uri ->
-                    KLog.i(TAG, "get uri:$uri")
-                    onAttach.invoke(uri)
-                    onDismiss.invoke()
-                }
-            }
-        }
-
-    val context = LocalContext.current
-
-    AlertDialog(onDismissRequest = { onDismiss.invoke() },
-        //Camera Button
-        dismissButton = {
-            Button(
-                modifier = Modifier
-                    .padding(start = 10.dp, top = 10.dp, end = 10.dp)
-                    .fillMaxWidth(),
-                onClick = {
-                    if (cameraPermissionState.status.isGranted) {
-                        if (captureUri == null) {
-                            captureUri = getCaptureUri(context)
-                        }
-                        val captureIntent =
-                            Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
-                                MediaStore.EXTRA_OUTPUT,
-                                getCaptureUri(context)
-                            )
-                        captureResult.launch(captureIntent)
-                    } else {
-                        cameraPermissionState.launchPermissionRequest()
-                    }
-                }) {
-                Text("打開相機", fontSize = 17.sp, color = Color.White)
-            }
-        },
-        //Image Picker Button
-        confirmButton = {
-            Button(
-                modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-                    .fillMaxWidth(),
-                onClick = {
-                    if (externalPermissionState.status.isGranted) {
-                        val intent =
-                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                        intent.setDataAndType(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            "image/*"
-                        )
-                        choosePhotoResult.launch(intent)
-                    } else {
-                        externalPermissionState.launchPermissionRequest()
-                    }
-                }) {
-                Text("從相簿中選取圖片", fontSize = 17.sp, color = Color.White)
-            }
-        }
-    )
-}
-
-private var captureUri: Uri? = null //Camera result callback
-
-private fun getCaptureUri(context: Context): Uri {
-    val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-    val file = File(storageDir, "captureImage.jpg")
-    return FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.provider",
-        file
-    )
 }
 
 @Preview(showBackground = true)

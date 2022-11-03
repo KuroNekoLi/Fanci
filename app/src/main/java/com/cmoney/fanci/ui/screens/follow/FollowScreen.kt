@@ -42,7 +42,7 @@ fun FollowScreen(
             .background(MaterialTheme.colors.surface),
         scaffoldState = followScreenState.scaffoldState,
         drawerContent = {
-            DrawerMenuScreen(modifier = Modifier.width(105.dp)) {
+            DrawerMenuScreen() {
                 followScreenState.closeDrawer()
             }
         },

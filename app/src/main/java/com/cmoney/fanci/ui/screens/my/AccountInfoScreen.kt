@@ -2,6 +2,7 @@ package com.cmoney.fanci.ui.screens.my
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +20,7 @@ import com.cmoney.fanci.ui.theme.White_767A7F
 import com.cmoney.fanci.ui.theme.White_BBBCBF
 
 @Composable
-fun AccountInfoScreen(modifier: Modifier = Modifier) {
+fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> Unit) {
     Column(modifier = modifier) {
         Text(
             modifier = Modifier
@@ -38,7 +39,10 @@ fun AccountInfoScreen(modifier: Modifier = Modifier) {
                         start = 25.dp,
                         end = 10.dp
                     )
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        onChangeAvatarClick.invoke()
+                    },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -120,6 +124,8 @@ fun AccountInfoScreen(modifier: Modifier = Modifier) {
 @Composable
 fun AccountInfoScreenPreview() {
     FanciTheme {
-        AccountInfoScreen()
+        AccountInfoScreen(
+            onChangeAvatarClick = {}
+        )
     }
 }

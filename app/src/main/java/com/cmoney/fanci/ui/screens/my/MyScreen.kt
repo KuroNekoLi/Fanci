@@ -12,13 +12,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.ui.screens.my.state.MyScreenState
 import com.cmoney.fanci.ui.screens.my.state.rememberMyScreenState
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 
+sealed class MyCallback {
+    object ChangeAvatar: MyCallback()
+}
+
+
 @Composable
-fun MyScreen(myScreenState: MyScreenState = rememberMyScreenState()) {
+fun MyScreen(
+    myScreenState: MyScreenState = rememberMyScreenState(),
+    onClick: (MyCallback) -> Unit
+) {
     val TAG = "MyScreen"
 
     Scaffold(
@@ -49,7 +58,10 @@ fun MyScreen(myScreenState: MyScreenState = rememberMyScreenState()) {
 
             //帳號資料
             AccountInfoScreen(
-                modifier = Modifier.padding(top = 15.dp)
+                modifier = Modifier.padding(top = 15.dp),
+                onChangeAvatarClick = {
+                    onClick.invoke(MyCallback.ChangeAvatar)
+                }
             )
 
             //社團設定
@@ -68,6 +80,7 @@ fun MyScreen(myScreenState: MyScreenState = rememberMyScreenState()) {
 @Composable
 fun MyScreenPreview() {
     FanciTheme {
-        MyScreen()
+        MyScreen {
+        }
     }
 }
