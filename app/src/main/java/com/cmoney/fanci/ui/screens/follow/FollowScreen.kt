@@ -32,7 +32,8 @@ import kotlin.math.roundToInt
 @Composable
 fun FollowScreen(
     followScreenState: FollowScreenState = rememberFollowScreenState(),
-    onChannelClick: ((channelBar: ChannelBar) -> Unit)?
+    onChannelClick: ((channelBar: ChannelBar) -> Unit)?,
+    onSearchClick: () -> Unit
 ) {
     val followCategoryList = followScreenState.viewModel.followData.observeAsState()
 
@@ -42,9 +43,14 @@ fun FollowScreen(
             .background(MaterialTheme.colors.surface),
         scaffoldState = followScreenState.scaffoldState,
         drawerContent = {
-            DrawerMenuScreen() {
-                followScreenState.closeDrawer()
-            }
+            DrawerMenuScreen(
+                onClick = {
+                    followScreenState.closeDrawer()
+                },
+                onSearch = {
+                    onSearchClick.invoke()
+                }
+            )
         },
         drawerBackgroundColor = Color.Transparent,
         drawerElevation = 0.dp,
@@ -94,7 +100,6 @@ fun FollowScreen(
                         painter = painterResource(id = R.drawable.menu),
                         contentDescription = null
                     )
-
                 }
             }
 
@@ -153,7 +158,9 @@ fun FollowScreen(
 @Preview(showBackground = true)
 @Composable
 fun FollowScreenPreview() {
-    FollowScreen {
+    FollowScreen(
+        onChannelClick = {}
+    ) {
 
     }
 }

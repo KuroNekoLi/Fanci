@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigator
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.model.ChatMessageModel
 import com.google.accompanist.systemuicontroller.SystemUiController
@@ -16,7 +15,6 @@ class MainStateHolder(
     val mainNavController: NavHostController,
     private val systemUiController: SystemUiController,
 ) {
-
     val route: (Route) -> Unit = {
         when (it) {
             is Route.Channel -> mainNavController.navigate(it.route)
@@ -27,6 +25,9 @@ class MainStateHolder(
                 mainNavController.navigate(it.route)
             }
             is Route.UserInfo -> {
+                mainNavController.navigate(it.route)
+            }
+            is Route.DiscoverGroup -> {
                 mainNavController.navigate(it.route)
             }
         }
@@ -45,9 +46,10 @@ class MainStateHolder(
 
     sealed class Route(route: String) {
         companion object {
-            val Channel = "channel"
-            val Announce = "announce"
-            val UserInfo = "userInfo"
+            const val Channel = "channel"
+            const val Announce = "announce"
+            const val UserInfo = "userInfo"
+            const val DiscoverGroup = "discoverGroup"
         }
 
         data class Channel(val channelId: String, val route: String = "$Channel/${channelId}") :
@@ -57,6 +59,8 @@ class MainStateHolder(
             Route(route)
 
         data class UserInfo(val route: String = UserInfo) : Route(route)
+
+        data class DiscoverGroup(val route: String = DiscoverGroup) : Route(route)
     }
 }
 

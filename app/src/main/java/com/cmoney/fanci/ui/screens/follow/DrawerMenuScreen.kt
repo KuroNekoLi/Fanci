@@ -20,7 +20,7 @@ import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.Black_282A2D
 
 @Composable
-fun DrawerMenuScreen(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun DrawerMenuScreen(modifier: Modifier = Modifier, onClick: () -> Unit, onSearch: () -> Unit) {
     Column(
         modifier = modifier
             .background(Black_282A2D)
@@ -61,7 +61,10 @@ fun DrawerMenuScreen(modifier: Modifier = Modifier, onClick: () -> Unit) {
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(Black_181C23),
+                .background(Black_181C23)
+                .clickable {
+                    onSearch.invoke()
+                },
             contentAlignment = Alignment.Center
         ) {
             Image(painter = painterResource(id = R.drawable.search), contentDescription = null)
@@ -84,7 +87,9 @@ fun DrawerMenuScreen(modifier: Modifier = Modifier, onClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun DrawerMenuScreenPreview() {
-    DrawerMenuScreen {
+    DrawerMenuScreen(
+        onClick = {}
+    ) {
 
     }
 }

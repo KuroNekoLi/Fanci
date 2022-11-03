@@ -21,6 +21,7 @@ import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
 import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
 import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
+import com.cmoney.fanci.ui.screens.group.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
@@ -70,6 +71,11 @@ fun MyAppNavHost(
         composable(MainStateHolder.Route.UserInfo) {
             UserInfoSettingScreen(mainNavController)
         }
+
+        //搜尋Group
+        composable(MainStateHolder.Route.DiscoverGroup) {
+            DiscoverGroupScreen(mainNavController)
+        }
     }
 }
 
@@ -101,9 +107,14 @@ fun MainNavHost(
                 }
                 MainTab.FOLLOW -> {
                     composable(MainTab.FOLLOW.route) {
-                        FollowScreen {
-                            route.invoke(MainStateHolder.Route.Channel("123"))
-                        }
+                        FollowScreen(
+                            onChannelClick = {
+                                route.invoke(MainStateHolder.Route.Channel("123"))
+                            },
+                            onSearchClick = {
+                                route.invoke(MainStateHolder.Route.DiscoverGroup())
+                            }
+                        )
                     }
                 }
                 MainTab.MY -> {

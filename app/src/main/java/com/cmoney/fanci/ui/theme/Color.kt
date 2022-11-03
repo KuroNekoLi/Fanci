@@ -14,6 +14,7 @@ val Black_181C23 = Color(0xFF181C23)
 val Black_202327 = Color(0Xff202327)
 val Black_282A2D = Color(0xFF282A2D)
 val Black_99000000 = Color(0x99000000)
+val Black_2B313C = Color(0xFF2B313C)
 
 val Blue_4F70E5 = Color(0xFF4F70E5)
 
