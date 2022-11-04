@@ -24,7 +24,7 @@ import com.cmoney.fanci.ui.theme.White_BBBCBF
 import com.socks.library.KLog
 
 @Composable
-fun GroupItemScreen(modifier: Modifier = Modifier) {
+fun GroupItemScreen(modifier: Modifier = Modifier, onGroupItemClick: () -> Unit) {
     val TAG = "GroupItemScreen"
     Row(
         modifier = modifier
@@ -33,6 +33,7 @@ fun GroupItemScreen(modifier: Modifier = Modifier) {
             .background(Black_2B313C)
             .clickable {
                 KLog.i(TAG, "click.")
+                onGroupItemClick.invoke()
             }
             .padding(15.dp),
         horizontalArrangement = Arrangement.End,
@@ -59,7 +60,7 @@ fun GroupItemScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(55.dp)
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(10.dp)),
+                .clip(RoundedCornerShape(18.dp)),
             contentScale = ContentScale.Crop,
             contentDescription = null,
             placeholder = painterResource(id = R.drawable.resource_default)
@@ -70,5 +71,5 @@ fun GroupItemScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GroupItemScreenPreview() {
-    GroupItemScreen()
+    GroupItemScreen(){}
 }

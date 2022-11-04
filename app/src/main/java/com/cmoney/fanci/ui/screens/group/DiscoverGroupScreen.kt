@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.fanci.ui.screens.group.state.DiscoverGroupState
 import com.cmoney.fanci.ui.screens.group.state.rememberDiscoverGroupState
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -89,11 +90,19 @@ fun DiscoverGroupScreen(
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 items(10) {
-                    GroupItemScreen()
+                    GroupItemScreen {
+                        state.openGroupItemDialog()
+                    }
                 }
             }
 
-
+            if (state.openGroupDialog.value) {
+                GroupItemDialogScreen(
+                    onDismiss = {
+                        state.closeGroupItemDialog()
+                    }
+                )
+            }
         }
     }
 }

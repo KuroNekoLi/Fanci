@@ -48,6 +48,7 @@ fun FollowScreen(
                     followScreenState.closeDrawer()
                 },
                 onSearch = {
+                    followScreenState.closeDrawer()
                     onSearchClick.invoke()
                 }
             )

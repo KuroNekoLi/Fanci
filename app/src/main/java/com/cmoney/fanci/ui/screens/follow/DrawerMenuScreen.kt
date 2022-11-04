@@ -34,7 +34,7 @@ fun DrawerMenuScreen(modifier: Modifier = Modifier, onClick: () -> Unit, onSearc
                     modifier = Modifier
                         .size(55.dp)
                         .aspectRatio(1f)
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(18.dp))
                         .clickable {
                             onClick.invoke()
                         },
