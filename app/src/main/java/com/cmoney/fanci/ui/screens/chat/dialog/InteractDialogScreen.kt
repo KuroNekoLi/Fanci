@@ -52,15 +52,15 @@ fun InteractDialogScreen(
         Column(
             modifier = Modifier.padding(
                 top = 20.dp,
-                start = 17.5.dp,
-                end = 17.5.dp,
                 bottom = 10.dp
             )
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
+                    .padding(start = 20.dp)
+                    .horizontalScroll(rememberScrollState()),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 emojiLit.forEach {
                     EmojiIcon(it) { resId ->
@@ -143,17 +143,15 @@ private fun EmojiIcon(@DrawableRes resId: Int, onClick: (Int) -> Unit) {
 private fun FeatureText(@DrawableRes resId: Int, text: String, onClick: () -> Unit) {
     val TAG = "FeatureText"
     Box(modifier = Modifier
-        .padding(start = 5.dp)
         .fillMaxWidth()
         .height(IntrinsicSize.Min)
         .clickable {
-            // TODO:
             KLog.i(TAG, "FeatureText click:$text")
             onClick.invoke()
         }
     ) {
         Row(
-            modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
+            modifier = Modifier.padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(painter = painterResource(id = resId), contentDescription = null)

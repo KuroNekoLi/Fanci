@@ -17,7 +17,6 @@ fun Activity.showInteractDialogBottomSheet(
     message: ChatMessageModel,
     onInteractClick: (MessageInteract) -> Unit
 ) {
-    //todo remove issue
     val viewGroup = this.findViewById(android.R.id.content) as ViewGroup
     viewGroup.addView(
         ComposeView(viewGroup.context).apply {
