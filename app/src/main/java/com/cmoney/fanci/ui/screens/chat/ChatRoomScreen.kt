@@ -86,10 +86,6 @@ fun ChatRoomScreen(
                 onMsgDismissHide = {
                     stateHolder.viewModel.onMsgDismissHide(it)
                 },
-                // TODO: move to onInteractClick
-                onEmojiClick = { model, resourceId ->
-                    stateHolder.viewModel.onEmojiClick(model, resourceId)
-                }
             )
 
             //回覆
