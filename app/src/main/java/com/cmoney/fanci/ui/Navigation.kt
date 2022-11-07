@@ -21,7 +21,7 @@ import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
 import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
 import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
-import com.cmoney.fanci.ui.screens.group.DiscoverGroupScreen
+import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen

@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.group.state
+package com.cmoney.fanci.ui.screens.group.search.state
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState

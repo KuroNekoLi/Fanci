@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.group
+package com.cmoney.fanci.ui.screens.group.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.screens.group.dialog.GroupItemDialogScreen
-import com.cmoney.fanci.ui.screens.group.state.DiscoverGroupState
-import com.cmoney.fanci.ui.screens.group.state.rememberDiscoverGroupState
+import com.cmoney.fanci.ui.screens.group.search.state.DiscoverGroupState
+import com.cmoney.fanci.ui.screens.group.search.state.rememberDiscoverGroupState
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.Black_2B313C
 import com.cmoney.fanci.ui.theme.FanciTheme

@@ -31,7 +31,7 @@ data class ChatRoomUiState(
     val reportUser: ChatMessageModel? = null
 )
 
-class ChatRoomViewModel(val context: Context) : ViewModel() {
+class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCase) : ViewModel() {
     private val TAG = ChatRoomViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(ChatRoomUiState())
@@ -39,8 +39,8 @@ class ChatRoomViewModel(val context: Context) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            val chatRoomUseCase = ChatRoomUseCase()
-            uiState = uiState.copy(message = chatRoomUseCase.createMockMessage())
+//            val chatRoomUseCase = ChatRoomUseCase()
+            uiState = uiState.copy(message = chatRoomUseCase.getOGMockMessage(context))
         }
     }
 

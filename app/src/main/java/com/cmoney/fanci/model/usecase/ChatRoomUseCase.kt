@@ -1,9 +1,87 @@
 package com.cmoney.fanci.model.usecase
 
+import android.content.Context
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
+import com.kedia.ogparser.OpenGraphCacheProvider
+import com.kedia.ogparser.OpenGraphCallback
+import com.kedia.ogparser.OpenGraphParser
+import com.kedia.ogparser.OpenGraphResult
+import com.socks.library.KLog
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class ChatRoomUseCase {
+    private val TAG = ChatRoomUseCase::class.java.simpleName
+
+    /**
+     * Get og content
+     */
+    private suspend fun ogParse(context: Context, url: String): OpenGraphResult? =
+        suspendCoroutine { cont ->
+            val openGraphParser = OpenGraphParser(
+                object : OpenGraphCallback {
+                    override fun onError(error: String) {
+                        KLog.e(TAG, "onError:$error")
+                        cont.resume(null)
+                    }
+
+                    override fun onPostResponse(openGraphResult: OpenGraphResult) {
+                        KLog.i(TAG, "onPostResponse:$openGraphResult")
+                        cont.resume(openGraphResult)
+                    }
+                },
+                showNullOnEmpty = true,
+                cacheProvider = OpenGraphCacheProvider(context)
+            )
+            openGraphParser.parse(url)
+        }
+
+    suspend fun getOGMockMessage(context: Context): List<ChatMessageModel> =
+        createMockMessage().map { model ->
+            model.copy(
+                message = model.message.copy(
+                    media = model.message.media.map { media ->
+                        when (media) {
+                            is ChatMessageModel.Media.Article -> {
+                                val ogResult = ogParse(context, media.url)
+                                val newMedia = ogResult?.let {
+                                    val imageUrl = it.image
+                                    val title = it.title
+                                    ChatMessageModel.Media.Article(
+                                        url = media.url,
+                                        from = media.from,
+                                        title = title ?: media.title,
+                                        thumbnail = imageUrl.orEmpty()
+                                    )
+                                } ?: media
+                                newMedia
+                            }
+                            is ChatMessageModel.Media.Image -> {
+                                media
+                            }
+                            is ChatMessageModel.Media.Instagram -> {
+                                media
+                            }
+                            is ChatMessageModel.Media.Youtube -> {
+                                val ogResult = ogParse(context, media.url)
+                                val newMedia = ogResult?.let {
+                                    val imageUrl = it.image
+                                    val title = it.title
+                                    ChatMessageModel.Media.Article(
+                                        url = media.url,
+                                        from = media.from,
+                                        title = title ?: media.title,
+                                        thumbnail = imageUrl.orEmpty()
+                                    )
+                                } ?: media
+                                newMedia
+                            }
+                        }
+                    }
+                )
+            )
+        }
 
     fun createMockMessage(): List<ChatMessageModel> {
         return listOf(
@@ -16,13 +94,15 @@ class ChatRoomUseCase {
                 publishTime = 1666334733000,
                 message = ChatMessageModel.Message(
                     reply = null,
-                    text = "[LE SSERAFIM COMEBACK SHOW : ANTIFRAGILE] LE SSERAFIM - ANTIFRAGILE\n" +
-                            "[르세라핌 컴백쇼 : ANTIFRAGILE] 르세라핌 - 안티프래자일\n",
+                    text = "2023木曜  戀愛老濕機巴士 主題桌曆開賣囉～\n" +
+                            "即日起~11/20預購截止\n" +
+                            "逛逛麥卡貝：https://shop.camerabay.tv/\n" +
+                            "蝦皮賣場：https://shope.ee/8UYTbTMMSX",
                     media = listOf(
                         ChatMessageModel.Media.Youtube(
-                            channel = "M2",
-                            title = "[최초공개] LE SSERAFIM(르세라핌) - ANTIFRAGILE (4K) | LE SSERAFIM COMEBACKSHOW | Mnet 221017 방송",
-                            thumbnail = "https://img.youtube.com/vi/p_XdZdg9oGc/0.jpg"
+                            url = "https://www.youtube.com/watch?v=d8pBKXyEt_0",
+                            title = "",
+                            thumbnail = ""
                         ),
                     ),
                     emoji = listOf(
@@ -96,7 +176,7 @@ class ChatRoomUseCase {
                 text = "文字YT",
                 media = listOf(
                     ChatMessageModel.Media.Youtube(
-                        channel = "阿滴英文",
+                        url = "https://www.youtube.com/watch?v=1J3WdNYCm5M&ab_channel=%E9%98%BF%E6%BB%B4%E8%8B%B1%E6%96%87",
                         title = "【奢華挑戰】在紐約一天花10萬台幣! 頂級享受讓阿滴感動到哭\uD83D\uDE2D @黃大謙 @HOOK",
                         thumbnail = "https://img.youtube.com/vi/1J3WdNYCm5M/0.jpg"
                     )
@@ -147,6 +227,7 @@ class ChatRoomUseCase {
                 text = "文字MEDIUM",
                 media = listOf(
                     ChatMessageModel.Media.Article(
+                        url = "https://medium.com/@tsif/an-ios-engineer-learns-about-androids-jetpack-compose-and-loves-it-c04fc6a53f10",
                         from = "Medium",
                         title = "An iOS Engineer learns about Android’s Jetpack Compose and loves it.",
                         thumbnail = "https://miro.medium.com/max/1100/1*J-2NDqdY4aWkJFKarhZzJw.jpeg"
@@ -183,12 +264,13 @@ class ChatRoomUseCase {
                 text = "房市利空齊發，不動產大老林正雄提出建言，認為現階段打房政策已奏效，政府不應在此時通過平均地權條例的修法，而內政部長徐國勇則也語帶保留的說，修法時將會考慮各時期的情景轉變。",
                 media = listOf(
                     ChatMessageModel.Media.Article(
+                        url = "https://medium.com/gitconnected/7-lifelong-learnings-from-my-first-ever-android-app-b6da8749b5cf",
                         from = "Medium",
-                        title = "12 BEST Apps for Productivity You Need To Use in 2022",
+                        title = "7 Lifelong Learnings From My First Ever Android App",
                         thumbnail = "https://miro.medium.com/max/1100/0*VLSb2Oc_WSxtqN6K"
                     ),
                     ChatMessageModel.Media.Youtube(
-                        channel = "蔡阿嘎Life",
+                        url = "https://www.youtube.com/watch?v=1p_GLULMNbw&ab_channel=%E8%94%A1%E9%98%BF%E5%98%8ELife",
                         title = "【蔡阿嘎地獄廚房#16】廚佛Fred大戰阿煨師，幹話最多的兩個男人正面對決！",
                         thumbnail = "https://img.youtube.com/vi/1p_GLULMNbw/0.jpg"
                     ),

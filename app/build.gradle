@@ -109,6 +109,9 @@ dependencies {
     //=============== SnackBar ===============
     implementation 'com.radusalagean:info-bar-compose:1.0.0'
 
+    //=============== OG Parse ===============
+    implementation 'com.github.Priyansh-Kedia:OpenGraphParser:2.5.5'
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.group
+package com.cmoney.fanci.ui.screens.group.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

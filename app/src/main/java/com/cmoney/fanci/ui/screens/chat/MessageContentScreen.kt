@@ -1,5 +1,9 @@
 package com.cmoney.fanci.ui.screens.chat
 
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
+import android.util.Patterns
+import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -9,9 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.util.LinkifyCompat
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.common.ChatMessageText
@@ -21,6 +29,7 @@ import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.White_494D54
+import com.cmoney.fanci.ui.theme.White_DDDEDF
 import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -29,7 +38,8 @@ import kotlinx.coroutines.launch
 sealed class MessageContentCallback {
     data class LongClick(val message: ChatMessageModel) : MessageContentCallback()
     data class MsgDismissHideClick(val message: ChatMessageModel) : MessageContentCallback()
-    data class EmojiClick(val message: ChatMessageModel, val resourceId: Int) : MessageContentCallback()
+    data class EmojiClick(val message: ChatMessageModel, val resourceId: Int) :
+        MessageContentCallback()
 }
 
 /**
@@ -42,7 +52,7 @@ fun MessageContentScreen(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onMessageContentCallback: (MessageContentCallback) -> Unit
 ) {
-    val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 40.dp)
+    val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp)
     val defaultColor = MaterialTheme.colors.surface
     var longTap by remember { mutableStateOf(false) }
     var backgroundColor by remember { mutableStateOf(defaultColor) }
@@ -105,17 +115,17 @@ fun MessageContentScreen(
                     }
 
                     //內文
-                    ChatMessageText(
+                    MessageTextScreen(
                         modifier = contentPaddingModifier,
-                        text = messageModel.message.text
+                        text = messageModel.message.text ?: ""
                     )
 
-                    messageModel.message.media?.forEach { mediaContent ->
+                    messageModel.message.media.forEach { mediaContent ->
                         MediaContent(contentPaddingModifier, mediaContent)
                     }
 
                     //Emoji
-                    messageModel.message.emoji?.apply {
+                    messageModel.message.emoji.apply {
                         FlowRow(
                             modifier = contentPaddingModifier.fillMaxWidth(),
                             crossAxisSpacing = 10.dp
@@ -170,7 +180,7 @@ private fun MediaContent(modifier: Modifier, media: ChatMessageModel.Media) {
             MessageYTScreen(
                 modifier = modifier,
                 thumbnail = media.thumbnail,
-                channel = media.channel,
+                channel = media.from,
                 title = media.title
             )
         }

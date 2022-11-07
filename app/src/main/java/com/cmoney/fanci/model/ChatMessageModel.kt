@@ -51,9 +51,11 @@ data class ChatMessageModel(
 
     sealed class Media: Parcelable {
         @Parcelize
-        data class Article(val from: String, val title: String, val thumbnail: String) : Media()
+        data class Article(val url: String, val from: String, val title: String, val thumbnail: String) : Media()
+
         @Parcelize
-        data class Youtube(val channel: String, val title: String, val thumbnail: String) : Media()
+        data class Youtube(val url: String, val from: String = "Youtube", val title: String, val thumbnail: String) : Media()
+
         @Parcelize
         data class Instagram(val channel: String, val title: String, val thumbnail: String) :
             Media()
