@@ -117,7 +117,7 @@ fun MessageContentScreen(
                     //內文
                     MessageTextScreen(
                         modifier = contentPaddingModifier,
-                        text = messageModel.message.text ?: ""
+                        text = messageModel.message.text
                     )
 
                     messageModel.message.media.forEach { mediaContent ->

@@ -1,0 +1,74 @@
+package com.cmoney.fanci.ui.screens.tutorial
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.cmoney.fanci.ui.theme.Black_1AFFFFFF
+import com.cmoney.fanci.ui.theme.Blue_4F70E5
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun TutorialScreen(modifier: Modifier = Modifier) {
+    Scaffold(
+        modifier = modifier.fillMaxSize()
+    ) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            val pagerState = rememberPagerState()
+
+            HorizontalPager(
+                count = 10,
+                state = pagerState,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+            ) { page ->
+                TutorialItemScreen(page = page)
+            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .clip(
+                        RoundedCornerShape(30.dp)
+                    )
+                    .background(Black_1AFFFFFF)
+                    .padding(2.dp)
+            ) {
+                HorizontalPagerIndicator(
+                    pagerState = pagerState,
+                    modifier = Modifier
+                        .padding(16.dp),
+                    activeColor = Blue_4F70E5,
+                    inactiveColor = Black_1AFFFFFF
+                )
+            }
+
+            Spacer(modifier = Modifier.height(80.dp))
+
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TutorialScreenPreview() {
+    FanciTheme {
+        TutorialScreen()
+    }
+}
