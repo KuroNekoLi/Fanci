@@ -23,6 +23,7 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -42,39 +43,41 @@ fun MessageScreen(
         modifier = modifier,
     ) {
         val context = LocalContext.current
-        LazyColumn(state = listState) {
+        LazyColumn(state = listState, reverseLayout = true) {
             if (message.isNotEmpty()) {
                 items(message) { message ->
                     MessageContentScreen(
                         messageModel = message,
                         coroutineScope = coroutineScope,
-                    ) {
-                        when (it) {
-                            is MessageContentCallback.EmojiClick -> {
-                                onInteractClick.invoke(
-                                    MessageInteract.EmojiClick(
-                                        it.message,
-                                        it.resourceId
+                        onMessageContentCallback = {
+                            when (it) {
+                                is MessageContentCallback.EmojiClick -> {
+                                    onInteractClick.invoke(
+                                        MessageInteract.EmojiClick(
+                                            it.message,
+                                            it.resourceId
+                                        )
                                     )
-                                )
-                            }
-                            is MessageContentCallback.LongClick -> {
-                                showInteractDialog(context.findActivity(), message, onInteractClick)
-                            }
-                            is MessageContentCallback.MsgDismissHideClick -> {
-                                onMsgDismissHide.invoke(message)
+                                }
+                                is MessageContentCallback.LongClick -> {
+                                    showInteractDialog(context.findActivity(), message, onInteractClick)
+                                }
+                                is MessageContentCallback.MsgDismissHideClick -> {
+                                    onMsgDismissHide.invoke(message)
+                                }
                             }
                         }
-                    }
+                    )
                 }
             }
         }
 
-        LaunchedEffect(message.size) {
-            CoroutineScope(Dispatchers.Main).launch {
-                listState.scrollToItem(index = message.size)
-            }
-        }
+//        LaunchedEffect(message.size) {
+//            CoroutineScope(Dispatchers.Main).launch {
+//                delay(800)
+//                listState.scrollToItem(index = message.size)
+//            }
+//        }
     }
 }
 

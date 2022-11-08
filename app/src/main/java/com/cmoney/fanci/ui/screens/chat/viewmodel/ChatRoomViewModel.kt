@@ -40,7 +40,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     init {
         viewModelScope.launch {
 //            val chatRoomUseCase = ChatRoomUseCase()
-            uiState = uiState.copy(message = chatRoomUseCase.getOGMockMessage(context))
+            uiState = uiState.copy(message = chatRoomUseCase.createMockMessage().reversed())
         }
     }
 
@@ -68,6 +68,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
             //如果是回覆 訊息
             uiState.replyMessage?.apply {
                 orgList.add(
+                    0,
                     ChatMessageModel(
                         poster = ChatMessageModel.User(
                             avatar = "https://picsum.photos/110/110",
@@ -85,6 +86,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
                 )
             } ?: kotlin.run {
                 orgList.add(
+                    0,
                     ChatMessageModel(
                         poster = ChatMessageModel.User(
                             avatar = "https://picsum.photos/110/110",

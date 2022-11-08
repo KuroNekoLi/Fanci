@@ -1,9 +1,5 @@
 package com.cmoney.fanci.ui.screens.chat
 
-import android.text.method.LinkMovementMethod
-import android.text.util.Linkify
-import android.util.Patterns
-import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -13,23 +9,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.text.util.LinkifyCompat
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
-import com.cmoney.fanci.ui.common.ChatMessageText
 import com.cmoney.fanci.ui.common.ChatTimeText
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.White_494D54
-import com.cmoney.fanci.ui.theme.White_DDDEDF
+import com.cmoney.fanci.utils.Utils
 import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -120,8 +111,9 @@ fun MessageContentScreen(
                         text = messageModel.message.text
                     )
 
-                    messageModel.message.media.forEach { mediaContent ->
-                        MediaContent(contentPaddingModifier, mediaContent)
+                    //OG
+                    Utils.extractLinks(messageModel.message.text).forEach { url ->
+                        MessageOGScreen(modifier = contentPaddingModifier, url = url)
                     }
 
                     //Emoji
@@ -150,45 +142,6 @@ fun MessageContentScreen(
 
                 }
             }
-        }
-    }
-}
-
-/**
- * 多媒體 型態
- */
-@Composable
-private fun MediaContent(modifier: Modifier, media: ChatMessageModel.Media) {
-    when (media) {
-        is ChatMessageModel.Media.Article -> {
-            MessageArticleScreen(
-                modifier = modifier,
-                thumbnail = media.thumbnail,
-                channel = media.from,
-                title = media.title
-            )
-        }
-        is ChatMessageModel.Media.Instagram -> {
-            MessageIGScreen(
-                modifier = modifier,
-                thumbnail = media.thumbnail,
-                channel = media.channel,
-                title = media.title
-            )
-        }
-        is ChatMessageModel.Media.Youtube -> {
-            MessageYTScreen(
-                modifier = modifier,
-                thumbnail = media.thumbnail,
-                channel = media.from,
-                title = media.title
-            )
-        }
-        is ChatMessageModel.Media.Image -> {
-            MessageImageScreen(
-                images = media.image,
-                modifier = Modifier.padding(start = 40.dp, top = 10.dp)
-            )
         }
     }
 }
