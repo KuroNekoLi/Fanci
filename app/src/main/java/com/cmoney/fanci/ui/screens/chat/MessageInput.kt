@@ -48,6 +48,10 @@ fun MessageInput(
 ) {
     val openDialog = remember { mutableStateOf(false) }
 
+    var isShowSend by remember {
+        mutableStateOf(false)
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,6 +92,7 @@ fun MessageInput(
             ),
             onValueChange = {
                 textState = it
+                isShowSend = it.isNotEmpty()
             },
             shape = RoundedCornerShape(40.dp),
             maxLines = 5,
@@ -95,22 +100,24 @@ fun MessageInput(
             placeholder = { Text(text = "輸入你想說的話...", fontSize = 16.sp, color = White_494D54) }
         )
 
-        IconButton(
-            onClick = {
-                onMessageSend.invoke(textState)
-                textState = ""
-            },
-            modifier = Modifier
-                .padding(top = 10.dp, bottom = 10.dp, end = 16.dp)
-                .size(41.dp)
-                .clip(CircleShape)
-                .background(Blue_4F70E5),
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.send),
-                contentDescription = null,
-                tint = Color.White
-            )
+        if (isShowSend) {
+            IconButton(
+                onClick = {
+                    onMessageSend.invoke(textState)
+                    textState = ""
+                },
+                modifier = Modifier
+                    .padding(top = 10.dp, bottom = 10.dp, end = 16.dp)
+                    .size(41.dp)
+                    .clip(CircleShape)
+                    .background(Blue_4F70E5),
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.send),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
         }
     }
 

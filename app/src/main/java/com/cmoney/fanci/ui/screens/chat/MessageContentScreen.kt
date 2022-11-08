@@ -116,6 +116,10 @@ fun MessageContentScreen(
                         MessageOGScreen(modifier = contentPaddingModifier, url = url)
                     }
 
+                    messageModel.message.media.forEach { mediaContent ->
+                        MediaContent(contentPaddingModifier, mediaContent)
+                    }
+
                     //Emoji
                     messageModel.message.emoji.apply {
                         FlowRow(
@@ -142,6 +146,21 @@ fun MessageContentScreen(
 
                 }
             }
+        }
+    }
+}
+
+/**
+ * 多媒體 型態
+ */
+@Composable
+private fun MediaContent(modifier: Modifier, media: ChatMessageModel.Media) {
+    when (media) {
+        is ChatMessageModel.Media.Image -> {
+            MessageImageScreen(
+                images = media.image,
+                modifier = modifier
+            )
         }
     }
 }
