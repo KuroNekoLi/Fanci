@@ -12,14 +12,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.common.ChatTimeText
+import com.cmoney.fanci.ui.common.AutoLinkText
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.White_494D54
+import com.cmoney.fanci.ui.theme.White_DDDEDF
 import com.cmoney.fanci.utils.Utils
 import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.CoroutineScope
@@ -106,9 +109,11 @@ fun MessageContentScreen(
                     }
 
                     //內文
-                    MessageTextScreen(
+                    AutoLinkText(
                         modifier = contentPaddingModifier,
-                        text = messageModel.message.text
+                        text = messageModel.message.text,
+                        fontSize = 17.sp,
+                        color = White_DDDEDF
                     )
 
                     //OG

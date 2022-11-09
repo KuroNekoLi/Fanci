@@ -7,26 +7,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.fanci.R
+import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.common.CategoryText
-import com.cmoney.fanci.ui.screens.shared.ChannelBar
 import com.cmoney.fanci.ui.screens.shared.ChannelBarScreen
 
-data class FollowCategory(
-    val categoryTitle: String,
-    val channelList: List<ChannelBar>
-)
 
 @Composable
 fun CategoryScreen(
-    followCategory: FollowCategory,
-    onChannelClick: (channelBar: ChannelBar) -> Unit
+    category: GroupModel.Category,
+    onChannelClick: (channel: GroupModel.Channel) -> Unit
 ) {
     Column {
-        CategoryText(text = followCategory.categoryTitle)
+        CategoryText(text = category.name)
         Spacer(modifier = Modifier.height(10.dp))
-        followCategory.channelList.forEach { channelBar ->
-            ChannelBarScreen(channelBar = channelBar) {
+        category.channels.forEach { channel ->
+            ChannelBarScreen(channel = channel) {
                 onChannelClick.invoke(it)
             }
         }
@@ -37,24 +32,32 @@ fun CategoryScreen(
 @Composable
 fun CategoryScreenPreview() {
     CategoryScreen(
-        FollowCategory(
-            categoryTitle = "分類1",
-            listOf(
-                ChannelBar(
-                    icon = R.drawable.message,
-                    channelTitle = "\uD83D\uDC4F｜歡迎新朋友"
+        GroupModel.Category(
+            categoryId = "",
+            groupId = "",
+            name = "分類1",
+            channels = listOf(
+                GroupModel.Channel(
+                    channelId = "",
+                    creatorId = "",
+                    groupId = "",
+                    name = "\uD83D\uDC4F｜歡迎新朋友"
                 ),
-                ChannelBar(
-                    icon = R.drawable.message,
-                    channelTitle = "\uD83D\uDC4F｜歡迎新朋友"
+                GroupModel.Channel(
+                    channelId = "",
+                    creatorId = "",
+                    groupId = "",
+                    name = "\uD83D\uDC4F｜歡迎新朋友"
                 ),
-                ChannelBar(
-                    icon = R.drawable.message,
-                    channelTitle = "\uD83D\uDC4F｜歡迎新朋友"
+                GroupModel.Channel(
+                    channelId = "",
+                    creatorId = "",
+                    groupId = "",
+                    name = "\uD83D\uDC4F｜歡迎新朋友"
                 )
             )
         )
-    ){
+    ) {
 
     }
 }

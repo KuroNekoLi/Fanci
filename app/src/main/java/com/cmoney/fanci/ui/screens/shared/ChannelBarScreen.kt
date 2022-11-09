@@ -11,19 +11,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.common.ChannelText
 import com.cmoney.fanci.ui.theme.White_494D54
 
-data class ChannelBar(
-    @DrawableRes val icon: Int,
-    val channelTitle: String
-)
-
 @Composable
-fun ChannelBarScreen(channelBar: ChannelBar, onClick: (channelBar: ChannelBar) -> Unit) {
+fun ChannelBarScreen(channel: GroupModel.Channel, onClick: (GroupModel.Channel) -> Unit) {
     Button(
         onClick = {
-            onClick.invoke(channelBar)
+            onClick.invoke(channel)
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -39,12 +35,12 @@ fun ChannelBarScreen(channelBar: ChannelBar, onClick: (channelBar: ChannelBar) -
         ) {
             Row {
                 Icon(
-                    painterResource(id = channelBar.icon),
+                    painterResource(id = R.drawable.message),
                     contentDescription = null,
                     tint = White_494D54
                 )
                 Spacer(modifier = Modifier.width(14.dp))
-                ChannelText(channelBar.channelTitle)
+                ChannelText(channel.name)
             }
         }
     }
@@ -54,9 +50,11 @@ fun ChannelBarScreen(channelBar: ChannelBar, onClick: (channelBar: ChannelBar) -
 @Composable
 fun ChannelBarScreenPreview() {
     ChannelBarScreen(
-        ChannelBar(
-            icon = R.drawable.message,
-            channelTitle = "\uD83D\uDC4F｜歡迎新朋友"
+        GroupModel.Channel(
+            channelId = "",
+            creatorId = "",
+            groupId = "",
+            name = "\uD83D\uDC4F｜歡迎新朋友"
         )
     ) {
 

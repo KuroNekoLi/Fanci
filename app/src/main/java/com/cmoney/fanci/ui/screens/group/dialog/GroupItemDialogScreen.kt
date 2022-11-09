@@ -2,7 +2,9 @@ package com.cmoney.fanci.ui.screens.group.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -20,11 +22,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.GroupModel
+import com.cmoney.fanci.ui.common.AutoLinkText
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.White_262C34
 
 @Composable
-fun GroupItemDialogScreen(modifier: Modifier = Modifier, onDismiss: () -> Unit) {
+fun GroupItemDialogScreen(
+    modifier: Modifier = Modifier,
+    groupModel: GroupModel,
+    onDismiss: () -> Unit
+) {
     val openDialog = remember { mutableStateOf(true) }
     if (openDialog.value) {
         Dialog(onDismissRequest = {
@@ -33,6 +41,7 @@ fun GroupItemDialogScreen(modifier: Modifier = Modifier, onDismiss: () -> Unit) 
         }) {
             Box(
                 modifier = Modifier
+                    .padding(bottom = 30.dp)
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min)
                     .clip(RoundedCornerShape(25.dp))
@@ -40,7 +49,7 @@ fun GroupItemDialogScreen(modifier: Modifier = Modifier, onDismiss: () -> Unit) 
             ) {
                 Column {
                     AsyncImage(
-                        model = "https://picsum.photos/${(100..400).random()}/${(100..400).random()}",
+                        model = groupModel.coverImageUrl,
                         modifier = Modifier
                             .height(170.dp)
                             .fillMaxWidth(),
@@ -51,18 +60,27 @@ fun GroupItemDialogScreen(modifier: Modifier = Modifier, onDismiss: () -> Unit) 
 
                     Text(
                         modifier = Modifier.padding(top = 15.dp, start = 110.dp),
-                        text = "韓勾ㄟ\uD83C\uDDF0\uD83C\uDDF7金針菇討論區",
+                        text = groupModel.name,
                         fontSize = 16.sp,
                         color = Color.White
                     )
 
                     Spacer(modifier = Modifier.height(35.dp))
 
-                    Text(
-                        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 15.dp),
-                        text = "這是金針菇的小家～大家都在這邊嘻嘻哈哈討論金針菇！我們都愛金針菇嘿嘿 這是金針菇的小家～大家都在這邊嘻嘻哈哈討論金針菇！我們都愛金針菇嘿嘿這是金針菇的小家～大家都在這邊嘻嘻哈哈討論金針菇！我們都愛金針菇嘿嘿",
-                        fontSize = 17.sp, color = Color.White
-                    )
+                    Column(
+                        modifier = Modifier
+                            .heightIn(0.dp, 300.dp)
+                            .verticalScroll(
+                                rememberScrollState()
+                            )
+                    ) {
+                        AutoLinkText(
+                            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 15.dp),
+                            text = groupModel.description,
+                            fontSize = 17.sp,
+                            color = Color.White
+                        )
+                    }
 
                     Button(
                         modifier = modifier
@@ -75,11 +93,10 @@ fun GroupItemDialogScreen(modifier: Modifier = Modifier, onDismiss: () -> Unit) 
                         onClick = { /*TODO*/ }) {
                         Text(text = "加入社團", fontSize = 16.sp, color = Blue_4F70E5)
                     }
-
                 }
 
                 AsyncImage(
-                    model = "https://picsum.photos/${(100..400).random()}/${(100..400).random()}",
+                    model = groupModel.thumbnailImageUrl,
                     modifier = Modifier
                         .padding(top = 130.dp, start = 20.dp)
                         .size(75.dp)
@@ -97,7 +114,43 @@ fun GroupItemDialogScreen(modifier: Modifier = Modifier, onDismiss: () -> Unit) 
 @Preview(showBackground = true)
 @Composable
 fun JoinGroupDialogScreenPreview() {
-    GroupItemDialogScreen {
+    GroupItemDialogScreen(
+        groupModel = GroupModel(
+            groupId = "",
+            name = "Hello",
+            description = "大家好，我是愛莉莎莎Alisasa！\n" +
+                    "\n" +
+                    "台灣人在韓國留學八個月 \n" +
+                    "已經在2018 一月\n" +
+                    "回到台灣當全職Youtuber囉！\n" +
+                    "\n" +
+                    "但是我還是每個月會去韓國\n" +
+                    "更新最新的韓國情報 （流行 美妝 美食等等） \n" +
+                    "提供給大家不同於一般觀光客\n" +
+                    "內行的認識韓國新角度\n" +
+                    "\n" +
+                    "另外也因為感情經驗豐富（？）\n" +
+                    "可以提供給大家一些女生的秘密想法～\n" +
+                    "\n" +
+                    "希望大家喜歡我的頻道＾＾\n" +
+                    "\n" +
+                    "\n" +
+                    "如果你喜歡我的影片，希望你可以幫我訂閱＋分享\n" +
+                    "\n" +
+                    "任何合作邀約請洽Pressplay Email :\n" +
+                    "alisasa@pressplay.cc\n" +
+                    "═════════════════════════════════════\n" +
+                    "\n" +
+                    "追蹤我 Follow Me \n" +
+                    "\n" +
+                    "★Facebook社團『愛莉莎莎敗家基地』: https://www.facebook.com/groups/924974291237889/\n" +
+                    "★Facebook粉絲專頁: https://www.facebook.com/alisasa11111/\n" +
+                    "★Instagram: goodalicia",
+            coverImageUrl = "",
+            thumbnailImageUrl = "",
+            categories = emptyList()
+        )
+    ) {
 
     }
 }

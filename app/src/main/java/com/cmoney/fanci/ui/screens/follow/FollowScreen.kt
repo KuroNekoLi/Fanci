@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
-import com.cmoney.fanci.ui.screens.shared.ChannelBar
 import com.cmoney.fanci.ui.theme.Black_282A2D
 import com.cmoney.fanci.ui.theme.Black_99000000
 import kotlin.math.roundToInt
@@ -32,10 +32,11 @@ import kotlin.math.roundToInt
 @Composable
 fun FollowScreen(
     followScreenState: FollowScreenState = rememberFollowScreenState(),
-    onChannelClick: ((channelBar: ChannelBar) -> Unit)?,
+    onChannelClick: ((channel: GroupModel.Channel) -> Unit)?,
     onSearchClick: () -> Unit
 ) {
     val followCategoryList = followScreenState.viewModel.followData.observeAsState()
+    val groupList = followScreenState.viewModel.groupList.observeAsState()
 
     Scaffold(
         modifier = Modifier
@@ -44,7 +45,9 @@ fun FollowScreen(
         scaffoldState = followScreenState.scaffoldState,
         drawerContent = {
             DrawerMenuScreen(
+                groupList = groupList.value.orEmpty(),
                 onClick = {
+                    followScreenState.viewModel.groupItemClick(it)
                     followScreenState.closeDrawer()
                 },
                 onSearch = {
@@ -70,7 +73,7 @@ fun FollowScreen(
                 //Cover Image
                 AsyncImage(
                     alignment = Alignment.TopCenter,
-                    model = "https://picsum.photos/400/400",
+                    model = followCategoryList.value?.coverImageUrl,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
@@ -123,6 +126,7 @@ fun FollowScreen(
                     backgroundColor = MaterialTheme.colors.onSecondary
                 ) {
                     LazyColumn(
+                        userScrollEnabled = true,
                         verticalArrangement = Arrangement.spacedBy(15.dp),
                         modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
                     ) {
@@ -131,8 +135,8 @@ fun FollowScreen(
                             followCategoryList.value?.let {
                                 GroupHeaderScreen(
                                     FollowGroup(
-                                        groupName = it.groupName,
-                                        groupAvatar = it.avatar
+                                        groupName = it.name,
+                                        groupAvatar = it.thumbnailImageUrl
                                     ),
                                     modifier = Modifier.background(
                                         MaterialTheme.colors.onSecondary
@@ -143,8 +147,8 @@ fun FollowScreen(
                         }
 
                         followCategoryList.value?.let {
-                            items(it.category) { category ->
-                                CategoryScreen(followCategory = category) {
+                            items(it.categories) { category ->
+                                CategoryScreen(category = category) {
                                     onChannelClick?.invoke(it)
                                 }
                             }

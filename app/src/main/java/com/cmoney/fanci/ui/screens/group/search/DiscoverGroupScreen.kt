@@ -3,6 +3,7 @@ package com.cmoney.fanci.ui.screens.group.search
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -89,17 +90,20 @@ fun DiscoverGroupScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                items(10) {
-                    GroupItemScreen {
-                        state.openGroupItemDialog()
+                items(state.viewModel.uiState.groupList) {
+                    GroupItemScreen(
+                        groupModel = it
+                    ) { groupModel ->
+                        state.viewModel.openGroupItemDialog(groupModel)
                     }
                 }
             }
 
-            if (state.openGroupDialog.value) {
+            state.viewModel.uiState.searchGroupClick?.apply {
                 GroupItemDialogScreen(
+                    groupModel = this,
                     onDismiss = {
-                        state.closeGroupItemDialog()
+                        state.viewModel.closeGroupItemDialog()
                     }
                 )
             }

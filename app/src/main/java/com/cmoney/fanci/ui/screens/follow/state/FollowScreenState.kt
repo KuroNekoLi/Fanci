@@ -17,7 +17,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.ui.screens.follow.FollowViewModel
+import com.cmoney.fanci.model.viewmodel.FollowViewModelFactory
+import com.cmoney.fanci.ui.screens.follow.viewmodel.FollowViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -54,11 +55,14 @@ class FollowScreenState(
             val delta = available.y
 
             //位移偏差值
-            val offsetVariable = 2.2f
+            val offsetVariable = 4.8f
             val newOffset = imageOffsetHeightPx.value + delta * offsetVariable
+
             imageOffsetHeightPx.value = newOffset.coerceIn(-maxUpPx, -minUpPx)
 
-            val newSpaceOffset = spaceOffsetHeightPx.value + delta
+            val spaceOffsetVariable = 2.4f
+            val newSpaceOffset = spaceOffsetHeightPx.value + delta * spaceOffsetVariable
+
             spaceOffsetHeightPx.value = newSpaceOffset.coerceIn(0f, maxSpaceUpPx)
 
             //是否顯示 大頭貼
@@ -77,8 +81,8 @@ class FollowScreenState(
     }
 
     /**
-    * 關閉 側邊menu
-    */
+     * 關閉 側邊menu
+     */
     fun closeDrawer() {
         coroutineScope.launch {
             scaffoldState.drawerState.close()
@@ -89,11 +93,20 @@ class FollowScreenState(
 @Composable
 fun rememberFollowScreenState(
     navController: NavHostController = rememberNavController(),
-    viewModel: FollowViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    viewModel: FollowViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = FollowViewModelFactory()
+    ),
     configuration: Configuration = LocalConfiguration.current,
     localDensity: Density = androidx.compose.ui.platform.LocalDensity.current,
     scaffoldState: ScaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed)),
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) = remember {
-    FollowScreenState(navController, viewModel, configuration, localDensity, scaffoldState, coroutineScope)
+    FollowScreenState(
+        navController,
+        viewModel,
+        configuration,
+        localDensity,
+        scaffoldState,
+        coroutineScope
+    )
 }

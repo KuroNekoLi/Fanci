@@ -18,13 +18,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.theme.Black_2B313C
 import com.cmoney.fanci.ui.theme.White_767A7F
 import com.cmoney.fanci.ui.theme.White_BBBCBF
 import com.socks.library.KLog
 
 @Composable
-fun GroupItemScreen(modifier: Modifier = Modifier, onGroupItemClick: () -> Unit) {
+fun GroupItemScreen(
+    modifier: Modifier = Modifier,
+    groupModel: GroupModel,
+    onGroupItemClick: (GroupModel) -> Unit
+) {
     val TAG = "GroupItemScreen"
     Row(
         modifier = modifier
@@ -33,21 +38,23 @@ fun GroupItemScreen(modifier: Modifier = Modifier, onGroupItemClick: () -> Unit)
             .background(Black_2B313C)
             .clickable {
                 KLog.i(TAG, "click.")
-                onGroupItemClick.invoke()
+                onGroupItemClick.invoke(groupModel)
             }
             .padding(15.dp),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier
-            .weight(1f)
-            .padding(end = 20.dp)) {
-            Text(text = "韓勾ㄟ\uD83C\uDDF0\uD83C\uDDF7金針菇討論區", fontSize = 16.sp, color = Color.White)
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 20.dp)
+        ) {
+            Text(text = groupModel.name, fontSize = 16.sp, color = Color.White)
             Spacer(modifier = Modifier.height(5.dp))
             Text(text = "私密社團・成員 1345 ", fontSize = 12.sp, color = White_767A7F)
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "我愛金針菇\uD83D\uDC97這裡是一群超愛",
+                text = groupModel.description,
                 fontSize = 14.sp,
                 color = White_BBBCBF,
                 maxLines = 1,
@@ -56,7 +63,7 @@ fun GroupItemScreen(modifier: Modifier = Modifier, onGroupItemClick: () -> Unit)
         }
 
         AsyncImage(
-            model = "https://picsum.photos/${(100..400).random()}/${(100..400).random()}",
+            model = groupModel.thumbnailImageUrl,
             modifier = Modifier
                 .size(55.dp)
                 .aspectRatio(1f)
@@ -71,5 +78,14 @@ fun GroupItemScreen(modifier: Modifier = Modifier, onGroupItemClick: () -> Unit)
 @Preview(showBackground = true)
 @Composable
 fun GroupItemScreenPreview() {
-    GroupItemScreen(){}
+    GroupItemScreen(
+        groupModel = GroupModel(
+            groupId = "",
+            name = "Hello",
+            description = "Description",
+            coverImageUrl = "",
+            thumbnailImageUrl = "",
+            categories = emptyList()
+        )
+    ) {}
 }
