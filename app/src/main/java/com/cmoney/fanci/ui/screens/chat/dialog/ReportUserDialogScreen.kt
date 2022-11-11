@@ -23,10 +23,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
-import com.cmoney.fanci.ui.theme.Black_181C23
-import com.cmoney.fanci.ui.theme.Color_CB4A4A
-import com.cmoney.fanci.ui.theme.White_262C34
-import com.cmoney.fanci.ui.theme.White_BBBCBF
+import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.LocalColor
 
 /**
  * 隱藏用戶 彈窗
@@ -63,7 +61,7 @@ fun ReportUserDialogScreen(
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .clip(RoundedCornerShape(8.dp))
-                    .background(White_262C34)
+                    .background(LocalColor.current.env_80)
                     .padding(20.dp)
             ) {
                 Column(
@@ -77,13 +75,13 @@ fun ReportUserDialogScreen(
                             contentDescription = null
                         )
                         Spacer(modifier = Modifier.width(9.dp))
-                        Text(text = "向管理員檢舉此用戶", fontSize = 19.sp, color = Color.White)
+                        Text(text = "向管理員檢舉此用戶", fontSize = 19.sp, color = LocalColor.current.text.default_100)
                     }
                     Spacer(modifier = Modifier.height(25.dp))
                     Text(
                         text = "送出檢舉要求給管理員，會由社團管理員決定是否該對此用戶進行限制。",
                         fontSize = 17.sp,
-                        color = Color.White
+                        color = LocalColor.current.text.default_100
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Box(
@@ -91,7 +89,7 @@ fun ReportUserDialogScreen(
                             .fillMaxWidth()
                             .height(50.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .background(Black_181C23)
+                            .background(LocalColor.current.background)
                             .padding(start = 12.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
@@ -106,9 +104,9 @@ fun ReportUserDialogScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(50.dp),
-                                border = BorderStroke(1.dp, White_BBBCBF),
+                                border = BorderStroke(1.dp, LocalColor.current.text.default_100),
                                 colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = Color.Transparent
+                                    backgroundColor = LocalColor.current.env_80
                                 ),
                                 onClick = {
                                     if (index == reportReason.size - 1) {
@@ -117,7 +115,7 @@ fun ReportUserDialogScreen(
                                         onConfirm.invoke(reason)
                                     }
                                 }) {
-                                Text(text = reason, fontSize = 16.sp, color = Color.White)
+                                Text(text = reason, fontSize = 16.sp, color = LocalColor.current.text.default_100)
                             }
                             Spacer(modifier = Modifier.height(20.dp))
                         }
@@ -126,9 +124,9 @@ fun ReportUserDialogScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
-                            border = BorderStroke(1.dp, White_BBBCBF),
+                            border = BorderStroke(1.dp, LocalColor.current.text.default_100),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent
+                                backgroundColor = LocalColor.current.env_80
                             ),
                             onClick = {
                                 dialogHeight.value = IntrinsicSize.Max
@@ -141,15 +139,15 @@ fun ReportUserDialogScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
-                            border = BorderStroke(1.dp, White_BBBCBF),
+                            border = BorderStroke(1.dp, LocalColor.current.text.default_100),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent
+                                backgroundColor = LocalColor.current.env_80
                             ),
                             onClick = {
                                 openDialog.value = false
                                 onDismiss.invoke()
                             }) {
-                            Text(text = "取消", fontSize = 16.sp, color = Color.White)
+                            Text(text = "取消", fontSize = 16.sp, color = LocalColor.current.text.default_100)
                         }
                     }
                 }
@@ -161,15 +159,17 @@ fun ReportUserDialogScreen(
 @Preview(showBackground = true)
 @Composable
 fun ReportUserDialogScreenPreview() {
-    ReportUserDialogScreen(
-        ChatMessageModel.User(
-            avatar = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
-            nickname = "Hello"
-        ),
-        {
+    FanciTheme {
+        ReportUserDialogScreen(
+            ChatMessageModel.User(
+                avatar = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
+                nickname = "Hello"
+            ),
+            {
+
+            }
+        ) {
 
         }
-    ) {
-
     }
 }

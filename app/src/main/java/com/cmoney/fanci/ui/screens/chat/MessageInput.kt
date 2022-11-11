@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -29,9 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.shared.camera.ChooseImagePickDialog
-import com.cmoney.fanci.ui.theme.Black_202327
-import com.cmoney.fanci.ui.theme.Blue_4F70E5
-import com.cmoney.fanci.ui.theme.White_494D54
+import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -64,7 +64,7 @@ fun MessageInput(
                 .padding(top = 10.dp, bottom = 10.dp, start = 16.dp)
                 .size(41.dp)
                 .clip(CircleShape)
-                .background(Black_202327)
+                .background(LocalColor.current.background)
                 .clickable {
                     openDialog.value = true
                 },
@@ -72,7 +72,9 @@ fun MessageInput(
         ) {
             Image(
                 modifier = Modifier.size(19.dp),
-                painter = painterResource(id = R.drawable.plus), contentDescription = null
+                painter = painterResource(id = R.drawable.plus),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = Color.White)
             )
         }
 
@@ -83,10 +85,10 @@ fun MessageInput(
                 .padding(10.dp),
             value = textState,
             colors = TextFieldDefaults.textFieldColors(
-                textColor = Color.White,
-                backgroundColor = Black_202327,
-                cursorColor = Color.White,
-                disabledLabelColor = Color.DarkGray,
+                textColor  = LocalColor.current.inputText.input_100,
+                backgroundColor = LocalColor.current.inputFrame,
+                cursorColor = LocalColor.current.primary,
+                disabledLabelColor = LocalColor.current.text.default_30,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -97,7 +99,7 @@ fun MessageInput(
             shape = RoundedCornerShape(40.dp),
             maxLines = 5,
             textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-            placeholder = { Text(text = "輸入你想說的話...", fontSize = 16.sp, color = White_494D54) }
+            placeholder = { Text(text = "輸入你想說的話...", fontSize = 16.sp, color = LocalColor.current.text.default_30) }
         )
 
         if (isShowSend) {
@@ -110,7 +112,7 @@ fun MessageInput(
                     .padding(top = 10.dp, bottom = 10.dp, end = 16.dp)
                     .size(41.dp)
                     .clip(CircleShape)
-                    .background(Blue_4F70E5),
+                    .background(LocalColor.current.primary),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.send),
@@ -133,8 +135,10 @@ fun MessageInput(
 @Preview(showBackground = true)
 @Composable
 fun MessageInputPreview() {
-    MessageInput(
-        {},
-        {}
-    )
+    FanciTheme {
+        MessageInput(
+            {},
+            {}
+        )
+    }
 }

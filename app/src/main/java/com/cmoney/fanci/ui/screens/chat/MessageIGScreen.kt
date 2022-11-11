@@ -19,6 +19,7 @@ import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.White_DDDEDF
 
+@Deprecated("not used")
 @Composable
 fun MessageIGScreen(
     thumbnail: String,

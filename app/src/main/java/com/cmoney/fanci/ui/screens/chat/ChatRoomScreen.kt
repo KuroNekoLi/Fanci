@@ -21,6 +21,7 @@ import com.cmoney.fanci.ui.screens.chat.state.rememberChatRoomState
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.socks.library.KLog
 
 @Composable
@@ -54,7 +55,7 @@ fun ChatRoomScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(LocalColor.current.env_80)
                 .fillMaxSize()
                 .padding(innerPadding),
             verticalArrangement = Arrangement.Bottom

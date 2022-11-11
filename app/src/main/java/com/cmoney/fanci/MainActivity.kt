@@ -9,6 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
@@ -17,12 +18,17 @@ import com.cmoney.fanci.ui.MainNavHost
 import com.cmoney.fanci.ui.MyAppNavHost
 import com.cmoney.fanci.ui.screens.BottomBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : AppCompatActivity() {
+    val viewModel by inject<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            FanciTheme {
+            val theme = viewModel.theme.observeAsState()
+
+            FanciTheme(themeSetting = theme.value ?: ThemeSetting.Default) {
                 val mainState = rememberMainState()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -33,7 +39,9 @@ class MainActivity : AppCompatActivity() {
                         mainState.navController,
                         mainState.mainNavController,
                         mainState.route
-                    )
+                    ) {
+                        viewModel.settingTheme(it)
+                    }
                 }
             }
         }
@@ -43,7 +51,8 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainScreen(
     mainNavController: NavHostController,
-    route: (MainStateHolder.Route) -> Unit
+    route: (MainStateHolder.Route) -> Unit,
+    theme: (ThemeSetting) -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -53,7 +62,8 @@ fun MainScreen(
         MainNavHost(
             navController = mainNavController,
             modifier = Modifier.padding(innerPadding),
-            route = route
+            route = route,
+            theme = theme
         )
     }
 }
@@ -61,6 +71,6 @@ fun MainScreen(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    MainScreen(rememberNavController()) {
+    MainScreen(rememberNavController(), route = {}) {
     }
 }

@@ -17,6 +17,7 @@ import com.cmoney.fanci.ui.screens.my.state.MyScreenState
 import com.cmoney.fanci.ui.screens.my.state.rememberMyScreenState
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 
 sealed class MyCallback {
     object ChangeAvatar: MyCallback()
@@ -47,7 +48,7 @@ fun MyScreen(
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .background(MaterialTheme.colors.surface)
+                .background(LocalColor.current.env_80)
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {

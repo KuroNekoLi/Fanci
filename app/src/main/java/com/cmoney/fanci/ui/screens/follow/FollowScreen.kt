@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -21,11 +22,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ThemeSetting
 import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
 import com.cmoney.fanci.ui.theme.Black_282A2D
 import com.cmoney.fanci.ui.theme.Black_99000000
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -33,15 +37,15 @@ import kotlin.math.roundToInt
 fun FollowScreen(
     followScreenState: FollowScreenState = rememberFollowScreenState(),
     onChannelClick: ((channel: GroupModel.Channel) -> Unit)?,
-    onSearchClick: () -> Unit
+    onSearchClick: () -> Unit,
+    theme: (ThemeSetting) -> Unit
 ) {
     val followCategoryList = followScreenState.viewModel.followData.observeAsState()
     val groupList = followScreenState.viewModel.groupList.observeAsState()
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.surface),
+            .fillMaxSize(),
         scaffoldState = followScreenState.scaffoldState,
         drawerContent = {
             DrawerMenuScreen(
@@ -49,6 +53,14 @@ fun FollowScreen(
                 onClick = {
                     followScreenState.viewModel.groupItemClick(it)
                     followScreenState.closeDrawer()
+
+                    // TODO:  test theme
+                    if (it.groupModel.name == "愛莉莎莎 Alisasa") {
+                        theme.invoke(ThemeSetting.Coffee)
+                    }
+                    else {
+                        theme.invoke(ThemeSetting.Default)
+                    }
                 },
                 onSearch = {
                     followScreenState.closeDrawer()
@@ -64,6 +76,7 @@ fun FollowScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .background(LocalColor.current.env_60)
                 .nestedScroll(followScreenState.nestedScrollConnection)
         ) {
             Box(
@@ -94,7 +107,7 @@ fun FollowScreen(
                         .padding(20.dp)
                         .size(45.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Black_282A2D)
+                        .background(LocalColor.current.env_80)
                         .clickable {
                             followScreenState.openDrawer()
                         },
@@ -102,7 +115,8 @@ fun FollowScreen(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.menu),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = LocalColor.current.env_100)
                     )
                 }
             }
@@ -123,7 +137,7 @@ fun FollowScreen(
                         ),
                     elevation = 0.dp,
                     shape = RoundedCornerShape(20.dp),
-                    backgroundColor = MaterialTheme.colors.onSecondary
+                    backgroundColor = LocalColor.current.env_80
                 ) {
                     LazyColumn(
                         userScrollEnabled = true,
@@ -138,10 +152,8 @@ fun FollowScreen(
                                         groupName = it.name,
                                         groupAvatar = it.thumbnailImageUrl
                                     ),
-                                    modifier = Modifier.background(
-                                        MaterialTheme.colors.onSecondary
-                                    ),
-                                    followScreenState.visibleAvatar
+                                    visibleAvatar = followScreenState.visibleAvatar,
+                                    modifier = Modifier.background(LocalColor.current.env_80)
                                 )
                             }
                         }
@@ -163,9 +175,12 @@ fun FollowScreen(
 @Preview(showBackground = true)
 @Composable
 fun FollowScreenPreview() {
-    FollowScreen(
-        onChannelClick = {}
-    ) {
+    FanciTheme {
+        FollowScreen(
+            onChannelClick = {},
+            onSearchClick = {}
+        ) {
 
+        }
     }
 }

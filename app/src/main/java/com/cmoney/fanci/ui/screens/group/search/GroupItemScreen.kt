@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.GroupModel
-import com.cmoney.fanci.ui.theme.Black_2B313C
-import com.cmoney.fanci.ui.theme.White_767A7F
-import com.cmoney.fanci.ui.theme.White_BBBCBF
+import com.cmoney.fanci.ui.common.GroupText
+import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.socks.library.KLog
 
 @Composable
@@ -35,7 +35,7 @@ fun GroupItemScreen(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(15.dp))
-            .background(Black_2B313C)
+            .background(LocalColor.current.background)
             .clickable {
                 KLog.i(TAG, "click.")
                 onGroupItemClick.invoke(groupModel)
@@ -49,14 +49,14 @@ fun GroupItemScreen(
                 .weight(1f)
                 .padding(end = 20.dp)
         ) {
-            Text(text = groupModel.name, fontSize = 16.sp, color = Color.White)
+            GroupText(text = groupModel.name)
             Spacer(modifier = Modifier.height(5.dp))
-            Text(text = "私密社團・成員 1345 ", fontSize = 12.sp, color = White_767A7F)
+            Text(text = "私密社團・成員 1345 ", fontSize = 12.sp, color = LocalColor.current.text.default_50)
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = groupModel.description,
                 fontSize = 14.sp,
-                color = White_BBBCBF,
+                color = LocalColor.current.text.default_80,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -78,14 +78,16 @@ fun GroupItemScreen(
 @Preview(showBackground = true)
 @Composable
 fun GroupItemScreenPreview() {
-    GroupItemScreen(
-        groupModel = GroupModel(
-            groupId = "",
-            name = "Hello",
-            description = "Description",
-            coverImageUrl = "",
-            thumbnailImageUrl = "",
-            categories = emptyList()
-        )
-    ) {}
+    FanciTheme {
+        GroupItemScreen(
+            groupModel = GroupModel(
+                groupId = "",
+                name = "Hello",
+                description = "Description",
+                coverImageUrl = "",
+                thumbnailImageUrl = "",
+                categories = emptyList()
+            )
+        ) {}
+    }
 }

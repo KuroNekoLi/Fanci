@@ -17,24 +17,25 @@ import com.cmoney.fanci.ui.common.ReplyText
 import com.cmoney.fanci.ui.common.ReplyTitleText
 import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_BBBCBF
 
 @Composable
 fun MessageRecycleScreen(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .background(Black_181C23)
+            .clip(RoundedCornerShape(12.dp))
+            .background(LocalColor.current.background)
             .padding(
-                16.dp
+                12.dp
             )
-            .clip(RoundedCornerShape(8.dp))
 
     ) {
         Text(
             text = "訊息已收回",
             style = TextStyle(
                 fontSize = 17.sp,
-                color = White_BBBCBF
+                color = LocalColor.current.text.default_100
             )
         )
     }

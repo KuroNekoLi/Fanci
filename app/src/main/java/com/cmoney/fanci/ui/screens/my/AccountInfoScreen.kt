@@ -9,15 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
-import com.cmoney.fanci.ui.theme.Black_181C23
-import com.cmoney.fanci.ui.theme.FanciTheme
-import com.cmoney.fanci.ui.theme.White_767A7F
-import com.cmoney.fanci.ui.theme.White_BBBCBF
+import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.LocalColor
 
 @Composable
 fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> Unit) {
@@ -27,10 +26,10 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
                 .padding(
                     start = 25.dp,
                 ),
-            text = "帳號資料", fontSize = 14.sp, color = Color.White
+            text = "帳號資料", fontSize = 14.sp, color = LocalColor.current.text.default_100
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Column(modifier = Modifier.background(Black_181C23)) {
+        Column(modifier = Modifier.background(LocalColor.current.background)) {
             Row(
                 modifier = Modifier
                     .padding(
@@ -48,16 +47,18 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
                 Image(
                     modifier = Modifier.size(20.dp),
                     painter = painterResource(id = R.drawable.smile),
-                    contentDescription = null
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
                 )
                 Spacer(modifier = Modifier.width(17.dp))
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "頭像與暱稱", fontSize = 17.sp, color = White_BBBCBF
+                    text = "頭像與暱稱", fontSize = 17.sp, color = LocalColor.current.text.default_100
                 )
                 Image(
                     painter = painterResource(id = R.drawable.next),
-                    contentDescription = null
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
                 )
             }
 
@@ -75,19 +76,21 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
                 Image(
                     modifier = Modifier.size(20.dp),
                     painter = painterResource(id = R.drawable.profile),
-                    contentDescription = null
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
                 )
                 Spacer(modifier = Modifier.width(17.dp))
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "帳號管理", fontSize = 17.sp, color = White_BBBCBF
+                    text = "帳號管理", fontSize = 17.sp, color = LocalColor.current.text.default_100
                 )
                 Text(
-                    text = "emily1112@gmail.com", fontSize = 14.sp, color = Color.White
+                    text = "emily1112@gmail.com", fontSize = 14.sp, color = LocalColor.current.text.default_100
                 )
                 Image(
                     painter = painterResource(id = R.drawable.next),
-                    contentDescription = null
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
                 )
             }
 
@@ -105,15 +108,16 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
                 Image(
                     modifier = Modifier.size(20.dp),
                     painter = painterResource(id = R.drawable.barcode),
-                    contentDescription = null
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
                 )
                 Spacer(modifier = Modifier.width(17.dp))
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "使用者編號", fontSize = 17.sp, color = White_BBBCBF
+                    text = "使用者編號", fontSize = 17.sp, color = LocalColor.current.text.default_100
                 )
                 Text(
-                    text = "13029", fontSize = 14.sp, color = White_767A7F
+                    text = "13029", fontSize = 14.sp, color = LocalColor.current.text.default_80
                 )
             }
         }

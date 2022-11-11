@@ -20,6 +20,7 @@ import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +40,7 @@ fun MessageScreen(
     onMsgDismissHide: (ChatMessageModel) -> Unit
 ) {
     Surface(
-        color = MaterialTheme.colors.surface,
+        color = LocalColor.current.env_80,
         modifier = modifier,
     ) {
         val context = LocalContext.current

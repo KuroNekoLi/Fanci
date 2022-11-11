@@ -21,6 +21,8 @@ import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.chat.dialog.ShowDisplayHideMessageScreen
 import com.cmoney.fanci.ui.theme.Black_181C23
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_BBBCBF
 
 @Composable
@@ -44,10 +46,10 @@ fun MessageHideUserScreen(
                 .fillMaxWidth()
                 .height(50.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(Black_181C23)
+                .background(LocalColor.current.background)
                 .padding(15.dp)
         ) {
-            Text(text = "該用戶的內容已自動為你隱藏", fontSize = 17.sp, color = White_BBBCBF)
+            Text(text = "該用戶的內容已自動為你隱藏", fontSize = 17.sp, color = LocalColor.current.text.default_30)
         }
     }
 
@@ -69,7 +71,9 @@ fun MessageHideUserScreen(
 @Preview(showBackground = true)
 @Composable
 fun MessageHideUserScreenPreview() {
-    MessageHideUserScreen(
-        chatMessageModel = ChatRoomUseCase.MockData.allMessageType
-    ) {}
+    FanciTheme {
+        MessageHideUserScreen(
+            chatMessageModel = ChatRoomUseCase.MockData.allMessageType
+        ) {}
+    }
 }

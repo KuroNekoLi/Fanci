@@ -20,6 +20,8 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.model.MainTab
 import com.cmoney.fanci.model.mainTabItems
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_494D54
 
 /**
@@ -56,10 +58,10 @@ fun BottomBarScreen(navController: NavHostController) {
             modifier = Modifier
                 .height(8.dp)
                 .fillMaxWidth()
-                .background(MaterialTheme.colors.primary),
+                .background(LocalColor.current.env_100),
         )
         BottomNavigation(
-            backgroundColor = MaterialTheme.colors.primary
+            backgroundColor = LocalColor.current.env_100
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
@@ -74,8 +76,8 @@ fun BottomBarScreen(navController: NavHostController) {
                     },
                     label = { Text(text = screen.title.uppercase()) },
                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                    selectedContentColor = Blue_4F70E5,
-                    unselectedContentColor = White_494D54,
+                    selectedContentColor = LocalColor.current.component.tabSelected,
+                    unselectedContentColor = LocalColor.current.component.tabUnSelect,
                     onClick = {
                         navController.navigate(screen.route) {
                             // Pop up to the start destination of the graph to
@@ -100,5 +102,7 @@ fun BottomBarScreen(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun BottomBarPreview() {
-    BottomBarScreen(rememberNavController())
+    FanciTheme {
+        BottomBarScreen(rememberNavController())
+    }
 }

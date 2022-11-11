@@ -16,6 +16,7 @@ import com.cmoney.fanci.ui.common.ReplyChatText
 import com.cmoney.fanci.ui.common.ReplyChatTitleText
 import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 
 /**
  * 回覆 某人 訊息
@@ -26,7 +27,7 @@ fun ChatReplyScreen(reply: ChatMessageModel.Reply, onDelete: (ChatMessageModel.R
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Black_181C23),
+            .background(LocalColor.current.background),
         contentAlignment = Alignment.TopEnd
     ) {
 

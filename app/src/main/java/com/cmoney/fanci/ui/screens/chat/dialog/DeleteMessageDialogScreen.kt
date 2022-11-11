@@ -23,10 +23,8 @@ import androidx.compose.ui.window.Dialog
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
-import com.cmoney.fanci.ui.theme.Black_181C23
-import com.cmoney.fanci.ui.theme.Color_CB4A4A
-import com.cmoney.fanci.ui.theme.White_262C34
-import com.cmoney.fanci.ui.theme.White_BBBCBF
+import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.LocalColor
 
 /**
  * 隱藏用戶 彈窗
@@ -48,7 +46,7 @@ fun DeleteMessageDialogScreen(
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(White_262C34)
+                    .background(LocalColor.current.env_80)
                     .padding(20.dp)
             ) {
                 Column {
@@ -60,17 +58,25 @@ fun DeleteMessageDialogScreen(
                             contentDescription = null
                         )
                         Spacer(modifier = Modifier.width(9.dp))
-                        Text(text = "將此訊息刪除", fontSize = 19.sp, color = Color.White)
+                        Text(
+                            text = "將此訊息刪除",
+                            fontSize = 19.sp,
+                            color = LocalColor.current.text.default_100
+                        )
                     }
                     Spacer(modifier = Modifier.height(25.dp))
-                    Text(text = "刪除的訊息整個聊天室的成員\n都不會看見它唷！", fontSize = 17.sp, color = Color.White)
+                    Text(
+                        text = "刪除的訊息整個聊天室的成員\n都不會看見它唷！",
+                        fontSize = 17.sp,
+                        color = LocalColor.current.text.default_100
+                    )
                     Spacer(modifier = Modifier.height(20.dp))
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(IntrinsicSize.Min)
                             .clip(RoundedCornerShape(4.dp))
-                            .background(Black_181C23)
+                            .background(LocalColor.current.background)
                             .padding(start = 12.dp, top = 10.dp, bottom = 10.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
@@ -78,13 +84,13 @@ fun DeleteMessageDialogScreen(
                             Text(
                                 text = chatMessageModel.poster.nickname,
                                 fontSize = 12.sp,
-                                color = White_BBBCBF
+                                color = LocalColor.current.text.default_100
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = chatMessageModel.message.text,
                                 fontSize = 14.sp,
-                                color = White_BBBCBF
+                                color = LocalColor.current.text.default_100
                             )
                         }
 
@@ -94,9 +100,9 @@ fun DeleteMessageDialogScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        border = BorderStroke(1.dp, White_BBBCBF),
+                        border = BorderStroke(1.dp, LocalColor.current.text.default_100),
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Transparent
+                            backgroundColor = LocalColor.current.env_80
                         ),
                         onClick = { onConfirm.invoke(chatMessageModel) }) {
                         Text(text = "確定刪除", fontSize = 16.sp, color = Color_CB4A4A)
@@ -106,15 +112,19 @@ fun DeleteMessageDialogScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        border = BorderStroke(1.dp, White_BBBCBF),
+                        border = BorderStroke(1.dp, LocalColor.current.text.default_100),
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Transparent
+                            backgroundColor = LocalColor.current.env_80
                         ),
                         onClick = {
                             openDialog.value = false
                             onDismiss.invoke()
                         }) {
-                        Text(text = "取消", fontSize = 16.sp, color = Color.White)
+                        Text(
+                            text = "取消",
+                            fontSize = 16.sp,
+                            color = LocalColor.current.text.default_100
+                        )
                     }
                 }
             }
@@ -125,9 +135,11 @@ fun DeleteMessageDialogScreen(
 @Preview(showBackground = true)
 @Composable
 fun DeleteMessageDialogScreenPreview() {
-    DeleteMessageDialogScreen(
-        ChatRoomUseCase.textType,
-        onConfirm = {},
-        onDismiss = {}
-    )
+    FanciTheme {
+        DeleteMessageDialogScreen(
+            ChatRoomUseCase.textType,
+            onConfirm = {},
+            onDismiss = {}
+        )
+    }
 }

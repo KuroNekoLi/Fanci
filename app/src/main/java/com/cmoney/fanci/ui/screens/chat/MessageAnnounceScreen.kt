@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_262C34
 
 /**
@@ -30,16 +33,20 @@ fun MessageAnnounceScreen(chatMessageModel: ChatMessageModel, modifier: Modifier
             .fillMaxWidth()
             .height(45.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(White_262C34),
+            .background(LocalColor.current.background),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(modifier = Modifier.padding(start = 17.dp, end = 17.dp)) {
-            Image(painter = painterResource(id = R.drawable.pin), contentDescription = null)
+            Image(
+                painter = painterResource(id = R.drawable.pin),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+            )
             Spacer(modifier = Modifier.width(15.dp))
             Text(
                 text = chatMessageModel.message.text,
                 fontSize = 16.sp,
-                color = Color.White,
+                color = LocalColor.current.text.default_100,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -50,5 +57,7 @@ fun MessageAnnounceScreen(chatMessageModel: ChatMessageModel, modifier: Modifier
 @Preview(showBackground = true)
 @Composable
 fun MessageAnnounceScreenPreview() {
-    MessageAnnounceScreen(ChatRoomUseCase.textType)
+    FanciTheme {
+        MessageAnnounceScreen(ChatRoomUseCase.textType)
+    }
 }

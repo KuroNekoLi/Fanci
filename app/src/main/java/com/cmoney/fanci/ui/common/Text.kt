@@ -1,17 +1,15 @@
 package com.cmoney.fanci.ui.common
 
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanci.ui.theme.White_767A7F
-import com.cmoney.fanci.ui.theme.White_BBBCBF
-import com.cmoney.fanci.ui.theme.White_C7C7C7
-import com.cmoney.fanci.ui.theme.White_DDDEDF
+import com.cmoney.fanci.ui.theme.*
 
 
 @Composable
@@ -20,7 +18,8 @@ fun GroupText(text: String, modifier: Modifier = Modifier) {
         text = text,
         style = TextStyle(
             fontSize = 16.sp,
-            color = Color.White
+            color = LocalColor.current.text.default_100,
+            fontWeight = FontWeight.Bold
         ),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
@@ -34,7 +33,7 @@ fun CategoryText(text: String) {
         text = text,
         style = TextStyle(
             fontSize = 14.sp,
-            color = MaterialTheme.colors.onSurface
+            color = LocalColor.current.text.default_50
         ),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
@@ -47,7 +46,7 @@ fun ChannelText(text: String) {
         text = text,
         style = TextStyle(
             fontSize = 16.sp,
-            color = Color.White
+            color = LocalColor.current.text.default_100
         ),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
@@ -91,7 +90,7 @@ fun EmojiText(text: String, modifier: Modifier = Modifier) {
         text = text,
         style = TextStyle(
             fontSize = 14.sp,
-            color = White_C7C7C7
+            color = LocalColor.current.text.default_80
         ),
         modifier = modifier
     )
@@ -106,7 +105,7 @@ fun ReplyTitleText(text: String, modifier: Modifier = Modifier) {
         text = text,
         style = TextStyle(
             fontSize = 12.sp,
-            color = White_BBBCBF
+            color = LocalColor.current.text.default_100
         ),
         modifier = modifier
     )
@@ -121,7 +120,7 @@ fun ReplyText(text: String, modifier: Modifier = Modifier) {
         text = text,
         style = TextStyle(
             fontSize = 14.sp,
-            color = White_BBBCBF
+            color = LocalColor.current.text.default_100
         ),
         modifier = modifier
     )
@@ -134,10 +133,8 @@ fun ReplyText(text: String, modifier: Modifier = Modifier) {
 fun ReplyChatTitleText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        style = TextStyle(
-            fontSize = 12.sp,
-            color = Color.White
-        ),
+        color = LocalColor.current.text.default_100,
+        fontSize = 12.sp,
         modifier = modifier,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
@@ -151,10 +148,8 @@ fun ReplyChatTitleText(text: String, modifier: Modifier = Modifier) {
 fun ReplyChatText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        style = TextStyle(
-            fontSize = 14.sp,
-            color = Color.White
-        ),
+        color = LocalColor.current.text.default_100,
+        fontSize = 14.sp,
         modifier = modifier,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis

@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.common.EmojiText
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_262C34
 
 @Composable
@@ -30,7 +31,7 @@ fun EmojiCountScreen(
             .clickable {
                 onClick.invoke(emojiResource)
             }
-            .background(White_262C34)
+            .background(LocalColor.current.background)
     ) {
         Row(
             modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),

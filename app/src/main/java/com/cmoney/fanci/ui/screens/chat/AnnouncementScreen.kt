@@ -15,10 +15,8 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
-import com.cmoney.fanci.ui.theme.Black_14171C
-import com.cmoney.fanci.ui.theme.Blue_4F70E5
-import com.cmoney.fanci.ui.theme.FanciTheme
-import com.cmoney.fanci.ui.theme.White_BBBCBF
+import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.LocalColor
 
 const val AnnounceBundleKey = "AnnounceBundleKey"
 
@@ -36,10 +34,9 @@ fun AnnouncementScreen(
             TopBarScreen(
                 navController,
                 title = "設定公告訊息",
+                trailingEnable = false,
                 moreEnable = false
-            ) {
-                navController.popBackStack()
-            }
+            ) {}
         }
     ) { innerPadding ->
         Column(
@@ -59,7 +56,7 @@ fun AnnouncementScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Black_14171C)
+                    .background(LocalColor.current.env_100)
                     .padding(24.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -68,7 +65,9 @@ fun AnnouncementScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "這則訊息公告後，將會覆蓋上一則公告", color = White_BBBCBF, fontSize = 16.sp
+                        text = "這則訊息公告後，將會覆蓋上一則公告",
+                        color = LocalColor.current.text.other,
+                        fontSize = 16.sp
                     )
 
                     Spacer(modifier = Modifier.height(17.dp))
@@ -77,11 +76,15 @@ fun AnnouncementScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue_4F70E5),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                         onClick = {
                             onConfirm.invoke(message)
                         }) {
-                        Text(text = "將此訊息設為公告", color = Color.White, fontSize = 16.sp)
+                        Text(
+                            text = "將此訊息設為公告",
+                            color = LocalColor.current.text.other,
+                            fontSize = 16.sp
+                        )
                     }
                 }
             }
@@ -94,7 +97,7 @@ fun AnnouncementScreen(
 fun AnnouncementScreenPreview() {
     FanciTheme {
         AnnouncementScreen(rememberNavController(), ChatRoomUseCase.imageType) {
-            
+
         }
     }
 }

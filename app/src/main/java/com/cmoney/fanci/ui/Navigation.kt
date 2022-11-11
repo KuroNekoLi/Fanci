@@ -12,6 +12,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainScreen
 import com.cmoney.fanci.MainStateHolder
+import com.cmoney.fanci.MainViewModel
+import com.cmoney.fanci.ThemeSetting
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
 import com.cmoney.fanci.extension.goBackWithParams
 import com.cmoney.fanci.model.ChatMessageModel
@@ -26,6 +28,7 @@ import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
 import com.socks.library.KLog
+import org.koin.androidx.compose.getViewModel
 
 /**
  * 決定頁面跳轉路徑
@@ -34,7 +37,8 @@ import com.socks.library.KLog
 fun MyAppNavHost(
     navController: NavHostController,
     mainNavController: NavHostController,
-    route: (MainStateHolder.Route) -> Unit
+    route: (MainStateHolder.Route) -> Unit,
+    theme: (ThemeSetting) -> Unit
 ) {
     NavHost(
         navController = mainNavController,
@@ -42,7 +46,7 @@ fun MyAppNavHost(
         modifier = Modifier,
     ) {
         composable("main") {
-            MainScreen(navController, route)
+            MainScreen(navController, route, theme)
         }
         //頻道頁面
         composable("${MainStateHolder.Route.Channel}/{channelId}") { backStackEntry ->
@@ -87,7 +91,8 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: MainTab = MainTab.FOLLOW,
-    route: (MainStateHolder.Route) -> Unit
+    route: (MainStateHolder.Route) -> Unit,
+    theme: (ThemeSetting) -> Unit
 ) {
     //test
     var pos by remember { mutableStateOf(0) }
@@ -113,7 +118,8 @@ fun MainNavHost(
                             },
                             onSearchClick = {
                                 route.invoke(MainStateHolder.Route.DiscoverGroup())
-                            }
+                            },
+                            theme = theme
                         )
                     }
                 }

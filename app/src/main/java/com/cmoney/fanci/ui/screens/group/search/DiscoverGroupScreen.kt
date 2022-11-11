@@ -23,6 +23,7 @@ import com.cmoney.fanci.ui.screens.group.search.state.rememberDiscoverGroupState
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.Black_2B313C
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_494D54
 
 @Composable
@@ -51,38 +52,47 @@ fun DiscoverGroupScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .background(MaterialTheme.colors.surface)
+                .background(LocalColor.current.env_80)
                 .padding(top = 20.dp, bottom = 10.dp, start = 18.dp, end = 18.dp)
         ) {
             TabRow(
                 selectedTabIndex = selectedIndex,
                 modifier = Modifier
                     .height(40.dp)
-                    .clip(RoundedCornerShape(20))
-                    .padding(1.dp),
+                    .padding(1.dp)
+                    .clip(RoundedCornerShape(35)),
                 indicator = { tabPositions: List<TabPosition> ->
                     Box {}
                 },
-                backgroundColor = Black_2B313C
+                backgroundColor = LocalColor.current.env_100
             ) {
                 list.forEachIndexed { index, text ->
                     val selected = selectedIndex == index
                     Tab(
                         modifier = if (selected) Modifier
-                            .padding(4.dp)
-                            .clip(RoundedCornerShape(20))
+                            .padding(2.dp)
+                            .clip(RoundedCornerShape(35))
                             .background(
-                                White_494D54
+                                LocalColor.current.env_60
                             )
                         else Modifier
                             .padding(10.dp)
-                            .clip(RoundedCornerShape(20))
+                            .clip(RoundedCornerShape(35))
                             .background(
                                 Color.Transparent
                             ),
                         selected = selected,
                         onClick = { selectedIndex = index },
-                        text = { Text(text = text, color = Color.White, fontSize = 14.sp) }
+                        text = {
+                            Text(
+                                text = text, color =
+                                if (selected) {
+                                    LocalColor.current.text.default_100
+                                } else {
+                                    LocalColor.current.text.other
+                                }, fontSize = 14.sp
+                            )
+                        }
                     )
                 }
             }

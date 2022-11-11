@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_767A7F
 
 @Composable
@@ -35,9 +36,9 @@ fun MyInfoScreen(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.width(20.dp))
         Column {
-            Text(text = "Emily Chen", fontSize = 17.sp, color = Color.White)
+            Text(text = "Emily Chen", fontSize = 17.sp, color = LocalColor.current.text.default_100)
             Spacer(modifier = Modifier.height(5.dp))
-            Text(text = "此頭像與暱稱為基本設定，你在不同社團的頭像與暱稱，皆可以自由更換。", fontSize = 12.sp, color = White_767A7F)
+            Text(text = "此頭像與暱稱為基本設定，你在不同社團的頭像與暱稱，皆可以自由更換。", fontSize = 12.sp, color = LocalColor.current.text.default_100)
         }
     }
 }

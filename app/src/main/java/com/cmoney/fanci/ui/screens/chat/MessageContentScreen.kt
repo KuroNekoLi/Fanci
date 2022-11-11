@@ -19,10 +19,8 @@ import com.cmoney.fanci.ui.common.ChatTimeText
 import com.cmoney.fanci.ui.common.AutoLinkText
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
-import com.cmoney.fanci.ui.theme.Black_181C23
-import com.cmoney.fanci.ui.theme.FanciTheme
-import com.cmoney.fanci.ui.theme.White_494D54
-import com.cmoney.fanci.ui.theme.White_DDDEDF
+import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.utils.Utils
 import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.CoroutineScope
@@ -47,7 +45,7 @@ fun MessageContentScreen(
     onMessageContentCallback: (MessageContentCallback) -> Unit
 ) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp)
-    val defaultColor = MaterialTheme.colors.surface
+    val defaultColor = LocalColor.current.env_80
     var longTap by remember { mutableStateOf(false) }
     var backgroundColor by remember { mutableStateOf(defaultColor) }
 
@@ -63,7 +61,7 @@ fun MessageContentScreen(
                 },
                 onLongPress = {
                     longTap = true
-                    backgroundColor = White_494D54
+                    backgroundColor = White_767A7F
                     coroutineScope.launch {
                         delay(300)
                         if (longTap && !messageModel.message.isRecycle) {
@@ -104,7 +102,7 @@ fun MessageContentScreen(
                         MessageReplayScreen(
                             this, modifier = contentPaddingModifier
                                 .clip(RoundedCornerShape(9.dp))
-                                .background(Black_181C23)
+                                .background(LocalColor.current.background)
                         )
                     }
 
@@ -113,7 +111,7 @@ fun MessageContentScreen(
                         modifier = contentPaddingModifier,
                         text = messageModel.message.text,
                         fontSize = 17.sp,
-                        color = White_DDDEDF
+                        color = LocalColor.current.text.default_100
                     )
 
                     //OG

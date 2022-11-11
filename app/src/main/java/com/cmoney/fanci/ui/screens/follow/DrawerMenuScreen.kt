@@ -11,16 +11,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ThemeSetting
 import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.Black_282A2D
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
+import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun DrawerMenuScreen(
@@ -31,7 +38,7 @@ fun DrawerMenuScreen(
 ) {
     Column(
         modifier = modifier
-            .background(Black_282A2D)
+            .background(LocalColor.current.env_80)
             .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 5.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
@@ -71,10 +78,14 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(Black_181C23),
+                .background(LocalColor.current.background),
             contentAlignment = Alignment.Center
         ) {
-            Image(painter = painterResource(id = R.drawable.bell), contentDescription = null)
+            Image(
+                painter = painterResource(id = R.drawable.bell),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+            )
         }
         Spacer(modifier = Modifier.height(7.dp))
 
@@ -82,13 +93,17 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(Black_181C23)
+                .background(LocalColor.current.background)
                 .clickable {
                     onSearch.invoke()
                 },
             contentAlignment = Alignment.Center
         ) {
-            Image(painter = painterResource(id = R.drawable.search), contentDescription = null)
+            Image(
+                painter = painterResource(id = R.drawable.search),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+            )
         }
         Spacer(modifier = Modifier.height(7.dp))
 
@@ -96,10 +111,14 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(Black_181C23),
+                .background(LocalColor.current. background),
             contentAlignment = Alignment.Center
         ) {
-            Image(painter = painterResource(id = R.drawable.plus), contentDescription = null)
+            Image(
+                painter = painterResource(id = R.drawable.plus),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+            )
         }
         Spacer(modifier = Modifier.height(5.dp))
     }
@@ -108,21 +127,22 @@ fun DrawerMenuScreen(
 @Preview(showBackground = true)
 @Composable
 fun DrawerMenuScreenPreview() {
-    DrawerMenuScreen(
-        groupList = listOf(
-            GroupItem(
-                isSelected = true, groupModel = GroupModel(
-                    groupId = "",
-                    name = "",
-                    description = "Description",
-                    coverImageUrl = "",
-                    thumbnailImageUrl = "",
-                    emptyList()
+    FanciTheme {
+        DrawerMenuScreen(
+            groupList = listOf(
+                GroupItem(
+                    isSelected = true, groupModel = GroupModel(
+                        groupId = "",
+                        name = "",
+                        description = "Description",
+                        coverImageUrl = "",
+                        thumbnailImageUrl = "",
+                        emptyList()
+                    )
                 )
-            )
-        ),
-        onClick = {}
-    ) {
-
+            ),
+            onClick = {},
+            onSearch = {}
+        )
     }
 }

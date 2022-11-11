@@ -11,24 +11,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
-import com.cmoney.fanci.ui.common.BlueCircleDot
+import com.cmoney.fanci.ui.common.CircleDot
 import com.cmoney.fanci.ui.common.GroupText
-import com.cmoney.fanci.ui.theme.Black_14171C
-import com.cmoney.fanci.ui.theme.Blue_4F70E5
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.socks.library.KLog
 
 data class FollowGroup(val groupName: String, val groupAvatar: String)
 
 @Composable
-fun GroupHeaderScreen(followGroup: FollowGroup, modifier: Modifier, visibleAvatar: Boolean) {
+fun GroupHeaderScreen(
+    followGroup: FollowGroup,
+    modifier: Modifier = Modifier,
+    visibleAvatar: Boolean
+) {
     val tag = "GroupHeaderScreen"
-
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -37,6 +41,9 @@ fun GroupHeaderScreen(followGroup: FollowGroup, modifier: Modifier, visibleAvata
             Image(
                 painter = painterResource(id = R.drawable.fanci),
                 contentDescription = null,
+                colorFilter = ColorFilter.tint(
+                    color = LocalColor.current.primary
+                )
             )
 
             GroupText(text = followGroup.groupName, Modifier.padding(top = 21.dp))
@@ -52,14 +59,14 @@ fun GroupHeaderScreen(followGroup: FollowGroup, modifier: Modifier, visibleAvata
                     .padding(end = 15.dp)
                     .size(35.dp)
                     .clip(CircleShape)
-                    .background(Black_14171C)
+                    .background(LocalColor.current.background)
                     .clickable {
                         // TODO:
                         KLog.i(tag, "more click.")
                     },
                 contentAlignment = Alignment.Center
             ) {
-                BlueCircleDot()
+                CircleDot()
             }
             AnimatedVisibility(
                 visible = visibleAvatar
@@ -82,12 +89,14 @@ fun GroupHeaderScreen(followGroup: FollowGroup, modifier: Modifier, visibleAvata
 @Preview(showBackground = false)
 @Composable
 fun GroupHeaderScreenPreview() {
-    GroupHeaderScreen(
-        FollowGroup(
-            groupName = "社團名稱",
-            groupAvatar = "https://i.pinimg.com/474x/60/5d/31/605d318d7f932e3ebd1d672e5bff9229.jpg"
-        ),
-        modifier = Modifier.padding(20.dp),
-        true
-    )
+    FanciTheme {
+        GroupHeaderScreen(
+            FollowGroup(
+                groupName = "社團名稱",
+                groupAvatar = "https://i.pinimg.com/474x/60/5d/31/605d318d7f932e3ebd1d672e5bff9229.jpg"
+            ),
+            modifier = Modifier.padding(20.dp),
+            true
+        )
+    }
 }

@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.common.CategoryText
 import com.cmoney.fanci.ui.screens.shared.ChannelBarScreen
+import com.cmoney.fanci.ui.theme.FanciTheme
 
 
 @Composable
@@ -31,33 +32,35 @@ fun CategoryScreen(
 @Preview(showBackground = true)
 @Composable
 fun CategoryScreenPreview() {
-    CategoryScreen(
-        GroupModel.Category(
-            categoryId = "",
-            groupId = "",
-            name = "分類1",
-            channels = listOf(
-                GroupModel.Channel(
-                    channelId = "",
-                    creatorId = "",
-                    groupId = "",
-                    name = "\uD83D\uDC4F｜歡迎新朋友"
-                ),
-                GroupModel.Channel(
-                    channelId = "",
-                    creatorId = "",
-                    groupId = "",
-                    name = "\uD83D\uDC4F｜歡迎新朋友"
-                ),
-                GroupModel.Channel(
-                    channelId = "",
-                    creatorId = "",
-                    groupId = "",
-                    name = "\uD83D\uDC4F｜歡迎新朋友"
+    FanciTheme {
+        CategoryScreen(
+            GroupModel.Category(
+                categoryId = "",
+                groupId = "",
+                name = "分類1",
+                channels = listOf(
+                    GroupModel.Channel(
+                        channelId = "",
+                        creatorId = "",
+                        groupId = "",
+                        name = "\uD83D\uDC4F｜歡迎新朋友"
+                    ),
+                    GroupModel.Channel(
+                        channelId = "",
+                        creatorId = "",
+                        groupId = "",
+                        name = "\uD83D\uDC4F｜歡迎新朋友"
+                    ),
+                    GroupModel.Channel(
+                        channelId = "",
+                        creatorId = "",
+                        groupId = "",
+                        name = "\uD83D\uDC4F｜歡迎新朋友"
+                    )
                 )
             )
-        )
-    ) {
+        ) {
 
+        }
     }
 }

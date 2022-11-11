@@ -8,9 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
+import com.cmoney.fanci.ui.theme.LocalColor
 
 @Composable
-fun BlueCircleDot() {
+fun CircleDot() {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
@@ -19,19 +20,19 @@ fun BlueCircleDot() {
             modifier = Modifier
                 .size(3.8.dp)
                 .clip(CircleShape)
-                .background(Blue_4F70E5)
+                .background(LocalColor.current.primary)
         )
         Box(
             modifier = Modifier
                 .size(3.8.dp)
                 .clip(CircleShape)
-                .background(Blue_4F70E5)
+                .background(LocalColor.current.primary)
         )
         Box(
             modifier = Modifier
                 .size(3.8.dp)
                 .clip(CircleShape)
-                .background(Blue_4F70E5)
+                .background(LocalColor.current.primary)
         )
     }
 }

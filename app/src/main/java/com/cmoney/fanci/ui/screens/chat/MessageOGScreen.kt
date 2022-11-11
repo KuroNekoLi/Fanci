@@ -20,6 +20,7 @@ import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.openUrl
 import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_DDDEDF
 import com.kedia.ogparser.OpenGraphCacheProvider
 import com.kedia.ogparser.OpenGraphCallback
@@ -65,7 +66,7 @@ fun MessageOGScreen(
         Box(
             modifier = modifier
                 .clip(RoundedCornerShape(9.dp))
-                .background(Black_181C23)
+                .background(LocalColor.current.background)
                 .clickable {
                     context.openUrl(url)
                 }
@@ -98,7 +99,7 @@ fun MessageOGScreen(
                     modifier = Modifier.padding(top = 5.6.dp),
                     text = openGraphResult.description.orEmpty(),
                     fontSize = 12.sp,
-                    color = White_DDDEDF,
+                    color = LocalColor.current.text.default_100,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
