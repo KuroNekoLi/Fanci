@@ -11,17 +11,19 @@ import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.common.CategoryText
 import com.cmoney.fanci.ui.screens.shared.ChannelBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanciapi.fanci.model.Category
+import com.cmoney.fanciapi.fanci.model.Channel
 
 
 @Composable
 fun CategoryScreen(
-    category: GroupModel.Category,
-    onChannelClick: (channel: GroupModel.Channel) -> Unit
+    category: Category,
+    onChannelClick: (channel: Channel) -> Unit
 ) {
     Column {
-        CategoryText(text = category.name)
+        CategoryText(text = category.name.orEmpty())
         Spacer(modifier = Modifier.height(10.dp))
-        category.channels.forEach { channel ->
+        category.channels?.forEach { channel ->
             ChannelBarScreen(channel = channel) {
                 onChannelClick.invoke(it)
             }
@@ -34,24 +36,24 @@ fun CategoryScreen(
 fun CategoryScreenPreview() {
     FanciTheme {
         CategoryScreen(
-            GroupModel.Category(
+            Category(
                 categoryId = "",
                 groupId = "",
                 name = "分類1",
                 channels = listOf(
-                    GroupModel.Channel(
+                    Channel(
                         channelId = "",
                         creatorId = "",
                         groupId = "",
                         name = "\uD83D\uDC4F｜歡迎新朋友"
                     ),
-                    GroupModel.Channel(
+                    Channel(
                         channelId = "",
                         creatorId = "",
                         groupId = "",
                         name = "\uD83D\uDC4F｜歡迎新朋友"
                     ),
-                    GroupModel.Channel(
+                    Channel(
                         channelId = "",
                         creatorId = "",
                         groupId = "",

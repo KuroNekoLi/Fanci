@@ -114,7 +114,7 @@ fun MainNavHost(
                     composable(MainTab.FOLLOW.route) {
                         FollowScreen(
                             onChannelClick = {
-                                route.invoke(MainStateHolder.Route.Channel("123"))
+                                route.invoke(MainStateHolder.Route.Channel(it.channelId.orEmpty()))
                             },
                             onSearchClick = {
                                 route.invoke(MainStateHolder.Route.DiscoverGroup())

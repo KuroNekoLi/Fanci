@@ -1,0 +1,133 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "https://repo1.maven.org/maven2" }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url "https://oss.sonatype.org/content/repositories/releases/"
+        }
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath('org.openapitools:openapi-generator-gradle-plugin:6.2.1') {
+            exclude group: 'com.google.guava'
+        }
+    }
+}
+
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.cmoney.fanciapi'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 24
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation "com.squareup.moshi:moshi-kotlin:1.9.2"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
+    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+    api "com.squareup.retrofit2:converter-moshi:2.9.0"
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+}
+
+configurations {
+    compile.exclude module: 'guava-jdk5'
+}
+
+apply plugin: 'org.openapi.generator'
+
+def apiName = "fanci"
+def buildApiDir = "$buildDir/openApiGenerator/$apiName"
+def basePackage = "com.cmoney.fanciapi"
+def input = "$rootDir/swagger.json"
+
+println(input)
+
+openApiMeta {
+    generatorName = apiName
+    packageName = basePackage
+    outputFolder = "$buildDir/meta".toString()
+}
+
+openApiValidate {
+    inputSpec = input
+    recommend = true
+}
+
+task buildKotlinClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "kotlin"
+    inputSpec = input
+    outputDir = buildApiDir
+    apiPackage = basePackage + "." + apiName + ".api"
+    modelPackage = basePackage + "." + apiName + ".model"
+    configOptions = [
+            dateLibrary: "java8"
+    ]
+    globalProperties = [
+            modelDocs: "false"
+    ]
+    additionalProperties = [
+            useCoroutines: "true"
+    ]
+    skipValidateSpec = false
+    packageName = "Fanci"
+    library = "jvm-retrofit2"
+    packageName = basePackage
+}
+
+task copy() {
+    def packageToDir = basePackage.replace('.', '/')
+    def dirFrom = buildApiDir + "/src/main/kotlin/" + packageToDir + "/"
+    def dirInto = "${project.projectDir}/src/main/java/" + packageToDir + "/"
+
+    doFirst {
+        delete(file(dirInto))
+    }
+
+    doLast {
+        copy {
+            from dirFrom
+            into dirInto
+        }
+    }
+}
+
+task buildApi() {
+    dependsOn(buildKotlinClient, copy)
+}

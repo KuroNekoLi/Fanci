@@ -6,5 +6,5 @@ import org.koin.dsl.module
 
 val useCaseModule = module {
     factory { ChatRoomUseCase() }
-    factory { GroupUseCase() }
+    factory { GroupUseCase(get()) }
 }

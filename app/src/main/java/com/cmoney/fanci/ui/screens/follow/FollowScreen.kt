@@ -30,13 +30,14 @@ import com.cmoney.fanci.ui.theme.Black_282A2D
 import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.Channel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FollowScreen(
     followScreenState: FollowScreenState = rememberFollowScreenState(),
-    onChannelClick: ((channel: GroupModel.Channel) -> Unit)?,
+    onChannelClick: ((channel: Channel) -> Unit)?,
     onSearchClick: () -> Unit,
     theme: (ThemeSetting) -> Unit
 ) {
@@ -149,8 +150,8 @@ fun FollowScreen(
                             followCategoryList.value?.let {
                                 GroupHeaderScreen(
                                     FollowGroup(
-                                        groupName = it.name,
-                                        groupAvatar = it.thumbnailImageUrl
+                                        groupName = it.name.orEmpty(),
+                                        groupAvatar = it.thumbnailImageUrl.orEmpty()
                                     ),
                                     visibleAvatar = followScreenState.visibleAvatar,
                                     modifier = Modifier.background(LocalColor.current.env_80)
@@ -159,7 +160,7 @@ fun FollowScreen(
                         }
 
                         followCategoryList.value?.let {
-                            items(it.categories) { category ->
+                            items(it.categories.orEmpty()) { category ->
                                 CategoryScreen(category = category) {
                                     onChannelClick?.invoke(it)
                                 }

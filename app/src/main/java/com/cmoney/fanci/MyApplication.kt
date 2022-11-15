@@ -6,6 +6,7 @@ import com.cmoney.backend2.base.model.setting.Platform
 import com.cmoney.backend2.base.model.setting.Setting
 import com.cmoney.data_logdatarecorder.recorder.LogDataRecorder
 import com.cmoney.fanci.di.appModule
+import com.cmoney.fanci.di.networkBaseModule
 import com.cmoney.fanci.di.useCaseModule
 import com.cmoney.fanci.di.viewModule
 import com.cmoney.xlogin.XLoginApplication
@@ -40,7 +41,8 @@ class MyApplication : XLoginApplication() {
             listOf(
                 viewModule,
                 useCaseModule,
-                appModule
+                appModule,
+                networkBaseModule
             )
         )
         // 設定Backend2

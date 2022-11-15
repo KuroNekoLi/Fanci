@@ -19,12 +19,15 @@ import com.cmoney.fanci.ui.MyAppNavHost
 import com.cmoney.fanci.ui.screens.BottomBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : AppCompatActivity() {
     val viewModel by inject<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // TODO:  
+        viewModel.test()
+
         setContent {
             val theme = viewModel.theme.observeAsState()
 

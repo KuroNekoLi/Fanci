@@ -1,8 +1,22 @@
 package com.cmoney.fanci.model.usecase
 
+import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanci.model.GroupModel
+import com.cmoney.fanci.ui.screens.follow.model.GroupItem
+import com.cmoney.fanciapi.fanci.api.GroupApi
 
-class GroupUseCase {
+class GroupUseCase(private val groupApi: GroupApi) {
+
+    /**
+     * 取得社團列表
+     */
+    suspend fun getGroup() =
+        kotlin.runCatching {
+            groupApi.apiV1GroupGet().checkResponseBody().items?.mapIndexed { index, group ->
+                GroupItem(group, index == 0)
+            }.orEmpty()
+        }
+
 
     /**
      * 群組 Mock Data

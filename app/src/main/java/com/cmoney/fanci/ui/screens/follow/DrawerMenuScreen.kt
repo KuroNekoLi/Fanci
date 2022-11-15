@@ -26,6 +26,7 @@ import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.Black_282A2D
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.Group
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -111,7 +112,7 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(LocalColor.current. background),
+                .background(LocalColor.current.background),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -131,13 +132,13 @@ fun DrawerMenuScreenPreview() {
         DrawerMenuScreen(
             groupList = listOf(
                 GroupItem(
-                    isSelected = true, groupModel = GroupModel(
+                    isSelected = true, groupModel = Group(
                         groupId = "",
                         name = "",
                         description = "Description",
                         coverImageUrl = "",
                         thumbnailImageUrl = "",
-                        emptyList()
+                        categories = emptyList()
                     )
                 )
             ),

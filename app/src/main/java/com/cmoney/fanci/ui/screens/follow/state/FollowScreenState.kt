@@ -21,6 +21,7 @@ import com.cmoney.fanci.model.viewmodel.FollowViewModelFactory
 import com.cmoney.fanci.ui.screens.follow.viewmodel.FollowViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 class FollowScreenState(
     val navController: NavHostController,
@@ -93,9 +94,10 @@ class FollowScreenState(
 @Composable
 fun rememberFollowScreenState(
     navController: NavHostController = rememberNavController(),
-    viewModel: FollowViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-        factory = FollowViewModelFactory()
-    ),
+//    viewModel: FollowViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+//        factory = FollowViewModelFactory()
+//    ),
+    viewModel: FollowViewModel = koinViewModel(),
     configuration: Configuration = LocalConfiguration.current,
     localDensity: Density = androidx.compose.ui.platform.LocalDensity.current,
     scaffoldState: ScaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed)),

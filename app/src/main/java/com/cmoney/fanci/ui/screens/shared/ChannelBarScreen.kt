@@ -1,6 +1,5 @@
 package com.cmoney.fanci.ui.screens.shared
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -19,10 +17,10 @@ import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.common.ChannelText
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanci.ui.theme.White_494D54
+import com.cmoney.fanciapi.fanci.model.Channel
 
 @Composable
-fun ChannelBarScreen(channel: GroupModel.Channel, onClick: (GroupModel.Channel) -> Unit) {
+fun ChannelBarScreen(channel: Channel, onClick: (Channel) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -44,7 +42,7 @@ fun ChannelBarScreen(channel: GroupModel.Channel, onClick: (GroupModel.Channel) 
                 tint = LocalColor.current.component.other
             )
             Spacer(modifier = Modifier.width(14.dp))
-            ChannelText(channel.name)
+            ChannelText(channel.name.orEmpty())
         }
     }
 }
@@ -54,7 +52,7 @@ fun ChannelBarScreen(channel: GroupModel.Channel, onClick: (GroupModel.Channel) 
 fun ChannelBarScreenPreview() {
     FanciTheme {
         ChannelBarScreen(
-            GroupModel.Channel(
+            Channel(
                 channelId = "",
                 creatorId = "",
                 groupId = "",

@@ -93,6 +93,7 @@ dependencies {
 
     //=============== CMoney ===============
     implementation 'com.cmoney.analytics:analytics-user:5.1.0'
+    implementation project(path: ':fancyapi')
     releaseImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
     debugImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
 
@@ -117,6 +118,10 @@ dependencies {
 
     //=============== Koin ===============
     implementation "io.insert-koin:koin-androidx-compose:3.2.1"
+
+    //=============== Chucker Log ===============
+    debugImplementation "com.github.chuckerteam.chucker:library:3.5.2"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.5.2"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
