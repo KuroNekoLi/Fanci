@@ -1,6 +1,7 @@
 package com.cmoney.fanci.repository
 
 import com.cmoney.fanciapi.fanci.api.GroupApi
+import com.cmoney.fanciapi.fanci.model.GroupPaging
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,12 +15,12 @@ class NetworkImpl(
     private val groupApi: GroupApi
 ) : Network {
 
-    override suspend fun testGroup()  =
-        withContext(dispatcher) {
-            kotlin.runCatching {
-                groupApi.apiV1GroupGet().checkResponseBody()
-            }
-        }
+//    override suspend fun testGroup()  =
+//        withContext(dispatcher) {
+//            kotlin.runCatching {
+//                groupApi.apiV1GroupGet().checkResponseBody()
+//            }
+//        }
 
 
 //        groupApi.apiV1GroupGet().enqueue(object: Callback<GroupPaging>{
@@ -32,40 +33,44 @@ class NetworkImpl(
 //            }
 //        })
 
-    @Throws(
-        HttpException::class,
-        JsonSyntaxException::class
-    )
-    inline fun <reified T : Response<T1>, reified T1> T.checkResponseBody(): T1 {
-        return when {
-            this.isSuccessful -> {
-                this.body() ?: throw EmptyBodyException()
-            }
-            else -> {
-                when (code()) {
-                    403, 404, 409 -> {
-                        val errorBody = errorBody()?.string().orEmpty()
+    //    @Throws(
+//        HttpException::class,
+//        JsonSyntaxException::class
+//    )
+//    inline fun <reified T : Response<T1>, reified T1> T.checkResponseBody(): T1 {
+//        return when {
+//            this.isSuccessful -> {
+//                this.body() ?: throw EmptyBodyException()
+//            }
+//            else -> {
+//                when (code()) {
+//                    403, 404, 409 -> {
+//                        val errorBody = errorBody()?.string().orEmpty()
+//
+//                        if (errorBody.contains("\"message\"") && errorBody.contains("\"type\"")) {
+//                            val error = Gson().fromJson(
+//                                errorBody,
+//                                GroupError::class.java
+//                            )
+//                            throw GroupServerException(this, error)
+//                        }
+//
+//                        throw HttpException(this)
+//                    }
+//                }
+//                throw HttpException(this)
+//            }
+//        }
+//    }
+//
+//    class GroupServerException(response: Response<*>, val groupError: GroupError) :
+//        HttpException(response)
+//
+//    data class GroupError(val message: String, val type: Int)
+//
+//    class EmptyBodyException : Exception("No response body from server")
 
-                        if (errorBody.contains("\"message\"") && errorBody.contains("\"type\"")) {
-                            val error = Gson().fromJson(
-                                errorBody,
-                                GroupError::class.java
-                            )
-                            throw GroupServerException(this, error)
-                        }
-
-                        throw HttpException(this)
-                    }
-                }
-                throw HttpException(this)
-            }
-        }
+    override suspend fun testGroup(): Result<GroupPaging> {
+        TODO("Not yet implemented")
     }
-
-    class GroupServerException(response: Response<*>, val groupError: GroupError) :
-        HttpException(response)
-
-    data class GroupError(val message: String, val type: Int)
-
-    class EmptyBodyException : Exception("No response body from server")
 }

@@ -119,8 +119,13 @@ fun DiscoverGroupScreen(
                         state.viewModel.closeGroupItemDialog()
                     },
                     onConfirm = {
+                        state.viewModel.joinGroup(it)
                     }
                 )
+            }
+
+            if (state.viewModel.uiState.joinSuccess) {
+                state.navController.popBackStack()
             }
         }
     }

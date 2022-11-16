@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
@@ -12,7 +13,8 @@ import kotlinx.coroutines.launch
 
 data class GroupUiState(
     val groupList: List<Group> = emptyList(),
-    val searchGroupClick: Group? = null
+    val searchGroupClick: Group? = null,
+    val joinSuccess: Boolean = false
 )
 
 class GroupViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
@@ -42,5 +44,18 @@ class GroupViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     fun closeGroupItemDialog() {
         KLog.i(TAG, "closeGroupItemDialog")
         uiState = uiState.copy(searchGroupClick = null)
+    }
+
+    fun joinGroup(group: Group) {
+        KLog.i(TAG, "joinGroup:$group")
+        viewModelScope.launch {
+            groupUseCase.joinGroup(group).fold({
+                uiState = uiState.copy(joinSuccess = true)
+            }, {
+                if (it is EmptyBodyException) {
+                    uiState = uiState.copy(joinSuccess = true)
+                }
+            })
+        }
     }
 }

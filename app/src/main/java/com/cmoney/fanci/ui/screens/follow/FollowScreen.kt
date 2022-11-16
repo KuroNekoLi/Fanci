@@ -54,12 +54,12 @@ fun FollowScreen(
                     followScreenState.viewModel.groupItemClick(it)
                     followScreenState.closeDrawer()
 
-                    // TODO:  test theme
-                    if (it.groupModel.name == "愛莉莎莎 Alisasa") {
-                        theme.invoke(ThemeSetting.Coffee)
-                    } else {
-                        theme.invoke(ThemeSetting.Default)
-                    }
+//                    // TODO:  test theme
+//                    if (it.groupModel.name == "Niccccc") {
+//                        theme.invoke(ThemeSetting.Coffee)
+//                    } else {
+//                        theme.invoke(ThemeSetting.Default)
+//                    }
                 },
                 onSearch = {
                     followScreenState.closeDrawer()
