@@ -18,10 +18,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.openUrl
-import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanci.ui.theme.White_DDDEDF
 import com.kedia.ogparser.OpenGraphCacheProvider
 import com.kedia.ogparser.OpenGraphCallback
 import com.kedia.ogparser.OpenGraphParser

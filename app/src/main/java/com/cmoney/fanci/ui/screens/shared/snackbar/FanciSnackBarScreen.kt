@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -14,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.R
 import com.radusalagean.infobarcompose.BaseInfoBarMessage
 import com.radusalagean.infobarcompose.InfoBar
-import androidx.compose.ui.Alignment
 import com.radusalagean.infobarcompose.InfoBarSlideEffect
 
 class CustomMessage(

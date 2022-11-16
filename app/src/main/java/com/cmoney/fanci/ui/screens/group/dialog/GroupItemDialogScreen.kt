@@ -1,16 +1,15 @@
 package com.cmoney.fanci.ui.screens.group.dialog
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -22,19 +21,22 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
-import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.common.AutoLinkText
 import com.cmoney.fanci.ui.common.GroupText
-import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanci.ui.theme.White_262C34
+import com.cmoney.fanciapi.fanci.model.Group
 
 @Composable
 fun GroupItemDialogScreen(
     modifier: Modifier = Modifier,
-    groupModel: GroupModel,
-    onDismiss: () -> Unit
+    groupModel: Group,
+    background: Color = LocalColor.current.env_80,
+    titleColor: Color = LocalColor.current.text.default_100,
+    descColor: Color = LocalColor.current.text.default_80,
+    joinTextColor: Color = LocalColor.current.primary,
+    onDismiss: () -> Unit,
+    onConfirm: (Group) -> Unit
 ) {
     val openDialog = remember { mutableStateOf(true) }
     if (openDialog.value) {
@@ -48,7 +50,7 @@ fun GroupItemDialogScreen(
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min)
                     .clip(RoundedCornerShape(25.dp))
-                    .background(LocalColor.current.env_80)
+                    .background(background)
             ) {
                 Column {
                     AsyncImage(
@@ -63,7 +65,8 @@ fun GroupItemDialogScreen(
 
                     GroupText(
                         modifier = Modifier.padding(top = 15.dp, start = 110.dp),
-                        text = groupModel.name,
+                        text = groupModel.name.orEmpty(),
+                        textColor = titleColor
                     )
 
                     Spacer(modifier = Modifier.height(35.dp))
@@ -77,22 +80,26 @@ fun GroupItemDialogScreen(
                     ) {
                         AutoLinkText(
                             modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 15.dp),
-                            text = groupModel.description,
+                            text = groupModel.description.orEmpty(),
                             fontSize = 17.sp,
-                            color = LocalColor.current.text.default_80
+                            color = descColor
                         )
                     }
 
-                    Button(
+                    Box(
                         modifier = modifier
                             .fillMaxWidth()
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Transparent
-                        ),
-                        elevation = ButtonDefaults.elevation(0.dp),
-                        onClick = { /*TODO*/ }) {
-                        Text(text = "加入社團", fontSize = 16.sp, color = LocalColor.current.primary)
+                            .height(50.dp)
+                            .background(Color.Transparent)
+                            .clickable {
+                                onConfirm.invoke(groupModel)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "加入社團", fontSize = 16.sp,
+                            color = joinTextColor
+                        )
                     }
                 }
 
@@ -117,7 +124,7 @@ fun GroupItemDialogScreen(
 fun JoinGroupDialogScreenPreview() {
     FanciTheme {
         GroupItemDialogScreen(
-            groupModel = GroupModel(
+            groupModel = Group(
                 groupId = "",
                 name = "Hello",
                 description = "大家好，我是愛莉莎莎Alisasa！\n" +
@@ -151,7 +158,8 @@ fun JoinGroupDialogScreenPreview() {
                 coverImageUrl = "",
                 thumbnailImageUrl = "",
                 categories = emptyList()
-            )
+            ),
+            onDismiss = {}
         ) {
 
         }

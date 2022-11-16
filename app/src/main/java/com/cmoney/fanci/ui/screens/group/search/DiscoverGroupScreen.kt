@@ -20,11 +20,9 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.fanci.ui.screens.group.search.state.DiscoverGroupState
 import com.cmoney.fanci.ui.screens.group.search.state.rememberDiscoverGroupState
+import com.cmoney.fanci.ui.screens.shared.GroupItemScreen
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
-import com.cmoney.fanci.ui.theme.Black_2B313C
-import com.cmoney.fanci.ui.theme.FanciTheme
-import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanci.ui.theme.White_494D54
+import com.cmoney.fanci.ui.theme.*
 
 @Composable
 fun DiscoverGroupScreen(
@@ -45,14 +43,16 @@ fun DiscoverGroupScreen(
                 leadingIcon = Icons.Filled.Home,
                 trailingEnable = true,
                 moreEnable = false,
+                backgroundColor = Color_20262F,
                 moreClick = null
             )
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding)
-                .background(LocalColor.current.env_80)
+                .background(Black_2B313C)
                 .padding(top = 20.dp, bottom = 10.dp, start = 18.dp, end = 18.dp)
         ) {
             TabRow(
@@ -64,7 +64,7 @@ fun DiscoverGroupScreen(
                 indicator = { tabPositions: List<TabPosition> ->
                     Box {}
                 },
-                backgroundColor = LocalColor.current.env_100
+                backgroundColor = Color_20262F
             ) {
                 list.forEachIndexed { index, text ->
                     val selected = selectedIndex == index
@@ -73,7 +73,7 @@ fun DiscoverGroupScreen(
                             .padding(2.dp)
                             .clip(RoundedCornerShape(35))
                             .background(
-                                LocalColor.current.env_60
+                                Color_303744
                             )
                         else Modifier
                             .padding(10.dp)
@@ -85,12 +85,7 @@ fun DiscoverGroupScreen(
                         onClick = { selectedIndex = index },
                         text = {
                             Text(
-                                text = text, color =
-                                if (selected) {
-                                    LocalColor.current.text.default_100
-                                } else {
-                                    LocalColor.current.text.other
-                                }, fontSize = 14.sp
+                                text = text, color = Color.White, fontSize = 14.sp
                             )
                         }
                     )
@@ -102,7 +97,11 @@ fun DiscoverGroupScreen(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 items(state.viewModel.uiState.groupList) {
                     GroupItemScreen(
-                        groupModel = it
+                        groupModel = it,
+                        background = Color_0DFFFFFF,
+                        titleTextColor = Color.White,
+                        subTitleColor = Color_80FFFFFF,
+                        descColor = Color_CCFFFFFF
                     ) { groupModel ->
                         state.viewModel.openGroupItemDialog(groupModel)
                     }
@@ -112,8 +111,14 @@ fun DiscoverGroupScreen(
             state.viewModel.uiState.searchGroupClick?.apply {
                 GroupItemDialogScreen(
                     groupModel = this,
+                    background = Color_2B313C,
+                    titleColor = Color.White,
+                    descColor = Color_CCFFFFFF,
+                    joinTextColor = Blue_4F70E5,
                     onDismiss = {
                         state.viewModel.closeGroupItemDialog()
+                    },
+                    onConfirm = {
                     }
                 )
             }

@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanci.repository.Network
-import com.cmoney.fanci.repository.NetworkImpl
+import com.cmoney.fanci.ui.screens.follow.model.GroupItem
+import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -14,11 +16,27 @@ sealed class ThemeSetting {
     object Coffee : ThemeSetting()
 }
 
-class MainViewModel(val network: Network) : ViewModel() {
+class MainViewModel(val groupUseCase: GroupUseCase) : ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
-    private val _theme = MutableLiveData<ThemeSetting>(ThemeSetting.Default)
+    private val _theme = MutableLiveData<ThemeSetting>(ThemeSetting.Coffee)
     val theme: LiveData<ThemeSetting> = _theme
+
+    private val _groupList = MutableLiveData<List<GroupItem>>()
+    val groupList: LiveData<List<GroupItem>> = _groupList
+
+    init {
+        viewModelScope.launch {
+            groupUseCase.groupToSelectGroupItem().fold({
+                if (it.isNotEmpty()) {
+                    //所有群組
+                    _groupList.value = it
+                }
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
 
     fun setCoffeeTheme() {
         KLog.i(TAG, "setCoffeeTheme")
@@ -28,15 +46,5 @@ class MainViewModel(val network: Network) : ViewModel() {
     fun settingTheme(themeSetting: ThemeSetting) {
         KLog.i(TAG, "settingTheme:$themeSetting")
         _theme.value = themeSetting
-    }
-
-    fun test() {
-        viewModelScope.launch {
-            network.testGroup().fold({
-                KLog.i(TAG, it)
-            },{
-                KLog.e(TAG, it)
-            })
-        }
     }
 }

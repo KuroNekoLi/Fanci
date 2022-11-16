@@ -14,7 +14,6 @@ import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.common.ReplyChatText
 import com.cmoney.fanci.ui.common.ReplyChatTitleText
-import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 

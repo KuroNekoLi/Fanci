@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.common.EmojiText
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanci.ui.theme.White_262C34
 
 @Composable
 fun EmojiCountScreen(

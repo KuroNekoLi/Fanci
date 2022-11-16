@@ -5,20 +5,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanci.ui.theme.White_767A7F
+import com.cmoney.fanci.ui.theme.White_DDDEDF
 
 
 @Composable
-fun GroupText(text: String, modifier: Modifier = Modifier) {
+fun GroupText(
+    text: String,
+    modifier: Modifier = Modifier,
+    textColor: Color = LocalColor.current.text.default_100
+) {
     Text(
         text = text,
         style = TextStyle(
             fontSize = 16.sp,
-            color = LocalColor.current.text.default_100,
+            color = textColor,
             fontWeight = FontWeight.Bold
         ),
         maxLines = 1,

@@ -12,7 +12,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainScreen
 import com.cmoney.fanci.MainStateHolder
-import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.ThemeSetting
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
 import com.cmoney.fanci.extension.goBackWithParams
@@ -28,7 +27,6 @@ import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
 import com.socks.library.KLog
-import org.koin.androidx.compose.getViewModel
 
 /**
  * 決定頁面跳轉路徑

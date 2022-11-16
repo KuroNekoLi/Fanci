@@ -7,14 +7,12 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import com.cmoney.fanci.MainActivity
-import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.ThemeSetting
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.InteractBottomSheet
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
-import org.koin.android.ext.android.inject
 
 /**
  * Show 聊天室 互動彈窗

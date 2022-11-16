@@ -97,7 +97,7 @@ dependencies {
     releaseImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
     debugImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
 
-    implementation('com.cmoney.xlab:login:1.1.0')
+    implementation('com.cmoney.xlab:login:1.1.1')
 
     implementation('com.cmoney.xlab:ratingview:1.1.8') { // 導入模組
         exclude group: 'androidx.constraintlayout', module: 'constraintlayout'

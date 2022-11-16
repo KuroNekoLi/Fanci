@@ -1,6 +1,9 @@
 package com.cmoney.fanci.ui.screens.follow
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,24 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
-import com.cmoney.fanci.ThemeSetting
-import com.cmoney.fanci.model.GroupModel
 import com.cmoney.fanci.ui.screens.follow.model.GroupItem
-import com.cmoney.fanci.ui.theme.Black_181C23
-import com.cmoney.fanci.ui.theme.Black_282A2D
+import com.cmoney.fanci.ui.theme.Color_2B313C
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanci.ui.theme.White_262C34
 import com.cmoney.fanciapi.fanci.model.Group
-import org.koin.androidx.compose.getViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun DrawerMenuScreen(
@@ -39,7 +36,7 @@ fun DrawerMenuScreen(
 ) {
     Column(
         modifier = modifier
-            .background(LocalColor.current.env_80)
+            .background(White_262C34)
             .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 5.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
@@ -79,46 +76,43 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(LocalColor.current.background),
+                .background(Color_2B313C),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.bell),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
             )
         }
-        Spacer(modifier = Modifier.height(7.dp))
+        Spacer(modifier = Modifier.height(17.dp))
 
         Box(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(LocalColor.current.background)
+                .background(Color_2B313C)
                 .clickable {
                     onSearch.invoke()
                 },
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.search),
+                painter = painterResource(id = R.drawable.menu_plus),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
             )
         }
-        Spacer(modifier = Modifier.height(7.dp))
+        Spacer(modifier = Modifier.height(17.dp))
 
         Box(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(LocalColor.current.background),
+                .background(Color_2B313C),
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.plus),
+                painter = painterResource(id = R.drawable.menu_setting),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
             )
         }
         Spacer(modifier = Modifier.height(5.dp))

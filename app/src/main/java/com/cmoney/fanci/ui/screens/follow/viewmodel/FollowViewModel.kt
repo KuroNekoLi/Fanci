@@ -16,24 +16,45 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     private val _followData = MutableLiveData<Group>()
     val followData: LiveData<Group> = _followData
 
-    private val _groupList = MutableLiveData<List<GroupItem>>()
-    val groupList: LiveData<List<GroupItem>> = _groupList
+    private val _myGroupList = MutableLiveData<List<GroupItem>>()
+    val myGroupList: LiveData<List<GroupItem>> = _myGroupList
+
+    private val _groupList = MutableLiveData<List<Group>>()
+    val groupList: LiveData<List<Group>> = _groupList
 
     init {
+        fetchMyGroup()
+    }
+
+    /**
+     * 取得 我的群組
+     */
+    private fun fetchMyGroup() {
         viewModelScope.launch {
-            groupUseCase.getGroup().fold({
-                KLog.i(TAG, it)
+            groupUseCase.groupToSelectGroupItem().fold({
                 if (it.isNotEmpty()) {
                     //所有群組
-                    _groupList.value = it
-
+                    _myGroupList.value = it
                     _followData.value = it.first().groupModel
+                } else {
+                    fetchAllGroupList()
                 }
-
             }, {
                 KLog.e(TAG, it)
             })
-//            _followData.value = groupList.first()
+        }
+    }
+
+    /**
+     * 當沒有 社團的時候, 取得目前 所有群組
+     */
+    private fun fetchAllGroupList() {
+        viewModelScope.launch {
+            groupUseCase.getGroup().fold({
+                _groupList.value = it.items
+            }, {
+                KLog.e(TAG, it)
+            })
         }
     }
 
@@ -42,7 +63,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun groupItemClick(groupItem: GroupItem) {
 //        _followData.value = groupItem.groupModel
-        _groupList.value = _groupList.value?.map {
+        _myGroupList.value = _myGroupList.value?.map {
             return@map if (it.groupModel == groupItem.groupModel) {
                 it.copy(isSelected = true)
             } else {
@@ -51,4 +72,17 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
         }
     }
 
+    /**
+     * 加入社團
+     */
+    fun joinGroup(group: Group) {
+        KLog.i(TAG, "joinGroup:$group")
+        viewModelScope.launch {
+            groupUseCase.joinGroup(group).fold({
+                fetchMyGroup()
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
 }

@@ -4,12 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -37,6 +35,7 @@ fun TopBarScreen(
     leadingIcon: ImageVector = Icons.Filled.ArrowBack,
     trailingEnable: Boolean = true,
     moreEnable: Boolean,
+    backgroundColor: Color = LocalColor.current.env_100,
     moreClick: (() -> Unit)?
 ) {
     val TAG = "TopBarScreen"
@@ -54,7 +53,7 @@ fun TopBarScreen(
             }
         },
         title = { Text(title, fontSize = 17.sp, color = Color.White) },
-        backgroundColor = LocalColor.current.env_100,
+        backgroundColor = backgroundColor,
         contentColor = Color.White,
         trailing = {
             if (trailingEnable) {

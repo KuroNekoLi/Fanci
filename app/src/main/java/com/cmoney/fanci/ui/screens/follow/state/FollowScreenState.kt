@@ -5,20 +5,18 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.model.viewmodel.FollowViewModelFactory
 import com.cmoney.fanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.fanciapi.fanci.model.Group
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -29,7 +27,8 @@ class FollowScreenState(
     val configuration: Configuration,
     val localDensity: Density,
     val scaffoldState: ScaffoldState,
-    val coroutineScope: CoroutineScope
+    val coroutineScope: CoroutineScope,
+    var openGroupDialog: MutableState<Group?>
 ) {
 
     // 偏移折叠工具栏上移高度
@@ -89,19 +88,33 @@ class FollowScreenState(
             scaffoldState.drawerState.close()
         }
     }
+
+    /**
+     * 點擊 社團
+     */
+    fun openGroupItemDialog(groupModel: Group) {
+        openGroupDialog.value = groupModel
+    }
+
+    /**
+     * 關閉 社團 彈窗
+     */
+    fun closeGroupItemDialog() {
+        openGroupDialog.value = null
+    }
 }
 
 @Composable
 fun rememberFollowScreenState(
     navController: NavHostController = rememberNavController(),
-//    viewModel: FollowViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-//        factory = FollowViewModelFactory()
-//    ),
     viewModel: FollowViewModel = koinViewModel(),
     configuration: Configuration = LocalConfiguration.current,
-    localDensity: Density = androidx.compose.ui.platform.LocalDensity.current,
+    localDensity: Density = LocalDensity.current,
     scaffoldState: ScaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed)),
-    coroutineScope: CoroutineScope = rememberCoroutineScope()
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    openGroupDialog: MutableState<Group?> = remember {
+        mutableStateOf(null)
+    }
 ) = remember {
     FollowScreenState(
         navController,
@@ -109,6 +122,7 @@ fun rememberFollowScreenState(
         configuration,
         localDensity,
         scaffoldState,
-        coroutineScope
+        coroutineScope,
+        openGroupDialog
     )
 }

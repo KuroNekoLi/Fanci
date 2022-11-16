@@ -2,7 +2,7 @@ package com.cmoney.fanci
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -11,31 +11,44 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.MainNavHost
 import com.cmoney.fanci.ui.MyAppNavHost
 import com.cmoney.fanci.ui.screens.BottomBarScreen
+import com.cmoney.fanci.ui.screens.follow.DrawerMenuScreen
+import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.loginlibrary.module.variable.loginlibraryenum.ApiAction
+import com.cmoney.loginlibrary.module.variable.loginlibraryenum.EventCode
+import com.cmoney.loginlibrary.view.base.LoginLibraryMainActivity
+import com.cmoney.xlogin.XLoginHelper
+import com.cmoney.xlogin.base.BaseLoginAppCompactActivity
+import kotlinx.android.parcel.Parcelize
 import org.koin.android.ext.android.inject
 
-class MainActivity : AppCompatActivity() {
+@Parcelize
+class MainActivity : BaseLoginAppCompactActivity() {
     val viewModel by inject<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO:  
-        viewModel.test()
+        if (!XLoginHelper.isLogin) {
+            processLogin()
+        }
 
         setContent {
             val theme = viewModel.theme.observeAsState()
 
             FanciTheme(themeSetting = theme.value ?: ThemeSetting.Default) {
                 val mainState = rememberMainState()
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background,
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.background),
                 ) {
                     mainState.setStatusBarColor()
                     MyAppNavHost(
@@ -48,6 +61,39 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun processLogin() {
+        val loginIntent = LoginLibraryMainActivity.IntentBuilder(
+            // context
+            this,
+            LoginLibraryMainActivity.IntentBuilder.BackportSupport(
+                resources.getInteger(R.integer.app_id),//your appId
+                getString(R.string.cm_server_url),
+                null,
+                XLoginHelper.userAccount,
+                XLoginHelper.userPassword,
+                XLoginHelper.notificationToken
+            ),
+            this
+        ).build()
+
+        startCmLogin(loginIntent)
+    }
+
+    override fun autoLoginFailCallback() {
+    }
+
+    override fun fbLogin(
+        callback: (() -> Unit)?,
+        errorCallback: ((Boolean, EventCode, ApiAction) -> Unit)?
+    ) {
+    }
+
+    override fun loginFailCallback(errorMessage: String) {
+    }
+
+    override fun loginSuccessCallback() {
     }
 }
 
