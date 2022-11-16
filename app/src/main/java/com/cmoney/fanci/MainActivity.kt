@@ -27,11 +27,14 @@ import com.cmoney.loginlibrary.module.variable.loginlibraryenum.EventCode
 import com.cmoney.loginlibrary.view.base.LoginLibraryMainActivity
 import com.cmoney.xlogin.XLoginHelper
 import com.cmoney.xlogin.base.BaseLoginAppCompactActivity
+import com.socks.library.KLog
 import kotlinx.android.parcel.Parcelize
 import org.koin.android.ext.android.inject
 
 @Parcelize
 class MainActivity : BaseLoginAppCompactActivity() {
+    private val TAG = MainActivity::class.java.simpleName
+
     val viewModel by inject<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,9 +94,12 @@ class MainActivity : BaseLoginAppCompactActivity() {
     }
 
     override fun loginFailCallback(errorMessage: String) {
+        KLog.i(TAG, "loginFailCallback:$errorMessage")
     }
 
     override fun loginSuccessCallback() {
+        KLog.i(TAG, "loginSuccessCallback")
+        viewModel.registerUser()
     }
 }
 

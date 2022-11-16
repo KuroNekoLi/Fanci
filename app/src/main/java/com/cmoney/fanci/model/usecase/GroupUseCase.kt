@@ -12,7 +12,8 @@ class GroupUseCase(private val groupApi: GroupApi, private val groupMemberApi: G
      * 加入社團
      */
     suspend fun joinGroup(group: Group) = kotlin.runCatching {
-        groupMemberApi.apiV1GroupMemberGroupGroupIdMePut(group.groupId.orEmpty()).checkResponseBody()
+        groupMemberApi.apiV1GroupMemberGroupGroupIdMePut(group.groupId.orEmpty())
+            .checkResponseBody()
     }
 
     /**

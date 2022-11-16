@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanciapi.fanci.model.Group
@@ -81,7 +82,12 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             groupUseCase.joinGroup(group).fold({
                 fetchMyGroup()
             }, {
-                KLog.e(TAG, it)
+                if (it is EmptyBodyException) {
+                    fetchMyGroup()
+                }
+                else {
+                    KLog.e(TAG, it)
+                }
             })
         }
     }

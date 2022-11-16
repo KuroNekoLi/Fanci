@@ -9,6 +9,7 @@ import com.cmoney.fanci.repository.Network
 import com.cmoney.fanci.repository.NetworkImpl
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupMemberApi
+import com.cmoney.fanciapi.fanci.api.UserApi
 import com.cmoney.fanciapi.infrastructure.ApiClient
 import com.cmoney.xlogin.XLoginHelper
 import com.google.gson.GsonBuilder
@@ -68,6 +69,10 @@ val networkBaseModule = module {
 
     single {
         get<ApiClient>().createService(GroupMemberApi::class.java)
+    }
+
+    single {
+        get<ApiClient>().createService(UserApi::class.java)
     }
 }
 

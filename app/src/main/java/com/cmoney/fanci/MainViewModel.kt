@@ -5,9 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.model.usecase.GroupUseCase
-import com.cmoney.fanci.repository.Network
+import com.cmoney.fanci.model.usecase.UserUseCase
 import com.cmoney.fanci.ui.screens.follow.model.GroupItem
-import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -16,7 +15,8 @@ sealed class ThemeSetting {
     object Coffee : ThemeSetting()
 }
 
-class MainViewModel(val groupUseCase: GroupUseCase) : ViewModel() {
+class MainViewModel(private val groupUseCase: GroupUseCase, val userUseCase: UserUseCase) :
+    ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
     private val _theme = MutableLiveData<ThemeSetting>(ThemeSetting.Coffee)
@@ -46,5 +46,15 @@ class MainViewModel(val groupUseCase: GroupUseCase) : ViewModel() {
     fun settingTheme(themeSetting: ThemeSetting) {
         KLog.i(TAG, "settingTheme:$themeSetting")
         _theme.value = themeSetting
+    }
+
+    /**
+     * 登入成功之後,要向 Fanci後台註冊
+     */
+    fun registerUser() {
+        KLog.i(TAG, "registerUser")
+        viewModelScope.launch {
+            userUseCase.registerUser()
+        }
     }
 }
