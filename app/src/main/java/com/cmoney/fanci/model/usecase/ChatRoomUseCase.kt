@@ -2,6 +2,9 @@ package com.cmoney.fanci.model.usecase
 
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IChatContent
 
 
 class ChatRoomUseCase {
@@ -40,6 +43,15 @@ class ChatRoomUseCase {
     }
 
     companion object MockData {
+        val mockMessage = ChatMessage(
+            author = GroupMember(
+                name = "Name"
+            ),
+            content =  IChatContent(
+                text = "Content"
+            )
+        )
+
         val textType = ChatMessageModel(
             poster = ChatMessageModel.User(
                 avatar = "https://picsum.photos/110/110",

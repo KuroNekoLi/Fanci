@@ -20,12 +20,13 @@ import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 /**
  * 聊天室 公告 訊息
  */
 @Composable
-fun MessageAnnounceScreen(chatMessageModel: ChatMessageModel, modifier: Modifier = Modifier) {
+fun MessageAnnounceScreen(chatMessageModel: ChatMessage, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -42,7 +43,7 @@ fun MessageAnnounceScreen(chatMessageModel: ChatMessageModel, modifier: Modifier
             )
             Spacer(modifier = Modifier.width(15.dp))
             Text(
-                text = chatMessageModel.message.text,
+                text = chatMessageModel.content?.text.orEmpty(),
                 fontSize = 16.sp,
                 color = LocalColor.current.text.default_100,
                 maxLines = 1,
@@ -56,6 +57,6 @@ fun MessageAnnounceScreen(chatMessageModel: ChatMessageModel, modifier: Modifier
 @Composable
 fun MessageAnnounceScreenPreview() {
     FanciTheme {
-        MessageAnnounceScreen(ChatRoomUseCase.textType)
+        MessageAnnounceScreen(ChatRoomUseCase.mockMessage)
     }
 }

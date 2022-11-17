@@ -25,14 +25,15 @@ import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.theme.Color_CB4A4A
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 /**
  * 隱藏用戶 彈窗
  */
 @Composable
 fun DeleteMessageDialogScreen(
-    chatMessageModel: ChatMessageModel,
-    onConfirm: (ChatMessageModel) -> Unit,
+    chatMessageModel: ChatMessage,
+    onConfirm: (ChatMessage) -> Unit,
     onDismiss: () -> Unit
 ) {
     val openDialog = remember { mutableStateOf(true) }
@@ -82,13 +83,13 @@ fun DeleteMessageDialogScreen(
                     ) {
                         Column {
                             Text(
-                                text = chatMessageModel.poster.nickname,
+                                text = chatMessageModel.author?.name.orEmpty(),
                                 fontSize = 12.sp,
                                 color = LocalColor.current.text.default_100
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = chatMessageModel.message.text,
+                                text = chatMessageModel.content?.text.orEmpty(),
                                 fontSize = 14.sp,
                                 color = LocalColor.current.text.default_100
                             )
@@ -137,7 +138,7 @@ fun DeleteMessageDialogScreen(
 fun DeleteMessageDialogScreenPreview() {
     FanciTheme {
         DeleteMessageDialogScreen(
-            ChatRoomUseCase.textType,
+            ChatRoomUseCase.mockMessage,
             onConfirm = {},
             onDismiss = {}
         )

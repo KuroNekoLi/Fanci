@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -55,7 +56,7 @@ class MainStateHolder(
         data class Channel(val channelId: String, val route: String = "$Channel/${channelId}") :
             Route(route)
 
-        data class Announce(val message: ChatMessageModel, val route: String = Announce) :
+        data class Announce(val message: ChatMessage, val route: String = Announce) :
             Route(route)
 
         data class UserInfo(val route: String = UserInfo) : Route(route)

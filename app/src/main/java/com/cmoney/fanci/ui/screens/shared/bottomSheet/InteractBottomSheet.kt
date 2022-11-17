@@ -9,36 +9,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.chat.dialog.InteractDialogScreen
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
  * 互動 彈窗總類
  */
-sealed class MessageInteract(message: ChatMessageModel) {
+sealed class MessageInteract(message: ChatMessage) {
     //Emoji
-    data class EmojiClick(val message: ChatMessageModel, val emojiResId: Int) : MessageInteract(message)
+    data class EmojiClick(val message: ChatMessage, val emojiResId: Int) : MessageInteract(message)
 
     //回覆
-    data class Reply(val message: ChatMessageModel) : MessageInteract(message)
+    data class Reply(val message: ChatMessage) : MessageInteract(message)
 
     //收回
-    data class Recycle(val message: ChatMessageModel) : MessageInteract(message)
+    data class Recycle(val message: ChatMessage) : MessageInteract(message)
 
     //複製
-    data class Copy(val message: ChatMessageModel) : MessageInteract(message)
+    data class Copy(val message: ChatMessage) : MessageInteract(message)
 
     //置頂
-    data class Announcement(val message: ChatMessageModel) : MessageInteract(message)
+    data class Announcement(val message: ChatMessage) : MessageInteract(message)
 
     //隱藏用戶
-    data class HideUser(val message: ChatMessageModel) : MessageInteract(message)
+    data class HideUser(val message: ChatMessage) : MessageInteract(message)
 
     //檢舉用戶
-    data class Report(val message: ChatMessageModel) : MessageInteract(message)
+    data class Report(val message: ChatMessage) : MessageInteract(message)
 
     //刪除
-    data class Delete(val message: ChatMessageModel) : MessageInteract(message)
+    data class Delete(val message: ChatMessage) : MessageInteract(message)
 }
 
 
@@ -47,7 +48,7 @@ sealed class MessageInteract(message: ChatMessageModel) {
 fun InteractBottomSheet(
     parent: ViewGroup,
     composeView: ComposeView,
-    message: ChatMessageModel,
+    message: ChatMessage,
     onInteractClick: (MessageInteract) -> Unit
 ) {
     val TAG = parent::class.java.simpleName

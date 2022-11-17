@@ -12,26 +12,36 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.fanci.ui.theme.White_494D54
 import com.cmoney.fanci.ui.theme.White_767A7F
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IChatContent
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
 data class ChatRoomUiState(
     val imageAttach: List<Uri> = emptyList(),
-    val replyMessage: ChatMessageModel.Reply? = null,
-    val message: List<ChatMessageModel> = emptyList(),
+    val replyMessage: ChatMessage? = null,
+
+    val message: List<ChatMessage> = emptyList(),
+
     val snackBarMessage: CustomMessage? = null,
-    val announceMessage: ChatMessageModel? = null,
-    val hideUserMessage: ChatMessageModel? = null,
-    val deleteMessage: ChatMessageModel? = null,
-    val reportUser: ChatMessageModel? = null
+    val announceMessage: ChatMessage? = null,
+    val hideUserMessage: ChatMessage? = null,
+    val deleteMessage: ChatMessage? = null,
+    val reportUser: ChatMessage? = null
 )
 
-class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCase) : ViewModel() {
+class ChatRoomViewModel(
+    val context: Context,
+    val chatRoomUseCase: ChatRoomUseCase,
+    val chatRoomPollUseCase: ChatRoomPollUseCase
+) : ViewModel() {
     private val TAG = ChatRoomViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(ChatRoomUiState())
@@ -40,21 +50,17 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     init {
         viewModelScope.launch {
 //            val chatRoomUseCase = ChatRoomUseCase()
-            uiState = uiState.copy(message = chatRoomUseCase.createMockMessage().reversed())
+//            uiState = uiState.copy(message = chatRoomUseCase.createMockMessage().reversed())
         }
     }
 
     /**
      * 點擊 回覆
      */
-    private fun replyMessage(message: ChatMessageModel) {
+    private fun replyMessage(message: ChatMessage) {
         KLog.i(TAG, "replyMessage click:$message")
-
         uiState = uiState.copy(
-            replyMessage = ChatMessageModel.Reply(
-                replyUser = message.poster,
-                text = message.message.text
-            )
+            replyMessage = message
         )
     }
 
@@ -69,35 +75,31 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
             uiState.replyMessage?.apply {
                 orgList.add(
                     0,
-                    ChatMessageModel(
-                        poster = ChatMessageModel.User(
-                            avatar = "https://picsum.photos/110/110",
-                            nickname = "TIGER"
+                    ChatMessage(
+                        author = GroupMember(
+                            thumbNail = "https://picsum.photos/110/110",
+                            name = "TIGER"
                         ),
-                        publishTime = System.currentTimeMillis(),
-                        message = ChatMessageModel.Message(
-                            reply = ChatMessageModel.Reply(
-                                replyUser = this.replyUser,
-                                text = this.text
-                            ),
+                        createUnixTime = System.currentTimeMillis(),
+                        content = IChatContent(
                             text = text
-                        )
-                    ),
+                        ),
+                        replyMessage = this
+                    )
                 )
             } ?: kotlin.run {
                 orgList.add(
                     0,
-                    ChatMessageModel(
-                        poster = ChatMessageModel.User(
-                            avatar = "https://picsum.photos/110/110",
-                            nickname = "TIGER"
+                    ChatMessage(
+                        author = GroupMember(
+                            thumbNail = "https://picsum.photos/110/110",
+                            name = "TIGER"
                         ),
-                        publishTime = System.currentTimeMillis(),
-                        message = ChatMessageModel.Message(
-                            reply = null,
+                        createUnixTime = System.currentTimeMillis(),
+                        content = IChatContent(
                             text = text
                         )
-                    ),
+                    )
                 )
             }
 
@@ -135,7 +137,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      * 取消 回覆
      */
-    fun removeReply(reply: ChatMessageModel.Reply) {
+    fun removeReply(reply: ChatMessage) {
         KLog.i(TAG, "removeReply:$reply")
         uiState = uiState.copy(
             replyMessage = null
@@ -169,7 +171,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      * 檢舉 用戶
      */
-    private fun reportUser(message: ChatMessageModel) {
+    private fun reportUser(message: ChatMessage) {
         KLog.i(TAG, "reportUser:$message")
         uiState = uiState.copy(
             reportUser = message
@@ -179,7 +181,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      * 刪除 訊息
      */
-    private fun deleteMessage(message: ChatMessageModel) {
+    private fun deleteMessage(message: ChatMessage) {
         KLog.i(TAG, "deleteMessage:$message")
         uiState = uiState.copy(
             deleteMessage = message
@@ -189,7 +191,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      * 隱藏 用戶
      */
-    private fun hideUserMessage(message: ChatMessageModel) {
+    private fun hideUserMessage(message: ChatMessage) {
         KLog.i(TAG, "hideUserMessage:$message")
         uiState = uiState.copy(
             hideUserMessage = message
@@ -199,12 +201,10 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      * 訊息 設定 公告
      */
-    private fun announceMessage(messageModel: ChatMessageModel) {
+    private fun announceMessage(messageModel: ChatMessage) {
         KLog.i(TAG, "announceMessage:$messageModel")
         val noEmojiMessage = messageModel.copy(
-            message = messageModel.message.copy(
-                emoji = emptyList()
-            )
+            emojiCount = null
         )
         uiState = uiState.copy(
             announceMessage = noEmojiMessage
@@ -214,9 +214,9 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      * 複製訊息
      */
-    private fun copyMessage(message: ChatMessageModel) {
+    private fun copyMessage(message: ChatMessage) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("", message.message.text)
+        val clip = ClipData.newPlainText("", message.content?.text)
         clipboard.setPrimaryClip(clip)
 
         uiState = uiState.copy(
@@ -233,7 +233,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      *  回收 訊息 並 show 回收成功 snackBar
      */
-    private fun recycleMessage(message: ChatMessageModel) {
+    private fun recycleMessage(message: ChatMessage) {
         KLog.i(TAG, "recycleMessage:$message")
         val orgMessage = uiState.message.toMutableList()
         uiState = uiState.copy(
@@ -247,9 +247,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
             message = orgMessage.map { chatModel ->
                 if (chatModel == message) {
                     chatModel.copy(
-                        message = chatModel.message.copy(
-                            isRecycle = true
-                        )
+                        isDeleted = true
                     )
                 } else {
                     chatModel
@@ -294,7 +292,7 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      * 確定 刪除 訊息
      */
-    fun onDeleteClick(chatMessageModel: ChatMessageModel) {
+    fun onDeleteClick(chatMessageModel: ChatMessage) {
         KLog.i(TAG, "onDeleteClick:$chatMessageModel")
         uiState = uiState.copy(
             message = uiState.message.filter {
@@ -342,96 +340,122 @@ class ChatRoomViewModel(val context: Context, val chatRoomUseCase: ChatRoomUseCa
     /**
      * 確定 隱藏 用戶
      */
-    fun onHideUserConfirm(user: ChatMessageModel.User) {
-        val message = uiState.message.toMutableList()
-        val newMessage = message.map { chatMessageModel ->
-            if (chatMessageModel.poster == user) {
-                val fixMessage = chatMessageModel.message.copy(
-                    isHideUser = true
-                )
-
-                chatMessageModel.copy(
-                    message = fixMessage,
-                )
-            } else {
-                chatMessageModel
-            }
-        }
-
-        uiState = uiState.copy(
-            message = newMessage,
-            hideUserMessage = null
-        )
+    fun onHideUserConfirm(user: GroupMember) {
+//        val message = uiState.message.toMutableList()
+//        val newMessage = message.map { chatMessageModel ->
+//            if (chatMessageModel.poster == user) {
+//                val fixMessage = chatMessageModel.message.copy(
+//                    isHideUser = true
+//                )
+//
+//                chatMessageModel.copy(
+//                    message = fixMessage,
+//                )
+//            } else {
+//                chatMessageModel
+//            }
+//        }
+//
+//        uiState = uiState.copy(
+//            message = newMessage,
+//            hideUserMessage = null
+//        )
     }
 
     /**
      * 解除 隱藏 用戶
      */
-    fun onMsgDismissHide(userModel: ChatMessageModel) {
-        val message = uiState.message.toMutableList()
-        val newMessage = message.map { chatMessageModel ->
-            if (chatMessageModel.poster == userModel.poster) {
-                val fixMessage = chatMessageModel.message.copy(
-                    isHideUser = false
-                )
-
-                chatMessageModel.copy(
-                    message = fixMessage,
-                )
-            } else {
-                chatMessageModel
-            }
-        }
-
-        uiState = uiState.copy(
-            message = newMessage,
-            hideUserMessage = null
-        )
+    fun onMsgDismissHide(userModel: ChatMessage) {
+        // TODO:
+//        val message = uiState.message.toMutableList()
+//        val newMessage = message.map { chatMessageModel ->
+//            if (chatMessageModel.poster == userModel.poster) {
+//                val fixMessage = chatMessageModel.message.copy(
+//                    isHideUser = false
+//                )
+//
+//                chatMessageModel.copy(
+//                    message = fixMessage,
+//                )
+//            } else {
+//                chatMessageModel
+//            }
+//        }
+//
+//        uiState = uiState.copy(
+//            message = newMessage,
+//            hideUserMessage = null
+//        )
     }
 
     /**
      * 點擊 Emoji
      */
-    fun onEmojiClick(model: ChatMessageModel, resourceId: Int) {
+    fun onEmojiClick(model: ChatMessage, resourceId: Int) {
         KLog.i(TAG, "onEmojiClick.")
+        // TODO:
+//        val orgEmojiList = model.message.emoji.toMutableList()
+//
+//        model.message.emoji.find {
+//            it.resource == resourceId
+//        }.apply {
+//            this?.apply {
+//                val countEmoji = copy(
+//                    count = count.plus(1)
+//                )
+//                orgEmojiList[orgEmojiList.indexOf(this)] = countEmoji
+//            } ?: kotlin.run {
+//                orgEmojiList.add(
+//                    ChatMessageModel.Emoji(
+//                        resource = resourceId,
+//                        count = 1
+//                    )
+//                )
+//            }
+//        }
+//
+//        val message = uiState.message.toMutableList()
+//        val newMessage = message.map { chatMessageModel ->
+//            if (chatMessageModel.message == model.message) {
+//                val fixMessage = chatMessageModel.message.copy(
+//                    emoji = orgEmojiList
+//                )
+//                chatMessageModel.copy(
+//                    message = fixMessage,
+//                )
+//            } else {
+//                chatMessageModel
+//            }
+//        }
+//
+//        uiState = uiState.copy(
+//            message = newMessage,
+//            hideUserMessage = null
+//        )
+    }
 
-        val orgEmojiList = model.message.emoji.toMutableList()
-
-        model.message.emoji.find {
-            it.resource == resourceId
-        }.apply {
-            this?.apply {
-                val countEmoji = copy(
-                    count = count.plus(1)
-                )
-                orgEmojiList[orgEmojiList.indexOf(this)] = countEmoji
-            } ?: kotlin.run {
-                orgEmojiList.add(
-                    ChatMessageModel.Emoji(
-                        resource = resourceId,
-                        count = 1
+    /**
+     * 獲取 聊天室 訊息
+     */
+    fun startPolling(channelId: String?) {
+        KLog.i(TAG, "startPolling:$channelId")
+        viewModelScope.launch {
+            if (channelId?.isNotEmpty() == true) {
+                chatRoomPollUseCase.poll(1000, channelId).collect {
+                    KLog.i(TAG, it)
+                    uiState = uiState.copy(
+                        message = it.items.orEmpty().reversed()
                     )
-                )
+                }
             }
         }
+    }
 
-        val message = uiState.message.toMutableList()
-        val newMessage = message.map { chatMessageModel ->
-            if (chatMessageModel.message == model.message) {
-                val fixMessage = chatMessageModel.message.copy(
-                    emoji = orgEmojiList
-                )
-                chatMessageModel.copy(
-                    message = fixMessage,
-                )
-            } else {
-                chatMessageModel
-            }
-        }
-
-        uiState = uiState.copy(
-            message = newMessage,
-            hideUserMessage = null
-        )
+    /**
+     * 停止 聊天室 訊息
+     */
+    fun stopPolling() {
+        KLog.i(TAG, "stopPolling")
+        chatRoomPollUseCase.close()
     }
 }

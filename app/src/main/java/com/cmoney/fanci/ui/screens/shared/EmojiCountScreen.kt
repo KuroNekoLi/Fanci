@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.common.EmojiText
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -36,9 +37,10 @@ fun EmojiCountScreen(
             modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
+            AsyncImage(
                 modifier = Modifier.size(15.dp),
-                painter = painterResource(id = emojiResource), contentDescription = null
+                model = emojiResource,
+                contentDescription = null
             )
             Spacer(modifier = Modifier.width(5.dp))
             EmojiText(text = countText)

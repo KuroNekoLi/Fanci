@@ -23,6 +23,7 @@ import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanciapi.fanci.model.GroupMember
 
 /**
  * 隱藏用戶 彈窗
@@ -30,7 +31,7 @@ import com.cmoney.fanci.ui.theme.*
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ReportUserDialogScreen(
-    user: ChatMessageModel.User,
+    user: GroupMember,
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -159,9 +160,9 @@ fun ReportUserDialogScreen(
 fun ReportUserDialogScreenPreview() {
     FanciTheme {
         ReportUserDialogScreen(
-            ChatMessageModel.User(
-                avatar = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
-                nickname = "Hello"
+            GroupMember(
+                thumbNail = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
+                name = "Hello"
             ),
             {
 

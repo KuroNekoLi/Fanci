@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.model.viewmodel.ChatRoomViewModelFactory
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import kotlinx.coroutines.CoroutineScope
+import org.koin.androidx.compose.koinViewModel
 
 class ChatRoomState(
     val navController: NavHostController,
@@ -26,10 +27,7 @@ fun rememberChatRoomState(
     navController: NavHostController = rememberNavController(),
     scope: CoroutineScope = rememberCoroutineScope(),
     scaffoldState: ScaffoldState = rememberScaffoldState(),
-    viewModel: ChatRoomViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-        factory =
-        ChatRoomViewModelFactory(LocalContext.current)
-    )
+    viewModel: ChatRoomViewModel = koinViewModel()
 ) = remember {
     ChatRoomState(navController, scope, scaffoldState, viewModel)
 }

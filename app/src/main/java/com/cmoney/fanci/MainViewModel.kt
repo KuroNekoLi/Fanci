@@ -15,7 +15,7 @@ sealed class ThemeSetting {
     object Coffee : ThemeSetting()
 }
 
-class MainViewModel(private val groupUseCase: GroupUseCase, val userUseCase: UserUseCase) :
+class MainViewModel(private val groupUseCase: GroupUseCase, private val userUseCase: UserUseCase) :
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
@@ -57,4 +57,16 @@ class MainViewModel(private val groupUseCase: GroupUseCase, val userUseCase: Use
             userUseCase.registerUser()
         }
     }
+
+//    fun stopPolling() {
+//        chatRoomPollUseCase.close()
+//    }
+//
+//    fun startPolling() {
+//        viewModelScope.launch {
+//            chatRoomPollUseCase.poll(1500, "2177").collect {
+//                KLog.i(TAG, it)
+//            }
+//        }
+//    }
 }

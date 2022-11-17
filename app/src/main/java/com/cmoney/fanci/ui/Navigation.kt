@@ -38,6 +38,8 @@ fun MyAppNavHost(
     route: (MainStateHolder.Route) -> Unit,
     theme: (ThemeSetting) -> Unit
 ) {
+    val TAG = "MyAppNavHost"
+
     NavHost(
         navController = mainNavController,
         startDestination = "main",
@@ -49,24 +51,27 @@ fun MyAppNavHost(
         //頻道頁面
         composable("${MainStateHolder.Route.Channel}/{channelId}") { backStackEntry ->
             val channelId = backStackEntry.arguments?.getString("channelId")
+            KLog.i(TAG, "open chanel page id:$channelId")
+
             ChatRoomScreen(channelId, mainNavController, route)
         }
 
         //公告訊息
         composable(MainStateHolder.Route.Announce) { _ ->
-            val message =
-                mainNavController.previousBackStackEntry?.savedStateHandle?.get<ChatMessageModel>("message")
-            message?.let {
-                AnnouncementScreen(
-                    navController = mainNavController,
-                    message = message,
-                    onConfirm = {
-                        KLog.i("announce", "click:$it")
-                        mainNavController.goBackWithParams {
-                            putParcelable(AnnounceBundleKey, it)
-                        }
-                    })
-            }
+            // TODO:
+//            val message =
+//                mainNavController.previousBackStackEntry?.savedStateHandle?.get<ChatMessageModel>("message")
+//            message?.let {
+//                AnnouncementScreen(
+//                    navController = mainNavController,
+//                    message = message,
+//                    onConfirm = {
+//                        KLog.i("announce", "click:$it")
+//                        mainNavController.goBackWithParams {
+//                            putParcelable(AnnounceBundleKey, it)
+//                        }
+//                    })
+//            }
         }
 
         //設定個人資料

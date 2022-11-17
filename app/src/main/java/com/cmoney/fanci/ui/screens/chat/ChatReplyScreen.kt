@@ -11,17 +11,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.R
-import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.common.ReplyChatText
 import com.cmoney.fanci.ui.common.ReplyChatTitleText
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 /**
  * 回覆 某人 訊息
  */
 @Composable
-fun ChatReplyScreen(reply: ChatMessageModel.Reply, onDelete: (ChatMessageModel.Reply) -> Unit) {
+fun ChatReplyScreen(reply: ChatMessage, onDelete: (ChatMessage) -> Unit) {
 
     Box(
         modifier = Modifier
@@ -31,16 +32,18 @@ fun ChatReplyScreen(reply: ChatMessageModel.Reply, onDelete: (ChatMessageModel.R
     ) {
 
         Column(
-            modifier = Modifier.padding(
-                top = 10.dp,
-                bottom = 10.dp,
-                start = 16.dp,
-                end = 16.dp
-            ).fillMaxWidth()
+            modifier = Modifier
+                .padding(
+                    top = 10.dp,
+                    bottom = 10.dp,
+                    start = 16.dp,
+                    end = 16.dp
+                )
+                .fillMaxWidth()
         ) {
-            ReplyChatTitleText(text = "回覆・" + reply.replyUser.nickname)
+            ReplyChatTitleText(text = "回覆・" + reply.author?.name)
             Spacer(modifier = Modifier.height(10.dp))
-            ReplyChatText(text = reply.text)
+            ReplyChatText(text = reply.content?.text.orEmpty())
         }
 
         Image(
@@ -61,11 +64,8 @@ fun ChatReplyScreen(reply: ChatMessageModel.Reply, onDelete: (ChatMessageModel.R
 fun ChatReplyScreenPreview() {
     FanciTheme {
         ChatReplyScreen(
-            ChatMessageModel.Reply(
-                replyUser = ChatMessageModel.User(avatar = "", nickname = "阿修羅"),
-                text = "內容內容內容內容內容內容"
-            )
-        ){
+            ChatRoomUseCase.mockMessage
+        ) {
 
         }
     }

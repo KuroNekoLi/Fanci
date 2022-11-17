@@ -19,6 +19,7 @@ import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 
@@ -29,10 +30,10 @@ import kotlinx.coroutines.CoroutineScope
 fun MessageScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     listState: LazyListState = rememberLazyListState(),
-    message: List<ChatMessageModel>,
+    message: List<ChatMessage>,
     coroutineScope: CoroutineScope,
     onInteractClick: (MessageInteract) -> Unit,
-    onMsgDismissHide: (ChatMessageModel) -> Unit
+    onMsgDismissHide: (ChatMessage) -> Unit
 ) {
     Surface(
         color = LocalColor.current.env_80,
@@ -82,7 +83,7 @@ fun MessageScreen(
  */
 fun showInteractDialog(
     activity: Activity,
-    message: ChatMessageModel,
+    message: ChatMessage,
     onInteractClick: (MessageInteract) -> Unit
 ) {
     val TAG = "MessageScreen"
@@ -97,7 +98,7 @@ fun MessageScreenPreview() {
         MessageScreen(
             coroutineScope = rememberCoroutineScope(),
             message = listOf(
-                ChatRoomUseCase.allMessageType
+                ChatRoomUseCase.mockMessage
             ),
             onInteractClick = {},
             onMsgDismissHide = {}

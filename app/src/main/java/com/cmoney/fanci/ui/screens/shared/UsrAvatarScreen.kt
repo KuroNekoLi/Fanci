@@ -19,16 +19,17 @@ import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.theme.Color_B3FB9304
+import com.cmoney.fanciapi.fanci.model.GroupMember
 
 @Composable
 fun ChatUsrAvatarScreen(
-    user: ChatMessageModel.User,
+    user: GroupMember,
     nickNameColor: Color = Color_B3FB9304,
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         AsyncImage(
-            model = user.avatar,
+            model = user.thumbNail,
             modifier = Modifier
                 .size(30.dp)
                 .clip(CircleShape),
@@ -38,7 +39,7 @@ fun ChatUsrAvatarScreen(
         )
 
         Text(
-            text = user.nickname,
+            text = user.name.orEmpty(),
             modifier = Modifier.padding(start = 10.dp),
             fontSize = 14.sp,
             color = nickNameColor
@@ -49,8 +50,8 @@ fun ChatUsrAvatarScreen(
 @Preview(showBackground = true)
 @Composable
 fun ChatUsrAvatarScreenPreview() {
-    ChatUsrAvatarScreen(user = ChatMessageModel.User(
-        avatar = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
-        nickname = "Hello"
+    ChatUsrAvatarScreen(user = GroupMember(
+        thumbNail = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
+        name = "Hello"
     ))
 }

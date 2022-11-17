@@ -13,9 +13,12 @@ import com.cmoney.fanci.ui.common.ReplyText
 import com.cmoney.fanci.ui.common.ReplyTitleText
 import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IChatContent
 
 @Composable
-fun MessageReplayScreen(reply: ChatMessageModel.Reply, modifier: Modifier = Modifier) {
+fun MessageReplayScreen(reply: ChatMessage, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
     ) {
@@ -27,9 +30,9 @@ fun MessageReplayScreen(reply: ChatMessageModel.Reply, modifier: Modifier = Modi
                 end = 16.dp
             )
         ) {
-            ReplyTitleText(text = "回覆・" + reply.replyUser.nickname)
+            ReplyTitleText(text = "回覆・" + reply.author?.name)
             Spacer(modifier = Modifier.height(10.dp))
-            ReplyText(text = reply.text)
+            ReplyText(text = reply.content?.text.orEmpty())
         }
     }
 }
@@ -39,9 +42,11 @@ fun MessageReplayScreen(reply: ChatMessageModel.Reply, modifier: Modifier = Modi
 fun MessageReplayScreenPreview() {
     FanciTheme {
         MessageReplayScreen(
-            ChatMessageModel.Reply(
-                replyUser = ChatMessageModel.User(avatar = "", nickname = "阿修羅"),
-                text = "內容內容內容內容內容內容"
+            ChatMessage(
+                author = GroupMember(name = "阿修羅"),
+                content = IChatContent(
+                    text = "內容內容內容內容1234"
+                )
             ),
             modifier = Modifier
                 .clip(RoundedCornerShape(9.dp))

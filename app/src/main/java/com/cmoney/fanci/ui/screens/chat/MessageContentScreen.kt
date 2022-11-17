@@ -22,15 +22,19 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.ui.theme.White_767A7F
 import com.cmoney.fanci.utils.Utils
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.MediaType
 import com.google.accompanist.flowlayout.FlowRow
+import com.squareup.moshi.internal.Util
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 sealed class MessageContentCallback {
-    data class LongClick(val message: ChatMessageModel) : MessageContentCallback()
-    data class MsgDismissHideClick(val message: ChatMessageModel) : MessageContentCallback()
-    data class EmojiClick(val message: ChatMessageModel, val resourceId: Int) :
+    data class LongClick(val message: ChatMessage) : MessageContentCallback()
+    data class MsgDismissHideClick(val message: ChatMessage) : MessageContentCallback()
+    data class EmojiClick(val message: ChatMessage, val resourceId: Int) :
         MessageContentCallback()
 }
 
@@ -39,7 +43,7 @@ sealed class MessageContentCallback {
  */
 @Composable
 fun MessageContentScreen(
-    messageModel: ChatMessageModel,
+    messageModel: ChatMessage,
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onMessageContentCallback: (MessageContentCallback) -> Unit
@@ -64,7 +68,7 @@ fun MessageContentScreen(
                     backgroundColor = White_767A7F
                     coroutineScope.launch {
                         delay(300)
-                        if (longTap && !messageModel.message.isRecycle) {
+                        if (longTap && messageModel.isDeleted != true) {
                             onMessageContentCallback.invoke(
                                 MessageContentCallback.LongClick(messageModel)
                             )
@@ -79,28 +83,35 @@ fun MessageContentScreen(
                 .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
                 .fillMaxWidth()
         ) {
+            //TODO Server TBD
             //隱藏用戶
-            if (messageModel.message.isHideUser) {
-                MessageHideUserScreen(chatMessageModel = messageModel) {
-                    onMessageContentCallback.invoke(MessageContentCallback.MsgDismissHideClick(it))
-                }
+//            if (messageModel.message.isHideUser) {
+            if (false) {
+//                MessageHideUserScreen(chatMessageModel = messageModel) {
+//                    onMessageContentCallback.invoke(MessageContentCallback.MsgDismissHideClick(it))
+//                }
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     //大頭貼
-                    ChatUsrAvatarScreen(messageModel.poster)
+                    messageModel.author?.let {
+                        ChatUsrAvatarScreen(it)
+                    }
+
                     Spacer(modifier = Modifier.width(10.dp))
+
                     //發文時間
-                    ChatTimeText(messageModel.displayTime)
+                    ChatTimeText(Utils.getDisplayTime(messageModel.createUnixTime?.times(1000) ?: 0))
                 }
 
                 //收回
-                if (messageModel.message.isRecycle) {
+                if (messageModel.isDeleted == true) {
                     MessageRecycleScreen(modifier = contentPaddingModifier)
                 } else {
                     //Reply
-                    messageModel.message.reply?.apply {
+                    messageModel.replyMessage?.apply {
                         MessageReplayScreen(
-                            this, modifier = contentPaddingModifier
+                            reply = this,
+                            modifier = contentPaddingModifier
                                 .clip(RoundedCornerShape(9.dp))
                                 .background(LocalColor.current.background)
                         )
@@ -109,32 +120,32 @@ fun MessageContentScreen(
                     //內文
                     AutoLinkText(
                         modifier = contentPaddingModifier,
-                        text = messageModel.message.text,
+                        text = messageModel.content?.text.orEmpty(),
                         fontSize = 17.sp,
                         color = LocalColor.current.text.default_100
                     )
 
                     //OG
-                    Utils.extractLinks(messageModel.message.text).forEach { url ->
+                    Utils.extractLinks(messageModel.content?.text.orEmpty()).forEach { url ->
                         MessageOGScreen(modifier = contentPaddingModifier, url = url)
                     }
 
-                    messageModel.message.media.forEach { mediaContent ->
-                        MediaContent(contentPaddingModifier, mediaContent)
+                    messageModel.content?.medias?.let {
+                        MediaContent(contentPaddingModifier, it)
                     }
 
                     //Emoji
-                    messageModel.message.emoji.apply {
+                    messageModel.emojiCount?.apply {
                         FlowRow(
                             modifier = contentPaddingModifier.fillMaxWidth(),
                             crossAxisSpacing = 10.dp
                         ) {
-                            this.forEach { emoji ->
+                            Utils.emojiMapping(this).forEach { emoji ->
                                 EmojiCountScreen(
                                     modifier = Modifier
                                         .padding(end = 10.dp),
-                                    emojiResource = emoji.resource,
-                                    countText = emoji.count.toString()
+                                    emojiResource = emoji.first,
+                                    countText = emoji.second.toString()
                                 ) {
                                     onMessageContentCallback.invoke(
                                         MessageContentCallback.EmojiClick(
@@ -157,14 +168,19 @@ fun MessageContentScreen(
  * 多媒體 型態
  */
 @Composable
-private fun MediaContent(modifier: Modifier, media: ChatMessageModel.Media) {
-    when (media) {
-        is ChatMessageModel.Media.Image -> {
-            MessageImageScreen(
-                images = media.image,
-                modifier = modifier
-            )
-        }
+private fun MediaContent(modifier: Modifier, medias: List<Media>) {
+    // TODO: 目前只先 處理 image
+    val imageList = medias.filter {
+        it.type == MediaType.image
+    }
+
+    if (imageList.isNotEmpty()) {
+        MessageImageScreen(
+            images = imageList.map {
+                it.resourceLink.orEmpty()
+            },
+            modifier = modifier
+        )
     }
 }
 
@@ -174,7 +190,7 @@ fun MessageContentScreenPreview() {
     FanciTheme {
         MessageContentScreen(
             coroutineScope = rememberCoroutineScope(),
-            messageModel = ChatRoomUseCase.allMessageType,
+            messageModel = ChatRoomUseCase.mockMessage
         ) {
 
         }

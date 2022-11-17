@@ -7,6 +7,7 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.cmoney.fanci.BuildConfig
 import com.cmoney.fanci.repository.Network
 import com.cmoney.fanci.repository.NetworkImpl
+import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupMemberApi
 import com.cmoney.fanciapi.fanci.api.UserApi
@@ -73,6 +74,10 @@ val networkBaseModule = module {
 
     single {
         get<ApiClient>().createService(UserApi::class.java)
+    }
+
+    single {
+        get<ApiClient>().createService(ChatRoomApi::class.java)
     }
 }
 

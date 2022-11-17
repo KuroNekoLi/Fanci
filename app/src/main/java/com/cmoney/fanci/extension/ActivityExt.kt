@@ -13,12 +13,13 @@ import com.cmoney.fanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.InteractBottomSheet
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 /**
  * Show 聊天室 互動彈窗
  */
 fun Activity.showInteractDialogBottomSheet(
-    message: ChatMessageModel,
+    message: ChatMessage,
     onInteractClick: (MessageInteract) -> Unit
 ) {
     val viewGroup = this.findViewById(android.R.id.content) as ViewGroup

@@ -25,14 +25,15 @@ import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.theme.Color_CB4A4A
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.GroupMember
 
 /**
  * 隱藏用戶 彈窗
  */
 @Composable
 fun HideUserDialogScreen(
-    user: ChatMessageModel.User,
-    onConfirm: (ChatMessageModel.User) -> Unit,
+    user: GroupMember,
+    onConfirm: (GroupMember) -> Unit,
     onDismiss: () -> Unit
 ) {
     val openDialog = remember { mutableStateOf(true) }
@@ -128,9 +129,9 @@ fun HideUserDialogScreen(
 fun HideUserDialogScreenPreview() {
     FanciTheme {
         HideUserDialogScreen(
-            ChatMessageModel.User(
-                avatar = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
-                nickname = "Hello"
+            GroupMember(
+                thumbNail = "https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png",
+                name = "Hello"
             ),
             {}
         ) {

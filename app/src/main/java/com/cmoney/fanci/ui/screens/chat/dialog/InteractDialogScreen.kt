@@ -19,7 +19,9 @@ import com.cmoney.fanci.R
 import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
+import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -29,7 +31,7 @@ import kotlinx.coroutines.launch
 fun InteractDialogScreen(
     coroutineScope: CoroutineScope,
     modalBottomSheetState: ModalBottomSheetState,
-    message: ChatMessageModel,
+    message: ChatMessage,
     onInteractClick: (MessageInteract) -> Unit
 ) {
     val emojiLit = listOf(
@@ -167,16 +169,18 @@ private fun FeatureText(@DrawableRes resId: Int, text: String, onClick: () -> Un
 @Preview(showBackground = true)
 @Composable
 fun InteractDialogScreenPreview() {
-    InteractDialogScreen(
-        rememberCoroutineScope(),
-        rememberModalBottomSheetState(
-            ModalBottomSheetValue.Hidden,
-            confirmStateChange = {
-                it != ModalBottomSheetValue.HalfExpanded
-            }
-        ),
-        message = ChatRoomUseCase.textType
-    ) {
+    FanciTheme {
+        InteractDialogScreen(
+            rememberCoroutineScope(),
+            rememberModalBottomSheetState(
+                ModalBottomSheetValue.Hidden,
+                confirmStateChange = {
+                    it != ModalBottomSheetValue.HalfExpanded
+                }
+            ),
+            message = ChatRoomUseCase.mockMessage
+        ) {
 
+        }
     }
 }

@@ -8,10 +8,10 @@ import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 
 class ChatRoomViewModelFactory(val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ChatRoomViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return ChatRoomViewModel(context, ChatRoomUseCase()) as T
-        }
+//        if (modelClass.isAssignableFrom(ChatRoomViewModel::class.java)) {
+//            @Suppress("UNCHECKED_CAST")
+//            return ChatRoomViewModel(context, ChatRoomUseCase()) as T
+//        }
         throw IllegalArgumentException("Unknown ViewModel Class")
     }
 }

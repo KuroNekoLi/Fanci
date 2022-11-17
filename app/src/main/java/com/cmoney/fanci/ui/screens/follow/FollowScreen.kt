@@ -29,6 +29,7 @@ import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.socks.library.KLog
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -39,6 +40,7 @@ fun FollowScreen(
     onSearchClick: () -> Unit,
     theme: (ThemeSetting) -> Unit
 ) {
+    val TAG = "FollowScreen"
     val followCategoryList = followScreenState.viewModel.followData.observeAsState()
     val groupList = followScreenState.viewModel.myGroupList.observeAsState()
 
@@ -143,7 +145,7 @@ fun FollowScreen(
                             verticalArrangement = Arrangement.spacedBy(15.dp),
                             modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
                         ) {
-
+                            //置頂 縮圖
                             stickyHeader {
                                 followCategoryList.value?.let {
                                     GroupHeaderScreen(
@@ -157,10 +159,12 @@ fun FollowScreen(
                                 }
                             }
 
+                            //頻道
                             followCategoryList.value?.let {
                                 items(it.categories.orEmpty()) { category ->
-                                    CategoryScreen(category = category) {
-                                        onChannelClick?.invoke(it)
+                                    CategoryScreen(category = category) { channel ->
+                                        KLog.i(TAG, "Category click:$channel")
+                                        onChannelClick?.invoke(channel)
                                     }
                                 }
                             }

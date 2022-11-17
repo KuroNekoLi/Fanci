@@ -25,11 +25,12 @@ import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.theme.White_262C34
 import com.cmoney.fanci.ui.theme.White_BBBCBF
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 @Composable
 fun ShowDisplayHideMessageScreen(
-    chatMessageModel: ChatMessageModel,
-    onConfirm: (ChatMessageModel) -> Unit,
+    chatMessageModel: ChatMessage,
+    onConfirm: (ChatMessage) -> Unit,
     onDismiss: () -> Unit
 ) {
     val openDialog = remember { mutableStateOf(true) }
@@ -94,7 +95,7 @@ fun ShowDisplayHideMessageScreen(
 @Composable
 fun ShowDisplayHideMessageScreenPreview() {
     ShowDisplayHideMessageScreen(
-        chatMessageModel = ChatRoomUseCase.allMessageType,
+        chatMessageModel = ChatRoomUseCase.mockMessage,
         {},
         {}
     )

@@ -16,6 +16,7 @@ import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 const val AnnounceBundleKey = "AnnounceBundleKey"
 
@@ -25,8 +26,8 @@ const val AnnounceBundleKey = "AnnounceBundleKey"
 @Composable
 fun AnnouncementScreen(
     navController: NavHostController,
-    message: ChatMessageModel,
-    onConfirm: (ChatMessageModel) -> Unit
+    message: ChatMessage,
+    onConfirm: (ChatMessage) -> Unit
 ) {
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -95,7 +96,7 @@ fun AnnouncementScreen(
 @Composable
 fun AnnouncementScreenPreview() {
     FanciTheme {
-        AnnouncementScreen(rememberNavController(), ChatRoomUseCase.imageType) {
+        AnnouncementScreen(rememberNavController(), ChatRoomUseCase.mockMessage) {
 
         }
     }

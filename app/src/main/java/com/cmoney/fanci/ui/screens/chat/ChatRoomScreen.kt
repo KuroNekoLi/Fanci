@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.chat
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
@@ -21,7 +22,9 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
+import org.koin.core.Koin
 
 @Composable
 fun ChatRoomScreen(
@@ -38,6 +41,15 @@ fun ChatRoomScreen(
     val bundle = navController.currentBackStackEntryAsState().value
 
     KLog.i(TAG, "bundle:$bundle")
+
+    KLog.i(TAG, "channelId:$channelId")
+
+    stateHolder.viewModel.startPolling(channelId)
+
+    BackHandler() {
+        stateHolder.viewModel.stopPolling()
+        navController.popBackStack()
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -62,13 +74,14 @@ fun ChatRoomScreen(
             //公告訊息
             bundle?.apply {
                 this.arguments?.apply {
-                    val announceModel = this.getParcelable<ChatMessageModel>(AnnounceBundleKey)
-                    announceModel?.apply {
-                        MessageAnnounceScreen(
-                            this,
-                            modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
-                        )
-                    }
+                    // TODO:
+//                    val announceModel = this.getParcelable<ChatMessage>(AnnounceBundleKey)
+//                    announceModel?.apply {
+//                        MessageAnnounceScreen(
+//                            this,
+//                            modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
+//                        )
+//                    }
                 }
             }
 
@@ -113,8 +126,8 @@ fun ChatRoomScreen(
 
         //Alert Dialog
         //檢舉用戶
-        uiState.reportUser?.apply {
-            ReportUserDialogScreen(user = this.poster,
+        uiState.reportUser?.author?.apply {
+            ReportUserDialogScreen(user = this,
                 onConfirm = {
                     stateHolder.viewModel.onReportUser(it)
                 }
@@ -134,9 +147,9 @@ fun ChatRoomScreen(
         }
 
         //隱藏用戶 彈窗
-        uiState.hideUserMessage?.apply {
+        uiState.hideUserMessage?.author?.apply {
             HideUserDialogScreen(
-                this.poster,
+                this,
                 onConfirm = {
                     stateHolder.viewModel.onHideUserConfirm(it)
                 }
