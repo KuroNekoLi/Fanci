@@ -20,12 +20,16 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomUiState
 
 /**
  * 聊天室 附加圖片
  */
 @Composable
-fun MessageAttachImageScreen(imageAttach: List<Uri>, onDelete: (Uri) -> Unit) {
+fun MessageAttachImageScreen(
+    imageAttach: List<Uri>,
+    onDelete: (Uri) -> Unit
+) {
     val listState = rememberLazyListState()
 
     LazyRow(
@@ -33,9 +37,9 @@ fun MessageAttachImageScreen(imageAttach: List<Uri>, onDelete: (Uri) -> Unit) {
         state = listState, horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         if (imageAttach.isNotEmpty()) {
-            items(imageAttach) { uri ->
-                AttachImage(uri) {
-                    onDelete.invoke(uri)
+            items(imageAttach) { attach ->
+                AttachImage(attach) {
+                    onDelete.invoke(attach)
                 }
             }
         }

@@ -59,7 +59,7 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageDelete(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<Unit>
 
     /**
-     * 取得 聊天室的一則聊天訊息
+     * 取得 聊天室的一則置頂訊息
      * 
      * Responses:
      *  - 204: No Content

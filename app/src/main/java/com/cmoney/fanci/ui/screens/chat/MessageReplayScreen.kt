@@ -16,6 +16,7 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IChatContent
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 
 @Composable
 fun MessageReplayScreen(reply: ChatMessage, modifier: Modifier = Modifier) {
@@ -44,7 +45,7 @@ fun MessageReplayScreenPreview() {
         MessageReplayScreen(
             ChatMessage(
                 author = GroupMember(name = "阿修羅"),
-                content = IChatContent(
+                content = MediaIChatContent(
                     text = "內容內容內容內容1234"
                 )
             ),

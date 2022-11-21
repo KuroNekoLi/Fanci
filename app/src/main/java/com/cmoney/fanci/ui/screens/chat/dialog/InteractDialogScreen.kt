@@ -16,7 +16,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
-import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -35,13 +34,13 @@ fun InteractDialogScreen(
     onInteractClick: (MessageInteract) -> Unit
 ) {
     val emojiLit = listOf(
+        R.drawable.emoji_money,
+        R.drawable.emoji_shock,
+        R.drawable.emoji_laugh,
         R.drawable.emoji_angry,
+        R.drawable.emoji_think,
         R.drawable.emoji_cry,
         R.drawable.emoji_like,
-        R.drawable.emoji_haha,
-        R.drawable.emoji_happiness,
-        R.drawable.emoji_love,
-        R.drawable.emoji_happy,
     )
 
     Box(

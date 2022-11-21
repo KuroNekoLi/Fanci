@@ -93,7 +93,7 @@ fun CoffeeTheme(
 
 private val LightImages = Images(lockupLogo = R.drawable.fanci)
 
-private val DarkImages = Images(lockupLogo = R.drawable.emoji_love)
+private val DarkImages = Images(lockupLogo = R.drawable.emoji_like)
 
 @Composable
 private fun MainTheme(

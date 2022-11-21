@@ -22,6 +22,7 @@ import com.squareup.moshi.Json
  * 使用者
  *
  * @param id 使用者id
+ * @param cmoneyMemberId CMoney 會員編號
  * @param name 使用者名稱
  * @param thumbNail 使用者頭像
  * @param serialNumber 使用者序列號
@@ -35,6 +36,10 @@ data class User (
     /* 使用者id */
     @Json(name = "id")
     val id: kotlin.String? = null,
+
+    /* CMoney 會員編號 */
+    @Json(name = "cmoneyMemberId")
+    val cmoneyMemberId: kotlin.Int? = null,
 
     /* 使用者名稱 */
     @Json(name = "name")

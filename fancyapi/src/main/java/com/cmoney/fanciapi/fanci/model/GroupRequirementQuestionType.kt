@@ -21,13 +21,13 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * Values: textMessage
+ * Values: written
  */
 
-enum class MessageType(val value: kotlin.String) {
+enum class GroupRequirementQuestionType(val value: kotlin.String) {
 
-    @Json(name = "TextMessage")
-    textMessage("TextMessage");
+    @Json(name = "Written")
+    written("Written");
 
     /**
      * Override toString() to avoid using the enum variable name as the value, and instead use
@@ -42,12 +42,12 @@ enum class MessageType(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is MessageType) "$data" else null
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is GroupRequirementQuestionType) "$data" else null
 
         /**
-         * Returns a valid [MessageType] for [data], null otherwise.
+         * Returns a valid [GroupRequirementQuestionType] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): MessageType? = data?.let {
+        fun decode(data: kotlin.Any?): GroupRequirementQuestionType? = data?.let {
           val normalizedData = "$it".lowercase()
           values().firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()

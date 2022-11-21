@@ -3,6 +3,7 @@ package com.cmoney.fanci.ui.screens.chat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,7 +20,7 @@ import com.cmoney.fanci.R
 import com.socks.library.KLog
 
 @Composable
-fun MessageImageScreen(images: List<String>, modifier: Modifier = Modifier) {
+fun MessageImageScreen(images: List<Any>, modifier: Modifier = Modifier, isShowLoading: Boolean = false) {
     val TAG = "MessageImageScreen"
     Box(
         modifier = modifier
@@ -128,11 +129,17 @@ fun MessageImageScreen(images: List<String>, modifier: Modifier = Modifier) {
                 }
             }
         }
+
+        if (isShowLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(45.dp).align(Alignment.Center)
+            )
+        }
     }
 }
 
 @Composable
-fun MessageImage(model: String, modifier: Modifier = Modifier) {
+fun MessageImage(model: Any, modifier: Modifier = Modifier) {
     AsyncImage(
         modifier = modifier,
         model = model,

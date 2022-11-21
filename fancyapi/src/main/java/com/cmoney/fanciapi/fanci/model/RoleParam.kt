@@ -33,7 +33,7 @@ data class RoleParam (
 
     /* Fanci權限ID清單  參考 /api/v1/Permission 清單內容 */
     @Json(name = "permissionIds")
-    val permissionIds: kotlin.collections.List<kotlin.Int>? = null
+    val permissionIds: kotlin.collections.List<kotlin.String>? = null
 
 )
 

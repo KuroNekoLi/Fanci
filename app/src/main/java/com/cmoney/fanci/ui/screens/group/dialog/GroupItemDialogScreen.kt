@@ -125,7 +125,7 @@ fun JoinGroupDialogScreenPreview() {
     FanciTheme {
         GroupItemDialogScreen(
             groupModel = Group(
-                groupId = "",
+                id = "",
                 name = "Hello",
                 description = "大家好，我是愛莉莎莎Alisasa！\n" +
                         "\n" +

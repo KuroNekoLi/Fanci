@@ -15,25 +15,25 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.Media
 
 import com.squareup.moshi.Json
 
 /**
  * 
  *
- * @param name 命名
- * @param isNeedApproval 
+ * @param text 
+ * @param medias 
  */
 
 
-data class EditChannelParam (
+data class MediaIChatContent (
 
-    /* 命名 */
-    @Json(name = "name")
-    val name: kotlin.String? = null,
+    @Json(name = "text")
+    val text: kotlin.String? = null,
 
-    @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null
+    @Json(name = "medias")
+    val medias: kotlin.collections.List<Media>? = null
 
 )
 

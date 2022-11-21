@@ -127,7 +127,7 @@ fun DrawerMenuScreenPreview() {
             groupList = listOf(
                 GroupItem(
                     isSelected = true, groupModel = Group(
-                        groupId = "",
+                        id = "",
                         name = "",
                         description = "Description",
                         coverImageUrl = "",

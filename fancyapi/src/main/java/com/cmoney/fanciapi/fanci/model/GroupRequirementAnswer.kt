@@ -19,21 +19,22 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 題組回應
  *
- * @param name 命名
- * @param isNeedApproval 
+ * @param question 題目
+ * @param answer 回應
  */
 
 
-data class EditChannelParam (
+data class GroupRequirementAnswer (
 
-    /* 命名 */
-    @Json(name = "name")
-    val name: kotlin.String? = null,
+    /* 題目 */
+    @Json(name = "question")
+    val question: kotlin.String? = null,
 
-    @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null
+    /* 回應 */
+    @Json(name = "answer")
+    val answer: kotlin.String? = null
 
 )
 

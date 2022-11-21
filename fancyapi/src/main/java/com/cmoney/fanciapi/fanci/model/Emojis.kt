@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * Emoji列舉
+ * 
  *
  * Values: like,dislike,laugh,money,shock,cry,think,angry
  */

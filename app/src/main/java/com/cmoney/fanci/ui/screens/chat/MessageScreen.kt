@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.cmoney.fanci.extension.findActivity
 import com.cmoney.fanci.extension.showInteractDialogBottomSheet
-import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -30,10 +30,10 @@ import kotlinx.coroutines.CoroutineScope
 fun MessageScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     listState: LazyListState = rememberLazyListState(),
-    message: List<ChatMessage>,
+    message: List<ChatMessageWrapper>,
     coroutineScope: CoroutineScope,
     onInteractClick: (MessageInteract) -> Unit,
-    onMsgDismissHide: (ChatMessage) -> Unit
+    onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
     Surface(
         color = LocalColor.current.env_80,
@@ -44,7 +44,7 @@ fun MessageScreen(
             if (message.isNotEmpty()) {
                 items(message) { message ->
                     MessageContentScreen(
-                        messageModel = message,
+                        chatMessageWrapper = message,
                         coroutineScope = coroutineScope,
                         onMessageContentCallback = {
                             when (it) {
@@ -57,10 +57,14 @@ fun MessageScreen(
                                     )
                                 }
                                 is MessageContentCallback.LongClick -> {
-                                    showInteractDialog(context.findActivity(), message, onInteractClick)
+                                    showInteractDialog(
+                                        context.findActivity(),
+                                        message.message,
+                                        onInteractClick
+                                    )
                                 }
                                 is MessageContentCallback.MsgDismissHideClick -> {
-                                    onMsgDismissHide.invoke(message)
+                                    onMsgDismissHide.invoke(message.message)
                                 }
                             }
                         }
@@ -96,12 +100,14 @@ fun showInteractDialog(
 fun MessageScreenPreview() {
     FanciTheme {
         MessageScreen(
-            coroutineScope = rememberCoroutineScope(),
             message = listOf(
-                ChatRoomUseCase.mockMessage
+                ChatMessageWrapper(
+                    message = ChatRoomUseCase.mockMessage
+                )
             ),
+            coroutineScope = rememberCoroutineScope(),
             onInteractClick = {},
-            onMsgDismissHide = {}
+            onMsgDismissHide = {},
         )
     }
 }

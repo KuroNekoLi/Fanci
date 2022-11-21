@@ -12,6 +12,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupPaging
 import com.cmoney.fanciapi.fanci.model.GroupParam
+import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.RoleParam
 
 interface GroupApi {
@@ -24,10 +25,11 @@ interface GroupApi {
      *
      * @param startWeight  (optional, default to 0L)
      * @param pageSize  (optional, default to 100)
+     * @param orderType  (optional)
      * @return [GroupPaging]
      */
     @GET("api/v1/Group")
-    suspend fun apiV1GroupGet(@Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 100): Response<GroupPaging>
+    suspend fun apiV1GroupGet(@Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 100, @Query("orderType") orderType: OrderType? = null): Response<GroupPaging>
 
     /**
      * 新增社團 頻道分類
@@ -122,7 +124,7 @@ interface GroupApi {
      * @return [Unit]
      */
     @DELETE("api/v1/Group/{groupId}/Role/{roleId}")
-    suspend fun apiV1GroupGroupIdRoleRoleIdDelete(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.Int): Response<Unit>
+    suspend fun apiV1GroupGroupIdRoleRoleIdDelete(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<Unit>
 
     /**
      * 編輯角色
@@ -136,7 +138,7 @@ interface GroupApi {
      * @return [Unit]
      */
     @PUT("api/v1/Group/{groupId}/Role/{roleId}")
-    suspend fun apiV1GroupGroupIdRoleRoleIdPut(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.Int, @Body roleParam: RoleParam? = null): Response<Unit>
+    suspend fun apiV1GroupGroupIdRoleRoleIdPut(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String, @Body roleParam: RoleParam? = null): Response<Unit>
 
     /**
      * 取得我加入的社團頻道清單

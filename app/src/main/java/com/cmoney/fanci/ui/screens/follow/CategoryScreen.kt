@@ -36,24 +36,24 @@ fun CategoryScreenPreview() {
     FanciTheme {
         CategoryScreen(
             Category(
-                categoryId = "",
+                id = "",
                 groupId = "",
                 name = "分類1",
                 channels = listOf(
                     Channel(
-                        channelId = "",
+                        id = "",
                         creatorId = "",
                         groupId = "",
                         name = "\uD83D\uDC4F｜歡迎新朋友"
                     ),
                     Channel(
-                        channelId = "",
+                        id = "",
                         creatorId = "",
                         groupId = "",
                         name = "\uD83D\uDC4F｜歡迎新朋友"
                     ),
                     Channel(
-                        channelId = "",
+                        id = "",
                         creatorId = "",
                         groupId = "",
                         name = "\uD83D\uDC4F｜歡迎新朋友"

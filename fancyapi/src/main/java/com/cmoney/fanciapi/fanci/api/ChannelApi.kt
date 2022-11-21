@@ -76,7 +76,7 @@ interface ChannelApi {
      * @return [Unit]
      */
     @DELETE("api/v1/Channel/{channelId}/Role/{roleId}")
-    suspend fun apiV1ChannelChannelIdRoleRoleIdDelete(@Path("channelId") channelId: kotlin.String, @Path("roleId") roleId: kotlin.Int): Response<Unit>
+    suspend fun apiV1ChannelChannelIdRoleRoleIdDelete(@Path("channelId") channelId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<Unit>
 
     /**
      * 新增角色到頻道/編輯可存取頻道角色權限
@@ -89,6 +89,6 @@ interface ChannelApi {
      * @return [Unit]
      */
     @PUT("api/v1/Channel/{channelId}/Role/{roleId}")
-    suspend fun apiV1ChannelChannelIdRoleRoleIdPut(@Path("channelId") channelId: kotlin.String, @Path("roleId") roleId: kotlin.Int): Response<Unit>
+    suspend fun apiV1ChannelChannelIdRoleRoleIdPut(@Path("channelId") channelId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<Unit>
 
 }

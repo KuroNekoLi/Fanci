@@ -21,11 +21,11 @@ import com.cmoney.fanciapi.fanci.model.MessageType
 import com.squareup.moshi.Json
 
 /**
- * 聊天訊息內容
+ * 
  *
  * @param replyMessageId 回覆的messageid
- * @param text 聊天訊息內容
- * @param medias 聊天訊息內容
+ * @param text 文字訊息內容
+ * @param medias 附帶媒體內容
  * @param messageType 
  */
 
@@ -36,11 +36,11 @@ data class ChatMessageParam (
     @Json(name = "replyMessageId")
     val replyMessageId: kotlin.String? = null,
 
-    /* 聊天訊息內容 */
+    /* 文字訊息內容 */
     @Json(name = "text")
     val text: kotlin.String? = null,
 
-    /* 聊天訊息內容 */
+    /* 附帶媒體內容 */
     @Json(name = "medias")
     val medias: kotlin.collections.List<Media>? = null,
 

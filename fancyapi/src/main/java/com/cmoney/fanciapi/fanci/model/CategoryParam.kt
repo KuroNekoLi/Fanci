@@ -22,7 +22,6 @@ import com.squareup.moshi.Json
  * 
  *
  * @param name 分類命名
- * @param isNeedApproval 分類是否公開
  */
 
 
@@ -30,11 +29,7 @@ data class CategoryParam (
 
     /* 分類命名 */
     @Json(name = "name")
-    val name: kotlin.String? = null,
-
-    /* 分類是否公開 */
-    @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null
+    val name: kotlin.String? = null
 
 )
 

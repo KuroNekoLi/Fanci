@@ -12,7 +12,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainStateHolder
-import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.fanci.ui.screens.chat.dialog.HideUserDialogScreen
 import com.cmoney.fanci.ui.screens.chat.dialog.ReportUserDialogScreen
@@ -22,13 +21,11 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
-import org.koin.core.Koin
 
 @Composable
 fun ChatRoomScreen(
-    channelId: String?,
+    channelId: String,
     navController: NavHostController,
     route: (MainStateHolder.Route) -> Unit,
     stateHolder: ChatRoomState = rememberChatRoomState(navController = navController)
@@ -46,7 +43,7 @@ fun ChatRoomScreen(
 
     stateHolder.viewModel.startPolling(channelId)
 
-    BackHandler() {
+    BackHandler {
         stateHolder.viewModel.stopPolling()
         navController.popBackStack()
     }
@@ -116,7 +113,7 @@ fun ChatRoomScreen(
             //輸入匡
             MessageInput(
                 onMessageSend = {
-                    stateHolder.viewModel.messageInput(it)
+                    stateHolder.viewModel.messageSend(channelId, it)
                 },
                 onAttach = {
                     stateHolder.viewModel.attachImage(it)
@@ -182,7 +179,7 @@ fun ChatRoomScreenPreview() {
         val route: (MainStateHolder.Route) -> Unit = {
         }
         ChatRoomScreen(
-            null,
+            "",
             rememberNavController(),
             route
         )

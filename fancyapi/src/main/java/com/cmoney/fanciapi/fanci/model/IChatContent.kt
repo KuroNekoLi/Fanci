@@ -15,27 +15,25 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.IMedia
 
 import com.squareup.moshi.Json
 
 /**
- * 聊天訊息內容
+ * 
  *
- * @param text 訊息
- * @param medias 媒體
+ * @param text 
+ * @param medias 
  */
 
 
 data class IChatContent (
 
-    /* 訊息 */
     @Json(name = "text")
     val text: kotlin.String? = null,
 
-    /* 媒體 */
     @Json(name = "medias")
-    val medias: kotlin.collections.List<Media>? = null
+    val medias: kotlin.collections.List<IMedia>? = null
 
 )
 

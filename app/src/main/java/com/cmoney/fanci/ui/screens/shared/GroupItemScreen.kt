@@ -85,7 +85,7 @@ fun GroupItemScreenPreview() {
     FanciTheme {
         GroupItemScreen(
             groupModel = Group(
-                groupId = "",
+                id = "",
                 name = "Hello",
                 description = "Description",
                 coverImageUrl = "",

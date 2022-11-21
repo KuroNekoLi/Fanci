@@ -21,26 +21,22 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param roleId 
+ * @param id 
  * @param name 
- * @param cmoneyDataId 
  * @param permissionIds 
  */
 
 
 data class FanciRole (
 
-    @Json(name = "roleId")
-    val roleId: kotlin.Int? = null,
+    @Json(name = "id")
+    val id: kotlin.String? = null,
 
     @Json(name = "name")
     val name: kotlin.String? = null,
 
-    @Json(name = "cmoneyDataId")
-    val cmoneyDataId: kotlin.String? = null,
-
     @Json(name = "permissionIds")
-    val permissionIds: kotlin.collections.List<kotlin.Int>? = null
+    val permissionIds: kotlin.collections.List<kotlin.String>? = null
 
 )
 

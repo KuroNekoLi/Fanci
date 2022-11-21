@@ -24,8 +24,8 @@ import com.squareup.moshi.Json
  * @param name 社團命名
  * @param description 社團簡介
  * @param isNeedApproval 社團是否為開放
- * @param coverImage 社團封面
- * @param thumbnailImage 社團縮圖
+ * @param coverImageUrl 社團封面
+ * @param thumbnailImageUrl 社團縮圖
  */
 
 
@@ -44,12 +44,12 @@ data class GroupParam (
     val isNeedApproval: kotlin.Boolean? = null,
 
     /* 社團封面 */
-    @Json(name = "coverImage")
-    val coverImage: kotlin.String? = null,
+    @Json(name = "coverImageUrl")
+    val coverImageUrl: kotlin.String? = null,
 
     /* 社團縮圖 */
-    @Json(name = "thumbnailImage")
-    val thumbnailImage: kotlin.String? = null
+    @Json(name = "thumbnailImageUrl")
+    val thumbnailImageUrl: kotlin.String? = null
 
 )
 

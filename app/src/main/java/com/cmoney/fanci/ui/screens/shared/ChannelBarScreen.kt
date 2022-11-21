@@ -52,7 +52,7 @@ fun ChannelBarScreenPreview() {
     FanciTheme {
         ChannelBarScreen(
             Channel(
-                channelId = "",
+                id = "",
                 creatorId = "",
                 groupId = "",
                 name = "\uD83D\uDC4F｜歡迎新朋友"

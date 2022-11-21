@@ -21,19 +21,14 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param name 命名
- * @param isNeedApproval 
+ * @param userIds 
  */
 
 
-data class EditChannelParam (
+data class UseridsParam (
 
-    /* 命名 */
-    @Json(name = "name")
-    val name: kotlin.String? = null,
-
-    @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null
+    @Json(name = "userIds")
+    val userIds: kotlin.collections.List<kotlin.String>? = null
 
 )
 

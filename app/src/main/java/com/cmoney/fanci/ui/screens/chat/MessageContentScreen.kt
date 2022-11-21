@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.chat
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -12,21 +13,21 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.common.AutoLinkText
 import com.cmoney.fanci.ui.common.ChatTimeText
+import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanci.ui.theme.White_767A7F
 import com.cmoney.fanci.utils.Utils
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.IMedia
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.google.accompanist.flowlayout.FlowRow
-import com.squareup.moshi.internal.Util
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -43,15 +44,17 @@ sealed class MessageContentCallback {
  */
 @Composable
 fun MessageContentScreen(
-    messageModel: ChatMessage,
+    chatMessageWrapper: ChatMessageWrapper,
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    onMessageContentCallback: (MessageContentCallback) -> Unit
+    onMessageContentCallback: (MessageContentCallback) -> Unit,
 ) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp)
     val defaultColor = LocalColor.current.env_80
     var longTap by remember { mutableStateOf(false) }
     var backgroundColor by remember { mutableStateOf(defaultColor) }
+    val longPressColor = LocalColor.current.component.other
+    val messageModel = chatMessageWrapper.message
 
     Box(modifier = modifier
         .fillMaxWidth()
@@ -65,7 +68,7 @@ fun MessageContentScreen(
                 },
                 onLongPress = {
                     longTap = true
-                    backgroundColor = White_767A7F
+                    backgroundColor = longPressColor
                     coroutineScope.launch {
                         delay(300)
                         if (longTap && messageModel.isDeleted != true) {
@@ -100,7 +103,11 @@ fun MessageContentScreen(
                     Spacer(modifier = Modifier.width(10.dp))
 
                     //發文時間
-                    ChatTimeText(Utils.getDisplayTime(messageModel.createUnixTime?.times(1000) ?: 0))
+                    ChatTimeText(
+                        Utils.getDisplayTime(
+                            messageModel.createUnixTime?.times(1000) ?: 0
+                        )
+                    )
                 }
 
                 //收回
@@ -118,20 +125,39 @@ fun MessageContentScreen(
                     }
 
                     //內文
-                    AutoLinkText(
-                        modifier = contentPaddingModifier,
-                        text = messageModel.content?.text.orEmpty(),
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100
-                    )
+                    messageModel.content?.text?.apply {
+                        if (this.isNotEmpty()) {
+                            AutoLinkText(
+                                modifier = contentPaddingModifier,
+                                text = this,
+                                fontSize = 17.sp,
+                                color = LocalColor.current.text.default_100
+                            )
 
-                    //OG
-                    Utils.extractLinks(messageModel.content?.text.orEmpty()).forEach { url ->
-                        MessageOGScreen(modifier = contentPaddingModifier, url = url)
+                            //OG
+                            Utils.extractLinks(this).forEach { url ->
+                                MessageOGScreen(modifier = contentPaddingModifier, url = url)
+                            }
+                        }
                     }
 
                     messageModel.content?.medias?.let {
                         MediaContent(contentPaddingModifier, it)
+                    }
+
+                    //上傳圖片前預覽
+                    if (chatMessageWrapper.uploadAttachPreview.isNotEmpty()) {
+                        MessageImageScreen(
+                            images = chatMessageWrapper.uploadAttachPreview.map {
+                                it.uri
+                            },
+                            modifier = contentPaddingModifier,
+                            isShowLoading = chatMessageWrapper.uploadAttachPreview.map {
+                                it.isUploadComplete
+                            }.any {
+                                !it
+                            }
+                        )
                     }
 
                     //Emoji
@@ -141,18 +167,20 @@ fun MessageContentScreen(
                             crossAxisSpacing = 10.dp
                         ) {
                             Utils.emojiMapping(this).forEach { emoji ->
-                                EmojiCountScreen(
-                                    modifier = Modifier
-                                        .padding(end = 10.dp),
-                                    emojiResource = emoji.first,
-                                    countText = emoji.second.toString()
-                                ) {
-                                    onMessageContentCallback.invoke(
-                                        MessageContentCallback.EmojiClick(
-                                            messageModel,
-                                            it
+                                if (emoji.second != 0) {
+                                    EmojiCountScreen(
+                                        modifier = Modifier
+                                            .padding(end = 10.dp),
+                                        emojiResource = emoji.first,
+                                        countText = emoji.second.toString()
+                                    ) {
+                                        onMessageContentCallback.invoke(
+                                            MessageContentCallback.EmojiClick(
+                                                messageModel,
+                                                it
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                             }
                         }
@@ -169,7 +197,6 @@ fun MessageContentScreen(
  */
 @Composable
 private fun MediaContent(modifier: Modifier, medias: List<Media>) {
-    // TODO: 目前只先 處理 image
     val imageList = medias.filter {
         it.type == MediaType.image
     }
@@ -189,10 +216,18 @@ private fun MediaContent(modifier: Modifier, medias: List<Media>) {
 fun MessageContentScreenPreview() {
     FanciTheme {
         MessageContentScreen(
+            chatMessageWrapper = ChatMessageWrapper(
+                message = ChatRoomUseCase.mockMessage,
+                uploadAttachPreview = listOf(
+                    ChatRoomUiState.ImageAttachState(
+                        uri = Uri.parse("")
+                    )
+                )
+            ),
             coroutineScope = rememberCoroutineScope(),
-            messageModel = ChatRoomUseCase.mockMessage
-        ) {
+            onMessageContentCallback = {
 
-        }
+            }
+        )
     }
 }

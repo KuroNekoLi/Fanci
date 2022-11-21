@@ -20,27 +20,28 @@ import com.cmoney.fanciapi.fanci.model.Category
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 群組
  *
- * @param groupId 唯一識別
+ * @param id 唯一識別
  * @param name 社團命名
  * @param description 社團描述
- * @param isNeedApproval 
+ * @param isNeedApproval 加入是否需要審核
  * @param coverImageUrl 封面圖
  * @param thumbnailImageUrl 縮圖
  * @param categories 社團下的分類
- * @param weight 
+ * @param weight 系統排序權重
  * @param creatorId 創立者
  * @param createUnixTime 創立時間
  * @param updateUnixTime 更新時間
+ * @param memberCount 會員總數
  */
 
 
 data class Group (
 
     /* 唯一識別 */
-    @Json(name = "groupId")
-    val groupId: kotlin.String? = null,
+    @Json(name = "id")
+    val id: kotlin.String? = null,
 
     /* 社團命名 */
     @Json(name = "name")
@@ -50,6 +51,7 @@ data class Group (
     @Json(name = "description")
     val description: kotlin.String? = null,
 
+    /* 加入是否需要審核 */
     @Json(name = "isNeedApproval")
     val isNeedApproval: kotlin.Boolean? = null,
 
@@ -65,6 +67,7 @@ data class Group (
     @Json(name = "categories")
     val categories: kotlin.collections.List<Category>? = null,
 
+    /* 系統排序權重 */
     @Json(name = "weight")
     val weight: kotlin.Long? = null,
 
@@ -78,7 +81,11 @@ data class Group (
 
     /* 更新時間 */
     @Json(name = "updateUnixTime")
-    val updateUnixTime: kotlin.Long? = null
+    val updateUnixTime: kotlin.Long? = null,
+
+    /* 會員總數 */
+    @Json(name = "memberCount")
+    val memberCount: kotlin.Int? = null
 
 )
 

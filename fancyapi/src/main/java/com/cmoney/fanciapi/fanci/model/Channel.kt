@@ -23,11 +23,10 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param channelId 頻道ID
+ * @param id 頻道ID
  * @param creatorId 頻道創立者
  * @param channelType 
  * @param name 頻道命名
- * @param isNeedApproval 是否為開放頻道
  * @param createUnixTime 頻道建立時間
  * @param updateUnixTime 頻道更新時間
  * @param weight 排序權重
@@ -39,8 +38,8 @@ import com.squareup.moshi.Json
 data class Channel (
 
     /* 頻道ID */
-    @Json(name = "channelId")
-    val channelId: kotlin.String? = null,
+    @Json(name = "id")
+    val id: kotlin.String? = null,
 
     /* 頻道創立者 */
     @Json(name = "creatorId")
@@ -52,10 +51,6 @@ data class Channel (
     /* 頻道命名 */
     @Json(name = "name")
     val name: kotlin.String? = null,
-
-    /* 是否為開放頻道 */
-    @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null,
 
     /* 頻道建立時間 */
     @Json(name = "createUnixTime")

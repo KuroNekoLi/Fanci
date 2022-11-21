@@ -16,8 +16,8 @@
 package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.IChatContent
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageType
 
 import com.squareup.moshi.Json
@@ -47,7 +47,7 @@ data class ChatMessage (
     val replyMessage: ChatMessage? = null,
 
     @Json(name = "content")
-    val content: IChatContent? = null,
+    val content: MediaIChatContent? = null,
 
     @Json(name = "emojiCount")
     val emojiCount: IEmojiCount? = null,

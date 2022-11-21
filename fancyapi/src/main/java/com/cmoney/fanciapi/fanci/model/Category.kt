@@ -22,25 +22,24 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param categoryId 分類ID
+ * @param id 分類ID
  * @param name 分類標籤名稱
  * @param weight 排序權重
  * @param createUnixTime 分類建立時間
  * @param updateUnixTime 分類更新時間
- * @param isNeedApproval 分類是否公開
  * @param creatorId 建立分類UserId
  * @param isDeleted 是否被刪除
  * @param groupId 所屬社團
  * @param channels 分類下的群組
- * @param orderIndex 分類 自訂排序
+ * @param userDefineOrder 分類 自訂排序
  */
 
 
 data class Category (
 
     /* 分類ID */
-    @Json(name = "categoryId")
-    val categoryId: kotlin.String? = null,
+    @Json(name = "id")
+    val id: kotlin.String? = null,
 
     /* 分類標籤名稱 */
     @Json(name = "name")
@@ -57,10 +56,6 @@ data class Category (
     /* 分類更新時間 */
     @Json(name = "updateUnixTime")
     val updateUnixTime: kotlin.Long? = null,
-
-    /* 分類是否公開 */
-    @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null,
 
     /* 建立分類UserId */
     @Json(name = "creatorId")
@@ -79,8 +74,8 @@ data class Category (
     val channels: kotlin.collections.List<Channel>? = null,
 
     /* 分類 自訂排序 */
-    @Json(name = "orderIndex")
-    val orderIndex: kotlin.Long? = null
+    @Json(name = "userDefineOrder")
+    val userDefineOrder: kotlin.Long? = null
 
 )
 

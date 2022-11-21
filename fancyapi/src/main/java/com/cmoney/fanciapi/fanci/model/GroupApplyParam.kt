@@ -15,25 +15,22 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
 
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 申請加入社團參數
  *
- * @param name 命名
- * @param isNeedApproval 
+ * @param answers 回答
  */
 
 
-data class EditChannelParam (
+data class GroupApplyParam (
 
-    /* 命名 */
-    @Json(name = "name")
-    val name: kotlin.String? = null,
-
-    @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null
+    /* 回答 */
+    @Json(name = "answers")
+    val answers: kotlin.collections.List<GroupRequirementAnswer>
 
 )
 

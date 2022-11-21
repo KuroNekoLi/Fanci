@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.model.ChatMessageModel
+import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -47,12 +47,13 @@ fun AnnouncementScreen(
             verticalArrangement = Arrangement.Bottom
         ) {
             MessageContentScreen(
+                chatMessageWrapper = ChatMessageWrapper(message),
                 modifier = Modifier
                     .weight(1f),
-                messageModel = message,
-            ) {
+                onMessageContentCallback = {
 
-            }
+                }
+            )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

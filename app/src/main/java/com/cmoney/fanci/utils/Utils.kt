@@ -21,27 +21,38 @@ class Utils {
             return links
         }
 
-        // TODO: 確認所有Emoji resource
         /**
          * @return resourceID, count
          */
         fun emojiMapping(emojiCount: IEmojiCount): List<Pair<Int, Int>> {
             val result = mutableListOf<Pair<Int, Int>>()
-            emojiCount.counts?.forEach {
-                val key = it.key
-                val value = it.value
-                val resourceId = when (key) {
-                    "Angry" -> {
-                        R.drawable.emoji_angry
-                    }
-                    "Cry" -> {
-                        R.drawable.emoji_cry
-                    }
-                    else -> {
-                        R.drawable.emoji_happy
-                    }
-                }
-                result.add(Pair(resourceId, value))
+
+            emojiCount.money?.let {
+                result.add(Pair(R.drawable.emoji_money, it))
+            }
+
+            emojiCount.shock?.let {
+                result.add(Pair(R.drawable.emoji_shock, it))
+            }
+
+            emojiCount.laugh?.let {
+                result.add(Pair(R.drawable.emoji_laugh, it))
+            }
+
+            emojiCount.angry?.let {
+                result.add(Pair(R.drawable.emoji_angry, it))
+            }
+
+            emojiCount.think?.let {
+                result.add(Pair(R.drawable.emoji_think, it))
+            }
+
+            emojiCount.money?.let {
+                result.add(Pair(R.drawable.emoji_cry, it))
+            }
+
+            emojiCount.money?.let {
+                result.add(Pair(R.drawable.emoji_like, it))
             }
             return result
         }

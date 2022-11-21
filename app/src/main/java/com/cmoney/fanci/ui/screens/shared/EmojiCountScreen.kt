@@ -53,5 +53,5 @@ fun EmojiCountScreen(
 @Preview(showBackground = true)
 @Composable
 fun EmojiCountScreenPreview() {
-    EmojiCountScreen(R.drawable.emoji_happiness, "123"){}
+    EmojiCountScreen(R.drawable.emoji_like, "123"){}
 }

@@ -20,9 +20,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.camera.ChooseImagePickDialog
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 聊天室 輸入匡
@@ -30,13 +32,17 @@ import com.cmoney.fanci.ui.theme.LocalColor
 @Composable
 fun MessageInput(
     onMessageSend: (text: String) -> Unit,
-    onAttach: (Uri) -> Unit
+    onAttach: (Uri) -> Unit,
+    viewModel: ChatRoomViewModel = koinViewModel()
 ) {
     val openDialog = remember { mutableStateOf(false) }
+    var textState by remember { mutableStateOf("") }
 
     var isShowSend by remember {
         mutableStateOf(false)
     }
+
+    isShowSend = viewModel.uiState.imageAttach.isNotEmpty() || textState.isNotEmpty()
 
     Row(
         modifier = Modifier
@@ -64,14 +70,13 @@ fun MessageInput(
             )
         }
 
-        var textState by remember { mutableStateOf("") }
         TextField(
             modifier = Modifier
                 .weight(1f)
                 .padding(10.dp),
             value = textState,
             colors = TextFieldDefaults.textFieldColors(
-                textColor  = LocalColor.current.inputText.input_100,
+                textColor = LocalColor.current.inputText.input_100,
                 backgroundColor = LocalColor.current.inputFrame,
                 cursorColor = LocalColor.current.primary,
                 disabledLabelColor = LocalColor.current.text.default_30,
@@ -85,7 +90,13 @@ fun MessageInput(
             shape = RoundedCornerShape(40.dp),
             maxLines = 5,
             textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-            placeholder = { Text(text = "輸入你想說的話...", fontSize = 16.sp, color = LocalColor.current.text.default_30) }
+            placeholder = {
+                Text(
+                    text = "輸入你想說的話...",
+                    fontSize = 16.sp,
+                    color = LocalColor.current.text.default_30
+                )
+            }
         )
 
         if (isShowSend) {

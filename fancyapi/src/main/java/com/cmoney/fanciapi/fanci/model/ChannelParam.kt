@@ -24,7 +24,6 @@ import com.squareup.moshi.Json
  *
  * @param channelType 
  * @param name 
- * @param isNeedApproval 
  */
 
 
@@ -34,10 +33,7 @@ data class ChannelParam (
     val channelType: ChannelType? = null,
 
     @Json(name = "name")
-    val name: kotlin.String? = null,
-
-    @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null
+    val name: kotlin.String? = null
 
 )
 
