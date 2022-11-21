@@ -15,9 +15,8 @@ import org.koin.androidx.compose.koinViewModel
 
 class ChatRoomState(
     val navController: NavHostController,
-    val scope: CoroutineScope,
     val scaffoldState: ScaffoldState,
-    val viewModel: ChatRoomViewModel,
+    val viewModel: ChatRoomViewModel
 ) {
 
 }
@@ -25,9 +24,8 @@ class ChatRoomState(
 @Composable
 fun rememberChatRoomState(
     navController: NavHostController = rememberNavController(),
-    scope: CoroutineScope = rememberCoroutineScope(),
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     viewModel: ChatRoomViewModel = koinViewModel()
 ) = remember {
-    ChatRoomState(navController, scope, scaffoldState, viewModel)
+    ChatRoomState(navController, scaffoldState, viewModel)
 }

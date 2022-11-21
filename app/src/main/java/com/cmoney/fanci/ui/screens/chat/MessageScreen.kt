@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +23,9 @@ import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * 聊天室 區塊
@@ -31,7 +35,8 @@ fun MessageScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     listState: LazyListState = rememberLazyListState(),
     message: List<ChatMessageWrapper>,
-    coroutineScope: CoroutineScope,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    isScrollToBottom: Boolean = false,
     onInteractClick: (MessageInteract) -> Unit,
     onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
@@ -73,12 +78,14 @@ fun MessageScreen(
             }
         }
 
-//        LaunchedEffect(message.size) {
-//            CoroutineScope(Dispatchers.Main).launch {
-//                delay(800)
-//                listState.scrollToItem(index = message.size)
-//            }
-//        }
+        if (isScrollToBottom) {
+            LaunchedEffect(message.size) {
+                CoroutineScope(Dispatchers.Main).launch {
+//                    delay(800)
+                    listState.scrollToItem(index = 0)
+                }
+            }
+        }
     }
 }
 

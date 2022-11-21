@@ -26,23 +26,21 @@ import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 data class ChatRoomUiState(
     val imageAttach: List<Uri> = emptyList(),
-//    val imageUpload: List<ImageAttachState> = emptyList(),
-
     val replyMessage: ChatMessage? = null,
-
     val message: List<ChatMessageWrapper> = emptyList(),
-
     val snackBarMessage: CustomMessage? = null,
     val announceMessage: ChatMessage? = null,
     val hideUserMessage: ChatMessage? = null,
     val deleteMessage: ChatMessage? = null,
-    val reportUser: ChatMessage? = null
+    val reportUser: ChatMessage? = null,
+    val isSendComplete: Boolean = false
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -239,8 +237,14 @@ class ChatRoomViewModel(
                         } else {
                             it
                         }
-                    }
+                    },
+                    isSendComplete = true
                 )
+                
+                //恢復聊天室內訊息,不會自動捲到最下面
+                delay(800)
+                uiState = uiState.copy(isSendComplete = false)
+
             }, {
                 KLog.e(TAG, it)
             })
@@ -611,7 +615,7 @@ class ChatRoomViewModel(
         KLog.i(TAG, "startPolling:$channelId")
         viewModelScope.launch {
             if (channelId?.isNotEmpty() == true) {
-                chatRoomPollUseCase.poll(1000, channelId).collect {
+                chatRoomPollUseCase.poll(3000, channelId).collect {
                     KLog.i(TAG, it)
                     uiState = uiState.copy(
                         message = it.items.orEmpty().map {

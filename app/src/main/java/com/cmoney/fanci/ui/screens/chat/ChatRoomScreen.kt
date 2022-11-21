@@ -89,13 +89,13 @@ fun ChatRoomScreen(
                     .padding(bottom = 5.dp)
                     .weight(1f),
                 message = uiState.message,
-                coroutineScope = stateHolder.scope,
+                isScrollToBottom = uiState.isSendComplete,
                 onInteractClick = {
                     stateHolder.viewModel.onInteractClick(it)
                 },
                 onMsgDismissHide = {
                     stateHolder.viewModel.onMsgDismissHide(it)
-                },
+                }
             )
 
             //回覆
