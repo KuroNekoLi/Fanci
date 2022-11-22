@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.chat
+package com.cmoney.fanci.ui.screens.chat.message
 
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -17,6 +17,10 @@ import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.common.AutoLinkText
 import com.cmoney.fanci.ui.common.ChatTimeText
+import com.cmoney.fanci.ui.screens.chat.MessageImageScreen
+import com.cmoney.fanci.ui.screens.chat.MessageOGScreen
+import com.cmoney.fanci.ui.screens.chat.MessageRecycleScreen
+import com.cmoney.fanci.ui.screens.chat.MessageReplayScreen
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
@@ -24,7 +28,6 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.utils.Utils
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.IMedia
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.google.accompanist.flowlayout.FlowRow

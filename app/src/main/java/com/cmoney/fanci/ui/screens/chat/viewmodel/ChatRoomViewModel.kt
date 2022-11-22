@@ -88,69 +88,6 @@ class ChatRoomViewModel(
     }
 
     /**
-     * 上傳所有 附加圖片
-     */
-    private suspend fun uploadImages(uriLis: List<Uri>, imageUploadCallback: ImageUploadCallback) {
-        KLog.i(TAG, "uploadImages:" + uriLis.size)
-
-        val uploadImage = UploadImage(
-            context,
-            uriLis,
-            XLoginHelper.accessToken,
-            isStaging = BuildConfig.DEBUG
-        )
-
-        withContext(Dispatchers.IO) {
-            uploadImage.upload().catch { e ->
-                KLog.e(TAG, e)
-                imageUploadCallback.onFailure(e)
-
-            }.collect {
-                KLog.i(TAG, "uploadImage:$it")
-                val uri = it.first
-                val imageUrl = it.second
-                //將 上傳成功的圖片 message overwrite
-                uiState = uiState.copy(
-                    message = uiState.message.map { chatMessageWrapper ->
-                        if (chatMessageWrapper.message.id == preSendChatId) {
-                            chatMessageWrapper.copy(
-                                uploadAttachPreview = chatMessageWrapper.uploadAttachPreview.map { attachImage ->
-                                    if (attachImage.uri == uri) {
-                                        ChatRoomUiState.ImageAttachState(
-                                            uri = uri,
-                                            serverUrl = imageUrl,
-                                            isUploadComplete = true
-                                        )
-                                    } else {
-                                        attachImage
-                                    }
-                                }
-                            )
-                        } else {
-                            chatMessageWrapper
-                        }
-                    }
-                )
-
-                //check is all image upload complete
-                val preSendAttach = uiState.message.find {
-                    it.message.id == preSendChatId
-                }?.uploadAttachPreview
-
-                val isComplete = preSendAttach?.none { imageAttach ->
-                    !imageAttach.isUploadComplete
-                }
-
-                if (isComplete == true) {
-                    imageUploadCallback.complete(preSendAttach.map { attach ->
-                        attach.serverUrl
-                    })
-                }
-            }
-        }
-    }
-
-    /**
      * 對外 發送訊息 接口
      */
     fun messageSend(channelId: String, text: String) {
@@ -218,6 +155,69 @@ class ChatRoomViewModel(
     }
 
     /**
+     * 上傳所有 附加圖片
+     */
+    private suspend fun uploadImages(uriLis: List<Uri>, imageUploadCallback: ImageUploadCallback) {
+        KLog.i(TAG, "uploadImages:" + uriLis.size)
+
+        val uploadImage = UploadImage(
+            context,
+            uriLis,
+            XLoginHelper.accessToken,
+            isStaging = BuildConfig.DEBUG
+        )
+
+        withContext(Dispatchers.IO) {
+            uploadImage.upload().catch { e ->
+                KLog.e(TAG, e)
+                imageUploadCallback.onFailure(e)
+
+            }.collect {
+                KLog.i(TAG, "uploadImage:$it")
+                val uri = it.first
+                val imageUrl = it.second
+                //將 上傳成功的圖片 message overwrite
+                uiState = uiState.copy(
+                    message = uiState.message.map { chatMessageWrapper ->
+                        if (chatMessageWrapper.message.id == preSendChatId) {
+                            chatMessageWrapper.copy(
+                                uploadAttachPreview = chatMessageWrapper.uploadAttachPreview.map { attachImage ->
+                                    if (attachImage.uri == uri) {
+                                        ChatRoomUiState.ImageAttachState(
+                                            uri = uri,
+                                            serverUrl = imageUrl,
+                                            isUploadComplete = true
+                                        )
+                                    } else {
+                                        attachImage
+                                    }
+                                }
+                            )
+                        } else {
+                            chatMessageWrapper
+                        }
+                    }
+                )
+
+                //check is all image upload complete
+                val preSendAttach = uiState.message.find {
+                    it.message.id == preSendChatId
+                }?.uploadAttachPreview
+
+                val isComplete = preSendAttach?.none { imageAttach ->
+                    !imageAttach.isUploadComplete
+                }
+
+                if (isComplete == true) {
+                    imageUploadCallback.complete(preSendAttach.map { attach ->
+                        attach.serverUrl
+                    })
+                }
+            }
+        }
+    }
+
+    /**
      * 對後端 Server 發送訊息
      */
     private fun send(channelId: String, text: String, images: List<String> = emptyList()) {
@@ -240,7 +240,7 @@ class ChatRoomViewModel(
                     },
                     isSendComplete = true
                 )
-                
+
                 //恢復聊天室內訊息,不會自動捲到最下面
                 delay(800)
                 uiState = uiState.copy(isSendComplete = false)
@@ -260,7 +260,7 @@ class ChatRoomViewModel(
                 add(0,
                     ChatMessageWrapper(
                         message = ChatMessage(
-                            id = "Preview",
+                            id = preSendChatId,
                             author = GroupMember(
                                 name = XLoginHelper.nickName,
                                 thumbNail = XLoginHelper.headImagePath
@@ -606,34 +606,5 @@ class ChatRoomViewModel(
 //            message = newMessage,
 //            hideUserMessage = null
 //        )
-    }
-
-    /**
-     * 獲取 聊天室 訊息
-     */
-    fun startPolling(channelId: String?) {
-        KLog.i(TAG, "startPolling:$channelId")
-        viewModelScope.launch {
-            if (channelId?.isNotEmpty() == true) {
-                chatRoomPollUseCase.poll(3000, channelId).collect {
-                    KLog.i(TAG, it)
-                    uiState = uiState.copy(
-                        message = it.items.orEmpty().map {
-                            ChatMessageWrapper(
-                                message = it
-                            )
-                        }.reversed()
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * 停止 聊天室 訊息
-     */
-    fun stopPolling() {
-        KLog.i(TAG, "stopPolling")
-        chatRoomPollUseCase.close()
     }
 }

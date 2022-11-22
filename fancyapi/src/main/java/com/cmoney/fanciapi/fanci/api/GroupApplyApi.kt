@@ -16,6 +16,8 @@ interface GroupApplyApi {
      * 
      * Responses:
      *  - 409: Conflict
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 社團id
      * @param applyStauts 申請狀態 (optional)
@@ -32,6 +34,8 @@ interface GroupApplyApi {
      * Responses:
      *  - 409: Conflict
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 社團id
      * @return [Unit]
@@ -44,6 +48,8 @@ interface GroupApplyApi {
      * 
      * Responses:
      *  - 409: Conflict
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 社團id
      * @param groupApplyParam 社團申請參數 (optional)
@@ -57,6 +63,8 @@ interface GroupApplyApi {
      * 
      * Responses:
      *  - 409: Conflict
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param id 申請id
      * @param groupApplyStatusParam 審核狀態參數 (optional)

@@ -1,6 +1,7 @@
 package com.cmoney.fanci.di
 
 import com.cmoney.fanci.MainViewModel
+import com.cmoney.fanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.fanci.ui.screens.group.viewmodel.GroupViewModel
@@ -11,5 +12,6 @@ val viewModule = module {
     viewModel { MainViewModel(get(), get()) }
     viewModel { FollowViewModel(get()) }
     viewModel { ChatRoomViewModel(get(), get(), get()) }
+    viewModel { MessageViewModel(get(), get()) }
     viewModel { GroupViewModel(get()) }
 }

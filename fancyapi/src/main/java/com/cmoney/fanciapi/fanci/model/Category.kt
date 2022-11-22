@@ -31,7 +31,6 @@ import com.squareup.moshi.Json
  * @param isDeleted 是否被刪除
  * @param groupId 所屬社團
  * @param channels 分類下的群組
- * @param userDefineOrder 分類 自訂排序
  */
 
 
@@ -71,11 +70,7 @@ data class Category (
 
     /* 分類下的群組 */
     @Json(name = "channels")
-    val channels: kotlin.collections.List<Channel>? = null,
-
-    /* 分類 自訂排序 */
-    @Json(name = "userDefineOrder")
-    val userDefineOrder: kotlin.Long? = null
+    val channels: kotlin.collections.List<Channel>? = null
 
 )
 

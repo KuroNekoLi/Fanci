@@ -7,6 +7,7 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.cmoney.fanci.BuildConfig
 import com.cmoney.fanci.repository.Network
 import com.cmoney.fanci.repository.NetworkImpl
+import com.cmoney.fanci.repository.interceptor.AddBearerTokenInterceptor
 import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupMemberApi
@@ -58,9 +59,8 @@ val networkBaseModule = module {
         ApiClient(
             baseUrl = getDomain(androidApplication()),
             okHttpClientBuilder = createOkHttpClient(androidApplication()).newBuilder(),
-            authNames = arrayOf("Bearer"),
         ).apply {
-            setBearerToken(XLoginHelper.accessToken)
+            addAuthorization("Bearer", AddBearerTokenInterceptor())
         }
     }
 

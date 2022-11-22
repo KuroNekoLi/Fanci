@@ -49,11 +49,11 @@ fun MyAppNavHost(
             MainScreen(navController, route, theme)
         }
         //頻道頁面
-        composable("${MainStateHolder.Route.Channel}/{channelId}") { backStackEntry ->
+        composable("${MainStateHolder.Route.Channel}/{channelId}/{channelName}") { backStackEntry ->
             val channelId = backStackEntry.arguments?.getString("channelId").orEmpty()
-            KLog.i(TAG, "open chanel page id:$channelId")
-
-            ChatRoomScreen(channelId, mainNavController, route)
+            val channelName = backStackEntry.arguments?.getString("channelName").orEmpty()
+            KLog.i(TAG, "open chanel page id:$channelId , name:$channelName")
+            ChatRoomScreen(channelId, channelName, mainNavController, route)
         }
 
         //公告訊息
@@ -117,7 +117,12 @@ fun MainNavHost(
                     composable(MainTab.FOLLOW.route) {
                         FollowScreen(
                             onChannelClick = {
-                                route.invoke(MainStateHolder.Route.Channel(it.id.orEmpty()))
+                                route.invoke(
+                                    MainStateHolder.Route.Channel(
+                                        channelId = it.id.orEmpty(),
+                                        channelName = it.name.orEmpty()
+                                    )
+                                )
                             },
                             onSearchClick = {
                                 route.invoke(MainStateHolder.Route.DiscoverGroup())

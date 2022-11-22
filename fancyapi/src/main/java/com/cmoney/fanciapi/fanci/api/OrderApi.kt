@@ -14,6 +14,8 @@ interface OrderApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param orderParam  (optional)
      * @return [Unit]

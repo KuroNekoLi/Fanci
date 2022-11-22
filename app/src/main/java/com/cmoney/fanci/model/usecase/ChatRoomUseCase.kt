@@ -8,7 +8,31 @@ import com.cmoney.fanciapi.fanci.model.*
 class ChatRoomUseCase(private val chatRoomApi: ChatRoomApi) {
     private val TAG = ChatRoomUseCase::class.java.simpleName
 
-    suspend fun sendMessage(chatRoomChannelId: String, text: String, images: List<String>) =
+
+    /**
+     * 讀取更多 分頁訊息
+     * @param chatRoomChannelId 聊天室 id
+     * @param fromSerialNumber 從哪一個序列號開始往回找 (若為Null 則從最新開始拿)
+     */
+    suspend fun fetchMoreMessage(chatRoomChannelId: String, fromSerialNumber: Long?) =
+        kotlin.runCatching {
+            chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
+                chatRoomChannelId = chatRoomChannelId,
+                fromSerialNumber = fromSerialNumber
+            ).checkResponseBody()
+        }
+
+    /**
+     * 發送訊息
+     * @param chatRoomChannelId 聊天室 id
+     * @param text 內文
+     * @param images 附加圖片
+     */
+    suspend fun sendMessage(
+        chatRoomChannelId: String,
+        text: String,
+        images: List<String> = emptyList()
+    ) =
         kotlin.runCatching {
             chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessagePost(
                 chatRoomChannelId = chatRoomChannelId,

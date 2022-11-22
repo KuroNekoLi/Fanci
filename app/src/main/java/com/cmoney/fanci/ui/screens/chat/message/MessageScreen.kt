@@ -1,22 +1,18 @@
-package com.cmoney.fanci.ui.screens.chat
+package com.cmoney.fanci.ui.screens.chat.message
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.cmoney.fanci.extension.findActivity
 import com.cmoney.fanci.extension.showInteractDialogBottomSheet
-import com.cmoney.fanci.model.ChatMessageWrapper
-import com.cmoney.fanci.model.usecase.ChatRoomUseCase
+import com.cmoney.fanci.ui.screens.chat.message.viewmodel.MessageViewModel
+import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -24,8 +20,8 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 聊天室 區塊
@@ -34,22 +30,31 @@ import kotlinx.coroutines.launch
 fun MessageScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     listState: LazyListState = rememberLazyListState(),
-    message: List<ChatMessageWrapper>,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    channelId: String,
+    viewModel: MessageViewModel = koinViewModel(),
     isScrollToBottom: Boolean = false,
     onInteractClick: (MessageInteract) -> Unit,
     onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
+    viewModel.startPolling(channelId)
+
+    BackHandler {
+        viewModel.stopPolling()
+    }
+
     Surface(
         color = LocalColor.current.env_80,
         modifier = modifier,
     ) {
+        val message = viewModel.uiState.message
+
         val context = LocalContext.current
         LazyColumn(state = listState, reverseLayout = true) {
             if (message.isNotEmpty()) {
-                items(message) { message ->
+                itemsIndexed(message) {index, chatMessageWrapper ->
                     MessageContentScreen(
-                        chatMessageWrapper = message,
+                        chatMessageWrapper = chatMessageWrapper,
                         coroutineScope = coroutineScope,
                         onMessageContentCallback = {
                             when (it) {
@@ -64,18 +69,23 @@ fun MessageScreen(
                                 is MessageContentCallback.LongClick -> {
                                     showInteractDialog(
                                         context.findActivity(),
-                                        message.message,
+                                        chatMessageWrapper.message,
                                         onInteractClick
                                     )
                                 }
                                 is MessageContentCallback.MsgDismissHideClick -> {
-                                    onMsgDismissHide.invoke(message.message)
+                                    onMsgDismissHide.invoke(chatMessageWrapper.message)
                                 }
                             }
                         }
                     )
                 }
             }
+        }
+
+        listState.OnBottomReached {
+            KLog.i("TAG", "load more....")
+            viewModel.onLoadMore(channelId)
         }
 
         if (isScrollToBottom) {
@@ -86,6 +96,35 @@ fun MessageScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun LazyListState.OnBottomReached(
+    loadMore : () -> Unit
+){
+    // state object which tells us if we should load more
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            // get last visible item
+            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+                ?:
+                // list is empty
+                // return false here if loadMore should not be invoked if the list is empty
+                return@derivedStateOf true
+
+            // Check if last visible item is the last item in the list
+            lastVisibleItem.index == layoutInfo.totalItemsCount - 1
+        }
+    }
+
+    // Convert the state into a cold flow and collect
+    LaunchedEffect(shouldLoadMore){
+        snapshotFlow { shouldLoadMore.value }
+            .collect {
+                // if should load more, then invoke loadMore
+                if (it) loadMore()
+            }
     }
 }
 
@@ -107,12 +146,8 @@ fun showInteractDialog(
 fun MessageScreenPreview() {
     FanciTheme {
         MessageScreen(
-            message = listOf(
-                ChatMessageWrapper(
-                    message = ChatRoomUseCase.mockMessage
-                )
-            ),
             coroutineScope = rememberCoroutineScope(),
+            channelId = "2177",
             onInteractClick = {},
             onMsgDismissHide = {},
         )

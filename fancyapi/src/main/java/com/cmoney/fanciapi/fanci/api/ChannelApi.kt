@@ -17,6 +17,7 @@ interface ChannelApi {
      * Responses:
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param channelId 指定聊天室
      * @return [Unit]
@@ -30,6 +31,8 @@ interface ChannelApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param channelId 指定聊天室
      * @return [Channel]
@@ -43,6 +46,8 @@ interface ChannelApi {
      * Responses:
      *  - 204: No Content
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param channelId 指定聊天室
      * @param editChannelParam  (optional)

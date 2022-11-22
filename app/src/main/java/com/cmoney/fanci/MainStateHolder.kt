@@ -53,7 +53,11 @@ class MainStateHolder(
             const val DiscoverGroup = "discoverGroup"
         }
 
-        data class Channel(val channelId: String, val route: String = "$Channel/${channelId}") :
+        data class Channel(
+            val channelId: String,
+            val channelName: String,
+            val route: String = "$Channel/${channelId}/${channelName}"
+        ) :
             Route(route)
 
         data class Announce(val message: ChatMessage, val route: String = Announce) :

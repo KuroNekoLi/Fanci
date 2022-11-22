@@ -15,7 +15,6 @@ import com.cmoney.fanci.ui.theme.Black_181C23
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.IChatContent
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 
 @Composable

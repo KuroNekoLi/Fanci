@@ -1,6 +1,6 @@
 package com.cmoney.fanciapi.infrastructure
 
-import com.cmoney.fanciapi.auth.HttpBearerAuth
+import com.cmoney.fanciapi.auth.ApiKeyAuth
 
 import okhttp3.Call
 import okhttp3.Interceptor
@@ -59,28 +59,11 @@ class ApiClient(
     ) : this(baseUrl, okHttpClientBuilder, serializerBuilder) {
         authNames.forEach { authName ->
             val auth = when (authName) {
-                "Bearer" -> HttpBearerAuth("bearer")
+                "oauth2" -> ApiKeyAuth("header", "Authorization")
                 else -> throw RuntimeException("auth name $authName not found in available auth names")
             }
             addAuthorization(authName, auth)
         }
-    }
-
-    constructor(
-        baseUrl: String = defaultBasePath,
-        okHttpClientBuilder: OkHttpClient.Builder? = null,
-        serializerBuilder: Moshi.Builder = Serializer.moshiBuilder,
-        authName: String,
-        bearerToken: String
-    ) : this(baseUrl, okHttpClientBuilder, serializerBuilder, arrayOf(authName)) {
-        setBearerToken(bearerToken)
-    }
-
-    fun setBearerToken(bearerToken: String): ApiClient {
-        apiAuthorizations.values.runOnFirst<Interceptor, HttpBearerAuth> {
-            this.bearerToken = bearerToken
-        }
-        return this
     }
 
     /**

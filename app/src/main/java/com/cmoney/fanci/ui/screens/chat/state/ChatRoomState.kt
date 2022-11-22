@@ -1,5 +1,7 @@
 package com.cmoney.fanci.ui.screens.chat.state
 
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -16,6 +18,7 @@ import org.koin.androidx.compose.koinViewModel
 class ChatRoomState(
     val navController: NavHostController,
     val scaffoldState: ScaffoldState,
+    val listState: LazyListState,
     val viewModel: ChatRoomViewModel
 ) {
 
@@ -25,7 +28,8 @@ class ChatRoomState(
 fun rememberChatRoomState(
     navController: NavHostController = rememberNavController(),
     scaffoldState: ScaffoldState = rememberScaffoldState(),
+    listState: LazyListState = rememberLazyListState(),
     viewModel: ChatRoomViewModel = koinViewModel()
 ) = remember {
-    ChatRoomState(navController, scaffoldState, viewModel)
+    ChatRoomState(navController, scaffoldState, listState, viewModel)
 }

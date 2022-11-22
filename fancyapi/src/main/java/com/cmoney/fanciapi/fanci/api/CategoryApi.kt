@@ -19,6 +19,8 @@ interface CategoryApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param categoryId 
      * @param startWeight  (optional, default to 0L)
@@ -34,6 +36,8 @@ interface CategoryApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param categoryId 
      * @param channelParam  (optional)
@@ -48,6 +52,8 @@ interface CategoryApi {
      * Responses:
      *  - 204: No Content
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param categoryId 
      * @return [Unit]
@@ -61,6 +67,8 @@ interface CategoryApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param categoryId 
      * @return [Category]
@@ -74,6 +82,8 @@ interface CategoryApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param categoryId 
      * @param categoryParam  (optional)

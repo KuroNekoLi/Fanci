@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "fanci",
-    "version": "v1"
+    "title": "Fanci.Api",
+    "version": "1.0"
   },
   "servers": [
     {
@@ -50,11 +50,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -80,11 +88,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -149,11 +165,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -216,11 +240,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -285,11 +317,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -334,11 +374,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -384,11 +432,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -414,11 +470,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -605,11 +666,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -639,9 +705,17 @@
             }
           },
           {
+            "name": "order",
+            "in": "query",
+            "description": "排序依據(預設為新到舊)",
+            "schema": {
+              "$ref": "#/components/schemas/OrderType"
+            }
+          },
+          {
             "name": "fromSerialNumber",
             "in": "query",
-            "description": "從哪一個序列號開始往回找 (若為Null 則從最新開始拿)",
+            "description": "從哪一個序列號開始往回找",
             "schema": {
               "type": "integer",
               "format": "int64"
@@ -671,11 +745,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -706,11 +788,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -759,11 +846,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -792,11 +884,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -844,11 +941,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -897,11 +999,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1010,11 +1117,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1087,11 +1202,17 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user",
+              "PERMISSION_解散社團_0_groupId"
+            ]
           }
         ]
       },
@@ -1140,11 +1261,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1212,11 +1338,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1269,11 +1400,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1484,11 +1623,19 @@
         "responses": {
           "409": {
             "description": "Conflict"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -1538,11 +1685,19 @@
         "responses": {
           "409": {
             "description": "Conflict"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1570,11 +1725,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1619,11 +1782,19 @@
         "responses": {
           "409": {
             "description": "Conflict"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1685,11 +1856,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1719,11 +1898,19 @@
           },
           "409": {
             "description": "Conflict"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -1751,11 +1938,19 @@
           },
           "409": {
             "description": "Conflict"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1842,11 +2037,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -1915,11 +2118,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -1968,11 +2179,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -2001,11 +2217,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -2056,11 +2277,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -2089,11 +2315,16 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -2126,11 +2357,19 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -2214,11 +2453,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -2263,11 +2510,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -2321,11 +2576,19 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       },
@@ -2377,11 +2640,19 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -2425,11 +2696,17 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [ ]
           }
         ]
       }
@@ -2463,11 +2740,17 @@
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [ ]
           }
         ]
       },
@@ -2499,11 +2782,19 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "oauth2": [
+              "user"
+            ]
           }
         ]
       }
@@ -2568,11 +2859,6 @@
             },
             "description": "分類下的群組",
             "nullable": true
-          },
-          "userDefineOrder": {
-            "type": "integer",
-            "description": "分類 自訂排序",
-            "format": "int64"
           }
         },
         "additionalProperties": false
@@ -3001,12 +3287,15 @@
         "additionalProperties": false
       },
       "GroupParam": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string",
-            "description": "社團命名",
-            "nullable": true
+            "description": "社團命名"
           },
           "description": {
             "type": "string",
@@ -3028,7 +3317,8 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "新增社團的參數"
       },
       "GroupRequirement": {
         "type": "object",
@@ -3060,17 +3350,14 @@
         "properties": {
           "question": {
             "type": "string",
-            "description": "題目",
             "nullable": true
           },
           "answer": {
             "type": "string",
-            "description": "回應",
             "nullable": true
           }
         },
-        "additionalProperties": false,
-        "description": "題組回應"
+        "additionalProperties": false
       },
       "GroupRequirementParam": {
         "type": "object",
@@ -3092,7 +3379,6 @@
         "properties": {
           "question": {
             "type": "string",
-            "description": "題目",
             "nullable": true
           },
           "type": {
@@ -3163,15 +3449,13 @@
         "properties": {
           "resourceLink": {
             "type": "string",
-            "description": "媒體位置",
             "nullable": true
           },
           "type": {
             "$ref": "#/components/schemas/MediaType"
           }
         },
-        "additionalProperties": false,
-        "description": "媒體"
+        "additionalProperties": false
       },
       "MediaIChatContent": {
         "type": "object",
@@ -3238,6 +3522,7 @@
       "OrderType": {
         "enum": [
           "Latest",
+          "Oldest",
           "Popular"
         ],
         "type": "string"
@@ -3396,11 +3681,11 @@
       }
     },
     "securitySchemes": {
-      "Bearer": {
-        "type": "http",
-        "description": "JWT Authorization header using the Bearer scheme.Put **_ONLY_** your JWT Bearer token on textbox below!",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+      "oauth2": {
+        "type": "apiKey",
+        "description": "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+        "name": "Authorization",
+        "in": "header"
       }
     }
   }

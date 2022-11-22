@@ -14,6 +14,8 @@ interface GroupMemberApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 社團id
      * @param skip 跳脫筆數 (optional, default to 0)
@@ -30,6 +32,8 @@ interface GroupMemberApi {
      *  - 204: No Content
      *  - 404: Not Found
      *  - 409: Conflict
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 
      * @return [Unit]
@@ -44,6 +48,8 @@ interface GroupMemberApi {
      *  - 204: No Content
      *  - 404: Not Found
      *  - 409: Conflict
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 
      * @return [Unit]

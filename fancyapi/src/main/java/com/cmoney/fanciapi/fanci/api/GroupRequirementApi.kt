@@ -28,6 +28,8 @@ interface GroupRequirementApi {
      * Responses:
      *  - 409: Conflict
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 社團id
      * @param groupRequirementParam 題目參數 (optional)

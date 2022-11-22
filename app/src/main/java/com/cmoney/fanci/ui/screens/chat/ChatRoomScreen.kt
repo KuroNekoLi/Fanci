@@ -15,6 +15,7 @@ import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.fanci.ui.screens.chat.dialog.HideUserDialogScreen
 import com.cmoney.fanci.ui.screens.chat.dialog.ReportUserDialogScreen
+import com.cmoney.fanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.fanci.ui.screens.chat.state.ChatRoomState
 import com.cmoney.fanci.ui.screens.chat.state.rememberChatRoomState
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -26,6 +27,7 @@ import com.socks.library.KLog
 @Composable
 fun ChatRoomScreen(
     channelId: String,
+    channelTitle: String,
     navController: NavHostController,
     route: (MainStateHolder.Route) -> Unit,
     stateHolder: ChatRoomState = rememberChatRoomState(navController = navController)
@@ -41,12 +43,12 @@ fun ChatRoomScreen(
 
     KLog.i(TAG, "channelId:$channelId")
 
-    stateHolder.viewModel.startPolling(channelId)
+//    stateHolder.viewModel.startPolling(channelId)
 
-    BackHandler {
-        stateHolder.viewModel.stopPolling()
-        navController.popBackStack()
-    }
+//    BackHandler {
+//        stateHolder.viewModel.stopPolling()
+//        navController.popBackStack()
+//    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -54,7 +56,7 @@ fun ChatRoomScreen(
         topBar = {
             TopBarScreen(
                 stateHolder.navController,
-                title = "\uD83D\uDC57｜金針菇穿什麼",
+                title = channelTitle,
                 moreEnable = true
             ) {
                 KLog.i(TAG, "more click.")
@@ -88,7 +90,7 @@ fun ChatRoomScreen(
                     .fillMaxWidth()
                     .padding(bottom = 5.dp)
                     .weight(1f),
-                message = uiState.message,
+                channelId = channelId,
                 isScrollToBottom = uiState.isSendComplete,
                 onInteractClick = {
                     stateHolder.viewModel.onInteractClick(it)
@@ -179,6 +181,7 @@ fun ChatRoomScreenPreview() {
         val route: (MainStateHolder.Route) -> Unit = {
         }
         ChatRoomScreen(
+            "",
             "",
             rememberNavController(),
             route

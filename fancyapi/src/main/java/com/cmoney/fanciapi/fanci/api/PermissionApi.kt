@@ -17,6 +17,8 @@ interface PermissionApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param channelId 指定聊天室
      * @return [Channel]
@@ -41,6 +43,8 @@ interface PermissionApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 
      * @return [Group]

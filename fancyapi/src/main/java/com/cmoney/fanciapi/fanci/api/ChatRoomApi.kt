@@ -10,6 +10,7 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessagePaging
 import com.cmoney.fanciapi.fanci.model.ChatMessageParam
 import com.cmoney.fanciapi.fanci.model.MessageIdParam
+import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.ReadStatus
 import com.cmoney.fanciapi.fanci.model.ReadStatusParam
 
@@ -20,14 +21,17 @@ interface ChatRoomApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param chatRoomChannelId 指定聊天室
      * @param take 取得比數 (optional, default to 20)
-     * @param fromSerialNumber 從哪一個序列號開始往回找 (若為Null 則從最新開始拿) (optional)
+     * @param order 排序依據(預設為新到舊) (optional)
+     * @param fromSerialNumber 從哪一個序列號開始往回找 (optional)
      * @return [ChatMessagePaging]
      */
     @GET("api/v1/ChatRoom/{chatRoomChannelId}/Message")
-    suspend fun apiV1ChatRoomChatRoomChannelIdMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Query("take") take: kotlin.Int? = 20, @Query("fromSerialNumber") fromSerialNumber: kotlin.Long? = null): Response<ChatMessagePaging>
+    suspend fun apiV1ChatRoomChatRoomChannelIdMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Query("take") take: kotlin.Int? = 20, @Query("order") order: OrderType? = null, @Query("fromSerialNumber") fromSerialNumber: kotlin.Long? = null): Response<ChatMessagePaging>
 
     /**
      * 對聊天室新增/回應一則聊天訊息
@@ -36,6 +40,7 @@ interface ChatRoomApi {
      *  - 200: Success
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param chatRoomChannelId 指定聊天室
      * @param chatMessageParam 訊息內容 (optional)
@@ -51,6 +56,7 @@ interface ChatRoomApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param chatRoomChannelId 指定聊天室
      * @return [Unit]
@@ -65,6 +71,7 @@ interface ChatRoomApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param chatRoomChannelId 指定聊天室
      * @return [Unit]
@@ -79,6 +86,7 @@ interface ChatRoomApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param chatRoomChannelId 指定聊天室
      * @param messageIdParam 要置頂的訊息id參數 (optional)
@@ -94,6 +102,7 @@ interface ChatRoomApi {
      *  - 200: Success
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param chatRoomChannelId 指定聊天室
      * @return [ReadStatus]
@@ -108,6 +117,7 @@ interface ChatRoomApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param chatRoomChannelId 指定聊天室
      * @param readStatusParam 已讀參數 (optional)

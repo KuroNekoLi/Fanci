@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 新增社團的參數
  *
  * @param name 社團命名
  * @param description 社團簡介
@@ -33,7 +33,7 @@ data class GroupParam (
 
     /* 社團命名 */
     @Json(name = "name")
-    val name: kotlin.String? = null,
+    val name: kotlin.String,
 
     /* 社團簡介 */
     @Json(name = "description")

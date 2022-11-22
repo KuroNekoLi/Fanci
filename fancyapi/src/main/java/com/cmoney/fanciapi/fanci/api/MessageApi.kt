@@ -18,6 +18,7 @@ interface MessageApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param messageId 
      * @return [Unit]
@@ -32,6 +33,7 @@ interface MessageApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param messageId 
      * @return [Unit]
@@ -46,6 +48,7 @@ interface MessageApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param messageId 
      * @param emojiParam 表情符號參數 (optional)
@@ -60,6 +63,8 @@ interface MessageApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param messageId 訊息id
      * @return [ChatMessage]
@@ -74,6 +79,7 @@ interface MessageApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param messageId 編輯的訊息ID
      * @param chatMessageParam 異動訊息參數 (optional)

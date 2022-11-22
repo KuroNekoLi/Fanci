@@ -20,16 +20,15 @@ import com.cmoney.fanciapi.fanci.model.MediaType
 import com.squareup.moshi.Json
 
 /**
- * 媒體
+ * 
  *
- * @param resourceLink 媒體位置
+ * @param resourceLink 
  * @param type 
  */
 
 
 data class Media (
 
-    /* 媒體位置 */
     @Json(name = "resourceLink")
     val resourceLink: kotlin.String? = null,
 

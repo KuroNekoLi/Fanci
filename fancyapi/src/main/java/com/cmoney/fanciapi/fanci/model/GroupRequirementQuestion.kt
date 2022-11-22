@@ -22,14 +22,13 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param question 題目
+ * @param question 
  * @param type 
  */
 
 
 data class GroupRequirementQuestion (
 
-    /* 題目 */
     @Json(name = "question")
     val question: kotlin.String? = null,
 

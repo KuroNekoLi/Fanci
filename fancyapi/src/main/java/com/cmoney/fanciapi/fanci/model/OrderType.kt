@@ -21,13 +21,16 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * Values: latest,popular
+ * Values: latest,oldest,popular
  */
 
 enum class OrderType(val value: kotlin.String) {
 
     @Json(name = "Latest")
     latest("Latest"),
+
+    @Json(name = "Oldest")
+    oldest("Oldest"),
 
     @Json(name = "Popular")
     popular("Popular");

@@ -14,6 +14,8 @@ interface RoleUserApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 
      * @param roleId 
@@ -28,6 +30,8 @@ interface RoleUserApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 
      * @param roleId 

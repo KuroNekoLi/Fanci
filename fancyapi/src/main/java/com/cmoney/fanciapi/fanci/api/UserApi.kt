@@ -16,6 +16,8 @@ interface UserApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param id 
      * @return [User]
@@ -29,6 +31,8 @@ interface UserApi {
      * Responses:
      *  - 200: Success
      *  - 404: Not Found
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @return [User]
      */
@@ -40,6 +44,8 @@ interface UserApi {
      * 
      * Responses:
      *  - 204: No Content
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param userParam  (optional)
      * @return [Unit]

@@ -3,6 +3,7 @@ package com.cmoney.fanci.model.usecase
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.model.ChatMessagePaging
+import com.cmoney.fanciapi.fanci.model.OrderType
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -21,18 +22,19 @@ class ChatRoomPollUseCase(
     override fun poll(delay: Long, channelId: String): Flow<ChatMessagePaging> {
         isClose = false
         return channelFlow {
-            while (!isClose) {
-                delay(delay)
+//            while (!isClose) {
                 kotlin.runCatching {
                     chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
-                        chatRoomChannelId = channelId
+                        chatRoomChannelId = channelId,
+//                        order = OrderType.latest
                     ).checkResponseBody()
                 }.fold({
                     send(it)
                 }, {
                     KLog.e(TAG, it)
                 })
-            }
+                delay(delay)
+//            }
         }
     }
 

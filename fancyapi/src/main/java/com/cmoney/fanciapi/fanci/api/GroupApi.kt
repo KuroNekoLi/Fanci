@@ -38,6 +38,7 @@ interface GroupApi {
      *  - 200: Success
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param groupId 
      * @param categoryParam  (optional)
@@ -53,6 +54,7 @@ interface GroupApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param groupId 
      * @return [Unit]
@@ -80,6 +82,7 @@ interface GroupApi {
      *  - 204: No Content
      *  - 403: Forbidden
      *  - 404: Not Found
+     *  - 401: Unauthorized
      *
      * @param groupId 
      * @param groupParam  (optional)
@@ -145,6 +148,8 @@ interface GroupApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param startWeight  (optional, default to 0L)
      * @param pageSize  (optional, default to 20)
@@ -158,6 +163,8 @@ interface GroupApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupParam  (optional)
      * @return [Group]
