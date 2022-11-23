@@ -33,16 +33,20 @@ fun MessageScreen(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     channelId: String,
     viewModel: MessageViewModel = koinViewModel(),
-    onInteractClick: (MessageInteract) -> Unit,
     onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
     val isScrollToBottom = viewModel.uiState.isSendComplete
-
-    viewModel.startPolling(channelId)
-
-    BackHandler {
-        viewModel.stopPolling()
+    val onInteractClick = object: (MessageInteract) -> Unit {
+        override fun invoke(messageInteract: MessageInteract) {
+            viewModel.onInteractClick(messageInteract)
+        }
     }
+
+//    viewModel.startPolling(channelId)
+//
+//    BackHandler {
+//        viewModel.stopPolling()
+//    }
 
     Surface(
         color = LocalColor.current.env_80,
@@ -149,7 +153,6 @@ fun MessageScreenPreview() {
         MessageScreen(
             coroutineScope = rememberCoroutineScope(),
             channelId = "2177",
-            onInteractClick = {},
             onMsgDismissHide = {},
         )
     }

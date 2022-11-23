@@ -12,7 +12,10 @@ import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomUiState
+import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
+import com.cmoney.fanci.utils.Utils
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.imagelibrary.UploadImage
@@ -27,7 +30,8 @@ import kotlinx.coroutines.withContext
 data class MessageUiState(
     val message: List<ChatMessageWrapper> = emptyList(),
     val imageAttach: List<Uri> = emptyList(),
-    val isSendComplete: Boolean = false
+    val isSendComplete: Boolean = false,
+    val replyMessage: ChatMessage? = null
 )
 
 /**
@@ -46,7 +50,7 @@ class MessageViewModel(
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
 
     /**
-     * 圖片上傳
+     * 圖片上傳 callback
      */
     interface ImageUploadCallback {
         fun complete(images: List<String>)
@@ -55,7 +59,7 @@ class MessageViewModel(
     }
 
     /**
-     * 獲取 聊天室 訊息
+     * 開始 Polling 聊天室 訊息
      * @param channelId 聊天室id
      */
     fun startPolling(channelId: String?) {
@@ -74,7 +78,7 @@ class MessageViewModel(
     }
 
     /**
-     * 停止 聊天室 訊息
+     * 停止 Polling 聊天室 訊息
      */
     fun stopPolling() {
         KLog.i(TAG, "stopPolling")
@@ -157,6 +161,8 @@ class MessageViewModel(
 
     /**
      * 對外 發送訊息 接口
+     * @param channelId 頻道id
+     * @param text 內文
      */
     fun messageSend(channelId: String, text: String) {
         KLog.i(TAG, "messageSend:$text")
@@ -202,7 +208,8 @@ class MessageViewModel(
                             content = MediaIChatContent(
                                 text = text
                             ),
-                            createUnixTime = System.currentTimeMillis() / 1000
+                            createUnixTime = System.currentTimeMillis() / 1000,
+                            replyMessage = uiState.replyMessage
                         ),
                         uploadAttachPreview = uiState.imageAttach.map { uri ->
                             ChatRoomUiState.ImageAttachState(
@@ -297,7 +304,8 @@ class MessageViewModel(
             chatRoomUseCase.sendMessage(
                 chatRoomChannelId = channelId,
                 text = text,
-                images = images
+                images = images,
+                replyMessageId = uiState.replyMessage?.id.orEmpty()
             ).fold({ chatMessage ->
                 //發送成功
                 KLog.i(TAG, "send success:$chatMessage")
@@ -309,7 +317,8 @@ class MessageViewModel(
                             it
                         }
                     },
-                    isSendComplete = true
+                    isSendComplete = true,
+                    replyMessage = null
                 )
 
                 //恢復聊天室內訊息,不會自動捲到最下面
@@ -320,5 +329,94 @@ class MessageViewModel(
                 KLog.e(TAG, it)
             })
         }
+    }
+
+    /**
+     * 點擊 Emoji
+     * @param chatMessage 訊息 model
+     * @param resourceId 點擊的Emoji resourceId
+     */
+    private fun onEmojiClick(chatMessage: ChatMessage, resourceId: Int) {
+        viewModelScope.launch {
+            val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
+
+            //先將 Emoji append to ui.
+            uiState = uiState.copy(
+                message = uiState.message.map { chatMessageWrapper ->
+                    if (chatMessageWrapper.message.id == chatMessage.id) {
+                        val orgEmoji = chatMessageWrapper.message.emojiCount
+                        val newEmoji = when (clickEmoji) {
+                            Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(1))
+                            Emojis.dislike -> orgEmoji?.copy(dislike = orgEmoji.dislike?.plus(1))
+                            Emojis.laugh -> orgEmoji?.copy(dislike = orgEmoji.laugh?.plus(1))
+                            Emojis.money -> orgEmoji?.copy(dislike = orgEmoji.money?.plus(1))
+                            Emojis.shock -> orgEmoji?.copy(dislike = orgEmoji.shock?.plus(1))
+                            Emojis.cry -> orgEmoji?.copy(dislike = orgEmoji.cry?.plus(1))
+                            Emojis.think -> orgEmoji?.copy(dislike = orgEmoji.think?.plus(1))
+                            Emojis.angry -> orgEmoji?.copy(dislike = orgEmoji.angry?.plus(1))
+                        }
+                        chatMessageWrapper.copy(
+                            message = chatMessageWrapper.message.copy(
+                                emojiCount = newEmoji
+                            )
+                        )
+                    } else {
+                        chatMessageWrapper
+                    }
+                }
+            )
+
+            chatRoomUseCase.sendEmoji(chatMessage.id.orEmpty(), clickEmoji).fold({
+            }, {
+            })
+        }
+    }
+
+    /**
+     * 互動彈窗
+     *
+     * @param messageInteract 互動 model
+     */
+    fun onInteractClick(messageInteract: MessageInteract) {
+        KLog.i(TAG, "onInteractClick:$messageInteract")
+        when (messageInteract) {
+//            is MessageInteract.Announcement -> announceMessage(messageInteract.message)
+//            is MessageInteract.Copy -> {
+//                copyMessage(messageInteract.message)
+//            }
+//            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
+//            is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
+//            is MessageInteract.Recycle -> {
+//                recycleMessage(messageInteract.message)
+//            }
+            is MessageInteract.Reply -> replyMessage(messageInteract.message)
+//            is MessageInteract.Report -> reportUser(messageInteract.message)
+            is MessageInteract.EmojiClick -> onEmojiClick(
+                messageInteract.message,
+                messageInteract.emojiResId
+            )
+        }
+    }
+
+    /**
+     * 點擊 回覆訊息
+     * @param message
+     */
+    private fun replyMessage(message: ChatMessage) {
+        KLog.i(TAG, "replyMessage click:$message")
+        uiState = uiState.copy(
+            replyMessage = message
+        )
+    }
+
+    /**
+     * 取消 回覆訊息
+     * @param reply
+     */
+    fun removeReply(reply: ChatMessage) {
+        KLog.i(TAG, "removeReply:$reply")
+        uiState = uiState.copy(
+            replyMessage = null
+        )
     }
 }

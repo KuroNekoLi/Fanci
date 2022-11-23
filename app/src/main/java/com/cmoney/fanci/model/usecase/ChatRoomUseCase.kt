@@ -2,12 +2,27 @@ package com.cmoney.fanci.model.usecase
 
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.ChatRoomApi
+import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.model.*
 
 
-class ChatRoomUseCase(private val chatRoomApi: ChatRoomApi) {
+class ChatRoomUseCase(private val chatRoomApi: ChatRoomApi, private val messageApi: MessageApi) {
     private val TAG = ChatRoomUseCase::class.java.simpleName
 
+    /**
+     * 針對指定訊息 發送 Emoji
+     * @param messageId 針對的訊息Id
+     * @param emoji 要發送的 Emoji
+     */
+    suspend fun sendEmoji(messageId: String, emoji: Emojis) =
+        kotlin.runCatching {
+            messageApi.apiV1MessageMessageIdEmojiPut(
+                messageId = messageId,
+                emojiParam = EmojiParam(
+                    emoji = emoji
+                )
+            ).checkResponseBody()
+        }
 
     /**
      * 讀取更多 分頁訊息
@@ -27,11 +42,13 @@ class ChatRoomUseCase(private val chatRoomApi: ChatRoomApi) {
      * @param chatRoomChannelId 聊天室 id
      * @param text 內文
      * @param images 附加圖片
+     * @param replyMessageId 回覆訊息的id
      */
     suspend fun sendMessage(
         chatRoomChannelId: String,
         text: String,
-        images: List<String> = emptyList()
+        images: List<String> = emptyList(),
+        replyMessageId: String = ""
     ) =
         kotlin.runCatching {
             chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessagePost(
@@ -44,7 +61,8 @@ class ChatRoomUseCase(private val chatRoomApi: ChatRoomApi) {
                             resourceLink = it,
                             type = MediaType.image
                         )
-                    }
+                    },
+                    replyMessageId = replyMessageId
                 )
             ).checkResponseBody()
         }

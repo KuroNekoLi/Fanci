@@ -10,34 +10,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanci.BuildConfig
 import com.cmoney.fanci.R
-import com.cmoney.fanci.model.ChatMessageWrapper
-import com.cmoney.fanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.fanci.ui.theme.White_494D54
 import com.cmoney.fanci.ui.theme.White_767A7F
+import com.cmoney.fanci.utils.Utils
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.MediaIChatContent
-import com.cmoney.imagelibrary.UploadImage
-import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class ChatRoomUiState(
-    val replyMessage: ChatMessage? = null,
+//    val replyMessage: ChatMessage? = null,
     val snackBarMessage: CustomMessage? = null,
     val announceMessage: ChatMessage? = null,
     val hideUserMessage: ChatMessage? = null,
     val deleteMessage: ChatMessage? = null,
-    val reportUser: ChatMessage? = null
+    val reportUser: ChatMessage? = null,
+    val emojiMessage: Pair<ChatMessage, Int>? = null
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -64,49 +57,49 @@ class ChatRoomViewModel(
         }
     }
 
-    /**
-     * 點擊 回覆
-     */
-    private fun replyMessage(message: ChatMessage) {
-        KLog.i(TAG, "replyMessage click:$message")
-        uiState = uiState.copy(
-            replyMessage = message
-        )
-    }
+//    /**
+//     * 點擊 回覆
+//     */
+//    private fun replyMessage(message: ChatMessage) {
+//        KLog.i(TAG, "replyMessage click:$message")
+//        uiState = uiState.copy(
+//            replyMessage = message
+//        )
+//    }
+//
+//    /**
+//     * 取消 回覆
+//     */
+//    fun removeReply(reply: ChatMessage) {
+//        KLog.i(TAG, "removeReply:$reply")
+//        uiState = uiState.copy(
+//            replyMessage = null
+//        )
+//    }
 
-    /**
-     * 取消 回覆
-     */
-    fun removeReply(reply: ChatMessage) {
-        KLog.i(TAG, "removeReply:$reply")
-        uiState = uiState.copy(
-            replyMessage = null
-        )
-    }
-
-    /**
-     * 點擊 互動彈窗
-     */
-    fun onInteractClick(messageInteract: MessageInteract) {
-        KLog.i(TAG, "onInteractClick:$messageInteract")
-        when (messageInteract) {
-            is MessageInteract.Announcement -> announceMessage(messageInteract.message)
-            is MessageInteract.Copy -> {
-                copyMessage(messageInteract.message)
-            }
-            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
-            is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
-            is MessageInteract.Recycle -> {
-                recycleMessage(messageInteract.message)
-            }
-            is MessageInteract.Reply -> replyMessage(messageInteract.message)
-            is MessageInteract.Report -> reportUser(messageInteract.message)
-            is MessageInteract.EmojiClick -> onEmojiClick(
-                messageInteract.message,
-                messageInteract.emojiResId
-            )
-        }
-    }
+//    /**
+//     * 點擊 互動彈窗
+//     */
+//    fun onInteractClick(messageInteract: MessageInteract) {
+//        KLog.i(TAG, "onInteractClick:$messageInteract")
+//        when (messageInteract) {
+//            is MessageInteract.Announcement -> announceMessage(messageInteract.message)
+//            is MessageInteract.Copy -> {
+//                copyMessage(messageInteract.message)
+//            }
+//            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
+//            is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
+//            is MessageInteract.Recycle -> {
+//                recycleMessage(messageInteract.message)
+//            }
+//            is MessageInteract.Reply -> replyMessage(messageInteract.message)
+//            is MessageInteract.Report -> reportUser(messageInteract.message)
+//            is MessageInteract.EmojiClick -> onEmojiClick(
+//                messageInteract.message,
+//                messageInteract.emojiResId
+//            )
+//        }
+//    }
 
     /**
      * 檢舉 用戶
@@ -331,8 +324,29 @@ class ChatRoomViewModel(
     /**
      * 點擊 Emoji
      */
-    fun onEmojiClick(model: ChatMessage, resourceId: Int) {
+    fun onEmojiClick(message: ChatMessage, resourceId: Int) {
         KLog.i(TAG, "onEmojiClick.")
+        val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
+        val orgEmoji = message.emojiCount
+        val newEmoji = when (clickEmoji) {
+            Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(1))
+            Emojis.dislike -> orgEmoji?.copy(dislike = orgEmoji.dislike?.plus(1))
+            Emojis.laugh -> orgEmoji?.copy(dislike = orgEmoji.laugh?.plus(1))
+            Emojis.money -> orgEmoji?.copy(dislike = orgEmoji.money?.plus(1))
+            Emojis.shock -> orgEmoji?.copy(dislike = orgEmoji.shock?.plus(1))
+            Emojis.cry -> orgEmoji?.copy(dislike = orgEmoji.cry?.plus(1))
+            Emojis.think -> orgEmoji?.copy(dislike = orgEmoji.think?.plus(1))
+            Emojis.angry -> orgEmoji?.copy(dislike = orgEmoji.angry?.plus(1))
+        }
+        val newMessage = message.copy(
+            emojiCount = newEmoji
+        )
+
+        uiState = uiState.copy(
+            emojiMessage = Pair(newMessage, resourceId)
+        )
+
+
         // TODO:
 //        val orgEmojiList = model.message.emoji.toMutableList()
 //

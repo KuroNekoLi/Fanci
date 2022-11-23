@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.chat
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
@@ -42,12 +43,12 @@ fun ChatRoomScreen(
 
     KLog.i(TAG, "channelId:$channelId")
 
-//    stateHolder.viewModel.startPolling(channelId)
+    stateHolder.messageViewModel.startPolling(channelId)
 
-//    BackHandler {
-//        stateHolder.viewModel.stopPolling()
-//        navController.popBackStack()
-//    }
+    BackHandler {
+        stateHolder.messageViewModel.stopPolling()
+        navController.popBackStack()
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -90,18 +91,15 @@ fun ChatRoomScreen(
                     .padding(bottom = 5.dp)
                     .weight(1f),
                 channelId = channelId,
-                onInteractClick = {
-                    stateHolder.viewModel.onInteractClick(it)
-                },
                 onMsgDismissHide = {
                     stateHolder.viewModel.onMsgDismissHide(it)
                 }
             )
 
             //回覆
-            uiState.replyMessage?.apply {
+            stateHolder.messageViewModel.uiState.replyMessage?.apply {
                 ChatReplyScreen(this) {
-                    stateHolder.viewModel.removeReply(it)
+                    stateHolder.messageViewModel.removeReply(it)
                 }
             }
 

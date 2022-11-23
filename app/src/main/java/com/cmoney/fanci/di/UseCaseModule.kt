@@ -7,7 +7,7 @@ import com.cmoney.fanci.model.usecase.UserUseCase
 import org.koin.dsl.module
 
 val useCaseModule = module {
-    factory { ChatRoomUseCase(get()) }
+    factory { ChatRoomUseCase(get(), get()) }
     factory { GroupUseCase(get(), get()) }
     factory { UserUseCase(get()) }
     factory { ChatRoomPollUseCase(get()) }

@@ -1,7 +1,9 @@
 package com.cmoney.fanci.utils
 
 import android.util.Patterns
+import androidx.annotation.DrawableRes
 import com.cmoney.fanci.R
+import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import java.text.SimpleDateFormat
 import java.util.regex.Matcher
@@ -22,6 +24,38 @@ class Utils {
         }
 
         /**
+         * 將Emoji 圖檔 轉換對應Server Key
+         * @param resourceId emoji 圖檔
+         */
+        fun emojiResourceToServerKey(@DrawableRes resourceId: Int): Emojis {
+            return when (resourceId) {
+                R.drawable.emoji_money -> {
+                    Emojis.money
+                }
+                R.drawable.emoji_shock -> {
+                    Emojis.shock
+                }
+                R.drawable.emoji_laugh -> {
+                    Emojis.laugh
+                }
+                R.drawable.emoji_angry -> {
+                    Emojis.angry
+                }
+                R.drawable.emoji_think -> {
+                    Emojis.think
+                }
+                R.drawable.emoji_cry -> {
+                    Emojis.cry
+                }
+                R.drawable.emoji_like -> {
+                    Emojis.like
+                }
+                else -> Emojis.like
+            }
+        }
+
+        /**
+         * 將Server 資料 map 對應圖檔
          * @return resourceID, count
          */
         fun emojiMapping(emojiCount: IEmojiCount): List<Pair<Int, Int>> {
@@ -47,11 +81,11 @@ class Utils {
                 result.add(Pair(R.drawable.emoji_think, it))
             }
 
-            emojiCount.money?.let {
+            emojiCount.cry?.let {
                 result.add(Pair(R.drawable.emoji_cry, it))
             }
 
-            emojiCount.money?.let {
+            emojiCount.like?.let {
                 result.add(Pair(R.drawable.emoji_like, it))
             }
             return result
