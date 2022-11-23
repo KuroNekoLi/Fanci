@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.camera.ChooseImagePickDialog
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -33,7 +34,7 @@ import org.koin.androidx.compose.koinViewModel
 fun MessageInput(
     onMessageSend: (text: String) -> Unit,
     onAttach: (Uri) -> Unit,
-    viewModel: ChatRoomViewModel = koinViewModel()
+    viewModel: MessageViewModel = koinViewModel()
 ) {
     val openDialog = remember { mutableStateOf(false) }
     var textState by remember { mutableStateOf("") }

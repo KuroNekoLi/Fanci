@@ -33,10 +33,11 @@ fun MessageScreen(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     channelId: String,
     viewModel: MessageViewModel = koinViewModel(),
-    isScrollToBottom: Boolean = false,
     onInteractClick: (MessageInteract) -> Unit,
     onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
+    val isScrollToBottom = viewModel.uiState.isSendComplete
+
     viewModel.startPolling(channelId)
 
     BackHandler {

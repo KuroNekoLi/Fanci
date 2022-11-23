@@ -32,15 +32,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 data class ChatRoomUiState(
-    val imageAttach: List<Uri> = emptyList(),
     val replyMessage: ChatMessage? = null,
-    val message: List<ChatMessageWrapper> = emptyList(),
     val snackBarMessage: CustomMessage? = null,
     val announceMessage: ChatMessage? = null,
     val hideUserMessage: ChatMessage? = null,
     val deleteMessage: ChatMessage? = null,
-    val reportUser: ChatMessage? = null,
-    val isSendComplete: Boolean = false
+    val reportUser: ChatMessage? = null
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -51,8 +48,7 @@ data class ChatRoomUiState(
 
 class ChatRoomViewModel(
     val context: Context,
-    val chatRoomUseCase: ChatRoomUseCase,
-    val chatRoomPollUseCase: ChatRoomPollUseCase
+    val chatRoomUseCase: ChatRoomUseCase
 ) : ViewModel() {
     private val TAG = ChatRoomViewModel::class.java.simpleName
 
@@ -75,236 +71,6 @@ class ChatRoomViewModel(
         KLog.i(TAG, "replyMessage click:$message")
         uiState = uiState.copy(
             replyMessage = message
-        )
-    }
-
-    /**
-     * 圖片上傳
-     */
-    interface ImageUploadCallback {
-        fun complete(images: List<String>)
-
-        fun onFailure(e: Throwable)
-    }
-
-    /**
-     * 對外 發送訊息 接口
-     */
-    fun messageSend(channelId: String, text: String) {
-        KLog.i(TAG, "messageSend:$text")
-        viewModelScope.launch {
-            generatePreviewBeforeSend(text)
-
-            //附加圖片, 獲取圖片 Url
-            if (uiState.imageAttach.isNotEmpty()) {
-                uploadImages(uiState.imageAttach, object : ImageUploadCallback {
-                    override fun complete(images: List<String>) {
-                        KLog.i(TAG, "all image upload complete:" + images.size)
-                        send(channelId, text, images)
-                    }
-
-                    override fun onFailure(e: Throwable) {
-                        KLog.e(TAG, "onFailure:$e")
-                    }
-                })
-                uiState = uiState.copy(imageAttach = emptyList())
-            }
-            //Only text
-            else {
-                send(channelId, text)
-            }
-        }
-
-//        if (text.isNotEmpty()) {
-//            val orgList = uiState.message.toMutableList()
-//
-////            //如果是回覆 訊息
-////            uiState.replyMessage?.apply {
-////                orgList.add(
-////                    0,
-////                    ChatMessage(
-////                        author = GroupMember(
-////                            thumbNail = "https://picsum.photos/110/110",
-////                            name = "TIGER"
-////                        ),
-////                        createUnixTime = System.currentTimeMillis(),
-////                        content = IChatContent(
-////                            text = text
-////                        ),
-////                        replyMessage = this
-////                    )
-////                )
-////            } ?: kotlin.run {
-////                orgList.add(
-////                    0,
-////                    ChatMessage(
-////                        author = GroupMember(
-////                            thumbNail = "https://picsum.photos/110/110",
-////                            name = "TIGER"
-////                        ),
-////                        createUnixTime = System.currentTimeMillis(),
-////                        content = IChatContent(
-////                            text = text
-////                        )
-////                    )
-////                )
-////            }
-//
-//            uiState = uiState.copy(message = orgList, replyMessage = null)
-//        }
-    }
-
-    /**
-     * 上傳所有 附加圖片
-     */
-    private suspend fun uploadImages(uriLis: List<Uri>, imageUploadCallback: ImageUploadCallback) {
-        KLog.i(TAG, "uploadImages:" + uriLis.size)
-
-        val uploadImage = UploadImage(
-            context,
-            uriLis,
-            XLoginHelper.accessToken,
-            isStaging = BuildConfig.DEBUG
-        )
-
-        withContext(Dispatchers.IO) {
-            uploadImage.upload().catch { e ->
-                KLog.e(TAG, e)
-                imageUploadCallback.onFailure(e)
-
-            }.collect {
-                KLog.i(TAG, "uploadImage:$it")
-                val uri = it.first
-                val imageUrl = it.second
-                //將 上傳成功的圖片 message overwrite
-                uiState = uiState.copy(
-                    message = uiState.message.map { chatMessageWrapper ->
-                        if (chatMessageWrapper.message.id == preSendChatId) {
-                            chatMessageWrapper.copy(
-                                uploadAttachPreview = chatMessageWrapper.uploadAttachPreview.map { attachImage ->
-                                    if (attachImage.uri == uri) {
-                                        ChatRoomUiState.ImageAttachState(
-                                            uri = uri,
-                                            serverUrl = imageUrl,
-                                            isUploadComplete = true
-                                        )
-                                    } else {
-                                        attachImage
-                                    }
-                                }
-                            )
-                        } else {
-                            chatMessageWrapper
-                        }
-                    }
-                )
-
-                //check is all image upload complete
-                val preSendAttach = uiState.message.find {
-                    it.message.id == preSendChatId
-                }?.uploadAttachPreview
-
-                val isComplete = preSendAttach?.none { imageAttach ->
-                    !imageAttach.isUploadComplete
-                }
-
-                if (isComplete == true) {
-                    imageUploadCallback.complete(preSendAttach.map { attach ->
-                        attach.serverUrl
-                    })
-                }
-            }
-        }
-    }
-
-    /**
-     * 對後端 Server 發送訊息
-     */
-    private fun send(channelId: String, text: String, images: List<String> = emptyList()) {
-        KLog.i(TAG, "send:" + text + " , media:" + images.size)
-        viewModelScope.launch {
-            chatRoomUseCase.sendMessage(
-                chatRoomChannelId = channelId,
-                text = text,
-                images = images
-            ).fold({ chatMessage ->
-                //發送成功
-                KLog.i(TAG, "send success:$chatMessage")
-                uiState = uiState.copy(
-                    message = uiState.message.map {
-                        if (it.message.id == preSendChatId) {
-                            ChatMessageWrapper(message = chatMessage)
-                        } else {
-                            it
-                        }
-                    },
-                    isSendComplete = true
-                )
-
-                //恢復聊天室內訊息,不會自動捲到最下面
-                delay(800)
-                uiState = uiState.copy(isSendComplete = false)
-
-            }, {
-                KLog.e(TAG, it)
-            })
-        }
-    }
-
-    /**
-     * 發送前 直接先貼上畫面 Preview
-     */
-    private fun generatePreviewBeforeSend(text: String) {
-        uiState = uiState.copy(
-            message = uiState.message.toMutableList().apply {
-                add(0,
-                    ChatMessageWrapper(
-                        message = ChatMessage(
-                            id = preSendChatId,
-                            author = GroupMember(
-                                name = XLoginHelper.nickName,
-                                thumbNail = XLoginHelper.headImagePath
-                            ),
-                            content = MediaIChatContent(
-                                text = text
-                            ),
-                            createUnixTime = System.currentTimeMillis() / 1000
-                        ),
-                        uploadAttachPreview = uiState.imageAttach.map { uri ->
-                            ChatRoomUiState.ImageAttachState(
-                                uri = uri
-                            )
-                        }
-                    )
-                )
-            }
-        )
-    }
-
-    /**
-     * 附加 圖片
-     */
-    fun attachImage(uri: Uri) {
-        KLog.i(TAG, "attachImage:$uri")
-        val imageList = uiState.imageAttach.toMutableList()
-        imageList.add(uri)
-
-        uiState = uiState.copy(
-            imageAttach = imageList
-        )
-    }
-
-    /**
-     * 移除 附加 圖片
-     */
-    fun removeAttach(uri: Uri) {
-        KLog.i(TAG, "removeAttach:$uri")
-        val imageList = uiState.imageAttach.toMutableList()
-
-        uiState = uiState.copy(
-            imageAttach = imageList.filter {
-                it != uri
-            }
         )
     }
 
@@ -409,7 +175,7 @@ class ChatRoomViewModel(
      */
     private fun recycleMessage(message: ChatMessage) {
         KLog.i(TAG, "recycleMessage:$message")
-        val orgMessage = uiState.message.toMutableList()
+//        val orgMessage = uiState.message.toMutableList()
 //        uiState = uiState.copy(
 //            snackBarMessage = CustomMessage(
 //                textString = "訊息收回成功！",

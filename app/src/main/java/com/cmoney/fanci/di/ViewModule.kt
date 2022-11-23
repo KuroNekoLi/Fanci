@@ -11,7 +11,7 @@ import org.koin.dsl.module
 val viewModule = module {
     viewModel { MainViewModel(get(), get()) }
     viewModel { FollowViewModel(get()) }
-    viewModel { ChatRoomViewModel(get(), get(), get()) }
-    viewModel { MessageViewModel(get(), get()) }
+    viewModel { ChatRoomViewModel(get(), get()) }
+    viewModel { MessageViewModel(get(), get(), get()) }
     viewModel { GroupViewModel(get()) }
 }

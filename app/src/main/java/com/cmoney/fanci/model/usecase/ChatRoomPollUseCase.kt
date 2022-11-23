@@ -22,10 +22,10 @@ class ChatRoomPollUseCase(
     override fun poll(delay: Long, channelId: String): Flow<ChatMessagePaging> {
         isClose = false
         return channelFlow {
-//            while (!isClose) {
+            while (!isClose) {
                 kotlin.runCatching {
                     chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
-                        chatRoomChannelId = channelId,
+                        chatRoomChannelId = channelId
 //                        order = OrderType.latest
                     ).checkResponseBody()
                 }.fold({
@@ -34,7 +34,7 @@ class ChatRoomPollUseCase(
                     KLog.e(TAG, it)
                 })
                 delay(delay)
-//            }
+            }
         }
     }
 

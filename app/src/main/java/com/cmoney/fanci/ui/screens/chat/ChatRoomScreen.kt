@@ -1,6 +1,5 @@
 package com.cmoney.fanci.ui.screens.chat
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
@@ -91,7 +90,6 @@ fun ChatRoomScreen(
                     .padding(bottom = 5.dp)
                     .weight(1f),
                 channelId = channelId,
-                isScrollToBottom = uiState.isSendComplete,
                 onInteractClick = {
                     stateHolder.viewModel.onInteractClick(it)
                 },
@@ -108,17 +106,17 @@ fun ChatRoomScreen(
             }
 
             //附加圖片
-            MessageAttachImageScreen(uiState.imageAttach) {
-                stateHolder.viewModel.removeAttach(it)
+            MessageAttachImageScreen(stateHolder.messageViewModel.uiState.imageAttach) {
+                stateHolder.messageViewModel.removeAttach(it)
             }
 
             //輸入匡
             MessageInput(
                 onMessageSend = {
-                    stateHolder.viewModel.messageSend(channelId, it)
+                    stateHolder.messageViewModel.messageSend(channelId, it)
                 },
                 onAttach = {
-                    stateHolder.viewModel.attachImage(it)
+                    stateHolder.messageViewModel.attachImage(it)
                 }
             )
         }
