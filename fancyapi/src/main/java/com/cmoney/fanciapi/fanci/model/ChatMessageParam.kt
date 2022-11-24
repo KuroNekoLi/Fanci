@@ -19,6 +19,8 @@ import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MessageType
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -28,6 +30,7 @@ import com.squareup.moshi.Json
  * @param medias 附帶媒體內容
  * @param messageType 
  */
+@Parcelize
 
 
 data class ChatMessageParam (
@@ -47,5 +50,5 @@ data class ChatMessageParam (
     @Json(name = "messageType")
     val messageType: MessageType? = null
 
-)
+) : Parcelable
 

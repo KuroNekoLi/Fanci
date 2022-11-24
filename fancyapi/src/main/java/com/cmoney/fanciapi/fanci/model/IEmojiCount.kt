@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -30,6 +32,7 @@ import com.squareup.moshi.Json
  * @param think 
  * @param angry 
  */
+@Parcelize
 
 
 data class IEmojiCount (
@@ -58,5 +61,5 @@ data class IEmojiCount (
     @Json(name = "angry")
     val angry: kotlin.Int? = null
 
-)
+) : Parcelable
 

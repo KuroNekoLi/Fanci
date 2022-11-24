@@ -18,6 +18,8 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.Channel
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -32,6 +34,7 @@ import com.squareup.moshi.Json
  * @param groupId 所屬社團
  * @param channels 分類下的群組
  */
+@Parcelize
 
 
 data class Category (
@@ -72,5 +75,5 @@ data class Category (
     @Json(name = "channels")
     val channels: kotlin.collections.List<Channel>? = null
 
-)
+) : Parcelable
 

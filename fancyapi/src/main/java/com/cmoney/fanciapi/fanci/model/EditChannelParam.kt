@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -24,6 +26,7 @@ import com.squareup.moshi.Json
  * @param name 命名
  * @param isNeedApproval 
  */
+@Parcelize
 
 
 data class EditChannelParam (
@@ -35,5 +38,5 @@ data class EditChannelParam (
     @Json(name = "isNeedApproval")
     val isNeedApproval: kotlin.Boolean? = null
 
-)
+) : Parcelable
 

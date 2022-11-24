@@ -17,10 +17,13 @@ package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageType
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -35,7 +38,9 @@ import com.squareup.moshi.Json
  * @param updateUnixTime 
  * @param serialNumber 
  * @param messageType 
+ * @param messageReaction 
  */
+@Parcelize
 
 
 data class ChatMessage (
@@ -68,7 +73,10 @@ data class ChatMessage (
     val serialNumber: kotlin.Long? = null,
 
     @Json(name = "messageType")
-    val messageType: MessageType? = null
+    val messageType: MessageType? = null,
 
-)
+    @Json(name = "messageReaction")
+    val messageReaction: IUserMessageReaction? = null
+
+) : Parcelable
 

@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -24,6 +26,7 @@ import com.squareup.moshi.Json
  * @param name 
  * @param permissionIds Fanci權限ID清單  參考 /api/v1/Permission 清單內容
  */
+@Parcelize
 
 
 data class RoleParam (
@@ -35,5 +38,5 @@ data class RoleParam (
     @Json(name = "permissionIds")
     val permissionIds: kotlin.collections.List<kotlin.String>? = null
 
-)
+) : Parcelable
 

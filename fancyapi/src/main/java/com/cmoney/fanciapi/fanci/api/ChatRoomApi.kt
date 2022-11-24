@@ -68,16 +68,15 @@ interface ChatRoomApi {
      * 取得 聊天室的一則置頂訊息
      * 
      * Responses:
-     *  - 204: No Content
+     *  - 200: Success
      *  - 403: Forbidden
-     *  - 404: Not Found
      *  - 401: Unauthorized
      *
      * @param chatRoomChannelId 指定聊天室
-     * @return [Unit]
+     * @return [ChatMessage]
      */
     @GET("api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage")
-    suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<Unit>
+    suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<ChatMessage>
 
     /**
      * 置頂 聊天室的一則聊天訊息

@@ -18,6 +18,8 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.Category
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 群組
@@ -35,6 +37,7 @@ import com.squareup.moshi.Json
  * @param updateUnixTime 更新時間
  * @param memberCount 會員總數
  */
+@Parcelize
 
 
 data class Group (
@@ -87,5 +90,5 @@ data class Group (
     @Json(name = "memberCount")
     val memberCount: kotlin.Int? = null
 
-)
+) : Parcelable
 

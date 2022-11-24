@@ -57,16 +57,4 @@ class MainViewModel(private val groupUseCase: GroupUseCase, private val userUseC
             userUseCase.registerUser()
         }
     }
-
-//    fun stopPolling() {
-//        chatRoomPollUseCase.close()
-//    }
-//
-//    fun startPolling() {
-//        viewModelScope.launch {
-//            chatRoomPollUseCase.poll(1500, "2177").collect {
-//                KLog.i(TAG, it)
-//            }
-//        }
-//    }
 }

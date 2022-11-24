@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 使用者
@@ -29,6 +31,7 @@ import com.squareup.moshi.Json
  * @param createUnixTime 使用者創建時間
  * @param updateUnixTime 使用者更新時間
  */
+@Parcelize
 
 
 data class User (
@@ -61,5 +64,5 @@ data class User (
     @Json(name = "updateUnixTime")
     val updateUnixTime: kotlin.Long? = null
 
-)
+) : Parcelable
 

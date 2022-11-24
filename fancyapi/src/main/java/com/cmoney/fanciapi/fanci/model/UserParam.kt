@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 使用者參數
@@ -24,6 +26,7 @@ import com.squareup.moshi.Json
  * @param name 使用者名稱
  * @param thumbNail 使用者頭像
  */
+@Parcelize
 
 
 data class UserParam (
@@ -36,5 +39,5 @@ data class UserParam (
     @Json(name = "thumbNail")
     val thumbNail: kotlin.String
 
-)
+) : Parcelable
 

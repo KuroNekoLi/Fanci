@@ -17,12 +17,15 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
  *
  * @param name 分類命名
  */
+@Parcelize
 
 
 data class CategoryParam (
@@ -31,5 +34,5 @@ data class CategoryParam (
     @Json(name = "name")
     val name: kotlin.String? = null
 
-)
+) : Parcelable
 

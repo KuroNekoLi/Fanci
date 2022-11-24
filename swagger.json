@@ -780,14 +780,28 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
           },
           "401": {
             "description": "Unauthorized"
@@ -3014,6 +3028,9 @@
           },
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
+          },
+          "messageReaction": {
+            "$ref": "#/components/schemas/IUserMessageReaction"
           }
         },
         "additionalProperties": false
@@ -3440,6 +3457,20 @@
           },
           "type": {
             "$ref": "#/components/schemas/GroupRequirementQuestionType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IUserMessageReaction": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "emoji": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

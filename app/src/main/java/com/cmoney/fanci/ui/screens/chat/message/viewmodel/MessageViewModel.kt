@@ -28,10 +28,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 data class MessageUiState(
-    val message: List<ChatMessageWrapper> = emptyList(),
-    val imageAttach: List<Uri> = emptyList(),
-    val isSendComplete: Boolean = false,
-    val replyMessage: ChatMessage? = null
+    val message: List<ChatMessageWrapper> = emptyList(),    //訊息
+    val imageAttach: List<Uri> = emptyList(),   //附加圖片
+    val isSendComplete: Boolean = false,        //訊息是否發送完成
+    val replyMessage: ChatMessage? = null,      //回覆訊息用
+    val routeAnnounceMessage: ChatMessage? = null    //設定公告訊息,跳轉設定頁面
 )
 
 /**
@@ -71,7 +72,7 @@ class MessageViewModel(
                     val newMessage = it.items?.map { chatMessage ->
                         ChatMessageWrapper(message = chatMessage)
                     }.orEmpty().reversed()
-                    processMessageCombine(newMessage)
+                    processMessageCombine(newMessage, true)
                 }
             }
         }
@@ -88,11 +89,17 @@ class MessageViewModel(
     /**
      *  將新的訊息 跟舊的合併
      *  @param newChatMessage 新訊息
+     *  @param isLatest 是否為新訊息,要加在頭
      */
-    private fun processMessageCombine(newChatMessage: List<ChatMessageWrapper>) {
+    private fun processMessageCombine(newChatMessage: List<ChatMessageWrapper>, isLatest: Boolean = false) {
         //combine old message
         val oldMessage = uiState.message.toMutableList()
-        oldMessage.addAll(0, newChatMessage)
+        if (isLatest) {
+            oldMessage.addAll(0, newChatMessage)
+        }
+        else {
+            oldMessage.addAll(newChatMessage)
+        }
 
         val distinctMessage = oldMessage.distinctBy { combineMessage ->
             combineMessage.message.id
@@ -221,7 +228,6 @@ class MessageViewModel(
             }
         )
     }
-
 
     /**
      * 上傳所有 附加圖片
@@ -374,13 +380,12 @@ class MessageViewModel(
 
     /**
      * 互動彈窗
-     *
      * @param messageInteract 互動 model
      */
     fun onInteractClick(messageInteract: MessageInteract) {
         KLog.i(TAG, "onInteractClick:$messageInteract")
         when (messageInteract) {
-//            is MessageInteract.Announcement -> announceMessage(messageInteract.message)
+            is MessageInteract.Announcement -> announceMessage(messageInteract.message)
 //            is MessageInteract.Copy -> {
 //                copyMessage(messageInteract.message)
 //            }
@@ -417,6 +422,29 @@ class MessageViewModel(
         KLog.i(TAG, "removeReply:$reply")
         uiState = uiState.copy(
             replyMessage = null
+        )
+    }
+
+    /**
+     * 訊息 設定 公告
+     * @param messageModel 訊息
+     */
+    private fun announceMessage(messageModel: ChatMessage) {
+        KLog.i(TAG, "announceMessage:$messageModel")
+        val noEmojiMessage = messageModel.copy(
+            emojiCount = null
+        )
+        uiState = uiState.copy(
+            routeAnnounceMessage = noEmojiMessage
+        )
+    }
+
+    /**
+     * 設置公告 跳轉完畢
+     */
+    fun announceRouteDone() {
+        uiState = uiState.copy(
+            routeAnnounceMessage = null
         )
     }
 }

@@ -18,12 +18,15 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.Emojis
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
  *
  * @param emoji 
  */
+@Parcelize
 
 
 data class EmojiParam (
@@ -31,5 +34,5 @@ data class EmojiParam (
     @Json(name = "emoji")
     val emoji: Emojis? = null
 
-)
+) : Parcelable
 

@@ -18,12 +18,15 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.ApplyStatus
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 申請狀態參數
  *
  * @param status 
  */
+@Parcelize
 
 
 data class GroupApplyStatusParam (
@@ -31,5 +34,5 @@ data class GroupApplyStatusParam (
     @Json(name = "status")
     val status: ApplyStatus? = null
 
-)
+) : Parcelable
 

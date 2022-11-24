@@ -18,6 +18,8 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.MediaType
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -25,6 +27,7 @@ import com.squareup.moshi.Json
  * @param resourceLink 
  * @param type 
  */
+@Parcelize
 
 
 data class Media (
@@ -35,5 +38,5 @@ data class Media (
     @Json(name = "type")
     val type: MediaType? = null
 
-)
+) : Parcelable
 

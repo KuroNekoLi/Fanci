@@ -18,6 +18,8 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.ChannelType
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -25,6 +27,7 @@ import com.squareup.moshi.Json
  * @param channelType 
  * @param name 
  */
+@Parcelize
 
 
 data class ChannelParam (
@@ -35,5 +38,5 @@ data class ChannelParam (
     @Json(name = "name")
     val name: kotlin.String? = null
 
-)
+) : Parcelable
 

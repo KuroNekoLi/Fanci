@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.GroupMember
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -24,23 +23,19 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param haveNextPage 
- * @param nextWeight 
- * @param items 
+ * @param userId 
+ * @param emoji 
  */
 @Parcelize
 
 
-data class GroupMemberPaging (
+data class IUserMessageReaction (
 
-    @Json(name = "haveNextPage")
-    val haveNextPage: kotlin.Boolean? = null,
+    @Json(name = "userId")
+    val userId: kotlin.String? = null,
 
-    @Json(name = "nextWeight")
-    val nextWeight: kotlin.Long? = null,
-
-    @Json(name = "items")
-    val items: kotlin.collections.List<GroupMember>? = null
+    @Json(name = "emoji")
+    val emoji: kotlin.String? = null
 
 ) : Parcelable
 

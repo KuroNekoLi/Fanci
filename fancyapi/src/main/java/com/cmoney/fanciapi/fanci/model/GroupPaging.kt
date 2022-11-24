@@ -18,6 +18,8 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.Group
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -26,6 +28,7 @@ import com.squareup.moshi.Json
  * @param nextWeight 
  * @param items 
  */
+@Parcelize
 
 
 data class GroupPaging (
@@ -39,5 +42,5 @@ data class GroupPaging (
     @Json(name = "items")
     val items: kotlin.collections.List<Group>? = null
 
-)
+) : Parcelable
 

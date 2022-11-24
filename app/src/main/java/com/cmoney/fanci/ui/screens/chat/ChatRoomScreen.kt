@@ -22,6 +22,7 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
 
 @Composable
@@ -35,18 +36,21 @@ fun ChatRoomScreen(
     val TAG = "ChatRoomScreen"
 
     val uiState = stateHolder.viewModel.uiState
+    val viewModel = stateHolder.viewModel
+    val messageViewModel = stateHolder.messageViewModel
 
     //Screen Callback like onActivityResult
     val bundle = navController.currentBackStackEntryAsState().value
 
     KLog.i(TAG, "bundle:$bundle")
-
     KLog.i(TAG, "channelId:$channelId")
 
-    stateHolder.messageViewModel.startPolling(channelId)
+    messageViewModel.startPolling(channelId)
+
+    viewModel.fetchAnnounceMessage(channelId)
 
     BackHandler {
-        stateHolder.messageViewModel.stopPolling()
+        messageViewModel.stopPolling()
         navController.popBackStack()
     }
 
@@ -70,18 +74,25 @@ fun ChatRoomScreen(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.Bottom
         ) {
-            //公告訊息
+            //公告訊息 send to server
             bundle?.apply {
                 this.arguments?.apply {
-                    // TODO:
-//                    val announceModel = this.getParcelable<ChatMessage>(AnnounceBundleKey)
-//                    announceModel?.apply {
-//                        MessageAnnounceScreen(
-//                            this,
-//                            modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
-//                        )
-//                    }
+                    val announceModel = this.getParcelable<ChatMessage>(AnnounceBundleKey)
+                    announceModel?.apply {
+                        viewModel.announceMessageToServer(
+                            channelId,
+                            this
+                        )
+                    }
                 }
+            }
+
+            //公告訊息 display
+            uiState.announceMessage?.let {
+                MessageAnnounceScreen(
+                    it,
+                    modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
+                )
             }
 
             //訊息 內文
@@ -92,29 +103,29 @@ fun ChatRoomScreen(
                     .weight(1f),
                 channelId = channelId,
                 onMsgDismissHide = {
-                    stateHolder.viewModel.onMsgDismissHide(it)
+                    viewModel.onMsgDismissHide(it)
                 }
             )
 
             //回覆
-            stateHolder.messageViewModel.uiState.replyMessage?.apply {
+            messageViewModel.uiState.replyMessage?.apply {
                 ChatReplyScreen(this) {
-                    stateHolder.messageViewModel.removeReply(it)
+                    messageViewModel.removeReply(it)
                 }
             }
 
             //附加圖片
-            MessageAttachImageScreen(stateHolder.messageViewModel.uiState.imageAttach) {
-                stateHolder.messageViewModel.removeAttach(it)
+            MessageAttachImageScreen(messageViewModel.uiState.imageAttach) {
+                messageViewModel.removeAttach(it)
             }
 
             //輸入匡
             MessageInput(
                 onMessageSend = {
-                    stateHolder.messageViewModel.messageSend(channelId, it)
+                    messageViewModel.messageSend(channelId, it)
                 },
                 onAttach = {
-                    stateHolder.messageViewModel.attachImage(it)
+                    messageViewModel.attachImage(it)
                 }
             )
         }
@@ -124,10 +135,10 @@ fun ChatRoomScreen(
         uiState.reportUser?.author?.apply {
             ReportUserDialogScreen(user = this,
                 onConfirm = {
-                    stateHolder.viewModel.onReportUser(it)
+                    viewModel.onReportUser(it)
                 }
             ) {
-                stateHolder.viewModel.onReportUserDialogDismiss()
+                viewModel.onReportUserDialogDismiss()
             }
         }
 
@@ -135,9 +146,9 @@ fun ChatRoomScreen(
         uiState.deleteMessage?.apply {
             DeleteMessageDialogScreen(chatMessageModel = this,
                 onConfirm = {
-                    stateHolder.viewModel.onDeleteClick(it)
+                    viewModel.onDeleteClick(it)
                 }) {
-                stateHolder.viewModel.onDeleteMessageDialogDismiss()
+                viewModel.onDeleteMessageDialogDismiss()
             }
         }
 
@@ -146,10 +157,10 @@ fun ChatRoomScreen(
             HideUserDialogScreen(
                 this,
                 onConfirm = {
-                    stateHolder.viewModel.onHideUserConfirm(it)
+                    viewModel.onHideUserConfirm(it)
                 }
             ) {
-                stateHolder.viewModel.onHideUserDialogDismiss()
+                viewModel.onHideUserDialogDismiss()
             }
         }
 
@@ -158,14 +169,14 @@ fun ChatRoomScreen(
             modifier = Modifier.padding(bottom = 70.dp),
             message = uiState.snackBarMessage
         ) {
-            stateHolder.viewModel.snackBarDismiss()
+            viewModel.snackBarDismiss()
         }
 
         //Route
         //跳轉 公告 page
-        uiState.announceMessage?.apply {
+        messageViewModel.uiState.routeAnnounceMessage?.apply {
             route.invoke(MainStateHolder.Route.Announce(this))
-            stateHolder.viewModel.routeDone()
+            messageViewModel.announceRouteDone()
         }
     }
 }

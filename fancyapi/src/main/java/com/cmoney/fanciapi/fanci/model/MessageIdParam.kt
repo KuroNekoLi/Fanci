@@ -17,12 +17,15 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 訊息id 參數
  *
  * @param messageId 訊息id
  */
+@Parcelize
 
 
 data class MessageIdParam (
@@ -31,5 +34,5 @@ data class MessageIdParam (
     @Json(name = "messageId")
     val messageId: kotlin.String
 
-)
+) : Parcelable
 

@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -27,6 +29,7 @@ import com.squareup.moshi.Json
  * @param authType 0. group(space) level  1. channel(board) level
  * @param spacePermissionIds 
  */
+@Parcelize
 
 
 data class Permission (
@@ -49,5 +52,5 @@ data class Permission (
     @Json(name = "spacePermissionIds")
     val spacePermissionIds: kotlin.collections.List<kotlin.Int>? = null
 
-)
+) : Parcelable
 

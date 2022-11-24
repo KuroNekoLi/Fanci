@@ -22,6 +22,7 @@ buildscript {
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -97,7 +98,8 @@ task buildKotlinClient(type: org.openapitools.generator.gradle.plugin.tasks.Gene
     apiPackage = basePackage + "." + apiName + ".api"
     modelPackage = basePackage + "." + apiName + ".model"
     configOptions = [
-            dateLibrary: "java8"
+            dateLibrary: "java8",
+            parcelizeModels: "true"
     ]
     globalProperties = [
             modelDocs: "false"

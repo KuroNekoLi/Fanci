@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -24,6 +26,7 @@ import com.squareup.moshi.Json
  * @param categoryId 
  * @param channelIds 
  */
+@Parcelize
 
 
 data class CategoryOrder (
@@ -34,5 +37,5 @@ data class CategoryOrder (
     @Json(name = "channelIds")
     val channelIds: kotlin.collections.List<kotlin.String>? = null
 
-)
+) : Parcelable
 

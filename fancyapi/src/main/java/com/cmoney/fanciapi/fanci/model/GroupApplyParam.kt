@@ -18,12 +18,15 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 申請加入社團參數
  *
  * @param answers 回答
  */
+@Parcelize
 
 
 data class GroupApplyParam (
@@ -32,5 +35,5 @@ data class GroupApplyParam (
     @Json(name = "answers")
     val answers: kotlin.collections.List<GroupRequirementAnswer>
 
-)
+) : Parcelable
 

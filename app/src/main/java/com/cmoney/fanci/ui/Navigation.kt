@@ -26,6 +26,7 @@ import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
 
 /**
@@ -58,20 +59,19 @@ fun MyAppNavHost(
 
         //公告訊息
         composable(MainStateHolder.Route.Announce) { _ ->
-            // TODO:
-//            val message =
-//                mainNavController.previousBackStackEntry?.savedStateHandle?.get<ChatMessageModel>("message")
-//            message?.let {
-//                AnnouncementScreen(
-//                    navController = mainNavController,
-//                    message = message,
-//                    onConfirm = {
-//                        KLog.i("announce", "click:$it")
-//                        mainNavController.goBackWithParams {
-//                            putParcelable(AnnounceBundleKey, it)
-//                        }
-//                    })
-//            }
+            val message =
+                mainNavController.previousBackStackEntry?.savedStateHandle?.get<ChatMessage>("message")
+            message?.let {
+                AnnouncementScreen(
+                    navController = mainNavController,
+                    message = message,
+                    onConfirm = {
+                        KLog.i("announce", "click:$it")
+                        mainNavController.goBackWithParams {
+                            putParcelable(AnnounceBundleKey, it)
+                        }
+                    })
+            }
         }
 
         //設定個人資料
@@ -126,8 +126,7 @@ fun MainNavHost(
                             },
                             onSearchClick = {
                                 route.invoke(MainStateHolder.Route.DiscoverGroup())
-                            },
-                            theme = theme
+                            }
                         )
                     }
                 }

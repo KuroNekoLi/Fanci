@@ -17,12 +17,15 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
  *
  * @param userIds 
  */
+@Parcelize
 
 
 data class UseridsParam (
@@ -30,5 +33,5 @@ data class UseridsParam (
     @Json(name = "userIds")
     val userIds: kotlin.collections.List<kotlin.String>? = null
 
-)
+) : Parcelable
 

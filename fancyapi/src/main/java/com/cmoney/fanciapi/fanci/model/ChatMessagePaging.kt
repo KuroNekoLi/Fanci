@@ -18,6 +18,8 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -26,6 +28,7 @@ import com.squareup.moshi.Json
  * @param nextWeight 
  * @param items 
  */
+@Parcelize
 
 
 data class ChatMessagePaging (
@@ -39,5 +42,5 @@ data class ChatMessagePaging (
     @Json(name = "items")
     val items: kotlin.collections.List<ChatMessage>? = null
 
-)
+) : Parcelable
 

@@ -17,12 +17,15 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
  *
  * @param serialNumber 
  */
+@Parcelize
 
 
 data class ReadStatus (
@@ -30,5 +33,5 @@ data class ReadStatus (
     @Json(name = "serialNumber")
     val serialNumber: kotlin.Long? = null
 
-)
+) : Parcelable
 

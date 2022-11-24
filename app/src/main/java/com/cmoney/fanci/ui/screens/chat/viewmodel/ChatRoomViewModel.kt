@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
-import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.fanci.ui.theme.White_494D54
 import com.cmoney.fanci.ui.theme.White_767A7F
@@ -26,11 +25,11 @@ import kotlinx.coroutines.launch
 data class ChatRoomUiState(
 //    val replyMessage: ChatMessage? = null,
     val snackBarMessage: CustomMessage? = null,
-    val announceMessage: ChatMessage? = null,
     val hideUserMessage: ChatMessage? = null,
     val deleteMessage: ChatMessage? = null,
     val reportUser: ChatMessage? = null,
-    val emojiMessage: Pair<ChatMessage, Int>? = null
+    val emojiMessage: Pair<ChatMessage, Int>? = null,
+    val announceMessage: ChatMessage? = null          //公告訊息,顯示用
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -57,49 +56,22 @@ class ChatRoomViewModel(
         }
     }
 
-//    /**
-//     * 點擊 回覆
-//     */
-//    private fun replyMessage(message: ChatMessage) {
-//        KLog.i(TAG, "replyMessage click:$message")
-//        uiState = uiState.copy(
-//            replyMessage = message
-//        )
-//    }
-//
-//    /**
-//     * 取消 回覆
-//     */
-//    fun removeReply(reply: ChatMessage) {
-//        KLog.i(TAG, "removeReply:$reply")
-//        uiState = uiState.copy(
-//            replyMessage = null
-//        )
-//    }
+    /**
+     * 抓取 公告 訊息
+     */
+    fun fetchAnnounceMessage(channelId: String) {
+        KLog.i(TAG, "fetchAnnounceMessage:$channelId")
+        viewModelScope.launch {
+            chatRoomUseCase.getAnnounceMessage(channelId).fold({
+                uiState = uiState.copy(
+                    announceMessage = it
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
 
-//    /**
-//     * 點擊 互動彈窗
-//     */
-//    fun onInteractClick(messageInteract: MessageInteract) {
-//        KLog.i(TAG, "onInteractClick:$messageInteract")
-//        when (messageInteract) {
-//            is MessageInteract.Announcement -> announceMessage(messageInteract.message)
-//            is MessageInteract.Copy -> {
-//                copyMessage(messageInteract.message)
-//            }
-//            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
-//            is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
-//            is MessageInteract.Recycle -> {
-//                recycleMessage(messageInteract.message)
-//            }
-//            is MessageInteract.Reply -> replyMessage(messageInteract.message)
-//            is MessageInteract.Report -> reportUser(messageInteract.message)
-//            is MessageInteract.EmojiClick -> onEmojiClick(
-//                messageInteract.message,
-//                messageInteract.emojiResId
-//            )
-//        }
-//    }
 
     /**
      * 檢舉 用戶
@@ -128,19 +100,6 @@ class ChatRoomViewModel(
         KLog.i(TAG, "hideUserMessage:$message")
         uiState = uiState.copy(
             hideUserMessage = message
-        )
-    }
-
-    /**
-     * 訊息 設定 公告
-     */
-    private fun announceMessage(messageModel: ChatMessage) {
-        KLog.i(TAG, "announceMessage:$messageModel")
-        val noEmojiMessage = messageModel.copy(
-            emojiCount = null
-        )
-        uiState = uiState.copy(
-            announceMessage = noEmojiMessage
         )
     }
 
@@ -195,12 +154,6 @@ class ChatRoomViewModel(
     fun snackBarDismiss() {
         uiState = uiState.copy(
             snackBarMessage = null
-        )
-    }
-
-    fun routeDone() {
-        uiState = uiState.copy(
-            announceMessage = null
         )
     }
 
@@ -386,5 +339,20 @@ class ChatRoomViewModel(
 //            message = newMessage,
 //            hideUserMessage = null
 //        )
+    }
+
+    /**
+     * 將訊息設定成公告
+     * @param channelId 頻道 ID
+     * @param chatMessage 訊息
+     */
+    fun announceMessageToServer(channelId: String, chatMessage: ChatMessage) {
+        KLog.i(TAG, "announceMessageToServer:$chatMessage")
+        viewModelScope.launch {
+            chatRoomUseCase.setAnnounceMessage(channelId, chatMessage).fold({}, {})
+            uiState = uiState.copy(
+                announceMessage = chatMessage
+            )
+        }
     }
 }

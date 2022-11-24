@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 
@@ -24,6 +26,7 @@ import com.squareup.moshi.Json
  * @param question 
  * @param answer 
  */
+@Parcelize
 
 
 data class GroupRequirementAnswer (
@@ -34,5 +37,5 @@ data class GroupRequirementAnswer (
     @Json(name = "answer")
     val answer: kotlin.String? = null
 
-)
+) : Parcelable
 

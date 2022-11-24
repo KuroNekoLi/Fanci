@@ -18,6 +18,8 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.IGroupRequirementQuestion
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 加入社團的要求項目
@@ -26,6 +28,7 @@ import com.squareup.moshi.Json
  * @param updateUnixTime 更新時間
  * @param questions 題目
  */
+@Parcelize
 
 
 data class GroupRequirement (
@@ -42,5 +45,5 @@ data class GroupRequirement (
     @Json(name = "questions")
     val questions: kotlin.collections.List<IGroupRequirementQuestion>? = null
 
-)
+) : Parcelable
 

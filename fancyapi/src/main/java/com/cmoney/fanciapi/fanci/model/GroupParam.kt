@@ -17,6 +17,8 @@ package com.cmoney.fanciapi.fanci.model
 
 
 import com.squareup.moshi.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * 新增社團的參數
@@ -27,6 +29,7 @@ import com.squareup.moshi.Json
  * @param coverImageUrl 社團封面
  * @param thumbnailImageUrl 社團縮圖
  */
+@Parcelize
 
 
 data class GroupParam (
@@ -51,5 +54,5 @@ data class GroupParam (
     @Json(name = "thumbnailImageUrl")
     val thumbnailImageUrl: kotlin.String? = null
 
-)
+) : Parcelable
 
