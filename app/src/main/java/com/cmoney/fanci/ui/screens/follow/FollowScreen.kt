@@ -1,9 +1,14 @@
 package com.cmoney.fanci.ui.screens.follow
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -43,6 +48,8 @@ fun FollowScreen(
     val followCategoryList = followScreenState.viewModel.followData.observeAsState()
     val groupList = followScreenState.viewModel.myGroupList.observeAsState()
 
+    KLog.i(TAG, "FollowScreen create.")
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -70,7 +77,6 @@ fun FollowScreen(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
-                    .nestedScroll(followScreenState.nestedScrollConnection)
             ) {
                 Box(
                     modifier = Modifier
@@ -114,10 +120,24 @@ fun FollowScreen(
                     }
                 }
 
-                Column {
-                    Spacer(modifier = Modifier.height(
-                        with(LocalDensity.current) { followScreenState.spaceOffsetHeightPx.value.toDp() }
-                    ))
+                Column(
+                    modifier = Modifier
+                        .scrollable(
+                            state = rememberScrollableState {
+                                followScreenState.scrollOffset(it)
+                                it
+                            },
+                            orientation = Orientation.Vertical
+                        )
+                ) {
+                    Spacer(modifier = Modifier
+                        .height(
+                            with(LocalDensity.current) { followScreenState.spaceOffsetHeightPx.value.toDp() }
+                        )
+                        .width(45.dp)
+                        .clickable {
+                            followScreenState.openDrawer()
+                        })
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -132,8 +152,23 @@ fun FollowScreen(
                         shape = RoundedCornerShape(20.dp),
                         backgroundColor = LocalColor.current.env_80
                     ) {
+                        val scrollState = rememberLazyListState()
+
+                        // observer when reached end of list
+                        val endOfListReached by remember {
+                            derivedStateOf {
+                                scrollState.isScrolledToTop()
+                            }
+                        }
+
+                        LaunchedEffect(endOfListReached) {
+                            // do your stuff
+                            followScreenState.lazyColumnAtTop()
+                        }
+
                         LazyColumn(
-                            userScrollEnabled = true,
+                            state = scrollState,
+                            userScrollEnabled = followScreenState.lazyColumnScrollEnabled,
                             verticalArrangement = Arrangement.spacedBy(15.dp),
                             modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
                         ) {
@@ -170,6 +205,8 @@ fun FollowScreen(
         }
     }
 }
+
+fun LazyListState.isScrolledToTop() = firstVisibleItemScrollOffset == 0
 
 @Preview(showBackground = true)
 @Composable

@@ -19,7 +19,7 @@ class MainViewModel(private val groupUseCase: GroupUseCase, private val userUseC
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
-    private val _theme = MutableLiveData<ThemeSetting>(ThemeSetting.Coffee)
+    private val _theme = MutableLiveData<ThemeSetting>(ThemeSetting.Default)
     val theme: LiveData<ThemeSetting> = _theme
 
     private val _groupList = MutableLiveData<List<GroupItem>>()
