@@ -22,15 +22,15 @@ import com.cmoney.fanci.ui.common.CircleDot
 import com.cmoney.fanci.ui.common.GroupText
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
-
-data class FollowGroup(val groupName: String, val groupAvatar: String)
 
 @Composable
 fun GroupHeaderScreen(
-    followGroup: FollowGroup,
+    followGroup: Group,
     modifier: Modifier = Modifier,
-    visibleAvatar: Boolean
+    visibleAvatar: Boolean,
+    onMoreClick: (Group) -> Unit
 ) {
     val tag = "GroupHeaderScreen"
     Row(
@@ -46,7 +46,7 @@ fun GroupHeaderScreen(
                 )
             )
 
-            GroupText(text = followGroup.groupName, Modifier.padding(top = 21.dp))
+            GroupText(text = followGroup.name.orEmpty(), Modifier.padding(top = 21.dp))
         }
 
         Row(
@@ -61,8 +61,7 @@ fun GroupHeaderScreen(
                     .clip(CircleShape)
                     .background(LocalColor.current.background)
                     .clickable {
-                        // TODO:
-                        KLog.i(tag, "more click.")
+                        onMoreClick.invoke(followGroup)
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -72,7 +71,7 @@ fun GroupHeaderScreen(
                 visible = visibleAvatar
             ) {
                 AsyncImage(
-                    model = followGroup.groupAvatar,
+                    model = followGroup.thumbnailImageUrl,
                     modifier = Modifier
                         .size(55.dp)
                         .aspectRatio(1f)
@@ -91,12 +90,12 @@ fun GroupHeaderScreen(
 fun GroupHeaderScreenPreview() {
     FanciTheme {
         GroupHeaderScreen(
-            FollowGroup(
-                groupName = "社團名稱",
-                groupAvatar = "https://i.pinimg.com/474x/60/5d/31/605d318d7f932e3ebd1d672e5bff9229.jpg"
+            Group(
+                name = "社團名稱",
+                thumbnailImageUrl = "https://i.pinimg.com/474x/60/5d/31/605d318d7f932e3ebd1d672e5bff9229.jpg"
             ),
             modifier = Modifier.padding(20.dp),
             true
-        )
+        ){}
     }
 }

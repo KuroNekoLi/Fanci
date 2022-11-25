@@ -21,12 +21,28 @@ interface GroupApplyApi {
      *
      * @param groupId 社團id
      * @param applyStauts 申請狀態 (optional)
-     * @param startWeight  (optional)
+     * @param startWeight  (optional, default to 0L)
      * @param pageSize  (optional, default to 20)
      * @return [Unit]
      */
     @GET("api/v1/GroupApply/group/{groupId}")
-    suspend fun apiV1GroupApplyGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("applyStauts") applyStauts: ApplyStatus? = null, @Query("startWeight") startWeight: kotlin.Long? = null, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<Unit>
+    suspend fun apiV1GroupApplyGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("applyStauts") applyStauts: ApplyStatus? = null, @Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<Unit>
+
+    /**
+     * 更新審核狀態
+     * 
+     * Responses:
+     *  - 409: Conflict
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param groupId 
+     * @param id 申請id
+     * @param groupApplyStatusParam 審核狀態參數 (optional)
+     * @return [Unit]
+     */
+    @PUT("api/v1/GroupApply/group/{groupId}/{id}")
+    suspend fun apiV1GroupApplyGroupGroupIdIdPut(@Path("groupId") groupId: kotlin.String, @Path("id") id: kotlin.String, @Body groupApplyStatusParam: GroupApplyStatusParam? = null): Response<Unit>
 
     /**
      * 取得我的社團申請
@@ -57,20 +73,5 @@ interface GroupApplyApi {
      */
     @PUT("api/v1/GroupApply/group/{groupId}")
     suspend fun apiV1GroupApplyGroupGroupIdPut(@Path("groupId") groupId: kotlin.String, @Body groupApplyParam: GroupApplyParam? = null): Response<Unit>
-
-    /**
-     * 更新審核狀態
-     * 
-     * Responses:
-     *  - 409: Conflict
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
-     *
-     * @param id 申請id
-     * @param groupApplyStatusParam 審核狀態參數 (optional)
-     * @return [Unit]
-     */
-    @PUT("api/v1/GroupApply/{id}")
-    suspend fun apiV1GroupApplyIdPut(@Path("id") id: kotlin.String, @Body groupApplyStatusParam: GroupApplyStatusParam? = null): Response<Unit>
 
 }

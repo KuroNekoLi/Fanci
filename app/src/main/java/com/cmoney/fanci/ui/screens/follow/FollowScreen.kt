@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -27,13 +26,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
-import com.cmoney.fanci.ThemeSetting
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
 import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 import kotlin.math.roundToInt
 
@@ -42,7 +41,8 @@ import kotlin.math.roundToInt
 fun FollowScreen(
     followScreenState: FollowScreenState = rememberFollowScreenState(),
     onChannelClick: ((channel: Channel) -> Unit)?,
-    onSearchClick: () -> Unit
+    onSearchClick: () -> Unit,
+    onGroupSettingClick: (Group) -> Unit
 ) {
     val TAG = "FollowScreen"
     val followCategoryList = followScreenState.viewModel.followData.observeAsState()
@@ -176,13 +176,12 @@ fun FollowScreen(
                             stickyHeader {
                                 followCategoryList.value?.let {
                                     GroupHeaderScreen(
-                                        FollowGroup(
-                                            groupName = it.name.orEmpty(),
-                                            groupAvatar = it.thumbnailImageUrl.orEmpty()
-                                        ),
+                                        followGroup = it,
                                         visibleAvatar = followScreenState.visibleAvatar,
                                         modifier = Modifier.background(LocalColor.current.env_80)
-                                    )
+                                    ) { group ->
+                                        onGroupSettingClick.invoke(group)
+                                    }
                                 }
                             }
 
@@ -214,7 +213,8 @@ fun FollowScreenPreview() {
     FanciTheme {
         FollowScreen(
             onChannelClick = {},
-            onSearchClick = {}
+            onSearchClick = {},
+            onGroupSettingClick = {}
         )
     }
 }

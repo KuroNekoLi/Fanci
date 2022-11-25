@@ -23,10 +23,12 @@ import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
 import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
+import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 
 /**
@@ -49,6 +51,7 @@ fun MyAppNavHost(
         composable("main") {
             MainScreen(navController, route, theme)
         }
+
         //頻道頁面
         composable("${MainStateHolder.Route.Channel}/{channelId}/{channelName}") { backStackEntry ->
             val channelId = backStackEntry.arguments?.getString("channelId").orEmpty()
@@ -82,6 +85,18 @@ fun MyAppNavHost(
         //搜尋Group
         composable(MainStateHolder.Route.DiscoverGroup) {
             DiscoverGroupScreen(mainNavController)
+        }
+
+        //社團設定頁面
+        composable(MainStateHolder.Route.GroupSetting) {
+            val group =
+                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+            group?.let {
+                GroupSettingScreen(
+                    navController = mainNavController,
+                    group = it
+                )
+            }
         }
     }
 }
@@ -126,6 +141,10 @@ fun MainNavHost(
                             },
                             onSearchClick = {
                                 route.invoke(MainStateHolder.Route.DiscoverGroup())
+                            },
+                            onGroupSettingClick = {
+                                //前往社團設定
+                                route.invoke(MainStateHolder.Route.GroupSetting(group = it))
                             }
                         )
                     }

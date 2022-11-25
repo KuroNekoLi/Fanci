@@ -99,7 +99,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_刪除分類_0_categoryId_categoryId"
             ]
           }
         ]
@@ -251,7 +252,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_建立頻道_0_categoryId_categoryId"
             ]
           }
         ]
@@ -328,7 +330,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_編輯分類_0_categoryId_categoryId"
             ]
           }
         ]
@@ -443,7 +446,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_編輯頻道_0_channelId_channelId"
             ]
           }
         ]
@@ -478,7 +482,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_刪除頻道_0_channelId_channelId"
             ]
           }
         ]
@@ -568,8 +573,21 @@
         "responses": {
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_指派頻道管理員_0_channelId_channelId"
+            ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -599,8 +617,21 @@
         "responses": {
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_指派頻道管理員_0_channelId_channelId"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/ChatRoom/{chatRoomChannelId}/Message": {
@@ -785,17 +816,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChatMessage"
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChatMessage"
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChatMessage"
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
                 }
               }
             }
@@ -1225,7 +1256,7 @@
           {
             "oauth2": [
               "user",
-              "PERMISSION_解散社團_0_groupId"
+              "PERMISSION_0_groupId_none"
             ]
           }
         ]
@@ -1283,7 +1314,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_編輯社團_0_groupId_none"
             ]
           }
         ]
@@ -1360,7 +1392,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_建立分類_0_groupId_none"
             ]
           }
         ]
@@ -1509,8 +1542,21 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_新增角色_0_groupId_none"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Group/{groupId}/Role/{roleId}": {
@@ -1562,8 +1608,21 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_編輯角色_0_groupId_none"
+            ]
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -1593,8 +1652,21 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_刪除角色_0_groupId_none"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/GroupApply/group/{groupId}": {
@@ -1682,7 +1754,8 @@
             "description": "",
             "schema": {
               "type": "integer",
-              "format": "int64"
+              "format": "int64",
+              "default": 0
             }
           },
           {
@@ -1710,7 +1783,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_審核入社申請_0_groupId_none"
             ]
           }
         ]
@@ -1756,13 +1830,21 @@
         ]
       }
     },
-    "/api/v1/GroupApply/{id}": {
+    "/api/v1/GroupApply/group/{groupId}/{id}": {
       "put": {
         "tags": [
           "GroupApply"
         ],
         "summary": "更新審核狀態",
         "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "id",
             "in": "path",
@@ -1807,7 +1889,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_審核入社申請_0_groupId_none"
             ]
           }
         ]
@@ -2062,7 +2145,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_建立與編輯入社問題_0_groupId_none"
             ]
           }
         ]
@@ -2601,7 +2685,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_指派身分_0_groupId_none"
             ]
           }
         ]
@@ -2665,7 +2750,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_指派身分_0_groupId_none"
             ]
           }
         ]
@@ -3089,9 +3175,6 @@
             "type": "string",
             "description": "命名",
             "nullable": true
-          },
-          "isNeedApproval": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -3591,6 +3674,18 @@
         },
         "additionalProperties": false
       },
+      "PinnedMessageInfo": {
+        "type": "object",
+        "properties": {
+          "isAnnounced": {
+            "type": "boolean"
+          },
+          "message": {
+            "$ref": "#/components/schemas/ChatMessage"
+          }
+        },
+        "additionalProperties": false
+      },
       "ReadStatus": {
         "type": "object",
         "properties": {
@@ -3705,6 +3800,7 @@
             "items": {
               "type": "string"
             },
+            "description": "Fanci 用戶 ID",
             "nullable": true
           }
         },

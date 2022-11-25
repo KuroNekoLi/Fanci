@@ -23,13 +23,14 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param userIds 
+ * @param userIds Fanci 用戶 ID
  */
 @Parcelize
 
 
 data class UseridsParam (
 
+    /* Fanci 用戶 ID */
     @Json(name = "userIds")
     val userIds: kotlin.collections.List<kotlin.String>? = null
 

@@ -11,6 +11,7 @@ import com.cmoney.fanciapi.fanci.model.ChatMessagePaging
 import com.cmoney.fanciapi.fanci.model.ChatMessageParam
 import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.OrderType
+import com.cmoney.fanciapi.fanci.model.PinnedMessageInfo
 import com.cmoney.fanciapi.fanci.model.ReadStatus
 import com.cmoney.fanciapi.fanci.model.ReadStatusParam
 
@@ -73,10 +74,10 @@ interface ChatRoomApi {
      *  - 401: Unauthorized
      *
      * @param chatRoomChannelId 指定聊天室
-     * @return [ChatMessage]
+     * @return [PinnedMessageInfo]
      */
     @GET("api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage")
-    suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<ChatMessage>
+    suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<PinnedMessageInfo>
 
     /**
      * 置頂 聊天室的一則聊天訊息

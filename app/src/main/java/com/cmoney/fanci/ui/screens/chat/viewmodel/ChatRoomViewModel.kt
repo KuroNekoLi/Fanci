@@ -63,9 +63,11 @@ class ChatRoomViewModel(
         KLog.i(TAG, "fetchAnnounceMessage:$channelId")
         viewModelScope.launch {
             chatRoomUseCase.getAnnounceMessage(channelId).fold({
-                uiState = uiState.copy(
-                    announceMessage = it
-                )
+                if (it.isAnnounced == true) {
+                    uiState = uiState.copy(
+                        announceMessage = it.message
+                    )
+                }
             }, {
                 KLog.e(TAG, it)
             })

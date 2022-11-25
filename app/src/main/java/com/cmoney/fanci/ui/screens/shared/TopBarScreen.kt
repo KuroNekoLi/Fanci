@@ -36,7 +36,7 @@ fun TopBarScreen(
     trailingEnable: Boolean = true,
     moreEnable: Boolean,
     backgroundColor: Color = LocalColor.current.env_100,
-    moreClick: (() -> Unit)?
+    moreClick: (() -> Unit)?= null
 ) {
     val TAG = "TopBarScreen"
     CenterTopAppBar(

@@ -6,8 +6,8 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.Group
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -31,6 +31,12 @@ class MainStateHolder(
             is Route.DiscoverGroup -> {
                 mainNavController.navigate(it.route)
             }
+            is Route.GroupSetting -> {
+                mainNavController.currentBackStackEntry?.savedStateHandle?.apply {
+                    set("group", it.group)
+                }
+                mainNavController.navigate(it.route)
+            }
         }
     }
 
@@ -45,12 +51,16 @@ class MainStateHolder(
         }
     }
 
+    /**
+     * 記得要去 Navigation 註冊
+     */
     sealed class Route(route: String) {
         companion object {
             const val Channel = "channel"
             const val Announce = "announce"
             const val UserInfo = "userInfo"
             const val DiscoverGroup = "discoverGroup"
+            const val GroupSetting = "groupsetting"
         }
 
         data class Channel(
@@ -66,6 +76,8 @@ class MainStateHolder(
         data class UserInfo(val route: String = UserInfo) : Route(route)
 
         data class DiscoverGroup(val route: String = DiscoverGroup) : Route(route)
+
+        data class GroupSetting(val route: String = GroupSetting, val group: Group) : Route(route)
     }
 }
 

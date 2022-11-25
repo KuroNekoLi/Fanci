@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -23,16 +24,19 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param name 命名
+ * @param isAnnounced 
+ * @param message 
  */
 @Parcelize
 
 
-data class EditChannelParam (
+data class PinnedMessageInfo (
 
-    /* 命名 */
-    @Json(name = "name")
-    val name: kotlin.String? = null
+    @Json(name = "isAnnounced")
+    val isAnnounced: kotlin.Boolean? = null,
+
+    @Json(name = "message")
+    val message: ChatMessage? = null
 
 ) : Parcelable
 

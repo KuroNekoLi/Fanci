@@ -108,6 +108,8 @@ interface GroupApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 
      * @param roleParam  (optional)
@@ -121,6 +123,8 @@ interface GroupApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 
      * @param roleId 
@@ -134,6 +138,8 @@ interface GroupApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param groupId 
      * @param roleId 
