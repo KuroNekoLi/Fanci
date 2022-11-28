@@ -22,32 +22,32 @@ import com.cmoney.fanci.model.mainTabItems
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 
-/**
- * 根據不同 Route 決定BottomBar 是否出現
- */
-@Deprecated("no used.")
-@Composable
-fun BottomBarController(navController: NavHostController) {
-    var showBottomBar by rememberSaveable { mutableStateOf(true) }
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    showBottomBar = when (navBackStackEntry?.destination?.route) {
-        MainTab.FOLLOW.route -> true
-        MainTab.NOTIFY.route -> true
-        MainTab.MY.route -> true
-        MainTab.ACTIVITY.route -> true
-        else -> false
-    }
-
-    BottomBarScreen(navController)
-
-//    AnimatedVisibility(
-//        visible = showBottomBar,
-//        enter = slideInVertically(initialOffsetY = { it }),
-//        exit = slideOutVertically(targetOffsetY = { it })
-//    ) {
-//        BottomBar(navController)
+///**
+// * 根據不同 Route 決定BottomBar 是否出現
+// */
+//@Deprecated("no used.")
+//@Composable
+//fun BottomBarController(navController: NavHostController) {
+//    var showBottomBar by rememberSaveable { mutableStateOf(true) }
+//    val navBackStackEntry by navController.currentBackStackEntryAsState()
+//    showBottomBar = when (navBackStackEntry?.destination?.route) {
+//        MainTab.FOLLOW.route -> true
+//        MainTab.NOTIFY.route -> true
+//        MainTab.MY.route -> true
+//        MainTab.ACTIVITY.route -> true
+//        else -> false
 //    }
-}
+//
+//    BottomBarScreen(navController)
+//
+////    AnimatedVisibility(
+////        visible = showBottomBar,
+////        enter = slideInVertically(initialOffsetY = { it }),
+////        exit = slideOutVertically(targetOffsetY = { it })
+////    ) {
+////        BottomBar(navController)
+////    }
+//}
 
 @Composable
 fun BottomBarScreen(navController: NavHostController) {

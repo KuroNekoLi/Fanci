@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -19,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +28,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
+import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -47,6 +48,12 @@ fun FollowScreen(
     val TAG = "FollowScreen"
     val followCategoryList = followScreenState.viewModel.followData.observeAsState()
     val groupList = followScreenState.viewModel.myGroupList.observeAsState()
+    val density = LocalDensity.current
+    val configuration = LocalConfiguration.current
+    val scrollableState = rememberScrollableState {
+        followScreenState.viewModel.scrollOffset(it, density, configuration)
+        it
+    }
 
     KLog.i(TAG, "FollowScreen create.")
 
@@ -92,7 +99,7 @@ fun FollowScreen(
                             .offset {
                                 IntOffset(
                                     x = 0,
-                                    y = followScreenState.imageOffsetHeightPx.value.roundToInt()
+                                    y = followScreenState.viewModel.uiState.imageOffset
                                 ) //设置偏移量
                             },
                         contentScale = ContentScale.Crop,
@@ -123,18 +130,18 @@ fun FollowScreen(
                 Column(
                     modifier = Modifier
                         .scrollable(
-                            state = rememberScrollableState {
-                                followScreenState.scrollOffset(it)
-                                it
-                            },
+                            state = scrollableState,
                             orientation = Orientation.Vertical
                         )
                 ) {
                     Spacer(modifier = Modifier
                         .height(
-                            with(LocalDensity.current) { followScreenState.spaceOffsetHeightPx.value.toDp() }
+                            with(LocalDensity.current) {
+//                                followScreenState.spaceOffsetHeightPx.value.toDp()
+                                followScreenState.viewModel.uiState.spaceHeight.toDp()
+                            }
                         )
-                        .width(45.dp)
+                        .width(65.dp)
                         .clickable {
                             followScreenState.openDrawer()
                         })
@@ -152,23 +159,35 @@ fun FollowScreen(
                         shape = RoundedCornerShape(20.dp),
                         backgroundColor = LocalColor.current.env_80
                     ) {
-                        val scrollState = rememberLazyListState()
-
                         // observer when reached end of list
                         val endOfListReached by remember {
                             derivedStateOf {
-                                scrollState.isScrolledToTop()
+                                followScreenState.scrollState.isScrolledToTop()
                             }
                         }
 
                         LaunchedEffect(endOfListReached) {
                             // do your stuff
-                            followScreenState.lazyColumnAtTop()
+                            followScreenState.viewModel.lazyColumnAtTop()
                         }
 
+                        //test
+//                        LazyColumn(
+//                            state = followScreenState.scrollState,
+//                            userScrollEnabled = followScreenState.viewModel.uiState.lazyColumnScrollEnabled
+//                        ) {
+//                            items(100) { index ->
+//                                SettingItemScreen(
+//                                    iconRes = R.drawable.guideline,
+//                                    text = "服務條款:$index",
+//                                    onItemClick = {}
+//                                )
+//                            }
+//                        }
+
                         LazyColumn(
-                            state = scrollState,
-                            userScrollEnabled = followScreenState.lazyColumnScrollEnabled,
+                            state = followScreenState.scrollState,
+                            userScrollEnabled = followScreenState.viewModel.uiState.lazyColumnScrollEnabled,
                             verticalArrangement = Arrangement.spacedBy(15.dp),
                             modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
                         ) {
@@ -177,7 +196,7 @@ fun FollowScreen(
                                 followCategoryList.value?.let {
                                     GroupHeaderScreen(
                                         followGroup = it,
-                                        visibleAvatar = followScreenState.visibleAvatar,
+                                        visibleAvatar = followScreenState.viewModel.uiState.visibleAvatar,
                                         modifier = Modifier.background(LocalColor.current.env_80)
                                     ) { group ->
                                         onGroupSettingClick.invoke(group)
@@ -195,6 +214,8 @@ fun FollowScreen(
                                 }
                             }
                         }
+
+
                     }
                 }
             }

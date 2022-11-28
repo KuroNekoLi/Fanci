@@ -10,13 +10,16 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.socks.library.KLog
 
 class MainStateHolder(
     val navController: NavHostController,
     val mainNavController: NavHostController,
     private val systemUiController: SystemUiController,
 ) {
+    private val TAG = MainStateHolder::class.java.simpleName
     val route: (Route) -> Unit = {
+        KLog.i(TAG, "route:$it")
         when (it) {
             is Route.Channel -> mainNavController.navigate(it.route)
             is Route.Announce -> {

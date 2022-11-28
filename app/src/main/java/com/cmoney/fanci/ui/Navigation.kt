@@ -189,6 +189,7 @@ fun MainNavHost(
 //test
 @Composable
 fun PageDisplay(name: String, pos: Int, onClick: () -> Unit) {
+    KLog.i("TAG", "PageDisplay")
     Column {
         Text(text = "Hello $name!$pos")
         Button(onClick = {

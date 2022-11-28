@@ -192,7 +192,6 @@ fun MessageContentScreen(
                             }
                         }
                     }
-
                 }
             }
         }
