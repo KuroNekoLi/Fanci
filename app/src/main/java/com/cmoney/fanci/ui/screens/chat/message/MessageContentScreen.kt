@@ -59,27 +59,29 @@ fun MessageContentScreen(
     val longPressColor = LocalColor.current.component.other
     val messageModel = chatMessageWrapper.message
 
+    //長案訊息
+    val onLongPress = {
+        longTap = true
+        backgroundColor = longPressColor
+        coroutineScope.launch {
+            delay(300)
+            if (longTap && messageModel.isDeleted != true) {
+                onMessageContentCallback.invoke(
+                    MessageContentCallback.LongClick(messageModel)
+                )
+            }
+            longTap = false
+            backgroundColor = defaultColor
+        }
+    }
+
     Box(modifier = modifier
         .fillMaxWidth()
         .background(backgroundColor)
         .pointerInput(messageModel) {
             detectTapGestures(
-                onPress = {
-                    tryAwaitRelease()
-                    longTap = false
-                    backgroundColor = defaultColor
-                },
                 onLongPress = {
-                    longTap = true
-                    backgroundColor = longPressColor
-                    coroutineScope.launch {
-                        delay(300)
-                        if (longTap && messageModel.isDeleted != true) {
-                            onMessageContentCallback.invoke(
-                                MessageContentCallback.LongClick(messageModel)
-                            )
-                        }
-                    }
+                    onLongPress.invoke()
                 }
             )
         }
@@ -135,7 +137,9 @@ fun MessageContentScreen(
                                 text = this,
                                 fontSize = 17.sp,
                                 color = LocalColor.current.text.default_100
-                            )
+                            ){
+                                onLongPress.invoke()
+                            }
 
                             //OG
                             Utils.extractLinks(this).forEach { url ->

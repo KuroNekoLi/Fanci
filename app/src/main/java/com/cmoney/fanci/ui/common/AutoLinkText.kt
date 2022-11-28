@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.util.LinkifyCompat
+import com.socks.library.KLog
 
 /**
  *  帶連結 文字訊息
@@ -23,7 +24,8 @@ fun AutoLinkText(
     modifier: Modifier = Modifier,
     text: String,
     fontSize: TextUnit = TextUnit.Unspecified,
-    color: Color = Color.Unspecified
+    color: Color = Color.Unspecified,
+    onLongClick: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val customLinkifyTextView = remember {
@@ -39,11 +41,15 @@ fun AutoLinkText(
             Linkify.sPhoneNumberMatchFilter, Linkify.sPhoneNumberTransformFilter
         )
         textView.movementMethod = LinkMovementMethod.getInstance()
+        textView.setOnLongClickListener {
+            onLongClick?.invoke()
+            true
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun AutoLinkTextPreview() {
-    AutoLinkText(text = "Hello")
+    AutoLinkText(text = "Hello"){}
 }

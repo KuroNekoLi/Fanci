@@ -122,6 +122,8 @@ fun MainScreen(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    MainScreen(rememberNavController(), route = {}) {
+    FanciTheme {
+        MainScreen(rememberNavController(), route = {}) {
+        }
     }
 }
