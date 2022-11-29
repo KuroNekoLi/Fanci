@@ -40,6 +40,18 @@ class MainStateHolder(
                 }
                 mainNavController.navigate(it.route)
             }
+            is Route.GroupSettingSetting -> {
+                mainNavController.currentBackStackEntry?.savedStateHandle?.apply {
+                    set("group", it.group)
+                }
+                mainNavController.navigate(it.route)
+            }
+            is Route.GroupSettingSettingName -> {
+                mainNavController.currentBackStackEntry?.savedStateHandle?.apply {
+                    set("group", it.group)
+                }
+                mainNavController.navigate(it.route)
+            }
         }
     }
 
@@ -64,6 +76,8 @@ class MainStateHolder(
             const val UserInfo = "userInfo"
             const val DiscoverGroup = "discoverGroup"
             const val GroupSetting = "groupsetting"
+            const val GroupSetting_Setting = "GroupSetting_Setting" //社團設定 -> 社團設定
+            const val GroupSetting_Setting_Name = "GroupSetting_Setting_Name" //社團設定 -> 社團設定 -> 社團名稱
         }
 
         data class Channel(
@@ -81,6 +95,10 @@ class MainStateHolder(
         data class DiscoverGroup(val route: String = DiscoverGroup) : Route(route)
 
         data class GroupSetting(val route: String = GroupSetting, val group: Group) : Route(route)
+
+        data class GroupSettingSetting(val route: String = GroupSetting_Setting, val group: Group) : Route(route)
+
+        data class GroupSettingSettingName(val route: String = GroupSetting_Setting_Name, val group: Group) : Route(route)
     }
 }
 

@@ -12,6 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.MainStateHolder
+import com.cmoney.fanci.ui.screens.group.setting.GroupSettingRoute.*
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -21,7 +23,8 @@ import com.cmoney.fanciapi.fanci.model.Group
 fun GroupSettingScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    group: Group
+    group: Group,
+    route: (MainStateHolder.Route) -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -45,7 +48,15 @@ fun GroupSettingScreen(
             Spacer(modifier = Modifier.height(28.dp))
 
             //社團管理
-            GroupManageScreen()
+            GroupManageScreen(
+                onItemClick = {
+                    groupSettingRouteProcess(
+                        group = group,
+                        mainRoute = route,
+                        route = it
+                    )
+                }
+            )
 
             Spacer(modifier = Modifier.height(28.dp))
 
@@ -60,13 +71,69 @@ fun GroupSettingScreen(
     }
 }
 
+/**
+ * 社團 設定各種點擊
+ */
+sealed class GroupSettingRoute {
+    //社團設定
+    object GroupSetting : GroupSettingRoute()
+
+    //頻道管理
+    object ChannelManage : GroupSettingRoute()
+
+    //社團公開度
+    object GroupPublic : GroupSettingRoute()
+
+    //角色管理
+    object UsrManage : GroupSettingRoute()
+
+    //所有成員
+    object AllMember : GroupSettingRoute()
+
+    //加入申請
+    object JoinApprove : GroupSettingRoute()
+
+    //檢舉審核
+    object ReportApprove : GroupSettingRoute()
+
+    //禁言列表
+    object BanList : GroupSettingRoute()
+
+    //黑名單列表
+    object BlockList : GroupSettingRoute()
+}
+
+private fun groupSettingRouteProcess(
+    group: Group,
+    mainRoute: (MainStateHolder.Route) -> Unit,
+    route: GroupSettingRoute,
+) {
+    when (route) {
+        GroupSetting -> mainRoute.invoke(
+            MainStateHolder.Route.GroupSettingSetting(
+                group = group
+            )
+        )
+        ChannelManage -> TODO()
+        GroupPublic -> TODO()
+        AllMember -> TODO()
+        BanList -> TODO()
+        BlockList -> TODO()
+        JoinApprove -> TODO()
+        ReportApprove -> TODO()
+        UsrManage -> TODO()
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GroupSettingScreenPreview() {
     FanciTheme {
         GroupSettingScreen(
             navController = rememberNavController(),
-            group = Group()
-        )
+            group = Group(),
+        ) {
+
+        }
     }
 }

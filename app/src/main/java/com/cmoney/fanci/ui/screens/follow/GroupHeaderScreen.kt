@@ -50,7 +50,7 @@ fun GroupHeaderScreen(
         }
 
         Row(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(0.5f),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -91,7 +91,7 @@ fun GroupHeaderScreenPreview() {
     FanciTheme {
         GroupHeaderScreen(
             Group(
-                name = "社團名稱",
+                name = "社團名稱社團名稱社團名稱社團名稱社團名稱社團名稱",
                 thumbnailImageUrl = "https://i.pinimg.com/474x/60/5d/31/605d318d7f932e3ebd1d672e5bff9229.jpg"
             ),
             modifier = Modifier.padding(20.dp),

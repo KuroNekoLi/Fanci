@@ -54,6 +54,8 @@ fun GroupRuleManageScreen(modifier: Modifier = Modifier) {
 @Composable
 fun GroupRuleManageScreenPreview() {
     FanciTheme {
-        GroupManageScreen()
+        GroupManageScreen {
+
+        }
     }
 }

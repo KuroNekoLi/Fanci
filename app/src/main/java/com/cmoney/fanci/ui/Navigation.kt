@@ -15,7 +15,6 @@ import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.ThemeSetting
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
 import com.cmoney.fanci.extension.goBackWithParams
-import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.MainTab
 import com.cmoney.fanci.model.mainTabItems
 import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
@@ -24,6 +23,8 @@ import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingNameScreen
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingSettingScreen
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
@@ -93,6 +94,32 @@ fun MyAppNavHost(
                 mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
             group?.let {
                 GroupSettingScreen(
+                    navController = mainNavController,
+                    group = it,
+                    route = route
+                )
+            }
+        }
+
+        //社團設定頁面-設定社團
+        composable(MainStateHolder.Route.GroupSetting_Setting) {
+            val group =
+                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+            group?.let {
+                GroupSettingSettingScreen(
+                    navController = mainNavController,
+                    groupParam = it,
+                    route = route
+                )
+            }
+        }
+
+        //社團設定頁面-設定社團-社團名稱
+        composable(MainStateHolder.Route.GroupSetting_Setting_Name) {
+            val group =
+                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+            group?.let {
+                GroupSettingNameScreen(
                     navController = mainNavController,
                     group = it
                 )

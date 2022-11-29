@@ -28,14 +28,12 @@ import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
-import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -137,7 +135,6 @@ fun FollowScreen(
                     Spacer(modifier = Modifier
                         .height(
                             with(LocalDensity.current) {
-//                                followScreenState.spaceOffsetHeightPx.value.toDp()
                                 followScreenState.viewModel.uiState.spaceHeight.toDp()
                             }
                         )

@@ -5,8 +5,26 @@ import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupMemberApi
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupParam
 
 class GroupUseCase(private val groupApi: GroupApi, private val groupMemberApi: GroupMemberApi) {
+
+    /**
+     * 更換 社團名字
+     * @param name 更換的名字
+     * @param group 社團 model
+     */
+    suspend fun changeGroupName(name: String, group: Group) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdPut(
+            groupId = group.id.orEmpty(), groupParam = GroupParam(
+                name = name,
+                description = group.description,
+                isNeedApproval = group.isNeedApproval,
+                coverImageUrl = group.coverImageUrl,
+                thumbnailImageUrl = group.thumbnailImageUrl
+            )
+        ).checkResponseBody()
+    }
 
     /**
      * 加入社團
