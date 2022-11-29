@@ -12,21 +12,19 @@ import com.cmoney.fanciapi.fanci.model.ChatMessageParam
 import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.PinnedMessageInfo
-import com.cmoney.fanciapi.fanci.model.ReadStatus
-import com.cmoney.fanciapi.fanci.model.ReadStatusParam
 
 interface ChatRoomApi {
     /**
-     * 取得聊天室訊息列表
+     * 取得聊天室訊息列表 __________🔒 可看
      * 
      * Responses:
-     *  - 200: Success
-     *  - 404: Not Found
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
-     * @param chatRoomChannelId 指定聊天室
-     * @param take 取得比數 (optional, default to 20)
+     * @param chatRoomChannelId 聊天室頻道Id
+     * @param take 取得筆數 (optional, default to 20)
      * @param order 排序依據(預設為新到舊) (optional)
      * @param fromSerialNumber 從哪一個序列號開始往回找 (optional)
      * @return [ChatMessagePaging]
@@ -35,95 +33,65 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Query("take") take: kotlin.Int? = 20, @Query("order") order: OrderType? = null, @Query("fromSerialNumber") fromSerialNumber: kotlin.Long? = null): Response<ChatMessagePaging>
 
     /**
-     * 對聊天室新增/回應一則聊天訊息
+     * 對聊天室新增一則聊天訊息 __________🔒 可發文
      * 
      * Responses:
-     *  - 200: Success
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
-     * @param chatRoomChannelId 指定聊天室
-     * @param chatMessageParam 訊息內容 (optional)
+     * @param chatRoomChannelId 聊天室頻道Id
+     * @param chatMessageParam 訊息參數 (optional)
      * @return [ChatMessage]
      */
     @POST("api/v1/ChatRoom/{chatRoomChannelId}/Message")
     suspend fun apiV1ChatRoomChatRoomChannelIdMessagePost(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Body chatMessageParam: ChatMessageParam? = null): Response<ChatMessage>
 
     /**
-     * 取消置頂 聊天室的一則聊天訊息
+     * 取消聊天室公告 __________🔒 設定公告
      * 
      * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
-     * @param chatRoomChannelId 指定聊天室
+     * @param chatRoomChannelId 聊天室頻道Id
      * @return [Unit]
      */
     @DELETE("api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage")
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageDelete(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<Unit>
 
     /**
-     * 取得 聊天室的一則置頂訊息
+     * 取得聊天室的公告訊息 __________🔒 可看
      * 
      * Responses:
-     *  - 200: Success
-     *  - 403: Forbidden
-     *  - 401: Unauthorized
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
-     * @param chatRoomChannelId 指定聊天室
+     * @param chatRoomChannelId 聊天室頻道Id
      * @return [PinnedMessageInfo]
      */
     @GET("api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage")
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<PinnedMessageInfo>
 
     /**
-     * 置頂 聊天室的一則聊天訊息
+     * 公告聊天室的一則聊天訊息 __________🔒 設定公告
      * 
      * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
-     * @param chatRoomChannelId 指定聊天室
-     * @param messageIdParam 要置頂的訊息id參數 (optional)
+     * @param chatRoomChannelId 聊天室頻道Id
+     * @param messageIdParam 公告訊息參數 (optional)
      * @return [Unit]
      */
     @PUT("api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage")
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessagePut(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Body messageIdParam: MessageIdParam? = null): Response<Unit>
-
-    /**
-     * 取得聊天室訊息已讀狀態
-     * 
-     * Responses:
-     *  - 200: Success
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
-     *
-     * @param chatRoomChannelId 指定聊天室
-     * @return [ReadStatus]
-     */
-    @GET("api/v1/ChatRoom/{chatRoomChannelId}/ReadStatus")
-    suspend fun apiV1ChatRoomChatRoomChannelIdReadStatusGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<ReadStatus>
-
-    /**
-     * 對聊天室訊息已讀
-     * 
-     * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
-     *
-     * @param chatRoomChannelId 指定聊天室
-     * @param readStatusParam 已讀參數 (optional)
-     * @return [Unit]
-     */
-    @PUT("api/v1/ChatRoom/{chatRoomChannelId}/ReadStatus")
-    suspend fun apiV1ChatRoomChatRoomChannelIdReadStatusPut(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Body readStatusParam: ReadStatusParam? = null): Response<Unit>
 
 }

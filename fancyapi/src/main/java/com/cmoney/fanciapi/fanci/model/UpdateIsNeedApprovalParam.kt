@@ -21,38 +21,18 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 新增社團的參數
+ * 更新 社團 公開或非公開
  *
- * @param name 社團命名
- * @param description 社團簡介
  * @param isNeedApproval true: 非公開(需審核)  false: 公開(不用審核)
- * @param coverImageUrl 社團封面
- * @param thumbnailImageUrl 社團縮圖
  */
 @Parcelize
 
 
-data class GroupParam (
-
-    /* 社團命名 */
-    @Json(name = "name")
-    val name: kotlin.String,
-
-    /* 社團簡介 */
-    @Json(name = "description")
-    val description: kotlin.String? = null,
+data class UpdateIsNeedApprovalParam (
 
     /* true: 非公開(需審核)  false: 公開(不用審核) */
     @Json(name = "isNeedApproval")
-    val isNeedApproval: kotlin.Boolean? = null,
-
-    /* 社團封面 */
-    @Json(name = "coverImageUrl")
-    val coverImageUrl: kotlin.String? = null,
-
-    /* 社團縮圖 */
-    @Json(name = "thumbnailImageUrl")
-    val thumbnailImageUrl: kotlin.String? = null
+    val isNeedApproval: kotlin.Boolean? = null
 
 ) : Parcelable
 

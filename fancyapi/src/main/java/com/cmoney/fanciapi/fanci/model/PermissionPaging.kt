@@ -15,29 +15,32 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ChannelType
+import com.cmoney.fanciapi.fanci.model.Permission
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 新增頻道參數
+ * 
  *
- * @param channelType 
- * @param name 頻道名稱
+ * @param haveNextPage 
+ * @param nextWeight 
+ * @param items 
  */
 @Parcelize
 
 
-data class ChannelParam (
+data class PermissionPaging (
 
-    @Json(name = "channelType")
-    val channelType: ChannelType? = null,
+    @Json(name = "haveNextPage")
+    val haveNextPage: kotlin.Boolean? = null,
 
-    /* 頻道名稱 */
-    @Json(name = "name")
-    val name: kotlin.String? = null
+    @Json(name = "nextWeight")
+    val nextWeight: kotlin.Long? = null,
+
+    @Json(name = "items")
+    val items: kotlin.collections.List<Permission>? = null
 
 ) : Parcelable
 

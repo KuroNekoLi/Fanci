@@ -23,14 +23,17 @@ import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingDescScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingNameScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingSettingScreen
+import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 決定頁面跳轉路徑
@@ -58,7 +61,9 @@ fun MyAppNavHost(
             val channelId = backStackEntry.arguments?.getString("channelId").orEmpty()
             val channelName = backStackEntry.arguments?.getString("channelName").orEmpty()
             KLog.i(TAG, "open chanel page id:$channelId , name:$channelName")
-            ChatRoomScreen(channelId, channelName, mainNavController, route)
+            ChatRoomScreen(
+                channelId, channelName, mainNavController, route
+            )
         }
 
         //公告訊息
@@ -103,25 +108,46 @@ fun MyAppNavHost(
 
         //社團設定頁面-設定社團
         composable(MainStateHolder.Route.GroupSetting_Setting) {
+            val groupSettingViewModel: GroupSettingViewModel = koinViewModel(owner = it)
+
             val group =
                 mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-            group?.let {
+            group?.let { group ->
                 GroupSettingSettingScreen(
                     navController = mainNavController,
-                    groupParam = it,
-                    route = route
+                    group = group,
+                    route = route,
+                    viewModel = groupSettingViewModel
                 )
             }
         }
 
         //社團設定頁面-設定社團-社團名稱
         composable(MainStateHolder.Route.GroupSetting_Setting_Name) {
+            val groupSettingViewModel: GroupSettingViewModel =
+                koinViewModel(owner = mainNavController.previousBackStackEntry!!)
             val group =
                 mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-            group?.let {
+            group?.let { group ->
                 GroupSettingNameScreen(
                     navController = mainNavController,
-                    group = it
+                    group = group,
+                    viewModel = groupSettingViewModel
+                )
+            }
+        }
+
+        //社團設定頁面-設定社團-社團簡介
+        composable(MainStateHolder.Route.GroupSetting_Setting_Desc) {
+            val groupSettingViewModel: GroupSettingViewModel =
+                koinViewModel(owner = mainNavController.previousBackStackEntry!!)
+            val group =
+                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+            group?.let { group ->
+                GroupSettingDescScreen(
+                    navController = mainNavController,
+                    group = group,
+                    viewModel = groupSettingViewModel
                 )
             }
         }
@@ -172,7 +198,8 @@ fun MainNavHost(
                             onGroupSettingClick = {
                                 //前往社團設定
                                 route.invoke(MainStateHolder.Route.GroupSetting(group = it))
-                            }
+                            },
+                            navController = navController
                         )
                     }
                 }

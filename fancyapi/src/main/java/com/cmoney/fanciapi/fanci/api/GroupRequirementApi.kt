@@ -14,22 +14,24 @@ interface GroupRequirementApi {
      * 取得加入社團的要求題目
      * 
      * Responses:
-     *  - 409: Conflict
+     *  - 200: 成功
+     *  - 404: 找不到社團
      *
      * @param groupId 社團id
-     * @return [Unit]
+     * @return [GroupRequirement]
      */
     @GET("api/v1/GroupRequirement/group/{groupId}")
-    suspend fun apiV1GroupRequirementGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<Unit>
+    suspend fun apiV1GroupRequirementGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<GroupRequirement>
 
     /**
-     * 新增或更新社團題目
+     * 新增或更新社團題目 __________🔒 建立與編輯入社問題
      * 
      * Responses:
      *  - 409: Conflict
-     *  - 200: Success
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
      *
      * @param groupId 社團id
      * @param groupRequirementParam 題目參數 (optional)

@@ -18,12 +18,14 @@ import com.cmoney.fanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.fanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.fanci.ui.screens.chat.state.ChatRoomState
 import com.cmoney.fanci.ui.screens.chat.state.rememberChatRoomState
+import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ChatRoomScreen(

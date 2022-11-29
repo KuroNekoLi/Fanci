@@ -12,28 +12,13 @@ import com.cmoney.fanciapi.fanci.model.EmojiParam
 
 interface MessageApi {
     /**
-     * 刪除/收回 訊息內容
+     * 收回表情符號 __________🔒 可看
      * 
      * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
-     *
-     * @param messageId 
-     * @return [Unit]
-     */
-    @DELETE("api/v1/Message/{messageId}")
-    suspend fun apiV1MessageMessageIdDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
-
-    /**
-     * 收回表情符號
-     * 
-     * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到訊息
      *
      * @param messageId 
      * @return [Unit]
@@ -42,15 +27,15 @@ interface MessageApi {
     suspend fun apiV1MessageMessageIdEmojiDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
 
     /**
-     * 對訊息新增表情符號
+     * 對訊息新增表情符號 __________🔒 可看
      * 
      * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到訊息
      *
-     * @param messageId 
+     * @param messageId 訊息Id
      * @param emojiParam 表情符號參數 (optional)
      * @return [Unit]
      */
@@ -58,13 +43,13 @@ interface MessageApi {
     suspend fun apiV1MessageMessageIdEmojiPut(@Path("messageId") messageId: kotlin.String, @Body emojiParam: EmojiParam? = null): Response<Unit>
 
     /**
-     * 取得單一訊息
+     * 取得單一訊息 __________🔒 可看
      * 
      * Responses:
-     *  - 200: Success
-     *  - 404: Not Found
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到訊息
      *
      * @param messageId 訊息id
      * @return [ChatMessage]
@@ -73,15 +58,15 @@ interface MessageApi {
     suspend fun apiV1MessageMessageIdGet(@Path("messageId") messageId: kotlin.String): Response<ChatMessage>
 
     /**
-     * 編輯訊息內容
+     * 編輯訊息內容 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 不是發文者
+     *  - 404: 找不到訊息
      *
-     * @param messageId 編輯的訊息ID
+     * @param messageId 訊息Id
      * @param chatMessageParam 異動訊息參數 (optional)
      * @return [Unit]
      */

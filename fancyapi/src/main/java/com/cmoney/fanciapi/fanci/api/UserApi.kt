@@ -11,28 +11,28 @@ import com.cmoney.fanciapi.fanci.model.UserParam
 
 interface UserApi {
     /**
-     * 取得使用者
+     * 取得使用者 __________🔒 cmoney token
      * 
      * Responses:
-     *  - 200: Success
-     *  - 404: Not Found
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到使用者
      *
-     * @param id 
+     * @param id 使用者Id
      * @return [User]
      */
     @GET("api/v1/User/{id}")
     suspend fun apiV1UserIdGet(@Path("id") id: kotlin.String): Response<User>
 
     /**
-     * 取得我的個人資訊
+     * 取得我的個人資訊 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 200: Success
-     *  - 404: Not Found
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到使用者
      *
      * @return [User]
      */
@@ -40,14 +40,14 @@ interface UserApi {
     suspend fun apiV1UserMeGet(): Response<User>
 
     /**
-     * 更新或新增使用者
+     * 向fanci註冊使用者 __________🔒 cmoney token
      * 
      * Responses:
-     *  - 204: No Content
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
      *
-     * @param userParam  (optional)
+     * @param userParam 註冊參數 (optional)
      * @return [Unit]
      */
     @PUT("api/v1/User/me")

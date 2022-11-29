@@ -21,7 +21,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 使用者陣列參數
  *
  * @param userIds Fanci 用戶 ID
  */

@@ -21,32 +21,33 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 編輯社團參數
  *
- * @param id 
- * @param name 權限名稱
- * @param description 權限描述
- * @param authType 0. group(space) level  1. channel(board) level
+ * @param name 社團命名
+ * @param description 社團簡介
+ * @param coverImageUrl 社團封面
+ * @param thumbnailImageUrl 社團縮圖
  */
 @Parcelize
 
 
-data class Permission (
+data class EditGroupParam (
 
-    @Json(name = "id")
-    val id: kotlin.String? = null,
-
-    /* 權限名稱 */
+    /* 社團命名 */
     @Json(name = "name")
-    val name: kotlin.String? = null,
+    val name: kotlin.String,
 
-    /* 權限描述 */
+    /* 社團簡介 */
     @Json(name = "description")
     val description: kotlin.String? = null,
 
-    /* 0. group(space) level  1. channel(board) level */
-    @Json(name = "authType")
-    val authType: kotlin.Int? = null
+    /* 社團封面 */
+    @Json(name = "coverImageUrl")
+    val coverImageUrl: kotlin.String? = null,
+
+    /* 社團縮圖 */
+    @Json(name = "thumbnailImageUrl")
+    val thumbnailImageUrl: kotlin.String? = null
 
 ) : Parcelable
 

@@ -21,7 +21,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 分類參數
  *
  * @param name 分類命名
  */

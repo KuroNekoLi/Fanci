@@ -24,6 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
@@ -41,7 +43,8 @@ fun FollowScreen(
     followScreenState: FollowScreenState = rememberFollowScreenState(),
     onChannelClick: ((channel: Channel) -> Unit)?,
     onSearchClick: () -> Unit,
-    onGroupSettingClick: (Group) -> Unit
+    onGroupSettingClick: (Group) -> Unit,
+    navController: NavHostController
 ) {
     val TAG = "FollowScreen"
     val followCategoryList = followScreenState.viewModel.followData.observeAsState()
@@ -232,7 +235,8 @@ fun FollowScreenPreview() {
         FollowScreen(
             onChannelClick = {},
             onSearchClick = {},
-            onGroupSettingClick = {}
+            onGroupSettingClick = {},
+            navController = rememberNavController()
         )
     }
 }

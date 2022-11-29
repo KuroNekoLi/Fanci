@@ -23,16 +23,16 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 頻道
  *
- * @param id 頻道ID
+ * @param id 頻道Id
  * @param creatorId 頻道創立者
  * @param channelType 
  * @param name 頻道命名
  * @param createUnixTime 頻道建立時間
  * @param updateUnixTime 頻道更新時間
  * @param weight 排序權重
- * @param groupId 頻道所屬社團
+ * @param groupId 頻道所屬社團Id
  * @param category 
  */
 @Parcelize
@@ -40,7 +40,7 @@ import kotlinx.parcelize.Parcelize
 
 data class Channel (
 
-    /* 頻道ID */
+    /* 頻道Id */
     @Json(name = "id")
     val id: kotlin.String? = null,
 
@@ -67,7 +67,7 @@ data class Channel (
     @Json(name = "weight")
     val weight: kotlin.Long? = null,
 
-    /* 頻道所屬社團 */
+    /* 頻道所屬社團Id */
     @Json(name = "groupId")
     val groupId: kotlin.String? = null,
 

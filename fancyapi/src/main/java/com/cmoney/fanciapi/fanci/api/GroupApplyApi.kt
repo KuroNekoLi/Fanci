@@ -9,35 +9,40 @@ import com.squareup.moshi.Json
 import com.cmoney.fanciapi.fanci.model.ApplyStatus
 import com.cmoney.fanciapi.fanci.model.GroupApplyParam
 import com.cmoney.fanciapi.fanci.model.GroupApplyStatusParam
+import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyInfo
 
 interface GroupApplyApi {
     /**
-     * 取得社團申請清單
+     * 取得社團申請清單 __________🔒 審核入社申請
      * 
      * Responses:
      *  - 409: Conflict
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 200: 成功
+     *  - 404: 找不到該社團
      *
      * @param groupId 社團id
      * @param applyStauts 申請狀態 (optional)
-     * @param startWeight  (optional, default to 0L)
-     * @param pageSize  (optional, default to 20)
+     * @param startWeight 起始權重 (optional, default to 0L)
+     * @param pageSize 每頁筆數 (optional, default to 20)
      * @return [Unit]
      */
     @GET("api/v1/GroupApply/group/{groupId}")
     suspend fun apiV1GroupApplyGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("applyStauts") applyStauts: ApplyStatus? = null, @Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<Unit>
 
     /**
-     * 更新審核狀態
+     * 更新審核狀態(通過/拒絕) __________🔒 審核入社申請
      * 
      * Responses:
-     *  - 409: Conflict
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: Success
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 204: 成功
+     *  - 404: 找不到該社團
      *
-     * @param groupId 
-     * @param id 申請id
+     * @param groupId 社團Id
+     * @param id 申請Id
      * @param groupApplyStatusParam 審核狀態參數 (optional)
      * @return [Unit]
      */
@@ -45,29 +50,31 @@ interface GroupApplyApi {
     suspend fun apiV1GroupApplyGroupGroupIdIdPut(@Path("groupId") groupId: kotlin.String, @Path("id") id: kotlin.String, @Body groupApplyStatusParam: GroupApplyStatusParam? = null): Response<Unit>
 
     /**
-     * 取得我的社團申請
+     * 取得我的社團申請 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 409: Conflict
-     *  - 404: Not Found
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該社團
      *
-     * @param groupId 社團id
-     * @return [Unit]
+     * @param groupId 社團Id
+     * @return [GroupRequirementApplyInfo]
      */
     @GET("api/v1/GroupApply/group/{groupId}/me")
-    suspend fun apiV1GroupApplyGroupGroupIdMeGet(@Path("groupId") groupId: kotlin.String): Response<Unit>
+    suspend fun apiV1GroupApplyGroupGroupIdMeGet(@Path("groupId") groupId: kotlin.String): Response<GroupRequirementApplyInfo>
 
     /**
-     * 新增社團申請
+     * 新增社團申請 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
      *  - 409: Conflict
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 204: 成功
+     *  - 404: 找不到該社團
      *
-     * @param groupId 社團id
+     * @param groupId 社團Id
      * @param groupApplyParam 社團申請參數 (optional)
      * @return [Unit]
      */

@@ -15,29 +15,29 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ChannelType
+import com.cmoney.fanciapi.fanci.model.GroupRequirementApply
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 新增頻道參數
+ * 社團申請資訊
  *
- * @param channelType 
- * @param name 頻道名稱
+ * @param hasApplied 是否有申請過
+ * @param apply 
  */
 @Parcelize
 
 
-data class ChannelParam (
+data class GroupRequirementApplyInfo (
 
-    @Json(name = "channelType")
-    val channelType: ChannelType? = null,
+    /* 是否有申請過 */
+    @Json(name = "hasApplied")
+    val hasApplied: kotlin.Boolean? = null,
 
-    /* 頻道名稱 */
-    @Json(name = "name")
-    val name: kotlin.String? = null
+    @Json(name = "apply")
+    val apply: GroupRequirementApply? = null
 
 ) : Parcelable
 

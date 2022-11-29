@@ -25,16 +25,16 @@ import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 
 @Composable
-fun GroupSettingNameScreen(
+fun GroupSettingDescScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     group: Group,
     viewModel: GroupSettingViewModel
 ) {
-    GroupSettingNameView(
+    GroupSettingDescView(
         modifier = modifier,
-        navController = navController, group = group, onChangeName = { name ->
-            viewModel.changeGroupName(name, group)
+        navController = navController, group = group, onChangeDesc = { desc ->
+            viewModel.changeGroupDesc(desc, group)
         })
 
     LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
@@ -46,15 +46,15 @@ fun GroupSettingNameScreen(
 }
 
 @Composable
-fun GroupSettingNameView(
+fun GroupSettingDescView(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     group: Group,
-    onChangeName: (String) -> Unit
+    onChangeDesc: (String) -> Unit
 ) {
     val context = LocalContext.current
-    var textState by remember { mutableStateOf(group.name.orEmpty()) }
-    val maxLength = 20
+    var textState by remember { mutableStateOf(group.description.orEmpty()) }
+    val maxLength = 150
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -62,7 +62,7 @@ fun GroupSettingNameView(
         topBar = {
             TopBarScreen(
                 navController,
-                title = "社團名稱",
+                title = "社團簡介",
                 leadingEnable = true,
                 moreEnable = false
             )
@@ -83,7 +83,7 @@ fun GroupSettingNameView(
                     .padding(top = 20.dp, start = 25.dp, end = 25.dp)
             ) {
                 Text(
-                    text = "%d/20".format(textState.length),
+                    text = "%d/100".format(textState.length),
                     fontSize = 14.sp,
                     color = LocalColor.current.text.default_50
                 )
@@ -91,6 +91,7 @@ fun GroupSettingNameView(
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(200.dp)
                         .padding(top = 10.dp),
                     value = textState,
                     colors = TextFieldDefaults.textFieldColors(
@@ -107,11 +108,10 @@ fun GroupSettingNameView(
                         }
                     },
                     shape = RoundedCornerShape(4.dp),
-                    maxLines = 1,
                     textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                     placeholder = {
                         Text(
-                            text = "填寫專屬於社團的名稱吧!",
+                            text = "填寫專屬於社團的簡介吧！",
                             fontSize = 16.sp,
                             color = LocalColor.current.text.default_30
                         )
@@ -135,11 +135,7 @@ fun GroupSettingNameView(
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                     onClick = {
-                        if (textState.isEmpty()) {
-                            context.showToast("社團名稱不可以是空白的唷！")
-                        } else {
-                            onChangeName.invoke(textState)
-                        }
+                        onChangeDesc.invoke(textState)
                     }) {
                     Text(
                         text = "儲存",
@@ -155,9 +151,9 @@ fun GroupSettingNameView(
 
 @Preview(showBackground = true)
 @Composable
-fun GroupSettingNameScreenPreview() {
+fun GroupSettingDescViewPreview() {
     FanciTheme {
-        GroupSettingNameView(
+        GroupSettingDescView(
             group = Group(
                 name = "韓勾ㄟ金針菇討論區",
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"

@@ -32,7 +32,7 @@ import kotlinx.parcelize.Parcelize
  * @param creatorId 建立分類UserId
  * @param isDeleted 是否被刪除
  * @param groupId 所屬社團
- * @param channels 分類下的群組
+ * @param channels 分類下的頻道
  */
 @Parcelize
 
@@ -71,7 +71,7 @@ data class Category (
     @Json(name = "groupId")
     val groupId: kotlin.String? = null,
 
-    /* 分類下的群組 */
+    /* 分類下的頻道 */
     @Json(name = "channels")
     val channels: kotlin.collections.List<Channel>? = null
 

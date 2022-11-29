@@ -22,9 +22,9 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 公告訊息資訊
  *
- * @param isAnnounced 
+ * @param isAnnounced 是否有公告訊息
  * @param message 
  */
 @Parcelize
@@ -32,6 +32,7 @@ import kotlinx.parcelize.Parcelize
 
 data class PinnedMessageInfo (
 
+    /* 是否有公告訊息 */
     @Json(name = "isAnnounced")
     val isAnnounced: kotlin.Boolean? = null,
 

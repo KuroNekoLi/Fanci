@@ -21,9 +21,9 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 新增角色參數
  *
- * @param name 
+ * @param name 角色名稱
  * @param permissionIds Fanci權限ID清單  參考 /api/v1/Permission 清單內容
  */
 @Parcelize
@@ -31,6 +31,7 @@ import kotlinx.parcelize.Parcelize
 
 data class RoleParam (
 
+    /* 角色名稱 */
     @Json(name = "name")
     val name: kotlin.String? = null,
 

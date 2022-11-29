@@ -23,13 +23,15 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.R
-import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
+import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
+
+const val GroupSettingBundleKey = "GroupSettingBundleKey"
 
 /**
  * 社團設定 - 社團設定
@@ -38,23 +40,31 @@ import com.socks.library.KLog
 fun GroupSettingSettingScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    groupParam: Group,
+    group: Group,
+    route: (MainStateHolder.Route) -> Unit,
+    viewModel: GroupSettingViewModel
+) {
+    var groupParam = group
+    viewModel.uiState.settingGroup?.let {
+        groupParam = it
+    }
+
+    GroupSettingSettingView(
+        modifier,
+        navController,
+        groupParam,
+        route,
+    )
+}
+
+@Composable
+fun GroupSettingSettingView(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    group: Group,
     route: (MainStateHolder.Route) -> Unit
 ) {
     val TAG = "GroupSettingSettingScreen"
-
-    var group = groupParam
-
-    //Screen Callback like onActivityResult
-    val bundle = navController.currentBackStackEntryAsState().value
-    bundle?.apply {
-        this.arguments?.apply {
-            val groupModel = this.getParcelable<Group>(GroupSettingNameBundleKey)
-            groupModel?.apply {
-                group = this
-            }
-        }
-    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -126,6 +136,9 @@ fun GroupSettingSettingScreen(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "description click")
+                        route.invoke(
+                            MainStateHolder.Route.GroupSettingSettingDesc(group = group)
+                        )
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),
@@ -235,16 +248,15 @@ fun GroupSettingSettingScreen(
                 )
             }
         }
-
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun SettingScreenPreview() {
+fun GroupSettingSettingView() {
     FanciTheme {
-        GroupSettingSettingScreen(
-            groupParam = Group(
+        GroupSettingSettingView(
+            group = Group(
                 name = "韓勾ㄟ金針菇討論區",
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
             ),

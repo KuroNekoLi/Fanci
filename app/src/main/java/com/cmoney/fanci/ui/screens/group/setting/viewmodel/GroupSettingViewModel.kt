@@ -12,7 +12,8 @@ import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
 data class GroupSettingUiState(
-    val changeGroupName: Group? = null
+    val settingGroup: Group? = null,
+    val isGroupSettingPop: Boolean = false
 )
 
 class GroupSettingViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
@@ -22,25 +23,68 @@ class GroupSettingViewModel(private val groupUseCase: GroupUseCase) : ViewModel(
         private set
 
     /**
-     * 更換 社團名字
-     * @param name 更換的名字
+     * 更換 社團 簡介
+     * @param desc 簡介
      * @param group 社團 model
      */
-    fun changeGroupName(name: String, group: Group) {
-        KLog.i(TAG, "changeGroupNameL$name")
+    fun changeGroupDesc(desc: String, group: Group) {
         viewModelScope.launch {
-            groupUseCase.changeGroupName(name, group).fold({
+            groupUseCase.changeGroupDesc(desc, group).fold({
             }, {
                 KLog.e(TAG, it)
                 if (it is EmptyBodyException) {
                     uiState = uiState.copy(
-                        changeGroupName = group.copy(
-                            name = name
-                        )
+                        settingGroup = group.copy(
+                            description = desc
+                        ),
+                        isGroupSettingPop = true
                     )
                 }
             }
             )
         }
     }
+
+    /**
+     * 更換 社團名字
+     * @param name 更換的名字
+     * @param group 社團 model
+     */
+    fun changeGroupName(name: String, group: Group) {
+        KLog.i(TAG, "changeGroupNameL$name")
+
+        //test
+//        uiState = uiState.copy(
+//            settingGroup = group.copy(
+//                name = name
+//            ),
+//            isGroupSettingNamePop = true
+//        )
+
+        viewModelScope.launch {
+            groupUseCase.changeGroupName(name, group).fold({
+            }, {
+                KLog.e(TAG, it)
+                if (it is EmptyBodyException) {
+                    uiState = uiState.copy(
+                        settingGroup = group.copy(
+                            name = name
+                        ),
+                        isGroupSettingPop = true
+                    )
+                }
+            }
+            )
+        }
+    }
+
+    /**
+     * 更換社團名稱 結束
+     */
+    fun changeNameScreenDone() {
+        uiState = uiState.copy(
+            isGroupSettingPop = false
+        )
+    }
+
 }

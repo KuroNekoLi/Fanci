@@ -24,16 +24,12 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param groupId 
  * @param categoryOrders 
  */
 @Parcelize
 
 
 data class OrderParam (
-
-    @Json(name = "groupId")
-    val groupId: kotlin.String? = null,
 
     @Json(name = "categoryOrders")
     val categoryOrders: kotlin.collections.List<CategoryOrder>? = null

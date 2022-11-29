@@ -21,16 +21,16 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 編輯頻道參數
  *
- * @param name 命名
+ * @param name 頻道名稱
  */
 @Parcelize
 
 
 data class EditChannelParam (
 
-    /* 命名 */
+    /* 頻道名稱 */
     @Json(name = "name")
     val name: kotlin.String? = null
 

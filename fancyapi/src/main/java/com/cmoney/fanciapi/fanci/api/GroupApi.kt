@@ -8,171 +8,195 @@ import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.CategoryParam
+import com.cmoney.fanciapi.fanci.model.EditGroupParam
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupPaging
 import com.cmoney.fanciapi.fanci.model.GroupParam
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.RoleParam
+import com.cmoney.fanciapi.fanci.model.UpdateIsNeedApprovalParam
 
 interface GroupApi {
     /**
      * 取得社團列表
      * 
      * Responses:
-     *  - 200: Success
-     *  - 404: Not Found
+     *  - 200: 成功
      *
-     * @param startWeight  (optional, default to 0L)
-     * @param pageSize  (optional, default to 100)
-     * @param orderType  (optional)
+     * @param startWeight 起始權重 (optional, default to 0L)
+     * @param pageSize 每頁筆數 (optional, default to 100)
+     * @param orderType 排序類型 (optional)
      * @return [GroupPaging]
      */
     @GET("api/v1/Group")
     suspend fun apiV1GroupGet(@Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 100, @Query("orderType") orderType: OrderType? = null): Response<GroupPaging>
 
     /**
-     * 新增社團 頻道分類
+     * 新增社團 頻道分類 __________🔒 建立分類
      * 
      * Responses:
-     *  - 200: Success
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該社團
      *
-     * @param groupId 
-     * @param categoryParam  (optional)
+     * @param groupId 社團Id
+     * @param categoryParam 分類參數 (optional)
      * @return [Category]
      */
     @POST("api/v1/Group/{groupId}/Category")
     suspend fun apiV1GroupGroupIdCategoryPost(@Path("groupId") groupId: kotlin.String, @Body categoryParam: CategoryParam? = null): Response<Category>
 
     /**
-     * 刪除/解散社團(只有社團管理員可執行)
+     * 刪除/解散社團 __________🔒 社長
      * 
      * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該社團
      *
-     * @param groupId 
+     * @param groupId 社團Id
      * @return [Unit]
      */
     @DELETE("api/v1/Group/{groupId}")
     suspend fun apiV1GroupGroupIdDelete(@Path("groupId") groupId: kotlin.String): Response<Unit>
 
     /**
-     * 根據社團id取得特定社團
+     * 取得特定社團
      * 
      * Responses:
-     *  - 200: Success
-     *  - 404: Not Found
+     *  - 200: 成功
+     *  - 404: 找不到該社團
      *
-     * @param groupId 
+     * @param groupId 社團Id
      * @return [Group]
      */
     @GET("api/v1/Group/{groupId}")
     suspend fun apiV1GroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<Group>
 
     /**
-     * 編輯社團資訊(重命名/簡介/是否公開)
+     * 更新社團是否公開 __________🔒 設定社團公開私密
      * 
      * Responses:
-     *  - 204: No Content
-     *  - 403: Forbidden
-     *  - 404: Not Found
-     *  - 401: Unauthorized
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該社團
      *
-     * @param groupId 
-     * @param groupParam  (optional)
+     * @param groupId 社團Id
+     * @param updateIsNeedApprovalParam 更新參數 (optional)
+     * @return [Unit]
+     */
+    @PUT("api/v1/Group/{groupId}/isNeedApproval")
+    suspend fun apiV1GroupGroupIdIsNeedApprovalPut(@Path("groupId") groupId: kotlin.String, @Body updateIsNeedApprovalParam: UpdateIsNeedApprovalParam? = null): Response<Unit>
+
+    /**
+     * 編輯社團資訊 __________🔒 編輯社團
+     * 
+     * Responses:
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該社團
+     *
+     * @param groupId 社團Id
+     * @param editGroupParam 編輯社團參數 (optional)
      * @return [Unit]
      */
     @PUT("api/v1/Group/{groupId}")
-    suspend fun apiV1GroupGroupIdPut(@Path("groupId") groupId: kotlin.String, @Body groupParam: GroupParam? = null): Response<Unit>
+    suspend fun apiV1GroupGroupIdPut(@Path("groupId") groupId: kotlin.String, @Body editGroupParam: EditGroupParam? = null): Response<Unit>
 
     /**
      * 取得頻道角色列表
      * 
      * Responses:
-     *  - 200: Success
+     *  - 200: 成功
+     *  - 404: 找不到該社團
      *
-     * @param groupId 
-     * @return [Unit]
+     * @param groupId 社團Id
+     * @return [kotlin.collections.List<FanciRole>]
      */
     @GET("api/v1/Group/{groupId}/Role")
-    suspend fun apiV1GroupGroupIdRoleGet(@Path("groupId") groupId: kotlin.String): Response<Unit>
+    suspend fun apiV1GroupGroupIdRoleGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
 
     /**
-     * 新增角色
+     * 新增角色 __________🔒 新增角色
      * 
      * Responses:
-     *  - 200: Success
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
+     *  - 409: 已有相同名稱的角色
      *
-     * @param groupId 
-     * @param roleParam  (optional)
+     * @param groupId 社團Id
+     * @param roleParam 角色參數 (optional)
      * @return [FanciRole]
      */
     @POST("api/v1/Group/{groupId}/Role")
     suspend fun apiV1GroupGroupIdRolePost(@Path("groupId") groupId: kotlin.String, @Body roleParam: RoleParam? = null): Response<FanciRole>
 
     /**
-     * 刪除角色
+     * 刪除角色 __________🔒 刪除角色
      * 
      * Responses:
-     *  - 200: Success
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
+     *  - 409: 找不到要刪除的角色
      *
-     * @param groupId 
-     * @param roleId 
+     * @param groupId 社團Id
+     * @param roleId 角色Id
      * @return [Unit]
      */
     @DELETE("api/v1/Group/{groupId}/Role/{roleId}")
     suspend fun apiV1GroupGroupIdRoleRoleIdDelete(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<Unit>
 
     /**
-     * 編輯角色
+     * 編輯角色 __________🔒 編輯角色
      * 
      * Responses:
-     *  - 200: Success
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
+     *  - 409: 已有相同名稱的角色
      *
-     * @param groupId 
-     * @param roleId 
-     * @param roleParam  (optional)
+     * @param groupId 社團Id
+     * @param roleId 角色Id
+     * @param roleParam 角色參數 (optional)
      * @return [Unit]
      */
     @PUT("api/v1/Group/{groupId}/Role/{roleId}")
     suspend fun apiV1GroupGroupIdRoleRoleIdPut(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String, @Body roleParam: RoleParam? = null): Response<Unit>
 
     /**
-     * 取得我加入的社團頻道清單
+     * 取得我加入的社團清單 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 200: Success
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
      *
-     * @param startWeight  (optional, default to 0L)
-     * @param pageSize  (optional, default to 20)
+     * @param startWeight 起始權重 (optional, default to 0L)
+     * @param pageSize 每頁筆數 (optional, default to 20)
      * @return [GroupPaging]
      */
-    @POST("api/v1/Group/me")
-    suspend fun apiV1GroupMePost(@Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<GroupPaging>
+    @GET("api/v1/Group/me")
+    suspend fun apiV1GroupMeGet(@Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<GroupPaging>
 
     /**
-     * 新增社團
+     * 新增社團 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 200: Success
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
      *
-     * @param groupParam  (optional)
+     * @param groupParam 新增社團參數 (optional)
      * @return [Group]
      */
     @POST("api/v1/Group")
