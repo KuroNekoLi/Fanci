@@ -12,7 +12,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,19 +35,19 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 
 @Composable
-fun GroupSettingAvatarScreen(
+fun GroupSettingBackgroundScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     group: Group,
     viewModel: GroupSettingViewModel
 ) {
-    GroupSettingAvatarView(
+    GroupSettingBackgroundView(
         modifier,
         navController,
         isLoading = viewModel.uiState.isLoading,
         group = group
     ) {
-        viewModel.changeGroupAvatar(it, group)
+        viewModel.changeGroupCover(it, group)
     }
 
     LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
@@ -57,7 +59,7 @@ fun GroupSettingAvatarScreen(
 }
 
 @Composable
-fun GroupSettingAvatarView(
+fun GroupSettingBackgroundView(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     group: Group,
@@ -66,13 +68,16 @@ fun GroupSettingAvatarView(
     onImageChange: (Uri) -> Unit
 ) {
     val TAG = "GroupSettingAvatarView"
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
                 navController,
-                title = "社團圖示",
+                title = "社團背景",
                 leadingEnable = true,
                 moreEnable = false
             )
@@ -80,7 +85,7 @@ fun GroupSettingAvatarView(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .background(LocalColor.current.env_80)
+                .background(Color.Black)
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),
@@ -94,16 +99,37 @@ fun GroupSettingAvatarView(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AsyncImage(
-                    model = state.avatarImage.value ?: group.thumbnailImageUrl,
-                    modifier = Modifier
-                        .size(182.dp)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(60.dp)),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.resource_default)
-                )
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    AsyncImage(
+                        model = state.coverImageUrl.value ?: group.coverImageUrl,
+                        modifier = Modifier
+                            .size(screenWidth)
+                            .aspectRatio(1f),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        placeholder = painterResource(id = R.drawable.resource_default)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .size(width = 340.dp, height = 185.dp)
+                            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                            .background(
+                                LocalColor.current.env_80
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "面板覆蓋處",
+                            fontSize = 30.sp,
+                            color = LocalColor.current.text.default_30
+                        )
+                    }
+                }
             }
 
             if (isLoading) {
@@ -122,8 +148,6 @@ fun GroupSettingAvatarView(
                 state.openCameraDialog()
             }
 
-            Spacer(modifier = Modifier.height(50.dp))
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -139,7 +163,7 @@ fun GroupSettingAvatarView(
                     colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                     onClick = {
                         KLog.i(TAG, "on save click.")
-                        state.avatarImage.value?.let {
+                        state.coverImageUrl.value?.let {
                             onImageChange.invoke(it)
                         }
                     }) {
@@ -156,7 +180,7 @@ fun GroupSettingAvatarView(
             ChooseImagePickDialog(onDismiss = {
                 state.closeCameraDialog()
             }) {
-                state.setAvatarImage(it)
+                state.setBackgroundImage(it)
             }
         }
     }
@@ -166,9 +190,9 @@ fun GroupSettingAvatarView(
 
 @Preview(showBackground = true)
 @Composable
-fun GroupSettingAvatarScreenPreview() {
+fun GroupSettingBackgroundPreview() {
     FanciTheme {
-        GroupSettingAvatarView(
+        GroupSettingBackgroundView(
             navController = rememberNavController(),
             group = Group(),
             isLoading = true

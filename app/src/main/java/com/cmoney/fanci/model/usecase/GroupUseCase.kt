@@ -24,31 +24,56 @@ class GroupUseCase(
 ) {
 
     /**
+     * 更換 社團背景圖
+     * @param uri 圖片Uri
+     * @param group 社團 model
+     */
+    suspend fun changeGroupBackground(uri: Uri, group: Group): Flow<String> {
+        return flow {
+            val uploadImage =
+                UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
+
+            uploadImage.upload().collect {
+                val uri = it.first
+                val imageUrl = it.second
+                emit(imageUrl)
+
+                groupApi.apiV1GroupGroupIdPut(
+                    groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
+                        name = group.name.orEmpty(),
+                        description = group.description,
+                        coverImageUrl = imageUrl,
+                        thumbnailImageUrl = group.thumbnailImageUrl
+                    )
+                )
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+    /**
      * 更換 社團縮圖
      * @param uri 圖片Uri
      * @param group 社團 model
      */
     suspend fun changeGroupAvatar(uri: Uri, group: Group): Flow<String> {
         return flow {
-//            withContext(Dispatchers.IO) {
-                val uploadImage =
-                    UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
+            val uploadImage =
+                UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
 
-                uploadImage.upload().collect {
-                    val uri = it.first
-                    val imageUrl = it.second
-                    emit(imageUrl)
+            uploadImage.upload().collect {
+                val uri = it.first
+                val imageUrl = it.second
+                emit(imageUrl)
 
-                    groupApi.apiV1GroupGroupIdPut(
-                        groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
-                            name = group.name.orEmpty(),
-                            description = group.description,
-                            coverImageUrl = group.coverImageUrl,
-                            thumbnailImageUrl = imageUrl
-                        )
+                groupApi.apiV1GroupGroupIdPut(
+                    groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
+                        name = group.name.orEmpty(),
+                        description = group.description,
+                        coverImageUrl = group.coverImageUrl,
+                        thumbnailImageUrl = imageUrl
                     )
-                }
-//            }
+                )
+            }
         }.flowOn(Dispatchers.IO)
     }
 

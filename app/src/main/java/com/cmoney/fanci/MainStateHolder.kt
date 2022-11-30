@@ -50,6 +50,9 @@ class MainStateHolder(
             is GroupRoute.GroupSettingSettingAvatar -> {
                 navigateWithGroup(it)
             }
+            is GroupRoute.GroupSettingSettingBackground -> {
+                navigateWithGroup(it)
+            }
         }
     }
 
@@ -88,6 +91,8 @@ class MainStateHolder(
             const val GroupSetting_Setting_Desc = "GroupSetting_Setting_Desc" //社團設定 -> 社團設定 -> 社團簡介
             const val GroupSetting_Setting_Avatar =
                 "GroupSetting_Setting_Avatar" //社團設定 -> 社團設定 -> 社團圖示
+            const val GroupSetting_Setting_Background =
+                "GroupSetting_Setting_Background" //社團設定 -> 社團設定 -> 社團背景
         }
 
         data class Channel(
@@ -119,6 +124,11 @@ class MainStateHolder(
 
         data class GroupSettingSettingAvatar(
             override val route: String = GroupSetting_Setting_Avatar,
+            override val group: Group
+        ) : GroupRoute()
+
+        data class GroupSettingSettingBackground(
+            override val route: String = GroupSetting_Setting_Background,
             override val group: Group
         ) : GroupRoute()
 

@@ -95,6 +95,7 @@ class GroupSettingViewModel(
      * 更換社團 頭貼
      */
     fun changeGroupAvatar(uri: Uri, group: Group) {
+        KLog.i(TAG, "changeGroupAvatar")
         viewModelScope.launch {
             uiState = uiState.copy(
                 isLoading = true
@@ -104,6 +105,27 @@ class GroupSettingViewModel(
                     isLoading = false,
                     settingGroup = group.copy(
                         thumbnailImageUrl = it
+                    ),
+                    isGroupSettingPop = true
+                )
+            }
+        }
+    }
+
+    /**
+     * 更換 社團 背景圖
+     */
+    fun changeGroupCover(uri: Uri, group: Group) {
+        KLog.i(TAG, "changeGroupCover")
+        viewModelScope.launch {
+            uiState = uiState.copy(
+                isLoading = true
+            )
+            groupUseCase.changeGroupBackground(uri, group).collect {
+                uiState = uiState.copy(
+                    isLoading = false,
+                    settingGroup = group.copy(
+                        coverImageUrl = it
                     ),
                     isGroupSettingPop = true
                 )

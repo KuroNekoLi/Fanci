@@ -229,9 +229,9 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "background image click")
-//                        route.invoke(
-//
-//                        )
+                        route.invoke(
+                            MainStateHolder.GroupRoute.GroupSettingSettingBackground(group = group)
+                        )
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),

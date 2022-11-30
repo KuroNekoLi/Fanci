@@ -8,7 +8,8 @@ import androidx.compose.runtime.remember
 
 class GroupSettingSettingState(
     val openCameraDialog: MutableState<Boolean>,
-    val onAttachImage: MutableState<Uri?>
+    val avatarImage: MutableState<Uri?>,
+    val coverImageUrl: MutableState<Uri?>
 ) {
 
     fun closeCameraDialog() {
@@ -19,15 +20,20 @@ class GroupSettingSettingState(
         openCameraDialog.value = true
     }
 
-    fun attachImage(uri: Uri) {
-        onAttachImage.value = uri
+    fun setAvatarImage(uri: Uri) {
+        avatarImage.value = uri
+    }
+
+    fun setBackgroundImage(uri: Uri) {
+        coverImageUrl.value = uri
     }
 }
 
 @Composable
 fun rememberGroupSettingSettingState(
     openCameraDialog: MutableState<Boolean> = mutableStateOf(false),
-    onAttachImage: MutableState<Uri?> = mutableStateOf(null)
+    avatarImage: MutableState<Uri?> = mutableStateOf(null),
+    coverImageUrl: MutableState<Uri?> = mutableStateOf(null)
 ) = remember {
-    GroupSettingSettingState(openCameraDialog, onAttachImage)
+    GroupSettingSettingState(openCameraDialog, avatarImage, coverImageUrl)
 }

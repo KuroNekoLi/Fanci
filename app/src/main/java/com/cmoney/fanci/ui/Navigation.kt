@@ -23,10 +23,7 @@ import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingAvatarScreen
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingDescScreen
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingNameScreen
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingSettingScreen
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.*
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
@@ -161,6 +158,21 @@ fun MyAppNavHost(
                 mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
             group?.let { group ->
                 GroupSettingAvatarScreen(
+                    navController = mainNavController,
+                    group = group,
+                    viewModel = groupSettingViewModel
+                )
+            }
+        }
+
+        //社團設定頁面-設定社團-社團背景
+        composable(MainStateHolder.Route.GroupSetting_Setting_Background) {
+            val groupSettingViewModel: GroupSettingViewModel =
+                koinViewModel(owner = mainNavController.previousBackStackEntry!!)
+            val group =
+                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+            group?.let { group ->
+                GroupSettingBackgroundScreen(
                     navController = mainNavController,
                     group = group,
                     viewModel = groupSettingViewModel
