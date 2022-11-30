@@ -10,14 +10,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.extension.showToast
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -40,7 +38,7 @@ fun GroupSettingDescScreen(
     LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
         if (viewModel.uiState.isGroupSettingPop) {
             navController.popBackStack()
-            viewModel.changeNameScreenDone()
+            viewModel.changeGroupInfoScreenDone()
         }
     }
 }
@@ -52,7 +50,6 @@ fun GroupSettingDescView(
     group: Group,
     onChangeDesc: (String) -> Unit
 ) {
-    val context = LocalContext.current
     var textState by remember { mutableStateOf(group.description.orEmpty()) }
     val maxLength = 150
 

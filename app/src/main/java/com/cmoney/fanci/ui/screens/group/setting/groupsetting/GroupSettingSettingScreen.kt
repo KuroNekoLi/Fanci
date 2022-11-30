@@ -92,7 +92,7 @@ fun GroupSettingSettingView(
                     .clickable {
                         KLog.i(TAG, "name click")
                         route.invoke(
-                            MainStateHolder.Route.GroupSettingSettingName(
+                            MainStateHolder.GroupRoute.GroupSettingSettingName(
                                 group = group
                             )
                         )
@@ -137,7 +137,7 @@ fun GroupSettingSettingView(
                     .clickable {
                         KLog.i(TAG, "description click")
                         route.invoke(
-                            MainStateHolder.Route.GroupSettingSettingDesc(group = group)
+                            MainStateHolder.GroupRoute.GroupSettingSettingDesc(group = group)
                         )
                     }
                     .padding(start = 24.dp, end = 24.dp)
@@ -187,9 +187,15 @@ fun GroupSettingSettingView(
             //========== 社團圖示 ==========
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .background(LocalColor.current.background)
-                    .padding(start = 24.dp, end = 24.dp),
+                    .clickable {
+                        KLog.i(TAG, "avatar image click")
+                        route.invoke(
+                            MainStateHolder.GroupRoute.GroupSettingSettingAvatar(group = group)
+                        )
+                    }
+                    .padding(start = 24.dp, end = 24.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -220,9 +226,15 @@ fun GroupSettingSettingView(
             //========== 首頁背景 ==========
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .background(LocalColor.current.background)
-                    .padding(start = 24.dp, end = 24.dp),
+                    .clickable {
+                        KLog.i(TAG, "background image click")
+//                        route.invoke(
+//
+//                        )
+                    }
+                    .padding(start = 24.dp, end = 24.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {

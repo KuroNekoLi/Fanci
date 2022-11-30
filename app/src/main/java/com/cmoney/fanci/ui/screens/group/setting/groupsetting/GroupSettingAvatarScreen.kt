@@ -1,41 +1,52 @@
 package com.cmoney.fanci.ui.screens.group.setting.groupsetting
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.extension.showToast
+import coil.compose.AsyncImage
+import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.common.TransparentButton
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.GroupSettingSettingState
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.rememberGroupSettingSettingState
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.camera.ChooseImagePickDialog
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.socks.library.KLog
 
 @Composable
-fun GroupSettingNameScreen(
+fun GroupSettingAvatarScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     group: Group,
     viewModel: GroupSettingViewModel
 ) {
-    GroupSettingNameView(
-        modifier = modifier,
-        navController = navController, group = group, onChangeName = { name ->
-            viewModel.changeGroupName(name, group)
-        })
+    GroupSettingAvatarView(
+        modifier,
+        navController,
+        isLoading = viewModel.uiState.isLoading,
+        group = group
+    ) {
+        viewModel.changeGroupAvatar(it, group)
+    }
 
     LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
         if (viewModel.uiState.isGroupSettingPop) {
@@ -46,23 +57,22 @@ fun GroupSettingNameScreen(
 }
 
 @Composable
-fun GroupSettingNameView(
+fun GroupSettingAvatarView(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     group: Group,
-    onChangeName: (String) -> Unit
+    state: GroupSettingSettingState = rememberGroupSettingSettingState(),
+    isLoading: Boolean,
+    onImageChange: (Uri) -> Unit
 ) {
-    val context = LocalContext.current
-    var textState by remember { mutableStateOf(group.name.orEmpty()) }
-    val maxLength = 20
-
+    val TAG = "GroupSettingAvatarView"
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
                 navController,
-                title = "社團名稱",
+                title = "社團圖示",
                 leadingEnable = true,
                 moreEnable = false
             )
@@ -80,47 +90,40 @@ fun GroupSettingNameView(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(top = 20.dp, start = 25.dp, end = 25.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "%d/20".format(textState.length),
-                    fontSize = 14.sp,
-                    color = LocalColor.current.text.default_50
-                )
-
-                TextField(
+                AsyncImage(
+                    model = state.onAttachImage.value ?: group.thumbnailImageUrl,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                    value = textState,
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = LocalColor.current.text.default_100,
-                        backgroundColor = LocalColor.current.background,
-                        cursorColor = LocalColor.current.primary,
-                        disabledLabelColor = LocalColor.current.text.default_30,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    onValueChange = {
-                        if (it.length <= maxLength) {
-                            textState = it
-                        }
-                    },
-                    shape = RoundedCornerShape(4.dp),
-                    maxLines = 1,
-                    textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-                    placeholder = {
-                        Text(
-                            text = "填寫專屬於社團的名稱吧!",
-                            fontSize = 16.sp,
-                            color = LocalColor.current.text.default_30
-                        )
-                    }
+                        .size(182.dp)
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(60.dp)),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    placeholder = painterResource(id = R.drawable.resource_default)
                 )
+            }
 
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(45.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
             }
 
             //========== 儲存 ==========
+            TransparentButton(
+                text = "更換圖片"
+            ) {
+                KLog.i(TAG, "button click.")
+                state.openCameraDialog()
+            }
+
+            Spacer(modifier = Modifier.height(50.dp))
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -135,10 +138,9 @@ fun GroupSettingNameView(
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                     onClick = {
-                        if (textState.isEmpty()) {
-                            context.showToast("社團名稱不可以是空白的唷！")
-                        } else {
-                            onChangeName.invoke(textState)
+                        KLog.i(TAG, "on save click.")
+                        state.onAttachImage.value?.let {
+                            onImageChange.invoke(it)
                         }
                     }) {
                     Text(
@@ -148,21 +150,28 @@ fun GroupSettingNameView(
                     )
                 }
             }
+        }
 
+        if (state.openCameraDialog.value) {
+            ChooseImagePickDialog(onDismiss = {
+                state.closeCameraDialog()
+            }) {
+                state.attachImage(it)
+            }
         }
     }
+
 }
+
 
 @Preview(showBackground = true)
 @Composable
-fun GroupSettingNameScreenPreview() {
+fun GroupSettingAvatarScreenPreview() {
     FanciTheme {
-        GroupSettingNameView(
-            group = Group(
-                name = "韓勾ㄟ金針菇討論區",
-                description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
-            ),
-            navController = rememberNavController()
+        GroupSettingAvatarView(
+            navController = rememberNavController(),
+            group = Group(),
+            isLoading = true
         ) {}
     }
 }

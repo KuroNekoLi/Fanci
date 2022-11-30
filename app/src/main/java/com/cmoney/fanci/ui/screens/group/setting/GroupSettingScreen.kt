@@ -110,7 +110,7 @@ private fun groupSettingRouteProcess(
 ) {
     when (route) {
         GroupSetting -> mainRoute.invoke(
-            MainStateHolder.Route.GroupSettingSetting(
+            MainStateHolder.GroupRoute.GroupSettingSetting(
                 group = group
             )
         )

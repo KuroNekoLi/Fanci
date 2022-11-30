@@ -1,15 +1,56 @@
 package com.cmoney.fanci.model.usecase
 
+import android.content.Context
+import android.net.Uri
+import com.cmoney.fanci.BuildConfig
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupMemberApi
 import com.cmoney.fanciapi.fanci.model.EditGroupParam
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.GroupParam
+import com.cmoney.imagelibrary.UploadImage
+import com.cmoney.xlogin.XLoginHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
-class GroupUseCase(private val groupApi: GroupApi, private val groupMemberApi: GroupMemberApi) {
+class GroupUseCase(
+    val context: Context,
+    private val groupApi: GroupApi,
+    private val groupMemberApi: GroupMemberApi
+) {
 
+    /**
+     * 更換 社團縮圖
+     * @param uri 圖片Uri
+     * @param group 社團 model
+     */
+    suspend fun changeGroupAvatar(uri: Uri, group: Group): Flow<String> {
+        return flow {
+//            withContext(Dispatchers.IO) {
+                val uploadImage =
+                    UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
+
+                uploadImage.upload().collect {
+                    val uri = it.first
+                    val imageUrl = it.second
+                    emit(imageUrl)
+
+                    groupApi.apiV1GroupGroupIdPut(
+                        groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
+                            name = group.name.orEmpty(),
+                            description = group.description,
+                            coverImageUrl = group.coverImageUrl,
+                            thumbnailImageUrl = imageUrl
+                        )
+                    )
+                }
+//            }
+        }.flowOn(Dispatchers.IO)
+    }
 
     /**
      * 更換 社團簡介

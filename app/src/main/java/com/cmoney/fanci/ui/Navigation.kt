@@ -23,6 +23,7 @@ import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingAvatarScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingDescScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingNameScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingSettingScreen
@@ -151,6 +152,21 @@ fun MyAppNavHost(
                 )
             }
         }
+
+        //社團設定頁面-設定社團-社團圖示
+        composable(MainStateHolder.Route.GroupSetting_Setting_Avatar) {
+            val groupSettingViewModel: GroupSettingViewModel =
+                koinViewModel(owner = mainNavController.previousBackStackEntry!!)
+            val group =
+                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+            group?.let { group ->
+                GroupSettingAvatarScreen(
+                    navController = mainNavController,
+                    group = group,
+                    viewModel = groupSettingViewModel
+                )
+            }
+        }
     }
 }
 
@@ -197,7 +213,7 @@ fun MainNavHost(
                             },
                             onGroupSettingClick = {
                                 //前往社團設定
-                                route.invoke(MainStateHolder.Route.GroupSetting(group = it))
+                                route.invoke(MainStateHolder.GroupRoute.GroupSetting(group = it))
                             },
                             navController = navController
                         )

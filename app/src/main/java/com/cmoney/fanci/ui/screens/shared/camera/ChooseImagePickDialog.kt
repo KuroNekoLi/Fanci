@@ -9,6 +9,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -67,7 +69,9 @@ fun ChooseImagePickDialog(
 
     val context = LocalContext.current
 
-    AlertDialog(onDismissRequest = { onDismiss.invoke() },
+    AlertDialog(
+        backgroundColor = LocalColor.current.env_80,
+        onDismissRequest = { onDismiss.invoke() },
         //Camera Button
         dismissButton = {
             Button(

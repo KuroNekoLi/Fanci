@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.group.setting.viewmodel
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,10 +14,13 @@ import kotlinx.coroutines.launch
 
 data class GroupSettingUiState(
     val settingGroup: Group? = null,
-    val isGroupSettingPop: Boolean = false
+    val isLoading: Boolean = false,
+    val isGroupSettingPop: Boolean = false,
 )
 
-class GroupSettingViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
+class GroupSettingViewModel(
+    private val groupUseCase: GroupUseCase
+) : ViewModel() {
     private val TAG = GroupSettingViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(GroupSettingUiState())
@@ -79,12 +83,32 @@ class GroupSettingViewModel(private val groupUseCase: GroupUseCase) : ViewModel(
     }
 
     /**
-     * 更換社團名稱 結束
+     * 更換社團info 結束
      */
-    fun changeNameScreenDone() {
+    fun changeGroupInfoScreenDone() {
         uiState = uiState.copy(
             isGroupSettingPop = false
         )
+    }
+
+    /**
+     * 更換社團 頭貼
+     */
+    fun changeGroupAvatar(uri: Uri, group: Group) {
+        viewModelScope.launch {
+            uiState = uiState.copy(
+                isLoading = true
+            )
+            groupUseCase.changeGroupAvatar(uri, group).collect {
+                uiState = uiState.copy(
+                    isLoading = false,
+                    settingGroup = group.copy(
+                        thumbnailImageUrl = it
+                    ),
+                    isGroupSettingPop = true
+                )
+            }
+        }
     }
 
 }
