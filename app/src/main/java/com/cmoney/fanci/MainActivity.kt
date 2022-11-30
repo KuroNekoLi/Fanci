@@ -13,12 +13,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.MainNavHost
 import com.cmoney.fanci.ui.MyAppNavHost
 import com.cmoney.fanci.ui.screens.BottomBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.loginlibrary.module.variable.loginlibraryenum.ApiAction
 import com.cmoney.loginlibrary.module.variable.loginlibraryenum.EventCode
 import com.cmoney.loginlibrary.view.base.LoginLibraryMainActivity
@@ -26,6 +28,8 @@ import com.cmoney.xlogin.XLoginHelper
 import com.cmoney.xlogin.base.BaseLoginAppCompactActivity
 import com.socks.library.KLog
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 @Parcelize
@@ -47,7 +51,7 @@ class MainActivity : BaseLoginAppCompactActivity() {
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colors.background),
+                        .background(LocalColor.current.primary),
                 ) {
                     mainState.setStatusBarColor()
                     MyAppNavHost(

@@ -108,7 +108,8 @@ private fun MainTheme(
     ) {
         MaterialTheme(
             colors = MaterialTheme.colors.copy(
-                primary = fanciColor.env_100
+                primary = fanciColor.env_100,
+                background = fanciColor.env_100
             ),
             content = content,
             typography = Typography,

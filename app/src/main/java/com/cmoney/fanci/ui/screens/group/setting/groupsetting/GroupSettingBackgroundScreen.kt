@@ -28,7 +28,7 @@ import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.GroupSetting
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.rememberGroupSettingSettingState
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
-import com.cmoney.fanci.ui.screens.shared.camera.ChooseImagePickDialog
+import com.cmoney.fanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
@@ -177,9 +177,11 @@ fun GroupSettingBackgroundView(
         }
 
         if (state.openCameraDialog.value) {
-            ChooseImagePickDialog(onDismiss = {
-                state.closeCameraDialog()
-            }) {
+            GroupPhotoPickDialogScreen(
+                onDismiss = {
+                    state.closeCameraDialog()
+                }
+            ) {
                 state.setBackgroundImage(it)
             }
         }

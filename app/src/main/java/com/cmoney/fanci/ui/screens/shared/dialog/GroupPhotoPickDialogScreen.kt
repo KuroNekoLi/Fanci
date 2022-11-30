@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.shared.camera
+package com.cmoney.fanci.ui.screens.shared.dialog
 
 import android.Manifest
 import android.app.Activity
@@ -9,25 +9,20 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
-import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingAvatarView
+import com.cmoney.fanci.ui.common.GrayButton
 import com.cmoney.fanci.ui.theme.FanciTheme
-import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -35,15 +30,16 @@ import com.socks.library.KLog
 import java.io.File
 
 /**
- * 附加圖片 Dialog
+ * 群組設定選擇圖片 彈窗
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun ChooseImagePickDialog(
+fun GroupPhotoPickDialogScreen(
+    modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     onAttach: (Uri) -> Unit,
 ) {
-    val TAG = "chooseImagePickDialog"
+    val TAG = "GroupPhotoPickDialogScreen"
 
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
 
@@ -74,16 +70,39 @@ fun ChooseImagePickDialog(
 
     val context = LocalContext.current
 
-    AlertDialog(
-        backgroundColor = LocalColor.current.env_80,
-        onDismissRequest = { onDismiss.invoke() },
-        //Camera Button
-        dismissButton = {
-            Button(
-                modifier = Modifier
-                    .padding(start = 10.dp, top = 10.dp, end = 10.dp)
-                    .fillMaxWidth(),
-                onClick = {
+    Dialog(onDismissRequest = {
+        onDismiss()
+    }) {
+        Surface(
+            modifier = modifier.fillMaxSize(),
+            color = Color.Transparent
+        ) {
+            Column(
+                modifier = Modifier.padding(bottom = 25.dp),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                GrayButton(
+                    text = "從相簿中選取圖片",
+                    shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+                ) {
+                    if (externalPermissionState.status.isGranted) {
+                        val intent =
+                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                        intent.setDataAndType(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            "image/*"
+                        )
+                        choosePhotoResult.launch(intent)
+                    } else {
+                        externalPermissionState.launchPermissionRequest()
+                    }
+                }
+
+                GrayButton(
+                    text = "打開相機",
+                    shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                ) {
                     if (cameraPermissionState.status.isGranted) {
                         if (captureUri == null) {
                             captureUri = getCaptureUri(context)
@@ -97,33 +116,18 @@ fun ChooseImagePickDialog(
                     } else {
                         cameraPermissionState.launchPermissionRequest()
                     }
-                }) {
-                Text("打開相機", fontSize = 17.sp, color = Color.White)
-            }
-        },
-        //Image Picker Button
-        confirmButton = {
-            Button(
-                modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-                    .fillMaxWidth(),
-                onClick = {
-                    if (externalPermissionState.status.isGranted) {
-                        val intent =
-                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                        intent.setDataAndType(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            "image/*"
-                        )
-                        choosePhotoResult.launch(intent)
-                    } else {
-                        externalPermissionState.launchPermissionRequest()
-                    }
-                }) {
-                Text("從相簿中選取圖片", fontSize = 17.sp, color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                GrayButton(
+                    text = "返回"
+                ) {
+                    onDismiss()
+                }
             }
         }
-    )
+    }
 }
 
 private var captureUri: Uri? = null //Camera result callback
@@ -140,10 +144,10 @@ private fun getCaptureUri(context: Context): Uri {
 
 @Preview(showBackground = true)
 @Composable
-fun ChooseImagePickDialogPreview() {
+fun GroupPhotoPickDialogScreenPreview() {
     FanciTheme {
-        ChooseImagePickDialog(
+        GroupPhotoPickDialogScreen(
             onDismiss = {}
-        ){}
+        ) {}
     }
 }

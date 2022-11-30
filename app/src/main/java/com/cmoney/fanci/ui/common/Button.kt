@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -69,5 +70,34 @@ fun BlueButton(text: String, onClick: () -> Unit) {
 fun BlueButtonPreview() {
     FanciTheme {
         BlueButton(text = "Hello") {}
+    }
+}
+
+@Composable
+fun GrayButton(text: String,
+               shape: RoundedCornerShape = RoundedCornerShape(15),
+               onClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        shape = shape,
+        colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.env_80),
+        onClick = {
+            onClick.invoke()
+        }) {
+        Text(
+            text = text,
+            color = LocalColor.current.text.other,
+            fontSize = 16.sp
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GrayButtonPreview() {
+    FanciTheme {
+        GrayButton(text = "Hello") {}
     }
 }
