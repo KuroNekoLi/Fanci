@@ -27,6 +27,7 @@ import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.*
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib.FanciDefaultAvatarScreen
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib.FanciDefaultCoverScreen
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
@@ -114,7 +115,8 @@ fun MyAppNavHost(
 
         //社團設定頁面-設定社團
         composable(MainStateHolder.Route.GroupSetting_Setting) {
-            val groupSettingViewModel: GroupSettingViewModel = koinViewModel(owner = viewModelStoreOwner)
+            val groupSettingViewModel: GroupSettingViewModel =
+                koinViewModel(owner = viewModelStoreOwner)
             val group =
                 mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
             group?.let { group ->
@@ -191,7 +193,8 @@ fun MyAppNavHost(
                     GroupSettingBackgroundScreen(
                         navController = mainNavController,
                         group = group,
-                        viewModel = koinViewModel()
+                        viewModel = koinViewModel(),
+                        route = route
                     )
                 }
             }
@@ -213,6 +216,24 @@ fun MyAppNavHost(
                 }
             }
         }
+
+        //社團設定頁面-設定社團-社團背景-Fanci預設
+        composable(MainStateHolder.Route.GroupSetting_Setting_Background_Fanci) {
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                val group =
+                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+                group?.let { group ->
+                    FanciDefaultCoverScreen(
+                        navController = mainNavController,
+                        group = group,
+                        viewModel = koinViewModel()
+                    )
+                }
+            }
+        }
+
     }
 }
 

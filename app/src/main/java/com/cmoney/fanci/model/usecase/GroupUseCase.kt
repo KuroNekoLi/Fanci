@@ -46,16 +46,23 @@ class GroupUseCase(
      * @param uri 圖片Uri
      * @param group 社團 model
      */
-    suspend fun changeGroupBackground(uri: Uri, group: Group): Flow<String> {
+    suspend fun changeGroupBackground(uri: Any, group: Group): Flow<String> {
         return flow {
-            val uploadImage =
-                UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
+            var imageUrl = ""
+            if (uri is Uri) {
+                val uploadImage =
+                    UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
 
-            uploadImage.upload().collect {
-                val uri = it.first
-                val imageUrl = it.second
+                val uploadResult = uploadImage.upload().first()
+                val uri = uploadResult.first
+                imageUrl = uploadResult.second
                 emit(imageUrl)
+            } else if (uri is String) {
+                imageUrl = uri
+                emit(uri)
+            }
 
+            if (imageUrl.isNotEmpty()) {
                 groupApi.apiV1GroupGroupIdPut(
                     groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
                         name = group.name.orEmpty(),

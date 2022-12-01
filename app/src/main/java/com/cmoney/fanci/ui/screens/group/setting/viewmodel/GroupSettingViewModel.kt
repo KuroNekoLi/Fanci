@@ -17,6 +17,7 @@ data class GroupSettingUiState(
     val isLoading: Boolean = false,
     val isGroupSettingPop: Boolean = false,
     val groupAvatarLib: List<String> = emptyList(),  //群組 預設大頭貼 清單
+    val groupCoverLib: List<String> = emptyList(),  //群組 預設背景 清單
 )
 
 class GroupSettingViewModel(
@@ -105,7 +106,7 @@ class GroupSettingViewModel(
     /**
      * 更換 社團 背景圖
      */
-    fun changeGroupCover(uri: Uri, group: Group) {
+    fun changeGroupCover(uri: Any, group: Group) {
         KLog.i(TAG, "changeGroupCover")
         viewModelScope.launch {
             loading()
@@ -139,6 +140,24 @@ class GroupSettingViewModel(
         }
     }
 
+    /**
+     * 抓取 預設背景 清單
+     */
+    fun fetchFanciCoverLib() {
+        KLog.i(TAG, "fetchFanciCoverLib")
+        viewModelScope.launch {
+            loading()
+            groupUseCase.fetchGroupCoverLib().fold({
+                uiState = uiState.copy(
+                    groupCoverLib = it,
+                    isLoading = false
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
     private fun loading() {
         uiState = uiState.copy(
             isLoading = true
@@ -153,6 +172,18 @@ class GroupSettingViewModel(
         uiState = uiState.copy(
             settingGroup = group.copy(
                 thumbnailImageUrl = url
+            )
+        )
+    }
+
+    /**
+     * Usr 選擇的 預設 背景
+     */
+    fun onGroupCoverSelect(url: String, group: Group) {
+        KLog.i(TAG, "onGroupCoverSelect:$url")
+        uiState = uiState.copy(
+            settingGroup = group.copy(
+                coverImageUrl = url
             )
         )
     }

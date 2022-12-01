@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.common.TransparentButton
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.GroupSettingSettingState
@@ -39,13 +40,17 @@ fun GroupSettingBackgroundScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     group: Group,
-    viewModel: GroupSettingViewModel
+    viewModel: GroupSettingViewModel,
+    route: (MainStateHolder.Route) -> Unit
 ) {
+    val state = viewModel.uiState
+
     GroupSettingBackgroundView(
         modifier,
         navController,
         isLoading = viewModel.uiState.isLoading,
-        group = group
+        group = state.settingGroup ?: group,
+        route = route
     ) {
         viewModel.changeGroupCover(it, group)
     }
@@ -65,7 +70,8 @@ fun GroupSettingBackgroundView(
     group: Group,
     state: GroupSettingSettingState = rememberGroupSettingSettingState(),
     isLoading: Boolean,
-    onImageChange: (Uri) -> Unit
+    route: (MainStateHolder.Route) -> Unit,
+    onImageChange: (Any) -> Unit
 ) {
     val TAG = "GroupSettingAvatarView"
     val configuration = LocalConfiguration.current
@@ -165,6 +171,8 @@ fun GroupSettingBackgroundView(
                         KLog.i(TAG, "on save click.")
                         state.coverImageUrl.value?.let {
                             onImageChange.invoke(it)
+                        } ?: kotlin.run {
+                            onImageChange.invoke(group.coverImageUrl.orEmpty())
                         }
                     }) {
                     Text(
@@ -185,7 +193,11 @@ fun GroupSettingBackgroundView(
                     state.setBackgroundImage(it)
                 },
                 onFanciClick = {
-                    // TODO:  
+                    route.invoke(
+                        MainStateHolder.GroupRoute.GroupSettingSettingCoverFanci(
+                            group = group
+                        )
+                    )
                 }
             )
         }
@@ -201,7 +213,8 @@ fun GroupSettingBackgroundPreview() {
         GroupSettingBackgroundView(
             navController = rememberNavController(),
             group = Group(),
-            isLoading = true
+            isLoading = true,
+            route = {}
         ) {}
     }
 }

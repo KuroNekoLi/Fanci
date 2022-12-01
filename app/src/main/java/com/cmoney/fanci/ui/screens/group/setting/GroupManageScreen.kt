@@ -24,6 +24,7 @@ fun GroupManageScreen(
     modifier: Modifier = Modifier,
     onItemClick: (GroupSettingRoute) -> Unit
 ) {
+
     Column(
         modifier = modifier
     ) {
