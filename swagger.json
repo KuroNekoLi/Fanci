@@ -953,6 +953,36 @@
         ]
       }
     },
+    "/api/v1/DefaultImage": {
+      "get": {
+        "tags": [
+          "DefaultImage"
+        ],
+        "summary": "取得預設圖片",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultImageResource"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultImageResource"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultImageResource"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Group": {
       "get": {
         "tags": [
@@ -1275,6 +1305,48 @@
             ]
           }
         ]
+      }
+    },
+    "/api/v1/Group/{groupId}/ColorScheme/{colorSchemeGroupKey}": {
+      "put": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "編輯社團資訊",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "colorSchemeGroupKey",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        }
       }
     },
     "/api/v1/Group/{groupId}/Category": {
@@ -2360,6 +2432,93 @@
         ]
       }
     },
+    "/api/v1/Message/role/{messageId}": {
+      "delete": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "角色刪除他人訊息 __________🔒 刪除他人訊息",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_刪除他人訊息_0_messageId_messageSpaceResolver"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Message/me/{messageId}": {
+      "delete": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "收回我的訊息 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限(代表不是自己發的訊息)"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/Message/{messageId}/Emoji": {
       "put": {
         "tags": [
@@ -2818,6 +2977,54 @@
         ]
       }
     },
+    "/api/v1/ThemeColor": {
+      "get": {
+        "tags": [
+          "ThemeColor"
+        ],
+        "summary": "取得所有主題色卡包",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Color"
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Color"
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Color"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/User/{id}": {
       "get": {
         "tags": [
@@ -3163,7 +3370,12 @@
             "nullable": true
           },
           "isDeleted": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "是否刪除"
+          },
+          "myProperty": {
+            "type": "integer",
+            "format": "int32"
           },
           "createUnixTime": {
             "type": "integer",
@@ -3182,6 +3394,12 @@
           },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
+          },
+          "deleteStatus": {
+            "$ref": "#/components/schemas/DeleteStatus"
+          },
+          "deleteFrom": {
+            "$ref": "#/components/schemas/GroupMember"
           }
         },
         "additionalProperties": false
@@ -3233,13 +3451,58 @@
         },
         "additionalProperties": false
       },
-      "EditChannelParam": {
+      "Color": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "description": "頻道名稱",
             "nullable": true
+          },
+          "hexColorCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "transparency": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DefaultImageResource": {
+        "type": "object",
+        "properties": {
+          "defaultImages": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeleteStatus": {
+        "enum": [
+          "None",
+          "Deleted",
+          "TakeBack"
+        ],
+        "type": "string"
+      },
+      "EditChannelParam": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "頻道名稱"
           }
         },
         "additionalProperties": false,
@@ -3314,6 +3577,10 @@
               "type": "string"
             },
             "nullable": true
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3382,6 +3649,11 @@
             "type": "integer",
             "description": "會員總數",
             "format": "int32"
+          },
+          "colorSchemeGroupKey": {
+            "type": "string",
+            "description": "社團的顏色包",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -3856,6 +4128,19 @@
         "additionalProperties": false,
         "description": "公告訊息資訊"
       },
+      "RoleColor": {
+        "enum": [
+          "紅",
+          "橘",
+          "黃",
+          "綠",
+          "藍綠",
+          "藍",
+          "紫",
+          "粉"
+        ],
+        "type": "string"
+      },
       "RoleParam": {
         "type": "object",
         "properties": {
@@ -3871,6 +4156,9 @@
             },
             "description": "Fanci權限ID清單\r\n參考 /api/v1/Permission 清單內容",
             "nullable": true
+          },
+          "color": {
+            "$ref": "#/components/schemas/RoleColor"
           }
         },
         "additionalProperties": false,

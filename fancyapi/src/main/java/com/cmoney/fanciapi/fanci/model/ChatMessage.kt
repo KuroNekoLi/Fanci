@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
@@ -33,12 +34,15 @@ import kotlinx.parcelize.Parcelize
  * @param content 
  * @param emojiCount 
  * @param id 
- * @param isDeleted 
+ * @param isDeleted 是否刪除
+ * @param myProperty 
  * @param createUnixTime 
  * @param updateUnixTime 
  * @param serialNumber 
  * @param messageType 
  * @param messageReaction 
+ * @param deleteStatus 
+ * @param deleteFrom 
  */
 @Parcelize
 
@@ -60,8 +64,12 @@ data class ChatMessage (
     @Json(name = "id")
     val id: kotlin.String? = null,
 
+    /* 是否刪除 */
     @Json(name = "isDeleted")
     val isDeleted: kotlin.Boolean? = null,
+
+    @Json(name = "myProperty")
+    val myProperty: kotlin.Int? = null,
 
     @Json(name = "createUnixTime")
     val createUnixTime: kotlin.Long? = null,
@@ -76,7 +84,13 @@ data class ChatMessage (
     val messageType: MessageType? = null,
 
     @Json(name = "messageReaction")
-    val messageReaction: IUserMessageReaction? = null
+    val messageReaction: IUserMessageReaction? = null,
+
+    @Json(name = "deleteStatus")
+    val deleteStatus: DeleteStatus? = null,
+
+    @Json(name = "deleteFrom")
+    val deleteFrom: GroupMember? = null
 
 ) : Parcelable
 

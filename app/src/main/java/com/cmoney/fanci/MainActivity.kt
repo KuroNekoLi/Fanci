@@ -1,19 +1,15 @@
 package com.cmoney.fanci
 
 import android.os.Bundle
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.MainNavHost
@@ -28,15 +24,14 @@ import com.cmoney.xlogin.XLoginHelper
 import com.cmoney.xlogin.base.BaseLoginAppCompactActivity
 import com.socks.library.KLog
 import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.koinViewModel
 
 @Parcelize
 class MainActivity : BaseLoginAppCompactActivity() {
     private val TAG = MainActivity::class.java.simpleName
 
-    val viewModel by inject<MainViewModel>()
+    val globalViewModel by inject<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,7 +40,7 @@ class MainActivity : BaseLoginAppCompactActivity() {
         }
 
         setContent {
-            val theme = viewModel.theme.observeAsState()
+            val theme = globalViewModel.theme.observeAsState()
             FanciTheme(themeSetting = theme.value ?: ThemeSetting.Default) {
                 val mainState = rememberMainState()
                 Scaffold(
@@ -57,9 +52,10 @@ class MainActivity : BaseLoginAppCompactActivity() {
                     MyAppNavHost(
                         mainState.navController,
                         mainState.mainNavController,
-                        mainState.route
+                        mainState.route,
+                        globalViewModel
                     ) {
-                        viewModel.settingTheme(it)
+                        globalViewModel.settingTheme(it)
                     }
                 }
             }
@@ -99,7 +95,7 @@ class MainActivity : BaseLoginAppCompactActivity() {
 
     override fun loginSuccessCallback() {
         KLog.i(TAG, "loginSuccessCallback")
-        viewModel.registerUser()
+        globalViewModel.registerUser()
     }
 }
 
@@ -107,7 +103,8 @@ class MainActivity : BaseLoginAppCompactActivity() {
 fun MainScreen(
     mainNavController: NavHostController,
     route: (MainStateHolder.Route) -> Unit,
-    theme: (ThemeSetting) -> Unit
+    theme: (ThemeSetting) -> Unit,
+    globalViewModel: MainViewModel
 ) {
     Scaffold(
         bottomBar = {
@@ -118,7 +115,8 @@ fun MainScreen(
             navController = mainNavController,
             modifier = Modifier.padding(innerPadding),
             route = route,
-            theme = theme
+            theme = theme,
+            globalViewModel = globalViewModel
         )
     }
 }
@@ -127,7 +125,7 @@ fun MainScreen(
 @Composable
 fun HomeScreenPreview() {
     FanciTheme {
-        MainScreen(rememberNavController(), route = {}) {
-        }
+        MainScreen(rememberNavController(), route = {}, {
+        }, koinViewModel())
     }
 }

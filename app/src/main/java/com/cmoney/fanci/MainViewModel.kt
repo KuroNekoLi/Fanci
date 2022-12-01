@@ -1,12 +1,14 @@
 package com.cmoney.fanci
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanci.model.usecase.UserUseCase
-import com.cmoney.fanci.ui.screens.follow.model.GroupItem
+import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -15,28 +17,19 @@ sealed class ThemeSetting {
     object Coffee : ThemeSetting()
 }
 
-class MainViewModel(private val groupUseCase: GroupUseCase, private val userUseCase: UserUseCase) :
+data class UiState(
+    val currentGroup: Group? = null //目前選擇中的社團
+)
+
+class MainViewModel(private val userUseCase: UserUseCase) :
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
     private val _theme = MutableLiveData<ThemeSetting>(ThemeSetting.Default)
     val theme: LiveData<ThemeSetting> = _theme
 
-    private val _groupList = MutableLiveData<List<GroupItem>>()
-    val groupList: LiveData<List<GroupItem>> = _groupList
-
-    init {
-        viewModelScope.launch {
-            groupUseCase.groupToSelectGroupItem().fold({
-                if (it.isNotEmpty()) {
-                    //所有群組
-                    _groupList.value = it
-                }
-            }, {
-                KLog.e(TAG, it)
-            })
-        }
-    }
+    var uiState by mutableStateOf(UiState())
+        private set
 
     fun setCoffeeTheme() {
         KLog.i(TAG, "setCoffeeTheme")
@@ -56,5 +49,14 @@ class MainViewModel(private val groupUseCase: GroupUseCase, private val userUseC
         viewModelScope.launch {
             userUseCase.registerUser()
         }
+    }
+
+    /**
+     * 設定 目前所選的社團
+     */
+    fun setCurrentGroup(group: Group) {
+        uiState = uiState.copy(
+            currentGroup = group
+        )
     }
 }

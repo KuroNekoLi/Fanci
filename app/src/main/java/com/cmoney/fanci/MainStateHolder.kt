@@ -53,6 +53,9 @@ class MainStateHolder(
             is GroupRoute.GroupSettingSettingBackground -> {
                 navigateWithGroup(it)
             }
+            is GroupRoute.GroupSettingSettingAvatarFanci -> {
+                navigateWithGroup(it)
+            }
         }
     }
 
@@ -93,6 +96,8 @@ class MainStateHolder(
                 "GroupSetting_Setting_Avatar" //社團設定 -> 社團設定 -> 社團圖示
             const val GroupSetting_Setting_Background =
                 "GroupSetting_Setting_Background" //社團設定 -> 社團設定 -> 社團背景
+            const val GroupSetting_Setting_Avatar_Fanci =
+                "GroupSetting_Setting_Avatar_Fanci" //社團設定 -> 社團設定 -> 社團背景 -> Fanci預設
         }
 
         data class Channel(
@@ -144,6 +149,11 @@ class MainStateHolder(
 
         data class GroupSettingSettingDesc(
             override val route: String = GroupSetting_Setting_Desc,
+            override val group: Group
+        ) : GroupRoute()
+
+        data class GroupSettingSettingAvatarFanci(
+            override val route: String = GroupSetting_Setting_Avatar_Fanci,
             override val group: Group
         ) : GroupRoute()
     }

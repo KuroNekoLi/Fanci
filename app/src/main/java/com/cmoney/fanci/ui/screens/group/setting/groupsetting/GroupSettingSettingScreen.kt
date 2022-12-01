@@ -18,10 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.cmoney.fanci.MainStateHolder
+import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -29,7 +29,6 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
-import org.koin.androidx.compose.koinViewModel
 
 const val GroupSettingBundleKey = "GroupSettingBundleKey"
 
@@ -42,11 +41,13 @@ fun GroupSettingSettingScreen(
     navController: NavHostController,
     group: Group,
     route: (MainStateHolder.Route) -> Unit,
-    viewModel: GroupSettingViewModel
+    viewModel: GroupSettingViewModel,
+    globalViewModel: MainViewModel
 ) {
     var groupParam = group
     viewModel.uiState.settingGroup?.let {
         groupParam = it
+        globalViewModel.setCurrentGroup(it)
     }
 
     GroupSettingSettingView(

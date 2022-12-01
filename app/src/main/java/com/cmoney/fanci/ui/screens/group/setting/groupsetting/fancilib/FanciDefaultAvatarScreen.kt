@@ -1,0 +1,119 @@
+package com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
+import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanciapi.fanci.model.Group
+import com.socks.library.KLog
+
+@Composable
+fun FanciDefaultAvatarScreen(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    group: Group,
+    viewModel: GroupSettingViewModel
+) {
+    val TAG = "FanciDefaultAvatarScreen"
+    val state = viewModel.uiState
+
+    FanciDefaultAvatarView(
+        modifier = modifier,
+        navController = navController,
+        imageUrl = state.groupAvatarLib,
+        isLoading = state.isLoading
+    ){
+        KLog.i(TAG, "image click:$it")
+        viewModel.onGroupAvatarSelect(it, group)
+        navController.popBackStack()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchFanciAvatarLib()
+    }
+}
+
+@Composable
+fun FanciDefaultAvatarView(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    imageUrl: List<String>,
+    isLoading: Boolean = false,
+    onImageClick: (String) -> Unit
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        scaffoldState = rememberScaffoldState(),
+        topBar = {
+            TopBarScreen(
+                navController,
+                title = "Fanci圖庫",
+                leadingEnable = true,
+                moreEnable = false
+            )
+        }
+    ) { innerPadding ->
+
+        Column {
+            LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+                items(imageUrl.size) { index ->
+                    val imageUrl = imageUrl[index]
+                    AsyncImage(
+                        model = imageUrl,
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clickable {
+                                onImageClick.invoke(imageUrl)
+                            },
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        placeholder = painterResource(id = R.drawable.resource_default)
+                    )
+                }
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(45.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+        }
+
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FanciDefaultAvatarScreenPreview() {
+    FanciTheme {
+        FanciDefaultAvatarView(
+            navController = rememberNavController(),
+            imageUrl = listOf("1", "2", "3", "4")
+        ) {
+            
+        }
+    }
+}

@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import com.cmoney.fanci.MainActivity
 import com.cmoney.fanci.ThemeSetting
-import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.InteractBottomSheet
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
@@ -27,7 +26,7 @@ fun Activity.showInteractDialogBottomSheet(
         viewGroup.addView(
             ComposeView(viewGroup.context).apply {
                 setContent {
-                    val theme = viewModel.theme.observeAsState()
+                    val theme = globalViewModel.theme.observeAsState()
                     FanciTheme(themeSetting = theme.value ?: ThemeSetting.Default) {
                         InteractBottomSheet(viewGroup, this, message, onInteractClick)
                     }

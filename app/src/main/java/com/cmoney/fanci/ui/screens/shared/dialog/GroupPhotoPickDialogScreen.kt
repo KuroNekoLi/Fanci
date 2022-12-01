@@ -38,6 +38,7 @@ fun GroupPhotoPickDialogScreen(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     onAttach: (Uri) -> Unit,
+    onFanciClick: () -> Unit
 ) {
     val TAG = "GroupPhotoPickDialogScreen"
 
@@ -101,7 +102,7 @@ fun GroupPhotoPickDialogScreen(
 
                 GrayButton(
                     text = "打開相機",
-                    shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                    shape = RoundedCornerShape(0.dp)
                 ) {
                     if (cameraPermissionState.status.isGranted) {
                         if (captureUri == null) {
@@ -116,6 +117,13 @@ fun GroupPhotoPickDialogScreen(
                     } else {
                         cameraPermissionState.launchPermissionRequest()
                     }
+                }
+
+                GrayButton(
+                    text = "從Fanci圖庫中選取圖片",
+                    shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                ) {
+                    onFanciClick.invoke()
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -147,7 +155,8 @@ private fun getCaptureUri(context: Context): Uri {
 fun GroupPhotoPickDialogScreenPreview() {
     FanciTheme {
         GroupPhotoPickDialogScreen(
-            onDismiss = {}
+            onDismiss = {},
+            onAttach = {}
         ) {}
     }
 }

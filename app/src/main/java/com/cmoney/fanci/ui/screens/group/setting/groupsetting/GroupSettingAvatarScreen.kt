@@ -20,13 +20,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.common.TransparentButton
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.GroupSettingSettingState
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.rememberGroupSettingSettingState
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
-import com.cmoney.fanci.ui.screens.shared.camera.ChooseImagePickDialog
 import com.cmoney.fanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -38,16 +38,23 @@ fun GroupSettingAvatarScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     group: Group,
-    viewModel: GroupSettingViewModel
+    viewModel: GroupSettingViewModel,
+    route: (MainStateHolder.Route) -> Unit
 ) {
+    val state = viewModel.uiState
+
+    KLog.i("GroupSettingAvatarScreen", "settingGroup:" + state.settingGroup?.toString())
+
     GroupSettingAvatarView(
         modifier,
         navController,
         isLoading = viewModel.uiState.isLoading,
-        group = group
-    ) {
-        viewModel.changeGroupAvatar(it, group)
-    }
+        group = state.settingGroup ?: group,
+        route = route,
+        onImageChange = {
+            viewModel.changeGroupAvatar(it, group)
+        }
+    )
 
     LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
         if (viewModel.uiState.isGroupSettingPop) {
@@ -64,7 +71,8 @@ fun GroupSettingAvatarView(
     group: Group,
     state: GroupSettingSettingState = rememberGroupSettingSettingState(),
     isLoading: Boolean,
-    onImageChange: (Uri) -> Unit
+    onImageChange: (Any) -> Unit,
+    route: (MainStateHolder.Route) -> Unit
 ) {
     val TAG = "GroupSettingAvatarView"
     Scaffold(
@@ -139,9 +147,11 @@ fun GroupSettingAvatarView(
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                     onClick = {
-                        KLog.i(TAG, "on save click.")
+                        KLog.i(TAG, "on image save click.")
                         state.avatarImage.value?.let {
                             onImageChange.invoke(it)
+                        } ?: kotlin.run {
+                            onImageChange.invoke(group.thumbnailImageUrl.orEmpty())
                         }
                     }) {
                     Text(
@@ -157,10 +167,21 @@ fun GroupSettingAvatarView(
             GroupPhotoPickDialogScreen(
                 onDismiss = {
                     state.closeCameraDialog()
+                },
+                onAttach = {
+                    KLog.i(TAG, "onAttach click.")
+                    state.setAvatarImage(it)
+                },
+                onFanciClick = {
+                    KLog.i(TAG, "onFanciClick")
+                    state.closeCameraDialog()
+                    route.invoke(
+                        MainStateHolder.GroupRoute.GroupSettingSettingAvatarFanci(
+                            group = group
+                        )
+                    )
                 }
-            ) {
-                state.setAvatarImage(it)
-            }
+            )
         }
     }
 
@@ -174,7 +195,9 @@ fun GroupSettingAvatarScreenPreview() {
         GroupSettingAvatarView(
             navController = rememberNavController(),
             group = Group(),
-            isLoading = true
-        ) {}
+            isLoading = true,
+            onImageChange = {},
+            route = {}
+        )
     }
 }

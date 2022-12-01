@@ -36,6 +36,7 @@ import kotlinx.parcelize.Parcelize
  * @param createUnixTime 創立時間
  * @param updateUnixTime 更新時間
  * @param memberCount 會員總數
+ * @param colorSchemeGroupKey 社團的顏色包
  */
 @Parcelize
 
@@ -88,7 +89,11 @@ data class Group (
 
     /* 會員總數 */
     @Json(name = "memberCount")
-    val memberCount: kotlin.Int? = null
+    val memberCount: kotlin.Int? = null,
+
+    /* 社團的顏色包 */
+    @Json(name = "colorSchemeGroupKey")
+    val colorSchemeGroupKey: kotlin.String? = null
 
 ) : Parcelable
 

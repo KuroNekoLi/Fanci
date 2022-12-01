@@ -180,10 +180,14 @@ fun GroupSettingBackgroundView(
             GroupPhotoPickDialogScreen(
                 onDismiss = {
                     state.closeCameraDialog()
+                },
+                onAttach = {
+                    state.setBackgroundImage(it)
+                },
+                onFanciClick = {
+                    // TODO:  
                 }
-            ) {
-                state.setBackgroundImage(it)
-            }
+            )
         }
     }
 

@@ -12,6 +12,22 @@ import com.cmoney.fanciapi.fanci.model.EmojiParam
 
 interface MessageApi {
     /**
+     * 收回我的訊息 __________🔒 已註冊的fanci使用者
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: 未驗證
+     *  - 403: 沒有權限(代表不是自己發的訊息)
+     *  - 204: 成功
+     *  - 404: 找不到訊息
+     *
+     * @param messageId 訊息Id
+     * @return [Unit]
+     */
+    @DELETE("api/v1/Message/me/{messageId}")
+    suspend fun apiV1MessageMeMessageIdDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
+
+    /**
      * 收回表情符號 __________🔒 可看
      * 
      * Responses:
@@ -72,5 +88,21 @@ interface MessageApi {
      */
     @PUT("api/v1/Message/{messageId}")
     suspend fun apiV1MessageMessageIdPut(@Path("messageId") messageId: kotlin.String, @Body chatMessageParam: ChatMessageParam? = null): Response<Unit>
+
+    /**
+     * 角色刪除他人訊息 __________🔒 刪除他人訊息
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 204: 成功
+     *  - 404: 找不到訊息
+     *
+     * @param messageId 訊息Id
+     * @return [Unit]
+     */
+    @DELETE("api/v1/Message/role/{messageId}")
+    suspend fun apiV1MessageRoleMessageIdDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
 
 }

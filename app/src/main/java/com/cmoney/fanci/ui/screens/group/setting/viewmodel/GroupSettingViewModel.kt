@@ -16,6 +16,7 @@ data class GroupSettingUiState(
     val settingGroup: Group? = null,
     val isLoading: Boolean = false,
     val isGroupSettingPop: Boolean = false,
+    val groupAvatarLib: List<String> = emptyList(),  //群組 預設大頭貼 清單
 )
 
 class GroupSettingViewModel(
@@ -56,15 +57,6 @@ class GroupSettingViewModel(
      */
     fun changeGroupName(name: String, group: Group) {
         KLog.i(TAG, "changeGroupNameL$name")
-
-        //test
-//        uiState = uiState.copy(
-//            settingGroup = group.copy(
-//                name = name
-//            ),
-//            isGroupSettingNamePop = true
-//        )
-
         viewModelScope.launch {
             groupUseCase.changeGroupName(name, group).fold({
             }, {
@@ -94,12 +86,10 @@ class GroupSettingViewModel(
     /**
      * 更換社團 頭貼
      */
-    fun changeGroupAvatar(uri: Uri, group: Group) {
+    fun changeGroupAvatar(uri: Any, group: Group) {
         KLog.i(TAG, "changeGroupAvatar")
         viewModelScope.launch {
-            uiState = uiState.copy(
-                isLoading = true
-            )
+            loading()
             groupUseCase.changeGroupAvatar(uri, group).collect {
                 uiState = uiState.copy(
                     isLoading = false,
@@ -118,9 +108,7 @@ class GroupSettingViewModel(
     fun changeGroupCover(uri: Uri, group: Group) {
         KLog.i(TAG, "changeGroupCover")
         viewModelScope.launch {
-            uiState = uiState.copy(
-                isLoading = true
-            )
+            loading()
             groupUseCase.changeGroupBackground(uri, group).collect {
                 uiState = uiState.copy(
                     isLoading = false,
@@ -131,6 +119,42 @@ class GroupSettingViewModel(
                 )
             }
         }
+    }
+
+    /**
+     * 抓取 預設大頭貼 清單
+     */
+    fun fetchFanciAvatarLib() {
+        KLog.i(TAG, "fetchFanciAvatarLib")
+        viewModelScope.launch {
+            loading()
+            groupUseCase.fetchGroupAvatarLib().fold({
+                uiState = uiState.copy(
+                    groupAvatarLib = it,
+                    isLoading = false
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    private fun loading() {
+        uiState = uiState.copy(
+            isLoading = true
+        )
+    }
+
+    /**
+     * Usr 選擇的 預設 大頭貼
+     */
+    fun onGroupAvatarSelect(url: String, group: Group) {
+        KLog.i(TAG, "onGroupAvatarSelect:$url")
+        uiState = uiState.copy(
+            settingGroup = group.copy(
+                thumbnailImageUrl = url
+            )
+        )
     }
 
 }

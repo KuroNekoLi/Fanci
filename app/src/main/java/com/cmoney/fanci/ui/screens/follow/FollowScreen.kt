@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
@@ -36,6 +37,7 @@ import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -44,11 +46,20 @@ fun FollowScreen(
     onChannelClick: ((channel: Channel) -> Unit)?,
     onSearchClick: () -> Unit,
     onGroupSettingClick: (Group) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    globalViewModel: MainViewModel
 ) {
     val TAG = "FollowScreen"
-    val followCategoryList = followScreenState.viewModel.followData.observeAsState()
+
+    val globalUiState = globalViewModel.uiState
+    val group = globalUiState.currentGroup
     val groupList = followScreenState.viewModel.myGroupList.observeAsState()
+    if (group == null) {
+        groupList.value?.first()?.let {
+            globalViewModel.setCurrentGroup(it.groupModel)
+        }
+    }
+
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val scrollableState = rememberScrollableState {
@@ -67,6 +78,7 @@ fun FollowScreen(
             DrawerMenuScreen(
                 groupList = groupList.value.orEmpty(),
                 onClick = {
+                    globalViewModel.setCurrentGroup(it.groupModel)
                     followScreenState.viewModel.groupItemClick(it)
                     followScreenState.closeDrawer()
                 },
@@ -80,7 +92,7 @@ fun FollowScreen(
         drawerElevation = 0.dp,
         drawerScrimColor = Black_99000000
     ) { innerPadding ->
-        if (followCategoryList.value != null) {
+        if (group != null) {
             Box(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -93,7 +105,7 @@ fun FollowScreen(
                     //Cover Image
                     AsyncImage(
                         alignment = Alignment.TopCenter,
-                        model = followCategoryList.value?.coverImageUrl,
+                        model = group?.coverImageUrl,
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
@@ -193,24 +205,20 @@ fun FollowScreen(
                         ) {
                             //置頂 縮圖
                             stickyHeader {
-                                followCategoryList.value?.let {
-                                    GroupHeaderScreen(
-                                        followGroup = it,
-                                        visibleAvatar = followScreenState.viewModel.uiState.visibleAvatar,
-                                        modifier = Modifier.background(LocalColor.current.env_80)
-                                    ) { group ->
-                                        onGroupSettingClick.invoke(group)
-                                    }
+                                GroupHeaderScreen(
+                                    followGroup = group,
+                                    visibleAvatar = followScreenState.viewModel.uiState.visibleAvatar,
+                                    modifier = Modifier.background(LocalColor.current.env_80)
+                                ) { group ->
+                                    onGroupSettingClick.invoke(group)
                                 }
                             }
 
                             //頻道
-                            followCategoryList.value?.let {
-                                items(it.categories.orEmpty()) { category ->
-                                    CategoryScreen(category = category) { channel ->
-                                        KLog.i(TAG, "Category click:$channel")
-                                        onChannelClick?.invoke(channel)
-                                    }
+                            items(group.categories.orEmpty()) { category ->
+                                CategoryScreen(category = category) { channel ->
+                                    KLog.i(TAG, "Category click:$channel")
+                                    onChannelClick?.invoke(channel)
                                 }
                             }
                         }
@@ -236,7 +244,8 @@ fun FollowScreenPreview() {
             onChannelClick = {},
             onSearchClick = {},
             onGroupSettingClick = {},
-            navController = rememberNavController()
+            navController = rememberNavController(),
+            globalViewModel = koinViewModel()
         )
     }
 }

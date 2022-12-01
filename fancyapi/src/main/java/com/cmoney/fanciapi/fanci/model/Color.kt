@@ -23,27 +23,23 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param id 
  * @param name 
- * @param permissionIds 
- * @param color 
+ * @param hexColorCode 
+ * @param transparency 
  */
 @Parcelize
 
 
-data class FanciRole (
-
-    @Json(name = "id")
-    val id: kotlin.String? = null,
+data class Color (
 
     @Json(name = "name")
     val name: kotlin.String? = null,
 
-    @Json(name = "permissionIds")
-    val permissionIds: kotlin.collections.List<kotlin.String>? = null,
+    @Json(name = "hexColorCode")
+    val hexColorCode: kotlin.String? = null,
 
-    @Json(name = "color")
-    val color: kotlin.String? = null
+    @Json(name = "transparency")
+    val transparency: kotlin.Double? = null
 
 ) : Parcelable
 

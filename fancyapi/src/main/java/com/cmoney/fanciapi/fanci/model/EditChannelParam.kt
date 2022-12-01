@@ -32,7 +32,7 @@ data class EditChannelParam (
 
     /* 頻道名稱 */
     @Json(name = "name")
-    val name: kotlin.String? = null
+    val name: kotlin.String
 
 ) : Parcelable
 

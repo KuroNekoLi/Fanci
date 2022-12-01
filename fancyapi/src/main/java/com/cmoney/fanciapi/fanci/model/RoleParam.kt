@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.RoleColor
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -25,6 +26,7 @@ import kotlinx.parcelize.Parcelize
  *
  * @param name 角色名稱
  * @param permissionIds Fanci權限ID清單  參考 /api/v1/Permission 清單內容
+ * @param color 
  */
 @Parcelize
 
@@ -37,7 +39,10 @@ data class RoleParam (
 
     /* Fanci權限ID清單  參考 /api/v1/Permission 清單內容 */
     @Json(name = "permissionIds")
-    val permissionIds: kotlin.collections.List<kotlin.String>? = null
+    val permissionIds: kotlin.collections.List<kotlin.String>? = null,
+
+    @Json(name = "color")
+    val color: RoleColor? = null
 
 ) : Parcelable
 

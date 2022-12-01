@@ -80,6 +80,10 @@ val networkBaseModule = module {
     single {
         get<ApiClient>().createService(MessageApi::class.java)
     }
+
+    single {
+        get<ApiClient>().createService(DefaultImageApi::class.java)
+    }
 }
 
 private fun getDomain(context: Context): String {

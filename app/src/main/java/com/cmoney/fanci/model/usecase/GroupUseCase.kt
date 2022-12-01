@@ -5,6 +5,7 @@ import android.net.Uri
 import com.cmoney.fanci.BuildConfig
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanci.ui.screens.follow.model.GroupItem
+import com.cmoney.fanciapi.fanci.api.DefaultImageApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupMemberApi
 import com.cmoney.fanciapi.fanci.model.EditGroupParam
@@ -13,15 +14,32 @@ import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.xlogin.XLoginHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 
 class GroupUseCase(
     val context: Context,
     private val groupApi: GroupApi,
-    private val groupMemberApi: GroupMemberApi
+    private val groupMemberApi: GroupMemberApi,
+    private val defaultImageApi: DefaultImageApi
 ) {
+
+    /**
+     * 抓取 預設 大頭貼圖庫
+     */
+    suspend fun fetchGroupAvatarLib() = kotlin.runCatching {
+        defaultImageApi.apiV1DefaultImageGet().checkResponseBody().defaultImages?.get("001")
+            ?: emptyList()
+    }
+
+    /**
+     * 抓取 預設 背景圖庫
+     */
+    suspend fun fetchGroupCoverLib() = kotlin.runCatching {
+        defaultImageApi.apiV1DefaultImageGet().checkResponseBody().defaultImages?.get("002")
+            ?: emptyList()
+    }
 
     /**
      * 更換 社團背景圖
@@ -52,19 +70,26 @@ class GroupUseCase(
 
     /**
      * 更換 社團縮圖
-     * @param uri 圖片Uri
+     * @param uri 圖片Uri, or 網址 (Fanci 預設)
      * @param group 社團 model
      */
-    suspend fun changeGroupAvatar(uri: Uri, group: Group): Flow<String> {
+    suspend fun changeGroupAvatar(uri: Any, group: Group): Flow<String> {
         return flow {
-            val uploadImage =
-                UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
+            var imageUrl = ""
+            if (uri is Uri) {
+                val uploadImage =
+                    UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
 
-            uploadImage.upload().collect {
-                val uri = it.first
-                val imageUrl = it.second
+                val uploadResult = uploadImage.upload().first()
+                val uri = uploadResult.first
+                imageUrl = uploadResult.second
                 emit(imageUrl)
+            } else if (uri is String) {
+                imageUrl = uri
+                emit(uri)
+            }
 
+            if (imageUrl.isNotEmpty()) {
                 groupApi.apiV1GroupGroupIdPut(
                     groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
                         name = group.name.orEmpty(),

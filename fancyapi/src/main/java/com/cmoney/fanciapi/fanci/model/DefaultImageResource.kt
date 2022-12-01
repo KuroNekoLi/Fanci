@@ -23,27 +23,15 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param id 
- * @param name 
- * @param permissionIds 
- * @param color 
+ * @param defaultImages 
  */
 @Parcelize
 
 
-data class FanciRole (
+data class DefaultImageResource (
 
-    @Json(name = "id")
-    val id: kotlin.String? = null,
-
-    @Json(name = "name")
-    val name: kotlin.String? = null,
-
-    @Json(name = "permissionIds")
-    val permissionIds: kotlin.collections.List<kotlin.String>? = null,
-
-    @Json(name = "color")
-    val color: kotlin.String? = null
+    @Json(name = "defaultImages")
+    val defaultImages: kotlin.collections.Map<kotlin.String, kotlin.collections.List<kotlin.String>>? = null
 
 ) : Parcelable
 
