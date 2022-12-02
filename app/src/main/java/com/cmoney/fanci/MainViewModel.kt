@@ -66,7 +66,7 @@ class MainViewModel(private val userUseCase: UserUseCase, private val themeUseCa
                 group.colorSchemeGroupKey?.apply {
                     themeUseCase.fetchThemeConfig(this).fold({
                         uiState = uiState.copy(
-                            theme = it
+                            theme = it.theme
                         )
                     }, {
                         KLog.e(TAG, it)

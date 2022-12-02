@@ -6,6 +6,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.flurry.sdk.it
@@ -62,6 +63,13 @@ class MainStateHolder(
             is GroupRoute.GroupSettingSettingTheme -> {
                 navigateWithGroup(it)
             }
+            is GroupRoute.GroupSettingSettingThemePreview -> {
+                mainNavController.currentBackStackEntry?.savedStateHandle?.apply {
+                    set("group", it.group)
+                    set("themeId", it.themeId)
+                }
+                mainNavController.navigate(it.route)
+            }
         }
     }
 
@@ -108,6 +116,8 @@ class MainStateHolder(
                 "GroupSetting_Setting_Background_Fanci" //社團設定 -> 社團設定 -> 社團背景 -> Fanci預設
             const val GroupSetting_Setting_Theme =
                 "GroupSetting_Setting_Theme" //社團設定 -> 社團設定 -> 主題色彩
+            const val GroupSetting_Setting_Theme_Preview =
+                "GroupSetting_Setting_Theme_Preview" //社團設定 -> 社團設定 -> 主題色彩 -> Preview
         }
 
         data class Channel(
@@ -175,6 +185,12 @@ class MainStateHolder(
         data class GroupSettingSettingTheme(
             override val route: String = GroupSetting_Setting_Theme,
             override val group: Group
+        ) : GroupRoute()
+
+        data class GroupSettingSettingThemePreview(
+            override val route: String = GroupSetting_Setting_Theme_Preview,
+            override val group: Group,
+            val themeId: String
         ) : GroupRoute()
     }
 }

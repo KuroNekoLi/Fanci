@@ -30,6 +30,7 @@ fun ThemeSettingItemScreen(
     env_60: Color,
     name: String,
     isSelected: Boolean,
+    isShowArrow: Boolean = true,
     onItemClick: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -85,12 +86,13 @@ fun ThemeSettingItemScreen(
                 }
             }
         }
-
-        Image(
-            painter = painterResource(id = R.drawable.next),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
-        )
+        if (isShowArrow) {
+            Image(
+                painter = painterResource(id = R.drawable.next),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
+            )
+        }
     }
 }
 

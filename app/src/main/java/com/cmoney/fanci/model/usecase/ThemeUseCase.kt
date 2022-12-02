@@ -59,7 +59,13 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: Group
     suspend fun fetchThemeConfig(colorTheme: ColorTheme) = kotlin.runCatching {
         KLog.i(TAG, "fetchThemeConfig")
         themeColorApi.apiV1ThemeColorColorThemeGet(colorTheme).checkResponseBody().let {
-            serverColorTransfer(it.colors.orEmpty())
+            GroupTheme(
+                id = colorTheme.value,
+                isSelected = false,
+                theme = serverColorTransfer(it.colors.orEmpty()),
+                name = it.displayName.orEmpty(),
+                preview = it.previewImage.orEmpty()
+            )
         }
     }
 

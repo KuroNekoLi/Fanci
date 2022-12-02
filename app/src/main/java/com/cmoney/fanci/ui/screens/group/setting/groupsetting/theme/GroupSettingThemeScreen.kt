@@ -61,6 +61,7 @@ fun GroupSettingThemeScreen(
         navController,
         isLoading = viewModel.uiState.isLoading,
         groupThemes = state.groupThemeList,
+        group = groupParam,
         route = route
     ) {
         KLog.i(TAG, "on theme click.")
@@ -78,6 +79,7 @@ private fun GroupSettingThemeView(
     navController: NavHostController,
     isLoading: Boolean,
     groupThemes: List<GroupTheme>,
+    group: Group,
     route: (MainStateHolder.Route) -> Unit,
     onThemeConfirmClick: (GroupTheme) -> Unit
 ) {
@@ -111,8 +113,10 @@ private fun GroupSettingThemeView(
                         name = it.name,
                         isSelected = it.isSelected,
                         onItemClick = {
-                            // TODO: 跳轉 preview
-//                            route.invoke()
+                            route.invoke(MainStateHolder.GroupRoute.GroupSettingSettingThemePreview(
+                                group = group,
+                                themeId = it.id
+                            ))
                         },
                         onConfirm = {
                             onThemeConfirmClick.invoke(it)
@@ -142,6 +146,7 @@ fun GroupSettingThemeScreenPreview() {
             navController = rememberNavController(),
             isLoading = false,
             groupThemes = emptyList(),
+            group = Group(),
             route = {},
             onThemeConfirmClick = {}
         )

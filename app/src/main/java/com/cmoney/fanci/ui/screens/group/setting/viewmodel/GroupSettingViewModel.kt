@@ -21,6 +21,7 @@ data class GroupSettingUiState(
     val groupAvatarLib: List<String> = emptyList(),  //社團 預設大頭貼 清單
     val groupCoverLib: List<String> = emptyList(),  //社團 預設背景 清單
     val groupThemeList: List<GroupTheme> = emptyList(),  //社團 主題色彩
+    val previewTheme: GroupTheme? = null            //社團 設定主題 Preview
 )
 
 class GroupSettingViewModel(
@@ -239,10 +240,30 @@ class GroupSettingViewModel(
                             } else {
                                 it.copy(isSelected = false)
                             }
-                        }
+                        },
+                        previewTheme = groupTheme.copy(isSelected = true)
                     )
                 }
             })
+        }
+    }
+
+    /**
+     * 抓取 特定主題 資訊
+     * @param themeId 主題Key ex: ThemeBabyBlue
+     */
+    fun fetchThemeInfo(themeId: String) {
+        KLog.i(TAG, "fetchThemeInfo:$themeId")
+        viewModelScope.launch {
+            ColorTheme.decode(themeId)?.let {
+                themeUseCase.fetchThemeConfig(it).fold({ groupTheme ->
+                    uiState = uiState.copy(
+                        previewTheme = groupTheme
+                    )
+                }, {
+                    KLog.e(TAG, it)
+                })
+            }
         }
     }
 

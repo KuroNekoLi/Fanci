@@ -29,6 +29,7 @@ import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.*
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib.FanciDefaultAvatarScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib.FanciDefaultCoverScreen
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.GroupSettingThemePreviewScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.GroupSettingThemeScreen
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.my.MyCallback
@@ -280,6 +281,27 @@ private fun navGroupSetting(
                         viewModel = koinViewModel(),
                         globalViewModel = globalViewModel,
                         route = route
+                    )
+                }
+            }
+        }
+
+        //社團設定頁面-設定社團-主題色彩-Preview
+        composable(MainStateHolder.Route.GroupSetting_Setting_Theme_Preview) {
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                val group =
+                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+                val themeId =
+                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<String>("themeId")
+                group?.let { group ->
+                    GroupSettingThemePreviewScreen(
+                        navController = mainNavController,
+                        group = group,
+                        viewModel = koinViewModel(),
+                        globalViewModel = globalViewModel,
+                        themeId = themeId.orEmpty()
                     )
                 }
             }
