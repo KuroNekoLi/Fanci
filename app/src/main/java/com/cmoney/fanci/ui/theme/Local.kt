@@ -1,6 +1,7 @@
 package com.cmoney.fanci.ui.theme
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.google.errorprone.annotations.Immutable
@@ -50,6 +51,6 @@ data class FanciTextColor(
     val other: Color
 )
 
-internal val LocalColor = staticCompositionLocalOf<FanciColor> {
+internal val LocalColor = compositionLocalOf<FanciColor> {
     error("No LocalColor specified")
 }

@@ -49,22 +49,6 @@ interface GroupApi {
     suspend fun apiV1GroupGroupIdCategoryPost(@Path("groupId") groupId: kotlin.String, @Body categoryParam: CategoryParam? = null): Response<Category>
 
     /**
-     * 編輯社團資訊
-     * 
-     * Responses:
-     *  - 204: 成功
-     *  - 401: 未驗證
-     *  - 403: 沒有權限
-     *  - 404: 找不到該社團
-     *
-     * @param groupId 社團Id
-     * @param colorSchemeGroupKey 
-     * @return [Unit]
-     */
-    @PUT("api/v1/Group/{groupId}/ColorScheme/{colorSchemeGroupKey}")
-    suspend fun apiV1GroupGroupIdColorSchemeColorSchemeGroupKeyPut(@Path("groupId") groupId: kotlin.String, @Path("colorSchemeGroupKey") colorSchemeGroupKey: kotlin.String): Response<Unit>
-
-    /**
      * 刪除/解散社團 __________🔒 社長
      * 
      * Responses:

@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,10 +14,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.model.MainTab
 import com.cmoney.fanci.model.mainTabItems
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.socks.library.KLog
 
 ///**
 // * 根據不同 Route 決定BottomBar 是否出現
@@ -51,14 +48,9 @@ import com.cmoney.fanci.ui.theme.LocalColor
 
 @Composable
 fun BottomBarScreen(navController: NavHostController) {
-    Column {
-        Spacer(
-            modifier = Modifier
-                .height(8.dp)
-                .fillMaxWidth()
-                .background(LocalColor.current.env_100),
-        )
+    Column{
         BottomNavigation(
+            modifier = Modifier.height(65.dp),
             backgroundColor = LocalColor.current.env_100
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()

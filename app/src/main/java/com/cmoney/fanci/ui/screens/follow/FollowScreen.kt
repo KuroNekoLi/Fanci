@@ -31,6 +31,7 @@ import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
+import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -114,7 +115,8 @@ fun FollowScreen(
                                     x = 0,
                                     y = followScreenState.viewModel.uiState.imageOffset
                                 ) //设置偏移量
-                            },
+                            }
+                        ,
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                         placeholder = painterResource(id = R.drawable.resource_default)

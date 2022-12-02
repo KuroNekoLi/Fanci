@@ -26,8 +26,8 @@ fun Activity.showInteractDialogBottomSheet(
         viewGroup.addView(
             ComposeView(viewGroup.context).apply {
                 setContent {
-                    val theme = globalViewModel.theme.observeAsState()
-                    FanciTheme(themeSetting = theme.value ?: ThemeSetting.Default) {
+                    val theme = globalViewModel.uiState.theme
+                    FanciTheme(fanciColor = theme) {
                         InteractBottomSheet(viewGroup, this, message, onInteractClick)
                     }
                 }

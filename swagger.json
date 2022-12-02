@@ -1307,48 +1307,6 @@
         ]
       }
     },
-    "/api/v1/Group/{groupId}/ColorScheme/{colorSchemeGroupKey}": {
-      "put": {
-        "tags": [
-          "Group"
-        ],
-        "summary": "編輯社團資訊",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "path",
-            "description": "社團Id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "colorSchemeGroupKey",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "成功"
-          },
-          "401": {
-            "description": "未驗證"
-          },
-          "403": {
-            "description": "沒有權限"
-          },
-          "404": {
-            "description": "找不到該社團"
-          }
-        }
-      }
-    },
     "/api/v1/Group/{groupId}/Category": {
       "post": {
         "tags": [
@@ -2680,6 +2638,66 @@
         ]
       }
     },
+    "/api/v1/Order/Group/{groupId}/Role/Order": {
+      "put": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "編輯角色列表排序 __________🔒 管理角色層級",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleOrderParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleOrderParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleOrderParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_管理角色層級_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/Permission": {
       "get": {
         "tags": [
@@ -2834,6 +2852,82 @@
       }
     },
     "/api/v1/RoleUser/Group/{groupId}/Role/{roleId}": {
+      "get": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "取得具有此角色身分的用戶清單 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "找不到指派的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
       "put": {
         "tags": [
           "RoleUser"
@@ -3017,6 +3111,55 @@
                     "items": {
                       "$ref": "#/components/schemas/Color"
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ThemeColor/{colorTheme}": {
+      "get": {
+        "tags": [
+          "ThemeColor"
+        ],
+        "summary": "取得特定主題色卡包",
+        "parameters": [
+          {
+            "name": "colorTheme",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ColorTheme"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Color"
                   }
                 }
               }
@@ -3461,13 +3604,24 @@
           "hexColorCode": {
             "type": "string",
             "nullable": true
-          },
-          "transparency": {
-            "type": "number",
-            "format": "double"
           }
         },
         "additionalProperties": false
+      },
+      "ColorTheme": {
+        "enum": [
+          "ThemeFanciBlue",
+          "ThemeSmokePink",
+          "ThemeMidnightBlue",
+          "ThemeClassicGreen",
+          "ThemeNeonBlack",
+          "ThemeCoffeeBrown",
+          "ThemeMintGreen",
+          "ThemePeachPink",
+          "ThemeDreamyPurple",
+          "ThemeBabyBlue"
+        ],
+        "type": "string"
       },
       "DefaultImageResource": {
         "type": "object",
@@ -3533,6 +3687,9 @@
             "type": "string",
             "description": "社團縮圖",
             "nullable": true
+          },
+          "colorSchemeGroupKey": {
+            "$ref": "#/components/schemas/ColorTheme"
           }
         },
         "additionalProperties": false,
@@ -3581,6 +3738,14 @@
           "color": {
             "type": "string",
             "nullable": true
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "format": "int64"
           }
         },
         "additionalProperties": false
@@ -3650,10 +3815,8 @@
             "description": "會員總數",
             "format": "int32"
           },
-          "colorSchemeGroupKey": {
-            "type": "string",
-            "description": "社團的顏色包",
-            "nullable": true
+          "ColorSchemeGroupKey": {
+            "$ref": "#/components/schemas/ColorTheme"
           }
         },
         "additionalProperties": false,
@@ -3783,6 +3946,9 @@
             "type": "string",
             "description": "社團縮圖",
             "nullable": true
+          },
+          "colorSchemeGroupKey": {
+            "$ref": "#/components/schemas/ColorTheme"
           }
         },
         "additionalProperties": false,
@@ -4130,16 +4296,30 @@
       },
       "RoleColor": {
         "enum": [
-          "紅",
-          "橘",
-          "黃",
-          "綠",
-          "藍綠",
-          "藍",
-          "紫",
-          "粉"
+          "SpecialColor_Red",
+          "SpecialColor_Orange",
+          "SpecialColor_Yellow",
+          "SpecialColor_Green",
+          "SpecialColor_BlueGreen",
+          "SpecialColor_Blue",
+          "SpecialColor_Purple",
+          "SpecialColor_Pink"
         ],
         "type": "string"
+      },
+      "RoleOrderParam": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "角色排序參數"
       },
       "RoleParam": {
         "type": "object",

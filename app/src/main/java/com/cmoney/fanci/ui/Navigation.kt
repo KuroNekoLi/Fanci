@@ -14,7 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainScreen
 import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.MainViewModel
-import com.cmoney.fanci.ThemeSetting
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
 import com.cmoney.fanci.extension.goBackWithParams
 import com.cmoney.fanci.model.MainTab
@@ -46,7 +45,6 @@ fun MyAppNavHost(
     mainNavController: NavHostController,
     route: (MainStateHolder.Route) -> Unit,
     globalViewModel: MainViewModel,
-    theme: (ThemeSetting) -> Unit,
 ) {
     val TAG = "MyAppNavHost"
 
@@ -60,7 +58,7 @@ fun MyAppNavHost(
         modifier = Modifier,
     ) {
         composable("main") {
-            MainScreen(navController, route, theme, globalViewModel)
+            MainScreen(navController, route, globalViewModel)
         }
 
         //頻道頁面
@@ -246,7 +244,6 @@ fun MainNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: MainTab = MainTab.FOLLOW,
     route: (MainStateHolder.Route) -> Unit,
-    theme: (ThemeSetting) -> Unit,
     globalViewModel: MainViewModel
 ) {
     //test

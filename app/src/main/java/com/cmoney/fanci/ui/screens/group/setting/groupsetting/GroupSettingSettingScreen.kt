@@ -24,6 +24,7 @@ import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
+import com.cmoney.fanci.ui.screens.shared.ThemeColorCardScreen
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -258,6 +259,41 @@ fun GroupSettingSettingView(
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
                     placeholder = painterResource(id = R.drawable.resource_default)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(1.dp))
+
+            //========== 主題色彩 ==========
+            Row(
+                modifier = Modifier
+                    .background(LocalColor.current.background)
+                    .clickable {
+                        KLog.i(TAG, "theme click")
+                        // TODO:
+                    }
+                    .padding(start = 24.dp, end = 24.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "主題色彩",
+                    fontSize = 17.sp,
+                    color = LocalColor.current.text.default_100,
+                    fontWeight = FontWeight.Bold
+                )
+
+                ThemeColorCardScreen(
+                    modifier = Modifier
+                        .padding(top = 15.dp, bottom = 15.dp)
+                        .size(55.dp),
+                    primary = LocalColor.current.primary,
+                    env_100 = LocalColor.current.env_100,
+                    env_80 = LocalColor.current.env_80,
+                    env_60 = LocalColor.current.env_60
                 )
             }
         }

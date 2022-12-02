@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.ColorTheme
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -28,6 +29,7 @@ import kotlinx.parcelize.Parcelize
  * @param isNeedApproval true: 非公開(需審核)  false: 公開(不用審核)
  * @param coverImageUrl 社團封面
  * @param thumbnailImageUrl 社團縮圖
+ * @param colorSchemeGroupKey 
  */
 @Parcelize
 
@@ -52,7 +54,10 @@ data class GroupParam (
 
     /* 社團縮圖 */
     @Json(name = "thumbnailImageUrl")
-    val thumbnailImageUrl: kotlin.String? = null
+    val thumbnailImageUrl: kotlin.String? = null,
+
+    @Json(name = "colorSchemeGroupKey")
+    val colorSchemeGroupKey: ColorTheme? = null
 
 ) : Parcelable
 

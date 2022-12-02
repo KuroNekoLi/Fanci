@@ -21,34 +21,34 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * Values: 紅,橘,黃,綠,藍綠,藍,紫,粉
+ * Values: red,orange,yellow,green,blueGreen,blue,purple,pink
  */
 
 enum class RoleColor(val value: kotlin.String) {
 
-    @Json(name = "紅")
-    紅("紅"),
+    @Json(name = "SpecialColor_Red")
+    red("SpecialColor_Red"),
 
-    @Json(name = "橘")
-    橘("橘"),
+    @Json(name = "SpecialColor_Orange")
+    orange("SpecialColor_Orange"),
 
-    @Json(name = "黃")
-    黃("黃"),
+    @Json(name = "SpecialColor_Yellow")
+    yellow("SpecialColor_Yellow"),
 
-    @Json(name = "綠")
-    綠("綠"),
+    @Json(name = "SpecialColor_Green")
+    green("SpecialColor_Green"),
 
-    @Json(name = "藍綠")
-    藍綠("藍綠"),
+    @Json(name = "SpecialColor_BlueGreen")
+    blueGreen("SpecialColor_BlueGreen"),
 
-    @Json(name = "藍")
-    藍("藍"),
+    @Json(name = "SpecialColor_Blue")
+    blue("SpecialColor_Blue"),
 
-    @Json(name = "紫")
-    紫("紫"),
+    @Json(name = "SpecialColor_Purple")
+    purple("SpecialColor_Purple"),
 
-    @Json(name = "粉")
-    粉("粉");
+    @Json(name = "SpecialColor_Pink")
+    pink("SpecialColor_Pink");
 
     /**
      * Override toString() to avoid using the enum variable name as the value, and instead use

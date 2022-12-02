@@ -21,21 +21,17 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 角色排序參數
  *
- * @param name 
- * @param hexColorCode 
+ * @param roleIds 
  */
 @Parcelize
 
 
-data class Color (
+data class RoleOrderParam (
 
-    @Json(name = "name")
-    val name: kotlin.String? = null,
-
-    @Json(name = "hexColorCode")
-    val hexColorCode: kotlin.String? = null
+    @Json(name = "roleIds")
+    val roleIds: kotlin.collections.List<kotlin.String>? = null
 
 ) : Parcelable
 

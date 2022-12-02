@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
@@ -40,8 +39,10 @@ class MainActivity : BaseLoginAppCompactActivity() {
         }
 
         setContent {
-            val theme = globalViewModel.theme.observeAsState()
-            FanciTheme(themeSetting = theme.value ?: ThemeSetting.Default) {
+//            val theme = globalViewModel.theme.observeAsState()
+            val state = globalViewModel.uiState
+
+            FanciTheme(fanciColor = state.theme) {
                 val mainState = rememberMainState()
                 Scaffold(
                     modifier = Modifier
@@ -54,9 +55,7 @@ class MainActivity : BaseLoginAppCompactActivity() {
                         mainState.mainNavController,
                         mainState.route,
                         globalViewModel
-                    ) {
-                        globalViewModel.settingTheme(it)
-                    }
+                    )
                 }
             }
         }
@@ -103,19 +102,20 @@ class MainActivity : BaseLoginAppCompactActivity() {
 fun MainScreen(
     mainNavController: NavHostController,
     route: (MainStateHolder.Route) -> Unit,
-    theme: (ThemeSetting) -> Unit,
     globalViewModel: MainViewModel
 ) {
+    KLog.i("TAG", "color:" + LocalColor.current.primary)
     Scaffold(
         bottomBar = {
-            BottomBarScreen(mainNavController)
+            BottomBarScreen(
+                mainNavController
+            )
         }
     ) { innerPadding ->
         MainNavHost(
-            navController = mainNavController,
             modifier = Modifier.padding(innerPadding),
+            navController = mainNavController,
             route = route,
-            theme = theme,
             globalViewModel = globalViewModel
         )
     }
@@ -125,7 +125,6 @@ fun MainScreen(
 @Composable
 fun HomeScreenPreview() {
     FanciTheme {
-        MainScreen(rememberNavController(), route = {}, {
-        }, koinViewModel())
+        MainScreen(rememberNavController(), route = {}, koinViewModel())
     }
 }

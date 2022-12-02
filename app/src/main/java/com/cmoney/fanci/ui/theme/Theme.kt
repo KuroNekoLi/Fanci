@@ -47,7 +47,7 @@ private val inputText = FanciInputText(
 )
 
 
-private val DefaultThemeColor = FanciColor(
+val DefaultThemeColor = FanciColor(
     primary = Color_4F70E5,
     background = Color_0DFFFFFF,
     env_40 = Color_3D4452,
@@ -69,7 +69,7 @@ fun DefaultTheme(
     MainTheme(darkTheme, DefaultThemeColor, content, image)
 }
 
-private val CoffeeThemeColor = FanciColor(
+val CoffeeThemeColor = FanciColor(
     primary = Color_84603F,
     background = Color_0D000000,
     env_40 = Color_F5E7DA,
@@ -96,6 +96,16 @@ private val LightImages = Images(lockupLogo = R.drawable.fanci)
 private val DarkImages = Images(lockupLogo = R.drawable.emoji_like)
 
 @Composable
+fun FanciTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    fanciColor: FanciColor = DefaultThemeColor,
+    content: @Composable () -> Unit
+) {
+    val image = LightImages
+    MainTheme(darkTheme, fanciColor, content, image)
+}
+
+@Composable
 private fun MainTheme(
     darkTheme: Boolean,
     fanciColor: FanciColor,
@@ -115,25 +125,5 @@ private fun MainTheme(
             typography = Typography,
             shapes = Shapes,
         )
-    }
-}
-
-@Composable
-fun FanciTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    themeSetting: ThemeSetting = ThemeSetting.Default,
-    content: @Composable () -> Unit
-) {
-    when (themeSetting) {
-        ThemeSetting.Coffee -> {
-            CoffeeTheme(
-                content = content
-            )
-        }
-        ThemeSetting.Default -> {
-            DefaultTheme(
-                content = content
-            )
-        }
     }
 }
