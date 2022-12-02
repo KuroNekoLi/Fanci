@@ -74,9 +74,11 @@ fun BlueButtonPreview() {
 }
 
 @Composable
-fun GrayButton(text: String,
-               shape: RoundedCornerShape = RoundedCornerShape(15),
-               onClick: () -> Unit) {
+fun GrayButton(
+    text: String,
+    shape: RoundedCornerShape = RoundedCornerShape(15),
+    onClick: () -> Unit
+) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,5 +101,39 @@ fun GrayButton(text: String,
 fun GrayButtonPreview() {
     FanciTheme {
         GrayButton(text = "Hello") {}
+    }
+}
+
+@Composable
+fun BorderButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    shape: RoundedCornerShape = RoundedCornerShape(15),
+    borderColor: Color,
+    textColor: Color = borderColor,
+    onClick: () -> Unit?
+) {
+    Button(
+        modifier = modifier,
+        shape = shape,
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+        border = BorderStroke(1.dp, borderColor),
+        elevation = ButtonDefaults.elevation(0.dp),
+        onClick = {
+            onClick.invoke()
+        }) {
+        Text(
+            text = text,
+            color = textColor,
+            fontSize = 14.sp
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BorderButtonPreview() {
+    FanciTheme {
+        BorderButton(text = "Hello", borderColor = Color.Gray) {}
     }
 }

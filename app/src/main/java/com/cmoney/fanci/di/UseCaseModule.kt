@@ -9,5 +9,5 @@ val useCaseModule = module {
     factory { GroupUseCase(androidApplication(), get(), get(), get()) }
     factory { UserUseCase(get()) }
     factory { ChatRoomPollUseCase(get()) }
-    factory { ThemeUseCase(get()) }
+    factory { ThemeUseCase(get(), get()) }
 }

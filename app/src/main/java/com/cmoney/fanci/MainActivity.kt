@@ -104,7 +104,6 @@ fun MainScreen(
     route: (MainStateHolder.Route) -> Unit,
     globalViewModel: MainViewModel
 ) {
-    KLog.i("TAG", "color:" + LocalColor.current.primary)
     Scaffold(
         bottomBar = {
             BottomBarScreen(

@@ -24,8 +24,8 @@ import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.fanci.ui.screens.shared.ThemeColorCardScreen
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.theme.ThemeColorCardScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
@@ -270,7 +270,11 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "theme click")
-                        // TODO:
+                        route.invoke(
+                            MainStateHolder.GroupRoute.GroupSettingSettingTheme(
+                                group = group
+                            )
+                        )
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),

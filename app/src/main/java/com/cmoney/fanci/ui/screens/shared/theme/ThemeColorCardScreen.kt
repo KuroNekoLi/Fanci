@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.shared
+package com.cmoney.fanci.ui.screens.shared.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

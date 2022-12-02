@@ -17,7 +17,6 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.model.mainTabItems
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.socks.library.KLog
 
 ///**
 // * 根據不同 Route 決定BottomBar 是否出現

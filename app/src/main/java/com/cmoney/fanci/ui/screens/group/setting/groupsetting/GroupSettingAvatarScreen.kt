@@ -43,8 +43,6 @@ fun GroupSettingAvatarScreen(
 ) {
     val state = viewModel.uiState
 
-    KLog.i("GroupSettingAvatarScreen", "settingGroup:" + state.settingGroup?.toString())
-
     GroupSettingAvatarView(
         modifier,
         navController,

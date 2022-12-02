@@ -15,5 +15,5 @@ val viewModule = module {
     viewModel { ChatRoomViewModel(get(), get()) }
     viewModel { MessageViewModel(get(), get(), get()) }
     viewModel { GroupViewModel(get()) }
-    viewModel { GroupSettingViewModel(get()) }
+    viewModel { GroupSettingViewModel(get(), get()) }
 }

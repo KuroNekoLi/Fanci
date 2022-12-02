@@ -1,25 +1,56 @@
 package com.cmoney.fanci.model.usecase
 
-import androidx.core.graphics.toColorInt
 import com.cmoney.fanci.extension.checkResponseBody
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanci.ui.theme.FanciColor
 import com.cmoney.fanci.ui.theme.FanciComponentColor
 import com.cmoney.fanci.ui.theme.FanciInputText
 import com.cmoney.fanci.ui.theme.FanciTextColor
+import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.ThemeColorApi
 import com.cmoney.fanciapi.fanci.model.Color
 import com.cmoney.fanciapi.fanci.model.ColorTheme
+import com.cmoney.fanciapi.fanci.model.EditGroupParam
+import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 
-class ThemeUseCase(private val themeColorApi: ThemeColorApi) {
+class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: GroupApi) {
     private val TAG = ThemeUseCase::class.java.simpleName
+
+    /**
+     * 更換 社團主題顏色
+     */
+    suspend fun changeGroupTheme(group: Group, groupTheme: GroupTheme) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdPut(
+            group.id.orEmpty(),
+            EditGroupParam(
+                name = group.name.orEmpty(),
+                description = group.description.orEmpty(),
+                coverImageUrl = group.coverImageUrl.orEmpty(),
+                thumbnailImageUrl = group.thumbnailImageUrl.orEmpty(),
+                colorSchemeGroupKey = ColorTheme.decode(groupTheme.id)
+            )
+        ).checkResponseBody()
+    }
 
     /**
      * 抓取 所有 主題設定檔
      */
     suspend fun fetchAllThemeConfig() = kotlin.runCatching {
         KLog.i(TAG, "fetchAllThemeConfig")
-        themeColorApi.apiV1ThemeColorGet().checkResponseBody()
+        themeColorApi.apiV1ThemeColorGet().checkResponseBody().toList().map {
+            val id = it.first
+            val theme = serverColorTransfer(it.second.colors.orEmpty())
+            val name = it.second.displayName
+            val preview = it.second.previewImage
+            GroupTheme(
+                id = id,
+                isSelected = false,
+                theme = theme,
+                name = name.orEmpty(),
+                preview = preview.orEmpty()
+            )
+        }
     }
 
     /**
@@ -28,7 +59,7 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi) {
     suspend fun fetchThemeConfig(colorTheme: ColorTheme) = kotlin.runCatching {
         KLog.i(TAG, "fetchThemeConfig")
         themeColorApi.apiV1ThemeColorColorThemeGet(colorTheme).checkResponseBody().let {
-            serverColorTransfer(it)
+            serverColorTransfer(it.colors.orEmpty())
         }
     }
 

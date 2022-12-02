@@ -6,8 +6,8 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
-import com.cmoney.fanciapi.fanci.model.Color
 import com.cmoney.fanciapi.fanci.model.ColorTheme
+import com.cmoney.fanciapi.fanci.model.Theme
 
 interface ThemeColorApi {
     /**
@@ -17,10 +17,10 @@ interface ThemeColorApi {
      *  - 200: Success
      *
      * @param colorTheme 
-     * @return [kotlin.collections.List<Color>]
+     * @return [Theme]
      */
     @GET("api/v1/ThemeColor/{colorTheme}")
-    suspend fun apiV1ThemeColorColorThemeGet(@Path("colorTheme") colorTheme: ColorTheme): Response<kotlin.collections.List<Color>>
+    suspend fun apiV1ThemeColorColorThemeGet(@Path("colorTheme") colorTheme: ColorTheme): Response<Theme>
 
     /**
      * 取得所有主題色卡包
@@ -28,9 +28,9 @@ interface ThemeColorApi {
      * Responses:
      *  - 200: Success
      *
-     * @return [kotlin.collections.Map<kotlin.String, kotlin.collections.List<Color>>]
+     * @return [kotlin.collections.Map<kotlin.String, Theme>]
      */
     @GET("api/v1/ThemeColor")
-    suspend fun apiV1ThemeColorGet(): Response<kotlin.collections.Map<kotlin.String, kotlin.collections.List<Color>>>
+    suspend fun apiV1ThemeColorGet(): Response<kotlin.collections.Map<kotlin.String, Theme>>
 
 }

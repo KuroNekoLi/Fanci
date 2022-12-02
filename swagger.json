@@ -3085,10 +3085,7 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Color"
-                    }
+                    "$ref": "#/components/schemas/Theme"
                   }
                 }
               },
@@ -3096,10 +3093,7 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Color"
-                    }
+                    "$ref": "#/components/schemas/Theme"
                   }
                 }
               },
@@ -3107,10 +3101,7 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Color"
-                    }
+                    "$ref": "#/components/schemas/Theme"
                   }
                 }
               }
@@ -3141,26 +3132,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Color"
-                  }
+                  "$ref": "#/components/schemas/Theme"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Color"
-                  }
+                  "$ref": "#/components/schemas/Theme"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Color"
-                  }
+                  "$ref": "#/components/schemas/Theme"
                 }
               }
             }
@@ -4343,6 +4325,33 @@
         },
         "additionalProperties": false,
         "description": "新增角色參數"
+      },
+      "Theme": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "previewImage": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "colors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Color"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
       },
       "UpdateIsNeedApprovalParam": {
         "type": "object",

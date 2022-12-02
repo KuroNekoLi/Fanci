@@ -1,6 +1,5 @@
 package com.cmoney.fanci.ui.screens.group.setting.viewmodel
 
-import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
+import com.cmoney.fanci.model.usecase.ThemeUseCase
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
+import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
@@ -16,12 +18,14 @@ data class GroupSettingUiState(
     val settingGroup: Group? = null,
     val isLoading: Boolean = false,
     val isGroupSettingPop: Boolean = false,
-    val groupAvatarLib: List<String> = emptyList(),  //群組 預設大頭貼 清單
-    val groupCoverLib: List<String> = emptyList(),  //群組 預設背景 清單
+    val groupAvatarLib: List<String> = emptyList(),  //社團 預設大頭貼 清單
+    val groupCoverLib: List<String> = emptyList(),  //社團 預設背景 清單
+    val groupThemeList: List<GroupTheme> = emptyList(),  //社團 主題色彩
 )
 
 class GroupSettingViewModel(
-    private val groupUseCase: GroupUseCase
+    private val groupUseCase: GroupUseCase,
+    private val themeUseCase: ThemeUseCase
 ) : ViewModel() {
     private val TAG = GroupSettingViewModel::class.java.simpleName
 
@@ -186,6 +190,60 @@ class GroupSettingViewModel(
                 coverImageUrl = url
             )
         )
+    }
+
+    /**
+     * 抓取所有主題設定檔案
+     * @param group 目前的主題
+     */
+    fun fetchAllTheme(group: Group) {
+        KLog.i(TAG, "fetchAllTheme:$group")
+        viewModelScope.launch {
+            val currentThemeName = group.colorSchemeGroupKey?.name.orEmpty()
+
+            themeUseCase.fetchAllThemeConfig().fold({
+                uiState = uiState.copy(
+                    groupThemeList = it.map { item ->
+                        if (item.id.lowercase() == currentThemeName.lowercase()) {
+                            item.copy(isSelected = true)
+                        } else {
+                            item
+                        }
+                    }
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 更換 主題
+     * @param groupTheme 要更換的主題
+     */
+    fun changeTheme(group: Group, groupTheme: GroupTheme) {
+        KLog.i(TAG, "changeTheme: $groupTheme")
+        viewModelScope.launch {
+            themeUseCase.changeGroupTheme(group, groupTheme).fold({
+
+            }, {
+                KLog.e(TAG, it)
+                if (it is EmptyBodyException) {
+                    uiState = uiState.copy(
+                        settingGroup = group.copy(
+                            colorSchemeGroupKey = ColorTheme.decode(groupTheme.id)
+                        ),
+                        groupThemeList = uiState.groupThemeList.map {
+                            if (it == groupTheme) {
+                                groupTheme.copy(isSelected = true)
+                            } else {
+                                it.copy(isSelected = false)
+                            }
+                        }
+                    )
+                }
+            })
+        }
     }
 
 }

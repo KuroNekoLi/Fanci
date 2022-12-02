@@ -6,7 +6,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,6 +29,7 @@ import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.*
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib.FanciDefaultAvatarScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib.FanciDefaultCoverScreen
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.GroupSettingThemeScreen
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
@@ -98,6 +101,37 @@ fun MyAppNavHost(
             DiscoverGroupScreen(mainNavController)
         }
 
+        navGroupSetting(
+            this,
+            mainNavController,
+            route,
+            globalViewModel,
+            viewModelStoreOwner
+        )
+
+    }
+}
+
+/**
+ * 社團設定頁 Route 路徑
+ *  -社團設定頁面
+ *  -社團設定頁面-設定社團
+ *  -社團設定頁面-設定社團-社團名稱
+ *  -社團設定頁面-設定社團-社團簡介
+ *  -社團設定頁面-設定社團-社團圖示
+ *  -社團設定頁面-設定社團-社團背景
+ *  -社團設定頁面-設定社團-社團圖示-Fanci預設
+ *  -社團設定頁面-設定社團-社團背景-Fanci預設
+ *  -社團設定頁面-設定社團-主題色彩
+ */
+private fun navGroupSetting(
+    navGraphBuilder: NavGraphBuilder,
+    mainNavController: NavHostController,
+    route: (MainStateHolder.Route) -> Unit,
+    globalViewModel: MainViewModel,
+    viewModelStoreOwner: ViewModelStoreOwner,
+) {
+    navGraphBuilder.apply {
         //社團設定頁面
         composable(MainStateHolder.Route.GroupSetting) {
             val group =
@@ -232,7 +266,27 @@ fun MyAppNavHost(
             }
         }
 
+        //社團設定頁面-設定社團-主題色彩
+        composable(MainStateHolder.Route.GroupSetting_Setting_Theme) {
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                val group =
+                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+                group?.let { group ->
+                    GroupSettingThemeScreen(
+                        navController = mainNavController,
+                        group = group,
+                        viewModel = koinViewModel(),
+                        globalViewModel = globalViewModel,
+                        route = route
+                    )
+                }
+            }
+        }
     }
+
+
 }
 
 /**

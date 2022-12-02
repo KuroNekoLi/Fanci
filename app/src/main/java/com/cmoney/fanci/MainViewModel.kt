@@ -58,19 +58,22 @@ class MainViewModel(private val userUseCase: UserUseCase, private val themeUseCa
      */
     fun setCurrentGroup(group: Group) {
         KLog.i(TAG, "setCurrentGroup:$group")
-        uiState = uiState.copy(
-            currentGroup = group
-        )
-        viewModelScope.launch {
-            group.colorSchemeGroupKey?.apply {
-                themeUseCase.fetchThemeConfig(this).fold({
-                    uiState = uiState.copy(
-                        theme = it
-                    )
-                }, {
-                    KLog.e(TAG, it)
-                })
+        if (group != uiState.currentGroup) {
+            uiState = uiState.copy(
+                currentGroup = group
+            )
+            viewModelScope.launch {
+                group.colorSchemeGroupKey?.apply {
+                    themeUseCase.fetchThemeConfig(this).fold({
+                        uiState = uiState.copy(
+                            theme = it
+                        )
+                    }, {
+                        KLog.e(TAG, it)
+                    })
+                }
             }
         }
     }
+
 }
