@@ -59,6 +59,7 @@ class MainViewModel(private val userUseCase: UserUseCase, private val themeUseCa
     fun setCurrentGroup(group: Group) {
         KLog.i(TAG, "setCurrentGroup:$group")
         if (group != uiState.currentGroup) {
+            KLog.i(TAG, "setCurrentGroup diff:$group")
             uiState = uiState.copy(
                 currentGroup = group
             )

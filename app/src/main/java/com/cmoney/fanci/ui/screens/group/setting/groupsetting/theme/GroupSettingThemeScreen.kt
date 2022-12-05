@@ -62,11 +62,12 @@ fun GroupSettingThemeScreen(
         isLoading = viewModel.uiState.isLoading,
         groupThemes = state.groupThemeList,
         group = groupParam,
-        route = route
-    ) {
-        KLog.i(TAG, "on theme click.")
-        viewModel.changeTheme(groupParam, it)
-    }
+        route = route,
+        onThemeConfirmClick = {
+            KLog.i(TAG, "on theme click.")
+            viewModel.changeTheme(groupParam, it)
+        }
+    )
 
     LaunchedEffect(fetchAllTheme) {
         viewModel.fetchAllTheme(groupParam)
@@ -113,10 +114,12 @@ private fun GroupSettingThemeView(
                         name = it.name,
                         isSelected = it.isSelected,
                         onItemClick = {
-                            route.invoke(MainStateHolder.GroupRoute.GroupSettingSettingThemePreview(
-                                group = group,
-                                themeId = it.id
-                            ))
+                            route.invoke(
+                                MainStateHolder.GroupRoute.GroupSettingSettingThemePreview(
+                                    group = group,
+                                    themeId = it.id
+                                )
+                            )
                         },
                         onConfirm = {
                             onThemeConfirmClick.invoke(it)

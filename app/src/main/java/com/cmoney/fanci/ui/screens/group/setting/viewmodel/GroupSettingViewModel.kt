@@ -241,7 +241,8 @@ class GroupSettingViewModel(
                                 it.copy(isSelected = false)
                             }
                         },
-                        previewTheme = groupTheme.copy(isSelected = true)
+                        previewTheme = groupTheme.copy(isSelected = true),
+                        isGroupSettingPop = true
                     )
                 }
             })
@@ -265,6 +266,15 @@ class GroupSettingViewModel(
                 })
             }
         }
+    }
+
+    /**
+     * Reset 要設定的model.
+     */
+    fun resetSettingGroup() {
+        uiState = uiState.copy(
+            settingGroup =  null
+        )
     }
 
 }

@@ -59,7 +59,7 @@ fun GroupSettingThemePreviewScreen(
         viewModel.changeTheme(groupParam, it)
     }
 
-    LaunchedEffect(viewModel.uiState.settingGroup) {
+    LaunchedEffect(Unit) {
         viewModel.fetchThemeInfo(themeId)
     }
 }
