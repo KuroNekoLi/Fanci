@@ -29,6 +29,9 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.ChatRoomScreenDestination
+import com.cmoney.fanci.destinations.DiscoverGroupScreenDestination
+import com.cmoney.fanci.destinations.GroupSettingScreenDestination
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
 import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
@@ -37,6 +40,7 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,7 +52,8 @@ fun FollowScreen(
     onSearchClick: () -> Unit,
     onGroupSettingClick: (Group) -> Unit,
     navController: NavHostController,
-    globalViewModel: MainViewModel
+    globalViewModel: MainViewModel,
+    navigator: DestinationsNavigator? = null
 ) {
     val TAG = "FollowScreen"
 
@@ -85,7 +90,9 @@ fun FollowScreen(
                 },
                 onSearch = {
                     followScreenState.closeDrawer()
-                    onSearchClick.invoke()
+//                    onSearchClick.invoke()
+                    // TODO:  
+                    navigator?.navigate(DiscoverGroupScreenDestination)
                 }
             )
         },
@@ -212,7 +219,9 @@ fun FollowScreen(
                                     visibleAvatar = followScreenState.viewModel.uiState.visibleAvatar,
                                     modifier = Modifier.background(LocalColor.current.env_80)
                                 ) { group ->
-                                    onGroupSettingClick.invoke(group)
+                                    navigator?.navigate(GroupSettingScreenDestination(
+                                        group = group
+                                    ))
                                 }
                             }
 
@@ -220,7 +229,12 @@ fun FollowScreen(
                             items(group.categories.orEmpty()) { category ->
                                 CategoryScreen(category = category) { channel ->
                                     KLog.i(TAG, "Category click:$channel")
-                                    onChannelClick?.invoke(channel)
+//                                    onChannelClick?.invoke(channel)
+                                    // TODO:
+                                    navigator?.navigate(ChatRoomScreenDestination(
+                                        channelId = channel.id.orEmpty(),
+                                        channelTitle = channel.name.orEmpty()
+                                    ))
                                 }
                             }
                         }

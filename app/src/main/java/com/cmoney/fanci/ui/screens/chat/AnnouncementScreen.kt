@@ -33,11 +33,14 @@ fun AnnouncementScreen(
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
             TopBarScreen(
-                navController,
                 title = "設定公告訊息",
                 trailingEnable = false,
-                moreEnable = false
-            ) {}
+                moreEnable = false,
+                moreClick = {},
+                backClick = {
+                    navController.popBackStack()
+                }
+            )
         }
     ) { innerPadding ->
         Column(

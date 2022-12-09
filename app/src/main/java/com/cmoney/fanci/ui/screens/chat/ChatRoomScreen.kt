@@ -24,16 +24,19 @@ import com.cmoney.fanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
+@Destination
 @Composable
 fun ChatRoomScreen(
     channelId: String,
     channelTitle: String,
-    navController: NavHostController,
-    route: (MainStateHolder.Route) -> Unit,
-    stateHolder: ChatRoomState = rememberChatRoomState(navController = navController)
+    navController: DestinationsNavigator,
+//    route: (MainStateHolder.Route) -> Unit,
+    stateHolder: ChatRoomState = rememberChatRoomState()
 ) {
     val TAG = "ChatRoomScreen"
 
@@ -42,9 +45,9 @@ fun ChatRoomScreen(
     val messageViewModel = stateHolder.messageViewModel
 
     //Screen Callback like onActivityResult
-    val bundle = navController.currentBackStackEntryAsState().value
+//    val bundle = navController.currentBackStackEntryAsState().value
 
-    KLog.i(TAG, "bundle:$bundle")
+//    KLog.i(TAG, "bundle:$bundle")
     KLog.i(TAG, "channelId:$channelId")
 
     messageViewModel.startPolling(channelId)
@@ -61,12 +64,15 @@ fun ChatRoomScreen(
         scaffoldState = stateHolder.scaffoldState,
         topBar = {
             TopBarScreen(
-                stateHolder.navController,
                 title = channelTitle,
-                moreEnable = true
-            ) {
-                KLog.i(TAG, "more click.")
-            }
+                moreEnable = true,
+                moreClick = {
+                    KLog.i(TAG, "more click.")
+                },
+                backClick = {
+                    navController.popBackStack()
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -77,17 +83,17 @@ fun ChatRoomScreen(
             verticalArrangement = Arrangement.Bottom
         ) {
             //公告訊息 send to server
-            bundle?.apply {
-                this.arguments?.apply {
-                    val announceModel = this.getParcelable<ChatMessage>(AnnounceBundleKey)
-                    announceModel?.apply {
-                        viewModel.announceMessageToServer(
-                            channelId,
-                            this
-                        )
-                    }
-                }
-            }
+//            bundle?.apply {
+//                this.arguments?.apply {
+//                    val announceModel = this.getParcelable<ChatMessage>(AnnounceBundleKey)
+//                    announceModel?.apply {
+//                        viewModel.announceMessageToServer(
+//                            channelId,
+//                            this
+//                        )
+//                    }
+//                }
+//            }
 
             //公告訊息 display
             uiState.announceMessage?.let {
@@ -177,7 +183,8 @@ fun ChatRoomScreen(
         //Route
         //跳轉 公告 page
         messageViewModel.uiState.routeAnnounceMessage?.apply {
-            route.invoke(MainStateHolder.Route.Announce(this))
+            // TODO:
+//            route.invoke(MainStateHolder.Route.Announce(this))
             messageViewModel.announceRouteDone()
         }
     }
@@ -189,11 +196,11 @@ fun ChatRoomScreenPreview() {
     FanciTheme {
         val route: (MainStateHolder.Route) -> Unit = {
         }
-        ChatRoomScreen(
-            "",
-            "",
-            rememberNavController(),
-            route
-        )
+//        ChatRoomScreen(
+//            "",
+//            "",
+//            rememberNavController(),
+//            route
+//        )
     }
 }

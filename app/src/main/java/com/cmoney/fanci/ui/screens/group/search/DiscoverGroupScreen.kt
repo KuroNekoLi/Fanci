@@ -23,12 +23,14 @@ import com.cmoney.fanci.ui.screens.group.search.state.rememberDiscoverGroupState
 import com.cmoney.fanci.ui.screens.shared.GroupItemScreen
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.*
+import com.ramcosta.composedestinations.annotation.Destination
 
+@Destination
 @Composable
 fun DiscoverGroupScreen(
-    navController: NavHostController,
+//    navController: NavHostController,
     modifier: Modifier = Modifier,
-    state: DiscoverGroupState = rememberDiscoverGroupState(navController = navController)
+    state: DiscoverGroupState = rememberDiscoverGroupState()
 ) {
     var selectedIndex by remember { mutableStateOf(0) }
     val list = listOf("熱門社團", "最新社團")
@@ -37,14 +39,17 @@ fun DiscoverGroupScreen(
         modifier = modifier,
         topBar = {
             TopBarScreen(
-                state.navController,
                 title = "探索社團",
                 leadingEnable = true,
                 leadingIcon = Icons.Filled.Home,
                 trailingEnable = true,
                 moreEnable = false,
                 backgroundColor = Color_20262F,
-                moreClick = null
+                moreClick = {
+                },
+                backClick = {
+                    state.navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->
@@ -135,6 +140,6 @@ fun DiscoverGroupScreen(
 @Composable
 fun DiscoverGroupScreenPreview() {
     FanciTheme {
-        DiscoverGroupScreen(navController = rememberNavController())
+        DiscoverGroupScreen()
     }
 }

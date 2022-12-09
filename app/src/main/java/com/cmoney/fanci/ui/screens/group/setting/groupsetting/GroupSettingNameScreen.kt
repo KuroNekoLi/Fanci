@@ -61,10 +61,14 @@ fun GroupSettingNameView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                navController,
                 title = "社團名稱",
                 leadingEnable = true,
-                moreEnable = false
+                moreEnable = false,
+                moreClick = {
+                },
+                backClick = {
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->

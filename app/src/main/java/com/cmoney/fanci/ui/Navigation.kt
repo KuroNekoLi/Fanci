@@ -36,6 +36,7 @@ import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -66,12 +67,12 @@ fun MyAppNavHost(
 
         //頻道頁面
         composable("${MainStateHolder.Route.Channel}/{channelId}/{channelName}") { backStackEntry ->
-            val channelId = backStackEntry.arguments?.getString("channelId").orEmpty()
-            val channelName = backStackEntry.arguments?.getString("channelName").orEmpty()
-            KLog.i(TAG, "open chanel page id:$channelId , name:$channelName")
-            ChatRoomScreen(
-                channelId, channelName, mainNavController, route
-            )
+//            val channelId = backStackEntry.arguments?.getString("channelId").orEmpty()
+//            val channelName = backStackEntry.arguments?.getString("channelName").orEmpty()
+//            KLog.i(TAG, "open chanel page id:$channelId , name:$channelName")
+//            ChatRoomScreen(
+//                channelId, channelName, mainNavController, route
+//            )
         }
 
         //公告訊息
@@ -98,7 +99,7 @@ fun MyAppNavHost(
 
         //搜尋Group
         composable(MainStateHolder.Route.DiscoverGroup) {
-            DiscoverGroupScreen(mainNavController)
+            DiscoverGroupScreen()
         }
 
         navGroupSetting(
@@ -134,15 +135,15 @@ private fun navGroupSetting(
     navGraphBuilder.apply {
         //社團設定頁面
         composable(MainStateHolder.Route.GroupSetting) {
-            val group =
-                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-            group?.let {
-                GroupSettingScreen(
-                    navController = mainNavController,
-                    group = it,
-                    route = route
-                )
-            }
+//            val group =
+//                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+//            group?.let {
+//                GroupSettingScreen(
+//                    navController = mainNavController,
+//                    group = it,
+//                    route = route
+//                )
+//            }
         }
 
         //社團設定頁面-設定社團
@@ -319,7 +320,8 @@ fun MainNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: TabItem = TabItem.Follow,
     route: (MainStateHolder.Route) -> Unit,
-    globalViewModel: MainViewModel
+    globalViewModel: MainViewModel,
+    navigator: DestinationsNavigator? = null
 ) {
     //test
     var pos by remember { mutableStateOf(0) }
@@ -350,7 +352,8 @@ fun MainNavHost(
                                 route.invoke(MainStateHolder.GroupRoute.GroupSetting(group = it))
                             },
                             navController = navController,
-                            globalViewModel = globalViewModel
+                            globalViewModel = globalViewModel,
+                            navigator = navigator
                         )
                     }
                 }

@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.ui.screens.group.create.state.CreateGroupState
 import com.cmoney.fanci.ui.screens.group.create.state.rememberCreateGroupState
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.socks.library.KLog
 
 @Composable
 fun CreateGroupScreen(
@@ -22,13 +23,16 @@ fun CreateGroupScreen(
         modifier = modifier,
         topBar = {
             TopBarScreen(
-                state.navController,
                 title = "建立社團",
                 leadingEnable = true,
                 leadingIcon = Icons.Filled.ArrowBack ,
                 trailingEnable = true,
                 moreEnable = false,
-                moreClick = null
+                moreClick = {
+                },
+                backClick = {
+                    state.navController.popBackStack()
+                }
             )
         }
     ) {

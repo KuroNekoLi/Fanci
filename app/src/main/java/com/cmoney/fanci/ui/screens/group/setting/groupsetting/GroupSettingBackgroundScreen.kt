@@ -82,10 +82,14 @@ fun GroupSettingBackgroundView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                navController,
                 title = "社團背景",
                 leadingEnable = true,
-                moreEnable = false
+                moreEnable = false,
+                moreClick = {
+                },
+                backClick = {
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->

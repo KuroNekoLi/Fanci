@@ -58,10 +58,14 @@ fun GroupSettingDescView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                navController,
                 title = "社團簡介",
                 leadingEnable = true,
-                moreEnable = false
+                moreEnable = false,
+                moreClick = {
+                },
+                backClick = {
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->

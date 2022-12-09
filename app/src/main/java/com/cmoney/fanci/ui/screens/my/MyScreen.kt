@@ -34,12 +34,15 @@ fun MyScreen(
         scaffoldState = myScreenState.scaffoldState,
         topBar = {
             TopBarScreen(
-                myScreenState.navController,
                 title = "我的",
                 leadingEnable = false,
                 trailingEnable = false,
                 moreEnable = false,
-                moreClick = null
+                moreClick = {
+                },
+                backClick = {
+                    myScreenState.navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->

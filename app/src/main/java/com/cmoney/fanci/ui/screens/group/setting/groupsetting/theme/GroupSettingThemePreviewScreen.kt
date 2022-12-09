@@ -76,10 +76,14 @@ private fun GroupSettingThemePreviewView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                navController,
                 title = "主題預覽",
                 leadingEnable = true,
-                moreEnable = false
+                moreEnable = false,
+                moreClick = {
+                },
+                backClick = {
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->

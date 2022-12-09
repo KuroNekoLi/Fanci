@@ -67,10 +67,14 @@ fun FanciDefaultAvatarView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                navController,
                 title = "Fanci圖庫",
                 leadingEnable = true,
-                moreEnable = false
+                moreEnable = false,
+                moreClick = {
+                },
+                backClick = {
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->

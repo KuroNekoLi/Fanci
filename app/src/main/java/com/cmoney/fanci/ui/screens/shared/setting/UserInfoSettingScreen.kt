@@ -42,10 +42,13 @@ fun UserInfoSettingScreen(
         ),
         topBar = {
             TopBarScreen(
-                state.navController,
                 title = "社團個人資料",
                 moreEnable = false,
-                moreClick = null
+                moreClick = {
+                },
+                backClick = {
+                    state.navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->

@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.core.di.DependencyContainer
+import com.cmoney.fanci.destinations.MainScreen1Destination
+import com.cmoney.fanci.destinations.testDestination
 import com.cmoney.fanci.ui.MainNavHost
-import com.cmoney.fanci.ui.MyAppNavHost
 import com.cmoney.fanci.ui.screens.BottomBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -21,16 +25,25 @@ import com.cmoney.loginlibrary.module.variable.loginlibraryenum.EventCode
 import com.cmoney.loginlibrary.view.base.LoginLibraryMainActivity
 import com.cmoney.xlogin.XLoginHelper
 import com.cmoney.xlogin.base.BaseLoginAppCompactActivity
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.android.parcel.Parcelize
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
+
+val LocalDependencyContainer = staticCompositionLocalOf<MainActivity> {
+    error("No dependency container provided!")
+}
 
 @Parcelize
 class MainActivity : BaseLoginAppCompactActivity() {
     private val TAG = MainActivity::class.java.simpleName
 
     val globalViewModel by inject<MainViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,23 +52,29 @@ class MainActivity : BaseLoginAppCompactActivity() {
         }
 
         setContent {
-//            val theme = globalViewModel.theme.observeAsState()
-            val state = globalViewModel.uiState
+            CompositionLocalProvider(LocalDependencyContainer provides this) {
+                val state = globalViewModel.uiState
+                FanciTheme(fanciColor = state.theme) {
+                    val mainState = rememberMainState()
+                    Scaffold(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(LocalColor.current.primary),
+                    ) {
+                        mainState.setStatusBarColor()
 
-            FanciTheme(fanciColor = state.theme) {
-                val mainState = rememberMainState()
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(LocalColor.current.primary),
-                ) {
-                    mainState.setStatusBarColor()
-                    MyAppNavHost(
-                        mainState.navController,
-                        mainState.mainNavController,
-                        mainState.route,
-                        globalViewModel
-                    )
+                        DestinationsNavHost(
+                            navGraph = NavGraphs.root,
+                            startRoute = MainScreen1Destination
+                        )
+
+//                    MyAppNavHost(
+//                        mainState.navController,
+//                        mainState.mainNavController,
+//                        mainState.route,
+//                        globalViewModel
+//                    )
+                    }
                 }
             }
         }
@@ -95,6 +114,51 @@ class MainActivity : BaseLoginAppCompactActivity() {
     override fun loginSuccessCallback() {
         KLog.i(TAG, "loginSuccessCallback")
         globalViewModel.registerUser()
+    }
+}
+
+@RootNavGraph(start = true)
+@Destination
+@Composable
+fun MainScreen1(
+    navigator: DestinationsNavigator,
+) {
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val mainNavController = rememberNavController()
+    val state = globalViewModel.uiState
+
+    FanciTheme(fanciColor = state.theme) {
+        KLog.i("TAG", "FanciTheme create.")
+        val mainState = rememberMainState()
+
+        Scaffold(
+            bottomBar = {
+                BottomBarScreen(
+                    mainNavController
+                )
+            }
+        ) { innerPadding ->
+            mainState.setStatusBarColor()
+            MainNavHost(
+                modifier = Modifier.padding(innerPadding),
+                navController = mainNavController,
+                route = {
+                    navigator.navigate(testDestination)
+                },
+                globalViewModel = globalViewModel,
+                navigator = navigator
+            )
+        }
+    }
+}
+
+@Destination
+@Composable
+fun test() {
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .background(LocalColor.current.primary)) {
+
     }
 }
 

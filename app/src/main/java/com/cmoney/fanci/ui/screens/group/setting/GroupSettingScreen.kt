@@ -18,23 +18,28 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@Destination
 @Composable
 fun GroupSettingScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
-    route: (MainStateHolder.Route) -> Unit
+//    route: (MainStateHolder.Route) -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                navController,
                 title = "社團設定",
                 leadingEnable = true,
-                moreEnable = false
+                moreEnable = false,
+                backClick = {
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->
@@ -50,11 +55,11 @@ fun GroupSettingScreen(
             //社團管理
             GroupManageScreen(
                 onItemClick = {
-                    groupSettingRouteProcess(
-                        group = group,
-                        mainRoute = route,
-                        route = it
-                    )
+//                    groupSettingRouteProcess(
+//                        group = group,
+//                        mainRoute = route,
+//                        route = it
+//                    )
                 }
             )
 
@@ -129,11 +134,11 @@ private fun groupSettingRouteProcess(
 @Composable
 fun GroupSettingScreenPreview() {
     FanciTheme {
-        GroupSettingScreen(
-            navController = rememberNavController(),
-            group = Group(),
-        ) {
-
-        }
+//        GroupSettingScreen(
+//            navController = rememberNavController(),
+//            group = Group(),
+//        ) {
+//
+//        }
     }
 }

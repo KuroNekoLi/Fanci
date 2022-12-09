@@ -29,21 +29,21 @@ import com.socks.library.KLog
 
 @Composable
 fun TopBarScreen(
-    navController: NavHostController,
     title: String,
     leadingEnable: Boolean = true,
     leadingIcon: ImageVector = Icons.Filled.ArrowBack,
     trailingEnable: Boolean = true,
     moreEnable: Boolean,
     backgroundColor: Color = LocalColor.current.env_100,
-    moreClick: (() -> Unit)?= null
+    moreClick: (() -> Unit)?= null,
+    backClick:  (() -> Unit)?= null,
 ) {
     val TAG = "TopBarScreen"
     CenterTopAppBar(
         leading = {
             if (leadingEnable) {
                 IconButton(onClick = {
-                    navController.popBackStack()
+                    backClick?.invoke()
                 }) {
                     Icon(
                         leadingIcon, null,
@@ -91,7 +91,6 @@ fun TopBarScreen(
 fun ChatRoomTopBarScreenPreview() {
     FanciTheme {
         TopBarScreen(
-            rememberNavController(),
             title = "Test",
             moreEnable = false
         ) {
