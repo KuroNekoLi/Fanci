@@ -11,10 +11,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.core.di.DependencyContainer
-import com.cmoney.fanci.destinations.MainScreen1Destination
+import com.cmoney.fanci.destinations.MainScreenDestination
 import com.cmoney.fanci.destinations.testDestination
 import com.cmoney.fanci.ui.MainNavHost
 import com.cmoney.fanci.ui.screens.BottomBarScreen
@@ -29,6 +27,7 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.android.parcel.Parcelize
 import org.koin.android.ext.android.inject
@@ -65,7 +64,7 @@ class MainActivity : BaseLoginAppCompactActivity() {
 
                         DestinationsNavHost(
                             navGraph = NavGraphs.root,
-                            startRoute = MainScreen1Destination
+                            startRoute = MainScreenDestination
                         )
 
 //                    MyAppNavHost(
@@ -120,7 +119,7 @@ class MainActivity : BaseLoginAppCompactActivity() {
 @RootNavGraph(start = true)
 @Destination
 @Composable
-fun MainScreen1(
+fun MainScreen(
     navigator: DestinationsNavigator,
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
@@ -162,32 +161,34 @@ fun test() {
     }
 }
 
-@Composable
-fun MainScreen(
-    mainNavController: NavHostController,
-    route: (MainStateHolder.Route) -> Unit,
-    globalViewModel: MainViewModel
-) {
-    Scaffold(
-        bottomBar = {
-            BottomBarScreen(
-                mainNavController
-            )
-        }
-    ) { innerPadding ->
-        MainNavHost(
-            modifier = Modifier.padding(innerPadding),
-            navController = mainNavController,
-            route = route,
-            globalViewModel = globalViewModel
-        )
-    }
-}
+//@Composable
+//fun MainScreen(
+//    mainNavController: NavHostController,
+//    route: (MainStateHolder.Route) -> Unit,
+//    globalViewModel: MainViewModel
+//) {
+//    Scaffold(
+//        bottomBar = {
+//            BottomBarScreen(
+//                mainNavController
+//            )
+//        }
+//    ) { innerPadding ->
+//        MainNavHost(
+//            modifier = Modifier.padding(innerPadding),
+//            navController = mainNavController,
+//            route = route,
+//            globalViewModel = globalViewModel
+//        )
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     FanciTheme {
-        MainScreen(rememberNavController(), route = {}, koinViewModel())
+        MainScreen(
+            EmptyDestinationsNavigator
+        )
     }
 }

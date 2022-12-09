@@ -22,7 +22,7 @@ import com.cmoney.fanci.ui.theme.LocalColor
 @Composable
 fun GroupManageScreen(
     modifier: Modifier = Modifier,
-    onItemClick: (GroupSettingRoute) -> Unit
+    onGroupSetting: (GroupSettingRoute) -> Unit
 ) {
 
     Column(
@@ -37,7 +37,7 @@ fun GroupManageScreen(
             iconRes = R.drawable.info,
             text = "社團設定",
             onItemClick = {
-                onItemClick.invoke(
+                onGroupSetting.invoke(
                     GroupSettingRoute.GroupSetting
                 )
             }
@@ -49,7 +49,7 @@ fun GroupManageScreen(
             iconRes = R.drawable.channel_setting,
             text = "頻道管理",
             onItemClick = {
-                onItemClick.invoke(
+                onGroupSetting.invoke(
                     GroupSettingRoute.ChannelManage
                 )
             }
@@ -60,7 +60,7 @@ fun GroupManageScreen(
             iconRes = R.drawable.lock,
             text = "社團公開度",
             onItemClick = {
-                onItemClick.invoke(
+                onGroupSetting.invoke(
                     GroupSettingRoute.GroupPublic
                 )
             }

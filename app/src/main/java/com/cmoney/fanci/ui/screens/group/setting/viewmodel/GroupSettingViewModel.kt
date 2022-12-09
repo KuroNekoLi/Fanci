@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanci.model.usecase.ThemeUseCase
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.ImageChangeData
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
@@ -92,18 +93,26 @@ class GroupSettingViewModel(
     /**
      * 更換社團 頭貼
      */
-    fun changeGroupAvatar(uri: Any, group: Group) {
+    fun changeGroupAvatar(data: ImageChangeData, group: Group) {
         KLog.i(TAG, "changeGroupAvatar")
         viewModelScope.launch {
             loading()
-            groupUseCase.changeGroupAvatar(uri, group).collect {
-                uiState = uiState.copy(
-                    isLoading = false,
-                    settingGroup = group.copy(
-                        thumbnailImageUrl = it
-                    ),
-                    isGroupSettingPop = true
-                )
+
+            var uri: Any? = data.uri
+            if (uri == null) {
+                uri = data.url
+            }
+
+            uri?.let {
+                groupUseCase.changeGroupAvatar(uri, group).collect {
+                    uiState = uiState.copy(
+                        isLoading = false,
+                        settingGroup = group.copy(
+                            thumbnailImageUrl = it
+                        ),
+                        isGroupSettingPop = true
+                    )
+                }
             }
         }
     }
@@ -111,18 +120,25 @@ class GroupSettingViewModel(
     /**
      * 更換 社團 背景圖
      */
-    fun changeGroupCover(uri: Any, group: Group) {
+    fun changeGroupCover(data: ImageChangeData, group: Group) {
         KLog.i(TAG, "changeGroupCover")
         viewModelScope.launch {
             loading()
-            groupUseCase.changeGroupBackground(uri, group).collect {
-                uiState = uiState.copy(
-                    isLoading = false,
-                    settingGroup = group.copy(
-                        coverImageUrl = it
-                    ),
-                    isGroupSettingPop = true
-                )
+            var uri: Any? = data.uri
+            if (uri == null) {
+                uri = data.url
+            }
+
+            uri?.let {
+                groupUseCase.changeGroupBackground(uri, group).collect {
+                    uiState = uiState.copy(
+                        isLoading = false,
+                        settingGroup = group.copy(
+                            coverImageUrl = it
+                        ),
+                        isGroupSettingPop = true
+                    )
+                }
             }
         }
     }
@@ -273,7 +289,7 @@ class GroupSettingViewModel(
      */
     fun resetSettingGroup() {
         uiState = uiState.copy(
-            settingGroup =  null
+            settingGroup = null
         )
     }
 

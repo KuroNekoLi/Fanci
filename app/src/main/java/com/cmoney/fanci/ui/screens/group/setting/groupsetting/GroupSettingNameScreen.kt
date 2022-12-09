@@ -15,40 +15,35 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.extension.showToast
-import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 
+@Destination
 @Composable
 fun GroupSettingNameScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
-    viewModel: GroupSettingViewModel
+    resultNavigator: ResultBackNavigator<String>
 ) {
     GroupSettingNameView(
         modifier = modifier,
         navController = navController, group = group, onChangeName = { name ->
-            viewModel.changeGroupName(name, group)
+            resultNavigator.navigateBack(name)
         })
-
-    LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
-        if (viewModel.uiState.isGroupSettingPop) {
-            navController.popBackStack()
-            viewModel.changeGroupInfoScreenDone()
-        }
-    }
 }
 
 @Composable
 fun GroupSettingNameView(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
     onChangeName: (String) -> Unit
 ) {
@@ -166,7 +161,7 @@ fun GroupSettingNameScreenPreview() {
                 name = "韓勾ㄟ金針菇討論區",
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
             ),
-            navController = rememberNavController()
+            navController = EmptyDestinationsNavigator
         ) {}
     }
 }

@@ -18,22 +18,25 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
-import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
+@Destination
 @Composable
 fun FanciDefaultCoverScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
-    group: Group,
-    viewModel: GroupSettingViewModel
+    navController: DestinationsNavigator,
+    viewModel: GroupSettingViewModel = koinViewModel(),
+    fanciResultNavigator: ResultBackNavigator<String>
 ) {
     val TAG = "FanciDefaultCoverScreen"
     val state = viewModel.uiState
@@ -45,8 +48,10 @@ fun FanciDefaultCoverScreen(
         isLoading = state.isLoading
     ) {
         KLog.i(TAG, "image click:$it")
-        viewModel.onGroupCoverSelect(it, group)
-        navController.popBackStack()
+        fanciResultNavigator.navigateBack(it)
+
+//        viewModel.onGroupCoverSelect(it, group)
+//        navController.popBackStack()
     }
 
     LaunchedEffect(Unit) {
@@ -57,7 +62,7 @@ fun FanciDefaultCoverScreen(
 @Composable
 fun FanciDefaultCoverView(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     imageUrl: List<String>,
     isLoading: Boolean = false,
     onImageClick: (String) -> Unit
@@ -77,18 +82,16 @@ fun FanciDefaultCoverView(
                 }
             )
         }
-    ) { innerPadding ->
-
+    ) {
         Column {
             LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                 items(imageUrl.size) { index ->
-                    val imageUrl = imageUrl[index]
                     AsyncImage(
-                        model = imageUrl,
+                        model = imageUrl[index],
                         modifier = Modifier
                             .aspectRatio(1f)
                             .clickable {
-                                onImageClick.invoke(imageUrl)
+                                onImageClick.invoke(imageUrl[index])
                             },
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
@@ -114,7 +117,7 @@ fun FanciDefaultCoverView(
 fun FanciDefaultCoverScreenPreview() {
     FanciTheme {
         FanciDefaultCoverView(
-            navController = rememberNavController(),
+            navController = EmptyDestinationsNavigator,
             imageUrl = listOf("1", "2", "3", "4")
         ) {
 

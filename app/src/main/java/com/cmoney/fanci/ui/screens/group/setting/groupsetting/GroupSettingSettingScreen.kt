@@ -17,12 +17,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.cmoney.fanci.MainStateHolder
-import com.cmoney.fanci.MainViewModel
+import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.GroupSettingAvatarScreenDestination
+import com.cmoney.fanci.destinations.GroupSettingBackgroundScreenDestination
+import com.cmoney.fanci.destinations.GroupSettingDescScreenDestination
+import com.cmoney.fanci.destinations.GroupSettingNameScreenDestination
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.theme.ThemeColorCardScreen
@@ -30,37 +31,38 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-
-const val GroupSettingBundleKey = "GroupSettingBundleKey"
-
-
-@Composable
-fun GroupSettingScreen(
-    modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
-    group: Group,
-    viewModel: GroupSettingViewModel,
-    globalViewModel: MainViewModel
-) {
-//    navigator.navigate(ChannelSettingScreenDestination())
-//    rememberNavHostEngine()
-}
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 社團設定 - 社團設定
  */
+@Destination
 @Composable
 fun GroupSettingSettingScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
+    setNameResult: ResultRecipient<GroupSettingNameScreenDestination, String>,
+    setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
+    setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
+    setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>,
     group: Group,
-    route: (MainStateHolder.Route) -> Unit,
-    viewModel: GroupSettingViewModel,
-    globalViewModel: MainViewModel
 ) {
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val viewModel: GroupSettingViewModel = koinViewModel()
+
+    setCallbackHandle(
+        setNameResult = setNameResult,
+        setDescResult = setDescResult,
+        setAvatarResult = setAvatarResult,
+        setBackgroundResult = setBackgroundResult,
+        group = group
+    )
+
     var groupParam = group
     viewModel.uiState.settingGroup?.let {
         groupParam = it
@@ -71,16 +73,75 @@ fun GroupSettingSettingScreen(
         modifier,
         navController,
         groupParam,
-        route,
     )
+}
+
+/**
+ * 處理 所有更改過的 callback
+ */
+@Composable
+private fun setCallbackHandle(
+    setNameResult: ResultRecipient<GroupSettingNameScreenDestination, String>,
+    setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
+    group: Group,
+    viewModel: GroupSettingViewModel = koinViewModel(),
+    setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
+    setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>
+) {
+    //更改名字 callback
+    setNameResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val changeName = result.value
+                viewModel.changeGroupName(name = changeName, group)
+            }
+        }
+    }
+
+    //更改簡介 callback
+    setDescResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val desc = result.value
+                viewModel.changeGroupDesc(desc, group)
+            }
+        }
+    }
+
+    //更改頭貼
+    setAvatarResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val uri = result.value
+                viewModel.changeGroupAvatar(uri, group)
+            }
+        }
+    }
+
+    //更改背景
+    setBackgroundResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val uri = result.value
+                viewModel.changeGroupCover(uri, group)
+            }
+        }
+    }
 }
 
 @Composable
 fun GroupSettingSettingView(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
-    group: Group,
-    route: (MainStateHolder.Route) -> Unit
+    navController: DestinationsNavigator,
+    group: Group
 ) {
     val TAG = "GroupSettingSettingScreen"
 
@@ -113,11 +174,7 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "name click")
-                        route.invoke(
-                            MainStateHolder.GroupRoute.GroupSettingSettingName(
-                                group = group
-                            )
-                        )
+                        navController.navigate(GroupSettingNameScreenDestination(group = group))
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),
@@ -158,9 +215,7 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "description click")
-                        route.invoke(
-                            MainStateHolder.GroupRoute.GroupSettingSettingDesc(group = group)
-                        )
+                        navController.navigate(GroupSettingDescScreenDestination(group = group))
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),
@@ -212,9 +267,7 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "avatar image click")
-                        route.invoke(
-                            MainStateHolder.GroupRoute.GroupSettingSettingAvatar(group = group)
-                        )
+                        navController.navigate(GroupSettingAvatarScreenDestination(group = group))
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),
@@ -251,8 +304,10 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "background image click")
-                        route.invoke(
-                            MainStateHolder.GroupRoute.GroupSettingSettingBackground(group = group)
+                        navController.navigate(
+                            GroupSettingBackgroundScreenDestination(
+                                group = group
+                            )
                         )
                     }
                     .padding(start = 24.dp, end = 24.dp)
@@ -290,11 +345,12 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "theme click")
-                        route.invoke(
-                            MainStateHolder.GroupRoute.GroupSettingSettingTheme(
-                                group = group
-                            )
-                        )
+                        // TODO: route
+//                        route.invoke(
+//                            MainStateHolder.GroupRoute.GroupSettingSettingTheme(
+//                                group = group
+//                            )
+//                        )
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),
@@ -333,7 +389,7 @@ fun GroupSettingSettingView() {
                 name = "韓勾ㄟ金針菇討論區",
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
             ),
-            navController = rememberNavController()
-        ) {}
+            navController = EmptyDestinationsNavigator
+        )
     }
 }

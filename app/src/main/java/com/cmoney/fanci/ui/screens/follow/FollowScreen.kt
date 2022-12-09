@@ -41,6 +41,7 @@ import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,12 +49,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun FollowScreen(
     followScreenState: FollowScreenState = rememberFollowScreenState(),
-    onChannelClick: ((channel: Channel) -> Unit)?,
-    onSearchClick: () -> Unit,
-    onGroupSettingClick: (Group) -> Unit,
-    navController: NavHostController,
     globalViewModel: MainViewModel,
-    navigator: DestinationsNavigator? = null
+    navigator: DestinationsNavigator
 ) {
     val TAG = "FollowScreen"
 
@@ -257,11 +254,8 @@ fun LazyListState.isScrolledToTop() = firstVisibleItemScrollOffset == 0
 fun FollowScreenPreview() {
     FanciTheme {
         FollowScreen(
-            onChannelClick = {},
-            onSearchClick = {},
-            onGroupSettingClick = {},
-            navController = rememberNavController(),
-            globalViewModel = koinViewModel()
+            globalViewModel = koinViewModel(),
+            navigator = EmptyDestinationsNavigator
         )
     }
 }

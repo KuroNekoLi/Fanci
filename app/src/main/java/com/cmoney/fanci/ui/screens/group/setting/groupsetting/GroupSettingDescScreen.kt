@@ -21,32 +21,31 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 
+@Destination
 @Composable
 fun GroupSettingDescScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
-    viewModel: GroupSettingViewModel
+    resultNavigator: ResultBackNavigator<String>
 ) {
     GroupSettingDescView(
         modifier = modifier,
         navController = navController, group = group, onChangeDesc = { desc ->
-            viewModel.changeGroupDesc(desc, group)
+            resultNavigator.navigateBack(desc)
         })
 
-    LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
-        if (viewModel.uiState.isGroupSettingPop) {
-            navController.popBackStack()
-            viewModel.changeGroupInfoScreenDone()
-        }
-    }
 }
 
 @Composable
 fun GroupSettingDescView(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
     onChangeDesc: (String) -> Unit
 ) {
@@ -159,7 +158,7 @@ fun GroupSettingDescViewPreview() {
                 name = "韓勾ㄟ金針菇討論區",
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
             ),
-            navController = rememberNavController()
-        ) {}
+            navController = EmptyDestinationsNavigator
+        ){}
     }
 }

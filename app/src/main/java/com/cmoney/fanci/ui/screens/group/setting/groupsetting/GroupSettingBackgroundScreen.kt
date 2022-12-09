@@ -1,6 +1,5 @@
 package com.cmoney.fanci.ui.screens.group.setting.groupsetting
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,11 +17,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.FanciDefaultAvatarScreenDestination
+import com.cmoney.fanci.destinations.FanciDefaultCoverScreenDestination
 import com.cmoney.fanci.ui.common.TransparentButton
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.GroupSettingSettingState
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.state.rememberGroupSettingSettingState
@@ -33,45 +30,63 @@ import com.cmoney.fanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
+@Destination
 @Composable
 fun GroupSettingBackgroundScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
-    viewModel: GroupSettingViewModel,
-    route: (MainStateHolder.Route) -> Unit
+    viewModel: GroupSettingViewModel = koinViewModel(),
+    resultNavigator: ResultBackNavigator<ImageChangeData>,
+    fanciCoverResult: ResultRecipient<FanciDefaultCoverScreenDestination, String>
 ) {
     val state = viewModel.uiState
+
+    fanciCoverResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val fanciUrl = result.value
+                viewModel.onGroupCoverSelect(fanciUrl, group)
+            }
+        }
+    }
 
     GroupSettingBackgroundView(
         modifier,
         navController,
         isLoading = viewModel.uiState.isLoading,
         group = state.settingGroup ?: group,
-        route = route
     ) {
-        viewModel.changeGroupCover(it, group)
+        resultNavigator.navigateBack(it)
     }
 
-    LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
-        if (viewModel.uiState.isGroupSettingPop) {
-            navController.popBackStack()
-            viewModel.changeGroupInfoScreenDone()
-        }
-    }
+//    LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
+//        if (viewModel.uiState.isGroupSettingPop) {
+//            navController.popBackStack()
+//            viewModel.changeGroupInfoScreenDone()
+//        }
+//    }
 }
 
 @Composable
 fun GroupSettingBackgroundView(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
     state: GroupSettingSettingState = rememberGroupSettingSettingState(),
     isLoading: Boolean,
-    route: (MainStateHolder.Route) -> Unit,
-    onImageChange: (Any) -> Unit
+    onImageChange: (ImageChangeData) -> Unit
 ) {
     val TAG = "GroupSettingAvatarView"
     val configuration = LocalConfiguration.current
@@ -174,9 +189,19 @@ fun GroupSettingBackgroundView(
                     onClick = {
                         KLog.i(TAG, "on save click.")
                         state.coverImageUrl.value?.let {
-                            onImageChange.invoke(it)
+                            onImageChange.invoke(
+                                ImageChangeData(
+                                    uri = it,
+                                    url = null
+                                )
+                            )
                         } ?: kotlin.run {
-                            onImageChange.invoke(group.coverImageUrl.orEmpty())
+                            onImageChange.invoke(
+                                ImageChangeData(
+                                    uri = null,
+                                    url = group.coverImageUrl.orEmpty()
+                                )
+                            )
                         }
                     }) {
                     Text(
@@ -197,11 +222,7 @@ fun GroupSettingBackgroundView(
                     state.setBackgroundImage(it)
                 },
                 onFanciClick = {
-                    route.invoke(
-                        MainStateHolder.GroupRoute.GroupSettingSettingCoverFanci(
-                            group = group
-                        )
-                    )
+                    navController.navigate(FanciDefaultCoverScreenDestination)
                 }
             )
         }
@@ -215,10 +236,9 @@ fun GroupSettingBackgroundView(
 fun GroupSettingBackgroundPreview() {
     FanciTheme {
         GroupSettingBackgroundView(
-            navController = rememberNavController(),
+            navController = EmptyDestinationsNavigator,
             group = Group(),
-            isLoading = true,
-            route = {}
+            isLoading = true
         ) {}
     }
 }

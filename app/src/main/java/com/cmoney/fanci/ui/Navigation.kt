@@ -61,19 +61,19 @@ fun MyAppNavHost(
         startDestination = "main",
         modifier = Modifier,
     ) {
-        composable("main") {
-            MainScreen(navController, route, globalViewModel)
-        }
+//        composable("main") {
+//            MainScreen(navController, route, globalViewModel)
+//        }
 
         //頻道頁面
-        composable("${MainStateHolder.Route.Channel}/{channelId}/{channelName}") { backStackEntry ->
+//        composable("${MainStateHolder.Route.Channel}/{channelId}/{channelName}") { backStackEntry ->
 //            val channelId = backStackEntry.arguments?.getString("channelId").orEmpty()
 //            val channelName = backStackEntry.arguments?.getString("channelName").orEmpty()
 //            KLog.i(TAG, "open chanel page id:$channelId , name:$channelName")
 //            ChatRoomScreen(
 //                channelId, channelName, mainNavController, route
 //            )
-        }
+//        }
 
         //公告訊息
         composable(MainStateHolder.Route.Announce) { _ ->
@@ -133,139 +133,139 @@ private fun navGroupSetting(
     viewModelStoreOwner: ViewModelStoreOwner,
 ) {
     navGraphBuilder.apply {
-        //社團設定頁面
-        composable(MainStateHolder.Route.GroupSetting) {
-//            val group =
-//                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-//            group?.let {
-//                GroupSettingScreen(
-//                    navController = mainNavController,
-//                    group = it,
-//                    route = route
-//                )
-//            }
-        }
+//        //社團設定頁面
+//        composable(MainStateHolder.Route.GroupSetting) {
+////            val group =
+////                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+////            group?.let {
+////                GroupSettingScreen(
+////                    navController = mainNavController,
+////                    group = it,
+////                    route = route
+////                )
+////            }
+//        }
 
         //社團設定頁面-設定社團
-        composable(MainStateHolder.Route.GroupSetting_Setting) {
-            val groupSettingViewModel: GroupSettingViewModel =
-                koinViewModel(owner = viewModelStoreOwner)
-            val group =
-                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-            group?.let { group ->
-                GroupSettingSettingScreen(
-                    navController = mainNavController,
-                    group = group,
-                    route = route,
-                    viewModel = groupSettingViewModel,
-                    globalViewModel = globalViewModel
-                )
-            }
-        }
+//        composable(MainStateHolder.Route.GroupSetting_Setting) {
+//            val groupSettingViewModel: GroupSettingViewModel =
+//                koinViewModel(owner = viewModelStoreOwner)
+//            val group =
+//                mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+//            group?.let { group ->
+//                GroupSettingSettingScreen(
+//                    navController = mainNavController,
+//                    group = group,
+//                    route = route,
+//                    viewModel = groupSettingViewModel,
+//                    globalViewModel = globalViewModel
+//                )
+//            }
+//        }
 
         //社團設定頁面-設定社團-社團名稱
-        composable(MainStateHolder.Route.GroupSetting_Setting_Name) {
-            CompositionLocalProvider(
-                LocalViewModelStoreOwner provides viewModelStoreOwner
-            ) {
-                val group =
-                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-                group?.let { group ->
-                    GroupSettingNameScreen(
-                        navController = mainNavController,
-                        group = group,
-                        viewModel = koinViewModel()
-                    )
-                }
-            }
-        }
+//        composable(MainStateHolder.Route.GroupSetting_Setting_Name) {
+//            CompositionLocalProvider(
+//                LocalViewModelStoreOwner provides viewModelStoreOwner
+//            ) {
+//                val group =
+//                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+//                group?.let { group ->
+//                    GroupSettingNameScreen(
+//                        navController = mainNavController,
+//                        group = group,
+//                        viewModel = koinViewModel()
+//                    )
+//                }
+//            }
+//        }
 
-        //社團設定頁面-設定社團-社團簡介
-        composable(MainStateHolder.Route.GroupSetting_Setting_Desc) {
-            CompositionLocalProvider(
-                LocalViewModelStoreOwner provides viewModelStoreOwner
-            ) {
-                val group =
-                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-                group?.let { group ->
-                    GroupSettingDescScreen(
-                        navController = mainNavController,
-                        group = group,
-                        viewModel = koinViewModel()
-                    )
-                }
-            }
-        }
+//        //社團設定頁面-設定社團-社團簡介
+//        composable(MainStateHolder.Route.GroupSetting_Setting_Desc) {
+//            CompositionLocalProvider(
+//                LocalViewModelStoreOwner provides viewModelStoreOwner
+//            ) {
+//                val group =
+//                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+//                group?.let { group ->
+//                    GroupSettingDescScreen(
+//                        navController = mainNavController,
+//                        group = group,
+//                        viewModel = koinViewModel()
+//                    )
+//                }
+//            }
+//        }
 
         //社團設定頁面-設定社團-社團圖示
-        composable(MainStateHolder.Route.GroupSetting_Setting_Avatar) {
-            CompositionLocalProvider(
-                LocalViewModelStoreOwner provides viewModelStoreOwner
-            ) {
-                val group =
-                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-                group?.let { group ->
-                    GroupSettingAvatarScreen(
-                        navController = mainNavController,
-                        group = group,
-                        viewModel = koinViewModel(),
-                        route = route
-                    )
-                }
-            }
-        }
+//        composable(MainStateHolder.Route.GroupSetting_Setting_Avatar) {
+//            CompositionLocalProvider(
+//                LocalViewModelStoreOwner provides viewModelStoreOwner
+//            ) {
+//                val group =
+//                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+//                group?.let { group ->
+//                    GroupSettingAvatarScreen(
+//                        navController = mainNavController,
+//                        group = group,
+//                        viewModel = koinViewModel(),
+//                        route = route
+//                    )
+//                }
+//            }
+//        }
 
-        //社團設定頁面-設定社團-社團背景
-        composable(MainStateHolder.Route.GroupSetting_Setting_Background) {
-            CompositionLocalProvider(
-                LocalViewModelStoreOwner provides viewModelStoreOwner
-            ) {
-                val group =
-                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-                group?.let { group ->
-                    GroupSettingBackgroundScreen(
-                        navController = mainNavController,
-                        group = group,
-                        viewModel = koinViewModel(),
-                        route = route
-                    )
-                }
-            }
-        }
+//        //社團設定頁面-設定社團-社團背景
+//        composable(MainStateHolder.Route.GroupSetting_Setting_Background) {
+//            CompositionLocalProvider(
+//                LocalViewModelStoreOwner provides viewModelStoreOwner
+//            ) {
+//                val group =
+//                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+//                group?.let { group ->
+//                    GroupSettingBackgroundScreen(
+//                        navController = mainNavController,
+//                        group = group,
+//                        viewModel = koinViewModel(),
+//                        route = route
+//                    )
+//                }
+//            }
+//        }
 
-        //社團設定頁面-設定社團-社團圖示-Fanci預設
-        composable(MainStateHolder.Route.GroupSetting_Setting_Avatar_Fanci) {
-            CompositionLocalProvider(
-                LocalViewModelStoreOwner provides viewModelStoreOwner
-            ) {
-                val group =
-                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-                group?.let { group ->
-                    FanciDefaultAvatarScreen(
-                        navController = mainNavController,
-                        group = group,
-                        viewModel = koinViewModel()
-                    )
-                }
-            }
-        }
+//        //社團設定頁面-設定社團-社團圖示-Fanci預設
+//        composable(MainStateHolder.Route.GroupSetting_Setting_Avatar_Fanci) {
+//            CompositionLocalProvider(
+//                LocalViewModelStoreOwner provides viewModelStoreOwner
+//            ) {
+//                val group =
+//                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+//                group?.let { group ->
+//                    FanciDefaultAvatarScreen(
+//                        navController = mainNavController,
+//                        group = group,
+//                        viewModel = koinViewModel()
+//                    )
+//                }
+//            }
+//        }
 
-        //社團設定頁面-設定社團-社團背景-Fanci預設
-        composable(MainStateHolder.Route.GroupSetting_Setting_Background_Fanci) {
-            CompositionLocalProvider(
-                LocalViewModelStoreOwner provides viewModelStoreOwner
-            ) {
-                val group =
-                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
-                group?.let { group ->
-                    FanciDefaultCoverScreen(
-                        navController = mainNavController,
-                        group = group,
-                        viewModel = koinViewModel()
-                    )
-                }
-            }
-        }
+//        //社團設定頁面-設定社團-社團背景-Fanci預設
+//        composable(MainStateHolder.Route.GroupSetting_Setting_Background_Fanci) {
+//            CompositionLocalProvider(
+//                LocalViewModelStoreOwner provides viewModelStoreOwner
+//            ) {
+//                val group =
+//                    mainNavController.previousBackStackEntry?.savedStateHandle?.get<Group>("group")
+//                group?.let { group ->
+//                    FanciDefaultCoverScreen(
+//                        navController = mainNavController,
+//                        group = group,
+//                        viewModel = koinViewModel()
+//                    )
+//                }
+//            }
+//        }
 
         //社團設定頁面-設定社團-主題色彩
         composable(MainStateHolder.Route.GroupSetting_Setting_Theme) {
@@ -321,7 +321,7 @@ fun MainNavHost(
     startDestination: TabItem = TabItem.Follow,
     route: (MainStateHolder.Route) -> Unit,
     globalViewModel: MainViewModel,
-    navigator: DestinationsNavigator? = null
+    navigator: DestinationsNavigator
 ) {
     //test
     var pos by remember { mutableStateOf(0) }
@@ -336,22 +336,22 @@ fun MainNavHost(
                 TabItem.Follow -> {
                     composable(TabItem.Follow.route) {
                         FollowScreen(
-                            onChannelClick = {
-                                route.invoke(
-                                    MainStateHolder.Route.Channel(
-                                        channelId = it.id.orEmpty(),
-                                        channelName = it.name.orEmpty()
-                                    )
-                                )
-                            },
-                            onSearchClick = {
-                                route.invoke(MainStateHolder.Route.DiscoverGroup())
-                            },
-                            onGroupSettingClick = {
-                                //前往社團設定
-                                route.invoke(MainStateHolder.GroupRoute.GroupSetting(group = it))
-                            },
-                            navController = navController,
+//                            onChannelClick = {
+//                                route.invoke(
+//                                    MainStateHolder.Route.Channel(
+//                                        channelId = it.id.orEmpty(),
+//                                        channelName = it.name.orEmpty()
+//                                    )
+//                                )
+//                            },
+//                            onSearchClick = {
+//                                route.invoke(MainStateHolder.Route.DiscoverGroup())
+//                            },
+//                            onGroupSettingClick = {
+//                                //前往社團設定
+//                                route.invoke(MainStateHolder.GroupRoute.GroupSetting(group = it))
+//                            },
+//                            navController = navController,
                             globalViewModel = globalViewModel,
                             navigator = navigator
                         )

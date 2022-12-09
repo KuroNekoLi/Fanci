@@ -10,10 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.MainStateHolder
+import com.cmoney.fanci.destinations.GroupSettingSettingScreenDestination
 import com.cmoney.fanci.ui.screens.group.setting.GroupSettingRoute.*
+import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingSettingScreen
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -54,7 +54,8 @@ fun GroupSettingScreen(
 
             //社團管理
             GroupManageScreen(
-                onItemClick = {
+                onGroupSetting = {
+                    navController.navigate(GroupSettingSettingScreenDestination(group = group))
 //                    groupSettingRouteProcess(
 //                        group = group,
 //                        mainRoute = route,
