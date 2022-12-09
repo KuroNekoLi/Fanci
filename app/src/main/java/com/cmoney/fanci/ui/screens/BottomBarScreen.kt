@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -14,7 +15,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.model.mainTabItems
+import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 
@@ -45,16 +46,28 @@ import com.cmoney.fanci.ui.theme.LocalColor
 ////    }
 //}
 
+enum class TabItem(
+    val title: String,
+    @DrawableRes val icon: Int,
+    val route: String
+) {
+    Follow(title = "社團", icon = R.drawable.follow, "follow"),
+    Chat(title = "聊天", icon = R.drawable.notify, "notify"),
+    Activity(title = "活動", icon = R.drawable.explore, "explore"),
+    Market(title = "商城", icon = R.drawable.market, "market"),
+    My(title = "我的", icon = R.drawable.my, "my")
+}
+
 @Composable
 fun BottomBarScreen(navController: NavHostController) {
-    Column{
+    Column {
         BottomNavigation(
             modifier = Modifier.height(65.dp),
             backgroundColor = LocalColor.current.env_100
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
-            mainTabItems.forEach { screen ->
+            TabItem.values().forEach { screen ->
                 BottomNavigationItem(
                     icon = {
                         Icon(

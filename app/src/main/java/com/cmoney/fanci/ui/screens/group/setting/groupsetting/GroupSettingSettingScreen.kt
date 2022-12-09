@@ -29,9 +29,25 @@ import com.cmoney.fanci.ui.screens.shared.theme.ThemeColorCardScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
 
 const val GroupSettingBundleKey = "GroupSettingBundleKey"
+
+
+@Composable
+fun GroupSettingScreen(
+    modifier: Modifier = Modifier,
+    navigator: DestinationsNavigator,
+    group: Group,
+    viewModel: GroupSettingViewModel,
+    globalViewModel: MainViewModel
+) {
+//    navigator.navigate(ChannelSettingScreenDestination())
+//    rememberNavHostEngine()
+}
 
 /**
  * 社團設定 - 社團設定

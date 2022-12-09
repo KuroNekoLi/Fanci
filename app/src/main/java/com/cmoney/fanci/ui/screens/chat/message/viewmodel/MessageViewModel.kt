@@ -400,6 +400,7 @@ class MessageViewModel(
                 messageInteract.message,
                 messageInteract.emojiResId
             )
+            else -> {}
         }
     }
 

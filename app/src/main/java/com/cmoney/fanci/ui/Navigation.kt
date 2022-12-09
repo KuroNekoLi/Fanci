@@ -18,8 +18,7 @@ import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
 import com.cmoney.fanci.extension.goBackWithParams
-import com.cmoney.fanci.model.MainTab
-import com.cmoney.fanci.model.mainTabItems
+import com.cmoney.fanci.ui.screens.TabItem
 import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
 import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
 import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
@@ -318,7 +317,7 @@ private fun navGroupSetting(
 fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: MainTab = MainTab.FOLLOW,
+    startDestination: TabItem = TabItem.Follow,
     route: (MainStateHolder.Route) -> Unit,
     globalViewModel: MainViewModel
 ) {
@@ -330,16 +329,10 @@ fun MainNavHost(
         startDestination = startDestination.route,
         modifier = modifier,
     ) {
-        mainTabItems.forEach { mainTab ->
+        TabItem.values().forEach { mainTab ->
             when (mainTab) {
-                MainTab.ACTIVITY -> {
-                    composable(MainTab.ACTIVITY.route) {
-                        AndroidViewBinding(MyFragmentLayoutBinding::inflate) {
-                        }
-                    }
-                }
-                MainTab.FOLLOW -> {
-                    composable(MainTab.FOLLOW.route) {
+                TabItem.Follow -> {
+                    composable(TabItem.Follow.route) {
                         FollowScreen(
                             onChannelClick = {
                                 route.invoke(
@@ -361,35 +354,34 @@ fun MainNavHost(
                         )
                     }
                 }
-                MainTab.MY -> {
-                    composable(MainTab.MY.route) {
+                TabItem.Chat -> {
+                    composable(TabItem.Chat.route) {
+                        PageDisplay(TabItem.Chat.title, pos) {
+                            pos += 1
+                        }
+                    }
+                }
+                TabItem.Activity -> {
+                    composable(TabItem.Activity.route) {
+                        AndroidViewBinding(MyFragmentLayoutBinding::inflate) {
+                        }
+                    }
+                }
+                TabItem.Market -> {
+                    composable(TabItem.Market.route) {
+                        PageDisplay(TabItem.Market.title, pos) {
+                            pos += 1
+                        }
+                    }
+                }
+                TabItem.My -> {
+                    composable(TabItem.My.route) {
                         MyScreen {
                             when (it) {
                                 MyCallback.ChangeAvatar -> {
                                     route.invoke(MainStateHolder.Route.UserInfo())
                                 }
                             }
-                        }
-                    }
-                }
-                MainTab.NOTIFY -> {
-                    composable(MainTab.NOTIFY.route) {
-                        PageDisplay(MainTab.NOTIFY.title, pos) {
-                            pos += 1
-                        }
-                    }
-                }
-                MainTab.MARKET -> {
-                    composable(MainTab.MARKET.route) {
-                        PageDisplay(MainTab.NOTIFY.title, pos) {
-                            pos += 1
-                        }
-                    }
-                }
-                else -> {
-                    composable(MainTab.FOLLOW.route) {
-                        PageDisplay(MainTab.FOLLOW.title, pos) {
-                            pos += 1
                         }
                     }
                 }
