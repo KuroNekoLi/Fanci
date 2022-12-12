@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
@@ -28,22 +29,26 @@ import com.cmoney.fanci.ui.theme.DefaultThemeColor
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 主題預覽
  */
+@Destination
 @Composable
 fun GroupSettingThemePreviewScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
     themeId: String,
-    viewModel: GroupSettingViewModel,
-    globalViewModel: MainViewModel
+    viewModel: GroupSettingViewModel = koinViewModel()
 ) {
     val TAG = "GroupSettingThemePreviewScreen"
-
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var groupParam = group
     viewModel.uiState.settingGroup?.let {
         groupParam = it
@@ -67,7 +72,7 @@ fun GroupSettingThemePreviewScreen(
 @Composable
 private fun GroupSettingThemePreviewView(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     groupTheme: GroupTheme?,
     onThemeConfirmClick: (GroupTheme) -> Unit
 ) {
@@ -142,7 +147,7 @@ private fun GroupSettingThemePreviewView(
 fun GroupSettingThemePreviewScreenPreview() {
     FanciTheme {
         GroupSettingThemePreviewView(
-            navController = rememberNavController(),
+            navController = EmptyDestinationsNavigator,
             groupTheme = GroupTheme(
                 id = "",
                 isSelected = false,

@@ -16,13 +16,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.MainStateHolder
-import com.cmoney.fanci.MainViewModel
+import com.cmoney.fanci.LocalDependencyContainer
+import com.cmoney.fanci.destinations.GroupSettingThemePreviewScreenDestination
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -30,21 +28,25 @@ import com.cmoney.fanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 主題色彩選擇畫面
  */
+@Destination
 @Composable
 fun GroupSettingThemeScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     group: Group,
-    viewModel: GroupSettingViewModel,
-    globalViewModel: MainViewModel,
-    route: (MainStateHolder.Route) -> Unit
+    viewModel: GroupSettingViewModel = koinViewModel(),
 ) {
     val TAG = "GroupSettingThemeScreen"
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
     val state = viewModel.uiState
     val fetchAllTheme = remember {
         mutableStateOf(true)
@@ -62,7 +64,6 @@ fun GroupSettingThemeScreen(
         isLoading = viewModel.uiState.isLoading,
         groupThemes = state.groupThemeList,
         group = groupParam,
-        route = route,
         onThemeConfirmClick = {
             KLog.i(TAG, "on theme click.")
             viewModel.changeTheme(groupParam, it)
@@ -77,11 +78,10 @@ fun GroupSettingThemeScreen(
 @Composable
 private fun GroupSettingThemeView(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: DestinationsNavigator,
     isLoading: Boolean,
     groupThemes: List<GroupTheme>,
     group: Group,
-    route: (MainStateHolder.Route) -> Unit,
     onThemeConfirmClick: (GroupTheme) -> Unit
 ) {
     Scaffold(
@@ -118,8 +118,8 @@ private fun GroupSettingThemeView(
                         name = it.name,
                         isSelected = it.isSelected,
                         onItemClick = {
-                            route.invoke(
-                                MainStateHolder.GroupRoute.GroupSettingSettingThemePreview(
+                            navController.navigate(
+                                GroupSettingThemePreviewScreenDestination(
                                     group = group,
                                     themeId = it.id
                                 )
@@ -150,11 +150,10 @@ private fun GroupSettingThemeView(
 fun GroupSettingThemeScreenPreview() {
     FanciTheme {
         GroupSettingThemeView(
-            navController = rememberNavController(),
+            navController = EmptyDestinationsNavigator,
             isLoading = false,
             groupThemes = emptyList(),
             group = Group(),
-            route = {},
             onThemeConfirmClick = {}
         )
     }

@@ -20,10 +20,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.R
-import com.cmoney.fanci.destinations.GroupSettingAvatarScreenDestination
-import com.cmoney.fanci.destinations.GroupSettingBackgroundScreenDestination
-import com.cmoney.fanci.destinations.GroupSettingDescScreenDestination
-import com.cmoney.fanci.destinations.GroupSettingNameScreenDestination
+import com.cmoney.fanci.destinations.*
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.theme.ThemeColorCardScreen
@@ -345,6 +342,9 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "theme click")
+                        navController.navigate(GroupSettingThemeScreenDestination(
+                            group = group
+                        ))
                         // TODO: route
 //                        route.invoke(
 //                            MainStateHolder.GroupRoute.GroupSettingSettingTheme(
