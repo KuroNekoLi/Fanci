@@ -23,9 +23,10 @@ fun CategoryScreen(
         CategoryText(text = category.name.orEmpty())
         Spacer(modifier = Modifier.height(10.dp))
         category.channels?.forEach { channel ->
-            ChannelBarScreen(channel = channel) {
-                onChannelClick.invoke(it)
-            }
+            ChannelBarScreen(channel = channel,
+                onClick = {
+                    onChannelClick.invoke(it)
+                })
         }
     }
 }

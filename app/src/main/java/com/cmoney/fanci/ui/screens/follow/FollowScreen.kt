@@ -87,9 +87,7 @@ fun FollowScreen(
                 },
                 onSearch = {
                     followScreenState.closeDrawer()
-//                    onSearchClick.invoke()
-                    // TODO:  
-                    navigator?.navigate(DiscoverGroupScreenDestination)
+                    navigator.navigate(DiscoverGroupScreenDestination)
                 }
             )
         },
@@ -226,9 +224,7 @@ fun FollowScreen(
                             items(group.categories.orEmpty()) { category ->
                                 CategoryScreen(category = category) { channel ->
                                     KLog.i(TAG, "Category click:$channel")
-//                                    onChannelClick?.invoke(channel)
-                                    // TODO:
-                                    navigator?.navigate(ChatRoomScreenDestination(
+                                    navigator.navigate(ChatRoomScreenDestination(
                                         channelId = channel.id.orEmpty(),
                                         channelTitle = channel.name.orEmpty()
                                     ))

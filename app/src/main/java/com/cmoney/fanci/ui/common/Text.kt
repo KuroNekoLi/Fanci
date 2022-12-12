@@ -33,8 +33,11 @@ fun GroupText(
 }
 
 @Composable
-fun CategoryText(text: String) {
+fun CategoryText(
+    modifier: Modifier = Modifier,
+    text: String) {
     Text(
+        modifier = modifier,
         text = text,
         style = TextStyle(
             fontSize = 14.sp,
@@ -46,8 +49,11 @@ fun CategoryText(text: String) {
 }
 
 @Composable
-fun ChannelText(text: String) {
+fun ChannelText(
+    modifier: Modifier = Modifier,
+    text: String) {
     Text(
+        modifier = modifier,
         text = text,
         style = TextStyle(
             fontSize = 16.sp,
