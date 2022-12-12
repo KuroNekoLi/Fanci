@@ -15,24 +15,32 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.Permission
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 已讀狀態參數
+ * 
  *
- * @param serialNumber 已讀訊息的流水號
+ * @param categoryName 
+ * @param displayCategoryName 
+ * @param permissions 
  */
 @Parcelize
 
 
-data class ReadStatusParam (
+data class PermissionCategory (
 
-    /* 已讀訊息的流水號 */
-    @Json(name = "serialNumber")
-    val serialNumber: kotlin.Long
+    @Json(name = "categoryName")
+    val categoryName: kotlin.String? = null,
+
+    @Json(name = "displayCategoryName")
+    val displayCategoryName: kotlin.String? = null,
+
+    @Json(name = "permissions")
+    val permissions: kotlin.collections.List<Permission>? = null
 
 ) : Parcelable
 

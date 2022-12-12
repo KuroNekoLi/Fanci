@@ -25,6 +25,7 @@ import kotlinx.parcelize.Parcelize
  * 
  *
  * @param displayName 
+ * @param previewThumbnail 
  * @param previewImage 
  * @param colors 
  */
@@ -35,6 +36,9 @@ data class Theme (
 
     @Json(name = "displayName")
     val displayName: kotlin.String? = null,
+
+    @Json(name = "previewThumbnail")
+    val previewThumbnail: kotlin.String? = null,
 
     @Json(name = "previewImage")
     val previewImage: kotlin.collections.List<kotlin.String>? = null,

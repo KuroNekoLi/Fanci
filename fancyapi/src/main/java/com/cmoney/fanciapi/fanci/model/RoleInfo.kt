@@ -21,17 +21,28 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 角色資訊
  *
- * @param serialNumber 
+ * @param id 角色Id
+ * @param name 角色名稱
+ * @param color 角色顏色
  */
 @Parcelize
 
 
-data class ReadStatus (
+data class RoleInfo (
 
-    @Json(name = "serialNumber")
-    val serialNumber: kotlin.Long? = null
+    /* 角色Id */
+    @Json(name = "id")
+    val id: kotlin.String? = null,
+
+    /* 角色名稱 */
+    @Json(name = "name")
+    val name: kotlin.String? = null,
+
+    /* 角色顏色 */
+    @Json(name = "color")
+    val color: kotlin.String? = null
 
 ) : Parcelable
 

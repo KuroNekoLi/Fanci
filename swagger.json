@@ -2712,7 +2712,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Permission"
+                    "$ref": "#/components/schemas/PermissionCategory"
                   }
                 }
               },
@@ -2720,7 +2720,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Permission"
+                    "$ref": "#/components/schemas/PermissionCategory"
                   }
                 }
               },
@@ -2728,7 +2728,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Permission"
+                    "$ref": "#/components/schemas/PermissionCategory"
                   }
                 }
               }
@@ -3854,6 +3854,9 @@
             "type": "integer",
             "description": "會員識別號",
             "format": "int64"
+          },
+          "roleInfo": {
+            "$ref": "#/components/schemas/RoleInfo"
           }
         },
         "additionalProperties": false,
@@ -4238,6 +4241,39 @@
             "type": "integer",
             "description": "0. group(space) level\r\n1. channel(board) level",
             "format": "int32"
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "highlight": {
+            "type": "boolean"
+          },
+          "displayCategoryName": {
+            "type": "string",
+            "description": "權限分類名稱",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PermissionCategory": {
+        "type": "object",
+        "properties": {
+          "categoryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "displayCategoryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -4289,6 +4325,28 @@
         ],
         "type": "string"
       },
+      "RoleInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "角色Id",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "角色名稱",
+            "nullable": true
+          },
+          "color": {
+            "type": "string",
+            "description": "角色顏色",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "角色資訊"
+      },
       "RoleOrderParam": {
         "type": "object",
         "properties": {
@@ -4333,6 +4391,10 @@
             "type": "string",
             "nullable": true,
             "readOnly": true
+          },
+          "previewThumbnail": {
+            "type": "string",
+            "nullable": true
           },
           "previewImage": {
             "type": "array",
