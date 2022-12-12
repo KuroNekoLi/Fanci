@@ -88,6 +88,10 @@ val networkBaseModule = module {
     single {
         get<ApiClient>().createService(ThemeColorApi::class.java)
     }
+
+    single {
+        get<ApiClient>().createService(CategoryApi::class.java)
+    }
 }
 
 private fun getDomain(context: Context): String {

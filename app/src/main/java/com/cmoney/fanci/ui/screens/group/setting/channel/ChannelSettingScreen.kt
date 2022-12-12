@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.fanci.LocalDependencyContainer
+import com.cmoney.fanci.destinations.AddChannelScreenDestination
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.channel.ChannelEditScreen
@@ -21,7 +23,10 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 頻道管理
@@ -31,12 +36,32 @@ import com.socks.library.KLog
 fun ChannelSettingScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    group: Group
+    group: Group,
+    viewModel: ChannelSettingViewModel = koinViewModel(),
+    setChannelResult: ResultRecipient<AddChannelScreenDestination, Channel>
 ) {
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    var groupParam = group
+    viewModel.uiState.group?.let {
+        groupParam = it
+        globalViewModel.setCurrentGroup(it)
+    }
+
+    setChannelResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val channel = result.value
+                viewModel.addChannelToGroup(channel = channel, group = group)
+            }
+        }
+    }
+
     ChannelSettingScreenView(
         modifier,
         navigator,
-        group
+        groupParam
     )
 }
 
@@ -107,6 +132,11 @@ fun ChannelSettingScreenView(
                     },
                     onAddChannel = {
                         KLog.i(TAG, "onAddChannel:$it")
+                        navigator.navigate(
+                            AddChannelScreenDestination(
+                                category = it
+                            )
+                        )
                     }
                 )
                 Spacer(modifier = Modifier.height(20.dp))

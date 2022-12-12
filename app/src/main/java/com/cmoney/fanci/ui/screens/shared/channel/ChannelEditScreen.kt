@@ -52,7 +52,7 @@ fun ChannelEditScreen(
                 modifier =
                 Modifier
                     .size(55.dp)
-                    .padding(end = 5.dp)
+                    .padding(end = 3.dp)
                     .clickable {
                         onCategoryEdit.invoke(category)
                     },

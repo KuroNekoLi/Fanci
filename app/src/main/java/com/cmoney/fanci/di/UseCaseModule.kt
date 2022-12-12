@@ -10,4 +10,5 @@ val useCaseModule = module {
     factory { UserUseCase(get()) }
     factory { ChatRoomPollUseCase(get()) }
     factory { ThemeUseCase(get(), get()) }
+    factory { ChannelUseCase(get()) }
 }
