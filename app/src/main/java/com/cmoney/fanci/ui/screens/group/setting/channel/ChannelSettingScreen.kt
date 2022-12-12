@@ -11,8 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.LocalDependencyContainer
+import com.cmoney.fanci.destinations.AddCategoryScreenDestination
 import com.cmoney.fanci.destinations.AddChannelScreenDestination
 import com.cmoney.fanci.ui.common.BorderButton
+import com.cmoney.fanci.ui.screens.group.setting.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.channel.ChannelEditScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -38,25 +40,38 @@ fun ChannelSettingScreen(
     navigator: DestinationsNavigator,
     group: Group,
     viewModel: ChannelSettingViewModel = koinViewModel(),
-    setChannelResult: ResultRecipient<AddChannelScreenDestination, Channel>
+    setChannelResult: ResultRecipient<AddChannelScreenDestination, Group>,
+    setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var groupParam = group
+
     viewModel.uiState.group?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
     }
 
+    //========== Result callback Start ==========
     setChannelResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
             is NavResult.Value -> {
-                val channel = result.value
-                viewModel.addChannelToGroup(channel = channel, group = group)
+                viewModel.setGroup(result.value)
             }
         }
     }
+
+    setCategoryResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                viewModel.setGroup(result.value)
+            }
+        }
+    }
+    //========== Result callback End ==========
 
     ChannelSettingScreenView(
         modifier,
@@ -104,6 +119,11 @@ fun ChannelSettingScreenView(
                     borderColor = LocalColor.current.text.default_100
                 ) {
                     KLog.i(TAG, "new category click.")
+                    navigator.navigate(
+                        AddCategoryScreenDestination(
+                            group = group
+                        )
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(23.dp))
@@ -134,6 +154,7 @@ fun ChannelSettingScreenView(
                         KLog.i(TAG, "onAddChannel:$it")
                         navigator.navigate(
                             AddChannelScreenDestination(
+                                group = group,
                                 category = it
                             )
                         )
