@@ -6,10 +6,26 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
+import com.cmoney.fanciapi.fanci.model.GroupMemberRoleInfos
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.fanciapi.fanci.model.UseridsParam
 
 interface RoleUserApi {
+    /**
+     * 取得用戶ID清單的腳色列表 __________🔒 已註冊的fanci使用者
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param groupId 
+     * @param userIds Fanci 用戶 ID (optional)
+     * @return [kotlin.collections.List<GroupMemberRoleInfos>]
+     */
+    @GET("api/v1/RoleUser/Group/{groupId}")
+    suspend fun apiV1RoleUserGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("UserIds") userIds: kotlin.collections.List<kotlin.String>? = null): Response<kotlin.collections.List<GroupMemberRoleInfos>>
+
     /**
      * 移除使用者的角色身分 __________🔒 指派身分
      * 

@@ -28,7 +28,7 @@ import kotlinx.parcelize.Parcelize
  * @param name 名稱
  * @param thumbNail 頭像
  * @param serialNumber 會員識別號
- * @param roleInfo 
+ * @param roleInfos 角色資訊(全部)
  */
 @Parcelize
 
@@ -51,8 +51,9 @@ data class GroupMember (
     @Json(name = "serialNumber")
     val serialNumber: kotlin.Long? = null,
 
-    @Json(name = "roleInfo")
-    val roleInfo: RoleInfo? = null
+    /* 角色資訊(全部) */
+    @Json(name = "roleInfos")
+    val roleInfos: kotlin.collections.List<RoleInfo>? = null
 
 ) : Parcelable
 

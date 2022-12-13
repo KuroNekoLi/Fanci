@@ -15,24 +15,30 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.RoleInfo
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 分類參數
+ * 社團會員 全部角色資訊
  *
- * @param name 分類命名
+ * @param id 使用者id
+ * @param roleInfos 角色資訊(最高)
  */
 @Parcelize
 
 
-data class CategoryParam (
+data class GroupMemberRoleInfos (
 
-    /* 分類命名 */
-    @Json(name = "name")
-    val name: kotlin.String
+    /* 使用者id */
+    @Json(name = "id")
+    val id: kotlin.String? = null,
+
+    /* 角色資訊(最高) */
+    @Json(name = "roleInfos")
+    val roleInfos: kotlin.collections.List<RoleInfo>? = null
 
 ) : Parcelable
 

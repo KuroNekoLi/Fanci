@@ -40,27 +40,29 @@ fun ChannelEditScreen(
             .padding(24.dp)
     ) {
         //分類
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            CategoryText(
-                modifier = Modifier.weight(1f),
-                text = category.name.orEmpty()
-            )
-
-            Box(
-                modifier =
-                Modifier
-                    .size(55.dp)
-                    .padding(end = 3.dp)
-                    .clickable {
-                        onCategoryEdit.invoke(category)
-                    },
-                contentAlignment = Alignment.Center
+        if (category.isDefault != true) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "編輯", fontSize = 14.sp, color = LocalColor.current.primary
+                CategoryText(
+                    modifier = Modifier.weight(1f),
+                    text = category.name.orEmpty()
                 )
+
+                Box(
+                    modifier =
+                    Modifier
+                        .size(55.dp)
+                        .padding(end = 3.dp)
+                        .clickable {
+                            onCategoryEdit.invoke(category)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "編輯", fontSize = 14.sp, color = LocalColor.current.primary
+                    )
+                }
             }
         }
 

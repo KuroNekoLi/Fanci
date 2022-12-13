@@ -33,6 +33,7 @@ import kotlinx.parcelize.Parcelize
  * @param isDeleted 是否被刪除
  * @param groupId 所屬社團
  * @param channels 分類下的頻道
+ * @param isDefault 前端顯示是否為隱藏
  */
 @Parcelize
 
@@ -73,7 +74,11 @@ data class Category (
 
     /* 分類下的頻道 */
     @Json(name = "channels")
-    val channels: kotlin.collections.List<Channel>? = null
+    val channels: kotlin.collections.List<Channel>? = null,
+
+    /* 前端顯示是否為隱藏 */
+    @Json(name = "isDefault")
+    val isDefault: kotlin.Boolean? = null
 
 ) : Parcelable
 

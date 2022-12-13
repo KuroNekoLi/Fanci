@@ -3071,6 +3071,80 @@
         ]
       }
     },
+    "/api/v1/RoleUser/Group/{groupId}": {
+      "get": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "取得用戶ID清單的腳色列表 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "UserIds",
+            "in": "query",
+            "description": "Fanci 用戶 ID",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMemberRoleInfos"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMemberRoleInfos"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMemberRoleInfos"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/ThemeColor": {
       "get": {
         "tags": [
@@ -3353,6 +3427,10 @@
             },
             "description": "分類下的頻道",
             "nullable": true
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "前端顯示是否為隱藏"
           }
         },
         "additionalProperties": false
@@ -3375,12 +3453,15 @@
         "additionalProperties": false
       },
       "CategoryParam": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string",
-            "description": "分類命名",
-            "nullable": true
+            "description": "分類命名"
           }
         },
         "additionalProperties": false,
@@ -3855,8 +3936,13 @@
             "description": "會員識別號",
             "format": "int64"
           },
-          "roleInfo": {
-            "$ref": "#/components/schemas/RoleInfo"
+          "roleInfos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleInfo"
+            },
+            "description": "角色資訊(全部)",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -3881,6 +3967,26 @@
           }
         },
         "additionalProperties": false
+      },
+      "GroupMemberRoleInfos": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "使用者id",
+            "nullable": true
+          },
+          "roleInfos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleInfo"
+            },
+            "description": "角色資訊(最高)",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "社團會員 全部角色資訊"
       },
       "GroupPaging": {
         "type": "object",

@@ -163,7 +163,6 @@ fun ChannelSettingScreenView(
                 }
             }
 
-
             group.categories?.forEach { category ->
                 ChannelEditScreen(
                     category = category,

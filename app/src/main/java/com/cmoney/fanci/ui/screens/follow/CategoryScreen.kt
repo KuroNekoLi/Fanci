@@ -20,7 +20,9 @@ fun CategoryScreen(
     onChannelClick: (channel: Channel) -> Unit
 ) {
     Column {
-        CategoryText(text = category.name.orEmpty())
+        if (category.isDefault != true) {
+            CategoryText(text = category.name.orEmpty())
+        }
         Spacer(modifier = Modifier.height(10.dp))
         category.channels?.forEach { channel ->
             ChannelBarScreen(channel = channel,
