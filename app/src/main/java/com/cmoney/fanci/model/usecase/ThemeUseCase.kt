@@ -2,10 +2,7 @@ package com.cmoney.fanci.model.usecase
 
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
-import com.cmoney.fanci.ui.theme.FanciColor
-import com.cmoney.fanci.ui.theme.FanciComponentColor
-import com.cmoney.fanci.ui.theme.FanciInputText
-import com.cmoney.fanci.ui.theme.FanciTextColor
+import com.cmoney.fanci.ui.theme.*
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.ThemeColorApi
 import com.cmoney.fanciapi.fanci.model.Color
@@ -149,6 +146,42 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: Group
             it.name == "Text_InputField_100"
         }.hexColorCode.orEmpty()
 
+        val blue = colors.first {
+            it.name == "SpecialColor_Blue"
+        }.hexColorCode.orEmpty()
+
+        val blueGreen = colors.first {
+            it.name == "SpecialColor_BlueGreen"
+        }.hexColorCode.orEmpty()
+
+        val green = colors.first {
+            it.name == "SpecialColor_Green"
+        }.hexColorCode.orEmpty()
+
+        val hintRed = colors.first {
+            it.name == "SpecialColor_Hint_Red"
+        }.hexColorCode.orEmpty()
+
+        val orange = colors.first {
+            it.name == "SpecialColor_Orange"
+        }.hexColorCode.orEmpty()
+
+        val pink = colors.first {
+            it.name == "SpecialColor_Pink"
+        }.hexColorCode.orEmpty()
+
+        val purple = colors.first {
+            it.name == "SpecialColor_Purple"
+        }.hexColorCode.orEmpty()
+
+        val red = colors.first {
+            it.name == "SpecialColor_Red"
+        }.hexColorCode.orEmpty()
+
+        val yellow = colors.first {
+            it.name == "SpecialColor_Yellow"
+        }.hexColorCode.orEmpty()
+
         return FanciColor(
             primary = androidx.compose.ui.graphics.Color(primary.toLong(16)),
             background = androidx.compose.ui.graphics.Color(background.toLong(16)),
@@ -174,6 +207,17 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: Group
                 input_50 = androidx.compose.ui.graphics.Color(input_50.toLong(16)),
                 input_80 = androidx.compose.ui.graphics.Color(input_80.toLong(16)),
                 input_100 = androidx.compose.ui.graphics.Color(input_100.toLong(16)),
+            ),
+            specialColor = SpecialColor(
+                blue = androidx.compose.ui.graphics.Color(blue.toLong(16)),
+                blueGreen = androidx.compose.ui.graphics.Color(blueGreen.toLong(16)),
+                green = androidx.compose.ui.graphics.Color(green.toLong(16)),
+                hintRed = androidx.compose.ui.graphics.Color(hintRed.toLong(16)),
+                orange = androidx.compose.ui.graphics.Color(orange.toLong(16)),
+                pink = androidx.compose.ui.graphics.Color(pink.toLong(16)),
+                purple = androidx.compose.ui.graphics.Color(purple.toLong(16)),
+                red = androidx.compose.ui.graphics.Color(red.toLong(16)),
+                yellow = androidx.compose.ui.graphics.Color(yellow.toLong(16))
             )
         )
     }

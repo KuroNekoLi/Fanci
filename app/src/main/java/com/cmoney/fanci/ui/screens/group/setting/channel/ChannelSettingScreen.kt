@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.destinations.AddCategoryScreenDestination
 import com.cmoney.fanci.destinations.AddChannelScreenDestination
+import com.cmoney.fanci.destinations.EditChannelScreenDestination
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.group.setting.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -41,7 +42,8 @@ fun ChannelSettingScreen(
     group: Group,
     viewModel: ChannelSettingViewModel = koinViewModel(),
     setChannelResult: ResultRecipient<AddChannelScreenDestination, Group>,
-    setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>
+    setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>,
+    setEditChannelResult: ResultRecipient<EditChannelScreenDestination, Group>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var groupParam = group
@@ -52,6 +54,16 @@ fun ChannelSettingScreen(
     }
 
     //========== Result callback Start ==========
+    setEditChannelResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                viewModel.setGroup(result.value)
+            }
+        }
+    }
+
     setChannelResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -149,6 +161,12 @@ fun ChannelSettingScreenView(
                     },
                     onChanelEdit = {
                         KLog.i(TAG, "onChanelEdit:$it")
+                        navigator.navigate(
+                            EditChannelScreenDestination(
+                                group = group,
+                                channel = it
+                            )
+                        )
                     },
                     onAddChannel = {
                         KLog.i(TAG, "onAddChannel:$it")

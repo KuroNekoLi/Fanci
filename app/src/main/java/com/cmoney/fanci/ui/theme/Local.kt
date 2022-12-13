@@ -24,8 +24,23 @@ data class FanciColor(
     val inputFrame: Color,          //輸入框
     val component: FanciComponentColor,  //元件色
     val text: FanciTextColor,            //文字色
-    val inputText: FanciInputText        //文字色-輸入框
+    val inputText: FanciInputText,       //文字色-輸入框
+    val specialColor: SpecialColor       //特殊色
 )
+
+@Immutable
+data class SpecialColor(
+    val blue: Color,
+    val blueGreen: Color,
+    val green: Color,
+    val hintRed: Color,
+    val orange: Color,
+    val pink: Color,
+    val purple: Color,
+    val red: Color,
+    val yellow: Color
+)
+
 
 @Immutable
 data class FanciInputText(

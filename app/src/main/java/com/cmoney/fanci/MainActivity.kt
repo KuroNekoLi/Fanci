@@ -126,6 +126,7 @@ fun MainScreen(
     val mainNavController = rememberNavController()
     val state = globalViewModel.uiState
 
+    //TODO
     FanciTheme(fanciColor = state.theme) {
         KLog.i("TAG", "FanciTheme create.")
         val mainState = rememberMainState()

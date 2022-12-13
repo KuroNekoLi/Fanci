@@ -46,6 +46,18 @@ private val inputText = FanciInputText(
     input_100 = Color_2D2D2D
 )
 
+private val specialColor = SpecialColor(
+    blue = Color_37A2EF,
+    blueGreen = Color_31B6A6,
+    green = Color_38B035,
+    hintRed = Color_CA4848,
+    orange = Color_E18910,
+    pink = Color_E24CA6,
+    purple = Color_8559E1,
+    red = Color.Red,
+    yellow = Color_DDBA00
+)
+
 
 val DefaultThemeColor = FanciColor(
     primary = Color_4F70E5,
@@ -57,7 +69,8 @@ val DefaultThemeColor = FanciColor(
     inputFrame = Color_E6FFFFFF,
     component = darkComponent,
     text = darkText,
-    inputText = inputText
+    inputText = inputText,
+    specialColor = specialColor
 )
 
 @Composable
@@ -79,7 +92,8 @@ val CoffeeThemeColor = FanciColor(
     inputFrame = Color_CCFFFFFF,
     component = lightComponent,
     text = lightText,
-    inputText = inputText
+    inputText = inputText,
+    specialColor = specialColor
 )
 
 @Composable

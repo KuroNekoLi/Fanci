@@ -2,15 +2,43 @@ package com.cmoney.fanci.model.usecase
 
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.CategoryApi
+import com.cmoney.fanciapi.fanci.api.ChannelApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.model.CategoryParam
 import com.cmoney.fanciapi.fanci.model.ChannelParam
 import com.cmoney.fanciapi.fanci.model.ChannelType
+import com.cmoney.fanciapi.fanci.model.EditChannelParam
 
 class ChannelUseCase(
     private val categoryApi: CategoryApi,
-    private val groupApi: GroupApi
+    private val groupApi: GroupApi,
+    private val channelApi: ChannelApi
 ) {
+
+    /**
+     * 刪除 頻道
+     */
+    suspend fun deleteChannel(channelId: String) = kotlin.runCatching {
+        channelApi.apiV1ChannelChannelIdDelete(channelId = channelId).checkResponseBody()
+    }
+
+    /**
+     * 編輯 頻道名稱
+     */
+    suspend fun editChannelName(channelId: String, name: String) = kotlin.runCatching {
+        channelApi.apiV1ChannelChannelIdPut(
+            channelId = channelId,
+            editChannelParam = EditChannelParam(name)
+        ).checkResponseBody()
+    }
+
+
+    /**
+     * 取得 頻道角色清單
+     */
+    suspend fun getChannelRole(channelId: String) = kotlin.runCatching {
+        channelApi.apiV1ChannelChannelIdRoleGet(channelId).checkResponseBody()
+    }
 
     /**
      * 新增 分類

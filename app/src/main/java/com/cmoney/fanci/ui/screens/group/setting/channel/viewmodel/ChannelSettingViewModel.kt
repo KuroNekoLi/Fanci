@@ -5,15 +5,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.ChannelUseCase
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
 data class UiState(
     val isLoading: Boolean = false,
-    val group: Group? = null
+    val group: Group? = null,
+    val channelRole: List<FanciRole>? = null
 )
 
 class ChannelSettingViewModel(
@@ -23,6 +26,22 @@ class ChannelSettingViewModel(
 
     var uiState by mutableStateOf(UiState())
         private set
+
+    /**
+     * 取得 頻道角色清單
+     */
+    fun getChannelRole(channelId: String) {
+        uiState = uiState.copy(isLoading = true)
+        viewModelScope.launch {
+            channelUseCase.getChannelRole(channelId).fold({
+                uiState = uiState.copy(isLoading = true, channelRole = it)
+            }, {
+                KLog.e(TAG, it)
+                uiState = uiState.copy(isLoading = false)
+            })
+        }
+    }
+
 
     /**
      * 新增 分類
@@ -44,8 +63,7 @@ class ChannelSettingViewModel(
                 )
 
                 uiState = uiState.copy(
-                    isLoading = false,
-                    group = newGroup
+                    isLoading = false, group = newGroup
                 )
 
             }, {
@@ -70,8 +88,7 @@ class ChannelSettingViewModel(
         )
         viewModelScope.launch {
             channelUseCase.addChannel(
-                categoryId = categoryId,
-                name = name
+                categoryId = categoryId, name = name
             ).fold({
                 addChannelToGroup(it, group)
             }, {
@@ -104,8 +121,7 @@ class ChannelSettingViewModel(
             uiState = uiState.copy(
                 group = group.copy(
                     categories = newCategory
-                ),
-                isLoading = false
+                ), isLoading = false
             )
         }
     }
@@ -115,5 +131,67 @@ class ChannelSettingViewModel(
      */
     fun setGroup(group: Group) {
         uiState = uiState.copy(group = group)
+    }
+
+    /**
+     * 編輯 頻道名稱
+     */
+    fun editChannel(group: Group, channel: Channel, name: String) {
+        KLog.i(TAG, "editChannel")
+        viewModelScope.launch {
+            channelUseCase.editChannelName(channelId = channel.id.orEmpty(), name = name).fold({}, {
+                if (it is EmptyBodyException) {
+                    val newCategory = group.categories?.map { category ->
+                        val newChannel = category.channels?.map { groupChannel ->
+                            if (channel.id == groupChannel.id) {
+                                groupChannel.copy(
+                                    name = name
+                                )
+                            } else {
+                                groupChannel
+                            }
+                        }
+                        category.copy(
+                            channels = newChannel
+                        )
+                    }
+
+                    uiState = uiState.copy(
+                        group = group.copy(
+                            categories = newCategory
+                        )
+                    )
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+
+        }
+    }
+
+    /**
+     * 刪除 頻道
+     */
+    fun deleteChannel(group: Group, channel: Channel) {
+        KLog.i(TAG, "deleteChannel:$channel")
+        viewModelScope.launch {
+            channelUseCase.deleteChannel(channel.id.orEmpty()).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    val newCategory = group.categories?.map { category ->
+                        category.copy(
+                            channels = category.channels?.filter { groupChannel ->
+                                groupChannel.id != channel.id
+                            }
+                        )
+                    }
+                    uiState = uiState.copy(
+                        group = group.copy(
+                            categories = newCategory
+                        )
+                    )
+                }
+            })
+        }
     }
 }
