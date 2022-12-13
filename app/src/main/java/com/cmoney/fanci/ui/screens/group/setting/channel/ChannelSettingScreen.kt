@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.destinations.AddCategoryScreenDestination
 import com.cmoney.fanci.destinations.AddChannelScreenDestination
+import com.cmoney.fanci.destinations.EditCategoryScreenDestination
 import com.cmoney.fanci.destinations.EditChannelScreenDestination
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.group.setting.channel.viewmodel.ChannelSettingViewModel
@@ -43,7 +44,8 @@ fun ChannelSettingScreen(
     viewModel: ChannelSettingViewModel = koinViewModel(),
     setChannelResult: ResultRecipient<AddChannelScreenDestination, Group>,
     setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>,
-    setEditChannelResult: ResultRecipient<EditChannelScreenDestination, Group>
+    setEditChannelResult: ResultRecipient<EditChannelScreenDestination, Group>,
+    setEditCategoryResult: ResultRecipient<EditCategoryScreenDestination, Group>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var groupParam = group
@@ -54,6 +56,16 @@ fun ChannelSettingScreen(
     }
 
     //========== Result callback Start ==========
+    setEditCategoryResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                viewModel.setGroup(result.value)
+            }
+        }
+    }
+
     setEditChannelResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -158,6 +170,12 @@ fun ChannelSettingScreenView(
                     channelList = category.channels.orEmpty(),
                     onCategoryEdit = {
                         KLog.i(TAG, "onCategoryEdit:$it")
+                        navigator.navigate(
+                            EditCategoryScreenDestination(
+                                group = group,
+                                category = it
+                            )
+                        )
                     },
                     onChanelEdit = {
                         KLog.i(TAG, "onChanelEdit:$it")

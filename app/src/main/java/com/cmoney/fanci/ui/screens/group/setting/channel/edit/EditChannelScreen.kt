@@ -54,7 +54,6 @@ fun EditChannelScreen(
     val showDialog = remember { mutableStateOf(false) }
 
     viewModel.uiState.group?.let {
-        KLog.i("TAG", "channel add.")
         resultNavigator.navigateBack(result = it)
     }
 

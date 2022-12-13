@@ -16,6 +16,25 @@ class ChannelUseCase(
 ) {
 
     /**
+     * 刪除 分類
+     */
+    suspend fun deleteCategory(categoryId: String) = kotlin.runCatching {
+        categoryApi.apiV1CategoryCategoryIdDelete(categoryId = categoryId).checkResponseBody()
+    }
+
+    /**
+     * 編輯 分類名稱
+     */
+    suspend fun editCategoryName(categoryId: String, name: String) = kotlin.runCatching {
+        categoryApi.apiV1CategoryCategoryIdNamePut(
+            categoryId = categoryId,
+            categoryParam = CategoryParam(
+                name
+            )
+        ).checkResponseBody()
+    }
+
+    /**
      * 刪除 頻道
      */
     suspend fun deleteChannel(channelId: String) = kotlin.runCatching {

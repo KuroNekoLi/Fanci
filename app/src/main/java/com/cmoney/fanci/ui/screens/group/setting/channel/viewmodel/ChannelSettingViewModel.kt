@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.ChannelUseCase
+import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
@@ -190,6 +191,60 @@ class ChannelSettingViewModel(
                             categories = newCategory
                         )
                     )
+                }
+            })
+        }
+    }
+
+    /**
+     * 編輯 類別名稱
+     */
+    fun editCategory(group: Group, category: Category, name: String) {
+        KLog.i(TAG, "editCategory")
+        viewModelScope.launch {
+            channelUseCase.editCategoryName(categoryId = category.id.orEmpty(), name = name).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    val newCategory = group.categories?.map { groupCategory ->
+                        if (groupCategory.id == category.id) {
+                            groupCategory.copy(name = name)
+                        } else {
+                            groupCategory
+                        }
+                    }
+
+                    uiState = uiState.copy(
+                        group = group.copy(
+                            categories = newCategory
+                        )
+                    )
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+
+        }
+    }
+
+    /**
+     * 刪除 分類
+     */
+    fun deleteCategory(group: Group, category: Category) {
+        KLog.i(TAG, "deleteCategory")
+        viewModelScope.launch {
+            channelUseCase.deleteCategory(categoryId = category.id.orEmpty()).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    val newCategory = group.categories?.filter { groupCategory ->
+                        groupCategory.id != category.id
+                    }
+                    uiState = uiState.copy(
+                        group = group.copy(
+                            categories = newCategory
+                        )
+                    )
+                } else {
+                    KLog.e(TAG, it)
                 }
             })
         }
