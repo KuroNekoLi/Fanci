@@ -77,6 +77,7 @@ fun EditCategoryScreen(
 
     if (showDialog.value) {
         showDeleteAlert(
+            categoryName = category.name.orEmpty(),
             onConfirm = {
                 showDialog.value = false
                 viewModel.deleteCategory(group, category)
@@ -89,15 +90,24 @@ fun EditCategoryScreen(
 }
 
 @Composable
-private fun showDeleteAlert(onConfirm: () -> Unit, onCancel: () -> Unit) {
+private fun showDeleteAlert(
+    categoryName: String,
+    onConfirm: () -> Unit, onCancel: () -> Unit
+) {
     AlertDialog(
         backgroundColor = LocalColor.current.env_80,
         onDismissRequest = {
             onCancel.invoke()
         },
+        title = {
+            Text(
+                text = "確定刪除分類「%s」".format(categoryName),
+                color = LocalColor.current.specialColor.red
+            )
+        },
         text = {
             Text(
-                text = "確定刪除", color = LocalColor.current.text.default_100
+                text = "分類刪除後，頻道會保留下來。", color = LocalColor.current.text.default_100
             )
         },
         confirmButton = {
@@ -105,7 +115,7 @@ private fun showDeleteAlert(onConfirm: () -> Unit, onCancel: () -> Unit) {
                 onClick = {
                     onConfirm.invoke()
                 }) {
-                Text("確定")
+                Text("確定刪除")
             }
         },
         dismissButton = {
@@ -113,7 +123,7 @@ private fun showDeleteAlert(onConfirm: () -> Unit, onCancel: () -> Unit) {
                 onClick = {
                     onCancel.invoke()
                 }) {
-                Text("取消")
+                Text("返回")
             }
         }
     )

@@ -81,6 +81,7 @@ fun EditChannelScreen(
 
     if (showDialog.value) {
         showDeleteAlert(
+            channelName = channel.name.orEmpty(),
             onConfirm = {
                 showDialog.value = false
                 viewModel.deleteChannel(group, channel)
@@ -97,15 +98,22 @@ fun EditChannelScreen(
 }
 
 @Composable
-private fun showDeleteAlert(onConfirm: () -> Unit, onCancel: () -> Unit) {
+private fun showDeleteAlert(
+    channelName: String,
+    onConfirm: () -> Unit, onCancel: () -> Unit) {
     AlertDialog(
         backgroundColor = LocalColor.current.env_80,
         onDismissRequest = {
             onCancel.invoke()
         },
+        title = {
+            Text(
+                text = "確定刪除頻道「%s」".format(channelName), color = LocalColor.current.specialColor.red
+            )
+        },
         text = {
             Text(
-                text = "確定刪除", color = LocalColor.current.text.default_100
+                text = "頻道刪除後，內容將會完全消失。", color = LocalColor.current.text.default_100
             )
         },
         confirmButton = {
@@ -113,7 +121,7 @@ private fun showDeleteAlert(onConfirm: () -> Unit, onCancel: () -> Unit) {
                 onClick = {
                     onConfirm.invoke()
                 }) {
-                Text("確定")
+                Text("確定刪除")
             }
         },
         dismissButton = {
@@ -121,7 +129,7 @@ private fun showDeleteAlert(onConfirm: () -> Unit, onCancel: () -> Unit) {
                 onClick = {
                     onCancel.invoke()
                 }) {
-                Text("取消")
+                Text("返回")
             }
         }
     )
