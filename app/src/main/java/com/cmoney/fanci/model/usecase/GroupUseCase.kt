@@ -26,6 +26,13 @@ class GroupUseCase(
 ) {
 
     /**
+     * 取得 群組角色列表
+     */
+    suspend fun fetchGroupRole(groupId: String) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdRoleGet(groupId).checkResponseBody()
+    }
+
+    /**
      * 抓取 預設 大頭貼圖庫
      */
     suspend fun fetchGroupAvatarLib() = kotlin.runCatching {

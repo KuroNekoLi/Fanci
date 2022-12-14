@@ -1,12 +1,10 @@
 package com.cmoney.fanci.ui.screens.group.setting
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
@@ -18,8 +16,9 @@ import com.cmoney.fanci.ui.theme.LocalColor
  * 成員管理
  */
 @Composable
-fun GroupMemberManageScreen(modifier: Modifier = Modifier) {
-    Column {
+fun GroupMemberManageScreen(modifier: Modifier = Modifier,
+                            onGroupSetting: (GroupSettingRoute) -> Unit) {
+    Column(modifier = modifier) {
         Text(
             modifier = Modifier.padding(start = 25.dp, bottom = 9.dp),
             text = "成員管理", fontSize = 14.sp, color = LocalColor.current.text.default_100
@@ -28,7 +27,9 @@ fun GroupMemberManageScreen(modifier: Modifier = Modifier) {
         SettingItemScreen(
             iconRes = R.drawable.rule_manage,
             text = "角色管理",
-            onItemClick= {}
+            onItemClick= {
+                onGroupSetting.invoke(GroupSettingRoute.UserManage)
+            }
         )
 
         Spacer(modifier = Modifier.height(1.dp))
@@ -54,6 +55,6 @@ fun GroupMemberManageScreen(modifier: Modifier = Modifier) {
 @Composable
 fun GroupMemberManageScreenPreview() {
     FanciTheme {
-        GroupMemberManageScreen()
+        GroupMemberManageScreen {}
     }
 }

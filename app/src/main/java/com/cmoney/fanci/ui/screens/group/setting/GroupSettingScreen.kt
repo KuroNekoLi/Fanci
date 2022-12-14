@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.destinations.ChannelSettingScreenDestination
 import com.cmoney.fanci.destinations.GroupSettingSettingScreenDestination
+import com.cmoney.fanci.destinations.RoleManageScreenDestination
 import com.cmoney.fanci.ui.screens.group.setting.GroupSettingRoute.*
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingSettingScreen
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -30,6 +30,30 @@ fun GroupSettingScreen(
     navController: DestinationsNavigator,
     group: Group
 ) {
+    val onGroupSetting: (GroupSettingRoute) -> Unit = {
+        when (it) {
+            AllMember -> TODO()
+            BanList -> TODO()
+            BlockList -> TODO()
+            ChannelManage -> navController.navigate(
+                ChannelSettingScreenDestination(
+                    group = group
+                )
+            )
+            GroupPublic -> TODO()
+            GroupSetting -> navController.navigate(
+                GroupSettingSettingScreenDestination(
+                    group = group
+                )
+            )
+            JoinApprove -> TODO()
+            ReportApprove -> TODO()
+            UserManage -> navController.navigate(
+                RoleManageScreenDestination(group = group)
+            )
+        }
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -55,33 +79,15 @@ fun GroupSettingScreen(
 
             //社團管理
             GroupManageScreen(
-                onGroupSetting = {
-                    when (it) {
-                        AllMember -> TODO()
-                        BanList -> TODO()
-                        BlockList -> TODO()
-                        ChannelManage -> navController.navigate(
-                            ChannelSettingScreenDestination(
-                                group = group
-                            )
-                        )
-                        GroupPublic -> TODO()
-                        GroupSetting -> navController.navigate(
-                            GroupSettingSettingScreenDestination(
-                                group = group
-                            )
-                        )
-                        JoinApprove -> TODO()
-                        ReportApprove -> TODO()
-                        UsrManage -> TODO()
-                    }
-                }
+                onGroupSetting = onGroupSetting
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
             //成員管理
-            GroupMemberManageScreen()
+            GroupMemberManageScreen(
+                onGroupSetting = onGroupSetting
+            )
 
             Spacer(modifier = Modifier.height(28.dp))
 
@@ -105,7 +111,7 @@ sealed class GroupSettingRoute {
     object GroupPublic : GroupSettingRoute()
 
     //角色管理
-    object UsrManage : GroupSettingRoute()
+    object UserManage : GroupSettingRoute()
 
     //所有成員
     object AllMember : GroupSettingRoute()
@@ -141,7 +147,7 @@ private fun groupSettingRouteProcess(
         BlockList -> TODO()
         JoinApprove -> TODO()
         ReportApprove -> TODO()
-        UsrManage -> TODO()
+        UserManage -> TODO()
     }
 }
 
