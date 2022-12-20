@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanci.destinations.AddRoleScreenDestination
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.group.setting.role.viewmodel.RoleManageViewModel
@@ -50,7 +51,8 @@ fun RoleManageScreen(
     RoleManageScreenView(
         modifier,
         navigator,
-        viewModel.uiState.fanciRole.orEmpty()
+        viewModel.uiState.fanciRole.orEmpty(),
+        group
     ) {
         KLog.i(TAG, "on save click.")
         // TODO()
@@ -66,6 +68,7 @@ fun RoleManageScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     roleList: List<FanciRole>,
+    group: Group,
     onSave: () -> Unit
 ) {
     Scaffold(
@@ -96,7 +99,7 @@ fun RoleManageScreenView(
                     borderColor = LocalColor.current.component.other,
                     textColor = Color.White
                 ) {
-                    // TODO:
+                    navigator.navigate(AddRoleScreenDestination(group = group))
                 }
 
                 Spacer(modifier = Modifier.width(23.dp))
@@ -182,7 +185,8 @@ fun RoleManageScreenPreview() {
                     name = "角色2",
                     color = "FF38B035"
                 )
-            )
+            ),
+            group = Group()
         ) {
 
         }

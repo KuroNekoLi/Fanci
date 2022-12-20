@@ -7,6 +7,7 @@ import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.GroupMemberRoleInfos
+import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.fanciapi.fanci.model.UseridsParam
 
@@ -25,6 +26,42 @@ interface RoleUserApi {
      */
     @GET("api/v1/RoleUser/Group/{groupId}")
     suspend fun apiV1RoleUserGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("UserIds") userIds: kotlin.collections.List<kotlin.String>? = null): Response<kotlin.collections.List<GroupMemberRoleInfos>>
+
+    /**
+     * 移除使用者的(多個)角色身分 __________🔒 指派身分
+     * 
+     * Responses:
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
+     *  - 409: 找不到指派的角色
+     *
+     * @param groupId 社團Id
+     * @param userId 成員Id
+     * @param roleIdsParam 使用者清單 (optional)
+     * @return [Unit]
+     */
+    @DELETE("api/v1/RoleUser/Group/{groupId}/Member/{userId}")
+    suspend fun apiV1RoleUserGroupGroupIdMemberUserIdDelete(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
+
+    /**
+     * 指派一個使用者的角色身分(可以設定多個role) __________🔒 指派身分
+     * 
+     * Responses:
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
+     *  - 409: 找不到指派的角色
+     *
+     * @param groupId 社團Id
+     * @param userId 成員Id
+     * @param roleIdsParam 使用者清單 (optional)
+     * @return [Unit]
+     */
+    @PUT("api/v1/RoleUser/Group/{groupId}/Member/{userId}")
+    suspend fun apiV1RoleUserGroupGroupIdMemberUserIdPut(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**
      * 移除使用者的角色身分 __________🔒 指派身分

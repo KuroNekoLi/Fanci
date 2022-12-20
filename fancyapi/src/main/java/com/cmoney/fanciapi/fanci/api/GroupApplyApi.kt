@@ -13,6 +13,23 @@ import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyInfo
 
 interface GroupApplyApi {
     /**
+     * 整批更新審核狀態(通過/拒絕) __________🔒 審核入社申請
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 204: 成功
+     *  - 404: 找不到該社團
+     *
+     * @param groupId 社團Id
+     * @param groupApplyStatusParam 審核狀態參數 (optional)
+     * @return [Unit]
+     */
+    @PUT("api/v1/GroupApply/group/{groupId}/Approval")
+    suspend fun apiV1GroupApplyGroupGroupIdApprovalPut(@Path("groupId") groupId: kotlin.String, @Body groupApplyStatusParam: GroupApplyStatusParam? = null): Response<Unit>
+
+    /**
      * 取得社團申請清單 __________🔒 審核入社申請
      * 
      * Responses:
@@ -30,24 +47,6 @@ interface GroupApplyApi {
      */
     @GET("api/v1/GroupApply/group/{groupId}")
     suspend fun apiV1GroupApplyGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("applyStauts") applyStauts: ApplyStatus? = null, @Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<Unit>
-
-    /**
-     * 更新審核狀態(通過/拒絕) __________🔒 審核入社申請
-     * 
-     * Responses:
-     *  - 200: Success
-     *  - 401: 未驗證
-     *  - 403: 沒有權限
-     *  - 204: 成功
-     *  - 404: 找不到該社團
-     *
-     * @param groupId 社團Id
-     * @param id 申請Id
-     * @param groupApplyStatusParam 審核狀態參數 (optional)
-     * @return [Unit]
-     */
-    @PUT("api/v1/GroupApply/group/{groupId}/{id}")
-    suspend fun apiV1GroupApplyGroupGroupIdIdPut(@Path("groupId") groupId: kotlin.String, @Path("id") id: kotlin.String, @Body groupApplyStatusParam: GroupApplyStatusParam? = null): Response<Unit>
 
     /**
      * 取得我的社團申請 __________🔒 已註冊的fanci使用者

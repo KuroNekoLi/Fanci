@@ -9,6 +9,7 @@ import com.squareup.moshi.Json
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.EditChannelParam
 import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 
 interface ChannelApi {
     /**
@@ -58,6 +59,23 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdPut(@Path("channelId") channelId: kotlin.String, @Body editChannelParam: EditChannelParam? = null): Response<Unit>
 
     /**
+     * 從頻道移除 多個 角色 __________🔒 指派頻道管理員
+     * 
+     * Responses:
+     *  - 404: 找不到該頻道
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 405: 要新增的角色不存在
+     *
+     * @param channelId 頻道Id
+     * @param roleIdsParam  (optional)
+     * @return [Unit]
+     */
+    @DELETE("api/v1/Channel/{channelId}/Role")
+    suspend fun apiV1ChannelChannelIdRoleDelete(@Path("channelId") channelId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
+
+    /**
      * 取得角色清單
      * 
      * Responses:
@@ -73,24 +91,7 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdRoleGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
 
     /**
-     * 從頻道移除角色 __________🔒 指派頻道管理員
-     * 
-     * Responses:
-     *  - 404: 找不到該頻道
-     *  - 204: 成功
-     *  - 401: 未驗證
-     *  - 403: 沒有權限
-     *  - 405: 要新增的角色不存在
-     *
-     * @param channelId 頻道Id
-     * @param roleId 角色Id
-     * @return [Unit]
-     */
-    @DELETE("api/v1/Channel/{channelId}/Role/{roleId}")
-    suspend fun apiV1ChannelChannelIdRoleRoleIdDelete(@Path("channelId") channelId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<Unit>
-
-    /**
-     * 新增更新頻道角色 __________🔒 指派頻道管理員
+     * 新增更新 多個 頻道角色 __________🔒 指派頻道管理員
      * 
      * Responses:
      *  - 204: 成功
@@ -100,10 +101,10 @@ interface ChannelApi {
      *  - 405: 要新增的角色不存在
      *
      * @param channelId 頻道Id
-     * @param roleId 角色Id
+     * @param roleIdsParam 新增的 role id 清單 (optional)
      * @return [Unit]
      */
-    @PUT("api/v1/Channel/{channelId}/Role/{roleId}")
-    suspend fun apiV1ChannelChannelIdRoleRoleIdPut(@Path("channelId") channelId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<Unit>
+    @PUT("api/v1/Channel/{channelId}/Role")
+    suspend fun apiV1ChannelChannelIdRolePut(@Path("channelId") channelId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
 }

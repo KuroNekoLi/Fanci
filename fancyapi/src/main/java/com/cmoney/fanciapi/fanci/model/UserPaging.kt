@@ -15,29 +15,32 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ApplyStatus
+import com.cmoney.fanciapi.fanci.model.User
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 申請狀態參數
+ * 
  *
- * @param status 
- * @param applyIds 處理的申請ID清單
+ * @param haveNextPage 
+ * @param nextWeight 
+ * @param items 
  */
 @Parcelize
 
 
-data class GroupApplyStatusParam (
+data class UserPaging (
 
-    @Json(name = "status")
-    val status: ApplyStatus? = null,
+    @Json(name = "haveNextPage")
+    val haveNextPage: kotlin.Boolean? = null,
 
-    /* 處理的申請ID清單 */
-    @Json(name = "applyIds")
-    val applyIds: kotlin.collections.List<kotlin.String>? = null
+    @Json(name = "nextWeight")
+    val nextWeight: kotlin.Long? = null,
+
+    @Json(name = "items")
+    val items: kotlin.collections.List<User>? = null
 
 ) : Parcelable
 

@@ -109,7 +109,7 @@ interface GroupApi {
     suspend fun apiV1GroupGroupIdPut(@Path("groupId") groupId: kotlin.String, @Body editGroupParam: EditGroupParam? = null): Response<Unit>
 
     /**
-     * 取得頻道角色列表
+     * 取得角色列表
      * 
      * Responses:
      *  - 200: 成功

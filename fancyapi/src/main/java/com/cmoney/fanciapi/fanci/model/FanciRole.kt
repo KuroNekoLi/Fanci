@@ -29,6 +29,7 @@ import kotlinx.parcelize.Parcelize
  * @param color 
  * @param createUnixTime 
  * @param updateUnixTime 
+ * @param userCount 
  */
 @Parcelize
 
@@ -51,7 +52,10 @@ data class FanciRole (
     val createUnixTime: kotlin.Long? = null,
 
     @Json(name = "updateUnixTime")
-    val updateUnixTime: kotlin.Long? = null
+    val updateUnixTime: kotlin.Long? = null,
+
+    @Json(name = "userCount")
+    val userCount: kotlin.Long? = null
 
 ) : Parcelable
 

@@ -58,4 +58,21 @@ interface GroupMemberApi {
     @PUT("api/v1/GroupMember/group/{groupId}/me")
     suspend fun apiV1GroupMemberGroupGroupIdMePut(@Path("groupId") groupId: kotlin.String): Response<Unit>
 
+    /**
+     * 踢除成員離開社團 __________🔒 踢除
+     * 
+     * Responses:
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
+     *  - 409: 社長不得離開社團
+     *
+     * @param groupId 社團Id
+     * @param userId 要剔除的成員id
+     * @return [Unit]
+     */
+    @DELETE("api/v1/GroupMember/group/{groupId}/{userId}")
+    suspend fun apiV1GroupMemberGroupGroupIdUserIdDelete(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String): Response<Unit>
+
 }

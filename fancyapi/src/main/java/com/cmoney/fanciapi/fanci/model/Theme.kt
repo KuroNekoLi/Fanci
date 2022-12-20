@@ -27,7 +27,7 @@ import kotlinx.parcelize.Parcelize
  * @param displayName 
  * @param previewThumbnail 
  * @param previewImage 
- * @param colors 
+ * @param categoryColors 
  */
 @Parcelize
 
@@ -43,8 +43,8 @@ data class Theme (
     @Json(name = "previewImage")
     val previewImage: kotlin.collections.List<kotlin.String>? = null,
 
-    @Json(name = "colors")
-    val colors: kotlin.collections.List<Color>? = null
+    @Json(name = "categoryColors")
+    val categoryColors: kotlin.collections.Map<kotlin.String, kotlin.collections.List<Color>>? = null
 
 ) : Parcelable
 

@@ -7,11 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.PermissionCategory
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
 data class UiState(
-    val fanciRole: List<FanciRole>? = null  //角色清單
+    val fanciRole: List<FanciRole>? = null,  //角色清單
+    val permissionList: List<PermissionCategory>? = null    //權限清單
 )
 
 class RoleManageViewModel(
@@ -30,6 +32,22 @@ class RoleManageViewModel(
             groupUseCase.fetchGroupRole(groupId).fold({
                 uiState = uiState.copy(
                     fanciRole = it
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 取得 權限清單
+     */
+    fun fetchPermissionList() {
+        KLog.i(TAG, "fetchPermissionList")
+        viewModelScope.launch {
+            groupUseCase.fetchPermissionList().fold({
+                uiState = uiState.copy(
+                    permissionList = it
                 )
             }, {
                 KLog.e(TAG, it)

@@ -15,29 +15,23 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ApplyStatus
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 申請狀態參數
+ * 多個角色id參數
  *
- * @param status 
- * @param applyIds 處理的申請ID清單
+ * @param roleIds 
  */
 @Parcelize
 
 
-data class GroupApplyStatusParam (
+data class RoleIdsParam (
 
-    @Json(name = "status")
-    val status: ApplyStatus? = null,
-
-    /* 處理的申請ID清單 */
-    @Json(name = "applyIds")
-    val applyIds: kotlin.collections.List<kotlin.String>? = null
+    @Json(name = "roleIds")
+    val roleIds: kotlin.collections.List<kotlin.String>? = null
 
 ) : Parcelable
 

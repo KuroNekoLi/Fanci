@@ -8,6 +8,7 @@ import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanciapi.fanci.api.DefaultImageApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupMemberApi
+import com.cmoney.fanciapi.fanci.api.PermissionApi
 import com.cmoney.fanciapi.fanci.model.EditGroupParam
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.imagelibrary.UploadImage
@@ -22,8 +23,16 @@ class GroupUseCase(
     val context: Context,
     private val groupApi: GroupApi,
     private val groupMemberApi: GroupMemberApi,
-    private val defaultImageApi: DefaultImageApi
+    private val defaultImageApi: DefaultImageApi,
+    private val permissionApi: PermissionApi
 ) {
+
+    /**
+     * 取得管理權限清單
+     */
+    suspend fun fetchPermissionList() = kotlin.runCatching {
+        permissionApi.apiV1PermissionGet().checkResponseBody()
+    }
 
     /**
      * 取得 群組角色列表

@@ -25,6 +25,7 @@ import kotlinx.parcelize.Parcelize
  *
  * @param name 
  * @param hexColorCode 
+ * @param displayName 
  */
 @Parcelize
 
@@ -35,7 +36,10 @@ data class Color (
     val name: kotlin.String? = null,
 
     @Json(name = "hexColorCode")
-    val hexColorCode: kotlin.String? = null
+    val hexColorCode: kotlin.String? = null,
+
+    @Json(name = "displayName")
+    val displayName: kotlin.String? = null
 
 ) : Parcelable
 

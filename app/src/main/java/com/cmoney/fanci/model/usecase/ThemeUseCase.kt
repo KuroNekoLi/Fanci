@@ -5,10 +5,7 @@ import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupT
 import com.cmoney.fanci.ui.theme.*
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.ThemeColorApi
-import com.cmoney.fanciapi.fanci.model.Color
-import com.cmoney.fanciapi.fanci.model.ColorTheme
-import com.cmoney.fanciapi.fanci.model.EditGroupParam
-import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.*
 import com.socks.library.KLog
 
 class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: GroupApi) {
@@ -37,7 +34,7 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: Group
         KLog.i(TAG, "fetchAllThemeConfig")
         themeColorApi.apiV1ThemeColorGet().checkResponseBody().toList().map {
             val id = it.first
-            val theme = serverColorTransfer(it.second.colors.orEmpty())
+            val theme = serverColorTransfer(it.second)
             val name = it.second.displayName
             val preview = it.second.previewImage
             GroupTheme(
@@ -59,7 +56,7 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: Group
             GroupTheme(
                 id = colorTheme.value,
                 isSelected = false,
-                theme = serverColorTransfer(it.colors.orEmpty()),
+                theme = serverColorTransfer(it),
                 name = it.displayName.orEmpty(),
                 preview = it.previewImage.orEmpty()
             )
@@ -69,7 +66,12 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: Group
     /**
      * 將 Server 回傳的 Model 轉換成 app theme model
      */
-    private fun serverColorTransfer(colors: List<Color>): FanciColor {
+    private fun serverColorTransfer(colors: Theme): FanciColor {
+        val colors = colors.categoryColors?.toList()?.map {
+            it.second
+        }?.flatten().orEmpty()
+
+
         val primary = colors.first {
             it.name == "Env_Theme"
         }.hexColorCode.orEmpty()
