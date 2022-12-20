@@ -58,6 +58,43 @@ private val specialColor = SpecialColor(
     yellow = Color_DDBA00
 )
 
+private val roleColor = RoleColor(
+    listOf(
+        com.cmoney.fanciapi.fanci.model.Color(
+            hexColorCode = "FF37A2EF",
+            displayName = "藍"
+        ),
+        com.cmoney.fanciapi.fanci.model.Color(
+            hexColorCode = "FF31B6A6",
+            displayName = "藍綠"
+        ),
+        com.cmoney.fanciapi.fanci.model.Color(
+            hexColorCode = "FF38B035",
+            displayName = "綠"
+        ),
+        com.cmoney.fanciapi.fanci.model.Color(
+            hexColorCode = "FFE18910",
+            displayName = "橘"
+        ),
+        com.cmoney.fanciapi.fanci.model.Color(
+            hexColorCode = "FFE24CA6",
+            displayName = "粉"
+        ),
+        com.cmoney.fanciapi.fanci.model.Color(
+            hexColorCode = "FF8559E1",
+            displayName = "紫"
+        ),
+        com.cmoney.fanciapi.fanci.model.Color(
+            hexColorCode = "FFCA4848",
+            displayName = "紅"
+        ),
+        com.cmoney.fanciapi.fanci.model.Color(
+            hexColorCode = "FFDDBA00",
+            displayName = "黃"
+        )
+    )
+)
+
 
 val DefaultThemeColor = FanciColor(
     primary = Color_4F70E5,
@@ -70,7 +107,8 @@ val DefaultThemeColor = FanciColor(
     component = darkComponent,
     text = darkText,
     inputText = inputText,
-    specialColor = specialColor
+    specialColor = specialColor,
+    roleColor = roleColor
 )
 
 @Composable
@@ -93,7 +131,8 @@ val CoffeeThemeColor = FanciColor(
     component = lightComponent,
     text = lightText,
     inputText = inputText,
-    specialColor = specialColor
+    specialColor = specialColor,
+    roleColor = roleColor
 )
 
 @Composable

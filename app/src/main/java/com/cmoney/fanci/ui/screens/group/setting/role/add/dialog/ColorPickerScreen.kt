@@ -21,10 +21,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanci.extension.toColor
 import com.cmoney.fanci.ui.screens.chat.dialog.onClose
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanci.ui.theme.White_262C34
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -33,24 +33,17 @@ fun ColorPickerScreen(
     coroutineScope: CoroutineScope,
     modalBottomSheetState: ModalBottomSheetState,
     modifier: Modifier = Modifier,
-    selectedColor: Color,
-    onColorPick: (Color) -> Unit
+    selectedColor: com.cmoney.fanciapi.fanci.model.Color,
+    onColorPick: (com.cmoney.fanciapi.fanci.model.Color) -> Unit
 ) {
 
-    val colorList = listOf(
-        LocalColor.current.specialColor.red,
-        LocalColor.current.specialColor.orange,
-        LocalColor.current.specialColor.yellow,
-        LocalColor.current.specialColor.green,
-        LocalColor.current.specialColor.blueGreen,
-        LocalColor.current.specialColor.blue,
-        LocalColor.current.specialColor.purple,
-        LocalColor.current.specialColor.pink
-    )
+    val colorModelList = LocalColor.current.roleColor.colors
 
-    var selectPos = colorList.map {
-        it.value
-    }.indexOf(selectedColor.value)
+    val colorList = colorModelList.map {
+        it.hexColorCode.orEmpty().toColor()
+    }
+
+    var selectPos = colorModelList.indexOf(selectedColor)
 
     if (selectPos == -1) {
         selectPos = 0
@@ -83,7 +76,7 @@ fun ColorPickerScreen(
                 Text(
                     modifier = Modifier.clickable {
                         onClose(coroutineScope, modalBottomSheetState)
-                        onColorPick.invoke(colorList[selectedIndex.value])
+                        onColorPick.invoke(colorModelList[selectedIndex.value])
                     },
                     text = "確定", fontSize = 17.sp, color = LocalColor.current.primary
                 )
@@ -144,7 +137,7 @@ fun ColorPickerScreenPreview() {
                     it != ModalBottomSheetValue.HalfExpanded
                 }
             ),
-            selectedColor = LocalColor.current.specialColor.orange
+            selectedColor = com.cmoney.fanciapi.fanci.model.Color()
         ) {}
     }
 }

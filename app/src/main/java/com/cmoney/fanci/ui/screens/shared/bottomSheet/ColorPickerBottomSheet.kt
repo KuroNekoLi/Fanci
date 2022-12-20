@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 fun ColorPickerBottomSheet(
     parent: ViewGroup,
     composeView: ComposeView,
-    selectedColor: Color,
-    onColorPicker: (Color) -> Unit
+    selectedColor: com.cmoney.fanciapi.fanci.model.Color,
+    onColorPicker: (com.cmoney.fanciapi.fanci.model.Color) -> Unit
 ) {
     val TAG = parent::class.java.simpleName
     val coroutineScope = rememberCoroutineScope()

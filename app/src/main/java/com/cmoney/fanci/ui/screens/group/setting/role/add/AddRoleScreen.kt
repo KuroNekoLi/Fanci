@@ -21,6 +21,7 @@ import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.MainActivity
 import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.showColorPickerDialogBottomSheet
+import com.cmoney.fanci.extension.toColor
 import com.cmoney.fanci.ui.screens.group.setting.role.viewmodel.RoleManageViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.setting.BottomButtonScreen
@@ -153,12 +154,16 @@ private fun AddRoleScreenView(
 }
 
 @Composable
-fun StyleView(modifier: Modifier = Modifier, mainActivity: MainActivity) {
+fun StyleView(
+    modifier: Modifier = Modifier,
+    mainActivity: MainActivity
+) {
     val TAG = "StyleView"
     val maxLength = 10
     var textState by remember { mutableStateOf("") }
-    val defaultColor = LocalColor.current.specialColor.red
-    var selectRoleColor = remember {
+    val defaultColor = LocalColor.current.roleColor.colors.first()
+
+    val selectRoleColor = remember {
         mutableStateOf(
             defaultColor
         )
@@ -240,12 +245,14 @@ fun StyleView(modifier: Modifier = Modifier, mainActivity: MainActivity) {
                 modifier = Modifier.padding(start = 25.dp),
                 painter = painterResource(id = R.drawable.rule_manage),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(color = selectRoleColor.value)
+                colorFilter = ColorFilter.tint(
+                    color = selectRoleColor.value.hexColorCode.orEmpty().toColor()
+                )
             )
 
             Text(
                 modifier = Modifier.padding(start = 17.dp),
-                text = "紅色 ",
+                text = selectRoleColor.value.displayName.orEmpty(),
                 fontSize = 17.sp,
                 color = LocalColor.current.text.default_100
             )

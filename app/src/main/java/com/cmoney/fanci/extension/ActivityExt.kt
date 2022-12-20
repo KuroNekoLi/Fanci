@@ -41,8 +41,8 @@ fun Activity.showInteractDialogBottomSheet(
  * @param selectedColor 預設選擇顏色
  */
 fun Activity.showColorPickerDialogBottomSheet(
-    selectedColor: Color,
-    onColorPicker: (Color) -> Unit
+    selectedColor: com.cmoney.fanciapi.fanci.model.Color,
+    onColorPicker: (com.cmoney.fanciapi.fanci.model.Color) -> Unit
 ) {
     val viewGroup = this.findViewById(android.R.id.content) as ViewGroup
     if (this is MainActivity) {

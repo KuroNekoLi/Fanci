@@ -5,11 +5,29 @@ import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupT
 import com.cmoney.fanci.ui.theme.*
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.ThemeColorApi
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.ColorTheme
+import com.cmoney.fanciapi.fanci.model.EditGroupParam
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.Theme
 import com.socks.library.KLog
 
 class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: GroupApi) {
     private val TAG = ThemeUseCase::class.java.simpleName
+
+    /**
+     * 抓取 角色顏色設定檔
+     */
+    suspend fun fetchRoleColor(colorTheme: ColorTheme) = kotlin.runCatching {
+        themeColorApi.apiV1ThemeColorColorThemeGet(colorTheme).checkResponseBody().let {
+            val colors = it.categoryColors?.let { categoryColors ->
+                categoryColors["RoleColor"]
+            }.orEmpty()
+
+            RoleColor(
+                colors = colors
+            )
+        }
+    }
 
     /**
      * 更換 社團主題顏色
@@ -66,11 +84,10 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: Group
     /**
      * 將 Server 回傳的 Model 轉換成 app theme model
      */
-    private fun serverColorTransfer(colors: Theme): FanciColor {
-        val colors = colors.categoryColors?.toList()?.map {
+    private fun serverColorTransfer(theme: Theme): FanciColor {
+        val colors = theme.categoryColors?.toList()?.map {
             it.second
         }?.flatten().orEmpty()
-
 
         val primary = colors.first {
             it.name == "Env_Theme"
@@ -220,6 +237,11 @@ class ThemeUseCase(private val themeColorApi: ThemeColorApi, val groupApi: Group
                 purple = androidx.compose.ui.graphics.Color(purple.toLong(16)),
                 red = androidx.compose.ui.graphics.Color(red.toLong(16)),
                 yellow = androidx.compose.ui.graphics.Color(yellow.toLong(16))
+            ),
+            roleColor = RoleColor(
+                theme.categoryColors?.let { categoryColors ->
+                    categoryColors["RoleColor"]
+                }.orEmpty()
             )
         )
     }

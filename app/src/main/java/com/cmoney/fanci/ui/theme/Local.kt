@@ -25,7 +25,13 @@ data class FanciColor(
     val component: FanciComponentColor,  //元件色
     val text: FanciTextColor,            //文字色
     val inputText: FanciInputText,       //文字色-輸入框
-    val specialColor: SpecialColor       //特殊色
+    val specialColor: SpecialColor,      //特殊色
+    val roleColor: RoleColor             //角色顏色
+)
+
+@Immutable
+data class RoleColor(
+    val colors: List<com.cmoney.fanciapi.fanci.model.Color>
 )
 
 @Immutable
