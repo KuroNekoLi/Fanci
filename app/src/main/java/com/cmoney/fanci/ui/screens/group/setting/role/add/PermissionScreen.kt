@@ -29,7 +29,6 @@ fun PermissionScreen(
 ) {
     LazyColumn(
         modifier = modifier
-            .fillMaxSize()
             .background(LocalColor.current.env_80)
     ) {
         items(permissionList) { permission ->

@@ -18,7 +18,7 @@ fun BottomButtonScreen(modifier: Modifier = Modifier, text: String, onClick: () 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(135.dp)
+            .height(115.dp)
             .background(LocalColor.current.env_100),
         contentAlignment = Alignment.Center
     ) {

@@ -13,17 +13,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.MainActivity
+import com.cmoney.fanci.destinations.AddMemberScreenDestination
 import com.cmoney.fanci.ui.screens.group.setting.role.viewmodel.RoleManageViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.Permission
 import com.cmoney.fanciapi.fanci.model.PermissionCategory
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.EmptyResultRecipient
+import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -32,7 +36,8 @@ fun AddRoleScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
-    viewModel: RoleManageViewModel = koinViewModel()
+    viewModel: RoleManageViewModel = koinViewModel(),
+    memberResult: ResultRecipient<AddMemberScreenDestination, String>
 ) {
     val mainActivity = LocalDependencyContainer.current
     val uiState = viewModel.uiState
@@ -40,10 +45,15 @@ fun AddRoleScreen(
     AddRoleScreenView(
         modifier,
         navigator,
+        uiState.tabSelected,
         group,
         mainActivity,
         uiState.permissionList.orEmpty(),
-        uiState.permissionSelected
+        uiState.permissionSelected,
+        memberResult,
+        onTabSelected = {
+            viewModel.onTabSelected(it)
+        }
     ) { key, selected ->
         viewModel.onPermissionSelected(key, selected)
     }
@@ -57,14 +67,16 @@ fun AddRoleScreen(
 private fun AddRoleScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
+    selectedIndex: Int,
     group: Group,
     mainActivity: MainActivity,
     permissionList: List<PermissionCategory>,
     permissionSelected: Map<String, Boolean>,
+    memberResult: ResultRecipient<AddMemberScreenDestination, String>,
+    onTabSelected: (Int) -> Unit,
     onPermissionSwitch: (String, Boolean) -> Unit
 ) {
     val tabList = listOf("樣式", "權限", "成員")
-    var selectedIndex by remember { mutableStateOf(0) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -114,7 +126,9 @@ private fun AddRoleScreenView(
                                 Color.Transparent
                             ),
                         selected = selected,
-                        onClick = { selectedIndex = index },
+                        onClick = {
+                            onTabSelected.invoke(index)
+                        },
                         text = {
                             Text(
                                 text = text, color = Color.White, fontSize = 14.sp
@@ -142,7 +156,11 @@ private fun AddRoleScreenView(
                     }
                     //成員
                     else -> {
-
+                        MemberScreen(
+                            navigator = navigator,
+                            group = group,
+                            memberResult = memberResult
+                        )
                     }
                 }
             }
@@ -163,6 +181,7 @@ fun AddRoleScreenPreview() {
     FanciTheme {
         AddRoleScreenView(
             navigator = EmptyDestinationsNavigator,
+            selectedIndex = 0,
             group = Group(),
             mainActivity = MainActivity(),
             permissionList = listOf(
@@ -180,7 +199,9 @@ fun AddRoleScreenPreview() {
                     )
                 )
             ),
-            permissionSelected = emptyMap()
+            permissionSelected = emptyMap(),
+            memberResult = EmptyResultRecipient(),
+            onTabSelected = {}
         ) { key, selected ->
 
         }

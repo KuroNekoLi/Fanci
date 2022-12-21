@@ -28,6 +28,19 @@ class GroupUseCase(
 ) {
 
     /**
+     * 取得群組會員清單, 預設抓取20筆
+     *
+     * @param groupId 群組id
+     * @param skipCount 因為分頁關係,要跳過前幾筆
+     */
+    suspend fun getGroupMember(groupId: String, skipCount: Int = 0) = kotlin.runCatching {
+        groupMemberApi.apiV1GroupMemberGroupGroupIdGet(
+            groupId = groupId,
+            skip = skipCount
+        ).checkResponseBody()
+    }
+
+    /**
      * 取得管理權限清單
      */
     suspend fun fetchPermissionList() = kotlin.runCatching {

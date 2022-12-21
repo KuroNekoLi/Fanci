@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 data class UiState(
     val fanciRole: List<FanciRole>? = null,  //角色清單
     val permissionList: List<PermissionCategory>? = null,    //權限清單
-    val permissionSelected: Map<String, Boolean> = emptyMap()   //勾選權限
+    val permissionSelected: Map<String, Boolean> = emptyMap(),   //勾選權限
+    val tabSelected: Int = 0
 )
 
 class RoleManageViewModel(
@@ -75,6 +76,10 @@ class RoleManageViewModel(
                 permissionSelected = newMap
             )
         }
+    }
+
+    fun onTabSelected(position: Int) {
+        uiState = uiState.copy(tabSelected = position)
     }
 
 }
