@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.PermissionCategory
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
@@ -15,7 +16,8 @@ data class UiState(
     val fanciRole: List<FanciRole>? = null,  //角色清單
     val permissionList: List<PermissionCategory>? = null,    //權限清單
     val permissionSelected: Map<String, Boolean> = emptyMap(),   //勾選權限
-    val tabSelected: Int = 0
+    val tabSelected: Int = 0,
+    val memberList: List<GroupMember> = emptyList() //assign 成員
 )
 
 class RoleManageViewModel(
@@ -80,6 +82,26 @@ class RoleManageViewModel(
 
     fun onTabSelected(position: Int) {
         uiState = uiState.copy(tabSelected = position)
+    }
+
+    /**
+     * 選擇assign的 成員
+     */
+    fun addMember(memberList: List<GroupMember>) {
+        uiState = uiState.copy(
+            memberList = memberList
+        )
+    }
+
+    /**
+     * 移除成員
+     */
+    fun onMemberRemove(groupMember: GroupMember) {
+        val memberList = uiState.memberList.toMutableList()
+        memberList.remove(groupMember)
+        uiState = uiState.copy(
+            memberList = memberList
+        )
     }
 
 }

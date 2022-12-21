@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -23,12 +23,15 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.Permission
 import com.cmoney.fanciapi.fanci.model.PermissionCategory
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.EmptyResultRecipient
+import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.koinViewModel
+import java.lang.reflect.Type
 
 @Destination
 @Composable
@@ -42,6 +45,22 @@ fun AddRoleScreen(
     val mainActivity = LocalDependencyContainer.current
     val uiState = viewModel.uiState
 
+    //Add Member Callback
+    memberResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val member = result.value
+                val gson = Gson()
+                val listType: Type =
+                    object : TypeToken<List<GroupMember>>() {}.type
+                val responseMemberList = gson.fromJson(member, listType) as List<GroupMember>
+                viewModel.addMember(responseMemberList)
+            }
+        }
+    }
+
     AddRoleScreenView(
         modifier,
         navigator,
@@ -50,9 +69,12 @@ fun AddRoleScreen(
         mainActivity,
         uiState.permissionList.orEmpty(),
         uiState.permissionSelected,
-        memberResult,
+        uiState.memberList,
         onTabSelected = {
             viewModel.onTabSelected(it)
+        },
+        onMemberRemove = {
+            viewModel.onMemberRemove(it)
         }
     ) { key, selected ->
         viewModel.onPermissionSelected(key, selected)
@@ -72,9 +94,10 @@ private fun AddRoleScreenView(
     mainActivity: MainActivity,
     permissionList: List<PermissionCategory>,
     permissionSelected: Map<String, Boolean>,
-    memberResult: ResultRecipient<AddMemberScreenDestination, String>,
+    memberList: List<GroupMember>,
     onTabSelected: (Int) -> Unit,
-    onPermissionSwitch: (String, Boolean) -> Unit
+    onMemberRemove: (GroupMember) -> Unit,
+    onPermissionSwitch: (String, Boolean) -> Unit,
 ) {
     val tabList = listOf("樣式", "權限", "成員")
 
@@ -159,8 +182,10 @@ private fun AddRoleScreenView(
                         MemberScreen(
                             navigator = navigator,
                             group = group,
-                            memberResult = memberResult
-                        )
+                            memberList = memberList
+                        ) {
+                            onMemberRemove.invoke(it)
+                        }
                     }
                 }
             }
@@ -200,8 +225,9 @@ fun AddRoleScreenPreview() {
                 )
             ),
             permissionSelected = emptyMap(),
-            memberResult = EmptyResultRecipient(),
-            onTabSelected = {}
+            memberList = emptyList(),
+            onTabSelected = {},
+            onMemberRemove = {}
         ) { key, selected ->
 
         }

@@ -8,8 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,45 +24,19 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.EmptyResultRecipient
-import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-import java.lang.reflect.Type
 
 @Composable
 fun MemberScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
-    memberResult: ResultRecipient<AddMemberScreenDestination, String>
+    memberList: List<GroupMember>,
+    onRemoveClick: (GroupMember) -> Unit
 ) {
     val TAG = "MemberScreen"
-
-    val memberList =
-        remember {
-            mutableStateListOf<GroupMember>()
-        }
-
-    //Add Member Callback
-    memberResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                val member = result.value
-                val gson = Gson()
-                val listType: Type =
-                    object : TypeToken<List<GroupMember>>() {}.type
-                val responseMemberList = gson.fromJson(member, listType) as List<GroupMember>
-                memberList.addAll(responseMemberList)
-            }
-        }
-    }
 
     Column(modifier = modifier.fillMaxSize()) {
         BorderButton(
@@ -88,7 +60,7 @@ fun MemberScreen(
             items(memberList) { member ->
                 MemberItem(groupMember = member) {
                     KLog.i(TAG, "remove:$it")
-                    memberList.remove(it)
+                    onRemoveClick.invoke(it)
                 }
             }
         }
@@ -147,7 +119,7 @@ fun MemberScreenPreview() {
         MemberScreen(
             navigator = EmptyDestinationsNavigator,
             group = Group(),
-            memberResult = EmptyResultRecipient()
-        )
+            memberList = emptyList()
+        ) {}
     }
 }
