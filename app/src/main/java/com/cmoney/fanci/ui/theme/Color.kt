@@ -71,3 +71,5 @@ val Color_E24CA6 = Color(0xFFE24CA6)
 val Color_8559E1 = Color(0xFF8559E1)
 val Color_DDBA00 = Color(0xFFDDBA00)
 
+val Color_29787880 = Color(0x29787880)
+

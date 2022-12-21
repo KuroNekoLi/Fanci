@@ -6,9 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.model.usecase.GroupUseCase
-import com.cmoney.fanci.model.usecase.ThemeUseCase
-import com.cmoney.fanciapi.fanci.model.Color
-import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.PermissionCategory
 import com.socks.library.KLog
@@ -17,6 +14,7 @@ import kotlinx.coroutines.launch
 data class UiState(
     val fanciRole: List<FanciRole>? = null,  //角色清單
     val permissionList: List<PermissionCategory>? = null,    //權限清單
+    val permissionSelected: Map<String, Boolean> = emptyMap()   //勾選權限
 )
 
 class RoleManageViewModel(
@@ -26,23 +24,6 @@ class RoleManageViewModel(
 
     var uiState by mutableStateOf(UiState())
         private set
-
-//    /**
-//     * 取得新增角色需要色碼
-//     */
-//    fun fetchRoleColor(colorTheme: ColorTheme) {
-//        KLog.i(TAG, "fetchRoleColor.")
-//        viewModelScope.launch {
-//            themeUseCase.fetchRoleColor(colorTheme).fold({
-//                uiState = uiState.copy(
-//                    roleColor = it.colors
-//                )
-//
-//            },{
-//                KLog.e(TAG, it)
-//            })
-//        }
-//    }
 
     /**
      * 取得 角色清單
@@ -65,13 +46,34 @@ class RoleManageViewModel(
     fun fetchPermissionList() {
         KLog.i(TAG, "fetchPermissionList")
         viewModelScope.launch {
-            groupUseCase.fetchPermissionList().fold({
+            groupUseCase.fetchPermissionList().fold({ permissionList ->
+                val flatMapPermission = permissionList.flatMap {
+                    it.permissions.orEmpty()
+                }
+                val permissionCheckedMap = flatMapPermission.associate {
+                    Pair(it.id.orEmpty(), false)
+                }
+
                 uiState = uiState.copy(
-                    permissionList = it
+                    permissionList = permissionList,
+                    permissionSelected = permissionCheckedMap
                 )
             }, {
                 KLog.e(TAG, it)
             })
+        }
+    }
+
+    /**
+     * 勾選 權限
+     */
+    fun onPermissionSelected(permissionId: String, isSelected: Boolean) {
+        if (uiState.permissionSelected.containsKey(permissionId)) {
+            val newMap = uiState.permissionSelected.toMutableMap()
+            newMap[permissionId] = isSelected
+            uiState = uiState.copy(
+                permissionSelected = newMap
+            )
         }
     }
 
