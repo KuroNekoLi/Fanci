@@ -8,27 +8,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.MainActivity
 import com.cmoney.fanci.destinations.AddMemberScreenDestination
+import com.cmoney.fanci.extension.showToast
 import com.cmoney.fanci.ui.screens.group.setting.role.viewmodel.RoleManageViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.Permission
-import com.cmoney.fanciapi.fanci.model.PermissionCategory
+import com.cmoney.fanciapi.fanci.model.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.koinViewModel
 import java.lang.reflect.Type
@@ -40,7 +40,8 @@ fun AddRoleScreen(
     navigator: DestinationsNavigator,
     group: Group,
     viewModel: RoleManageViewModel = koinViewModel(),
-    memberResult: ResultRecipient<AddMemberScreenDestination, String>
+    memberResult: ResultRecipient<AddMemberScreenDestination, String>,
+    resultNavigator: ResultBackNavigator<FanciRole>
 ) {
     val mainActivity = LocalDependencyContainer.current
     val uiState = viewModel.uiState
@@ -52,11 +53,7 @@ fun AddRoleScreen(
             }
             is NavResult.Value -> {
                 val member = result.value
-                val gson = Gson()
-                val listType: Type =
-                    object : TypeToken<List<GroupMember>>() {}.type
-                val responseMemberList = gson.fromJson(member, listType) as List<GroupMember>
-                viewModel.addMember(responseMemberList)
+                viewModel.addMember(member)
             }
         }
     }
@@ -70,18 +67,36 @@ fun AddRoleScreen(
         uiState.permissionList.orEmpty(),
         uiState.permissionSelected,
         uiState.memberList,
+        roleName = uiState.roleName,
+        roleColor = uiState.roleColor,
         onTabSelected = {
             viewModel.onTabSelected(it)
         },
         onMemberRemove = {
             viewModel.onMemberRemove(it)
+        },
+        onConfirm = {
+            viewModel.onConfirmAddRole(group)
+        },
+        onPermissionSwitch = { key, selected ->
+            viewModel.onPermissionSelected(key, selected)
+        },
+        onRoleStyleChange = { name, color ->
+            viewModel.setRoleStyle(name, color)
         }
-    ) { key, selected ->
-        viewModel.onPermissionSelected(key, selected)
-    }
+    )
 
     if (uiState.permissionList == null) {
         viewModel.fetchPermissionList()
+    }
+
+    if (uiState.addRoleError.isNotEmpty()) {
+        LocalContext.current.showToast(uiState.addRoleError)
+        viewModel.errorShowDone()
+    }
+
+    if (uiState.addFanciRole != null) {
+        resultNavigator.navigateBack(uiState.addFanciRole)
     }
 }
 
@@ -95,9 +110,13 @@ private fun AddRoleScreenView(
     permissionList: List<PermissionCategory>,
     permissionSelected: Map<String, Boolean>,
     memberList: List<GroupMember>,
+    roleName: String,
+    roleColor: com.cmoney.fanciapi.fanci.model.Color,
     onTabSelected: (Int) -> Unit,
     onMemberRemove: (GroupMember) -> Unit,
+    onConfirm: () -> Unit,
     onPermissionSwitch: (String, Boolean) -> Unit,
+    onRoleStyleChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit
 ) {
     val tabList = listOf("樣式", "權限", "成員")
 
@@ -165,7 +184,12 @@ private fun AddRoleScreenView(
                 when (selectedIndex) {
                     //樣式
                     0 -> {
-                        StyleScreen(mainActivity = mainActivity)
+                        StyleScreen(
+                            mainActivity = mainActivity,
+                            roleName = roleName,
+                            roleColor = roleColor,
+                            onChange = onRoleStyleChange
+                        )
                     }
                     //權限
                     1 -> {
@@ -194,7 +218,7 @@ private fun AddRoleScreenView(
             BottomButtonScreen(
                 text = "確定新增"
             ) {
-
+                onConfirm.invoke()
             }
         }
     }
@@ -226,10 +250,13 @@ fun AddRoleScreenPreview() {
             ),
             permissionSelected = emptyMap(),
             memberList = emptyList(),
+            roleColor = com.cmoney.fanciapi.fanci.model.Color(),
+            roleName = "Hi",
             onTabSelected = {},
-            onMemberRemove = {}
-        ) { key, selected ->
-
-        }
+            onMemberRemove = {},
+            onConfirm = {},
+            onPermissionSwitch = { key, selected -> },
+            onRoleStyleChange = { _, _ -> }
+        )
     }
 }

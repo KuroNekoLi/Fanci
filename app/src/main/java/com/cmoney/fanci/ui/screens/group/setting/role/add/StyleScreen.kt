@@ -29,17 +29,35 @@ import com.socks.library.KLog
  * 樣式 View
  */
 @Composable
-fun StyleScreen(modifier: Modifier = Modifier, mainActivity: MainActivity) {
+fun StyleScreen(
+    modifier: Modifier = Modifier,
+    mainActivity: MainActivity,
+    roleName: String,
+    roleColor: com.cmoney.fanciapi.fanci.model.Color,
+    onChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit
+) {
     val TAG = "StyleView"
     val maxLength = 10
-    var textState by remember { mutableStateOf("") }
-    val defaultColor = LocalColor.current.roleColor.colors.first()
 
-    val selectRoleColor = remember {
-        mutableStateOf(
-            defaultColor
-        )
+//    var textState by remember { mutableStateOf("") }
+
+    val defaultColor = if (roleColor.hexColorCode.orEmpty().isEmpty()) {
+        LocalColor.current.roleColor.colors.first()
     }
+    else {
+        roleColor
+    }
+
+//    val selectRoleColor = remember {
+//        mutableStateOf(
+//            if (roleColor.hexColorCode.orEmpty().isEmpty()) {
+//                defaultColor
+//            }
+//            else {
+//                roleColor
+//            }
+//        )
+//    }
 
     Column(modifier = modifier.background(LocalColor.current.env_80)) {
         Row(
@@ -57,7 +75,7 @@ fun StyleScreen(modifier: Modifier = Modifier, mainActivity: MainActivity) {
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = "%d/%d".format(textState.length, maxLength),
+                text = "%d/%d".format(roleName.length, maxLength),
                 fontSize = 14.sp,
                 color = LocalColor.current.text.default_50
             )
@@ -65,7 +83,7 @@ fun StyleScreen(modifier: Modifier = Modifier, mainActivity: MainActivity) {
 
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = textState,
+            value = roleName,
             colors = TextFieldDefaults.textFieldColors(
                 textColor = LocalColor.current.text.default_100,
                 backgroundColor = LocalColor.current.background,
@@ -76,7 +94,7 @@ fun StyleScreen(modifier: Modifier = Modifier, mainActivity: MainActivity) {
             ),
             onValueChange = {
                 if (it.length <= maxLength) {
-                    textState = it
+                    onChange.invoke(it, defaultColor)
                 }
             },
             maxLines = 1,
@@ -104,10 +122,10 @@ fun StyleScreen(modifier: Modifier = Modifier, mainActivity: MainActivity) {
                 .background(LocalColor.current.background)
                 .clickable {
                     mainActivity.showColorPickerDialogBottomSheet(
-                        selectedColor = selectRoleColor.value
+                        selectedColor = defaultColor
                     ) {
                         KLog.i(TAG, "color pick:$it")
-                        selectRoleColor.value = it
+                        onChange.invoke(roleName, it)
                     }
                 },
             verticalAlignment = Alignment.CenterVertically
@@ -118,13 +136,13 @@ fun StyleScreen(modifier: Modifier = Modifier, mainActivity: MainActivity) {
                 painter = painterResource(id = R.drawable.rule_manage),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(
-                    color = selectRoleColor.value.hexColorCode.orEmpty().toColor()
+                    color = defaultColor.hexColorCode.orEmpty().toColor()
                 )
             )
 
             Text(
                 modifier = Modifier.padding(start = 17.dp),
-                text = selectRoleColor.value.displayName.orEmpty(),
+                text = defaultColor.displayName.orEmpty(),
                 fontSize = 17.sp,
                 color = LocalColor.current.text.default_100
             )
@@ -136,6 +154,10 @@ fun StyleScreen(modifier: Modifier = Modifier, mainActivity: MainActivity) {
 @Composable
 fun StyleScreenPreview() {
     FanciTheme {
-        StyleScreen(mainActivity = MainActivity())
+        StyleScreen(mainActivity = MainActivity(),
+            roleName = "",
+            roleColor = com.cmoney.fanciapi.fanci.model.Color()
+        ) { _, _ ->
+        }
     }
 }

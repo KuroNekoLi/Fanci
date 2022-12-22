@@ -9,8 +9,7 @@ import com.cmoney.fanciapi.fanci.api.DefaultImageApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupMemberApi
 import com.cmoney.fanciapi.fanci.api.PermissionApi
-import com.cmoney.fanciapi.fanci.model.EditGroupParam
-import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.xlogin.XLoginHelper
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +25,30 @@ class GroupUseCase(
     private val defaultImageApi: DefaultImageApi,
     private val permissionApi: PermissionApi
 ) {
+
+    /**
+     * 社團 新增角色
+     *
+     * @param groupId 社團 id
+     * @param name 角色名稱
+     * @param permissionIds 權限清單
+     * @param colorCode 色碼代碼
+     */
+    suspend fun addGroupRole(
+        groupId: String,
+        name: String,
+        permissionIds: List<String>,
+        colorCode: Color
+    ) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdRolePost(
+            groupId = groupId,
+            roleParam = RoleParam(
+                name = name,
+                permissionIds = permissionIds,
+                color = RoleColor.decode(colorCode.name)
+            )
+        ).checkResponseBody()
+    }
 
     /**
      * 取得群組會員清單, 預設抓取20筆

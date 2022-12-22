@@ -34,6 +34,7 @@ import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
+import com.cmoney.fanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -118,6 +119,10 @@ fun MainNavHost(
 ) {
     //test
     var pos by remember { mutableStateOf(0) }
+
+    Column {
+        TutorialScreen()
+    }
 
     NavHost(
         navController = navController,

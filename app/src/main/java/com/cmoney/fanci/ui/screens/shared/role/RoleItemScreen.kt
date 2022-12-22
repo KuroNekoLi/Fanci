@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.extension.toColor
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.FanciRole
@@ -49,7 +50,14 @@ fun RoleItemScreen(
         )
 
         val roleColor = if (fanciRole.color?.isNotEmpty() == true) {
-            Color(fanciRole.color.orEmpty().toLong(16))
+            val roleColor = LocalColor.current.roleColor.colors.first {
+                it.name == fanciRole.color
+            }
+            roleColor.hexColorCode?.let {
+                it.toColor()
+            } ?: kotlin.run {
+                LocalColor.current.specialColor.red
+            }
         } else {
             LocalColor.current.specialColor.red
         }
@@ -65,8 +73,12 @@ fun RoleItemScreen(
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Test", fontSize = 16.sp, color = Color.White)
-            Text(text = "3位成員", fontSize = 12.sp, color = LocalColor.current.component.other)
+            Text(text = fanciRole.name.orEmpty(), fontSize = 16.sp, color = Color.White)
+            Text(
+                text = "%d 位成員".format(fanciRole.userCount ?: 0),
+                fontSize = 12.sp,
+                color = LocalColor.current.component.other
+            )
         }
 
         Text(

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanci.destinations.AddMemberScreenDestination
 import com.cmoney.fanci.destinations.AddRoleScreenDestination
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
@@ -28,6 +29,8 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,12 +43,21 @@ fun RoleManageScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
-    viewModel: RoleManageViewModel = koinViewModel()
+    viewModel: RoleManageViewModel = koinViewModel(),
+    roleResult: ResultRecipient<AddRoleScreenDestination, FanciRole>
 ) {
     val TAG = "RoleManageScreen"
 
-    viewModel.uiState.fanciRole?.let {
 
+    roleResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val role = result.value
+                viewModel.addMemberRole(role)
+            }
+        }
     }
 
     RoleManageScreenView(
@@ -58,7 +70,7 @@ fun RoleManageScreen(
         // TODO()
     }
 
-    viewModel.uiState.fanciRole?.let {
+    if (viewModel.uiState.fanciRole == null) {
         viewModel.fetchRoleList(group.id.orEmpty())
     }
 }
