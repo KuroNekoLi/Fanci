@@ -15,7 +15,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanci.destinations.AddMemberScreenDestination
 import com.cmoney.fanci.destinations.AddRoleScreenDestination
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
@@ -83,6 +82,8 @@ fun RoleManageScreenView(
     group: Group,
     onSave: () -> Unit
 ) {
+    val TAG = "RoleManageScreenView"
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -160,7 +161,13 @@ fun RoleManageScreenView(
                             index = index + 1,
                             fanciRole = item,
                             onEditClick = {
-                                // TODO: Edit screen
+                                KLog.i(TAG, "onEditClick")
+                                navigator.navigate(
+                                    AddRoleScreenDestination(
+                                        group = group,
+                                        fanciRole = it
+                                    )
+                                )
                             }
                         )
                     }

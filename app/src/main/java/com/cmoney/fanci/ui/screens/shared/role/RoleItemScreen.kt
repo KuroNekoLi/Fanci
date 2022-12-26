@@ -50,14 +50,18 @@ fun RoleItemScreen(
         )
 
         val roleColor = if (fanciRole.color?.isNotEmpty() == true) {
-            val roleColor = LocalColor.current.roleColor.colors.first {
+            var roleColor = LocalColor.current.specialColor.red
+
+            val filterList = LocalColor.current.roleColor.colors.filter {
                 it.name == fanciRole.color
             }
-            roleColor.hexColorCode?.let {
-                it.toColor()
-            } ?: kotlin.run {
-                LocalColor.current.specialColor.red
+
+            if (filterList.isNotEmpty()) {
+                filterList[0].hexColorCode?.let {
+                    roleColor = it.toColor()
+                }
             }
+            roleColor
         } else {
             LocalColor.current.specialColor.red
         }

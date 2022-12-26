@@ -5,10 +5,7 @@ import android.net.Uri
 import com.cmoney.fanci.BuildConfig
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanci.ui.screens.follow.model.GroupItem
-import com.cmoney.fanciapi.fanci.api.DefaultImageApi
-import com.cmoney.fanciapi.fanci.api.GroupApi
-import com.cmoney.fanciapi.fanci.api.GroupMemberApi
-import com.cmoney.fanciapi.fanci.api.PermissionApi
+import com.cmoney.fanciapi.fanci.api.*
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.xlogin.XLoginHelper
@@ -23,8 +20,64 @@ class GroupUseCase(
     private val groupApi: GroupApi,
     private val groupMemberApi: GroupMemberApi,
     private val defaultImageApi: DefaultImageApi,
-    private val permissionApi: PermissionApi
+    private val permissionApi: PermissionApi,
+    private val roleUserApi: RoleUserApi
 ) {
+
+    /**
+     * 移除使用者的角色
+     * @param groupId 群組id
+     * @param roleId 角色id
+     * @param userId 要移除的 user 清單
+     */
+    suspend fun removeUserRole(
+        groupId: String,
+        roleId: String,
+        userId: List<String>
+    ) = kotlin.runCatching {
+        roleUserApi.apiV1RoleUserGroupGroupIdRoleRoleIdDelete(
+            groupId = groupId,
+            roleId = roleId,
+            useridsParam = UseridsParam(
+                userIds = userId
+            )
+        ).checkResponseBody()
+    }
+
+    /**
+     * 取得 具有該角色權限的使用者清單
+     * @param groupId 社團id
+     * @param roleId 角色id
+     */
+    suspend fun fetchRoleMemberList(
+        groupId: String,
+        roleId: String
+    ) = kotlin.runCatching {
+        roleUserApi.apiV1RoleUserGroupGroupIdRoleRoleIdGet(
+            groupId = groupId,
+            roleId = roleId
+        ).checkResponseBody()
+    }
+
+    /**
+     * 指派 多個使用者 角色身份
+     * @param groupId 社團 id
+     * @param roleId 要分配的角色 id
+     * @param memberList 多個使用者
+     */
+    suspend fun addMemberToRole(
+        groupId: String,
+        roleId: String,
+        memberList: List<String>
+    ) = kotlin.runCatching {
+        roleUserApi.apiV1RoleUserGroupGroupIdRoleRoleIdPut(
+            groupId = groupId,
+            roleId = roleId,
+            useridsParam = UseridsParam(
+                userIds = memberList
+            )
+        )
+    }
 
     /**
      * 社團 新增角色
@@ -42,6 +95,33 @@ class GroupUseCase(
     ) = kotlin.runCatching {
         groupApi.apiV1GroupGroupIdRolePost(
             groupId = groupId,
+            roleParam = RoleParam(
+                name = name,
+                permissionIds = permissionIds,
+                color = RoleColor.decode(colorCode.name)
+            )
+        ).checkResponseBody()
+    }
+
+    /**
+     * 社團 編輯角色
+     *
+     * @param groupId 社團 id
+     * @param roleId 要編輯的角色id
+     * @param name 角色名稱
+     * @param permissionIds 權限清單
+     * @param colorCode 色碼代碼
+     */
+    suspend fun editGroupRole(
+        groupId: String,
+        roleId: String,
+        name: String,
+        permissionIds: List<String>,
+        colorCode: Color
+    ) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdRoleRoleIdPut(
+            groupId = groupId,
+            roleId = roleId,
             roleParam = RoleParam(
                 name = name,
                 permissionIds = permissionIds,

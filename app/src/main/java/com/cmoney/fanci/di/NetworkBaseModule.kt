@@ -101,6 +101,10 @@ val networkBaseModule = module {
         get<ApiClient>().createService(PermissionApi::class.java)
     }
 
+    single {
+        get<ApiClient>().createService(RoleUserApi::class.java)
+    }
+
 }
 
 private fun getDomain(context: Context): String {

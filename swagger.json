@@ -2541,6 +2541,45 @@
       }
     },
     "/api/v1/Message/{messageId}/Emoji": {
+      "get": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "取得訊息表情符號來自誰 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_canRead_1_messageId_messageId"
+            ]
+          }
+        ]
+      },
       "put": {
         "tags": [
           "Message"
@@ -2610,6 +2649,47 @@
             "name": "messageId",
             "in": "path",
             "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_canRead_1_messageId_messageId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Message/{messageId}/Emoji/me": {
+      "get": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "取得自己產生的訊息表情符號 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
             "required": true,
             "schema": {
               "type": "string"

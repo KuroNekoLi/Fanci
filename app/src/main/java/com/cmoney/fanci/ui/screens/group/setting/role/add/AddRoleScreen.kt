@@ -22,8 +22,6 @@ import com.cmoney.fanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.*
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -31,7 +29,6 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.koinViewModel
-import java.lang.reflect.Type
 
 @Destination
 @Composable
@@ -39,6 +36,7 @@ fun AddRoleScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
+    fanciRole: FanciRole? = null,
     viewModel: RoleManageViewModel = koinViewModel(),
     memberResult: ResultRecipient<AddMemberScreenDestination, String>,
     resultNavigator: ResultBackNavigator<FanciRole>
@@ -86,8 +84,12 @@ fun AddRoleScreen(
         }
     )
 
-    if (uiState.permissionList == null) {
-        viewModel.fetchPermissionList()
+    if (fanciRole != null) {
+        viewModel.setRoleEdit(group.id.orEmpty(), fanciRole, LocalColor.current.roleColor.colors)
+    } else {
+        if (uiState.permissionList == null) {
+            viewModel.fetchPermissionList()
+        }
     }
 
     if (uiState.addRoleError.isNotEmpty()) {
@@ -216,7 +218,7 @@ private fun AddRoleScreenView(
 
             //========== 儲存 ==========
             BottomButtonScreen(
-                text = "確定新增"
+                text = "儲存"
             ) {
                 onConfirm.invoke()
             }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanciapi.fanci.model.*
 import com.google.gson.Gson
@@ -33,6 +34,10 @@ class RoleManageViewModel(
 
     var uiState by mutableStateOf(UiState())
         private set
+
+    private var isEdited = false    //是否已經初始化編輯資料
+    private var editFanciRole: FanciRole? = null  //要編輯的角色
+    private var editMemberList: List<GroupMember> = emptyList() //編輯模式下原本的成員清單
 
     /**
      * 取得 角色清單
@@ -98,8 +103,15 @@ class RoleManageViewModel(
         val listType: Type =
             object : TypeToken<List<GroupMember>>() {}.type
         val responseMemberList = gson.fromJson(memberStr, listType) as List<GroupMember>
+
+        val newList = uiState.memberList.toMutableList()
+        newList.addAll(responseMemberList)
+        newList.distinctBy {
+            it.id
+        }
+
         uiState = uiState.copy(
-            memberList = responseMemberList
+            memberList = newList
         )
     }
 
@@ -126,7 +138,7 @@ class RoleManageViewModel(
     }
 
     /**
-     * 確定 新增角色
+     * 確定 新增角色 or 編輯角色
      */
     fun onConfirmAddRole(group: Group) {
         KLog.i(TAG, "onConfirmAddRole")
@@ -144,21 +156,127 @@ class RoleManageViewModel(
                 it.first
             }
 
-            groupUseCase.addGroupRole(
-                groupId = group.id.orEmpty(),
-                name = name,
-                permissionIds = permissionIds,
-                colorCode = uiState.roleColor
-            ).fold({
-                KLog.i(TAG, it)
+            //編輯
+            if (isEdited && editFanciRole != null) {
+                //re-assign data
+                editFanciRole = editFanciRole?.copy(
+                    name = name,
+                    color = uiState.roleColor.name,
+                    permissionIds = permissionIds,
+                    userCount = uiState.memberList.size.toLong()
+                )
+
+                groupUseCase.editGroupRole(
+                    groupId = group.id.orEmpty(),
+                    roleId = editFanciRole!!.id.orEmpty(),
+                    name = name,
+                    permissionIds = permissionIds,
+                    colorCode = uiState.roleColor
+                ).fold({
+                }, {
+                    KLog.e(TAG, it)
+                    if (it is EmptyBodyException) {
+                        assignMemberRole(group.id.orEmpty(), editFanciRole!!)
+                    } else {
+                        // TODO: 判斷server error type
+                        uiState = uiState.copy(
+                            addRoleError = "已有相同名稱的腳色"
+                        )
+                    }
+                })
+            }
+            //新增
+            else {
+                groupUseCase.addGroupRole(
+                    groupId = group.id.orEmpty(),
+                    name = name,
+                    permissionIds = permissionIds,
+                    colorCode = uiState.roleColor
+                ).fold({
+                    KLog.i(TAG, it)
+                    assignMemberRole(group.id.orEmpty(), it)
+                }, {
+                    KLog.e(TAG, it)
+                })
+            }
+        }
+    }
+
+    /**
+     * 將角色分配給選擇的人員, 或是將人員移除
+     * @param groupId 群組Id
+     * @param fanciRole 角色 model
+     */
+    private fun assignMemberRole(groupId: String, fanciRole: FanciRole) {
+        KLog.i(TAG, "assignMemberRole:$groupId , $fanciRole")
+        viewModelScope.launch {
+            if (uiState.memberList.isNotEmpty()) {
+
+                //新增人員至角色
+                val addMemberList = uiState.memberList.filter { !editMemberList.contains(it) }
+                if (addMemberList.isNotEmpty()) {
+                    groupUseCase.addMemberToRole(
+                        groupId = groupId,
+                        roleId = fanciRole.id.orEmpty(),
+                        memberList = addMemberList.map {
+                            it.id.orEmpty()
+                        }
+                    ).fold({
+                        KLog.i(TAG, "assignMemberRole complete")
+                        uiState = uiState.copy(
+                            addFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong()),
+                            addRoleError = "",
+                            addRoleComplete = true
+                        )
+                    }, {
+                        KLog.e(TAG, it)
+                    })
+                }
+
+                //要移除的人員
+                val removeMemberList = editMemberList.filter { !uiState.memberList.contains(it) }
+                if (removeMemberList.isNotEmpty()) {
+                    groupUseCase.removeUserRole(
+                        groupId = groupId,
+                        roleId = fanciRole.id.orEmpty(),
+                        userId = removeMemberList.map {
+                            it.id.orEmpty()
+                        }
+                    ).fold({
+
+                    }, {
+                        KLog.e(TAG, it)
+                        if (it is EmptyBodyException) {
+                            uiState = uiState.copy(
+                                addFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong()),
+                                addRoleError = "",
+                                addRoleComplete = true
+                            )
+                        }
+                    })
+                }
+            } else {
+                //將原本清單的人員都移除
+                if (editMemberList.isNotEmpty()) {
+                    groupUseCase.removeUserRole(
+                        groupId = groupId,
+                        roleId = fanciRole.id.orEmpty(),
+                        userId = editMemberList.map {
+                            it.id.orEmpty()
+                        }
+                    ).fold({
+
+                    }, {
+                        KLog.e(TAG, it)
+                    })
+                }
+
                 uiState = uiState.copy(
-                    addFanciRole = it,
+                    addFanciRole = fanciRole,
                     addRoleError = "",
                     addRoleComplete = true
                 )
-            }, {
-                KLog.e(TAG, it)
-            })
+            }
         }
     }
 
@@ -174,12 +292,78 @@ class RoleManageViewModel(
     /**
      * 增加會員至清單
      */
-    fun addMemberRole(role: FanciRole) {
-        KLog.i(TAG, "addMemberRole:$role")
+    fun addMemberRole(fanciRole: FanciRole) {
+        KLog.i(TAG, "addMemberRole:$fanciRole")
         val roleList = uiState.fanciRole?.toMutableList()
-        roleList?.add(role)
+        roleList?.let {
+            //find out exists or not
+            val existsPos = it.indexOfFirst { role ->
+                role.id == fanciRole.id
+            }
+            if (existsPos == -1) {
+                roleList.add(fanciRole)
+            } else {
+                roleList.set(existsPos, fanciRole)
+            }
+        }
+
         uiState = uiState.copy(
             fanciRole = roleList
         )
+    }
+
+    /**
+     *  編輯模式 設定
+     *  @param fanciRole 要編輯的角色
+     *  @param roleColors 角色色卡清單
+     */
+    fun setRoleEdit(groupId: String, fanciRole: FanciRole, roleColors: List<Color>) {
+        KLog.i(TAG, "setRoleEdit:$fanciRole, isEdited:$isEdited")
+        if (!isEdited) {
+            isEdited = true
+            editFanciRole = fanciRole
+
+            viewModelScope.launch {
+                //Color
+                val roleColor = roleColors.first { color ->
+                    color.name == fanciRole.color
+                }
+
+                //Permission
+                val checkedPermission = fanciRole.permissionIds.orEmpty()
+                val permissionList = groupUseCase.fetchPermissionList().getOrNull()
+                val flatMapPermission = permissionList?.flatMap {
+                    it.permissions.orEmpty()
+                }
+                val permissionCheckedMap = flatMapPermission?.associate {
+                    if (checkedPermission.contains(it.id)) {
+                        Pair(it.id.orEmpty(), true)
+                    } else {
+                        Pair(it.id.orEmpty(), false)
+                    }
+                }
+
+                //Member List
+                editMemberList = groupUseCase.fetchRoleMemberList(
+                    groupId = groupId,
+                    roleId = fanciRole.id.orEmpty()
+                ).getOrNull().orEmpty().map { user ->
+                    GroupMember(
+                        id = user.id,
+                        name = user.name,
+                        thumbNail = user.thumbNail,
+                        serialNumber = user.serialNumber
+                    )
+                }
+
+                uiState = uiState.copy(
+                    roleName = fanciRole.name.orEmpty(),
+                    roleColor = roleColor,
+                    permissionList = permissionList,
+                    permissionSelected = permissionCheckedMap.orEmpty(),
+                    memberList = editMemberList
+                )
+            }
+        }
     }
 }
