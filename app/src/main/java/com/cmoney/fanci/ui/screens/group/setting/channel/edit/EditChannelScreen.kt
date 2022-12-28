@@ -195,7 +195,6 @@ fun EditChannelScreenView(
             TabRow(
                 selectedTabIndex = selectedIndex,
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
                     .height(40.dp)
                     .padding(1.dp)
                     .clip(RoundedCornerShape(35)),
@@ -214,7 +213,6 @@ fun EditChannelScreenView(
                                 LocalColor.current.env_60
                             )
                         else Modifier
-                            .padding(10.dp)
                             .clip(RoundedCornerShape(15))
                             .background(
                                 Color.Transparent
