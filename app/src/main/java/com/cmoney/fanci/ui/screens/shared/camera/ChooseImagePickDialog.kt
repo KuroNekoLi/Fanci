@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.GroupSettingAvatarView
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.GroupSettingAvatarView
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group

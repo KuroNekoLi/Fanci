@@ -1,7 +1,7 @@
 package com.cmoney.fanci.model.usecase
 
 import com.cmoney.fanci.extension.checkResponseBody
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanci.ui.theme.*
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.ThemeColorApi

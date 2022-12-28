@@ -4,11 +4,11 @@ import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.follow.viewmodel.FollowViewModel
-import com.cmoney.fanci.ui.screens.group.setting.channel.viewmodel.ChannelSettingViewModel
-import com.cmoney.fanci.ui.screens.group.setting.role.viewmodel.RoleManageViewModel
+import com.cmoney.fanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
+import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.group.viewmodel.GroupViewModel
-import com.cmoney.fanci.ui.screens.shared.member.viewmodel.AddMemberViewModel
+import com.cmoney.fanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -21,5 +21,5 @@ val viewModule = module {
     viewModel { GroupSettingViewModel(get(), get()) }
     viewModel { ChannelSettingViewModel(get(), get()) }
     viewModel { RoleManageViewModel(get()) }
-    viewModel { AddMemberViewModel(get()) }
+    viewModel { MemberViewModel(get()) }
 }

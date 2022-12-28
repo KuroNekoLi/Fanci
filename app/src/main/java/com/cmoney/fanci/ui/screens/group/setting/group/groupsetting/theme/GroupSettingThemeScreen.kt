@@ -1,0 +1,160 @@
+package com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.cmoney.fanci.LocalDependencyContainer
+import com.cmoney.fanci.destinations.GroupSettingThemePreviewScreenDestination
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
+import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
+import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.theme.ThemeSettingItemScreen
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
+
+/**
+ * 主題色彩選擇畫面
+ */
+@Destination
+@Composable
+fun GroupSettingThemeScreen(
+    modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
+    group: Group,
+    viewModel: GroupSettingViewModel = koinViewModel(),
+) {
+    val TAG = "GroupSettingThemeScreen"
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val state = viewModel.uiState
+    val fetchAllTheme = remember {
+        mutableStateOf(true)
+    }
+
+    var groupParam = group
+    viewModel.uiState.settingGroup?.let {
+        groupParam = it
+        globalViewModel.setCurrentGroup(it)
+    }
+
+    GroupSettingThemeView(
+        modifier,
+        navController,
+        isLoading = viewModel.uiState.isLoading,
+        groupThemes = state.groupThemeList,
+        group = groupParam,
+        onThemeConfirmClick = {
+            KLog.i(TAG, "on theme click.")
+            viewModel.changeTheme(groupParam, it)
+        }
+    )
+
+    LaunchedEffect(fetchAllTheme) {
+        viewModel.fetchAllTheme(groupParam)
+    }
+}
+
+@Composable
+private fun GroupSettingThemeView(
+    modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
+    isLoading: Boolean,
+    groupThemes: List<GroupTheme>,
+    group: Group,
+    onThemeConfirmClick: (GroupTheme) -> Unit
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        scaffoldState = rememberScaffoldState(),
+        topBar = {
+            TopBarScreen(
+                title = "主題色彩",
+                leadingEnable = true,
+                moreEnable = false,
+                moreClick = {
+                },
+                backClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .background(LocalColor.current.env_80)
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            LazyColumn(
+                state = rememberLazyListState(),
+            ) {
+                items(groupThemes) {
+                    ThemeSettingItemScreen(
+                        primary = it.theme.primary,
+                        env_100 = it.theme.env_100,
+                        env_80 = it.theme.env_80,
+                        env_60 = it.theme.env_60,
+                        name = it.name,
+                        isSelected = it.isSelected,
+                        onItemClick = {
+                            navController.navigate(
+                                GroupSettingThemePreviewScreenDestination(
+                                    group = group,
+                                    themeId = it.id
+                                )
+                            )
+                        },
+                        onConfirm = {
+                            onThemeConfirmClick.invoke(it)
+                        }
+                    )
+                }
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(45.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+
+        }
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GroupSettingThemeScreenPreview() {
+    FanciTheme {
+        GroupSettingThemeView(
+            navController = EmptyDestinationsNavigator,
+            isLoading = false,
+            groupThemes = emptyList(),
+            group = Group(),
+            onThemeConfirmClick = {}
+        )
+    }
+}

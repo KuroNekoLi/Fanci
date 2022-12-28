@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanci.model.usecase.ThemeUseCase
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.ImageChangeData
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.ImageChangeData
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog

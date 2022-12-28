@@ -26,10 +26,10 @@ import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
 import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
 import com.cmoney.fanci.ui.screens.group.setting.groupsetting.*
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib.FanciDefaultAvatarScreen
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.fancilib.FanciDefaultCoverScreen
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.GroupSettingThemePreviewScreen
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.GroupSettingThemeScreen
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.fancilib.FanciDefaultAvatarScreen
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.fancilib.FanciDefaultCoverScreen
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.GroupSettingThemePreviewScreen
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.GroupSettingThemeScreen
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen

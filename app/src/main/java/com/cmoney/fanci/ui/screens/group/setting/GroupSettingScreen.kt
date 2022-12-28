@@ -86,6 +86,8 @@ fun GroupSettingScreen(
 
             //成員管理
             GroupMemberManageScreen(
+                group = group,
+                navController = navController,
                 onGroupSetting = onGroupSetting
             )
 

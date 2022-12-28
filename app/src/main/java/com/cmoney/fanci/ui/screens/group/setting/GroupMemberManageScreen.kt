@@ -8,16 +8,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.AllMemberScreenDestination
+import com.cmoney.fanci.destinations.RoleManageScreenDestination
 import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
 /**
  * 成員管理
  */
 @Composable
-fun GroupMemberManageScreen(modifier: Modifier = Modifier,
-                            onGroupSetting: (GroupSettingRoute) -> Unit) {
+fun GroupMemberManageScreen(
+    modifier: Modifier = Modifier,
+    group: Group,
+    navController: DestinationsNavigator,
+    onGroupSetting: (GroupSettingRoute) -> Unit
+) {
     Column(modifier = modifier) {
         Text(
             modifier = Modifier.padding(start = 25.dp, bottom = 9.dp),
@@ -27,8 +36,8 @@ fun GroupMemberManageScreen(modifier: Modifier = Modifier,
         SettingItemScreen(
             iconRes = R.drawable.rule_manage,
             text = "角色管理",
-            onItemClick= {
-                onGroupSetting.invoke(GroupSettingRoute.UserManage)
+            onItemClick = {
+                navController.navigate(RoleManageScreenDestination(group = group))
             }
         )
 
@@ -37,14 +46,18 @@ fun GroupMemberManageScreen(modifier: Modifier = Modifier,
         SettingItemScreen(
             iconRes = R.drawable.all_member,
             text = "所有成員",
-            onItemClick= {}
+            onItemClick = {
+                navController.navigate(AllMemberScreenDestination(
+                    group = group
+                ))
+            }
         )
         Spacer(modifier = Modifier.height(1.dp))
 
         SettingItemScreen(
             iconRes = R.drawable.join_apply,
             text = "加入申請",
-            onItemClick= {}
+            onItemClick = {}
         ) {
             Text(text = "121", fontSize = 17.sp, color = LocalColor.current.text.default_100)
         }
@@ -55,6 +68,10 @@ fun GroupMemberManageScreen(modifier: Modifier = Modifier,
 @Composable
 fun GroupMemberManageScreenPreview() {
     FanciTheme {
-        GroupMemberManageScreen {}
+        GroupMemberManageScreen(
+            group = Group(),
+            navController = EmptyDestinationsNavigator,
+            onGroupSetting = {}
+        )
     }
 }

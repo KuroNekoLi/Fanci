@@ -7,7 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import com.cmoney.fanci.ui.screens.group.setting.role.add.dialog.ColorPickerScreen
+import com.cmoney.fanci.ui.screens.group.setting.member.role.add.dialog.ColorPickerScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

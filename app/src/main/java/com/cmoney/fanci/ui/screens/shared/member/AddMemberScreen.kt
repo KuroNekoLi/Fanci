@@ -27,7 +27,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.ui.screens.chat.message.OnBottomReached
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
-import com.cmoney.fanci.ui.screens.shared.member.viewmodel.AddMemberViewModel
+import com.cmoney.fanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.fanci.ui.screens.shared.member.viewmodel.GroupMemberSelect
 import com.cmoney.fanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -46,7 +46,7 @@ fun AddMemberScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
-    viewModel: AddMemberViewModel = koinViewModel(),
+    viewModel: MemberViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<String>
 ) {
     val TAG = "AddMemberScreen"

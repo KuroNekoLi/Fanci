@@ -6,7 +6,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.theme.model.GroupTheme
+import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.flurry.sdk.it
