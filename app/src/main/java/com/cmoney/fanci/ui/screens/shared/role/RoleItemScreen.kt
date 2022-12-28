@@ -25,12 +25,15 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
  * 社團角色 Item
  * @param index 排名第幾
  * @param fanciRole 角色 Model
+ * @param isShowIndex 是否要呈現 排名
  */
 @Composable
 fun RoleItemScreen(
     modifier: Modifier = Modifier,
     index: Int,
+    isShowIndex: Boolean = false,
     fanciRole: FanciRole,
+    editText: String = "編輯",
     onEditClick: (FanciRole) -> Unit
 ) {
     Row(
@@ -42,12 +45,19 @@ fun RoleItemScreen(
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            modifier = Modifier.padding(top = 20.dp, bottom = 20.dp, start = 30.dp, end = 16.dp),
-            text = "NO.%d".format(index),
-            fontSize = 14.sp,
-            color = LocalColor.current.component.other
-        )
+        if (isShowIndex) {
+            Text(
+                modifier = Modifier.padding(
+                    top = 20.dp,
+                    bottom = 20.dp,
+                    start = 30.dp,
+                    end = 16.dp
+                ),
+                text = "NO.%d".format(index),
+                fontSize = 14.sp,
+                color = LocalColor.current.component.other
+            )
+        }
 
         val roleColor = if (fanciRole.color?.isNotEmpty() == true) {
             var roleColor = LocalColor.current.specialColor.red
@@ -66,8 +76,16 @@ fun RoleItemScreen(
             LocalColor.current.specialColor.red
         }
 
+        val imageModifier = if (isShowIndex) {
+            Modifier.size(25.dp)
+        } else {
+            Modifier
+                .padding(top = 20.dp, bottom = 20.dp, start = 30.dp, end = 16.dp)
+                .size(25.dp)
+        }
+
         Image(
-            modifier = Modifier.size(25.dp),
+            modifier = imageModifier,
             contentScale = ContentScale.FillBounds,
             painter = painterResource(id = R.drawable.rule_manage),
             colorFilter = ColorFilter.tint(color = roleColor),
@@ -87,7 +105,7 @@ fun RoleItemScreen(
 
         Text(
             modifier = Modifier.padding(end = 24.dp),
-            text = "編輯", fontSize = 14.sp, color = LocalColor.current.primary
+            text = editText, fontSize = 14.sp, color = LocalColor.current.primary
         )
     }
 }

@@ -1,8 +1,6 @@
 package com.cmoney.fanci.ui.screens.group.setting.channel.edit
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -19,11 +17,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.AddChannelRoleScreenDestination
 import com.cmoney.fanci.extension.showToast
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.group.setting.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Channel
@@ -32,7 +32,9 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -47,25 +49,36 @@ fun EditChannelScreen(
     group: Group,
     channel: Channel,
     viewModel: ChannelSettingViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<Group>
+    resultNavigator: ResultBackNavigator<Group>,
+    setRoleResult: ResultRecipient<AddChannelRoleScreenDestination, String>
 ) {
     val context = LocalContext.current
     val TAG = "EditChannelScreen"
     val showDialog = remember { mutableStateOf(false) }
 
-    viewModel.uiState.group?.let {
+    val uiState = viewModel.uiState
+    uiState.group?.let {
         resultNavigator.navigateBack(result = it)
     }
 
-//    viewModel.uiState.channelRole?.let {
-//        KLog.i("TAG", it)
-//    }
+    //Add role callback
+    setRoleResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                viewModel.addChannelRole(result.value)
+            }
+        }
+    }
 
     EditChannelScreenView(
         modifier,
         navigator,
         channel,
-        viewModel.uiState.channelRole,
+        uiState.channelRole,
+        group = group,
+        selectedIndex = uiState.tabSelected,
         onConfirm = {
             if (it.isNotEmpty()) {
                 viewModel.editChannel(group, channel, it)
@@ -76,6 +89,12 @@ fun EditChannelScreen(
         onDelete = {
             KLog.i(TAG, "onDelete click")
             showDialog.value = true
+        },
+        onTabSelected = {
+            viewModel.onTabSelected(it)
+        },
+        onRemoveRole = {
+            viewModel.onRemoveRole(it)
         }
     )
 
@@ -100,7 +119,8 @@ fun EditChannelScreen(
 @Composable
 private fun showDeleteAlert(
     channelName: String,
-    onConfirm: () -> Unit, onCancel: () -> Unit) {
+    onConfirm: () -> Unit, onCancel: () -> Unit
+) {
     AlertDialog(
         backgroundColor = LocalColor.current.env_80,
         onDismissRequest = {
@@ -141,12 +161,15 @@ fun EditChannelScreenView(
     navigator: DestinationsNavigator,
     channel: Channel,
     fanciRole: List<FanciRole>?,
+    group: Group,
+    selectedIndex: Int,
     onConfirm: (String) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onTabSelected: (Int) -> Unit,
+    onRemoveRole: (FanciRole) -> Unit
 ) {
     var textState by remember { mutableStateOf(channel.name.orEmpty()) }
     val tabList = listOf("樣式", "管理員")
-    var selectedIndex by remember { mutableStateOf(0) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -197,7 +220,9 @@ fun EditChannelScreenView(
                                 Color.Transparent
                             ),
                         selected = selected,
-                        onClick = { selectedIndex = index },
+                        onClick = {
+                            onTabSelected.invoke(index)
+                        },
                         text = {
                             Text(
                                 text = text, color = Color.White, fontSize = 14.sp
@@ -223,8 +248,11 @@ fun EditChannelScreenView(
                     ManageView(
                         modifier = Modifier.weight(1f),
                         navigator,
-                        fanciRole
-                    )
+                        fanciRole,
+                        group
+                    ){
+                        onRemoveRole.invoke(it)
+                    }
                 }
 
                 //========== 儲存 ==========
@@ -255,9 +283,13 @@ fun EditChannelScreenView(
 private fun ManageView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    fanciRole: List<FanciRole>?
+    fanciRole: List<FanciRole>?,
+    group: Group,
+    onRemoveRole: (FanciRole) -> Unit
 ) {
-    Column(modifier = modifier) {
+    val TAG = "ManageView"
+
+    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         Text(
             modifier = Modifier.padding(20.dp),
             text = "選擇角色來建立頻道管理員：擁有該角色之成員，即可針對相對應的權限，進行頻道管理。",
@@ -265,9 +297,21 @@ private fun ManageView(
             color = LocalColor.current.component.other
         )
 
-        //TODO Rule
-        fanciRole?.let {
-
+        fanciRole?.let { roleList ->
+            repeat(roleList.size) {
+                RoleItemScreen(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    index = it,
+                    isShowIndex = false,
+                    fanciRole = roleList[it],
+                    editText = "移除",
+                    onEditClick = {
+                        onRemoveRole.invoke(it)
+                    }
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+            }
         }
 
         BorderButton(
@@ -278,8 +322,12 @@ private fun ManageView(
             text = "新增角色",
             borderColor = Color.White
         ) {
-            // TODO: Route
-//            navigator.navigate()
+            KLog.i(TAG, "add role click.")
+            navigator.navigate(
+                AddChannelRoleScreenDestination(
+                    group = group
+                )
+            )
         }
     }
 }
@@ -408,8 +456,16 @@ fun EditChannelScreenPreview() {
         EditChannelScreenView(
             navigator = EmptyDestinationsNavigator,
             channel = Channel(name = "嘿嘿"),
-            fanciRole = null,
-            onConfirm = {}
-        ) {}
+            fanciRole = listOf(
+                FanciRole(name = "Hi", userCount = 3),
+                FanciRole(name = "Hi2", userCount = 3)
+            ),
+            group = Group(),
+            selectedIndex = 1,
+            onConfirm = {},
+            onDelete = {},
+            onTabSelected = {},
+            onRemoveRole = {}
+        )
     }
 }

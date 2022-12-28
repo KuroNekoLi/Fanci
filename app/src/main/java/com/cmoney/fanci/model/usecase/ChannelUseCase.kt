@@ -4,16 +4,42 @@ import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.CategoryApi
 import com.cmoney.fanciapi.fanci.api.ChannelApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
-import com.cmoney.fanciapi.fanci.model.CategoryParam
-import com.cmoney.fanciapi.fanci.model.ChannelParam
-import com.cmoney.fanciapi.fanci.model.ChannelType
-import com.cmoney.fanciapi.fanci.model.EditChannelParam
+import com.cmoney.fanciapi.fanci.model.*
 
 class ChannelUseCase(
     private val categoryApi: CategoryApi,
     private val groupApi: GroupApi,
     private val channelApi: ChannelApi
 ) {
+
+    /**
+     * 頻道 移除多個角色
+     * @param channelId 頻道id
+     * @param roleIds 角色id清單
+     */
+    suspend fun deleteRoleFromChannel(channelId: String, roleIds: List<String>) =
+        kotlin.runCatching {
+            channelApi.apiV1ChannelChannelIdRoleDelete(
+                channelId = channelId,
+                roleIdsParam = RoleIdsParam(
+                    roleIds = roleIds
+                )
+            ).checkResponseBody()
+        }
+
+    /**
+     * 頻道 新增多個角色
+     * @param channelId 頻道id
+     * @param roleIds 角色id清單
+     */
+    suspend fun addRoleToChannel(channelId: String, roleIds: List<String>) = kotlin.runCatching {
+        channelApi.apiV1ChannelChannelIdRolePut(
+            channelId = channelId,
+            roleIdsParam = RoleIdsParam(
+                roleIds = roleIds
+            )
+        ).checkResponseBody()
+    }
 
     /**
      * 刪除 分類
