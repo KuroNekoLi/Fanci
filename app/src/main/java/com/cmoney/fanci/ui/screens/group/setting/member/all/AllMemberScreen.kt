@@ -18,18 +18,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanci.destinations.MemberManageScreenDestination
 import com.cmoney.fanci.extension.toColor
 import com.cmoney.fanci.ui.common.CircleImage
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.RoleInfo
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -48,11 +50,9 @@ fun AllMemberScreen(
     AllMemberScreenView(
         modifier = modifier,
         navController = navController,
+        group = group,
         groupMemberList = uiState.groupMember.orEmpty().map {
             it.groupMember
-        },
-        onManageClick = {
-            // TODO:
         }
     )
 }
@@ -61,9 +61,10 @@ fun AllMemberScreen(
 fun AllMemberScreenView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    groupMemberList: List<GroupMember>,
-    onManageClick: (GroupMember) -> Unit
+    group: Group,
+    groupMemberList: List<GroupMember>
 ) {
+    val TAG = "AllMemberScreenView"
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -81,7 +82,13 @@ fun AllMemberScreenView(
 
         LazyColumn {
             items(groupMemberList) { groupMember ->
-                MemberItem(groupMember = groupMember)
+                MemberItem(groupMember = groupMember) {
+                    KLog.i(TAG, "member click:$it")
+                    navController.navigate(MemberManageScreenDestination(
+                        group = group,
+                        groupMember =  groupMember
+                    ))
+                }
                 Spacer(modifier = Modifier.height(1.dp))
             }
         }
@@ -90,13 +97,17 @@ fun AllMemberScreenView(
 }
 
 @Composable
-private fun MemberItem(modifier: Modifier = Modifier, groupMember: GroupMember) {
+private fun MemberItem(
+    modifier: Modifier = Modifier,
+    groupMember: GroupMember,
+    onMemberClick: (GroupMember) -> Unit
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(LocalColor.current.background)
             .clickable {
-                //todo
+                onMemberClick.invoke(groupMember)
             }
             .padding(start = 30.dp, end = 24.dp, top = 9.dp, bottom = 9.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -151,7 +162,7 @@ private fun MemberItem(modifier: Modifier = Modifier, groupMember: GroupMember) 
 }
 
 @Composable
-private fun RoleItem(roleInfo: RoleInfo) {
+private fun RoleItem(roleInfo: FanciRole) {
     val roleColor = LocalColor.current.roleColor.colors.firstOrNull {
         it.name == roleInfo.color
     } ?: LocalColor.current.roleColor.colors.first()
@@ -190,7 +201,7 @@ private fun RoleItem(roleInfo: RoleInfo) {
 fun RoleItemPreview() {
     FanciTheme {
         RoleItem(
-            roleInfo = RoleInfo(
+            roleInfo = FanciRole(
                 name = "Hello",
                 color = ""
             )
@@ -211,14 +222,14 @@ fun AllMemberScreenPreview() {
                     name = "王力宏",
                     serialNumber = 123456,
                     roleInfos = listOf(
-                        RoleInfo(
+                        FanciRole(
                             name = "Role",
                             color = ""
                         )
                     )
                 )
             ),
-            onManageClick = {}
+            group = Group()
         )
     }
 }

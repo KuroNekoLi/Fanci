@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.group.setting.group.channel.add
+package com.cmoney.fanci.ui.screens.shared.member
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -41,18 +41,20 @@ import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
-fun AddChannelRoleScreen(
+fun ShareAddRoleScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     viewModel: ChannelSettingViewModel = koinViewModel(),
     group: Group,
+    buttonText: String,
+    existsRole: Array<FanciRole>,
     resultNavigator: ResultBackNavigator<String>
 ) {
 
     val uiState = viewModel.uiState
 
     if (uiState.groupRoleList.isEmpty()) {
-        viewModel.getGroupRoleList(group.id.orEmpty())
+        viewModel.getGroupRoleList(group.id.orEmpty(), existsRole)
     }
 
     if (uiState.confirmRoleList.isNotEmpty()) {
@@ -60,10 +62,11 @@ fun AddChannelRoleScreen(
         resultNavigator.navigateBack(uiState.confirmRoleList)
     }
 
-    AddChannelRoleScreenView(
+    ShareAddRoleScreenView(
         modifier,
         navigator,
         uiState.groupRoleList,
+        buttonText = buttonText,
         onRoleClick = {
             viewModel.onRoleClick(it)
         },
@@ -74,10 +77,11 @@ fun AddChannelRoleScreen(
 }
 
 @Composable
-fun AddChannelRoleScreenView(
+fun ShareAddRoleScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     roleList: List<AddChannelRoleModel>,
+    buttonText: String,
     onRoleClick: (AddChannelRoleModel) -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -106,7 +110,7 @@ fun AddChannelRoleScreenView(
                 }
 
                 BottomButtonScreen(
-                    text = "新增角色成為頻道管理員"
+                    text = buttonText
                 ) {
                     onConfirm.invoke()
                 }
@@ -209,9 +213,9 @@ private fun RoleItemScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun AddRoleScreenPreview() {
+fun ShareAddRoleScreenViewPreview() {
     FanciTheme {
-        AddChannelRoleScreenView(
+        ShareAddRoleScreenView(
             navigator = EmptyDestinationsNavigator,
             roleList = listOf(
                 AddChannelRoleModel(
@@ -228,7 +232,8 @@ fun AddRoleScreenPreview() {
                 )
             ),
             onRoleClick = {},
-            onConfirm = {}
+            onConfirm = {},
+            buttonText = "新增角色成為頻道管理員"
         )
     }
 }

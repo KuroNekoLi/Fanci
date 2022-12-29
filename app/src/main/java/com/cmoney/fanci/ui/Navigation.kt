@@ -6,14 +6,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.MainScreen
 import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.databinding.MyFragmentLayoutBinding
@@ -21,25 +18,15 @@ import com.cmoney.fanci.extension.goBackWithParams
 import com.cmoney.fanci.ui.screens.TabItem
 import com.cmoney.fanci.ui.screens.chat.AnnounceBundleKey
 import com.cmoney.fanci.ui.screens.chat.AnnouncementScreen
-import com.cmoney.fanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.fanci.ui.screens.follow.FollowScreen
 import com.cmoney.fanci.ui.screens.group.search.DiscoverGroupScreen
-import com.cmoney.fanci.ui.screens.group.setting.GroupSettingScreen
-import com.cmoney.fanci.ui.screens.group.setting.groupsetting.*
-import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.fancilib.FanciDefaultAvatarScreen
-import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.fancilib.FanciDefaultCoverScreen
-import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.GroupSettingThemePreviewScreen
-import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.GroupSettingThemeScreen
-import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.my.MyCallback
 import com.cmoney.fanci.ui.screens.my.MyScreen
 import com.cmoney.fanci.ui.screens.shared.setting.UserInfoSettingScreen
 import com.cmoney.fanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
-import org.koin.androidx.compose.koinViewModel
 
 /**
  * 決定頁面跳轉路徑

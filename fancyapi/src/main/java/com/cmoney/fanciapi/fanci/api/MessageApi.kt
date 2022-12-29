@@ -43,6 +43,21 @@ interface MessageApi {
     suspend fun apiV1MessageMessageIdEmojiDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
 
     /**
+     * 取得訊息表情符號來自誰 __________🔒 可看
+     * 
+     * Responses:
+     *  - 204: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到訊息
+     *
+     * @param messageId 訊息Id
+     * @return [Unit]
+     */
+    @GET("api/v1/Message/{messageId}/Emoji")
+    suspend fun apiV1MessageMessageIdEmojiGet(@Path("messageId") messageId: kotlin.String): Response<Unit>
+
+    /**
      * 對訊息新增表情符號 __________🔒 可看
      * 
      * Responses:

@@ -41,15 +41,19 @@ class ChannelSettingViewModel(
 
     /**
      * 取得 社團下角色清單
+     * @param groupId 社團 id
+     * @param exclusiveRole 排除的 Role
      */
-    fun getGroupRoleList(groupId: String) {
+    fun getGroupRoleList(groupId: String, exclusiveRole: Array<FanciRole>) {
         KLog.i(TAG, "getGroupRole:$groupId")
         viewModelScope.launch {
             groupUseCase.fetchGroupRole(
                 groupId = groupId
             ).fold({
                 uiState = uiState.copy(
-                    groupRoleList = it.map {
+                    groupRoleList = it.filter {
+                        !exclusiveRole.contains(it)
+                    }.map {
                         AddChannelRoleModel(role = it)
                     }
                 )

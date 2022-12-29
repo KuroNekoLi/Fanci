@@ -10,6 +10,210 @@
     }
   ],
   "paths": {
+    "/api/v1/Ban/Group/{groupId}": {
+      "get": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "取得社團的禁言用戶清單 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "解除禁言 __________🔒 禁言",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_禁言_0_groupId_groupId"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "新增或調整某個用戶的禁言狀態 __________🔒 禁言",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_禁言_0_groupId_groupId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Ban/Group/{groupId}/me": {
+      "get": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "取得自己在社團的禁言狀態 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BanStatus"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BanStatus"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BanStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/Category/{categoryId}": {
       "get": {
         "tags": [
@@ -727,6 +931,7 @@
           {
             "oauth2": [
               "user",
+              "BANNED_1_chatRoomChannelId",
               "PERMISSION_canPost_1_chatRoomChannelId_none"
             ]
           }
@@ -927,6 +1132,7 @@
           {
             "oauth2": [
               "user",
+              "BANNED_1_chatRoomChannelId",
               "PERMISSION_設定公告_0_chatRoomChannelId_channelId"
             ]
           }
@@ -966,6 +1172,7 @@
           {
             "oauth2": [
               "user",
+              "BANNED_1_chatRoomChannelId",
               "PERMISSION_設定公告_0_chatRoomChannelId_channelId"
             ]
           }
@@ -2447,7 +2654,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "BANNED_2_messageId"
             ]
           }
         ]
@@ -2491,6 +2699,7 @@
           {
             "oauth2": [
               "user",
+              "BANNED_2_messageId",
               "PERMISSION_刪除他人訊息_0_messageId_messageSpaceResolver"
             ]
           }
@@ -2534,7 +2743,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "BANNED_2_messageId"
             ]
           }
         ]
@@ -2634,6 +2844,7 @@
           {
             "oauth2": [
               "user",
+              "BANNED_2_messageId",
               "PERMISSION_canRead_1_messageId_messageId"
             ]
           }
@@ -2673,47 +2884,7 @@
           {
             "oauth2": [
               "user",
-              "PERMISSION_canRead_1_messageId_messageId"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/v1/Message/{messageId}/Emoji/me": {
-      "get": {
-        "tags": [
-          "Message"
-        ],
-        "summary": "取得自己產生的訊息表情符號 __________🔒 可看",
-        "parameters": [
-          {
-            "name": "messageId",
-            "in": "path",
-            "description": "訊息Id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "成功"
-          },
-          "401": {
-            "description": "未驗證"
-          },
-          "403": {
-            "description": "沒有權限"
-          },
-          "404": {
-            "description": "找不到訊息"
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "user",
+              "BANNED_2_messageId",
               "PERMISSION_canRead_1_messageId_messageId"
             ]
           }
@@ -3938,6 +4109,42 @@
         ],
         "type": "string"
       },
+      "BanParam": {
+        "type": "object",
+        "properties": {
+          "userid": {
+            "type": "string",
+            "nullable": true
+          },
+          "periodOption": {
+            "$ref": "#/components/schemas/BanPeriodOption"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BanPeriodOption": {
+        "enum": [
+          "OneDay",
+          "ThreeDay",
+          "OneWeek",
+          "OneMounth",
+          "Forever"
+        ],
+        "type": "string"
+      },
+      "BanStatus": {
+        "type": "object",
+        "properties": {
+          "isBanned": {
+            "type": "boolean"
+          },
+          "expireUnixDateTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "Category": {
         "type": "object",
         "properties": {
@@ -4515,7 +4722,7 @@
           "roleInfos": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RoleInfo"
+              "$ref": "#/components/schemas/FanciRole"
             },
             "description": "角色資訊(全部)",
             "nullable": true
@@ -4555,7 +4762,7 @@
           "roleInfos": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RoleInfo"
+              "$ref": "#/components/schemas/FanciRole"
             },
             "description": "角色資訊(最高)",
             "nullable": true
@@ -5050,28 +5257,6 @@
         },
         "additionalProperties": false,
         "description": "多個角色id參數"
-      },
-      "RoleInfo": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "角色Id",
-            "nullable": true
-          },
-          "name": {
-            "type": "string",
-            "description": "角色名稱",
-            "nullable": true
-          },
-          "color": {
-            "type": "string",
-            "description": "角色顏色",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false,
-        "description": "角色資訊"
       },
       "RoleOrderParam": {
         "type": "object",

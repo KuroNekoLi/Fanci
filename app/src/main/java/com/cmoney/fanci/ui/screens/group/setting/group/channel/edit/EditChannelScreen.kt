@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
-import com.cmoney.fanci.destinations.AddChannelRoleScreenDestination
+import com.cmoney.fanci.destinations.ShareAddRoleScreenDestination
 import com.cmoney.fanci.extension.showToast
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
@@ -50,7 +50,7 @@ fun EditChannelScreen(
     channel: Channel,
     viewModel: ChannelSettingViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<Group>,
-    setRoleResult: ResultRecipient<AddChannelRoleScreenDestination, String>
+    setRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>
 ) {
     val context = LocalContext.current
     val TAG = "EditChannelScreen"
@@ -322,8 +322,10 @@ private fun ManageView(
         ) {
             KLog.i(TAG, "add role click.")
             navigator.navigate(
-                AddChannelRoleScreenDestination(
-                    group = group
+                ShareAddRoleScreenDestination(
+                    group = group,
+                    buttonText = "新增角色成為頻道管理員",
+                    existsRole = fanciRole.orEmpty().toTypedArray()
                 )
             )
         }

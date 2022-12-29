@@ -15,30 +15,28 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 社團會員 全部角色資訊
+ * 
  *
- * @param id 使用者id
- * @param roleInfos 角色資訊(最高)
+ * @param userid 
+ * @param periodOption 
  */
 @Parcelize
 
 
-data class GroupMemberRoleInfos (
+data class BanParam (
 
-    /* 使用者id */
-    @Json(name = "id")
-    val id: kotlin.String? = null,
+    @Json(name = "userid")
+    val userid: kotlin.String? = null,
 
-    /* 角色資訊(最高) */
-    @Json(name = "roleInfos")
-    val roleInfos: kotlin.collections.List<FanciRole>? = null
+    @Json(name = "periodOption")
+    val periodOption: BanPeriodOption? = null
 
 ) : Parcelable
 

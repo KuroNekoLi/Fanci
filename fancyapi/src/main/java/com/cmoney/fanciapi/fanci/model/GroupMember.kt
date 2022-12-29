@@ -15,7 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.RoleInfo
+import com.cmoney.fanciapi.fanci.model.FanciRole
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -53,7 +53,7 @@ data class GroupMember (
 
     /* 角色資訊(全部) */
     @Json(name = "roleInfos")
-    val roleInfos: kotlin.collections.List<RoleInfo>? = null
+    val roleInfos: kotlin.collections.List<FanciRole>? = null
 
 ) : Parcelable
 
