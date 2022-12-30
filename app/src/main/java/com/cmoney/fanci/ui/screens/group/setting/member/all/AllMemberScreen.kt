@@ -19,6 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.destinations.MemberManageScreenDestination
+import com.cmoney.fanci.destinations.MemberRoleManageScreenDestination
+import com.cmoney.fanci.extension.fromJsonTypeToken
 import com.cmoney.fanci.extension.toColor
 import com.cmoney.fanci.ui.common.CircleImage
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -28,9 +30,12 @@ import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,11 +45,24 @@ fun AllMemberScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     group: Group,
-    viewModel: MemberViewModel = koinViewModel()
+    viewModel: MemberViewModel = koinViewModel(),
+    setMemberResult: ResultRecipient<MemberManageScreenDestination, GroupMember>
 ) {
     val uiState = viewModel.uiState
     if (uiState.groupMember == null) {
         viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+    }
+
+    //Edit callback
+    setMemberResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val member = result.value
+                viewModel.editGroupMember(member)
+            }
+        }
     }
 
     AllMemberScreenView(

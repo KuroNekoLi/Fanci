@@ -5,10 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
+import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.google.gson.Gson
 import com.socks.library.KLog
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 data class UiState(
@@ -22,6 +26,26 @@ class MemberViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
 
     var uiState by mutableStateOf(UiState())
         private set
+
+    /**
+     * 編輯 會員之後 刷新
+     */
+    fun editGroupMember(groupMember: GroupMember) {
+        val memberList = uiState.groupMember.orEmpty().toMutableList()
+        val newList = memberList.map {
+            if (it.groupMember.id == groupMember.id) {
+                GroupMemberSelect(
+                    groupMember = groupMember
+                )
+            }
+            else {
+                it
+            }
+        }
+        uiState = uiState.copy(
+            groupMember = newList
+        )
+    }
 
     /**
      * 獲取群組會員清單
@@ -95,4 +119,45 @@ class MemberViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
         return gson.toJson(list)
     }
 
+    /**
+     * 給予成員新的角色清單
+     *
+     * @param groupId 社團 id
+     * @param userId 使用者 id
+     * @param oldFanciRole 原本擁有的角色清單
+     * @param newFanciRole 新的角色清單
+     */
+    fun assignMemberRole(
+        groupId: String,
+        userId: String,
+        oldFanciRole: List<FanciRole>, newFanciRole: List<FanciRole>
+    ) {
+        KLog.i(TAG, "assignMemberRole")
+        viewModelScope.launch {
+            val task = listOf(
+                async {
+                    val addRole = newFanciRole.filter { !oldFanciRole.contains(it) }
+                    if (addRole.isNotEmpty()) {
+                        groupUseCase.addRoleToMember(
+                            groupId = groupId,
+                            userId = userId,
+                            roleIds = addRole.map { it.id.orEmpty() }
+                        ).getOrNull()
+                    }
+                },
+                async {
+                    val deleteRole = oldFanciRole.filter { !newFanciRole.contains(it) }
+                    if (deleteRole.isNotEmpty()) {
+                        groupUseCase.removeRoleFromUser(
+                            groupId = groupId,
+                            userId = userId,
+                            roleIds = deleteRole.map { it.id.orEmpty() }
+                        ).getOrNull()
+                    }
+                }
+            )
+
+            task.awaitAll()
+        }
+    }
 }

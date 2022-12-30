@@ -25,7 +25,39 @@ class GroupUseCase(
 ) {
 
     /**
-     * 移除使用者的角色
+     * 取得 具有該角色權限的使用者清單
+     * @param groupId 社團id
+     * @param roleId 角色id
+     */
+    suspend fun fetchRoleMemberList(
+        groupId: String,
+        roleId: String
+    ) = kotlin.runCatching {
+        roleUserApi.apiV1RoleUserGroupGroupIdRoleRoleIdGet(
+            groupId = groupId,
+            roleId = roleId
+        ).checkResponseBody()
+    }
+
+
+    /**
+     * 移除使用者多個 角色權限
+     *
+     * @param groupId 社團 id
+     * @param userId 使用者id
+     * @param roleIds 角色清單
+     */
+    suspend fun removeRoleFromUser(groupId: String, userId: String, roleIds: List<String>) =
+        kotlin.runCatching {
+            roleUserApi.apiV1RoleUserGroupGroupIdMemberUserIdDelete(
+                groupId = groupId,
+                userId = userId,
+                roleIdsParam = RoleIdsParam(roleIds = roleIds)
+            ).checkResponseBody()
+        }
+
+    /**
+     * 移除多個使用者的角色
      * @param groupId 群組id
      * @param roleId 角色id
      * @param userId 要移除的 user 清單
@@ -45,22 +77,24 @@ class GroupUseCase(
     }
 
     /**
-     * 取得 具有該角色權限的使用者清單
-     * @param groupId 社團id
-     * @param roleId 角色id
+     * 指派 使用者 多個角色
+     * @param groupId 社團 id
+     * @param userId 使用者id
+     * @param roleIds 角色清單
      */
-    suspend fun fetchRoleMemberList(
-        groupId: String,
-        roleId: String
-    ) = kotlin.runCatching {
-        roleUserApi.apiV1RoleUserGroupGroupIdRoleRoleIdGet(
-            groupId = groupId,
-            roleId = roleId
-        ).checkResponseBody()
-    }
+    suspend fun addRoleToMember(groupId: String, userId: String, roleIds: List<String>) =
+        kotlin.runCatching {
+            roleUserApi.apiV1RoleUserGroupGroupIdMemberUserIdPut(
+                groupId = groupId,
+                userId = userId,
+                roleIdsParam = RoleIdsParam(
+                    roleIds = roleIds
+                )
+            ).checkResponseBody()
+        }
 
     /**
-     * 指派 多個使用者 角色身份
+     * 指派 角色身份 給 多個使用者
      * @param groupId 社團 id
      * @param roleId 要分配的角色 id
      * @param memberList 多個使用者

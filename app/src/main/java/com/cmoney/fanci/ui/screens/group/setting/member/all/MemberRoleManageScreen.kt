@@ -17,6 +17,7 @@ import com.cmoney.fanci.destinations.ShareAddRoleScreenDestination
 import com.cmoney.fanci.extension.fromJsonTypeToken
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.fanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.fanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -28,9 +29,8 @@ import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.EmptyResultRecipient
-import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultRecipient
+import com.ramcosta.composedestinations.result.*
+import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
@@ -39,7 +39,9 @@ fun MemberRoleManageScreen(
     navController: DestinationsNavigator,
     group: Group,
     groupMember: GroupMember,
-    setRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>
+    viewModel: MemberViewModel = koinViewModel(),
+    setRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
+    resultNavigator: ResultBackNavigator<String>
 ) {
     val roleList = remember {
         mutableStateOf(groupMember.roleInfos.orEmpty())
@@ -60,6 +62,43 @@ fun MemberRoleManageScreen(
         }
     }
 
+    MemberRoleManageScreenView(
+        modifier = modifier,
+        navController = navController,
+        groupMember = groupMember,
+        roleList = roleList.value,
+        group = group,
+        onRemove = {
+            roleList.value = roleList.value.toMutableList().filter { fanciRole ->
+                it.id != fanciRole.id
+            }
+        },
+        onSave = {
+            viewModel.assignMemberRole(
+                groupId = group.id.orEmpty(),
+                userId = groupMember.id.orEmpty(),
+                oldFanciRole = groupMember.roleInfos.orEmpty(),
+                newFanciRole = roleList.value
+            )
+            val gson = Gson()
+
+            resultNavigator.navigateBack(
+                gson.toJson(roleList.value)
+            )
+        }
+    )
+}
+
+@Composable
+private fun MemberRoleManageScreenView(
+    modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
+    groupMember: GroupMember,
+    roleList: List<FanciRole>,
+    group: Group,
+    onRemove: (FanciRole) -> Unit,
+    onSave: () -> Unit
+) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -93,17 +132,15 @@ fun MemberRoleManageScreen(
                 )
 
                 //角色清單
-                repeat(roleList.value.size) { index ->
-                    val role = roleList.value[index]
+                repeat(roleList.size) { index ->
+                    val role = roleList[index]
                     RoleItemScreen(
                         index = index,
                         isShowIndex = false,
                         fanciRole = role,
                         editText = "移除"
                     ) {
-                        roleList.value = roleList.value.toMutableList().filter { fanciRole ->
-                            it.id != fanciRole.id
-                        }
+                        onRemove.invoke(it)
                     }
 
                     Spacer(modifier = Modifier.height(1.dp))
@@ -127,7 +164,7 @@ fun MemberRoleManageScreen(
                             ShareAddRoleScreenDestination(
                                 group = group,
                                 buttonText = "新增角色給「%s」".format(groupMember.name.orEmpty()),
-                                existsRole = roleList.value.toTypedArray()
+                                existsRole = roleList.toTypedArray()
                             )
                         )
                     }
@@ -137,17 +174,18 @@ fun MemberRoleManageScreen(
             BottomButtonScreen(
                 text = "儲存"
             ) {
-                // TODO:
+                onSave.invoke()
             }
         }
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun MemberRoleManageScreenPreview() {
     FanciTheme {
-        MemberRoleManageScreen(
+        MemberRoleManageScreenView(
             navController = EmptyDestinationsNavigator,
             group = Group(),
             groupMember = GroupMember(
@@ -161,7 +199,9 @@ fun MemberRoleManageScreenPreview() {
                     )
                 )
             ),
-            setRoleResult = EmptyResultRecipient()
+            roleList = listOf(),
+            onRemove = {},
+            onSave = {}
         )
     }
 }

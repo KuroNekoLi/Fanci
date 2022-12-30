@@ -42,7 +42,7 @@ interface RoleUserApi {
      * @param roleIdsParam 使用者清單 (optional)
      * @return [Unit]
      */
-    @DELETE("api/v1/RoleUser/Group/{groupId}/Member/{userId}")
+    @HTTP(method = "DELETE", path = "api/v1/RoleUser/Group/{groupId}/Member/{userId}", hasBody = true)
     suspend fun apiV1RoleUserGroupGroupIdMemberUserIdDelete(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**
@@ -78,7 +78,7 @@ interface RoleUserApi {
      * @param useridsParam 使用者清單 (optional)
      * @return [Unit]
      */
-    @DELETE("api/v1/RoleUser/Group/{groupId}/Role/{roleId}")
+    @HTTP(method = "DELETE", path = "api/v1/RoleUser/Group/{groupId}/Role/{roleId}", hasBody = true)
     suspend fun apiV1RoleUserGroupGroupIdRoleRoleIdDelete(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String, @Body useridsParam: UseridsParam? = null): Response<Unit>
 
     /**

@@ -72,7 +72,7 @@ interface ChannelApi {
      * @param roleIdsParam  (optional)
      * @return [Unit]
      */
-    @DELETE("api/v1/Channel/{channelId}/Role")
+    @HTTP(method = "DELETE", path = "api/v1/Channel/{channelId}/Role", hasBody = true)
     suspend fun apiV1ChannelChannelIdRoleDelete(@Path("channelId") channelId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**

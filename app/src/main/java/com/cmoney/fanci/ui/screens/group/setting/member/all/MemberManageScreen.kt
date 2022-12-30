@@ -1,11 +1,15 @@
 package com.cmoney.fanci.ui.screens.group.setting.member.all
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,20 +19,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.MemberRoleManageScreenDestination
+import com.cmoney.fanci.extension.fromJsonTypeToken
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.common.CircleImage
 import com.cmoney.fanci.ui.common.HexStringMapRoleColor
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
@@ -36,14 +49,42 @@ fun MemberManageScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     group: Group,
-    groupMember: GroupMember
+    groupMember: GroupMember,
+    setRoleResult: ResultRecipient<MemberRoleManageScreenDestination, String>,
+    resultNavigator: ResultBackNavigator<GroupMember>
 ) {
+    val member = remember {
+        mutableStateOf(groupMember)
+    }
+
+    //Add role callback
+    setRoleResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val roleListStr = result.value
+                val gson = Gson()
+                val resultRoleList = gson.fromJsonTypeToken<List<FanciRole>>(roleListStr)
+                member.value = member.value.copy(
+                    roleInfos = resultRoleList
+                )
+            }
+        }
+    }
+
     MemberManageScreenView(
         modifier = modifier,
         navController = navController,
         group = group,
-        groupMember = groupMember
-    )
+        groupMember = member.value
+    ){
+        resultNavigator.navigateBack(member.value)
+    }
+
+    BackHandler(enabled = true, onBack = {
+        resultNavigator.navigateBack(member.value)
+    })
 }
 
 @Composable
@@ -51,7 +92,8 @@ private fun MemberManageScreenView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     group: Group,
-    groupMember: GroupMember
+    groupMember: GroupMember,
+    onBack: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -62,7 +104,7 @@ private fun MemberManageScreenView(
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
-                    navController.popBackStack()
+                    onBack.invoke()
                 }
             )
         }
@@ -160,10 +202,12 @@ private fun MemberManageScreenView(
                 borderColor = LocalColor.current.text.default_50,
                 textColor = LocalColor.current.text.default_100,
                 onClick = {
-                    navController.navigate(MemberRoleManageScreenDestination(
-                        group = group,
-                        groupMember = groupMember
-                    ))
+                    navController.navigate(
+                        MemberRoleManageScreenDestination(
+                            group = group,
+                            groupMember = groupMember
+                        )
+                    )
                 }
             )
 
@@ -231,7 +275,8 @@ fun MemberManageScreenPreview() {
                         name = "Hi"
                     )
                 )
-            )
+            ),
+            onBack = {}
         )
     }
 }
