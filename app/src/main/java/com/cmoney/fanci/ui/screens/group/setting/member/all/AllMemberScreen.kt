@@ -46,7 +46,7 @@ fun AllMemberScreen(
     navController: DestinationsNavigator,
     group: Group,
     viewModel: MemberViewModel = koinViewModel(),
-    setMemberResult: ResultRecipient<MemberManageScreenDestination, GroupMember>
+    setMemberResult: ResultRecipient<MemberManageScreenDestination, MemberManageResult>
 ) {
     val uiState = viewModel.uiState
     if (uiState.groupMember == null) {
@@ -59,8 +59,15 @@ fun AllMemberScreen(
             is NavResult.Canceled -> {
             }
             is NavResult.Value -> {
-                val member = result.value
-                viewModel.editGroupMember(member)
+                val memberResult = result.value
+                when (memberResult.type) {
+                    MemberManageResult.Type.Update -> {
+                        viewModel.editGroupMember(memberResult.groupMember)
+                    }
+                    MemberManageResult.Type.Delete -> {
+                        viewModel.removeMember(memberResult.groupMember)
+                    }
+                }
             }
         }
     }

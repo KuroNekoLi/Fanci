@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.group.setting.member.all
 
+import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -7,7 +8,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.MemberRoleManageScreenDestination
 import com.cmoney.fanci.extension.fromJsonTypeToken
@@ -27,6 +26,10 @@ import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.common.CircleImage
 import com.cmoney.fanci.ui.common.HexStringMapRoleColor
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.dialog.AlertDialogScreen
+import com.cmoney.fanci.ui.screens.shared.dialog.item.BanDayItemScreen
+import com.cmoney.fanci.ui.screens.shared.dialog.item.DisBanItemScreen
+import com.cmoney.fanci.ui.screens.shared.dialog.item.KickOutItemScreen
 import com.cmoney.fanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -40,8 +43,19 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
-import com.socks.library.KLog
+import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
+
+@Parcelize
+data class MemberManageResult(
+    val groupMember: GroupMember,
+    val type: Type
+) : Parcelable {
+    enum class Type {
+        Update,
+        Delete
+    }
+}
 
 @Destination
 @Composable
@@ -50,9 +64,18 @@ fun MemberManageScreen(
     navController: DestinationsNavigator,
     group: Group,
     groupMember: GroupMember,
+    viewModel: MemberViewModel = koinViewModel(),
     setRoleResult: ResultRecipient<MemberRoleManageScreenDestination, String>,
-    resultNavigator: ResultBackNavigator<GroupMember>
+    resultNavigator: ResultBackNavigator<MemberManageResult>
 ) {
+    val uiState = viewModel.uiState
+
+    val showBanDialog = remember { mutableStateOf(false) }
+
+    val showDisBanDialog = remember { mutableStateOf(false) }
+
+    val showKickOutDialog = remember { mutableStateOf(false) }
+
     val member = remember {
         mutableStateOf(groupMember)
     }
@@ -77,14 +100,107 @@ fun MemberManageScreen(
         modifier = modifier,
         navController = navController,
         group = group,
-        groupMember = member.value
-    ){
-        resultNavigator.navigateBack(member.value)
-    }
+        groupMember = member.value,
+        onBack = {
+            resultNavigator.navigateBack(
+                MemberManageResult(
+                    member.value,
+                    MemberManageResult.Type.Update
+                )
+            )
+        },
+        onBanClick = {
+            showBanDialog.value = true
+        },
+        onKickClick = {
+            showKickOutDialog.value = true
+        }
+    )
 
     BackHandler(enabled = true, onBack = {
-        resultNavigator.navigateBack(member.value)
+        MemberManageResult(
+            member.value,
+            MemberManageResult.Type.Update
+        )
     })
+
+    if (uiState.kickMember != null) {
+        resultNavigator.navigateBack(
+            MemberManageResult(
+                member.value,
+                MemberManageResult.Type.Delete
+            )
+        )
+    }
+
+    //禁言 彈窗
+    if (showBanDialog.value) {
+        AlertDialogScreen(
+            onDismiss = {
+                showBanDialog.value = false
+            },
+            title = "禁言 " + groupMember.name,
+        ) {
+            BanDayItemScreen(
+                name = groupMember.name.orEmpty(),
+                onClick = {
+                    showBanDialog.value = false
+                    viewModel.banUser(
+                        groupId = group.id.orEmpty(),
+                        userId = groupMember.id.orEmpty(),
+                        banPeriodOption = it
+                    )
+                },
+                onDismiss = {
+                    showBanDialog.value = false
+                }
+            )
+        }
+    }
+
+    //解除禁言 彈窗
+    if (showDisBanDialog.value) {
+        AlertDialogScreen(
+            onDismiss = {
+                showDisBanDialog.value = false
+            },
+            title = groupMember.name + " 禁言中",
+        ) {
+            DisBanItemScreen(
+                onConfirm = {
+                    showDisBanDialog.value = false
+                    //TODO api
+                },
+                onDismiss = {
+                    showDisBanDialog.value = false
+                }
+            )
+        }
+    }
+
+    //踢出社團 彈窗
+    if (showKickOutDialog.value) {
+        AlertDialogScreen(
+            onDismiss = {
+                showKickOutDialog.value = false
+            },
+            title = "將 " + groupMember.name + " 踢出社團",
+        ) {
+            KickOutItemScreen(
+                name = groupMember.name.orEmpty(),
+                onConfirm = {
+                    viewModel.kickOutMember(
+                        groupId = group.id.orEmpty(),
+                        groupMember
+                    )
+                    showKickOutDialog.value = false
+                },
+                onDismiss = {
+                    showKickOutDialog.value = false
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -93,7 +209,9 @@ private fun MemberManageScreenView(
     navController: DestinationsNavigator,
     group: Group,
     groupMember: GroupMember,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onBanClick: () -> Unit,
+    onKickClick: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -222,7 +340,7 @@ private fun MemberManageScreenView(
                 banTitle = "禁言「%s」".format(groupMember.name),
                 desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
             ) {
-                //TODO
+                onBanClick.invoke()
             }
 
             Spacer(modifier = Modifier.height(1.dp))
@@ -232,7 +350,7 @@ private fun MemberManageScreenView(
                 banTitle = "將「%s」踢出社團".format(groupMember.name),
                 desc = "讓 %s 離開社團".format(groupMember.name)
             ) {
-                //TODO
+                onKickClick.invoke()
             }
         }
 
@@ -276,7 +394,9 @@ fun MemberManageScreenPreview() {
                     )
                 )
             ),
-            onBack = {}
+            onBack = {},
+            onBanClick = {},
+            onKickClick = {}
         )
     }
 }

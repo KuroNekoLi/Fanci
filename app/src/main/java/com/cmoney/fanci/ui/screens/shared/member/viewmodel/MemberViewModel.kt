@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
+import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.google.gson.Gson
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 
 data class UiState(
     val groupMember: List<GroupMemberSelect>? = null,  //社團會員
+    val kickMember: GroupMember? = null     //踢除會員
 )
 
 data class GroupMemberSelect(val groupMember: GroupMember, val isSelected: Boolean = false)
@@ -28,6 +30,30 @@ class MemberViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
         private set
 
     /**
+     * 禁言 使用者
+     * @param groupId 社團id
+     * @param userId 要ban 的 user
+     * @param banPeriodOption 天數
+     */
+    fun banUser(groupId: String, userId: String, banPeriodOption: BanPeriodOption) {
+        viewModelScope.launch {
+            groupUseCase.banUser(
+                userId = userId,
+                groupId = groupId,
+                banPeriodOption = banPeriodOption
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    // TODO:
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
+
+
+    /**
      * 編輯 會員之後 刷新
      */
     fun editGroupMember(groupMember: GroupMember) {
@@ -37,8 +63,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 GroupMemberSelect(
                     groupMember = groupMember
                 )
-            }
-            else {
+            } else {
                 it
             }
         }
@@ -158,6 +183,46 @@ class MemberViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             )
 
             task.awaitAll()
+        }
+    }
+
+    /**
+     * 剔除人員
+     * @param groupId 社團id
+     * @param groupMember 會員
+     */
+    fun kickOutMember(groupId: String, groupMember: GroupMember) {
+        KLog.i(TAG, "kickOutMember:$groupMember")
+        viewModelScope.launch {
+            groupUseCase.kickOutMember(
+                groupId = groupId,
+                userId = groupMember.id.orEmpty()
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    uiState = uiState.copy(
+                        kickMember = groupMember
+                    )
+
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
+
+    /**
+     * 踢除 成員
+     */
+    fun removeMember(groupMember: GroupMember) {
+        KLog.i(TAG, "removeMember$groupMember")
+        viewModelScope.launch {
+            val newGroupList = uiState.groupMember?.filter {
+                it.groupMember.id != groupMember.id
+            }
+            uiState = uiState.copy(
+                groupMember = newGroupList
+            )
         }
     }
 }

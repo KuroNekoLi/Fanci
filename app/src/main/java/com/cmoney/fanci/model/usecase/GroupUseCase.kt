@@ -21,8 +21,35 @@ class GroupUseCase(
     private val groupMemberApi: GroupMemberApi,
     private val defaultImageApi: DefaultImageApi,
     private val permissionApi: PermissionApi,
-    private val roleUserApi: RoleUserApi
+    private val roleUserApi: RoleUserApi,
+    private val banApi: BanApi
 ) {
+
+    /**
+     * 剔除成員
+     *
+     * @param groupId 社團id
+     * @param userId 要被踢除的會員 id
+     */
+    suspend fun kickOutMember(groupId: String, userId: String) = kotlin.runCatching {
+        groupMemberApi.apiV1GroupMemberGroupGroupIdUserIdDelete(
+            groupId, userId
+        ).checkResponseBody()
+    }
+
+    /**
+     * 禁言使用者
+     */
+    suspend fun banUser(groupId: String, userId: String, banPeriodOption: BanPeriodOption) =
+        kotlin.runCatching {
+            banApi.apiV1BanGroupGroupIdPut(
+                groupId = groupId,
+                banParam = BanParam(
+                    userid = userId,
+                    periodOption = banPeriodOption
+                )
+            )
+        }
 
     /**
      * 取得 具有該角色權限的使用者清單
