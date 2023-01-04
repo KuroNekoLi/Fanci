@@ -2125,8 +2125,25 @@
           }
         ],
         "responses": {
-          "409": {
-            "description": "Conflict"
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyPaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyPaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyPaging"
+                }
+              }
+            }
           },
           "401": {
             "description": "未驗證"
@@ -2134,11 +2151,11 @@
           "403": {
             "description": "沒有權限"
           },
-          "200": {
-            "description": "成功"
-          },
           "404": {
             "description": "找不到該社團"
+          },
+          "409": {
+            "description": "社團id 不合法"
           }
         },
         "security": [
@@ -4992,6 +5009,26 @@
         },
         "additionalProperties": false,
         "description": "社團申請資訊"
+      },
+      "GroupRequirementApplyPaging": {
+        "type": "object",
+        "properties": {
+          "haveNextPage": {
+            "type": "boolean"
+          },
+          "nextWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupRequirementApply"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "GroupRequirementParam": {
         "type": "object",
