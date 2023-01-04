@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.BanUseCase
 import com.cmoney.fanci.model.usecase.GroupUseCase
+import com.cmoney.fanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GroupMember
@@ -16,22 +17,46 @@ import com.socks.library.KLog
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 data class UiState(
     val groupMember: List<GroupMemberSelect>? = null,  //社團會員
-    val kickMember: GroupMember? = null     //踢除會員
+    val kickMember: GroupMember? = null,     //踢除會員
+    val banUiModel: BanUiModel? = null      //禁言中 info
 )
 
 data class GroupMemberSelect(val groupMember: GroupMember, val isSelected: Boolean = false)
 
-class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUseCase: BanUseCase) : ViewModel() {
+class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUseCase: BanUseCase) :
+    ViewModel() {
     private val TAG = MemberViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(UiState())
         private set
 
     /**
-     * 禁言 使用者
+     * 解除 禁言
+     */
+    fun liftBanUser(userId: String, groupId: String) {
+        KLog.i(TAG, "liftBanUser:$userId")
+        viewModelScope.launch {
+            banUseCase.liftBanUser(
+                groupId = groupId,
+                userIds = listOf(userId)
+            ).fold({
+                uiState = uiState.copy(
+                    banUiModel = null
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 禁言 使用者, 成功之後再次抓取 該 user 禁言 info
      * @param groupId 社團id
      * @param userId 要ban 的 user
      * @param banPeriodOption 天數
@@ -45,10 +70,47 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
             ).fold({
             }, {
                 if (it is EmptyBodyException) {
-                    // TODO:
+                    fetchUserBanInfo(
+                        groupId = groupId,
+                        userId = userId
+                    )
                 } else {
                     KLog.e(TAG, it)
                 }
+            })
+        }
+    }
+
+    /**
+     * 取得 使用者 禁言 info
+     */
+    fun fetchUserBanInfo(groupId: String, userId: String) {
+        KLog.i(TAG, "fetchUserBanInfo:$groupId, $userId")
+        viewModelScope.launch {
+            banUseCase.fetchBanInfo(
+                groupId = groupId,
+                userId = userId
+            ).fold({ userBanInformation ->
+                val date = Date(
+                    userBanInformation.startDateTime?.times(1000) ?: System.currentTimeMillis()
+                )
+                val startDay = SimpleDateFormat("yyyy/MM/dd").format(date)
+
+                val oneDaySecond = TimeUnit.DAYS.toSeconds(1)
+                var duration = 0
+                userBanInformation.panaltySeconds?.let { second ->
+                    duration = (second / oneDaySecond).toInt()
+                }
+
+                uiState = uiState.copy(
+                    banUiModel = BanUiModel(
+                        user = userBanInformation.user,
+                        startDay = startDay,
+                        duration = "%d日".format(duration)
+                    )
+                )
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }

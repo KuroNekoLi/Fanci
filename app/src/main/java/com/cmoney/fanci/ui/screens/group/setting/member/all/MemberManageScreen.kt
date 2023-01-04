@@ -25,6 +25,7 @@ import com.cmoney.fanci.extension.fromJsonTypeToken
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.common.CircleImage
 import com.cmoney.fanci.ui.common.HexStringMapRoleColor
+import com.cmoney.fanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.fanci.ui.screens.shared.dialog.item.BanDayItemScreen
@@ -96,11 +97,17 @@ fun MemberManageScreen(
         }
     }
 
+    viewModel.fetchUserBanInfo(
+        groupId = group.id.orEmpty(),
+        userId = groupMember.id.orEmpty()
+    )
+
     MemberManageScreenView(
         modifier = modifier,
         navController = navController,
         group = group,
         groupMember = member.value,
+        banInfo = uiState.banUiModel,
         onBack = {
             resultNavigator.navigateBack(
                 MemberManageResult(
@@ -114,13 +121,18 @@ fun MemberManageScreen(
         },
         onKickClick = {
             showKickOutDialog.value = true
+        },
+        onDisBanClick = {
+            showDisBanDialog.value = true
         }
     )
 
     BackHandler {
-        MemberManageResult(
-            member.value,
-            MemberManageResult.Type.Update
+        resultNavigator.navigateBack(
+            MemberManageResult(
+                member.value,
+                MemberManageResult.Type.Update
+            )
         )
     }
 
@@ -168,8 +180,11 @@ fun MemberManageScreen(
         ) {
             DisBanItemScreen(
                 onConfirm = {
+                    viewModel.liftBanUser(
+                        groupId = group.id.orEmpty(),
+                        userId = groupMember.id.orEmpty()
+                    )
                     showDisBanDialog.value = false
-                    //TODO api
                 },
                 onDismiss = {
                     showDisBanDialog.value = false
@@ -209,9 +224,11 @@ private fun MemberManageScreenView(
     navController: DestinationsNavigator,
     group: Group,
     groupMember: GroupMember,
+    banInfo: BanUiModel?,
     onBack: () -> Unit,
     onBanClick: () -> Unit,
-    onKickClick: () -> Unit
+    onKickClick: () -> Unit,
+    onDisBanClick: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -336,11 +353,23 @@ private fun MemberManageScreenView(
             )
 
             //禁言
-            BanItem(
-                banTitle = "禁言「%s」".format(groupMember.name),
-                desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
-            ) {
-                onBanClick.invoke()
+            if (banInfo == null) {
+                BanItem(
+                    banTitle = "禁言「%s」".format(groupMember.name),
+                    desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
+                ) {
+                    onBanClick.invoke()
+                }
+            }
+            else {
+                BanInfo(
+                    banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
+                    banStartDay = banInfo.startDay,
+                    banDuration = banInfo.duration,
+                    onClick = {
+                        onDisBanClick.invoke()
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(1.dp))
@@ -377,6 +406,36 @@ private fun BanItem(banTitle: String, desc: String, onClick: () -> Unit) {
     }
 }
 
+@Composable
+private fun BanInfo(banTitle: String,
+                    banStartDay: String,
+                    banDuration: String,
+                    onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(LocalColor.current.background)
+            .clickable {
+                onClick.invoke()
+            }
+            .padding(start = 30.dp, end = 24.dp, top = 9.dp, bottom = 9.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = banTitle, fontSize = 16.sp, color = LocalColor.current.text.default_100)
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(text = "被禁言日：%s".format(banStartDay), fontSize = 12.sp, color = LocalColor.current.text.default_80)
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(text = "禁言時長：%s".format(banDuration), fontSize = 12.sp, color = LocalColor.current.text.default_80)
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+
+        Text(
+            text = "調整", fontSize = 16.sp, color = LocalColor.current.primary
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun MemberManageScreenPreview() {
@@ -396,7 +455,13 @@ fun MemberManageScreenPreview() {
             ),
             onBack = {},
             onBanClick = {},
-            onKickClick = {}
+            onKickClick = {},
+            onDisBanClick = {},
+            banInfo = BanUiModel(
+                user = null,
+                startDay = "2020/10/22",
+                duration = "3日"
+            )
         )
     }
 }

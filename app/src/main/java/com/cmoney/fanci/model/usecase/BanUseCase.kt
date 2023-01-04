@@ -11,6 +11,18 @@ class BanUseCase(
 ) {
 
     /**
+     * 取得 使用者 禁言狀態
+     * @param groupId 社團id
+     * @param userId 查詢的 user
+     */
+    suspend fun fetchBanInfo(groupId: String, userId: String) = kotlin.runCatching {
+        banApi.apiV1BanGroupGroupIdUserIdGet(
+            groupId = groupId,
+            userId = userId
+        ).checkResponseBody()
+    }
+
+    /**
      * 解除 禁言
      * @param groupId 社團id
      * @param userIds 解除禁言 user
@@ -43,6 +55,6 @@ class BanUseCase(
                     userid = userId,
                     periodOption = banPeriodOption
                 )
-            )
+            ).checkResponseBody()
         }
 }
