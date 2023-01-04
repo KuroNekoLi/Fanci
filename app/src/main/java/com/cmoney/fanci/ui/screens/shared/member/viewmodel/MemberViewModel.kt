@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
+import com.cmoney.fanci.model.usecase.BanUseCase
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.FanciRole
@@ -23,7 +24,7 @@ data class UiState(
 
 data class GroupMemberSelect(val groupMember: GroupMember, val isSelected: Boolean = false)
 
-class MemberViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
+class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUseCase: BanUseCase) : ViewModel() {
     private val TAG = MemberViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(UiState())
@@ -37,7 +38,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun banUser(groupId: String, userId: String, banPeriodOption: BanPeriodOption) {
         viewModelScope.launch {
-            groupUseCase.banUser(
+            banUseCase.banUser(
                 userId = userId,
                 groupId = groupId,
                 banPeriodOption = banPeriodOption

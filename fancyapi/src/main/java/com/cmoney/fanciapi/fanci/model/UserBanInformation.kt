@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.User
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -23,19 +24,27 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param isBanned 
- * @param expireUnixDateTime 
+ * @param user 
+ * @param startDateTime 
+ * @param endDateTime 
+ * @param panaltySeconds 
  */
 @Parcelize
 
 
-data class BanStatus (
+data class UserBanInformation (
 
-    @Json(name = "isBanned")
-    val isBanned: kotlin.Boolean? = null,
+    @Json(name = "user")
+    val user: User? = null,
 
-    @Json(name = "expireUnixDateTime")
-    val expireUnixDateTime: kotlin.Long? = null
+    @Json(name = "startDateTime")
+    val startDateTime: kotlin.Long? = null,
+
+    @Json(name = "endDateTime")
+    val endDateTime: kotlin.Long? = null,
+
+    @Json(name = "panaltySeconds")
+    val panaltySeconds: kotlin.Long? = null
 
 ) : Parcelable
 

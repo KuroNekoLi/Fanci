@@ -117,12 +117,12 @@ fun MemberManageScreen(
         }
     )
 
-    BackHandler(enabled = true, onBack = {
+    BackHandler {
         MemberManageResult(
             member.value,
             MemberManageResult.Type.Update
         )
-    })
+    }
 
     if (uiState.kickMember != null) {
         resultNavigator.navigateBack(

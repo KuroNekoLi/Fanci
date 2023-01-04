@@ -87,14 +87,16 @@ fun GroupSettingScreen(
             //成員管理
             GroupMemberManageScreen(
                 group = group,
-                navController = navController,
-                onGroupSetting = onGroupSetting
+                navController = navController
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
             //秩序管理
-            GroupRuleManageScreen()
+            GroupRuleManageScreen(
+                group = group,
+                navController = navController
+            )
         }
     }
 }

@@ -81,7 +81,7 @@ fun BanDayItemScreen(modifier: Modifier = Modifier,
             borderColor = LocalColor.current.component.other,
             textColor = Color.White
         ) {
-            onClick.invoke(BanPeriodOption.oneMounth)
+            onClick.invoke(BanPeriodOption.oneMonth)
         }
 
         Spacer(modifier = Modifier.height(20.dp))

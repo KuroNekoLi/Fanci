@@ -24,8 +24,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 fun GroupMemberManageScreen(
     modifier: Modifier = Modifier,
     group: Group,
-    navController: DestinationsNavigator,
-    onGroupSetting: (GroupSettingRoute) -> Unit
+    navController: DestinationsNavigator
 ) {
     Column(modifier = modifier) {
         Text(
@@ -70,8 +69,7 @@ fun GroupMemberManageScreenPreview() {
     FanciTheme {
         GroupMemberManageScreen(
             group = Group(),
-            navController = EmptyDestinationsNavigator,
-            onGroupSetting = {}
+            navController = EmptyDestinationsNavigator
         )
     }
 }

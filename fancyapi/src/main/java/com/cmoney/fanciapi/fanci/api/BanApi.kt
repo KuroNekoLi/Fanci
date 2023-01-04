@@ -7,7 +7,7 @@ import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.BanParam
-import com.cmoney.fanciapi.fanci.model.BanStatus
+import com.cmoney.fanciapi.fanci.model.UserBanInformation
 import com.cmoney.fanciapi.fanci.model.UseridsParam
 
 interface BanApi {
@@ -23,11 +23,11 @@ interface BanApi {
      * @param useridsParam  (optional)
      * @return [Unit]
      */
-    @DELETE("api/v1/Ban/Group/{groupId}")
+    @HTTP(method = "DELETE", path = "api/v1/Ban/Group/{groupId}", hasBody = true)
     suspend fun apiV1BanGroupGroupIdDelete(@Path("groupId") groupId: kotlin.String, @Body useridsParam: UseridsParam? = null): Response<Unit>
 
     /**
-     * 取得社團的禁言用戶清單 __________🔒 已註冊的fanci使用者
+     * 取得社團的禁言用戶清單 __________🔒 禁言
      * 
      * Responses:
      *  - 200: Success
@@ -35,11 +35,10 @@ interface BanApi {
      *  - 403: Forbidden
      *
      * @param groupId 
-     * @return [Unit]
+     * @return [kotlin.collections.List<UserBanInformation>]
      */
-    @Deprecated("This api was deprecated")
     @GET("api/v1/Ban/Group/{groupId}")
-    suspend fun apiV1BanGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<Unit>
+    suspend fun apiV1BanGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<UserBanInformation>>
 
     /**
      * 取得自己在社團的禁言狀態 __________🔒 已註冊的fanci使用者
@@ -50,10 +49,10 @@ interface BanApi {
      *  - 403: Forbidden
      *
      * @param groupId 
-     * @return [BanStatus]
+     * @return [UserBanInformation]
      */
     @GET("api/v1/Ban/Group/{groupId}/me")
-    suspend fun apiV1BanGroupGroupIdMeGet(@Path("groupId") groupId: kotlin.String): Response<BanStatus>
+    suspend fun apiV1BanGroupGroupIdMeGet(@Path("groupId") groupId: kotlin.String): Response<UserBanInformation>
 
     /**
      * 新增或調整某個用戶的禁言狀態 __________🔒 禁言
@@ -69,5 +68,20 @@ interface BanApi {
      */
     @PUT("api/v1/Ban/Group/{groupId}")
     suspend fun apiV1BanGroupGroupIdPut(@Path("groupId") groupId: kotlin.String, @Body banParam: BanParam? = null): Response<Unit>
+
+    /**
+     * 取得特定會員在社團的禁言狀態 __________🔒 已註冊的fanci使用者
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param groupId 
+     * @param userId 
+     * @return [UserBanInformation]
+     */
+    @GET("api/v1/Ban/Group/{groupId}/{userId}")
+    suspend fun apiV1BanGroupGroupIdUserIdGet(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String): Response<UserBanInformation>
 
 }

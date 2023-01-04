@@ -15,34 +15,28 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.User
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 角色資訊
+ * 
  *
- * @param id 角色Id
- * @param name 角色名稱
- * @param color 角色顏色
+ * @param user 
+ * @param expireUnixDateTime 
  */
 @Parcelize
 
 
-data class RoleInfo (
+data class UserBanExpireTime (
 
-    /* 角色Id */
-    @Json(name = "id")
-    val id: kotlin.String? = null,
+    @Json(name = "user")
+    val user: User? = null,
 
-    /* 角色名稱 */
-    @Json(name = "name")
-    val name: kotlin.String? = null,
-
-    /* 角色顏色 */
-    @Json(name = "color")
-    val color: kotlin.String? = null
+    @Json(name = "expireUnixDateTime")
+    val expireUnixDateTime: kotlin.Long? = null
 
 ) : Parcelable
 

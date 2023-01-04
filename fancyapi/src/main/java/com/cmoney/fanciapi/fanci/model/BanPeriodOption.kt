@@ -21,7 +21,7 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * Values: oneDay,threeDay,oneWeek,oneMounth,forever
+ * Values: oneDay,threeDay,oneWeek,oneMonth,forever
  */
 
 enum class BanPeriodOption(val value: kotlin.String) {
@@ -35,8 +35,8 @@ enum class BanPeriodOption(val value: kotlin.String) {
     @Json(name = "OneWeek")
     oneWeek("OneWeek"),
 
-    @Json(name = "OneMounth")
-    oneMounth("OneMounth"),
+    @Json(name = "OneMonth")
+    oneMonth("OneMonth"),
 
     @Json(name = "Forever")
     forever("Forever");

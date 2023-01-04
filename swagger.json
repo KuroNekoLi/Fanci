@@ -15,7 +15,7 @@
         "tags": [
           "Ban"
         ],
-        "summary": "取得社團的禁言用戶清單 __________🔒 已註冊的fanci使用者",
+        "summary": "取得社團的禁言用戶清單 __________🔒 禁言",
         "parameters": [
           {
             "name": "groupId",
@@ -29,7 +29,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBanInformation"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBanInformation"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBanInformation"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -38,11 +64,11 @@
             "description": "Forbidden"
           }
         },
-        "deprecated": true,
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_禁言_0_groupId_groupId"
             ]
           }
         ]
@@ -183,17 +209,80 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/BanStatus"
+                  "$ref": "#/components/schemas/UserBanInformation"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BanStatus"
+                  "$ref": "#/components/schemas/UserBanInformation"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BanStatus"
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Ban/Group/{groupId}/{userId}": {
+      "get": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "取得特定會員在社團的禁言狀態 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
                 }
               }
             }
@@ -4127,23 +4216,10 @@
           "OneDay",
           "ThreeDay",
           "OneWeek",
-          "OneMounth",
+          "OneMonth",
           "Forever"
         ],
         "type": "string"
-      },
-      "BanStatus": {
-        "type": "object",
-        "properties": {
-          "isBanned": {
-            "type": "boolean"
-          },
-          "expireUnixDateTime": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
       },
       "Category": {
         "type": "object",
@@ -5381,6 +5457,28 @@
         },
         "additionalProperties": false,
         "description": "使用者"
+      },
+      "UserBanInformation": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "startDateTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "endDateTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "panaltySeconds": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
       },
       "UserPaging": {
         "type": "object",
