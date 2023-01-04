@@ -12,4 +12,5 @@ val useCaseModule = module {
     factory { ThemeUseCase(get(), get()) }
     factory { ChannelUseCase(get(), get(), get()) }
     factory { BanUseCase(get()) }
+    factory { GroupApplyUseCase(get()) }
 }

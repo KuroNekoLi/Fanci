@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.AllMemberScreenDestination
+import com.cmoney.fanci.destinations.GroupApplyScreenDestination
 import com.cmoney.fanci.destinations.RoleManageScreenDestination
 import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -56,7 +57,11 @@ fun GroupMemberManageScreen(
         SettingItemScreen(
             iconRes = R.drawable.join_apply,
             text = "加入申請",
-            onItemClick = {}
+            onItemClick = {
+                navController.navigate(GroupApplyScreenDestination(
+                    group = group
+                ))
+            }
         ) {
             Text(text = "121", fontSize = 17.sp, color = LocalColor.current.text.default_100)
         }

@@ -92,7 +92,7 @@ fun ChatRoomTopBarScreenPreview() {
     FanciTheme {
         TopBarScreen(
             title = "Test",
-            moreEnable = false
+            moreEnable = true
         ) {
 
         }
