@@ -215,7 +215,7 @@ fun FollowScreen(
                                     modifier = Modifier.background(LocalColor.current.env_80)
                                 ) { group ->
                                     navigator?.navigate(GroupSettingScreenDestination(
-                                        group = group
+                                        initGroup = group
                                     ))
                                 }
                             }

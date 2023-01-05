@@ -12,9 +12,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.ChannelSettingScreenDestination
+import com.cmoney.fanci.destinations.GroupOpennessScreenDestination
+import com.cmoney.fanci.destinations.GroupSettingSettingScreenDestination
 import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.Group
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
 /**
  * 社團管理
@@ -22,7 +28,8 @@ import com.cmoney.fanci.ui.theme.LocalColor
 @Composable
 fun GroupManageScreen(
     modifier: Modifier = Modifier,
-    onGroupSetting: (GroupSettingRoute) -> Unit
+    group: Group,
+    navController: DestinationsNavigator
 ) {
 
     Column(
@@ -37,8 +44,10 @@ fun GroupManageScreen(
             iconRes = R.drawable.info,
             text = "社團設定",
             onItemClick = {
-                onGroupSetting.invoke(
-                    GroupSettingRoute.GroupSetting
+                navController.navigate(
+                    GroupSettingSettingScreenDestination(
+                        group = group
+                    )
                 )
             }
         )
@@ -49,8 +58,10 @@ fun GroupManageScreen(
             iconRes = R.drawable.channel_setting,
             text = "頻道管理",
             onItemClick = {
-                onGroupSetting.invoke(
-                    GroupSettingRoute.ChannelManage
+                navController.navigate(
+                    ChannelSettingScreenDestination(
+                        group = group
+                    )
                 )
             }
         )
@@ -60,12 +71,19 @@ fun GroupManageScreen(
             iconRes = R.drawable.lock,
             text = "社團公開度",
             onItemClick = {
-                onGroupSetting.invoke(
-                    GroupSettingRoute.GroupPublic
+                navController.navigate(
+                    GroupOpennessScreenDestination(
+                        group = group
+                    )
                 )
             }
         ) {
-            Text(text = "私密", fontSize = 17.sp, color = Color.Red)
+            val publicText = if (group.isNeedApproval == true) {
+                "不公開"
+            } else {
+                "公開"
+            }
+            Text(text = publicText, fontSize = 17.sp, color = LocalColor.current.specialColor.red)
         }
     }
 }
@@ -74,8 +92,6 @@ fun GroupManageScreen(
 @Composable
 fun GroupManageScreenPreview() {
     FanciTheme {
-        GroupManageScreen {
-
-        }
+        GroupManageScreen(group = Group(), navController = EmptyDestinationsNavigator)
     }
 }

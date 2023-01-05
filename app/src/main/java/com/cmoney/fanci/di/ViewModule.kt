@@ -7,6 +7,7 @@ import com.cmoney.fanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.fanci.ui.screens.group.setting.apply.viewmodel.GroupApplyViewModel
 import com.cmoney.fanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
 import com.cmoney.fanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
+import com.cmoney.fanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.group.viewmodel.GroupViewModel
@@ -26,4 +27,10 @@ val viewModule = module {
     viewModel { MemberViewModel(get(), get()) }
     viewModel { BanListViewModel(get()) }
     viewModel { GroupApplyViewModel(get()) }
+    viewModel { params ->
+        GroupOpennessViewModel(
+            group = params.get(),
+            get()
+        )
+    }
 }

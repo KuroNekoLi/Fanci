@@ -112,6 +112,10 @@ val networkBaseModule = module {
     single {
         get<ApiClient>().createService(GroupApplyApi::class.java)
     }
+
+    single {
+        get<ApiClient>().createService(GroupRequirementApi::class.java)
+    }
 }
 
 private fun getDomain(context: Context): String {

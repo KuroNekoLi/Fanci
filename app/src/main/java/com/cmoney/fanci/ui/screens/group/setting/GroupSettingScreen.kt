@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.group.setting
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,11 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.fanci.MainStateHolder
-import com.cmoney.fanci.destinations.ChannelSettingScreenDestination
-import com.cmoney.fanci.destinations.GroupSettingSettingScreenDestination
-import com.cmoney.fanci.destinations.RoleManageScreenDestination
-import com.cmoney.fanci.ui.screens.group.setting.GroupSettingRoute.*
+import com.cmoney.fanci.LocalDependencyContainer
+import com.cmoney.fanci.destinations.GroupOpennessScreenDestination
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -22,36 +20,35 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.EmptyResultRecipient
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 
 @Destination
 @Composable
 fun GroupSettingScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    group: Group
+    initGroup: Group,
+    resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>
 ) {
-    val onGroupSetting: (GroupSettingRoute) -> Unit = {
-        when (it) {
-            AllMember -> TODO()
-            BanList -> TODO()
-            BlockList -> TODO()
-            ChannelManage -> navController.navigate(
-                ChannelSettingScreenDestination(
-                    group = group
-                )
-            )
-            GroupPublic -> TODO()
-            GroupSetting -> navController.navigate(
-                GroupSettingSettingScreenDestination(
-                    group = group
-                )
-            )
-            JoinApprove -> TODO()
-            ReportApprove -> TODO()
-            UserManage -> navController.navigate(
-                RoleManageScreenDestination(group = group)
-            )
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    var group = initGroup
+
+    resultRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val resultGroup = result.value
+                group = resultGroup
+            }
         }
+    }
+
+    BackHandler {
+        globalViewModel.setCurrentGroup(group)
+        navController.popBackStack()
     }
 
     Scaffold(
@@ -63,6 +60,7 @@ fun GroupSettingScreen(
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
+                    globalViewModel.setCurrentGroup(group)
                     navController.popBackStack()
                 }
             )
@@ -79,7 +77,8 @@ fun GroupSettingScreen(
 
             //社團管理
             GroupManageScreen(
-                onGroupSetting = onGroupSetting
+                group = group,
+                navController = navController
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -101,67 +100,14 @@ fun GroupSettingScreen(
     }
 }
 
-/**
- * 社團 設定各種點擊
- */
-sealed class GroupSettingRoute {
-    //社團設定
-    object GroupSetting : GroupSettingRoute()
-
-    //頻道管理
-    object ChannelManage : GroupSettingRoute()
-
-    //社團公開度
-    object GroupPublic : GroupSettingRoute()
-
-    //角色管理
-    object UserManage : GroupSettingRoute()
-
-    //所有成員
-    object AllMember : GroupSettingRoute()
-
-    //加入申請
-    object JoinApprove : GroupSettingRoute()
-
-    //檢舉審核
-    object ReportApprove : GroupSettingRoute()
-
-    //禁言列表
-    object BanList : GroupSettingRoute()
-
-    //黑名單列表
-    object BlockList : GroupSettingRoute()
-}
-
-private fun groupSettingRouteProcess(
-    group: Group,
-    mainRoute: (MainStateHolder.Route) -> Unit,
-    route: GroupSettingRoute,
-) {
-    when (route) {
-        GroupSetting -> mainRoute.invoke(
-            MainStateHolder.GroupRoute.GroupSettingSetting(
-                group = group
-            )
-        )
-        ChannelManage -> TODO()
-        GroupPublic -> TODO()
-        AllMember -> TODO()
-        BanList -> TODO()
-        BlockList -> TODO()
-        JoinApprove -> TODO()
-        ReportApprove -> TODO()
-        UserManage -> TODO()
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun GroupSettingScreenPreview() {
     FanciTheme {
         GroupSettingScreen(
             navController = EmptyDestinationsNavigator,
-            group = Group(),
+            initGroup = Group(),
+            resultRecipient = EmptyResultRecipient()
         )
     }
 }

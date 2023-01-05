@@ -110,7 +110,7 @@ private fun GroupApplyScreenView(
                     // TODO:  
                 },
                 onApply = {
-                    // TODO:  
+                    // TODO:
                 }
             )
         }

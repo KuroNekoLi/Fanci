@@ -17,6 +17,7 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
 /**
  * 秩序管理
@@ -68,8 +69,6 @@ fun GroupRuleManageScreen(
 @Composable
 fun GroupRuleManageScreenPreview() {
     FanciTheme {
-        GroupManageScreen {
-
-        }
+        GroupRuleManageScreen(group = Group(), navController = EmptyDestinationsNavigator)
     }
 }

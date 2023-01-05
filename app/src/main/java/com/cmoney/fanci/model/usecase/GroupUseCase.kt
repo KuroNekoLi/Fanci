@@ -22,7 +22,54 @@ class GroupUseCase(
     private val defaultImageApi: DefaultImageApi,
     private val permissionApi: PermissionApi,
     private val roleUserApi: RoleUserApi,
+    private val groupRequirement: GroupRequirementApi
 ) {
+
+    /**
+     * 設定 加入社團 問題清單
+     * @param groupId 社團 id
+     * @param question 問題清單
+     */
+    suspend fun setGroupRequirementQuestion(groupId: String, question: List<String>) =
+        kotlin.runCatching {
+            groupRequirement.apiV1GroupRequirementGroupGroupIdPut(
+                groupId = groupId,
+                groupRequirementParam = GroupRequirementParam(
+                    questions = question.map {
+                        GroupRequirementQuestion(
+                            question = it,
+                            type = GroupRequirementQuestionType.written
+                        )
+                    }
+                )
+            ).checkResponseBody()
+        }
+
+    /**
+     * 抓取 加入要求題目
+     */
+    suspend fun fetchGroupRequirement(groupId: String) = kotlin.runCatching {
+        groupRequirement.apiV1GroupRequirementGroupGroupIdGet(groupId = groupId).checkResponseBody()
+    }
+
+
+    /**
+     *
+     * 設定 社團 是否需要審核
+     *
+     * @param groupId 社團 id
+     * @param isNeedApproval 是否需要審核
+     */
+    suspend fun setGroupNeedApproval(groupId: String, isNeedApproval: Boolean) =
+        kotlin.runCatching {
+            groupApi.apiV1GroupGroupIdIsNeedApprovalPut(
+                groupId = groupId,
+                updateIsNeedApprovalParam = UpdateIsNeedApprovalParam(
+                    isNeedApproval = isNeedApproval
+                )
+            ).checkResponseBody()
+        }
+
     /**
      * 剔除成員
      * @param groupId 社團id

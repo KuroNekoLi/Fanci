@@ -48,13 +48,15 @@ fun TransparentButtonPreview() {
 
 @Composable
 fun BlueButton(
-    modifier: Modifier = Modifier,
-    text: String, onClick: () -> Unit) {
+    modifier: Modifier = Modifier
+        .padding(25.dp)
+        .fillMaxWidth()
+        .height(50.dp),
+    text: String,
+    onClick: () -> Unit
+) {
     Button(
-        modifier = modifier
-            .padding(25.dp)
-            .fillMaxWidth()
-            .height(50.dp),
+        modifier = modifier,
         colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
         onClick = {
             onClick.invoke()
