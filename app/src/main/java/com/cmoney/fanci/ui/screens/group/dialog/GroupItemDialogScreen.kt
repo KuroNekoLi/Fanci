@@ -1,10 +1,11 @@
 package com.cmoney.fanci.ui.screens.group.dialog
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +31,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 @Composable
 fun GroupItemDialogScreen(
     modifier: Modifier = Modifier,
+    isJoined: Boolean = false,
     groupModel: Group,
     background: Color = LocalColor.current.env_80,
     titleColor: Color = LocalColor.current.text.default_100,
@@ -97,7 +99,11 @@ fun GroupItemDialogScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "加入社團", fontSize = 16.sp,
+                            text = if (isJoined) {
+                                "已經加入，進入社團"
+                            } else {
+                                "加入社團"
+                            }, fontSize = 16.sp,
                             color = joinTextColor
                         )
                     }
@@ -124,6 +130,7 @@ fun GroupItemDialogScreen(
 fun JoinGroupDialogScreenPreview() {
     FanciTheme {
         GroupItemDialogScreen(
+            isJoined = true,
             groupModel = Group(
                 id = "",
                 name = "Hello",

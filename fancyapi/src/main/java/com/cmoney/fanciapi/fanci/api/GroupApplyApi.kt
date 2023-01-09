@@ -7,6 +7,7 @@ import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.ApplyStatus
+import com.cmoney.fanciapi.fanci.model.CountResult
 import com.cmoney.fanciapi.fanci.model.GroupApplyParam
 import com.cmoney.fanciapi.fanci.model.GroupApplyStatusParam
 import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyInfo
@@ -29,6 +30,21 @@ interface GroupApplyApi {
      */
     @PUT("api/v1/GroupApply/group/{groupId}/Approval")
     suspend fun apiV1GroupApplyGroupGroupIdApprovalPut(@Path("groupId") groupId: kotlin.String, @Body groupApplyStatusParam: GroupApplyStatusParam? = null): Response<Unit>
+
+    /**
+     * 查詢未處理的入社申請筆數 __________🔒 審核入社申請
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param groupId 
+     * @param applyStauts  (optional)
+     * @return [CountResult]
+     */
+    @GET("api/v1/GroupApply/group/{groupId}/Count")
+    suspend fun apiV1GroupApplyGroupGroupIdCountGet(@Path("groupId") groupId: kotlin.String, @Query("applyStauts") applyStauts: ApplyStatus? = null): Response<CountResult>
 
     /**
      * 取得社團申請清單 __________🔒 審核入社申請

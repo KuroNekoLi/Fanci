@@ -24,21 +24,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.ChatRoomScreenDestination
 import com.cmoney.fanci.destinations.DiscoverGroupScreenDestination
 import com.cmoney.fanci.destinations.GroupSettingScreenDestination
+import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
-import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -61,6 +58,9 @@ fun FollowScreen(
         groupList.value?.first()?.let {
             globalViewModel.setCurrentGroup(it.groupModel)
         }
+    }
+    else {
+        followScreenState.viewModel.checkGroupMenu(group)
     }
 
     val density = LocalDensity.current
@@ -87,7 +87,13 @@ fun FollowScreen(
                 },
                 onSearch = {
                     followScreenState.closeDrawer()
-                    navigator.navigate(DiscoverGroupScreenDestination)
+                    val arrayGroupItems = arrayListOf<Group>()
+                    arrayGroupItems.addAll(groupList.value.orEmpty().map {
+                        it.groupModel
+                    })
+                    navigator.navigate(DiscoverGroupScreenDestination(
+                        groupItems = arrayGroupItems
+                    ))
                 }
             )
         },

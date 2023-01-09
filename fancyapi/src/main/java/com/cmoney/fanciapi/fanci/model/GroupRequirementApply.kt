@@ -32,6 +32,7 @@ import kotlinx.parcelize.Parcelize
  * @param status 
  * @param updateUnixTime 更新時間
  * @param weight 
+ * @param wasKicked 
  */
 @Parcelize
 
@@ -57,7 +58,10 @@ data class GroupRequirementApply (
     val updateUnixTime: kotlin.Long? = null,
 
     @Json(name = "weight")
-    val weight: kotlin.Long? = null
+    val weight: kotlin.Long? = null,
+
+    @Json(name = "wasKicked")
+    val wasKicked: kotlin.Boolean? = null
 
 ) : Parcelable
 

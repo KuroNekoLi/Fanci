@@ -2225,6 +2225,69 @@
         ]
       }
     },
+    "/api/v1/GroupApply/group/{groupId}/Count": {
+      "get": {
+        "tags": [
+          "GroupApply"
+        ],
+        "summary": "查詢未處理的入社申請筆數 __________🔒 審核入社申請",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applyStauts",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/ApplyStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_審核入社申請_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/GroupApply/group/{groupId}/Approval": {
       "put": {
         "tags": [
@@ -4550,6 +4613,16 @@
         ],
         "type": "string"
       },
+      "CountResult": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "DefaultImageResource": {
         "type": "object",
         "properties": {
@@ -4991,6 +5064,9 @@
             "type": "integer",
             "format": "int64",
             "readOnly": true
+          },
+          "wasKicked": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false,

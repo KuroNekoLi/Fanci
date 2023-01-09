@@ -21,8 +21,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.CreateGroupScreenDestination
+import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.fanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.fanci.ui.screens.shared.GroupItemScreen
@@ -40,8 +42,10 @@ fun DiscoverGroupScreen(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: DiscoverViewModel = koinViewModel(),
+    groupItems: ArrayList<Group> = arrayListOf()
 ) {
     val uiState = viewModel.uiState
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
 
     DiscoverGroupScreenView(
         modifier = modifier,
@@ -60,7 +64,12 @@ fun DiscoverGroupScreen(
     )
 
     uiState.searchGroupClick?.apply {
+        val isJoined = groupItems.any {
+            it.id == this.id
+        }
+
         GroupItemDialogScreen(
+            isJoined = isJoined,
             groupModel = this,
             background = Color_2B313C,
             titleColor = Color.White,
@@ -70,7 +79,14 @@ fun DiscoverGroupScreen(
                 viewModel.closeGroupItemDialog()
             },
             onConfirm = {
-                viewModel.joinGroup(it)
+                if (isJoined) {
+                    //global change group
+                    globalViewModel.setCurrentGroup(it)
+                    navController.popBackStack()
+                }
+                else {
+                    viewModel.joinGroup(it)
+                }
             }
         )
     }

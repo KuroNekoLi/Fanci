@@ -251,11 +251,24 @@ private fun ApplyQuestionItem(
             Date(groupRequirementApply.updateUnixTime?.times(10001) ?: System.currentTimeMillis())
         val dayString = SimpleDateFormat("yyyy/MM/dd").format(date)
 
-        Text(
-            text = "作答日期：%s".format(dayString),
-            fontSize = 12.sp,
-            color = LocalColor.current.text.default_30
-        )
+        Row {
+            Text(
+                text = "作答日期：%s".format(dayString),
+                fontSize = 12.sp,
+                color = LocalColor.current.text.default_30
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+
+            if (groupRequirementApplySelected.groupRequirementApply.wasKicked == true) {
+                Text(
+                    text = "此用戶曾經被踢出社團",
+                    fontSize = 12.sp,
+                    color = LocalColor.current.specialColor.red
+                )
+            }
+        }
     }
 }
 
@@ -325,7 +338,8 @@ fun GroupApplyScreenPreview() {
                                 question = "Q2：金針菇第一隻破十萬觀看數的影片是哪一隻呢？（敘述即可不用寫出全名）",
                                 answer = "金針菇快閃韓國，回家嚇到爸媽"
                             )
-                        )
+                        ),
+                        wasKicked = true
                     ),
                     isSelected = true
                 )

@@ -148,4 +148,16 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             visibleAvatar = false
         )
     }
+
+    /**
+     * 檢查 側邊 menu 是否正確選中
+     */
+    fun checkGroupMenu(group: Group) {
+        groupItemClick(
+            groupItem = GroupItem(
+                groupModel = group,
+                isSelected = true
+            )
+        )
+    }
 }

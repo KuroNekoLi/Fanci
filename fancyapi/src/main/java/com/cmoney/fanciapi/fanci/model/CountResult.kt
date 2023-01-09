@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.User
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -24,19 +23,15 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param user 
- * @param expireUnixDateTime 
+ * @param count 
  */
 @Parcelize
 
 
-data class UserBanExpireTime (
+data class CountResult (
 
-    @Json(name = "user")
-    val user: User? = null,
-
-    @Json(name = "expireUnixDateTime")
-    val expireUnixDateTime: kotlin.Long? = null
+    @Json(name = "count")
+    val count: kotlin.Long? = null
 
 ) : Parcelable
 
