@@ -1,38 +1,95 @@
 package com.cmoney.fanci.ui.screens.group.search
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.CreateGroupScreenDestination
 import com.cmoney.fanci.ui.screens.group.dialog.GroupItemDialogScreen
-import com.cmoney.fanci.ui.screens.group.search.state.DiscoverGroupState
-import com.cmoney.fanci.ui.screens.group.search.state.rememberDiscoverGroupState
+import com.cmoney.fanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.fanci.ui.screens.shared.GroupItemScreen
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
 fun DiscoverGroupScreen(
-//    navController: NavHostController,
+    navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
-    state: DiscoverGroupState = rememberDiscoverGroupState()
+    viewModel: DiscoverViewModel = koinViewModel(),
 ) {
-    var selectedIndex by remember { mutableStateOf(0) }
+    val uiState = viewModel.uiState
+
+    DiscoverGroupScreenView(
+        modifier = modifier,
+        navController = navController,
+        selectedIndex = uiState.tabIndex,
+        groupList = uiState.groupList,
+        onTabClick = {
+            viewModel.onTabClick(it)
+        },
+        onGroupItemClick = {
+            viewModel.openGroupItemDialog(it)
+        },
+        onCreateClick = {
+            navController.navigate(CreateGroupScreenDestination())
+        }
+    )
+
+    uiState.searchGroupClick?.apply {
+        GroupItemDialogScreen(
+            groupModel = this,
+            background = Color_2B313C,
+            titleColor = Color.White,
+            descColor = Color_CCFFFFFF,
+            joinTextColor = Blue_4F70E5,
+            onDismiss = {
+                viewModel.closeGroupItemDialog()
+            },
+            onConfirm = {
+                viewModel.joinGroup(it)
+            }
+        )
+    }
+
+    if (uiState.joinSuccess) {
+        navController.popBackStack()
+    }
+}
+
+@Composable
+private fun DiscoverGroupScreenView(
+    modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
+    selectedIndex: Int,
+    groupList: List<Group>,
+    onTabClick: (Int) -> Unit,
+    onGroupItemClick: (Group) -> Unit,
+    onCreateClick: () -> Unit
+) {
     val list = listOf("熱門社團", "最新社團")
 
     Scaffold(
@@ -48,9 +105,27 @@ fun DiscoverGroupScreen(
                 moreClick = {
                 },
                 backClick = {
-                    state.navController.popBackStack()
+                    navController.popBackStack()
                 }
             )
+        },
+        floatingActionButton = {
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .background(LocalColor.current.primary)
+                    .clickable {
+                        onCreateClick.invoke()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.plus),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = Color.White)
+                )
+            }
         }
     ) { innerPadding ->
         Column(
@@ -87,7 +162,9 @@ fun DiscoverGroupScreen(
                                 Color.Transparent
                             ),
                         selected = selected,
-                        onClick = { selectedIndex = index },
+                        onClick = {
+                            onTabClick.invoke(index)
+                        },
                         text = {
                             Text(
                                 text = text, color = Color.White, fontSize = 14.sp
@@ -100,37 +177,17 @@ fun DiscoverGroupScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                items(state.viewModel.uiState.groupList) {
+                items(groupList) { group ->
                     GroupItemScreen(
-                        groupModel = it,
+                        groupModel = group,
                         background = Color_0DFFFFFF,
                         titleTextColor = Color.White,
                         subTitleColor = Color_80FFFFFF,
                         descColor = Color_CCFFFFFF
                     ) { groupModel ->
-                        state.viewModel.openGroupItemDialog(groupModel)
+                        onGroupItemClick.invoke(groupModel)
                     }
                 }
-            }
-
-            state.viewModel.uiState.searchGroupClick?.apply {
-                GroupItemDialogScreen(
-                    groupModel = this,
-                    background = Color_2B313C,
-                    titleColor = Color.White,
-                    descColor = Color_CCFFFFFF,
-                    joinTextColor = Blue_4F70E5,
-                    onDismiss = {
-                        state.viewModel.closeGroupItemDialog()
-                    },
-                    onConfirm = {
-                        state.viewModel.joinGroup(it)
-                    }
-                )
-            }
-
-            if (state.viewModel.uiState.joinSuccess) {
-                state.navController.popBackStack()
             }
         }
     }
@@ -140,6 +197,17 @@ fun DiscoverGroupScreen(
 @Composable
 fun DiscoverGroupScreenPreview() {
     FanciTheme {
-        DiscoverGroupScreen()
+        DiscoverGroupScreenView(
+            navController = EmptyDestinationsNavigator,
+            selectedIndex = 0,
+            groupList = listOf(
+                Group(
+                    name = "Hi"
+                )
+            ),
+            onTabClick = {},
+            onGroupItemClick = {},
+            onCreateClick = {}
+        )
     }
 }

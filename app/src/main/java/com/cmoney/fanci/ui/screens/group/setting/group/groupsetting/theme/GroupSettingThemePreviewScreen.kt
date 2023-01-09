@@ -29,9 +29,11 @@ import com.cmoney.fanci.ui.theme.DefaultThemeColor
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -45,7 +47,8 @@ fun GroupSettingThemePreviewScreen(
     navController: DestinationsNavigator,
     group: Group,
     themeId: String,
-    viewModel: GroupSettingViewModel = koinViewModel()
+    viewModel: GroupSettingViewModel = koinViewModel(),
+    resultNavigator: ResultBackNavigator<String>
 ) {
     val TAG = "GroupSettingThemePreviewScreen"
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
@@ -62,6 +65,10 @@ fun GroupSettingThemePreviewScreen(
     ) {
         KLog.i(TAG, "on theme click.")
         viewModel.changeTheme(groupParam, it)
+        if (groupParam.id == null) {
+            val gson = Gson()
+            resultNavigator.navigateBack(gson.toJson(it))
+        }
     }
 
     LaunchedEffect(Unit) {

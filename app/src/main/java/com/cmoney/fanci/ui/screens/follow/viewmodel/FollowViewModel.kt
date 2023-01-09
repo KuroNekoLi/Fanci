@@ -15,7 +15,6 @@ import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
-import com.cmoney.fanci.extension.dp
 import com.cmoney.fanci.extension.px
 
 data class FollowUiState(
@@ -69,7 +68,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      */
     private fun fetchAllGroupList() {
         viewModelScope.launch {
-            groupUseCase.getGroup().fold({
+            groupUseCase.getPopularGroup().fold({
                 _groupList.value = it.items
             }, {
                 KLog.e(TAG, it)

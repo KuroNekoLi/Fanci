@@ -87,7 +87,7 @@ fun MyAppNavHost(
 
         //搜尋Group
         composable(MainStateHolder.Route.DiscoverGroup) {
-            DiscoverGroupScreen()
+//            DiscoverGroupScreen()
         }
     }
 }

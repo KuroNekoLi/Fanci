@@ -1,4 +1,4 @@
-package com.cmoney.fanci.ui.screens.group.viewmodel
+package com.cmoney.fanci.ui.screens.group.search.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,21 +11,47 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
-data class GroupUiState(
+data class UiState(
     val groupList: List<Group> = emptyList(),
     val searchGroupClick: Group? = null,
-    val joinSuccess: Boolean = false
+    val joinSuccess: Boolean = false,
+    val tabIndex: Int = 0
 )
 
-class GroupViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
-    val TAG = GroupViewModel::class.java.simpleName
+class DiscoverViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
+    val TAG = DiscoverViewModel::class.java.simpleName
 
-    var uiState by mutableStateOf(GroupUiState())
+    var uiState by mutableStateOf(UiState())
         private set
 
     init {
+        fetchPopularGroup()
+    }
+
+    /**
+     * 抓取 熱門社團
+     */
+    private fun fetchPopularGroup() {
+        uiState = uiState.copy(groupList = emptyList())
         viewModelScope.launch {
-            groupUseCase.getGroup().fold(
+            groupUseCase.getPopularGroup().fold(
+                {
+                    uiState = uiState.copy(groupList = it.items.orEmpty())
+                },
+                {
+                    KLog.e(TAG, it)
+                }
+            )
+        }
+    }
+
+    /**
+     * 抓取 最新社團
+     */
+    private fun fetchLatestGroup() {
+        uiState = uiState.copy(groupList = emptyList())
+        viewModelScope.launch {
+            groupUseCase.getNewestGroup().fold(
                 {
                     uiState = uiState.copy(groupList = it.items.orEmpty())
                 },
@@ -56,6 +82,24 @@ class GroupViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                     uiState = uiState.copy(joinSuccess = true)
                 }
             })
+        }
+    }
+
+    /**
+     * 點擊 Tab
+     */
+    fun onTabClick(index: Int) {
+        KLog.i(TAG, "onTabClick:$index")
+        uiState = uiState.copy(
+            tabIndex = index
+        )
+        when (index) {
+            0 -> {
+                fetchPopularGroup()
+            }
+            else -> {
+                fetchLatestGroup()
+            }
         }
     }
 }

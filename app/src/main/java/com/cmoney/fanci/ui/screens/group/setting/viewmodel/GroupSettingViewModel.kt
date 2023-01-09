@@ -241,28 +241,37 @@ class GroupSettingViewModel(
     fun changeTheme(group: Group, groupTheme: GroupTheme) {
         KLog.i(TAG, "changeTheme: $groupTheme")
         viewModelScope.launch {
-            themeUseCase.changeGroupTheme(group, groupTheme).fold({
+            if (group.id != null) {
+                themeUseCase.changeGroupTheme(group, groupTheme).fold({
 
-            }, {
-                KLog.e(TAG, it)
-                if (it is EmptyBodyException) {
-                    uiState = uiState.copy(
-                        settingGroup = group.copy(
-                            colorSchemeGroupKey = ColorTheme.decode(groupTheme.id)
-                        ),
-                        groupThemeList = uiState.groupThemeList.map {
-                            if (it == groupTheme) {
-                                groupTheme.copy(isSelected = true)
-                            } else {
-                                it.copy(isSelected = false)
-                            }
-                        },
-                        previewTheme = groupTheme.copy(isSelected = true),
-                        isGroupSettingPop = true
-                    )
-                }
-            })
+                }, {
+                    KLog.e(TAG, it)
+                    if (it is EmptyBodyException) {
+                        setSelectedTheme(group, groupTheme)
+                    }
+                })
+            }
         }
+    }
+
+    /**
+     * 設定 選中的 Theme
+     */
+    fun setSelectedTheme(group: Group, groupTheme: GroupTheme) {
+        uiState = uiState.copy(
+            settingGroup = group.copy(
+                colorSchemeGroupKey = ColorTheme.decode(groupTheme.id)
+            ),
+            groupThemeList = uiState.groupThemeList.map {
+                if (it == groupTheme) {
+                    groupTheme.copy(isSelected = true)
+                } else {
+                    it.copy(isSelected = false)
+                }
+            },
+            previewTheme = groupTheme.copy(isSelected = true),
+            isGroupSettingPop = true
+        )
     }
 
     /**

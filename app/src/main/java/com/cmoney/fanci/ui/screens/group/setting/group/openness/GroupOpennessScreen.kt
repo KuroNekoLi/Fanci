@@ -160,7 +160,7 @@ fun GroupOpennessScreen(
 }
 
 @Composable
-private fun GroupOpennessScreenView(
+fun GroupOpennessScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     isNeedApproval: Boolean,
@@ -294,7 +294,7 @@ private fun GroupOpennessScreenView(
 }
 
 @Composable
-private fun TipDialog(
+fun TipDialog(
     onAddTopic: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -363,7 +363,7 @@ private fun TipDialog(
 }
 
 @Composable
-private fun QuestionItem(question: String, onClick: (String) -> Unit) {
+fun QuestionItem(question: String, onClick: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

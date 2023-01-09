@@ -345,12 +345,6 @@ fun GroupSettingSettingView(
                         navController.navigate(GroupSettingThemeScreenDestination(
                             group = group
                         ))
-                        // TODO: route
-//                        route.invoke(
-//                            MainStateHolder.GroupRoute.GroupSettingSettingTheme(
-//                                group = group
-//                            )
-//                        )
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),

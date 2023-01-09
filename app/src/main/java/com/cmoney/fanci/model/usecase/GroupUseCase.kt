@@ -26,6 +26,36 @@ class GroupUseCase(
 ) {
 
     /**
+     * 建立社團
+     *
+     * @param name 社團名稱
+     * @param description 社團描述, 一開始建立時,可以不用輸入 (需求)
+     * @param isNeedApproval 是否需要認證
+     * @param coverImageUrl 背景圖
+     * @param thumbnailImageUrl 小圖
+     * @param themeName 背景主題名稱
+     */
+    suspend fun createGroup(
+        name: String,
+        description: String = "",
+        isNeedApproval: Boolean,
+        coverImageUrl: String,
+        thumbnailImageUrl: String,
+        themeName: String
+    ) = kotlin.runCatching {
+        groupApi.apiV1GroupPost(
+            groupParam = GroupParam(
+                name = name,
+                description = description,
+                isNeedApproval = isNeedApproval,
+                coverImageUrl = coverImageUrl,
+                thumbnailImageUrl = thumbnailImageUrl,
+                colorSchemeGroupKey = ColorTheme.decode(themeName)
+            )
+        ).checkResponseBody()
+    }
+
+    /**
      * 設定 加入社團 問題清單
      * @param groupId 社團 id
      * @param question 問題清單
@@ -373,11 +403,22 @@ class GroupUseCase(
     }
 
     /**
-     * 取得社團列表
+     * 取得 最新 社團列表
      */
-    suspend fun getGroup() =
+    suspend fun getNewestGroup() = kotlin.runCatching {
+        groupApi.apiV1GroupGet(
+            orderType = OrderType.latest
+        ).checkResponseBody()
+    }
+
+    /**
+     * 取得 熱門 社團列表
+     */
+    suspend fun getPopularGroup() =
         kotlin.runCatching {
-            groupApi.apiV1GroupGet().checkResponseBody()
+            groupApi.apiV1GroupGet(
+                orderType = OrderType.popular
+            ).checkResponseBody()
         }
 
     /**

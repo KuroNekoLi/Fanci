@@ -28,9 +28,13 @@ import com.cmoney.fanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -44,6 +48,8 @@ fun GroupSettingThemeScreen(
     navController: DestinationsNavigator,
     group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
+    resultNavigator: ResultBackNavigator<String>,
+    themeResult: ResultRecipient<GroupSettingThemePreviewScreenDestination, String>
 ) {
     val TAG = "GroupSettingThemeScreen"
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
@@ -58,6 +64,17 @@ fun GroupSettingThemeScreen(
         globalViewModel.setCurrentGroup(it)
     }
 
+    themeResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val groupThemeStr = result.value
+                resultNavigator.navigateBack(groupThemeStr)
+            }
+        }
+    }
+
     GroupSettingThemeView(
         modifier,
         navController,
@@ -67,11 +84,17 @@ fun GroupSettingThemeScreen(
         onThemeConfirmClick = {
             KLog.i(TAG, "on theme click.")
             viewModel.changeTheme(groupParam, it)
+            if (groupParam.id == null) {
+                val gson = Gson()
+                resultNavigator.navigateBack(gson.toJson(it))
+            }
         }
     )
 
     LaunchedEffect(fetchAllTheme) {
-        viewModel.fetchAllTheme(groupParam)
+        if (state.groupThemeList.isEmpty()) {
+            viewModel.fetchAllTheme(groupParam)
+        }
     }
 }
 

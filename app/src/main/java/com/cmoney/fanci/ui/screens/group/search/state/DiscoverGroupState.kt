@@ -6,14 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.ui.screens.group.viewmodel.GroupViewModel
+import com.cmoney.fanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.fanciapi.fanci.model.Group
 import org.koin.androidx.compose.koinViewModel
 
 class DiscoverGroupState(
     val navController: NavHostController,
     val openGroupDialog: MutableState<Boolean>,
-    val viewModel: GroupViewModel
+    val viewModel: DiscoverViewModel
 ) {
 
     /**
@@ -36,7 +36,7 @@ class DiscoverGroupState(
 fun rememberDiscoverGroupState(
     navController: NavHostController = rememberNavController(),
     openGroupDialog: MutableState<Boolean> = mutableStateOf(false),
-    viewModel: GroupViewModel = koinViewModel()
+    viewModel: DiscoverViewModel = koinViewModel()
 ) = remember {
     DiscoverGroupState(navController, openGroupDialog, viewModel)
 }
