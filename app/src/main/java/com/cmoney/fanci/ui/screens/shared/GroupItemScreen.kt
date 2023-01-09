@@ -31,7 +31,7 @@ fun GroupItemScreen(
     background: Color = LocalColor.current.background,
     titleTextColor: Color = LocalColor.current.text.default_100,
     subTitleColor: Color = LocalColor.current.text.default_50,
-    descColor: Color =  LocalColor.current.text.default_80,
+    descColor: Color = LocalColor.current.text.default_80,
     onGroupItemClick: (Group) -> Unit
 ) {
     val TAG = "GroupItemScreen"
@@ -55,7 +55,14 @@ fun GroupItemScreen(
         ) {
             GroupText(text = groupModel.name.orEmpty(), textColor = titleTextColor)
             Spacer(modifier = Modifier.height(5.dp))
-            Text(text = "私密社團・成員 1345 ", fontSize = 12.sp, color = subTitleColor)
+
+            val subTitle = if (groupModel.isNeedApproval == true) {
+                "私密社團・成員 %d".format(groupModel.memberCount ?: 0)
+            } else {
+                "公開社團・成員 %d".format(groupModel.memberCount ?: 0)
+            }
+
+            Text(text = subTitle, fontSize = 12.sp, color = subTitleColor)
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = groupModel.description.orEmpty(),
