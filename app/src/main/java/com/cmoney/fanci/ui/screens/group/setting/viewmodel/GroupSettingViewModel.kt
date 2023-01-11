@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
+import com.cmoney.fanci.model.usecase.GroupApplyUseCase
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanci.model.usecase.ThemeUseCase
 import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.ImageChangeData
@@ -19,20 +20,38 @@ data class GroupSettingUiState(
     val settingGroup: Group? = null,
     val isLoading: Boolean = false,
     val isGroupSettingPop: Boolean = false,
-    val groupAvatarLib: List<String> = emptyList(),  //社團 預設大頭貼 清單
-    val groupCoverLib: List<String> = emptyList(),  //社團 預設背景 清單
-    val groupThemeList: List<GroupTheme> = emptyList(),  //社團 主題色彩
-    val previewTheme: GroupTheme? = null            //社團 設定主題 Preview
+    val groupAvatarLib: List<String> = emptyList(),         //社團 預設大頭貼 清單
+    val groupCoverLib: List<String> = emptyList(),          //社團 預設背景 清單
+    val groupThemeList: List<GroupTheme> = emptyList(),     //社團 主題色彩
+    val previewTheme: GroupTheme? = null,                   //社團 設定主題 Preview
+    val unApplyCount: Long? = null                           //等待加入申請數量
 )
 
 class GroupSettingViewModel(
     private val groupUseCase: GroupUseCase,
-    private val themeUseCase: ThemeUseCase
+    private val themeUseCase: ThemeUseCase,
+    private val groupApplyUseCase: GroupApplyUseCase
 ) : ViewModel() {
     private val TAG = GroupSettingViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(GroupSettingUiState())
         private set
+
+    /**
+     * 抓取 加入申請 數量
+     * @param groupId 社團 id
+     */
+    fun fetchUnApplyCount(groupId: String) {
+        viewModelScope.launch {
+            groupApplyUseCase.getUnApplyCount(groupId = groupId).fold({
+                uiState = uiState.copy(
+                    unApplyCount = it.count
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
 
     /**
      * 更換 社團 簡介

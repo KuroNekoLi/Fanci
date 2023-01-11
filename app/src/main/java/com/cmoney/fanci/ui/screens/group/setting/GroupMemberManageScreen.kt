@@ -1,10 +1,13 @@
 package com.cmoney.fanci.ui.screens.group.setting
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
@@ -25,7 +28,8 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 fun GroupMemberManageScreen(
     modifier: Modifier = Modifier,
     group: Group,
-    navController: DestinationsNavigator
+    navController: DestinationsNavigator,
+    unApplyCount: Long
 ) {
     Column(modifier = modifier) {
         Text(
@@ -47,9 +51,11 @@ fun GroupMemberManageScreen(
             iconRes = R.drawable.all_member,
             text = "所有成員",
             onItemClick = {
-                navController.navigate(AllMemberScreenDestination(
-                    group = group
-                ))
+                navController.navigate(
+                    AllMemberScreenDestination(
+                        group = group
+                    )
+                )
             }
         )
         Spacer(modifier = Modifier.height(1.dp))
@@ -58,12 +64,15 @@ fun GroupMemberManageScreen(
             iconRes = R.drawable.join_apply,
             text = "加入申請",
             onItemClick = {
-                navController.navigate(GroupApplyScreenDestination(
-                    group = group
-                ))
+                navController.navigate(
+                    GroupApplyScreenDestination(
+                        group = group
+                    )
+                )
             }
         ) {
-            Text(text = "121", fontSize = 17.sp, color = LocalColor.current.text.default_100)
+            val text = if (unApplyCount != 0L) unApplyCount.toString() else ""
+            Text(text = text, fontSize = 17.sp, color = LocalColor.current.text.default_100)
         }
     }
 }
@@ -74,7 +83,8 @@ fun GroupMemberManageScreenPreview() {
     FanciTheme {
         GroupMemberManageScreen(
             group = Group(),
-            navController = EmptyDestinationsNavigator
+            navController = EmptyDestinationsNavigator,
+            unApplyCount = 20
         )
     }
 }

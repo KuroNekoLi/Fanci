@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.destinations.GroupOpennessScreenDestination
+import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -20,9 +21,9 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
+import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
@@ -30,10 +31,13 @@ fun GroupSettingScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     initGroup: Group,
+    viewModel: GroupSettingViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var group = initGroup
+
+    val uiState = viewModel.uiState
 
     resultRecipient.onNavResult { result ->
         when (result) {
@@ -51,17 +55,42 @@ fun GroupSettingScreen(
         navController.popBackStack()
     }
 
+    GroupSettingScreenView(
+        modifier = modifier,
+        navController = navController,
+        group = group,
+        unApplyCount = uiState.unApplyCount ?: 0,
+        onBackClick = {
+            globalViewModel.setCurrentGroup(group)
+            navController.popBackStack()
+        }
+    )
+
+    //抓取加入申請 數量
+    if (uiState.unApplyCount == null) {
+        viewModel.fetchUnApplyCount(groupId = group.id.orEmpty())
+    }
+
+}
+
+@Composable
+fun GroupSettingScreenView(
+    modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
+    group: Group,
+    onBackClick: () -> Unit,
+    unApplyCount: Long
+) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "社團設定",
+                title = "設定",
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
-                    globalViewModel.setCurrentGroup(group)
-                    navController.popBackStack()
+                    onBackClick.invoke()
                 }
             )
         }
@@ -86,7 +115,8 @@ fun GroupSettingScreen(
             //成員管理
             GroupMemberManageScreen(
                 group = group,
-                navController = navController
+                navController = navController,
+                unApplyCount = unApplyCount
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -100,14 +130,16 @@ fun GroupSettingScreen(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun GroupSettingScreenPreview() {
     FanciTheme {
-        GroupSettingScreen(
+        GroupSettingScreenView(
             navController = EmptyDestinationsNavigator,
-            initGroup = Group(),
-            resultRecipient = EmptyResultRecipient()
+            group = Group(),
+            onBackClick = {},
+            unApplyCount = 20
         )
     }
 }

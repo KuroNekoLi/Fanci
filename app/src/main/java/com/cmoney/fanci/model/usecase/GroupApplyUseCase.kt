@@ -9,6 +9,16 @@ import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
 class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi) {
 
     /**
+     * 查詢未處理的入社申請筆數
+     *
+     * @param groupId 社團id
+     * @param applyStauts 查詢審核狀態, 預設 未審核
+     */
+    suspend fun getUnApplyCount(groupId: String, applyStauts: ApplyStatus = ApplyStatus.unConfirmed) = kotlin.runCatching {
+        groupApplyApi.apiV1GroupApplyGroupGroupIdCountGet(groupId = groupId).checkResponseBody()
+    }
+
+    /**
      * 申請加入審核社團
      *
      * @param groupId 社團id
