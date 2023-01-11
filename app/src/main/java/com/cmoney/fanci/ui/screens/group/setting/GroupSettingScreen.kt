@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.LocalDependencyContainer
+import com.cmoney.fanci.destinations.GroupApplyScreenDestination
 import com.cmoney.fanci.destinations.GroupOpennessScreenDestination
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -32,7 +33,8 @@ fun GroupSettingScreen(
     navController: DestinationsNavigator,
     initGroup: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
-    resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>
+    resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>,
+    applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var group = initGroup
@@ -46,6 +48,19 @@ fun GroupSettingScreen(
             is NavResult.Value -> {
                 val resultGroup = result.value
                 group = resultGroup
+            }
+        }
+    }
+
+    applyResultRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val isNeedRefresh = result.value
+                if (isNeedRefresh) {
+                    viewModel.fetchUnApplyCount(groupId = group.id.orEmpty())
+                }
             }
         }
     }

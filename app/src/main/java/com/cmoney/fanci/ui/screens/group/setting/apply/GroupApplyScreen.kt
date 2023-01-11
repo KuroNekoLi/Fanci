@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.group.setting.apply
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,25 +18,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.extension.showToast
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.group.setting.apply.viewmodel.GroupApplyViewModel
 import com.cmoney.fanci.ui.screens.group.setting.apply.viewmodel.GroupRequirementApplySelected
 import com.cmoney.fanci.ui.screens.shared.CenterTopAppBar
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.GroupRequirementApply
-import com.cmoney.fanciapi.fanci.model.IGroupRequirementAnswer
-import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.fanciapi.fanci.model.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
@@ -47,7 +48,8 @@ fun GroupApplyScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     viewModel: GroupApplyViewModel = koinViewModel(),
-    group: Group
+    group: Group,
+    resultBackNavigator: ResultBackNavigator<Boolean>
 ) {
     val TAG = "GroupApplyScreen"
 
@@ -65,8 +67,37 @@ fun GroupApplyScreen(
         groupRequirementApplyList = uiState.applyList.orEmpty(),
         onApplyClick = {
             KLog.i(TAG, "onApplyClick:$it")
+            viewModel.onApplyItemClick(it)
+        },
+        onSelectAllClick = {
+            KLog.i(TAG, "onSelectAllClick")
+            viewModel.selectAllClick()
+        },
+        onReject = {
+            viewModel.onApplyOrReject(
+                groupId = group.id.orEmpty(),
+                applyStatus = ApplyStatus.denied
+            )
+        },
+        onApply = {
+            viewModel.onApplyOrReject(
+                groupId = group.id.orEmpty(),
+                applyStatus = ApplyStatus.confirmed
+            )
+        },
+        onBackClick = {
+            resultBackNavigator.navigateBack(result = uiState.isComplete)
         }
     )
+
+    if (uiState.tips?.isNotEmpty() == true) {
+        LocalContext.current.showToast(uiState.tips)
+    }
+
+    //通知前一頁,是否需要刷新
+    BackHandler {
+        resultBackNavigator.navigateBack(result = uiState.isComplete)
+    }
 }
 
 @Composable
@@ -74,7 +105,11 @@ private fun GroupApplyScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     groupRequirementApplyList: List<GroupRequirementApplySelected>,
-    onApplyClick: (GroupRequirementApplySelected) -> Unit
+    onApplyClick: (GroupRequirementApplySelected) -> Unit,
+    onSelectAllClick: () -> Unit,
+    onReject: () -> Unit,
+    onApply: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     val TAG = "GroupApplyScreenView"
 
@@ -84,11 +119,11 @@ private fun GroupApplyScreenView(
         topBar = {
             TopAppBar(
                 backClick = {
-                    navigator.popBackStack()
+                    onBackClick.invoke()
                 },
                 onSelectedAll = {
                     KLog.i(TAG, "onSelectedAll click.")
-                    // TODO:
+                    onSelectAllClick.invoke()
                 }
             )
         }
@@ -107,15 +142,13 @@ private fun GroupApplyScreenView(
 
             BottomButton(
                 onReject = {
-                    // TODO:  
+                    onReject.invoke()
                 },
                 onApply = {
-                    // TODO:
+                    onApply.invoke()
                 }
             )
         }
-
-
     }
 }
 
@@ -253,7 +286,7 @@ private fun ApplyQuestionItem(
 
         Row {
             Text(
-                text = "作答日期：%s".format(dayString),
+                text = "申請日期：%s".format(dayString),
                 fontSize = 12.sp,
                 color = LocalColor.current.text.default_30
             )
@@ -345,7 +378,11 @@ fun GroupApplyScreenPreview() {
                 )
             ),
             onApplyClick = {
-            }
+            },
+            onSelectAllClick = {},
+            onReject = {},
+            onApply = {},
+            onBackClick = {}
         )
     }
 }
