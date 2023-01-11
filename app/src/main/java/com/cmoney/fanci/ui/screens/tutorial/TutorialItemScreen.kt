@@ -1,38 +1,86 @@
 package com.cmoney.fanci.ui.screens.tutorial
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanci.ui.theme.FanciTheme
+import coil.compose.AsyncImage
+import com.cmoney.fanci.R
+import com.cmoney.fanci.ui.theme.Black_242424
+import com.cmoney.fanci.ui.theme.Blue_4F70E5
 
 @Composable
-fun TutorialItemScreen(modifier: Modifier = Modifier, page: Int) {
-    Column(modifier = Modifier.background(MaterialTheme.colors.surface)) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = page.toString(),
-            fontSize = 110.sp,
-            color = Color.White,
-            textAlign = TextAlign.Center
+fun TutorialItemScreen(
+    modifier: Modifier = Modifier,
+    page: Int,
+    isFinalPage: Boolean,
+    onStart: () -> Unit
+) {
+    Column(modifier = modifier) {
+        val imageResource = when (page) {
+            0 -> {
+                R.drawable.tutorial1
+            }
+            1 -> {
+                R.drawable.tutorial2
+            }
+            else -> {
+                R.drawable.tutorial3
+            }
+        }
+
+        val title = when (page) {
+            1 -> {
+                "一手掌握當紅名人所有資訊"
+            }
+            2 -> {
+                "跟同溫層一起聊天嘻嘻哈哈"
+            }
+            else -> {
+                "打開通知即時訊息不漏接"
+            }
+        }
+
+        val desc = when (page) {
+            1 -> {
+                "你喜歡的偶像、網紅、KOL都在這！\n" +
+                        "最新消息、周邊搶賣，加入社團再也不錯過"
+            }
+            2 -> {
+                "生活中沒有人可以跟你一起聊喜愛事物？\n" +
+                        "懂你的朋友都在這，快來一起嘰哩呱啦！"
+            }
+            else -> {
+                "Fanci 能讓你知道最即時的消息！\n" +
+                        "所以...打開通知是你最棒的選擇"
+            }
+        }
+
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(375.dp)
+                .padding(top = 30.dp, bottom = 30.dp),
+            model = imageResource,
+            contentScale = ContentScale.Fit,
+            contentDescription = null,
+            placeholder = painterResource(id = R.drawable.resource_default)
         )
 
-        Spacer(modifier = Modifier.height(120.dp))
-
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "打開通知即時訊息不漏接",
+            text = title,
             fontSize = 21.sp,
             color = Color.White,
             textAlign = TextAlign.Center,
@@ -43,13 +91,39 @@ fun TutorialItemScreen(modifier: Modifier = Modifier, page: Int) {
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "文字文字文字文字文字文字文字文字文字文字\n" +
-                    "文字文字文字文字文字文字文字文字文字文字\n" +
-                    "文字文字文字文字文字文字文字文字文字文字\n" +
-                    "文字文字文字文字文字文字文字文字文字文字",
+            text = desc,
             fontSize = 16.sp,
             color = Color.White,
             textAlign = TextAlign.Center,
+        )
+
+        if (isFinalPage) {
+            BlueButton(text = "開始使用 Fanci") {
+                onStart.invoke()
+            }
+        }
+    }
+}
+
+@Composable
+fun BlueButton(
+    modifier: Modifier = Modifier
+        .padding(25.dp)
+        .fillMaxWidth()
+        .height(50.dp),
+    text: String,
+    onClick: () -> Unit
+) {
+    Button(
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(backgroundColor = Blue_4F70E5),
+        onClick = {
+            onClick.invoke()
+        }) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = 16.sp
         )
     }
 }
@@ -57,7 +131,8 @@ fun TutorialItemScreen(modifier: Modifier = Modifier, page: Int) {
 @Preview(showBackground = true)
 @Composable
 fun TutorialItemScreenPreview() {
-    FanciTheme {
-        TutorialItemScreen(page = 0)
-    }
+    TutorialItemScreen(
+        page = 1,
+        isFinalPage = true,
+        onStart = {})
 }

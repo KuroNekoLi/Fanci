@@ -5,12 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.model.persistence.SettingsDataStore
 import com.cmoney.fanci.model.usecase.ThemeUseCase
 import com.cmoney.fanci.model.usecase.UserUseCase
 import com.cmoney.fanci.ui.theme.CoffeeThemeColor
+import com.cmoney.fanci.ui.theme.DefaultThemeColor
 import com.cmoney.fanci.ui.theme.FanciColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 sealed class ThemeSetting {
@@ -20,10 +23,16 @@ sealed class ThemeSetting {
 
 data class UiState(
     val currentGroup: Group? = null, //目前選擇中的社團
-    val theme: FanciColor = CoffeeThemeColor
+//    val theme: FanciColor = CoffeeThemeColor,
+    val theme: FanciColor = DefaultThemeColor,
+    val isOpenTutorial: Boolean? = null
 )
 
-class MainViewModel(private val userUseCase: UserUseCase, private val themeUseCase: ThemeUseCase) :
+class MainViewModel(
+    private val userUseCase: UserUseCase,
+    private val themeUseCase: ThemeUseCase,
+    private val settingsDataStore: SettingsDataStore
+) :
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
@@ -32,6 +41,17 @@ class MainViewModel(private val userUseCase: UserUseCase, private val themeUseCa
 
     var uiState by mutableStateOf(UiState())
         private set
+
+    init {
+        viewModelScope.launch {
+            settingsDataStore.isTutorial.collect {
+                uiState = uiState.copy(
+                    isOpenTutorial = it
+                )
+            }
+        }
+    }
+
 
 //    fun setCoffeeTheme() {
 //        KLog.i(TAG, "setCoffeeTheme")
@@ -74,6 +94,19 @@ class MainViewModel(private val userUseCase: UserUseCase, private val themeUseCa
                     })
                 }
             }
+        }
+    }
+
+    /**
+     * 看過 tutorial
+     */
+    fun tutorialOnOpen() {
+        KLog.i(TAG, "tutorialOnOpen")
+        viewModelScope.launch {
+//            settingsDataStore.onTutorialOpen()
+            uiState = uiState.copy(
+                isOpenTutorial = true
+            )
         }
     }
 

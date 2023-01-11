@@ -6,79 +6,16 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
-import com.flurry.sdk.it
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.socks.library.KLog
 
 class MainStateHolder(
     val navController: NavHostController,
-    val mainNavController: NavHostController,
     private val systemUiController: SystemUiController,
 ) {
     private val TAG = MainStateHolder::class.java.simpleName
-    val route: (Route) -> Unit = {
-        KLog.i(TAG, "route:$it")
-        when (it) {
-            is Route.Channel -> mainNavController.navigate(it.route)
-            is Route.Announce -> {
-                mainNavController.currentBackStackEntry?.savedStateHandle?.apply {
-                    set("message", it.message)
-                }
-                mainNavController.navigate(it.route)
-            }
-            is Route.UserInfo -> {
-                mainNavController.navigate(it.route)
-            }
-            is Route.DiscoverGroup -> {
-                mainNavController.navigate(it.route)
-            }
-            is GroupRoute.GroupSetting -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSetting -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSettingName -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSettingDesc -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSettingAvatar -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSettingBackground -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSettingAvatarFanci -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSettingCoverFanci -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSettingTheme -> {
-                navigateWithGroup(it)
-            }
-            is GroupRoute.GroupSettingSettingThemePreview -> {
-                mainNavController.currentBackStackEntry?.savedStateHandle?.apply {
-                    set("group", it.group)
-                    set("themeId", it.themeId)
-                }
-                mainNavController.navigate(it.route)
-            }
-        }
-    }
-
-    private fun navigateWithGroup(route: GroupRoute) {
-        mainNavController.currentBackStackEntry?.savedStateHandle?.apply {
-            set("group", route.group)
-        }
-        mainNavController.navigate(route.route)
-    }
 
     @Composable
     fun setStatusBarColor() {
@@ -199,8 +136,7 @@ class MainStateHolder(
 @Composable
 fun rememberMainState(
     navController: NavHostController = rememberNavController(),
-    mainNavController: NavHostController = rememberNavController(),
     systemUiController: SystemUiController = rememberSystemUiController()
 ) = remember {
-    MainStateHolder(navController, mainNavController, systemUiController)
+    MainStateHolder(navController, systemUiController)
 }

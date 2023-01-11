@@ -18,7 +18,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModule = module {
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get()) }
     viewModel { FollowViewModel(get()) }
     viewModel { ChatRoomViewModel(get(), get()) }
     viewModel { MessageViewModel(get(), get(), get()) }

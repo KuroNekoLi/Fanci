@@ -11,6 +11,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.ui.theme.Black_1AFFFFFF
+import com.cmoney.fanci.ui.theme.Black_242424
 import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -20,25 +21,27 @@ import com.google.accompanist.pager.rememberPagerState
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun TutorialScreen(modifier: Modifier = Modifier) {
+fun TutorialScreen(modifier: Modifier = Modifier, onStart: () -> Unit) {
     Scaffold(
-        modifier = modifier.fillMaxSize()
-    ) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        modifier = modifier
+            .fillMaxSize(),
+        backgroundColor = Black_242424
+    ) {
+        Column {
             val pagerState = rememberPagerState()
 
             HorizontalPager(
-                count = 10,
+                count = 3,
                 state = pagerState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
             ) { page ->
-                TutorialItemScreen(page = page)
+                TutorialItemScreen(page = page,
+                    isFinalPage = (page == 2),
+                    onStart = {
+                        onStart.invoke()
+                    })
             }
 
             Box(
@@ -53,7 +56,7 @@ fun TutorialScreen(modifier: Modifier = Modifier) {
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
                     modifier = Modifier
-                        .padding(16.dp),
+                        .padding(5.dp),
                     activeColor = Blue_4F70E5,
                     inactiveColor = Black_1AFFFFFF
                 )
@@ -69,6 +72,8 @@ fun TutorialScreen(modifier: Modifier = Modifier) {
 @Composable
 fun TutorialScreenPreview() {
     FanciTheme {
-        TutorialScreen()
+        TutorialScreen(
+            onStart = {}
+        )
     }
 }

@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -16,6 +18,7 @@ import com.cmoney.fanci.destinations.MainScreenDestination
 import com.cmoney.fanci.destinations.testDestination
 import com.cmoney.fanci.ui.MainNavHost
 import com.cmoney.fanci.ui.screens.BottomBarScreen
+import com.cmoney.fanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.loginlibrary.module.variable.loginlibraryenum.ApiAction
@@ -31,7 +34,6 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.android.parcel.Parcelize
 import org.koin.android.ext.android.inject
-import org.koin.androidx.compose.koinViewModel
 
 val LocalDependencyContainer = staticCompositionLocalOf<MainActivity> {
     error("No dependency container provided!")
@@ -46,26 +48,27 @@ class MainActivity : BaseLoginAppCompactActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!XLoginHelper.isLogin) {
-            processLogin()
-        }
+//        if (!XLoginHelper.isLogin) {
+//            processLogin()
+//        }
 
         setContent {
             CompositionLocalProvider(LocalDependencyContainer provides this) {
                 val state = globalViewModel.uiState
-                FanciTheme(fanciColor = state.theme) {
-                    val mainState = rememberMainState()
-                    Scaffold(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(LocalColor.current.primary),
-                    ) {
-                        mainState.setStatusBarColor()
+                if (state.isOpenTutorial == true) {
+                    FanciTheme(fanciColor = state.theme) {
+                        val mainState = rememberMainState()
+                        Scaffold(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(LocalColor.current.primary),
+                        ) {
+                            mainState.setStatusBarColor()
 
-                        DestinationsNavHost(
-                            navGraph = NavGraphs.root,
-                            startRoute = MainScreenDestination
-                        )
+                            DestinationsNavHost(
+                                navGraph = NavGraphs.root,
+                                startRoute = MainScreenDestination
+                            )
 
 //                    MyAppNavHost(
 //                        mainState.navController,
@@ -73,6 +76,16 @@ class MainActivity : BaseLoginAppCompactActivity() {
 //                        mainState.route,
 //                        globalViewModel
 //                    )
+                        }
+                    }
+                }
+                else {
+                    MaterialTheme {
+                        TutorialScreen(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            globalViewModel.tutorialOnOpen()
+                        }
                     }
                 }
             }

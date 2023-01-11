@@ -107,9 +107,9 @@ fun MainNavHost(
     //test
     var pos by remember { mutableStateOf(0) }
 
-    Column {
-        TutorialScreen()
-    }
+//    Column {
+//        TutorialScreen()
+//    }
 
     NavHost(
         navController = navController,
