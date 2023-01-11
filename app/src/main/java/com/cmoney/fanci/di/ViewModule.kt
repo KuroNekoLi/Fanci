@@ -5,6 +5,7 @@ import com.cmoney.fanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.fanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
+import com.cmoney.fanci.ui.screens.group.search.apply.viewmodel.ApplyForGroupViewModel
 import com.cmoney.fanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.fanci.ui.screens.group.setting.apply.viewmodel.GroupApplyViewModel
 import com.cmoney.fanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
@@ -37,4 +38,5 @@ val viewModule = module {
     viewModel {
         CreateGroupViewModel(get())
     }
+    viewModel { ApplyForGroupViewModel(get(), get()) }
 }

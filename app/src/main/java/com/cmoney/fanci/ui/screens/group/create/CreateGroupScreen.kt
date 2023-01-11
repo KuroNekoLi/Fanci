@@ -334,7 +334,7 @@ private fun CreateGroupScreenView(
 }
 
 /**
- * 設定名稱
+ * TODO desc
  */
 @Composable
 private fun StepProgressBar(
@@ -436,7 +436,7 @@ fun CreateGroupScreenPreview() {
         CreateGroupScreenView(
             navController = EmptyDestinationsNavigator,
             uiState = UiState(
-                currentStep = 3
+                currentStep = 1
             ),
             approvalUiState = com.cmoney.fanci.ui.screens.group.setting.group.openness.viewmodel.UiState(),
             onGroupName = {},

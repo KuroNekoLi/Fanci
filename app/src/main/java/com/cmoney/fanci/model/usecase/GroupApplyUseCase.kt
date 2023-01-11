@@ -3,8 +3,29 @@ package com.cmoney.fanci.model.usecase
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.GroupApplyApi
 import com.cmoney.fanciapi.fanci.model.ApplyStatus
+import com.cmoney.fanciapi.fanci.model.GroupApplyParam
+import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
 
 class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi) {
+
+    /**
+     * 申請加入審核社團
+     *
+     * @param groupId 社團id
+     * @param groupRequirementAnswer 問題及答案
+     */
+    suspend fun joinGroupWithQuestion(
+        groupId: String,
+        groupRequirementAnswer: List<GroupRequirementAnswer>
+    ) = kotlin.runCatching {
+        groupApplyApi.apiV1GroupApplyGroupGroupIdPut(
+            groupId = groupId,
+            groupApplyParam = GroupApplyParam(
+                groupRequirementAnswer
+            )
+        ).checkResponseBody()
+    }
+
 
     /**
      * 抓取社團申請 清單,

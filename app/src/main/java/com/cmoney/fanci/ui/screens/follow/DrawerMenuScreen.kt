@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,7 +37,7 @@ fun DrawerMenuScreen(
 ) {
     Column(
         modifier = modifier
-            .background(White_262C34)
+            .background(LocalColor.current.env_100)
             .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 5.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
@@ -76,12 +77,13 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(Color_2B313C),
+                .background(LocalColor.current.env_80),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.bell),
                 contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
             )
         }
         Spacer(modifier = Modifier.height(17.dp))
@@ -90,7 +92,7 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(Color_2B313C)
+                .background(LocalColor.current.env_80)
                 .clickable {
                     onSearch.invoke()
                 },
@@ -99,6 +101,7 @@ fun DrawerMenuScreen(
             Image(
                 painter = painterResource(id = R.drawable.menu_plus),
                 contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
             )
         }
         Spacer(modifier = Modifier.height(17.dp))
@@ -107,12 +110,13 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(Color_2B313C),
+                .background(LocalColor.current.env_80),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.menu_setting),
                 contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
             )
         }
         Spacer(modifier = Modifier.height(5.dp))

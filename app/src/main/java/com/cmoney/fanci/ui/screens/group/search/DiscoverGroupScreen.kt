@@ -23,17 +23,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.ApplyForGroupScreenDestination
 import com.cmoney.fanci.destinations.CreateGroupScreenDestination
-import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.fanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.fanci.ui.screens.shared.GroupItemScreen
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
-import com.cmoney.fanci.ui.theme.*
+import com.cmoney.fanci.ui.theme.FanciTheme
+import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -42,7 +45,8 @@ fun DiscoverGroupScreen(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: DiscoverViewModel = koinViewModel(),
-    groupItems: ArrayList<Group> = arrayListOf()
+    groupItems: ArrayList<Group> = arrayListOf(),
+    resultRecipient: ResultRecipient<ApplyForGroupScreenDestination, Boolean>
 ) {
     val uiState = viewModel.uiState
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
@@ -63,6 +67,19 @@ fun DiscoverGroupScreen(
         }
     )
 
+    resultRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val isJoinComplete = result.value
+                if (isJoinComplete) {
+                    viewModel.closeGroupItemDialog()
+                }
+            }
+        }
+    }
+
     uiState.searchGroupClick?.apply {
         val isJoined = groupItems.any {
             it.id == this.id
@@ -71,10 +88,10 @@ fun DiscoverGroupScreen(
         GroupItemDialogScreen(
             isJoined = isJoined,
             groupModel = this,
-            background = Color_2B313C,
-            titleColor = Color.White,
-            descColor = Color_CCFFFFFF,
-            joinTextColor = Blue_4F70E5,
+            background = LocalColor.current.env_80,
+            titleColor = LocalColor.current.text.default_100,
+            descColor = LocalColor.current.text.default_80,
+            joinTextColor = LocalColor.current.primary,
             onDismiss = {
                 viewModel.closeGroupItemDialog()
             },
@@ -83,9 +100,19 @@ fun DiscoverGroupScreen(
                     //global change group
                     globalViewModel.setCurrentGroup(it)
                     navController.popBackStack()
-                }
-                else {
-                    viewModel.joinGroup(it)
+                } else {
+                    //不公開
+                    if (it.isNeedApproval == true) {
+                        navController.navigate(
+                            ApplyForGroupScreenDestination(
+                                group = it
+                            )
+                        )
+                    }
+                    //公開
+                    else {
+                        viewModel.joinGroup(it)
+                    }
                 }
             }
         )
@@ -117,7 +144,6 @@ private fun DiscoverGroupScreenView(
                 leadingIcon = Icons.Filled.Home,
                 trailingEnable = true,
                 moreEnable = false,
-                backgroundColor = Color_20262F,
                 moreClick = {
                 },
                 backClick = {
@@ -148,7 +174,7 @@ private fun DiscoverGroupScreenView(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Black_2B313C)
+                .background(LocalColor.current.env_80)
                 .padding(top = 20.dp, bottom = 10.dp, start = 18.dp, end = 18.dp)
         ) {
             TabRow(
@@ -160,7 +186,7 @@ private fun DiscoverGroupScreenView(
                 indicator = { tabPositions: List<TabPosition> ->
                     Box {}
                 },
-                backgroundColor = Color_20262F
+                backgroundColor = LocalColor.current.env_100
             ) {
                 list.forEachIndexed { index, text ->
                     val selected = selectedIndex == index
@@ -169,7 +195,7 @@ private fun DiscoverGroupScreenView(
                             .padding(2.dp)
                             .clip(RoundedCornerShape(35))
                             .background(
-                                Color_303744
+                                LocalColor.current.env_60
                             )
                         else Modifier
                             .padding(10.dp)
@@ -183,7 +209,9 @@ private fun DiscoverGroupScreenView(
                         },
                         text = {
                             Text(
-                                text = text, color = Color.White, fontSize = 14.sp
+                                text = text,
+                                color = LocalColor.current.text.default_100,
+                                fontSize = 14.sp
                             )
                         }
                     )
@@ -196,10 +224,10 @@ private fun DiscoverGroupScreenView(
                 items(groupList) { group ->
                     GroupItemScreen(
                         groupModel = group,
-                        background = Color_0DFFFFFF,
-                        titleTextColor = Color.White,
-                        subTitleColor = Color_80FFFFFF,
-                        descColor = Color_CCFFFFFF
+                        background = LocalColor.current.background,
+                        titleTextColor = LocalColor.current.text.default_100,
+                        subTitleColor = LocalColor.current.text.default_50,
+                        descColor = LocalColor.current.text.default_80
                     ) { groupModel ->
                         onGroupItemClick.invoke(groupModel)
                     }
