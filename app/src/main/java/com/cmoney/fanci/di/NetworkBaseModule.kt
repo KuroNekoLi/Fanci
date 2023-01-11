@@ -5,12 +5,9 @@ import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.cmoney.fanci.BuildConfig
-import com.cmoney.fanci.repository.Network
-import com.cmoney.fanci.repository.NetworkImpl
 import com.cmoney.fanci.repository.interceptor.AddBearerTokenInterceptor
 import com.cmoney.fanciapi.fanci.api.*
 import com.cmoney.fanciapi.infrastructure.ApiClient
-import com.cmoney.xlogin.XLoginHelper
 import com.google.gson.GsonBuilder
 import okhttp3.Cache
 import okhttp3.ConnectionSpec
@@ -30,26 +27,6 @@ val networkBaseModule = module {
             .setPrettyPrinting()
             .setLenient()
             .create()
-    }
-
-//    single<Retrofit> {
-//        Retrofit.Builder()
-//            .baseUrl(
-//                getDomain(androidApplication())
-//            )
-//            .client(createOkHttpClient(androidApplication()))
-//            .addConverterFactory(GsonConverterFactory.create(get(APP_GSON)))
-//            .build()
-//    }
-
-//    single<FanciService> {
-//        get<Retrofit>().create(FanciService::class.java)
-//    }
-
-    single<Network> {
-        NetworkImpl(
-            groupApi = get()
-        )
     }
 
     single {

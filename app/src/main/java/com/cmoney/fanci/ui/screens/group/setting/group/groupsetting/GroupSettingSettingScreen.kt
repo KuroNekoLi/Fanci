@@ -342,9 +342,7 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "theme click")
-                        navController.navigate(GroupSettingThemeScreenDestination(
-                            group = group
-                        ))
+                        navController.navigate(GroupSettingThemeScreenDestination())
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),

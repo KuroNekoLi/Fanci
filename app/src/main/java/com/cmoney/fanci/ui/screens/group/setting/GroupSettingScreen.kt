@@ -66,7 +66,7 @@ fun GroupSettingScreen(
     }
 
     BackHandler {
-        globalViewModel.setCurrentGroup(group)
+//        globalViewModel.setCurrentGroup(group)
         navController.popBackStack()
     }
 
@@ -76,7 +76,7 @@ fun GroupSettingScreen(
         group = group,
         unApplyCount = uiState.unApplyCount ?: 0,
         onBackClick = {
-            globalViewModel.setCurrentGroup(group)
+//            globalViewModel.setCurrentGroup(group)
             navController.popBackStack()
         }
     )

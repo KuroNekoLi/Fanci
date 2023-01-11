@@ -320,7 +320,7 @@ private fun CreateGroupScreenView(
                         onThemeChange = {
                             navController.navigate(
                                 GroupSettingThemeScreenDestination(
-                                    group = Group()
+                                    isFromCreate = true
                                 )
                             )
                         },
@@ -334,7 +334,7 @@ private fun CreateGroupScreenView(
 }
 
 /**
- * TODO desc
+ * 設定進度條
  */
 @Composable
 private fun StepProgressBar(

@@ -27,6 +27,7 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
 import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
@@ -46,7 +47,7 @@ import org.koin.androidx.compose.koinViewModel
 fun GroupSettingThemeScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    group: Group,
+    isFromCreate: Boolean = false,
     viewModel: GroupSettingViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<String>,
     themeResult: ResultRecipient<GroupSettingThemePreviewScreenDestination, String>
@@ -54,11 +55,8 @@ fun GroupSettingThemeScreen(
     val TAG = "GroupSettingThemeScreen"
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     val state = viewModel.uiState
-    val fetchAllTheme = remember {
-        mutableStateOf(true)
-    }
 
-    var groupParam = group
+    var groupParam = globalViewModel.uiState.currentGroup!!
     viewModel.uiState.settingGroup?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
@@ -70,7 +68,9 @@ fun GroupSettingThemeScreen(
             }
             is NavResult.Value -> {
                 val groupThemeStr = result.value
-                resultNavigator.navigateBack(groupThemeStr)
+                if (isFromCreate) {
+                    resultNavigator.navigateBack(groupThemeStr)
+                }
             }
         }
     }
@@ -80,21 +80,21 @@ fun GroupSettingThemeScreen(
         navController,
         isLoading = viewModel.uiState.isLoading,
         groupThemes = state.groupThemeList,
-        group = groupParam,
+        isFromCreate = isFromCreate,
         onThemeConfirmClick = {
             KLog.i(TAG, "on theme click.")
-            viewModel.changeTheme(groupParam, it)
-            if (groupParam.id == null) {
+            if (isFromCreate) {
                 val gson = Gson()
                 resultNavigator.navigateBack(gson.toJson(it))
+            }
+            else {
+                viewModel.changeTheme(groupParam, it)
             }
         }
     )
 
-    LaunchedEffect(fetchAllTheme) {
-        if (state.groupThemeList.isEmpty()) {
-            viewModel.fetchAllTheme(groupParam)
-        }
+    LaunchedEffect(Unit) {
+        viewModel.fetchAllTheme(groupParam)
     }
 }
 
@@ -104,7 +104,7 @@ private fun GroupSettingThemeView(
     navController: DestinationsNavigator,
     isLoading: Boolean,
     groupThemes: List<GroupTheme>,
-    group: Group,
+    isFromCreate: Boolean,
     onThemeConfirmClick: (GroupTheme) -> Unit
 ) {
     Scaffold(
@@ -143,8 +143,8 @@ private fun GroupSettingThemeView(
                         onItemClick = {
                             navController.navigate(
                                 GroupSettingThemePreviewScreenDestination(
-                                    group = group,
-                                    themeId = it.id
+                                    themeId = it.id,
+                                    isFromCreate = isFromCreate
                                 )
                             )
                         },
@@ -176,7 +176,7 @@ fun GroupSettingThemeScreenPreview() {
             navController = EmptyDestinationsNavigator,
             isLoading = false,
             groupThemes = emptyList(),
-            group = Group(),
+            isFromCreate = false,
             onThemeConfirmClick = {}
         )
     }

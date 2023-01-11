@@ -276,7 +276,7 @@ class GroupSettingViewModel(
     /**
      * 設定 選中的 Theme
      */
-    fun setSelectedTheme(group: Group, groupTheme: GroupTheme) {
+    private fun setSelectedTheme(group: Group, groupTheme: GroupTheme) {
         uiState = uiState.copy(
             settingGroup = group.copy(
                 colorSchemeGroupKey = ColorTheme.decode(groupTheme.id)

@@ -45,14 +45,14 @@ import org.koin.androidx.compose.koinViewModel
 fun GroupSettingThemePreviewScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    group: Group,
+    isFromCreate: Boolean = false,
     themeId: String,
     viewModel: GroupSettingViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<String>
 ) {
     val TAG = "GroupSettingThemePreviewScreen"
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
-    var groupParam = group
+    var groupParam = globalViewModel.uiState.currentGroup!!
     viewModel.uiState.settingGroup?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
@@ -64,10 +64,12 @@ fun GroupSettingThemePreviewScreen(
         groupTheme = viewModel.uiState.previewTheme,
     ) {
         KLog.i(TAG, "on theme click.")
-        viewModel.changeTheme(groupParam, it)
-        if (groupParam.id == null) {
+        if (isFromCreate) {
             val gson = Gson()
             resultNavigator.navigateBack(gson.toJson(it))
+        }
+        else {
+            viewModel.changeTheme(groupParam, it)
         }
     }
 
