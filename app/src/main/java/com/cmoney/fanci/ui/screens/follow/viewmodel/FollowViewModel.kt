@@ -24,7 +24,8 @@ data class FollowUiState(
     val visibleAvatar: Boolean = false,  //是否要顯示 大頭貼
     val lazyColumnScrollEnabled: Boolean = false,    //LazyColumn 是否可以滑動
     val showLoginDialog: Boolean = false,        //呈現登入彈窗
-    val navigateToCreateGroup: Boolean = false   //前往建立社團
+    val navigateToCreateGroup: Boolean = false,  //前往建立社團
+    val navigateToApproveGroup: Group? = null  //前往社團認證
 )
 
 class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
@@ -98,16 +99,29 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun joinGroup(group: Group) {
         KLog.i(TAG, "joinGroup:$group")
-        viewModelScope.launch {
-            groupUseCase.joinGroup(group).fold({
-                fetchMyGroup()
-            }, {
-                if (it is EmptyBodyException) {
-                    fetchMyGroup()
-                } else {
-                    KLog.e(TAG, it)
+        if (XLoginHelper.isLogin) {
+            viewModelScope.launch {
+                if (group.isNeedApproval == true) {
+                    uiState = uiState.copy(
+                        navigateToApproveGroup = group
+                    )
+                }else {
+                    groupUseCase.joinGroup(group).fold({
+                        fetchMyGroup()
+                    }, {
+                        if (it is EmptyBodyException) {
+                            fetchMyGroup()
+                        } else {
+                            KLog.e(TAG, it)
+                        }
+                    })
                 }
-            })
+            }
+        }
+        else {
+            uiState = uiState.copy(
+                showLoginDialog = true
+            )
         }
     }
 
@@ -191,7 +205,8 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
 
     fun navigateDone() {
         uiState = uiState.copy(
-            navigateToCreateGroup = false
+            navigateToCreateGroup = false,
+            navigateToApproveGroup = null
         )
     }
 }

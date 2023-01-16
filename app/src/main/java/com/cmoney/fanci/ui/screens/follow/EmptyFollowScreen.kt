@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.ApplyForGroupScreenDestination
 import com.cmoney.fanci.destinations.CreateGroupScreenDestination
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
@@ -31,7 +31,6 @@ import com.cmoney.fanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Composable
@@ -80,10 +79,22 @@ fun EmptyFollowScreen(
         )
     }
 
+    //打開 建立社團
     if (uiState.navigateToCreateGroup) {
         navigator.navigate(CreateGroupScreenDestination)
         viewModel.navigateDone()
     }
+
+    //前往社團認證
+    uiState.navigateToApproveGroup?.let {
+        navigator.navigate(
+            ApplyForGroupScreenDestination(
+                group = it
+            )
+        )
+        viewModel.navigateDone()
+    }
+
 }
 
 @Composable
