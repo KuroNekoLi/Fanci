@@ -45,6 +45,23 @@
                 android:resource="@xml/fileprovider" />
         </provider>
 
+        <activity android:name="com.cmoney.member.application.view.CMoneyLoginActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:host="auth" android:scheme="@string/app_client_id" />
+            </intent-filter>
+        </activity>
+
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabService" />
+        </intent>
+    </queries>
 
 </manifest>

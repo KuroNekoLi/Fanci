@@ -33,7 +33,8 @@ fun DrawerMenuScreen(
     modifier: Modifier = Modifier,
     groupList: List<GroupItem>,
     onClick: (GroupItem) -> Unit,
-    onSearch: () -> Unit
+    onSearch: () -> Unit,
+    onLogout: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -110,7 +111,10 @@ fun DrawerMenuScreen(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(22.dp))
-                .background(LocalColor.current.env_80),
+                .background(LocalColor.current.env_80)
+                .clickable {
+                    onLogout.invoke()
+                },
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -141,7 +145,8 @@ fun DrawerMenuScreenPreview() {
                 )
             ),
             onClick = {},
-            onSearch = {}
+            onSearch = {},
+            onLogout = {}
         )
     }
 }

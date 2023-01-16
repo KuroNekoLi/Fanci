@@ -9,10 +9,12 @@ import com.cmoney.fanci.di.appModule
 import com.cmoney.fanci.di.networkBaseModule
 import com.cmoney.fanci.di.useCaseModule
 import com.cmoney.fanci.di.viewModule
+import com.cmoney.member.application.di.CMoneyMemberServiceLocator
 import com.cmoney.xlogin.XLoginApplication
 import com.flurry.android.FlurryAgent
 import com.flurry.android.FlurryPerformance
 import com.google.firebase.FirebaseApp
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.getKoin
 import org.koin.core.context.loadKoinModules
 
@@ -60,5 +62,19 @@ class MyApplication : XLoginApplication() {
             appId = resources.getInteger(R.integer.app_id)
             platform = com.cmoney.domain_logdatarecorder.data.information.Platform.Android
         }
+
+        CMoneyMemberServiceLocator.initialGoogle(
+            context = this,
+            identityWeb = get(),
+            profileWeb = get(),
+            commonWeb = get(),
+            notificationWeb = get()
+        ) { backend2Setting ->
+            backend2Setting.appId = resources.getInteger(R.integer.app_id)
+            backend2Setting.clientId = getString(R.string.app_client_id)
+            backend2Setting.domainUrl = getString(R.string.cm_server_url)
+            backend2Setting.platform = com.cmoney.backend2.base.model.setting.Platform.Android
+        }
+
     }
 }

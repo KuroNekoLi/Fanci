@@ -16,12 +16,15 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 import com.cmoney.fanci.extension.px
+import com.cmoney.xlogin.XLoginHelper
 
 data class FollowUiState(
     val spaceHeight: Int = 190.px,  //滑動時的間距
     val imageOffset: Int = 0,       //滑動時圖片Offset
     val visibleAvatar: Boolean = false,  //是否要顯示 大頭貼
-    val lazyColumnScrollEnabled: Boolean = false    //LazyColumn 是否可以滑動
+    val lazyColumnScrollEnabled: Boolean = false,    //LazyColumn 是否可以滑動
+    val showLoginDialog: Boolean = false,        //呈現登入彈窗
+    val navigateToCreateGroup: Boolean = false   //前往建立社團
 )
 
 class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
@@ -46,7 +49,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     /**
      * 取得 我的群組
      */
-    private fun fetchMyGroup() {
+    fun fetchMyGroup() {
         KLog.i(TAG, "fetchMyGroup")
         viewModelScope.launch {
             groupUseCase.groupToSelectGroupItem().fold({
@@ -69,7 +72,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     private fun fetchAllGroupList() {
         viewModelScope.launch {
             groupUseCase.getPopularGroup().fold({
-                _groupList.value = it.items
+                _groupList.value = it.items.orEmpty()
             }, {
                 KLog.e(TAG, it)
             })
@@ -158,6 +161,37 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 groupModel = group,
                 isSelected = true
             )
+        )
+    }
+
+    /**
+     * 點擊建立社團
+     */
+    fun onCreateGroupClick() {
+        KLog.i(TAG, "onCreateGroupClick")
+        uiState = if (XLoginHelper.isLogin) {
+            uiState.copy(
+                navigateToCreateGroup = true
+            )
+        } else {
+            uiState.copy(
+                showLoginDialog = true
+            )
+        }
+    }
+
+    /**
+     * 關閉登入彈窗
+     */
+    fun dismissLoginDialog() {
+        uiState = uiState.copy(
+            showLoginDialog = false
+        )
+    }
+
+    fun navigateDone() {
+        uiState = uiState.copy(
+            navigateToCreateGroup = false
         )
     }
 }

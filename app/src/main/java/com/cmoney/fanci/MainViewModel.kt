@@ -3,6 +3,8 @@ package com.cmoney.fanci
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.model.persistence.SettingsDataStore
@@ -25,7 +27,7 @@ data class UiState(
     val currentGroup: Group? = null, //目前選擇中的社團
 //    val theme: FanciColor = CoffeeThemeColor,
     val theme: FanciColor = DefaultThemeColor,
-    val isOpenTutorial: Boolean? = null
+    val isLoginSuccess: Boolean = false
 )
 
 class MainViewModel(
@@ -39,15 +41,16 @@ class MainViewModel(
 //    private val _theme = MutableLiveData<ThemeSetting>(ThemeSetting.Coffee)
 //    val theme: LiveData<ThemeSetting> = _theme
 
+    private val _isOpenTutorial = MutableLiveData<Boolean>()
+    val isOpenTutorial: LiveData<Boolean> = _isOpenTutorial
+
     var uiState by mutableStateOf(UiState())
         private set
 
     init {
         viewModelScope.launch {
             settingsDataStore.isTutorial.collect {
-                uiState = uiState.copy(
-                    isOpenTutorial = it
-                )
+                _isOpenTutorial.value = it
             }
         }
     }
@@ -103,11 +106,19 @@ class MainViewModel(
     fun tutorialOnOpen() {
         KLog.i(TAG, "tutorialOnOpen")
         viewModelScope.launch {
-//            settingsDataStore.onTutorialOpen()
-            uiState = uiState.copy(
-                isOpenTutorial = true
-            )
+            settingsDataStore.onTutorialOpen()
+            _isOpenTutorial.value = true
         }
+    }
+
+    /**
+     * 登入成功
+     */
+    fun loginSuccess() {
+        KLog.i(TAG, "loginSuccess")
+        uiState = uiState.copy(
+            isLoginSuccess = true
+        )
     }
 
 }

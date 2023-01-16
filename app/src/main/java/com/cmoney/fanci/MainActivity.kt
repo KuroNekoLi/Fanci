@@ -3,6 +3,7 @@ package com.cmoney.fanci
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,81 +11,71 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.destinations.MainScreenDestination
-import com.cmoney.fanci.destinations.testDestination
 import com.cmoney.fanci.ui.MainNavHost
 import com.cmoney.fanci.ui.screens.BottomBarScreen
 import com.cmoney.fanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.loginlibrary.module.variable.loginlibraryenum.ApiAction
-import com.cmoney.loginlibrary.module.variable.loginlibraryenum.EventCode
-import com.cmoney.loginlibrary.view.base.LoginLibraryMainActivity
-import com.cmoney.xlogin.XLoginHelper
-import com.cmoney.xlogin.base.BaseLoginAppCompactActivity
+import com.cmoney.xlogin.base.BaseWebLoginActivity
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
-import kotlinx.android.parcel.Parcelize
 import org.koin.android.ext.android.inject
 
 val LocalDependencyContainer = staticCompositionLocalOf<MainActivity> {
     error("No dependency container provided!")
 }
 
-@Parcelize
-class MainActivity : BaseLoginAppCompactActivity() {
+class MainActivity : BaseWebLoginActivity() {
     private val TAG = MainActivity::class.java.simpleName
 
     val globalViewModel by inject<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-//        if (!XLoginHelper.isLogin) {
-//            processLogin()
-//        }
-
         setContent {
             CompositionLocalProvider(LocalDependencyContainer provides this) {
                 val state = globalViewModel.uiState
-                if (state.isOpenTutorial == true) {
-                    FanciTheme(fanciColor = state.theme) {
-                        val mainState = rememberMainState()
-                        Scaffold(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(LocalColor.current.primary),
-                        ) {
+                val isOpenTutorial = globalViewModel.isOpenTutorial.observeAsState()
+
+                isOpenTutorial.value?.let { isOpenTutorial ->
+                    if (isOpenTutorial) {
+                        FanciTheme(fanciColor = state.theme) {
+                            val mainState = rememberMainState()
                             mainState.setStatusBarColor()
 
-                            DestinationsNavHost(
-                                navGraph = NavGraphs.root,
-                                startRoute = MainScreenDestination
-                            )
-
-//                    MyAppNavHost(
-//                        mainState.navController,
-//                        mainState.mainNavController,
-//                        mainState.route,
-//                        globalViewModel
-//                    )
+                            Scaffold(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(LocalColor.current.primary),
+                            ) { padding ->
+                                Column(
+                                    modifier = Modifier
+                                        .padding(padding)
+                                ) {
+                                    DestinationsNavHost(
+                                        navGraph = NavGraphs.root,
+                                        startRoute = MainScreenDestination
+                                    )
+                                }
+                            }
                         }
-                    }
-                }
-                else {
-                    MaterialTheme {
-                        TutorialScreen(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            globalViewModel.tutorialOnOpen()
+                    } else {
+                        MaterialTheme {
+                            TutorialScreen(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                globalViewModel.tutorialOnOpen()
+                            }
                         }
                     }
                 }
@@ -92,31 +83,12 @@ class MainActivity : BaseLoginAppCompactActivity() {
         }
     }
 
-    private fun processLogin() {
-        val loginIntent = LoginLibraryMainActivity.IntentBuilder(
-            // context
-            this,
-            LoginLibraryMainActivity.IntentBuilder.BackportSupport(
-                resources.getInteger(R.integer.app_id),//your appId
-                getString(R.string.cm_server_url),
-                null,
-                XLoginHelper.userAccount,
-                XLoginHelper.userPassword,
-                XLoginHelper.notificationToken
-            ),
-            this
-        ).build()
-
-        startCmLogin(loginIntent)
-    }
-
     override fun autoLoginFailCallback() {
+        KLog.i(TAG, "autoLoginFailCallback")
     }
 
-    override fun fbLogin(
-        callback: (() -> Unit)?,
-        errorCallback: ((Boolean, EventCode, ApiAction) -> Unit)?
-    ) {
+    override fun loginCancel() {
+        KLog.i(TAG, "loginCancel")
     }
 
     override fun loginFailCallback(errorMessage: String) {
@@ -126,6 +98,7 @@ class MainActivity : BaseLoginAppCompactActivity() {
     override fun loginSuccessCallback() {
         KLog.i(TAG, "loginSuccessCallback")
         globalViewModel.registerUser()
+        globalViewModel.loginSuccess()
     }
 }
 
@@ -139,7 +112,6 @@ fun MainScreen(
     val mainNavController = rememberNavController()
     val state = globalViewModel.uiState
 
-    //TODO
     FanciTheme(fanciColor = state.theme) {
         KLog.i("TAG", "FanciTheme create.")
         val mainState = rememberMainState()
@@ -156,22 +128,11 @@ fun MainScreen(
                 modifier = Modifier.padding(innerPadding),
                 navController = mainNavController,
                 route = {
-                    navigator.navigate(testDestination)
                 },
                 globalViewModel = globalViewModel,
                 navigator = navigator
             )
         }
-    }
-}
-
-@Destination
-@Composable
-fun test() {
-    Scaffold(modifier = Modifier
-        .fillMaxSize()
-        .background(LocalColor.current.primary)) {
-
     }
 }
 

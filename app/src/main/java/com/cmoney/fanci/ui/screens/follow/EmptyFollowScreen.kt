@@ -5,32 +5,94 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.R
+import com.cmoney.fanci.destinations.CreateGroupScreenDestination
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
 import com.cmoney.fanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.fanci.ui.screens.shared.GroupItemScreen
+import com.cmoney.fanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.xlogin.XLoginHelper
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Composable
 fun EmptyFollowScreen(
     followScreenState: FollowScreenState = rememberFollowScreenState(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigator: DestinationsNavigator
 ) {
-    val groupList = followScreenState.viewModel.groupList.observeAsState()
+    val uiState = followScreenState.viewModel.uiState
+    val viewModel = followScreenState.viewModel
+    val groupList = viewModel.groupList.observeAsState()
+    val mainActivity = LocalDependencyContainer.current
 
+    EmptyFollowScreenView(
+        modifier = modifier,
+        groupList = groupList,
+        onJoinClick = {
+            followScreenState.openGroupItemDialog(it)
+        },
+        onCreateClick = {
+            viewModel.onCreateGroupClick()
+        }
+    )
+
+    followScreenState.openGroupDialog.value?.let { group ->
+        GroupItemDialogScreen(
+            groupModel = group,
+            onDismiss = {
+                followScreenState.closeGroupItemDialog()
+            },
+            onConfirm = {
+                followScreenState.viewModel.joinGroup(it)
+            }
+        )
+    }
+
+    if (uiState.showLoginDialog) {
+        LoginDialogScreen(
+            onDismiss = {
+                viewModel.dismissLoginDialog()
+            },
+            onLogin = {
+                viewModel.dismissLoginDialog()
+                mainActivity.startLogin()
+            }
+        )
+    }
+
+    if (uiState.navigateToCreateGroup) {
+        navigator.navigate(CreateGroupScreenDestination)
+        viewModel.navigateDone()
+    }
+}
+
+@Composable
+private fun EmptyFollowScreenView(
+    modifier: Modifier = Modifier,
+    groupList: State<List<Group>?>,
+    onJoinClick: (Group) -> Unit,
+    onCreateClick: () -> Unit
+) {
     Column(
         modifier = modifier
             .padding(top = 20.dp, start = 20.dp, end = 20.dp)
@@ -67,7 +129,7 @@ fun EmptyFollowScreen(
                 .background(LocalColor.current.primary)
                 .clip(RoundedCornerShape(4.dp))
                 .clickable {
-                    // TODO:
+                    onCreateClick.invoke()
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -84,21 +146,9 @@ fun EmptyFollowScreen(
             GroupItemScreen(
                 groupModel = it
             ) { groupModel ->
-                followScreenState.openGroupItemDialog(groupModel)
+                onJoinClick.invoke(groupModel)
             }
             Spacer(modifier = Modifier.height(10.dp))
-        }
-
-        followScreenState.openGroupDialog.value?.let { group ->
-            GroupItemDialogScreen(
-                groupModel = group,
-                onDismiss = {
-                    followScreenState.closeGroupItemDialog()
-                },
-                onConfirm = {
-                    followScreenState.viewModel.joinGroup(it)
-                }
-            )
         }
     }
 }
@@ -107,6 +157,9 @@ fun EmptyFollowScreen(
 @Composable
 fun EmptyFollowScreenPreview() {
     FanciTheme {
-        EmptyFollowScreen()
+        EmptyFollowScreenView(
+            groupList = remember { mutableStateOf(emptyList()) },
+            onJoinClick = {},
+            onCreateClick = {})
     }
 }

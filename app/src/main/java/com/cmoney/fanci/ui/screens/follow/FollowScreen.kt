@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.follow
 
+import android.content.Intent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
@@ -19,28 +20,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.cmoney.fanci.MainActivity
 import com.cmoney.fanci.MainViewModel
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.ChatRoomScreenDestination
 import com.cmoney.fanci.destinations.DiscoverGroupScreenDestination
 import com.cmoney.fanci.destinations.GroupSettingScreenDestination
-import com.cmoney.fanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.fanci.ui.screens.follow.state.rememberFollowScreenState
 import com.cmoney.fanci.ui.theme.Black_99000000
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -58,8 +62,7 @@ fun FollowScreen(
         groupList.value?.first()?.let {
             globalViewModel.setCurrentGroup(it.groupModel)
         }
-    }
-    else {
+    } else {
         followScreenState.viewModel.checkGroupMenu(group)
     }
 
@@ -70,7 +73,13 @@ fun FollowScreen(
         it
     }
 
+    val context = LocalContext.current
+
     KLog.i(TAG, "FollowScreen create.")
+
+    if (globalUiState.isLoginSuccess) {
+        followScreenState.viewModel.fetchMyGroup()
+    }
 
     Scaffold(
         modifier = Modifier
@@ -91,9 +100,18 @@ fun FollowScreen(
                     arrayGroupItems.addAll(groupList.value.orEmpty().map {
                         it.groupModel
                     })
-                    navigator.navigate(DiscoverGroupScreenDestination(
-                        groupItems = arrayGroupItems
-                    ))
+                    navigator.navigate(
+                        DiscoverGroupScreenDestination(
+                            groupItems = arrayGroupItems
+                        )
+                    )
+                },
+                onLogout = {
+                    XLoginHelper.logOut(context)
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    context.startActivity(intent)
+                    Runtime.getRuntime().exit(0)
                 }
             )
         },
@@ -123,8 +141,7 @@ fun FollowScreen(
                                     x = 0,
                                     y = followScreenState.viewModel.uiState.imageOffset
                                 ) //设置偏移量
-                            }
-                        ,
+                            },
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                         placeholder = painterResource(id = R.drawable.resource_default)
@@ -193,20 +210,6 @@ fun FollowScreen(
                             followScreenState.viewModel.lazyColumnAtTop()
                         }
 
-                        //test
-//                        LazyColumn(
-//                            state = followScreenState.scrollState,
-//                            userScrollEnabled = followScreenState.viewModel.uiState.lazyColumnScrollEnabled
-//                        ) {
-//                            items(100) { index ->
-//                                SettingItemScreen(
-//                                    iconRes = R.drawable.guideline,
-//                                    text = "服務條款:$index",
-//                                    onItemClick = {}
-//                                )
-//                            }
-//                        }
-
                         LazyColumn(
                             state = followScreenState.scrollState,
                             userScrollEnabled = followScreenState.viewModel.uiState.lazyColumnScrollEnabled,
@@ -220,9 +223,11 @@ fun FollowScreen(
                                     visibleAvatar = followScreenState.viewModel.uiState.visibleAvatar,
                                     modifier = Modifier.background(LocalColor.current.env_80)
                                 ) { group ->
-                                    navigator?.navigate(GroupSettingScreenDestination(
-                                        initGroup = group
-                                    ))
+                                    navigator?.navigate(
+                                        GroupSettingScreenDestination(
+                                            initGroup = group
+                                        )
+                                    )
                                 }
                             }
 
@@ -230,21 +235,23 @@ fun FollowScreen(
                             items(group.categories.orEmpty()) { category ->
                                 CategoryScreen(category = category) { channel ->
                                     KLog.i(TAG, "Category click:$channel")
-                                    navigator.navigate(ChatRoomScreenDestination(
-                                        channelId = channel.id.orEmpty(),
-                                        channelTitle = channel.name.orEmpty()
-                                    ))
+                                    navigator.navigate(
+                                        ChatRoomScreenDestination(
+                                            channelId = channel.id.orEmpty(),
+                                            channelTitle = channel.name.orEmpty()
+                                        )
+                                    )
                                 }
                             }
                         }
-
-
                     }
                 }
             }
         } else {
             //Empty follow group
-            EmptyFollowScreen()
+            EmptyFollowScreen(
+                navigator = navigator
+            )
         }
     }
 }
