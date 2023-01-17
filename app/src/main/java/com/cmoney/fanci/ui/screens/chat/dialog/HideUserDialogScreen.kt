@@ -60,14 +60,20 @@ fun HideUserDialogScreen(
                         )
                         Spacer(modifier = Modifier.width(9.dp))
                         Text(
-                            text = "隱藏此用戶的所有內容",
+                            text = "封鎖此用戶",
                             fontSize = 19.sp,
                             color = LocalColor.current.text.default_100
                         )
                     }
                     Spacer(modifier = Modifier.height(25.dp))
                     Text(
-                        text = "該用戶在社團內發布的所有內容\n將會自動為你隱藏",
+                        text = "注意：封鎖是雙向的。\n" +
+                                "\n" +
+                                "你封鎖對方後，對方的所有動態會\n" +
+                                "為你隱藏，你的所有動態也不會被\n" +
+                                "對方看見。\n" +
+                                "\n" +
+                                "你可以在個人頁面中，解除封鎖。",
                         fontSize = 17.sp,
                         color = LocalColor.current.text.default_100
                     )
@@ -96,7 +102,7 @@ fun HideUserDialogScreen(
                         onClick = {
                             onConfirm.invoke(user)
                         }) {
-                        Text(text = "確定隱藏", fontSize = 16.sp, color = Color_CB4A4A)
+                        Text(text = "確定封鎖", fontSize = 16.sp, color = Color_CB4A4A)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(

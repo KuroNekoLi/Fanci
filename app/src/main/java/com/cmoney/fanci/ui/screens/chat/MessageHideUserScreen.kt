@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
-import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.chat.dialog.ShowDisplayHideMessageScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -28,6 +27,7 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 fun MessageHideUserScreen(
     modifier: Modifier = Modifier,
     chatMessageModel: ChatMessage,
+    isBlocking: Boolean,
     onHideMessageClick: (ChatMessage) -> Unit
 ) {
     val openDialog = remember { mutableStateOf(false) }
@@ -48,7 +48,13 @@ fun MessageHideUserScreen(
                 .background(LocalColor.current.background)
                 .padding(15.dp)
         ) {
-            Text(text = "該用戶的內容已自動為你隱藏", fontSize = 17.sp, color = LocalColor.current.text.default_30)
+            Text(
+                text = if (isBlocking) {
+                    "此用戶已被你封鎖"
+                } else {
+                    "此用戶已將您封鎖"
+                }, fontSize = 17.sp, color = LocalColor.current.text.default_30
+            )
         }
     }
 
@@ -72,7 +78,8 @@ fun MessageHideUserScreen(
 fun MessageHideUserScreenPreview() {
     FanciTheme {
         MessageHideUserScreen(
-            chatMessageModel = ChatRoomUseCase.mockMessage
+            chatMessageModel = ChatRoomUseCase.mockMessage,
+            isBlocking = true
         ) {}
     }
 }

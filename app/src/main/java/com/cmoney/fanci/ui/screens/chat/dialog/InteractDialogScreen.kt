@@ -92,7 +92,7 @@ fun InteractDialogScreen(
                 onInteractClick.invoke(MessageInteract.Announcement(message))
             }
 
-            FeatureText(R.drawable.hide, "隱藏此用戶的所有內容") {
+            FeatureText(R.drawable.hide, "封鎖此用戶") {
                 onClose(coroutineScope, modalBottomSheetState)
                 onInteractClick.invoke(MessageInteract.HideUser(message))
             }

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.R
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
+import com.cmoney.fanci.model.usecase.RelationUseCase
 import com.cmoney.fanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.fanci.ui.theme.White_494D54
 import com.cmoney.fanci.ui.theme.White_767A7F
@@ -19,6 +20,7 @@ import com.cmoney.fanci.utils.Utils
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.User
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -30,7 +32,9 @@ data class ChatRoomUiState(
     val reportUser: ChatMessage? = null,
     val emojiMessage: Pair<ChatMessage, Int>? = null,
     val announceMessage: ChatMessage? = null,          //公告訊息,顯示用
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    var blockingList: List<User> = emptyList(), //封鎖用戶
+    var blockerList: List<User> = emptyList()   //封鎖我的用戶
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -41,8 +45,10 @@ data class ChatRoomUiState(
 
 class ChatRoomViewModel(
     val context: Context,
-    val chatRoomUseCase: ChatRoomUseCase
+    val chatRoomUseCase: ChatRoomUseCase,
+    val relationUseCase: RelationUseCase
 ) : ViewModel() {
+
     private val TAG = ChatRoomViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(ChatRoomUiState())
@@ -50,12 +56,28 @@ class ChatRoomViewModel(
 
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
 
+    //取得封鎖清單
     init {
         viewModelScope.launch {
-//            val chatRoomUseCase = ChatRoomUseCase()
-//            uiState = uiState.copy(message = chatRoomUseCase.createMockMessage().reversed())
+            try {
+                val blockList = relationUseCase.getMyRelation()
+                uiState = uiState.copy(
+                    blockingList = blockList.first,
+                    blockerList = blockList.second
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                KLog.e(TAG, e)
+            }
         }
     }
+
+//    init {
+//        viewModelScope.launch {
+////            val chatRoomUseCase = ChatRoomUseCase()
+////            uiState = uiState.copy(message = chatRoomUseCase.createMockMessage().reversed())
+//        }
+//    }
 
     /**
      * 抓取 公告 訊息
@@ -161,15 +183,6 @@ class ChatRoomViewModel(
     }
 
     /**
-     * 關閉 隱藏用戶彈窗
-     */
-    fun onHideUserDialogDismiss() {
-        uiState = uiState.copy(
-            hideUserMessage = null
-        )
-    }
-
-    /**
      * 關閉 刪除訊息 彈窗
      */
     fun onDeleteMessageDialogDismiss() {
@@ -225,11 +238,27 @@ class ChatRoomViewModel(
         )
     }
 
-    // TODO:
     /**
-     * 確定 隱藏 用戶
+     * 確定 封鎖 用戶
      */
-    fun onHideUserConfirm(user: GroupMember) {
+    fun onBlockingUserConfirm(user: GroupMember) {
+        KLog.i(TAG, "onHideUserConfirm:$user")
+        viewModelScope.launch {
+            relationUseCase.blocking(
+                userId = user.id.orEmpty()
+            ).fold({
+                val newList = uiState.blockingList.toMutableList()
+                newList.add(it)
+                uiState = uiState.copy(
+                    blockingList = newList.distinct(),
+                    hideUserMessage = null
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+
+
 //        val message = uiState.message.toMutableList()
 //        val newMessage = message.map { chatMessageModel ->
 //            if (chatMessageModel.poster == user) {
@@ -252,9 +281,10 @@ class ChatRoomViewModel(
     }
 
     /**
-     * 解除 隱藏 用戶
+     * 解除 封鎖 用戶
      */
     fun onMsgDismissHide(userModel: ChatMessage) {
+        KLog.i(TAG, "onMsgDismissHide")
         // TODO:
 //        val message = uiState.message.toMutableList()
 //        val newMessage = message.map { chatMessageModel ->

@@ -17,10 +17,7 @@ import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.common.AutoLinkText
 import com.cmoney.fanci.ui.common.ChatTimeText
-import com.cmoney.fanci.ui.screens.chat.MessageImageScreen
-import com.cmoney.fanci.ui.screens.chat.MessageOGScreen
-import com.cmoney.fanci.ui.screens.chat.MessageRecycleScreen
-import com.cmoney.fanci.ui.screens.chat.MessageReplayScreen
+import com.cmoney.fanci.ui.screens.chat.*
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.screens.shared.EmojiCountScreen
@@ -91,13 +88,14 @@ fun MessageContentScreen(
                 .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
                 .fillMaxWidth()
         ) {
-            //TODO Server TBD
-            //隱藏用戶
-//            if (messageModel.message.isHideUser) {
-            if (false) {
-//                MessageHideUserScreen(chatMessageModel = messageModel) {
-//                    onMessageContentCallback.invoke(MessageContentCallback.MsgDismissHideClick(it))
-//                }
+            //封鎖
+            if (chatMessageWrapper.isBlocking || chatMessageWrapper.isBlocker) {
+                MessageHideUserScreen(
+                    chatMessageModel = messageModel,
+                    isBlocking = chatMessageWrapper.isBlocking
+                ) {
+                    onMessageContentCallback.invoke(MessageContentCallback.MsgDismissHideClick(it))
+                }
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     //大頭貼
@@ -137,7 +135,7 @@ fun MessageContentScreen(
                                 text = this,
                                 fontSize = 17.sp,
                                 color = LocalColor.current.text.default_100
-                            ){
+                            ) {
                                 onLongPress.invoke()
                             }
 

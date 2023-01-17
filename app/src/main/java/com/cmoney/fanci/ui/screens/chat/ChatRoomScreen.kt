@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.fanci.MainStateHolder
 import com.cmoney.fanci.destinations.AnnouncementScreenDestination
 import com.cmoney.fanci.extension.showToast
 import com.cmoney.fanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
@@ -166,15 +165,15 @@ fun ChatRoomScreen(
             }
         }
 
-        //隱藏用戶 彈窗
-        uiState.hideUserMessage?.author?.apply {
+        //封鎖用戶 彈窗
+        messageViewModel.uiState.hideUserMessage?.author?.apply {
             HideUserDialogScreen(
                 this,
                 onConfirm = {
-                    viewModel.onHideUserConfirm(it)
+                    viewModel.onBlockingUserConfirm(it)
                 }
             ) {
-                viewModel.onHideUserDialogDismiss()
+                messageViewModel.onHideUserDialogDismiss()
             }
         }
 

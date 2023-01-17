@@ -31,7 +31,8 @@ data class MessageUiState(
     val isSendComplete: Boolean = false,        //訊息是否發送完成
     val replyMessage: ChatMessage? = null,      //回覆訊息用
     val routeAnnounceMessage: ChatMessage? = null,    //設定公告訊息,跳轉設定頁面
-    val copyMessage: ChatMessage? = null    //複製訊息
+    val copyMessage: ChatMessage? = null,    //複製訊息
+    val hideUserMessage: ChatMessage? = null    //封鎖用戶
 )
 
 /**
@@ -48,6 +49,8 @@ class MessageViewModel(
         private set
 
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
+
+    private val pollingInterval = 30000L
 
     /**
      * 圖片上傳 callback
@@ -66,7 +69,7 @@ class MessageViewModel(
         KLog.i(TAG, "startPolling:$channelId")
         viewModelScope.launch {
             if (channelId?.isNotEmpty() == true) {
-                chatRoomPollUseCase.poll(30000, channelId).collect {
+                chatRoomPollUseCase.poll(pollingInterval, channelId).collect {
                     KLog.i(TAG, it)
                     val newMessage = it.items?.map { chatMessage ->
                         ChatMessageWrapper(message = chatMessage)
@@ -432,7 +435,11 @@ class MessageViewModel(
                 )
             }
 //            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
-//            is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
+            is MessageInteract.HideUser -> {
+                uiState = uiState.copy(
+                    hideUserMessage = messageInteract.message
+                )
+            }
             is MessageInteract.Recycle -> {
                 recycleMessage(messageInteract.message)
             }
@@ -529,6 +536,15 @@ class MessageViewModel(
     fun copyDone() {
         uiState = uiState.copy(
             copyMessage = null
+        )
+    }
+
+    /**
+     * 關閉 隱藏用戶彈窗
+     */
+    fun onHideUserDialogDismiss() {
+        uiState = uiState.copy(
+            hideUserMessage = null
         )
     }
 }

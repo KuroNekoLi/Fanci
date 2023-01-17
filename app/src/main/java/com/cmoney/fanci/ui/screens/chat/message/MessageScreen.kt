@@ -1,9 +1,11 @@
 package com.cmoney.fanci.ui.screens.chat.message
 
 import android.app.Activity
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -34,13 +36,14 @@ fun MessageScreen(
     listState: LazyListState = rememberLazyListState(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     channelId: String,
-    viewModel: MessageViewModel = koinViewModel(),
+    messageViewModel: MessageViewModel = koinViewModel(),
+    viewModel: ChatRoomViewModel = koinViewModel(),
     onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
-    val isScrollToBottom = viewModel.uiState.isSendComplete
+    val isScrollToBottom = messageViewModel.uiState.isSendComplete
     val onInteractClick = object : (MessageInteract) -> Unit {
         override fun invoke(messageInteract: MessageInteract) {
-            viewModel.onInteractClick(messageInteract)
+            messageViewModel.onInteractClick(messageInteract)
         }
     }
 
@@ -50,16 +53,23 @@ fun MessageScreen(
 //        viewModel.stopPolling()
 //    }
 
+
     MessageScreenView(
         modifier = modifier,
-        message = viewModel.uiState.message,
+        message = messageViewModel.uiState.message,
+        blockingList = viewModel.uiState.blockingList.map {
+            it.id.orEmpty()
+        },
+        blockerList = viewModel.uiState.blockerList.map {
+            it.id.orEmpty()
+        },
         listState = listState,
         coroutineScope = coroutineScope,
         onInteractClick = onInteractClick,
         onMsgDismissHide = onMsgDismissHide,
         isScrollToBottom = isScrollToBottom,
         onLoadMore = {
-            viewModel.onLoadMore(channelId)
+            messageViewModel.onLoadMore(channelId)
         }
     )
 }
@@ -68,6 +78,8 @@ fun MessageScreen(
 private fun MessageScreenView(
     modifier: Modifier = Modifier,
     message: List<ChatMessageWrapper>,
+    blockingList: List<String>,
+    blockerList: List<String>,
     listState: LazyListState,
     coroutineScope: CoroutineScope,
     onInteractClick: (MessageInteract) -> Unit,
@@ -83,8 +95,21 @@ private fun MessageScreenView(
         LazyColumn(state = listState, reverseLayout = true) {
             if (message.isNotEmpty()) {
                 itemsIndexed(message) { index, chatMessageWrapper ->
+                    var isBlocking = false
+                    chatMessageWrapper.message.author?.id?.let { authUserId ->
+                        isBlocking = blockingList.contains(authUserId)
+                    }
+
+                    var isBlocker = false
+                    chatMessageWrapper.message.author?.id?.let { authUserId ->
+                        isBlocker = blockerList.contains(authUserId)
+                    }
+
                     MessageContentScreen(
-                        chatMessageWrapper = chatMessageWrapper,
+                        chatMessageWrapper = chatMessageWrapper.copy(
+                            isBlocking = isBlocking,
+                            isBlocker = isBlocker
+                        ),
                         coroutineScope = coroutineScope,
                         onMessageContentCallback = {
                             when (it) {
@@ -191,7 +216,9 @@ fun MessageScreenPreview() {
             isScrollToBottom = false,
             onInteractClick = {},
             onMsgDismissHide = {},
-            onLoadMore = {}
+            onLoadMore = {},
+            blockingList = emptyList(),
+            blockerList = emptyList()
         )
     }
 }

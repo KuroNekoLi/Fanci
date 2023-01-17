@@ -13,4 +13,5 @@ val useCaseModule = module {
     factory { ChannelUseCase(get(), get(), get()) }
     factory { BanUseCase(get()) }
     factory { GroupApplyUseCase(get()) }
+    factory { RelationUseCase(get()) }
 }
