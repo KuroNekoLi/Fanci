@@ -14,10 +14,7 @@ import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.utils.Utils
-import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.Emojis
-import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -67,7 +64,7 @@ class MessageViewModel(
         KLog.i(TAG, "startPolling:$channelId")
         viewModelScope.launch {
             if (channelId?.isNotEmpty() == true) {
-                chatRoomPollUseCase.poll(3000, channelId).collect {
+                chatRoomPollUseCase.poll(30000, channelId).collect {
                     KLog.i(TAG, it)
                     val newMessage = it.items?.map { chatMessage ->
                         ChatMessageWrapper(message = chatMessage)
@@ -91,13 +88,15 @@ class MessageViewModel(
      *  @param newChatMessage 新訊息
      *  @param isLatest 是否為新訊息,要加在頭
      */
-    private fun processMessageCombine(newChatMessage: List<ChatMessageWrapper>, isLatest: Boolean = false) {
+    private fun processMessageCombine(
+        newChatMessage: List<ChatMessageWrapper>,
+        isLatest: Boolean = false
+    ) {
         //combine old message
         val oldMessage = uiState.message.toMutableList()
         if (isLatest) {
             oldMessage.addAll(0, newChatMessage)
-        }
-        else {
+        } else {
             oldMessage.addAll(newChatMessage)
         }
 
@@ -339,13 +338,27 @@ class MessageViewModel(
     }
 
     /**
-     * 點擊 Emoji
+     * 點擊 Emoji, 判斷是否增加or收回
+     *
      * @param chatMessage 訊息 model
      * @param resourceId 點擊的Emoji resourceId
      */
     private fun onEmojiClick(chatMessage: ChatMessage, resourceId: Int) {
+        KLog.i(TAG, "onEmojiClick:$chatMessage")
         viewModelScope.launch {
             val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
+
+            //判斷是否為收回
+            var emojiCount = 1
+            chatMessage.messageReaction?.let {
+                emojiCount = if (it.emoji.orEmpty().lowercase() == clickEmoji.value.lowercase()) {
+                    //收回
+                    -1
+                } else {
+                    //增加
+                    1
+                }
+            }
 
             //先將 Emoji append to ui.
             uiState = uiState.copy(
@@ -353,18 +366,29 @@ class MessageViewModel(
                     if (chatMessageWrapper.message.id == chatMessage.id) {
                         val orgEmoji = chatMessageWrapper.message.emojiCount
                         val newEmoji = when (clickEmoji) {
-                            Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(1))
-                            Emojis.dislike -> orgEmoji?.copy(dislike = orgEmoji.dislike?.plus(1))
-                            Emojis.laugh -> orgEmoji?.copy(dislike = orgEmoji.laugh?.plus(1))
-                            Emojis.money -> orgEmoji?.copy(dislike = orgEmoji.money?.plus(1))
-                            Emojis.shock -> orgEmoji?.copy(dislike = orgEmoji.shock?.plus(1))
-                            Emojis.cry -> orgEmoji?.copy(dislike = orgEmoji.cry?.plus(1))
-                            Emojis.think -> orgEmoji?.copy(dislike = orgEmoji.think?.plus(1))
-                            Emojis.angry -> orgEmoji?.copy(dislike = orgEmoji.angry?.plus(1))
+                            Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(emojiCount))
+                            Emojis.dislike -> orgEmoji?.copy(
+                                dislike = orgEmoji.dislike?.plus(
+                                    emojiCount
+                                )
+                            )
+                            Emojis.laugh -> orgEmoji?.copy(laugh = orgEmoji.laugh?.plus(emojiCount))
+                            Emojis.money -> orgEmoji?.copy(money = orgEmoji.money?.plus(emojiCount))
+                            Emojis.shock -> orgEmoji?.copy(shock = orgEmoji.shock?.plus(emojiCount))
+                            Emojis.cry -> orgEmoji?.copy(cry = orgEmoji.cry?.plus(emojiCount))
+                            Emojis.think -> orgEmoji?.copy(think = orgEmoji.think?.plus(emojiCount))
+                            Emojis.angry -> orgEmoji?.copy(angry = orgEmoji.angry?.plus(emojiCount))
                         }
+
+                        //回填資料
                         chatMessageWrapper.copy(
                             message = chatMessageWrapper.message.copy(
-                                emojiCount = newEmoji
+                                emojiCount = newEmoji,
+                                messageReaction = if (emojiCount == -1) null else {
+                                    IUserMessageReaction(
+                                        emoji = clickEmoji.value
+                                    )
+                                }
                             )
                         )
                     } else {
@@ -373,9 +397,22 @@ class MessageViewModel(
                 }
             )
 
-            chatRoomUseCase.sendEmoji(chatMessage.id.orEmpty(), clickEmoji).fold({
-            }, {
-            })
+            //Call Emoji api
+            if (emojiCount == -1) {
+                //收回
+                chatRoomUseCase.deleteEmoji(chatMessage.id.orEmpty()).fold({
+                    KLog.e(TAG, "delete emoji success.")
+                }, {
+                    KLog.e(TAG, it)
+                })
+            } else {
+                //增加
+                chatRoomUseCase.sendEmoji(chatMessage.id.orEmpty(), clickEmoji).fold({
+                    KLog.i(TAG, "sendEmoji success.")
+                }, {
+                    KLog.e(TAG, it)
+                })
+            }
         }
     }
 

@@ -49,6 +49,16 @@ class ChatRoomUseCase(private val chatRoomApi: ChatRoomApi, private val messageA
         }
 
     /**
+     * 收回 Emoji
+     * @param messageId 訊息 id
+     */
+    suspend fun deleteEmoji(messageId: String) = kotlin.runCatching {
+        messageApi.apiV1MessageMessageIdEmojiDelete(
+            messageId = messageId
+        ).checkResponseBody()
+    }
+
+    /**
      * 讀取更多 分頁訊息
      * @param chatRoomChannelId 聊天室 id
      * @param fromSerialNumber 從哪一個序列號開始往回找 (若為Null 則從最新開始拿)

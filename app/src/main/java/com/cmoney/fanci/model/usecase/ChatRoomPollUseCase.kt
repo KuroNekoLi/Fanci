@@ -19,6 +19,7 @@ class ChatRoomPollUseCase(
     private val TAG = ChatRoomPollUseCase::class.java.simpleName
     private var isClose = false
 
+    //todo: 優化, 根據 page index 拿取
     override fun poll(delay: Long, channelId: String): Flow<ChatMessagePaging> {
         isClose = false
         return channelFlow {
