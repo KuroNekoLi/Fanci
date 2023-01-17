@@ -30,7 +30,8 @@ data class MessageUiState(
     val imageAttach: List<Uri> = emptyList(),   //附加圖片
     val isSendComplete: Boolean = false,        //訊息是否發送完成
     val replyMessage: ChatMessage? = null,      //回覆訊息用
-    val routeAnnounceMessage: ChatMessage? = null    //設定公告訊息,跳轉設定頁面
+    val routeAnnounceMessage: ChatMessage? = null,    //設定公告訊息,跳轉設定頁面
+    val copyMessage: ChatMessage? = null    //複製訊息
 )
 
 /**
@@ -425,9 +426,11 @@ class MessageViewModel(
         KLog.i(TAG, "onInteractClick:$messageInteract")
         when (messageInteract) {
             is MessageInteract.Announcement -> announceMessage(messageInteract.message)
-//            is MessageInteract.Copy -> {
-//                copyMessage(messageInteract.message)
-//            }
+            is MessageInteract.Copy -> {
+                uiState = uiState.copy(
+                    copyMessage = messageInteract.message
+                )
+            }
 //            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
 //            is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
             is MessageInteract.Recycle -> {
@@ -517,6 +520,15 @@ class MessageViewModel(
     fun announceRouteDone() {
         uiState = uiState.copy(
             routeAnnounceMessage = null
+        )
+    }
+
+    /**
+     * 執行完複製
+     */
+    fun copyDone() {
+        uiState = uiState.copy(
+            copyMessage = null
         )
     }
 }

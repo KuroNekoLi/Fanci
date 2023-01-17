@@ -48,6 +48,7 @@ fun ChatRoomScreen(
 
     messageViewModel.startPolling(channelId)
 
+    //抓取 公告
     viewModel.fetchAnnounceMessage(channelId)
 
     BackHandler {
@@ -55,11 +56,13 @@ fun ChatRoomScreen(
         navController.popBackStack()
     }
 
+    //錯誤訊息提示
     uiState.errorMessage?.let {
         LocalContext.current.showToast(it)
         viewModel.errorMessageDone()
     }
 
+    //設定公告 callback
     resultRecipient.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -72,6 +75,11 @@ fun ChatRoomScreen(
                 )
             }
         }
+    }
+
+    messageViewModel.uiState.copyMessage?.let {
+        viewModel.copyMessage(it)
+        messageViewModel.copyDone()
     }
 
     Scaffold(

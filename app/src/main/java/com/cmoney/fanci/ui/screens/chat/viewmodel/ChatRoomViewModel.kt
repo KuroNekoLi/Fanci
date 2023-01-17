@@ -109,7 +109,7 @@ class ChatRoomViewModel(
     /**
      * 複製訊息
      */
-    private fun copyMessage(message: ChatMessage) {
+    fun copyMessage(message: ChatMessage) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("", message.content?.text)
         clipboard.setPrimaryClip(clip)
