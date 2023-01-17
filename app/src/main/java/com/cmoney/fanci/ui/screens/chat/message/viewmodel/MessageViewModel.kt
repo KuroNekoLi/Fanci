@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.BuildConfig
+import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
@@ -348,7 +349,7 @@ class MessageViewModel(
         viewModelScope.launch {
             val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
 
-            //判斷是否為收回
+            //判斷是否為收回Emoji
             var emojiCount = 1
             chatMessage.messageReaction?.let {
                 emojiCount = if (it.emoji.orEmpty().lowercase() == clickEmoji.value.lowercase()) {
@@ -429,9 +430,9 @@ class MessageViewModel(
 //            }
 //            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
 //            is MessageInteract.HideUser -> hideUserMessage(messageInteract.message)
-//            is MessageInteract.Recycle -> {
-//                recycleMessage(messageInteract.message)
-//            }
+            is MessageInteract.Recycle -> {
+                recycleMessage(messageInteract.message)
+            }
             is MessageInteract.Reply -> replyMessage(messageInteract.message)
 //            is MessageInteract.Report -> reportUser(messageInteract.message)
             is MessageInteract.EmojiClick -> onEmojiClick(
@@ -439,6 +440,38 @@ class MessageViewModel(
                 messageInteract.emojiResId
             )
             else -> {}
+        }
+    }
+
+    /**
+     * 收回 訊息
+     */
+    private fun recycleMessage(message: ChatMessage) {
+        KLog.i(TAG, "recycleMessage:$message")
+        viewModelScope.launch {
+            chatRoomUseCase.recycleMessage(
+                messageId = message.id.orEmpty()
+            ).fold({
+            }, {
+                KLog.e(TAG, it)
+                if (it is EmptyBodyException) {
+                    uiState = uiState.copy(
+                        message = uiState.message.map { chatMessageWrapper ->
+                            if (chatMessageWrapper.message.id == message.id) {
+                                chatMessageWrapper.copy(
+                                    message = chatMessageWrapper.message.copy(
+                                        isDeleted = true
+                                    )
+                                )
+                            } else {
+                                chatMessageWrapper
+                            }
+                        }
+                    )
+                } else {
+                    it.printStackTrace()
+                }
+            })
         }
     }
 

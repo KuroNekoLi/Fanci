@@ -101,6 +101,16 @@ class ChatRoomUseCase(private val chatRoomApi: ChatRoomApi, private val messageA
             ).checkResponseBody()
         }
 
+    /**
+     * 收回訊息
+     * @param messageId 訊息 id
+     */
+    suspend fun recycleMessage(
+        messageId: String
+    ) = kotlin.runCatching {
+        messageApi.apiV1MessageMeMessageIdDelete(messageId = messageId).checkResponseBody()
+    }
+
     companion object MockData {
         val mockMessage = ChatMessage(
             author = GroupMember(
