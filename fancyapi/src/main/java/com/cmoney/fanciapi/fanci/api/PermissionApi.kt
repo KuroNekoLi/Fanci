@@ -6,8 +6,9 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
+import com.cmoney.fanciapi.fanci.model.PatchPermissionParam
+import com.cmoney.fanciapi.fanci.model.Permission
 import com.cmoney.fanciapi.fanci.model.PermissionCategory
-import com.cmoney.fanciapi.fanci.model.PermissionPaging
 
 interface PermissionApi {
     /**
@@ -20,10 +21,10 @@ interface PermissionApi {
      *  - 404: 找不到該頻道
      *
      * @param channelId 聊天室頻道Id
-     * @return [PermissionPaging]
+     * @return [kotlin.collections.List<Permission>]
      */
     @GET("api/v1/Permission/Channel/{channelId}")
-    suspend fun apiV1PermissionChannelChannelIdGet(@Path("channelId") channelId: kotlin.String): Response<PermissionPaging>
+    suspend fun apiV1PermissionChannelChannelIdGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<Permission>>
 
     /**
      * 取得管理權限表
@@ -46,9 +47,37 @@ interface PermissionApi {
      *  - 404: 找不到該社團
      *
      * @param groupId 社團Id
-     * @return [PermissionPaging]
+     * @return [kotlin.collections.List<Permission>]
      */
     @GET("api/v1/Permission/Group/{groupId}")
-    suspend fun apiV1PermissionGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<PermissionPaging>
+    suspend fun apiV1PermissionGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<Permission>>
+
+    /**
+     * 取得單一權限資訊
+     * 
+     * Responses:
+     *  - 200: Success
+     *
+     * @param id 
+     * @return [Permission]
+     */
+    @Deprecated("This api was deprecated")
+    @GET("api/v1/Permission/{id}")
+    suspend fun apiV1PermissionIdGet(@Path("id") id: kotlin.String): Response<Permission>
+
+    /**
+     * 
+     * 
+     * Responses:
+     *  - 200: Success
+     *
+     * @param id 
+     * @param passCode  (optional)
+     * @param patchPermissionParam  (optional)
+     * @return [Permission]
+     */
+    @Deprecated("This api was deprecated")
+    @PATCH("api/v1/Permission/{id}")
+    suspend fun apiV1PermissionIdPatch(@Path("id") id: kotlin.String, @Query("passCode") passCode: kotlin.String? = null, @Body patchPermissionParam: PatchPermissionParam? = null): Response<Permission>
 
 }

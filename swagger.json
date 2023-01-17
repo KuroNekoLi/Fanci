@@ -723,7 +723,7 @@
           {
             "oauth2": [
               "user",
-              "PERMISSION_編輯頻道_0_channelId_channelId"
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
             ]
           }
         ]
@@ -762,7 +762,7 @@
           {
             "oauth2": [
               "user",
-              "PERMISSION_刪除頻道_0_channelId_channelId"
+              "PERMISSION_刪除頻道_0_channelId_channelGroupId"
             ]
           }
         ]
@@ -882,7 +882,7 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_指派頻道管理員_0_channelId_channelId"
+              "PERMISSION_指派頻道管理員_0_channelId_channelGroupId"
             ]
           }
         ]
@@ -904,6 +904,7 @@
           }
         ],
         "requestBody": {
+          "description": "角色Id",
           "content": {
             "application/json": {
               "schema": {
@@ -942,7 +943,7 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_指派頻道管理員_0_channelId_channelId"
+              "PERMISSION_指派頻道管理員_0_channelId_channelGroupId"
             ]
           }
         ]
@@ -953,7 +954,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "對聊天室新增一則聊天訊息 __________🔒 可發文",
+        "summary": "對聊天室新增一則聊天訊息 __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1020,8 +1021,7 @@
           {
             "oauth2": [
               "user",
-              "BANNED_1_chatRoomChannelId",
-              "PERMISSION_canPost_1_chatRoomChannelId_none"
+              "BANNED_1_chatRoomChannelId"
             ]
           }
         ]
@@ -1030,7 +1030,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取得聊天室訊息列表 __________🔒 可看",
+        "summary": "取得聊天室訊息列表 __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1103,8 +1103,7 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_canRead_1_chatRoomChannelId_none"
+              "user"
             ]
           }
         ]
@@ -1115,7 +1114,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取得聊天室的公告訊息 __________🔒 可看",
+        "summary": "取得聊天室的公告訊息 __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1161,8 +1160,7 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_canRead_1_chatRoomChannelId_none"
+              "user"
             ]
           }
         ]
@@ -1171,7 +1169,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "公告聊天室的一則聊天訊息 __________🔒 設定公告",
+        "summary": "公告聊天室的一則聊天訊息 __________🔒 可管理",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1204,14 +1202,17 @@
           }
         },
         "responses": {
-          "204": {
-            "description": "成功"
+          "200": {
+            "description": "Success"
           },
           "401": {
             "description": "未驗證"
           },
           "403": {
             "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
           },
           "404": {
             "description": "找不到該頻道"
@@ -1222,7 +1223,7 @@
             "oauth2": [
               "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_設定公告_0_chatRoomChannelId_channelId"
+              "PERMISSION_可管理_1_chatRoomChannelId_channelId"
             ]
           }
         ]
@@ -1231,7 +1232,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取消聊天室公告 __________🔒 設定公告",
+        "summary": "取消聊天室公告 __________🔒 可管理",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1244,14 +1245,17 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "成功"
+          "200": {
+            "description": "Success"
           },
           "401": {
             "description": "未驗證"
           },
           "403": {
             "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
           },
           "404": {
             "description": "找不到該頻道"
@@ -1262,7 +1266,7 @@
             "oauth2": [
               "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_設定公告_0_chatRoomChannelId_channelId"
+              "PERMISSION_可管理_1_chatRoomChannelId_channelId"
             ]
           }
         ]
@@ -2096,7 +2100,7 @@
             }
           },
           {
-            "name": "applyStauts",
+            "name": "applyStatus",
             "in": "query",
             "description": "申請狀態",
             "schema": {
@@ -2242,7 +2246,7 @@
             }
           },
           {
-            "name": "applyStauts",
+            "name": "applyStatus",
             "in": "query",
             "description": "",
             "schema": {
@@ -2718,7 +2722,7 @@
         "tags": [
           "Message"
         ],
-        "summary": "取得單一訊息 __________🔒 可看",
+        "summary": "取得單一訊息 __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "messageId",
@@ -2764,8 +2768,7 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_canRead_1_messageId_messageId"
+              "user"
             ]
           }
         ]
@@ -2807,14 +2810,17 @@
           }
         },
         "responses": {
-          "204": {
-            "description": "成功"
+          "200": {
+            "description": "Success"
           },
           "401": {
             "description": "未驗證"
           },
           "403": {
             "description": "不是發文者"
+          },
+          "204": {
+            "description": "成功"
           },
           "404": {
             "description": "找不到訊息"
@@ -2835,7 +2841,7 @@
         "tags": [
           "Message"
         ],
-        "summary": "角色刪除他人訊息 __________🔒 刪除他人訊息",
+        "summary": "角色刪除他人訊息 __________🔒 可管理",
         "parameters": [
           {
             "name": "messageId",
@@ -2869,7 +2875,7 @@
             "oauth2": [
               "user",
               "BANNED_2_messageId",
-              "PERMISSION_刪除他人訊息_0_messageId_messageSpaceResolver"
+              "PERMISSION_可管理_2_messageId_messageId"
             ]
           }
         ]
@@ -2924,7 +2930,7 @@
         "tags": [
           "Message"
         ],
-        "summary": "取得訊息表情符號來自誰 __________🔒 可看",
+        "summary": "取得訊息表情符號來自誰 __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "messageId",
@@ -2937,14 +2943,52 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "成功"
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "未驗證"
           },
           "403": {
             "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
           },
           "404": {
             "description": "找不到訊息"
@@ -2953,8 +2997,7 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_canRead_1_messageId_messageId"
+              "user"
             ]
           }
         ]
@@ -2963,7 +3006,7 @@
         "tags": [
           "Message"
         ],
-        "summary": "對訊息新增表情符號 __________🔒 可看",
+        "summary": "對訊息新增表情符號 __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "messageId",
@@ -2996,14 +3039,17 @@
           }
         },
         "responses": {
-          "204": {
-            "description": "成功"
+          "200": {
+            "description": "Success"
           },
           "401": {
             "description": "未驗證"
           },
           "403": {
             "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
           },
           "404": {
             "description": "找不到訊息"
@@ -3013,8 +3059,7 @@
           {
             "oauth2": [
               "user",
-              "BANNED_2_messageId",
-              "PERMISSION_canRead_1_messageId_messageId"
+              "BANNED_2_messageId"
             ]
           }
         ]
@@ -3023,7 +3068,7 @@
         "tags": [
           "Message"
         ],
-        "summary": "收回表情符號 __________🔒 可看",
+        "summary": "收回表情符號 __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "messageId",
@@ -3036,14 +3081,17 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "成功"
+          "200": {
+            "description": "Success"
           },
           "401": {
             "description": "未驗證"
           },
           "403": {
             "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
           },
           "404": {
             "description": "找不到訊息"
@@ -3053,8 +3101,7 @@
           {
             "oauth2": [
               "user",
-              "BANNED_2_messageId",
-              "PERMISSION_canRead_1_messageId_messageId"
+              "BANNED_2_messageId"
             ]
           }
         ]
@@ -3243,17 +3290,26 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PermissionPaging"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Permission"
+                  }
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PermissionPaging"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Permission"
+                  }
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PermissionPaging"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Permission"
+                  }
                 }
               }
             }
@@ -3300,17 +3356,26 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PermissionPaging"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Permission"
+                  }
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PermissionPaging"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Permission"
+                  }
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PermissionPaging"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Permission"
+                  }
                 }
               }
             }
@@ -3332,6 +3397,112 @@
             ]
           }
         ]
+      }
+    },
+    "/api/v1/Permission/{id}": {
+      "patch": {
+        "tags": [
+          "Permission"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "passCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchPermissionParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchPermissionParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchPermissionParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "get": {
+        "tags": [
+          "Permission"
+        ],
+        "summary": "取得單一權限資訊",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
       }
     },
     "/api/v1/Relation/{relation}/me": {
@@ -4169,7 +4340,7 @@
       }
     },
     "/api/v1/UserReport/Channel/{channelId}": {
-      "put": {
+      "post": {
         "tags": [
           "UserReport"
         ],
@@ -4207,6 +4378,92 @@
         },
         "responses": {
           "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportInformation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "204": {
+            "description": "成功"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/UserReport/Channel/{channelId}/{id}": {
+      "put": {
+        "tags": [
+          "UserReport"
+        ],
+        "summary": "更新檢舉處理狀態 __________🔒 讀取被檢舉名單",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportStatusUpdateParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportStatusUpdateParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportStatusUpdateParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
             "description": "Success"
           },
           "401": {
@@ -4219,10 +4476,10 @@
             "description": "成功"
           }
         },
-        "deprecated": true,
         "security": [
           {
             "oauth2": [
+              "PERMISSION_讀取被檢舉名單_0_channelId_channelGroupId",
               "user"
             ]
           }
@@ -4234,7 +4491,7 @@
         "tags": [
           "UserReport"
         ],
-        "summary": "取得社團的檢舉審核清單 __________🔒 已註冊的fanci使用者",
+        "summary": "取得社團的檢舉審核清單 __________🔒 讀取被檢舉名單",
         "parameters": [
           {
             "name": "groupId",
@@ -4248,7 +4505,33 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportInformation"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportInformation"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportInformation"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -4257,10 +4540,10 @@
             "description": "Forbidden"
           }
         },
-        "deprecated": true,
         "security": [
           {
             "oauth2": [
+              "PERMISSION_讀取被檢舉名單_0_groupId_none",
               "user"
             ]
           }
@@ -4433,6 +4716,10 @@
           },
           "category": {
             "$ref": "#/components/schemas/Category"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "是否為公開頻道"
           }
         },
         "additionalProperties": false,
@@ -4827,18 +5114,15 @@
         "description": "群組"
       },
       "GroupApplyParam": {
-        "required": [
-          "answers"
-        ],
         "type": "object",
         "properties": {
           "answers": {
-            "minItems": 1,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GroupRequirementAnswer"
             },
-            "description": "回答"
+            "description": "回答",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -5298,6 +5582,23 @@
         ],
         "type": "string"
       },
+      "PatchPermissionParam": {
+        "type": "object",
+        "properties": {
+          "spacePermissionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "isAdd": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "Permission": {
         "type": "object",
         "properties": {
@@ -5319,6 +5620,13 @@
             "type": "integer",
             "description": "0. group(space) level\r\n1. channel(board) level",
             "format": "int32"
+          },
+          "allowedActions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           },
           "displayName": {
             "type": "string",
@@ -5356,26 +5664,6 @@
         },
         "additionalProperties": false
       },
-      "PermissionPaging": {
-        "type": "object",
-        "properties": {
-          "haveNextPage": {
-            "type": "boolean"
-          },
-          "nextWeight": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Permission"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "PinnedMessageInfo": {
         "type": "object",
         "properties": {
@@ -5397,6 +5685,51 @@
         ],
         "type": "string"
       },
+      "ReportInformation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "reportee": {
+            "$ref": "#/components/schemas/GroupMember"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/Channel"
+          },
+          "contentId": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentSnapshot": {
+            "type": "string",
+            "nullable": true
+          },
+          "processStatus": {
+            "$ref": "#/components/schemas/ReportProcessStatus"
+          },
+          "mostReason": {
+            "$ref": "#/components/schemas/ReportReason"
+          },
+          "reporters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupMember"
+            },
+            "nullable": true
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "ReportParm": {
         "type": "object",
         "properties": {
@@ -5410,6 +5743,14 @@
         },
         "additionalProperties": false
       },
+      "ReportProcessStatus": {
+        "enum": [
+          "Pending",
+          "Ignored",
+          "Punished"
+        ],
+        "type": "string"
+      },
       "ReportReason": {
         "enum": [
           "SpamAds",
@@ -5419,6 +5760,15 @@
           "Other"
         ],
         "type": "string"
+      },
+      "ReportStatusUpdateParam": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ReportProcessStatus"
+          }
+        },
+        "additionalProperties": false
       },
       "RoleColor": {
         "enum": [
@@ -5589,6 +5939,9 @@
             "type": "integer",
             "format": "int64",
             "readOnly": true
+          },
+          "periodOption": {
+            "$ref": "#/components/schemas/BanPeriodOption"
           }
         },
         "additionalProperties": false

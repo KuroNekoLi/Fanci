@@ -34,6 +34,7 @@ import kotlinx.parcelize.Parcelize
  * @param weight 排序權重
  * @param groupId 頻道所屬社團Id
  * @param category 
+ * @param isPublic 是否為公開頻道
  */
 @Parcelize
 
@@ -72,7 +73,11 @@ data class Channel (
     val groupId: kotlin.String? = null,
 
     @Json(name = "category")
-    val category: Category? = null
+    val category: Category? = null,
+
+    /* 是否為公開頻道 */
+    @Json(name = "isPublic")
+    val isPublic: kotlin.Boolean? = null
 
 ) : Parcelable
 

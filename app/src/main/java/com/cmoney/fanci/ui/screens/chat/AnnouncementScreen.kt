@@ -9,8 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.chat.message.MessageContentScreen
@@ -18,17 +16,23 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.EmptyResultBackNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 
 const val AnnounceBundleKey = "AnnounceBundleKey"
 
 /**
  * 設定 公告 訊息
  */
+@Destination
 @Composable
 fun AnnouncementScreen(
-    navController: NavHostController,
+    navigator: DestinationsNavigator,
     message: ChatMessage,
-    onConfirm: (ChatMessage) -> Unit
+    resultBackNavigator: ResultBackNavigator<ChatMessage>
 ) {
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -38,7 +42,7 @@ fun AnnouncementScreen(
                 moreEnable = false,
                 moreClick = {},
                 backClick = {
-                    navController.popBackStack()
+                    navigator.popBackStack()
                 }
             )
         }
@@ -83,7 +87,7 @@ fun AnnouncementScreen(
                             .height(50.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                         onClick = {
-                            onConfirm.invoke(message)
+                            resultBackNavigator.navigateBack(message)
                         }) {
                         Text(
                             text = "將此訊息設為公告",
@@ -101,8 +105,9 @@ fun AnnouncementScreen(
 @Composable
 fun AnnouncementScreenPreview() {
     FanciTheme {
-        AnnouncementScreen(rememberNavController(), ChatRoomUseCase.mockMessage) {
-
-        }
+        AnnouncementScreen(
+            EmptyDestinationsNavigator,
+            ChatRoomUseCase.mockMessage,
+            resultBackNavigator = EmptyResultBackNavigator())
     }
 }

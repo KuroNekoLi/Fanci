@@ -29,7 +29,8 @@ data class ChatRoomUiState(
     val deleteMessage: ChatMessage? = null,
     val reportUser: ChatMessage? = null,
     val emojiMessage: Pair<ChatMessage, Int>? = null,
-    val announceMessage: ChatMessage? = null          //公告訊息,顯示用
+    val announceMessage: ChatMessage? = null,          //公告訊息,顯示用
+    val errorMessage: String? = null
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -351,10 +352,24 @@ class ChatRoomViewModel(
     fun announceMessageToServer(channelId: String, chatMessage: ChatMessage) {
         KLog.i(TAG, "announceMessageToServer:$chatMessage")
         viewModelScope.launch {
-            chatRoomUseCase.setAnnounceMessage(channelId, chatMessage).fold({}, {})
-            uiState = uiState.copy(
-                announceMessage = chatMessage
-            )
+            chatRoomUseCase.setAnnounceMessage(channelId, chatMessage).fold({
+                uiState = uiState.copy(
+                    announceMessage = chatMessage
+                )
+            }, {
+                uiState = uiState.copy(
+                    errorMessage = it.toString()
+                )
+            })
         }
+    }
+
+    /**
+     * Finish error message.
+     */
+    fun errorMessageDone() {
+        uiState = uiState.copy(
+            errorMessage = null
+        )
     }
 }

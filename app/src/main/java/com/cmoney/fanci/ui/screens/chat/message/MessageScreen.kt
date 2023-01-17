@@ -11,12 +11,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.cmoney.fanci.extension.findActivity
 import com.cmoney.fanci.extension.showInteractDialogBottomSheet
+import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +38,7 @@ fun MessageScreen(
     onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
     val isScrollToBottom = viewModel.uiState.isSendComplete
-    val onInteractClick = object: (MessageInteract) -> Unit {
+    val onInteractClick = object : (MessageInteract) -> Unit {
         override fun invoke(messageInteract: MessageInteract) {
             viewModel.onInteractClick(messageInteract)
         }
@@ -48,16 +50,39 @@ fun MessageScreen(
 //        viewModel.stopPolling()
 //    }
 
+    MessageScreenView(
+        modifier = modifier,
+        message = viewModel.uiState.message,
+        listState = listState,
+        coroutineScope = coroutineScope,
+        onInteractClick = onInteractClick,
+        onMsgDismissHide = onMsgDismissHide,
+        isScrollToBottom = isScrollToBottom,
+        onLoadMore = {
+            viewModel.onLoadMore(channelId)
+        }
+    )
+}
+
+@Composable
+private fun MessageScreenView(
+    modifier: Modifier = Modifier,
+    message: List<ChatMessageWrapper>,
+    listState: LazyListState,
+    coroutineScope: CoroutineScope,
+    onInteractClick: (MessageInteract) -> Unit,
+    onMsgDismissHide: (ChatMessage) -> Unit,
+    isScrollToBottom: Boolean,
+    onLoadMore: () -> Unit
+) {
     Surface(
         color = LocalColor.current.env_80,
         modifier = modifier,
     ) {
-        val message = viewModel.uiState.message
-
         val context = LocalContext.current
         LazyColumn(state = listState, reverseLayout = true) {
             if (message.isNotEmpty()) {
-                itemsIndexed(message) {index, chatMessageWrapper ->
+                itemsIndexed(message) { index, chatMessageWrapper ->
                     MessageContentScreen(
                         chatMessageWrapper = chatMessageWrapper,
                         coroutineScope = coroutineScope,
@@ -90,7 +115,7 @@ fun MessageScreen(
 
         listState.OnBottomReached {
             KLog.i("TAG", "load more....")
-            viewModel.onLoadMore(channelId)
+            onLoadMore.invoke()
         }
 
         if (isScrollToBottom) {
@@ -104,10 +129,11 @@ fun MessageScreen(
     }
 }
 
+
 @Composable
 fun LazyListState.OnBottomReached(
-    loadMore : () -> Unit
-){
+    loadMore: () -> Unit
+) {
     // state object which tells us if we should load more
     val shouldLoadMore = remember {
         derivedStateOf {
@@ -124,7 +150,7 @@ fun LazyListState.OnBottomReached(
     }
 
     // Convert the state into a cold flow and collect
-    LaunchedEffect(shouldLoadMore){
+    LaunchedEffect(shouldLoadMore) {
         snapshotFlow { shouldLoadMore.value }
             .collect {
                 // if should load more, then invoke loadMore
@@ -150,10 +176,22 @@ fun showInteractDialog(
 @Composable
 fun MessageScreenPreview() {
     FanciTheme {
-        MessageScreen(
+        MessageScreenView(
+            message = listOf(
+                ChatMessageWrapper(
+                    message = ChatMessage(
+                        content = MediaIChatContent(
+                            text = "Message"
+                        )
+                    )
+                )
+            ),
             coroutineScope = rememberCoroutineScope(),
-            channelId = "2177",
+            listState = rememberLazyListState(),
+            isScrollToBottom = false,
+            onInteractClick = {},
             onMsgDismissHide = {},
+            onLoadMore = {}
         )
     }
 }

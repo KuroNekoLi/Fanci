@@ -15,25 +15,24 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
+import com.cmoney.fanciapi.fanci.model.ReportProcessStatus
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 申請加入社團參數
+ * 
  *
- * @param answers 回答
+ * @param status 
  */
 @Parcelize
 
 
-data class GroupApplyParam (
+data class ReportStatusUpdateParam (
 
-    /* 回答 */
-    @Json(name = "answers")
-    val answers: kotlin.collections.List<GroupRequirementAnswer>? = null
+    @Json(name = "status")
+    val status: ReportProcessStatus? = null
 
 ) : Parcelable
 

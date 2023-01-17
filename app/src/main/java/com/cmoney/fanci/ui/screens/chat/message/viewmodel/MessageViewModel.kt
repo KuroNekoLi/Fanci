@@ -333,6 +333,7 @@ class MessageViewModel(
 
             }, {
                 KLog.e(TAG, it)
+                // TODO: send error
             })
         }
     }

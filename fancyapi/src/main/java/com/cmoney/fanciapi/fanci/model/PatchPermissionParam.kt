@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.Permission
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -24,23 +23,19 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param haveNextPage 
- * @param nextWeight 
- * @param items 
+ * @param spacePermissionIds 
+ * @param isAdd 
  */
 @Parcelize
 
 
-data class PermissionPaging (
+data class PatchPermissionParam (
 
-    @Json(name = "haveNextPage")
-    val haveNextPage: kotlin.Boolean? = null,
+    @Json(name = "spacePermissionIds")
+    val spacePermissionIds: kotlin.collections.List<kotlin.Int>? = null,
 
-    @Json(name = "nextWeight")
-    val nextWeight: kotlin.Long? = null,
-
-    @Json(name = "items")
-    val items: kotlin.collections.List<Permission>? = null
+    @Json(name = "isAdd")
+    val isAdd: kotlin.Boolean? = null
 
 ) : Parcelable
 

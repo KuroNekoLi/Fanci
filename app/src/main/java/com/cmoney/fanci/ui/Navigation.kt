@@ -64,21 +64,21 @@ fun MyAppNavHost(
 //        }
 
         //公告訊息
-        composable(MainStateHolder.Route.Announce) { _ ->
-            val message =
-                mainNavController.previousBackStackEntry?.savedStateHandle?.get<ChatMessage>("message")
-            message?.let {
-                AnnouncementScreen(
-                    navController = mainNavController,
-                    message = message,
-                    onConfirm = {
-                        KLog.i("announce", "click:$it")
-                        mainNavController.goBackWithParams {
-                            putParcelable(AnnounceBundleKey, it)
-                        }
-                    })
-            }
-        }
+//        composable(MainStateHolder.Route.Announce) { _ ->
+//            val message =
+//                mainNavController.previousBackStackEntry?.savedStateHandle?.get<ChatMessage>("message")
+//            message?.let {
+//                AnnouncementScreen(
+//                    navController = mainNavController,
+//                    message = message,
+//                    onConfirm = {
+//                        KLog.i("announce", "click:$it")
+//                        mainNavController.goBackWithParams {
+//                            putParcelable(AnnounceBundleKey, it)
+//                        }
+//                    })
+//            }
+//        }
 
         //設定個人資料
         composable(MainStateHolder.Route.UserInfo) {

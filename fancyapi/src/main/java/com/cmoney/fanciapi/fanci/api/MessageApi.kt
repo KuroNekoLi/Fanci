@@ -9,6 +9,7 @@ import com.squareup.moshi.Json
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessageParam
 import com.cmoney.fanciapi.fanci.model.EmojiParam
+import com.cmoney.fanciapi.fanci.model.User
 
 interface MessageApi {
     /**
@@ -28,12 +29,13 @@ interface MessageApi {
     suspend fun apiV1MessageMeMessageIdDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
 
     /**
-     * 收回表情符號 __________🔒 可看
+     * 收回表情符號 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 204: 成功
+     *  - 200: Success
      *  - 401: 未驗證
      *  - 403: 沒有權限
+     *  - 204: 成功
      *  - 404: 找不到訊息
      *
      * @param messageId 
@@ -43,27 +45,29 @@ interface MessageApi {
     suspend fun apiV1MessageMessageIdEmojiDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
 
     /**
-     * 取得訊息表情符號來自誰 __________🔒 可看
+     * 取得訊息表情符號來自誰 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 204: 成功
+     *  - 200: Success
      *  - 401: 未驗證
      *  - 403: 沒有權限
+     *  - 204: 成功
      *  - 404: 找不到訊息
      *
      * @param messageId 訊息Id
-     * @return [Unit]
+     * @return [kotlin.collections.Map<kotlin.String, kotlin.collections.List<User>>]
      */
     @GET("api/v1/Message/{messageId}/Emoji")
-    suspend fun apiV1MessageMessageIdEmojiGet(@Path("messageId") messageId: kotlin.String): Response<Unit>
+    suspend fun apiV1MessageMessageIdEmojiGet(@Path("messageId") messageId: kotlin.String): Response<kotlin.collections.Map<kotlin.String, kotlin.collections.List<User>>>
 
     /**
-     * 對訊息新增表情符號 __________🔒 可看
+     * 對訊息新增表情符號 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 204: 成功
+     *  - 200: Success
      *  - 401: 未驗證
      *  - 403: 沒有權限
+     *  - 204: 成功
      *  - 404: 找不到訊息
      *
      * @param messageId 訊息Id
@@ -74,7 +78,7 @@ interface MessageApi {
     suspend fun apiV1MessageMessageIdEmojiPut(@Path("messageId") messageId: kotlin.String, @Body emojiParam: EmojiParam? = null): Response<Unit>
 
     /**
-     * 取得單一訊息 __________🔒 可看
+     * 取得單一訊息 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
      *  - 200: 成功
@@ -92,9 +96,10 @@ interface MessageApi {
      * 編輯訊息內容 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
-     *  - 204: 成功
+     *  - 200: Success
      *  - 401: 未驗證
      *  - 403: 不是發文者
+     *  - 204: 成功
      *  - 404: 找不到訊息
      *
      * @param messageId 訊息Id
@@ -105,7 +110,7 @@ interface MessageApi {
     suspend fun apiV1MessageMessageIdPut(@Path("messageId") messageId: kotlin.String, @Body chatMessageParam: ChatMessageParam? = null): Response<Unit>
 
     /**
-     * 角色刪除他人訊息 __________🔒 刪除他人訊息
+     * 角色刪除他人訊息 __________🔒 可管理
      * 
      * Responses:
      *  - 200: Success

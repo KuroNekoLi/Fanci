@@ -15,7 +15,7 @@ import com.cmoney.fanciapi.fanci.model.PinnedMessageInfo
 
 interface ChatRoomApi {
     /**
-     * 取得聊天室訊息列表 __________🔒 可看
+     * 取得聊天室訊息列表 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
      *  - 200: 成功
@@ -33,7 +33,7 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Query("take") take: kotlin.Int? = 20, @Query("order") order: OrderType? = null, @Query("fromSerialNumber") fromSerialNumber: kotlin.Long? = null): Response<ChatMessagePaging>
 
     /**
-     * 對聊天室新增一則聊天訊息 __________🔒 可發文
+     * 對聊天室新增一則聊天訊息 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
      *  - 200: 成功
@@ -49,12 +49,13 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdMessagePost(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Body chatMessageParam: ChatMessageParam? = null): Response<ChatMessage>
 
     /**
-     * 取消聊天室公告 __________🔒 設定公告
+     * 取消聊天室公告 __________🔒 可管理
      * 
      * Responses:
-     *  - 204: 成功
+     *  - 200: Success
      *  - 401: 未驗證
      *  - 403: 沒有權限
+     *  - 204: 成功
      *  - 404: 找不到該頻道
      *
      * @param chatRoomChannelId 聊天室頻道Id
@@ -64,7 +65,7 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageDelete(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<Unit>
 
     /**
-     * 取得聊天室的公告訊息 __________🔒 可看
+     * 取得聊天室的公告訊息 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
      *  - 200: 成功
@@ -79,12 +80,13 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<PinnedMessageInfo>
 
     /**
-     * 公告聊天室的一則聊天訊息 __________🔒 設定公告
+     * 公告聊天室的一則聊天訊息 __________🔒 可管理
      * 
      * Responses:
-     *  - 204: 成功
+     *  - 200: Success
      *  - 401: 未驗證
      *  - 403: 沒有權限
+     *  - 204: 成功
      *  - 404: 找不到該頻道
      *
      * @param chatRoomChannelId 聊天室頻道Id

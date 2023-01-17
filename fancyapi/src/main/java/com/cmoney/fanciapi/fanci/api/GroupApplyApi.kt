@@ -40,11 +40,11 @@ interface GroupApplyApi {
      *  - 403: Forbidden
      *
      * @param groupId 
-     * @param applyStauts  (optional)
+     * @param applyStatus  (optional)
      * @return [CountResult]
      */
     @GET("api/v1/GroupApply/group/{groupId}/Count")
-    suspend fun apiV1GroupApplyGroupGroupIdCountGet(@Path("groupId") groupId: kotlin.String, @Query("applyStauts") applyStauts: ApplyStatus? = null): Response<CountResult>
+    suspend fun apiV1GroupApplyGroupGroupIdCountGet(@Path("groupId") groupId: kotlin.String, @Query("applyStatus") applyStatus: ApplyStatus? = null): Response<CountResult>
 
     /**
      * 取得社團申請清單 __________🔒 審核入社申請
@@ -57,13 +57,13 @@ interface GroupApplyApi {
      *  - 409: 社團id 不合法
      *
      * @param groupId 社團id
-     * @param applyStauts 申請狀態 (optional)
+     * @param applyStatus 申請狀態 (optional)
      * @param startWeight 起始權重 (optional, default to 0L)
      * @param pageSize 每頁筆數 (optional, default to 20)
      * @return [GroupRequirementApplyPaging]
      */
     @GET("api/v1/GroupApply/group/{groupId}")
-    suspend fun apiV1GroupApplyGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("applyStauts") applyStauts: ApplyStatus? = null, @Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<GroupRequirementApplyPaging>
+    suspend fun apiV1GroupApplyGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("applyStatus") applyStatus: ApplyStatus? = null, @Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<GroupRequirementApplyPaging>
 
     /**
      * 取得我的社團申請 __________🔒 已註冊的fanci使用者
