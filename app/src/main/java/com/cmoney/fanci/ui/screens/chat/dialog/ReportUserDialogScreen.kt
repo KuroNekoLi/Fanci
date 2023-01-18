@@ -24,6 +24,7 @@ import com.cmoney.fanci.model.ChatMessageModel
 import com.cmoney.fanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.fanci.ui.theme.*
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.ReportReason
 
 /**
  * 隱藏用戶 彈窗
@@ -32,7 +33,7 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 @Composable
 fun ReportUserDialogScreen(
     user: GroupMember,
-    onConfirm: (String) -> Unit,
+    onConfirm: (ReportReason) -> Unit,
     onDismiss: () -> Unit
 ) {
     val openDialog = remember { mutableStateOf(true) }
@@ -45,7 +46,16 @@ fun ReportUserDialogScreen(
         mutableStateOf(IntrinsicSize.Min)
     }
 
-    val reportReason = listOf("濫發廣告訊息", "傳送色情訊息", "騷擾行為", "內容與主題無關", "其他", "取消檢舉")
+    val reportReasonMap = hashMapOf(
+        "濫發廣告訊息" to ReportReason.spamAds,
+        "傳送色情訊息" to ReportReason.adultContent,
+        "騷擾行為" to ReportReason.harass,
+        "內容與主題無關" to ReportReason.notRelated,
+        "其他" to ReportReason.other,
+        "取消檢舉" to null
+    )
+
+//    val reportReason = listOf("濫發廣告訊息", "傳送色情訊息", "騷擾行為", "內容與主題無關", "其他", "取消檢舉")
 
     if (openDialog.value) {
         Dialog(
@@ -98,7 +108,7 @@ fun ReportUserDialogScreen(
 
                     //檢舉原因
                     if (showReason.value) {
-                        reportReason.forEachIndexed { index, reason ->
+                        reportReasonMap.keys.forEachIndexed { index, reason ->
                             Button(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -108,10 +118,10 @@ fun ReportUserDialogScreen(
                                     backgroundColor = LocalColor.current.env_80
                                 ),
                                 onClick = {
-                                    if (index == reportReason.size - 1) {
+                                    if (index == reportReasonMap.size - 1) {
                                         onDismiss.invoke()
                                     } else {
-                                        onConfirm.invoke(reason)
+                                        onConfirm.invoke(reportReasonMap[reason]!!)
                                     }
                                 }) {
                                 Text(text = reason, fontSize = 16.sp, color = LocalColor.current.text.default_100)

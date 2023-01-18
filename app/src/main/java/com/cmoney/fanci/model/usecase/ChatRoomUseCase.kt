@@ -3,11 +3,37 @@ package com.cmoney.fanci.model.usecase
 import com.cmoney.fanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.MessageApi
+import com.cmoney.fanciapi.fanci.api.UserReportApi
 import com.cmoney.fanciapi.fanci.model.*
 
 
-class ChatRoomUseCase(private val chatRoomApi: ChatRoomApi, private val messageApi: MessageApi) {
+class ChatRoomUseCase(
+    private val chatRoomApi: ChatRoomApi,
+    private val messageApi: MessageApi,
+    private val userReport: UserReportApi
+) {
     private val TAG = ChatRoomUseCase::class.java.simpleName
+
+    /**
+     * 檢舉內容
+     * @param channelId 頻道 id
+     * @param contentId 哪一篇文章
+     * @param reason 原因
+     */
+    suspend fun reportContent(
+        channelId: String,
+        contentId: String,
+        reason: ReportReason
+    ) = kotlin.runCatching {
+        userReport.apiV1UserReportChannelChannelIdPost(
+            channelId = channelId,
+            reportParm = ReportParm(
+                contentId = contentId,
+                reason = reason
+            )
+        ).checkResponseBody()
+    }
+
 
     /**
      * 取得 公告 訊息

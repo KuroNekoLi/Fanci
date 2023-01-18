@@ -5,7 +5,7 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
 val useCaseModule = module {
-    factory { ChatRoomUseCase(get(), get()) }
+    factory { ChatRoomUseCase(get(), get(), get()) }
     factory { GroupUseCase(androidApplication(), get(), get(), get(), get(), get(), get()) }
     factory { UserUseCase(get()) }
     factory { ChatRoomPollUseCase(get()) }

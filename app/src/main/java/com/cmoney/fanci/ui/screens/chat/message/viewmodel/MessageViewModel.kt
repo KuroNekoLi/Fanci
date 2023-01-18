@@ -5,15 +5,20 @@ import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.BuildConfig
+import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.ChatMessageWrapper
 import com.cmoney.fanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
+import com.cmoney.fanci.ui.screens.shared.snackbar.CustomMessage
+import com.cmoney.fanci.ui.theme.White_494D54
+import com.cmoney.fanci.ui.theme.White_767A7F
 import com.cmoney.fanci.utils.Utils
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.imagelibrary.UploadImage
@@ -26,13 +31,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 data class MessageUiState(
+    val snackBarMessage: CustomMessage? = null,
     val message: List<ChatMessageWrapper> = emptyList(),    //訊息
     val imageAttach: List<Uri> = emptyList(),   //附加圖片
     val isSendComplete: Boolean = false,        //訊息是否發送完成
     val replyMessage: ChatMessage? = null,      //回覆訊息用
     val routeAnnounceMessage: ChatMessage? = null,    //設定公告訊息,跳轉設定頁面
     val copyMessage: ChatMessage? = null,    //複製訊息
-    val hideUserMessage: ChatMessage? = null    //封鎖用戶
+    val hideUserMessage: ChatMessage? = null,    //封鎖用戶
+    val reportMessage: ChatMessage? = null
 )
 
 /**
@@ -444,7 +451,11 @@ class MessageViewModel(
                 recycleMessage(messageInteract.message)
             }
             is MessageInteract.Reply -> replyMessage(messageInteract.message)
-//            is MessageInteract.Report -> reportUser(messageInteract.message)
+            is MessageInteract.Report -> {
+                uiState = uiState.copy(
+                    reportMessage = messageInteract.message
+                )
+            }
             is MessageInteract.EmojiClick -> onEmojiClick(
                 messageInteract.message,
                 messageInteract.emojiResId
@@ -545,6 +556,53 @@ class MessageViewModel(
     fun onHideUserDialogDismiss() {
         uiState = uiState.copy(
             hideUserMessage = null
+        )
+    }
+
+
+    /**
+     * 檢舉 用戶
+     */
+    fun onReportUser(reason: ReportReason, channelId: String, contentId: String) {
+        KLog.i(TAG, "onReportUser:$reason")
+        viewModelScope.launch {
+            chatRoomUseCase.reportContent(
+                channelId = channelId,
+                contentId = contentId,
+                reason = reason
+            ).fold({
+                KLog.i(TAG, "onReportUser success:$it")
+                uiState = uiState.copy(
+                    reportMessage = null,
+                    snackBarMessage = CustomMessage(
+                        textString = "檢舉成立！",
+                        textColor = Color.White,
+                        iconRes = R.drawable.report,
+                        iconColor = White_767A7F,
+                        backgroundColor = White_494D54
+                    )
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 關閉 檢舉用戶 彈窗
+     */
+    fun onReportUserDialogDismiss() {
+        uiState = uiState.copy(
+            reportMessage = null
+        )
+    }
+
+    /**
+     * 隱藏 SnackBar
+     */
+    fun snackBarDismiss() {
+        uiState = uiState.copy(
+            snackBarMessage = null
         )
     }
 }

@@ -145,13 +145,17 @@ fun ChatRoomScreen(
 
         //Alert Dialog
         //檢舉用戶
-        uiState.reportUser?.author?.apply {
+        messageViewModel.uiState.reportMessage?.author?.apply {
             ReportUserDialogScreen(user = this,
                 onConfirm = {
-                    viewModel.onReportUser(it)
+                    messageViewModel.onReportUser(
+                        reason = it,
+                        channelId = channelId,
+                        contentId = messageViewModel.uiState.reportMessage?.id.orEmpty()
+                    )
                 }
             ) {
-                viewModel.onReportUserDialogDismiss()
+                messageViewModel.onReportUserDialogDismiss()
             }
         }
 
@@ -181,9 +185,9 @@ fun ChatRoomScreen(
         //SnackBar
         FanciSnackBarScreen(
             modifier = Modifier.padding(bottom = 70.dp),
-            message = uiState.snackBarMessage
+            message = messageViewModel.uiState.snackBarMessage
         ) {
-            viewModel.snackBarDismiss()
+            messageViewModel.snackBarDismiss()
         }
 
         //Route

@@ -222,22 +222,22 @@ class ChatRoomViewModel(
     }
 
     // TODO:
-    /**
-     * 檢舉 用戶
-     */
-    fun onReportUser(reason: String) {
-        KLog.i(TAG, "onReportUser:$reason")
-        uiState = uiState.copy(
-            reportUser = null,
-            snackBarMessage = CustomMessage(
-                textString = "檢舉成立！",
-                textColor = Color.White,
-                iconRes = R.drawable.report,
-                iconColor = White_767A7F,
-                backgroundColor = White_494D54
-            )
-        )
-    }
+//    /**
+//     * 檢舉 用戶
+//     */
+//    fun onReportUser(reason: String) {
+//        KLog.i(TAG, "onReportUser:$reason")
+//        uiState = uiState.copy(
+//            reportUser = null,
+//            snackBarMessage = CustomMessage(
+//                textString = "檢舉成立！",
+//                textColor = Color.White,
+//                iconRes = R.drawable.report,
+//                iconColor = White_767A7F,
+//                backgroundColor = White_494D54
+//            )
+//        )
+//    }
 
     /**
      * 確定 封鎖 用戶
@@ -286,73 +286,6 @@ class ChatRoomViewModel(
                 }
             })
         }
-    }
-
-    /**
-     * 點擊 Emoji
-     */
-    fun onEmojiClick(message: ChatMessage, resourceId: Int) {
-        KLog.i(TAG, "onEmojiClick.")
-        val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
-        val orgEmoji = message.emojiCount
-        val newEmoji = when (clickEmoji) {
-            Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(1))
-            Emojis.dislike -> orgEmoji?.copy(dislike = orgEmoji.dislike?.plus(1))
-            Emojis.laugh -> orgEmoji?.copy(dislike = orgEmoji.laugh?.plus(1))
-            Emojis.money -> orgEmoji?.copy(dislike = orgEmoji.money?.plus(1))
-            Emojis.shock -> orgEmoji?.copy(dislike = orgEmoji.shock?.plus(1))
-            Emojis.cry -> orgEmoji?.copy(dislike = orgEmoji.cry?.plus(1))
-            Emojis.think -> orgEmoji?.copy(dislike = orgEmoji.think?.plus(1))
-            Emojis.angry -> orgEmoji?.copy(dislike = orgEmoji.angry?.plus(1))
-        }
-        val newMessage = message.copy(
-            emojiCount = newEmoji
-        )
-
-        uiState = uiState.copy(
-            emojiMessage = Pair(newMessage, resourceId)
-        )
-
-
-        // TODO:
-//        val orgEmojiList = model.message.emoji.toMutableList()
-//
-//        model.message.emoji.find {
-//            it.resource == resourceId
-//        }.apply {
-//            this?.apply {
-//                val countEmoji = copy(
-//                    count = count.plus(1)
-//                )
-//                orgEmojiList[orgEmojiList.indexOf(this)] = countEmoji
-//            } ?: kotlin.run {
-//                orgEmojiList.add(
-//                    ChatMessageModel.Emoji(
-//                        resource = resourceId,
-//                        count = 1
-//                    )
-//                )
-//            }
-//        }
-//
-//        val message = uiState.message.toMutableList()
-//        val newMessage = message.map { chatMessageModel ->
-//            if (chatMessageModel.message == model.message) {
-//                val fixMessage = chatMessageModel.message.copy(
-//                    emoji = orgEmojiList
-//                )
-//                chatMessageModel.copy(
-//                    message = fixMessage,
-//                )
-//            } else {
-//                chatMessageModel
-//            }
-//        }
-//
-//        uiState = uiState.copy(
-//            message = newMessage,
-//            hideUserMessage = null
-//        )
     }
 
     /**
