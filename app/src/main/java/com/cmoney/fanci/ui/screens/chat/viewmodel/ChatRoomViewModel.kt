@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.R
+import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.model.usecase.RelationUseCase
 import com.cmoney.fanci.ui.screens.shared.snackbar.CustomMessage
@@ -257,54 +258,34 @@ class ChatRoomViewModel(
                 KLog.e(TAG, it)
             })
         }
-
-
-//        val message = uiState.message.toMutableList()
-//        val newMessage = message.map { chatMessageModel ->
-//            if (chatMessageModel.poster == user) {
-//                val fixMessage = chatMessageModel.message.copy(
-//                    isHideUser = true
-//                )
-//
-//                chatMessageModel.copy(
-//                    message = fixMessage,
-//                )
-//            } else {
-//                chatMessageModel
-//            }
-//        }
-//
-//        uiState = uiState.copy(
-//            message = newMessage,
-//            hideUserMessage = null
-//        )
     }
 
     /**
      * 解除 封鎖 用戶
      */
-    fun onMsgDismissHide(userModel: ChatMessage) {
+    fun onMsgDismissHide(chatMessage: ChatMessage) {
         KLog.i(TAG, "onMsgDismissHide")
-        // TODO:
-//        val message = uiState.message.toMutableList()
-//        val newMessage = message.map { chatMessageModel ->
-//            if (chatMessageModel.poster == userModel.poster) {
-//                val fixMessage = chatMessageModel.message.copy(
-//                    isHideUser = false
-//                )
-//
-//                chatMessageModel.copy(
-//                    message = fixMessage,
-//                )
-//            } else {
-//                chatMessageModel
-//            }
-//        }
-//
-//        uiState = uiState.copy(
-//            message = newMessage,
-//            hideUserMessage = null
-//        )
+        viewModelScope.launch {
+            relationUseCase.disBlocking(
+                userId = chatMessage.author?.id.orEmpty()
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    KLog.i(TAG, "onMsgDismissHide success")
+                    val newList = uiState.blockingList.filter { user ->
+                        user.id != chatMessage.author?.id.orEmpty()
+                    }
+
+                    uiState = uiState.copy(
+                        blockingList = newList.distinct(),
+                        hideUserMessage = null
+                    )
+
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
     }
 
     /**

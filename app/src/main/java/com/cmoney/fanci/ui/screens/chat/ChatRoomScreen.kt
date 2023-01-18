@@ -171,6 +171,7 @@ fun ChatRoomScreen(
                 this,
                 onConfirm = {
                     viewModel.onBlockingUserConfirm(it)
+                    messageViewModel.onHideUserDialogDismiss()
                 }
             ) {
                 messageViewModel.onHideUserDialogDismiss()

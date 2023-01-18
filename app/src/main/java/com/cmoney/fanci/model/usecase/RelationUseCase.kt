@@ -76,4 +76,16 @@ class RelationUseCase(private val relationApi: RelationApi) {
             blockUserId = userId
         ).checkResponseBody()
     }
+
+    /**
+     * 解除封鎖對方
+     * @param userId 被封鎖的人
+     */
+    suspend fun disBlocking(userId: String) = kotlin.runCatching {
+        relationApi.apiV1RelationRelationMeBlockUserIdDelete(
+            relation = Relation.blocking,
+            blockUserId = userId
+        ).checkResponseBody()
+    }
+
 }

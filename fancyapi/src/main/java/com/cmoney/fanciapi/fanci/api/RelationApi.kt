@@ -23,7 +23,7 @@ interface RelationApi {
      * @param blockUserId 
      * @return [Unit]
      */
-    @DELETE("api/v1/Relation/{relation}/me/{blockUserId}")
+    @HTTP(method = "DELETE", path = "api/v1/Relation/{relation}/me/{blockUserId}", hasBody = true)
     suspend fun apiV1RelationRelationMeBlockUserIdDelete(@Path("relation") relation: Relation, @Path("blockUserId") blockUserId: kotlin.String): Response<Unit>
 
     /**
