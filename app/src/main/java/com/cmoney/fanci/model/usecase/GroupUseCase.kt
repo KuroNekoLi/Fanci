@@ -27,6 +27,22 @@ class GroupUseCase(
 ) {
 
     /**
+     * 更新 處理狀態
+     * @param channelId 頻道
+     * @param reportId 檢舉 id
+     * @param reportProcessStatus 檢舉狀態
+     */
+    suspend fun handlerReport(channelId: String, reportId: String, reportProcessStatus: ReportProcessStatus) = kotlin.runCatching {
+        userReport.apiV1UserReportChannelChannelIdIdPut(
+            channelId = channelId,
+            id = reportId,
+            reportStatusUpdateParam = ReportStatusUpdateParam(
+                status = reportProcessStatus
+            )
+        ).checkResponseBody()
+    }
+
+    /**
      * 取得 檢舉審核清單
      */
     suspend fun getReportList(groupId: String) = kotlin.runCatching {

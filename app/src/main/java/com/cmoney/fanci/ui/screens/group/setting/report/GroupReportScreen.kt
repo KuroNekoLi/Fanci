@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.group.setting.report
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,6 +29,7 @@ import com.cmoney.fanci.destinations.GroupReportMessageScreenDestination
 import com.cmoney.fanci.destinations.GroupReporterScreenDestination
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
+import com.cmoney.fanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -39,6 +41,9 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * 檢舉審核
@@ -48,20 +53,44 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 fun GroupReportScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    reportList: Array<ReportInformation>
+    reportList: Array<ReportInformation>,
+    viewModel: GroupReportViewModel = koinViewModel(
+        parameters = {
+            parametersOf(reportList.toList())
+        }
+    ),
+    resultBackNavigator: ResultBackNavigator<Boolean>
 ) {
+    val uiState = viewModel.uiState
+
     GroupReportScreenView(
         modifier = modifier,
         navigator = navigator,
-        reportList = reportList.toList()
+        reportList = uiState.reportList,
+        onIgnore = {
+            viewModel.ignoreReport(it)
+        },
+        onBack = {
+            resultBackNavigator.navigateBack(
+                result = (reportList.size != uiState.reportList.size)
+            )
+        }
     )
+
+    BackHandler {
+        resultBackNavigator.navigateBack(
+            result = (reportList.size != uiState.reportList.size)
+        )
+    }
 }
 
 @Composable
 private fun GroupReportScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    reportList: List<ReportInformation>
+    reportList: List<ReportInformation>,
+    onIgnore: (ReportInformation) -> Unit,
+    onBack: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -72,7 +101,7 @@ private fun GroupReportScreenView(
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
-                    navigator.popBackStack()
+                    onBack.invoke()
                 }
             )
         }
@@ -97,6 +126,9 @@ private fun GroupReportScreenView(
                                 it.reporters?.toTypedArray() ?: arrayOf()
                             )
                         )
+                    },
+                    onIgnore = {
+                        onIgnore.invoke(it)
                     }
                 )
             }
@@ -109,6 +141,7 @@ private fun ReportItem(
     reportInformation: ReportInformation,
     onFullMessageClick: (ReportInformation) -> Unit,
     onReporterClick: (ReportInformation) -> Unit,
+    onIgnore: (ReportInformation) -> Unit
 ) {
     val reportUser = reportInformation.reportee
     val channel = reportInformation.channel
@@ -247,7 +280,7 @@ private fun ReportItem(
                 textColor = LocalColor.current.text.default_100,
                 text = "不懲處"
             ) {
-                // TODO:
+                onIgnore.invoke(reportInformation)
             }
 
             Spacer(modifier = Modifier.width(20.dp))
@@ -289,7 +322,9 @@ fun GroupReportScreenPreview() {
                     mostReason = ReportReason.harass,
                     channel = Channel(name = "❣️｜聊聊大廳")
                 )
-            )
+            ),
+            onIgnore = {},
+            onBack = {}
         )
     }
 }

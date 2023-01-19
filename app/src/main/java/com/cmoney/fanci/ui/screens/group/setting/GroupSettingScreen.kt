@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.destinations.GroupApplyScreenDestination
 import com.cmoney.fanci.destinations.GroupOpennessScreenDestination
+import com.cmoney.fanci.destinations.GroupReportScreenDestination
+import com.cmoney.fanci.destinations.GroupReporterScreenDestination
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -35,7 +37,8 @@ fun GroupSettingScreen(
     initGroup: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>,
-    applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>
+    applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
+    reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var group = initGroup
@@ -49,6 +52,20 @@ fun GroupSettingScreen(
             is NavResult.Value -> {
                 val resultGroup = result.value
                 group = resultGroup
+            }
+        }
+    }
+
+    //是否刷新檢舉
+    reportResultRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val refreshReport = result.value
+                if (refreshReport) {
+                    viewModel.fetchReportList(groupId = group.id.orEmpty())
+                }
             }
         }
     }
