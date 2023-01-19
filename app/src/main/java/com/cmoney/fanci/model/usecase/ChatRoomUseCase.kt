@@ -15,6 +15,20 @@ class ChatRoomUseCase(
     private val TAG = ChatRoomUseCase::class.java.simpleName
 
     /**
+     * 刪除他人訊息
+     */
+    suspend fun deleteOtherMessage(messageId: String) = kotlin.runCatching {
+        messageApi.apiV1MessageRoleMessageIdDelete(messageId = messageId).checkResponseBody()
+    }
+
+    /**
+     * 刪除自己發送的訊息
+     */
+    suspend fun takeBackMyMessage(messageId: String) = kotlin.runCatching {
+        messageApi.apiV1MessageMeMessageIdDelete(messageId = messageId).checkResponseBody()
+    }
+
+    /**
      * 檢舉內容
      * @param channelId 頻道 id
      * @param contentId 哪一篇文章
@@ -147,5 +161,4 @@ class ChatRoomUseCase(
             )
         )
     }
-
 }

@@ -25,6 +25,7 @@ import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.utils.Utils
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.google.accompanist.flowlayout.FlowRow
@@ -96,6 +97,8 @@ fun MessageContentScreen(
                 ) {
                     onMessageContentCallback.invoke(MessageContentCallback.MsgDismissHideClick(it))
                 }
+            } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
+                MessageRemoveScreen()
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     //大頭貼

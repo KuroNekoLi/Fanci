@@ -47,13 +47,6 @@ fun MessageScreen(
         }
     }
 
-//    viewModel.startPolling(channelId)
-//
-//    BackHandler {
-//        viewModel.stopPolling()
-//    }
-
-
     MessageScreenView(
         modifier = modifier,
         message = messageViewModel.uiState.message,

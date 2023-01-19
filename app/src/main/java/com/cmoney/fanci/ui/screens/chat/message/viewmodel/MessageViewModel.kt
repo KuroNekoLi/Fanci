@@ -12,6 +12,7 @@ import com.cmoney.fanci.BuildConfig
 import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.ChatMessageWrapper
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomUiState
@@ -39,7 +40,8 @@ data class MessageUiState(
     val routeAnnounceMessage: ChatMessage? = null,    //設定公告訊息,跳轉設定頁面
     val copyMessage: ChatMessage? = null,    //複製訊息
     val hideUserMessage: ChatMessage? = null,    //封鎖用戶
-    val reportMessage: ChatMessage? = null
+    val reportMessage: ChatMessage? = null,
+    val deleteMessage: ChatMessage? = null
 )
 
 /**
@@ -441,7 +443,7 @@ class MessageViewModel(
                     copyMessage = messageInteract.message
                 )
             }
-//            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
+            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
             is MessageInteract.HideUser -> {
                 uiState = uiState.copy(
                     hideUserMessage = messageInteract.message
@@ -461,6 +463,87 @@ class MessageViewModel(
                 messageInteract.emojiResId
             )
             else -> {}
+        }
+    }
+
+    /**
+     * 刪除 訊息
+     */
+    private fun deleteMessage(message: ChatMessage) {
+        KLog.i(TAG, "deleteMessage:$message")
+        uiState = uiState.copy(
+            deleteMessage = message
+        )
+    }
+
+    /**
+     * 關閉 刪除訊息 彈窗
+     */
+    fun onDeleteMessageDialogDismiss() {
+        uiState = uiState.copy(
+            deleteMessage = null
+        )
+    }
+
+    // TODO: 驗證 刪除他人訊息
+    /**
+     * 確定 刪除 訊息
+     * 要先判斷 刪除自己的貼文 or 刪除他人(需要有該權限)
+     */
+    fun onDeleteClick(chatMessageModel: ChatMessage) {
+        KLog.i(TAG, "onDeleteClick:$chatMessageModel")
+        viewModelScope.launch {
+            if (chatMessageModel.author?.id == Constant.MyInfo?.id) {
+                //自己發的文章
+                KLog.i(TAG, "onDelete my post")
+                chatRoomUseCase.takeBackMyMessage(chatMessageModel.id.orEmpty()).fold({
+                }, {
+                    if (it is EmptyBodyException) {
+                        KLog.i(TAG, "onDelete my post success")
+                        uiState = uiState.copy(
+                            message = uiState.message.filter {
+                                it.message != chatMessageModel
+                            },
+                            deleteMessage = null,
+                            snackBarMessage = CustomMessage(
+                                textString = "成功刪除訊息！",
+                                textColor = Color.White,
+                                iconRes = R.drawable.delete,
+                                iconColor = White_767A7F,
+                                backgroundColor = White_494D54
+                            )
+                        )
+                    } else {
+                        it.printStackTrace()
+                        KLog.e(TAG, it)
+                    }
+                })
+            } else {
+                //別人的文章
+                KLog.i(TAG, "onDelete other post")
+                chatRoomUseCase.deleteOtherMessage(chatMessageModel.id.orEmpty()).fold({
+                }, {
+                    if (it is EmptyBodyException) {
+                        KLog.i(TAG, "onDelete other post success")
+                        uiState = uiState.copy(
+                            message = uiState.message.filter {
+                                it.message != chatMessageModel
+                            },
+                            deleteMessage = null,
+                            snackBarMessage = CustomMessage(
+                                textString = "成功刪除訊息！",
+                                textColor = Color.White,
+                                iconRes = R.drawable.delete,
+                                iconColor = White_767A7F,
+                                backgroundColor = White_494D54
+                            )
+                        )
+                    } else {
+                        it.printStackTrace()
+                        KLog.e(TAG, it)
+                    }
+                })
+            }
         }
     }
 

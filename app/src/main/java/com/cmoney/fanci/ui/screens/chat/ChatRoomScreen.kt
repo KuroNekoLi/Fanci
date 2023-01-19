@@ -160,12 +160,13 @@ fun ChatRoomScreen(
         }
 
         //刪除訊息 彈窗
-        uiState.deleteMessage?.apply {
+        messageViewModel.uiState.deleteMessage?.apply {
             DeleteMessageDialogScreen(chatMessageModel = this,
                 onConfirm = {
-                    viewModel.onDeleteClick(it)
+                    messageViewModel.onDeleteMessageDialogDismiss()
+                    messageViewModel.onDeleteClick(it)
                 }) {
-                viewModel.onDeleteMessageDialogDismiss()
+                messageViewModel.onDeleteMessageDialogDismiss()
             }
         }
 

@@ -177,6 +177,7 @@ class RoleManageViewModel(
                     KLog.e(TAG, it)
                     if (it is EmptyBodyException) {
                         assignMemberRole(group.id.orEmpty(), editFanciRole!!)
+
                     } else {
                         // TODO: 判斷server error type
                         uiState = uiState.copy(

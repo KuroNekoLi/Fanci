@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.model.persistence.SettingsDataStore
 import com.cmoney.fanci.model.usecase.ThemeUseCase
 import com.cmoney.fanci.model.usecase.UserUseCase
@@ -73,6 +74,11 @@ class MainViewModel(
         KLog.i(TAG, "registerUser")
         viewModelScope.launch {
             userUseCase.registerUser()
+            userUseCase.fetchMyInfo().fold({
+                Constant.MyInfo = it
+            },{
+                KLog.e(TAG, it)
+            })
         }
     }
 

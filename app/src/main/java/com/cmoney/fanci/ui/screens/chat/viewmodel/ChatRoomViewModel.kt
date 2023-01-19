@@ -30,7 +30,7 @@ data class ChatRoomUiState(
     val snackBarMessage: CustomMessage? = null,
     val hideUserMessage: ChatMessage? = null,
     val deleteMessage: ChatMessage? = null,
-    val reportUser: ChatMessage? = null,
+//    val reportUser: ChatMessage? = null,
     val emojiMessage: Pair<ChatMessage, Int>? = null,
     val announceMessage: ChatMessage? = null,          //公告訊息,顯示用
     val errorMessage: String? = null,
@@ -99,15 +99,15 @@ class ChatRoomViewModel(
     }
 
 
-    /**
-     * 檢舉 用戶
-     */
-    private fun reportUser(message: ChatMessage) {
-        KLog.i(TAG, "reportUser:$message")
-        uiState = uiState.copy(
-            reportUser = message
-        )
-    }
+//    /**
+//     * 檢舉 用戶
+//     */
+//    private fun reportUser(message: ChatMessage) {
+//        KLog.i(TAG, "reportUser:$message")
+//        uiState = uiState.copy(
+//            reportUser = message
+//        )
+//    }
 
     /**
      * 刪除 訊息
@@ -212,14 +212,14 @@ class ChatRoomViewModel(
 //        )
     }
 
-    /**
-     * 關閉 檢舉用戶 彈窗
-     */
-    fun onReportUserDialogDismiss() {
-        uiState = uiState.copy(
-            reportUser = null
-        )
-    }
+//    /**
+//     * 關閉 檢舉用戶 彈窗
+//     */
+//    fun onReportUserDialogDismiss() {
+//        uiState = uiState.copy(
+//            reportUser = null
+//        )
+//    }
 
     // TODO:
 //    /**
