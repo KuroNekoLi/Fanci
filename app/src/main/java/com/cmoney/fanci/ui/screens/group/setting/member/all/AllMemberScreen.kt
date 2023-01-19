@@ -103,9 +103,8 @@ fun AllMemberScreenView(
                 }
             )
         }
-    ) {
-
-        LazyColumn {
+    ) { innerPadding ->
+        LazyColumn(modifier = Modifier.padding(innerPadding)) {
             items(groupMemberList) { groupMember ->
                 MemberItem(groupMember = groupMember) {
                     KLog.i(TAG, "member click:$it")
@@ -187,7 +186,7 @@ private fun MemberItem(
 }
 
 @Composable
-private fun RoleItem(roleInfo: FanciRole) {
+fun RoleItem(roleInfo: FanciRole) {
     val roleColor = LocalColor.current.roleColor.colors.firstOrNull {
         it.name == roleInfo.color
     } ?: LocalColor.current.roleColor.colors.first()

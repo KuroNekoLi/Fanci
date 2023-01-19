@@ -5,11 +5,46 @@ import androidx.annotation.DrawableRes
 import com.cmoney.fanci.R
 import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.ReportReason
 import java.text.SimpleDateFormat
 import java.util.regex.Matcher
 
 class Utils {
     companion object {
+
+        /**
+         * 根據顯示文案 回傳對應 ReportReason model
+         *
+         * @param reasonText 檢舉文案
+         * @return ReportReason model
+         */
+        fun getReportReason(reasonText: String): ReportReason {
+            return when (reasonText) {
+                "濫發廣告訊息" -> ReportReason.spamAds
+                "傳送色情訊息" -> ReportReason.adultContent
+                "騷擾行為" -> ReportReason.harass
+                "內容與主題無關" -> ReportReason.notRelated
+                else -> {
+                    ReportReason.other
+                }
+            }
+        }
+
+        /**
+         * 取得 檢舉文案
+         * @param reportReason ReportReason model
+         * @return display text
+         */
+        fun getReportReasonShowText(reportReason: ReportReason): String {
+            return when (reportReason) {
+                ReportReason.spamAds -> "濫發廣告訊息"
+                ReportReason.adultContent -> "傳送色情訊息"
+                ReportReason.harass -> "騷擾行為"
+                ReportReason.notRelated -> "內容與主題無關"
+                else -> "其他"
+            }
+        }
+
         /**
          * 根據 text 提出 url
          */

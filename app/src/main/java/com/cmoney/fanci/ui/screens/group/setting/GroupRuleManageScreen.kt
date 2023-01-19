@@ -12,10 +12,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.BanListScreenDestination
+import com.cmoney.fanci.destinations.GroupReportScreenDestination
 import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
@@ -26,8 +28,11 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 fun GroupRuleManageScreen(
     modifier: Modifier = Modifier,
     group: Group,
-    navController: DestinationsNavigator
+    navController: DestinationsNavigator,
+    reportList: List<ReportInformation>?
 ) {
+    val reportCount = reportList?.size ?: 0
+
     Column(modifier = modifier) {
         Text(
             modifier = Modifier.padding(start = 25.dp, bottom = 9.dp),
@@ -37,9 +42,25 @@ fun GroupRuleManageScreen(
         SettingItemScreen(
             iconRes = R.drawable.report_apply,
             text = "檢舉審核",
-            onItemClick = {}
+            onItemClick = {
+                if (reportCount != 0) {
+                    reportList?.let {
+                        navController.navigate(
+                            GroupReportScreenDestination(
+                                reportList = it.toTypedArray()
+                            )
+                        )
+                    }
+                }
+            }
         ) {
-            Text(text = "121", fontSize = 17.sp, color = LocalColor.current.text.default_100)
+            if (reportCount != 0) {
+                Text(
+                    text = reportCount.toString(),
+                    fontSize = 17.sp,
+                    color = LocalColor.current.text.default_100
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(1.dp))
@@ -69,6 +90,10 @@ fun GroupRuleManageScreen(
 @Composable
 fun GroupRuleManageScreenPreview() {
     FanciTheme {
-        GroupRuleManageScreen(group = Group(), navController = EmptyDestinationsNavigator)
+        GroupRuleManageScreen(
+            group = Group(),
+            navController = EmptyDestinationsNavigator,
+            reportList = emptyList()
+        )
     }
 }

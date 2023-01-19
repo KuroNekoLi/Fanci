@@ -22,8 +22,18 @@ class GroupUseCase(
     private val defaultImageApi: DefaultImageApi,
     private val permissionApi: PermissionApi,
     private val roleUserApi: RoleUserApi,
-    private val groupRequirement: GroupRequirementApi
+    private val groupRequirement: GroupRequirementApi,
+    private val userReport: UserReportApi
 ) {
+
+    /**
+     * 取得 檢舉審核清單
+     */
+    suspend fun getReportList(groupId: String) = kotlin.runCatching {
+        userReport.apiV1UserReportGroupGroupIdGet(
+            groupId = groupId
+        ).checkResponseBody()
+    }
 
     /**
      * 建立社團

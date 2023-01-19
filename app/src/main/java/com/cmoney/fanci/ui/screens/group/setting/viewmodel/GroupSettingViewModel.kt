@@ -13,6 +13,7 @@ import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.ImageChangeD
 import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -24,18 +25,36 @@ data class GroupSettingUiState(
     val groupCoverLib: List<String> = emptyList(),          //社團 預設背景 清單
     val groupThemeList: List<GroupTheme> = emptyList(),     //社團 主題色彩
     val previewTheme: GroupTheme? = null,                   //社團 設定主題 Preview
-    val unApplyCount: Long? = null                           //等待加入申請數量
+    val unApplyCount: Long? = null,                         //等待加入申請數量
+    val reportList: List<ReportInformation>? = null         //檢舉清單
 )
 
 class GroupSettingViewModel(
     private val groupUseCase: GroupUseCase,
     private val themeUseCase: ThemeUseCase,
-    private val groupApplyUseCase: GroupApplyUseCase
+    private val groupApplyUseCase: GroupApplyUseCase,
 ) : ViewModel() {
     private val TAG = GroupSettingViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(GroupSettingUiState())
         private set
+
+    /**
+     * 抓取 檢舉清單
+     */
+    fun fetchReportList(groupId: String) {
+        KLog.i(TAG, "fetchReportList:$groupId")
+        viewModelScope.launch {
+            groupUseCase.getReportList(groupId = groupId).fold({
+                uiState = uiState.copy(
+                    reportList = it
+                )
+            }, {
+                it.printStackTrace()
+                KLog.i(TAG, it)
+            })
+        }
+    }
 
     /**
      * 抓取 加入申請 數量

@@ -19,6 +19,7 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -75,6 +76,7 @@ fun GroupSettingScreen(
         navController = navController,
         group = group,
         unApplyCount = uiState.unApplyCount ?: 0,
+        reportList = uiState.reportList,
         onBackClick = {
 //            globalViewModel.setCurrentGroup(group)
             navController.popBackStack()
@@ -86,6 +88,10 @@ fun GroupSettingScreen(
         viewModel.fetchUnApplyCount(groupId = group.id.orEmpty())
     }
 
+    //抓取檢舉內容
+    if (uiState.reportList == null) {
+        viewModel.fetchReportList(groupId = group.id.orEmpty())
+    }
 }
 
 @Composable
@@ -94,7 +100,8 @@ fun GroupSettingScreenView(
     navController: DestinationsNavigator,
     group: Group,
     onBackClick: () -> Unit,
-    unApplyCount: Long
+    unApplyCount: Long,
+    reportList: List<ReportInformation>?
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -139,6 +146,7 @@ fun GroupSettingScreenView(
             //秩序管理
             GroupRuleManageScreen(
                 group = group,
+                reportList = reportList,
                 navController = navController
             )
         }
@@ -154,7 +162,8 @@ fun GroupSettingScreenPreview() {
             navController = EmptyDestinationsNavigator,
             group = Group(),
             onBackClick = {},
-            unApplyCount = 20
+            unApplyCount = 20,
+            reportList = emptyList()
         )
     }
 }

@@ -42,6 +42,9 @@ import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * 加入申請
+ */
 @Destination
 @Composable
 fun GroupApplyScreen(
@@ -127,8 +130,8 @@ private fun GroupApplyScreenView(
                 }
             )
         }
-    ) {
-        Column {
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding)) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
