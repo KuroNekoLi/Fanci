@@ -250,8 +250,9 @@ class GroupSettingViewModel(
     /**
      * 抓取所有主題設定檔案
      * @param group 目前的主題
+     * @param isFromCreate 是否從 create 來
      */
-    fun fetchAllTheme(group: Group) {
+    fun fetchAllTheme(group: Group, isFromCreate: Boolean) {
         KLog.i(TAG, "fetchAllTheme:$group")
         viewModelScope.launch {
             val currentThemeName = group.colorSchemeGroupKey?.name.orEmpty()
@@ -259,7 +260,7 @@ class GroupSettingViewModel(
             themeUseCase.fetchAllThemeConfig().fold({
                 uiState = uiState.copy(
                     groupThemeList = it.map { item ->
-                        if (item.id.lowercase() == currentThemeName.lowercase()) {
+                        if (item.id.lowercase() == currentThemeName.lowercase() && !isFromCreate) {
                             item.copy(isSelected = true)
                         } else {
                             item

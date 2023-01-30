@@ -13,8 +13,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,8 +25,6 @@ import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.ColorTheme
-import com.cmoney.fanciapi.fanci.model.Group
 import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -94,7 +90,7 @@ fun GroupSettingThemeScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.fetchAllTheme(groupParam)
+        viewModel.fetchAllTheme(groupParam, isFromCreate)
     }
 }
 
