@@ -95,7 +95,7 @@ fun MessageInput(
                 Text(
                     text = "輸入你想說的話...",
                     fontSize = 16.sp,
-                    color = LocalColor.current.text.default_30
+                    color = LocalColor.current.inputText.input_30
                 )
             }
         )

@@ -27,12 +27,28 @@ class GroupUseCase(
 ) {
 
     /**
+     * 刪除 角色
+     * @param groupId 社團id
+     * @param roleId 角色 id
+     */
+    suspend fun deleteRole(groupId: String, roleId: String) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdRoleRoleIdDelete(
+            groupId = groupId,
+            roleId = roleId
+        ).checkResponseBody()
+    }
+
+    /**
      * 更新 處理狀態
      * @param channelId 頻道
      * @param reportId 檢舉 id
      * @param reportProcessStatus 檢舉狀態
      */
-    suspend fun handlerReport(channelId: String, reportId: String, reportProcessStatus: ReportProcessStatus) = kotlin.runCatching {
+    suspend fun handlerReport(
+        channelId: String,
+        reportId: String,
+        reportProcessStatus: ReportProcessStatus
+    ) = kotlin.runCatching {
         userReport.apiV1UserReportChannelChannelIdIdPut(
             channelId = channelId,
             id = reportId,

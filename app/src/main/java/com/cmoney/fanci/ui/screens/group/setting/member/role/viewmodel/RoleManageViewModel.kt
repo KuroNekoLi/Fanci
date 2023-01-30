@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel
 
+import android.os.Parcelable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,7 @@ import com.cmoney.fanciapi.fanci.model.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
+import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.launch
 import java.lang.reflect.Type
 
@@ -24,8 +26,14 @@ data class UiState(
     val addRoleError: String = "",          //新增角色 錯誤
     val roleName: String = "",              //角色名稱
     val roleColor: Color = Color(),         //角色顏色
-    val addFanciRole: FanciRole? = null     //新增角色
+    val fanciRoleCallback: FanciRoleCallback? = null // 新增 or 刪除 角色
 )
+
+@Parcelize
+data class FanciRoleCallback(
+    val isAdd: Boolean = false,
+    val fanciRole: FanciRole
+) : Parcelable
 
 class RoleManageViewModel(
     private val groupUseCase: GroupUseCase
@@ -225,7 +233,9 @@ class RoleManageViewModel(
                     ).fold({
                         KLog.i(TAG, "assignMemberRole complete")
                         uiState = uiState.copy(
-                            addFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong()),
+                            fanciRoleCallback = FanciRoleCallback(
+                                fanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
+                            ),
                             addRoleError = "",
                             addRoleComplete = true
                         )
@@ -244,12 +254,13 @@ class RoleManageViewModel(
                             it.id.orEmpty()
                         }
                     ).fold({
-
                     }, {
                         KLog.e(TAG, it)
                         if (it is EmptyBodyException) {
                             uiState = uiState.copy(
-                                addFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong()),
+                                fanciRoleCallback = FanciRoleCallback(
+                                    fanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
+                                ),
                                 addRoleError = "",
                                 addRoleComplete = true
                             )
@@ -273,7 +284,9 @@ class RoleManageViewModel(
                 }
 
                 uiState = uiState.copy(
-                    addFanciRole = fanciRole,
+                    fanciRoleCallback = FanciRoleCallback(
+                        fanciRole = fanciRole
+                    ),
                     addRoleError = "",
                     addRoleComplete = true
                 )
@@ -366,5 +379,43 @@ class RoleManageViewModel(
                 )
             }
         }
+    }
+
+    /**
+     * 刪除 角色
+     */
+    fun onDelete(fanciRole: FanciRole, group: Group) {
+        KLog.i(TAG, "onDelete:$fanciRole")
+        viewModelScope.launch {
+            groupUseCase.deleteRole(
+                groupId = group.id.orEmpty(),
+                roleId = fanciRole.id.orEmpty()
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    uiState = uiState.copy(
+                        fanciRoleCallback = FanciRoleCallback(
+                            isAdd = false,
+                            fanciRole = fanciRole
+                        )
+                    )
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
+
+    /**
+     * 移除 角色
+     */
+    fun removeRole(fanciRole: FanciRole) {
+        KLog.i(TAG, "removeRole:$fanciRole")
+        val roleList = uiState.fanciRole?.filter {
+            it.id != fanciRole.id
+        }
+        uiState = uiState.copy(
+            fanciRole = roleList
+        )
     }
 }

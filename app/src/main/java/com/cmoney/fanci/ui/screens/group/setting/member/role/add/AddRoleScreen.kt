@@ -16,6 +16,7 @@ import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.MainActivity
 import com.cmoney.fanci.destinations.AddMemberScreenDestination
 import com.cmoney.fanci.extension.showToast
+import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
 import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.setting.BottomButtonScreen
@@ -39,7 +40,7 @@ fun AddRoleScreen(
     fanciRole: FanciRole? = null,
     viewModel: RoleManageViewModel = koinViewModel(),
     memberResult: ResultRecipient<AddMemberScreenDestination, String>,
-    resultNavigator: ResultBackNavigator<FanciRole>
+    resultNavigator: ResultBackNavigator<FanciRoleCallback>
 ) {
     val mainActivity = LocalDependencyContainer.current
     val uiState = viewModel.uiState
@@ -61,6 +62,7 @@ fun AddRoleScreen(
         navigator,
         uiState.tabSelected,
         group,
+        fanciRole = fanciRole,
         mainActivity,
         uiState.permissionList.orEmpty(),
         uiState.permissionSelected,
@@ -81,9 +83,15 @@ fun AddRoleScreen(
         },
         onRoleStyleChange = { name, color ->
             viewModel.setRoleStyle(name, color)
+        },
+        onDelete = {
+            fanciRole?.let {
+                viewModel.onDelete(it, group)
+            }
         }
     )
 
+    //是否為編輯
     if (fanciRole != null) {
         viewModel.setRoleEdit(group.id.orEmpty(), fanciRole, LocalColor.current.roleColor.colors)
     } else {
@@ -97,8 +105,8 @@ fun AddRoleScreen(
         viewModel.errorShowDone()
     }
 
-    if (uiState.addFanciRole != null) {
-        resultNavigator.navigateBack(uiState.addFanciRole)
+    uiState.fanciRoleCallback?.let {
+        resultNavigator.navigateBack(it)
     }
 }
 
@@ -108,6 +116,7 @@ private fun AddRoleScreenView(
     navigator: DestinationsNavigator,
     selectedIndex: Int,
     group: Group,
+    fanciRole: FanciRole? = null,
     mainActivity: MainActivity,
     permissionList: List<PermissionCategory>,
     permissionSelected: Map<String, Boolean>,
@@ -117,6 +126,7 @@ private fun AddRoleScreenView(
     onTabSelected: (Int) -> Unit,
     onMemberRemove: (GroupMember) -> Unit,
     onConfirm: () -> Unit,
+    onDelete: () -> Unit,
     onPermissionSwitch: (String, Boolean) -> Unit,
     onRoleStyleChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit
 ) {
@@ -127,7 +137,7 @@ private fun AddRoleScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "新增角色",
+                title = fanciRole?.name ?: "新增角色",
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
@@ -135,7 +145,7 @@ private fun AddRoleScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -150,7 +160,7 @@ private fun AddRoleScreenView(
                     .height(40.dp)
                     .padding(1.dp)
                     .clip(RoundedCornerShape(35)),
-                indicator = { tabPositions: List<TabPosition> ->
+                indicator = {
                     Box {}
                 },
                 backgroundColor = LocalColor.current.env_100
@@ -190,7 +200,9 @@ private fun AddRoleScreenView(
                             mainActivity = mainActivity,
                             roleName = roleName,
                             roleColor = roleColor,
-                            onChange = onRoleStyleChange
+                            onChange = onRoleStyleChange,
+                            showDelete = fanciRole != null,
+                            onDelete = onDelete
                         )
                     }
                     //權限
@@ -258,7 +270,8 @@ fun AddRoleScreenPreview() {
             onMemberRemove = {},
             onConfirm = {},
             onPermissionSwitch = { key, selected -> },
-            onRoleStyleChange = { _, _ -> }
+            onRoleStyleChange = { _, _ -> },
+            onDelete = {}
         )
     }
 }

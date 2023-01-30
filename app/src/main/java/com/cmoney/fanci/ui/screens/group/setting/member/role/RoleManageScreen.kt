@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.destinations.AddRoleScreenDestination
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
+import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
 import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.role.RoleItemScreen
@@ -43,7 +44,7 @@ fun RoleManageScreen(
     navigator: DestinationsNavigator,
     group: Group,
     viewModel: RoleManageViewModel = koinViewModel(),
-    roleResult: ResultRecipient<AddRoleScreenDestination, FanciRole>
+    roleResult: ResultRecipient<AddRoleScreenDestination, FanciRoleCallback>
 ) {
     val TAG = "RoleManageScreen"
 
@@ -53,8 +54,13 @@ fun RoleManageScreen(
             is NavResult.Canceled -> {
             }
             is NavResult.Value -> {
-                val role = result.value
-                viewModel.addMemberRole(role)
+                val fanciRoleCallback = result.value
+                if (fanciRoleCallback.isAdd) {
+                    viewModel.addMemberRole(fanciRoleCallback.fanciRole)
+                }
+                else {
+                    viewModel.removeRole(fanciRoleCallback.fanciRole)
+                }
             }
         }
     }
@@ -97,7 +103,7 @@ fun RoleManageScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -175,17 +181,17 @@ fun RoleManageScreenView(
             }
 
             //========== 儲存 ==========
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(135.dp)
-                    .background(LocalColor.current.env_100),
-                contentAlignment = Alignment.Center
-            ) {
-                BlueButton(text = "儲存") {
-                    onSave.invoke()
-                }
-            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(135.dp)
+//                    .background(LocalColor.current.env_100),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                BlueButton(text = "儲存") {
+//                    onSave.invoke()
+//                }
+//            }
         }
     }
 }

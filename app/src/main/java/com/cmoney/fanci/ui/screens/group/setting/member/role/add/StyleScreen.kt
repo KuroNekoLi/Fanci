@@ -7,14 +7,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.MainActivity
@@ -34,30 +34,18 @@ fun StyleScreen(
     mainActivity: MainActivity,
     roleName: String,
     roleColor: com.cmoney.fanciapi.fanci.model.Color,
-    onChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit
+    showDelete: Boolean,
+    onChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit,
+    onDelete: () -> Unit
 ) {
     val TAG = "StyleView"
     val maxLength = 10
 
-//    var textState by remember { mutableStateOf("") }
-
     val defaultColor = if (roleColor.hexColorCode.orEmpty().isEmpty()) {
         LocalColor.current.roleColor.colors.first()
-    }
-    else {
+    } else {
         roleColor
     }
-
-//    val selectRoleColor = remember {
-//        mutableStateOf(
-//            if (roleColor.hexColorCode.orEmpty().isEmpty()) {
-//                defaultColor
-//            }
-//            else {
-//                roleColor
-//            }
-//        )
-//    }
 
     Column(modifier = modifier.background(LocalColor.current.env_80)) {
         Row(
@@ -130,7 +118,6 @@ fun StyleScreen(
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Image(
                 modifier = Modifier.padding(start = 25.dp),
                 painter = painterResource(id = R.drawable.rule_manage),
@@ -147,6 +134,30 @@ fun StyleScreen(
                 color = LocalColor.current.text.default_100
             )
         }
+
+        if (showDelete) {
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Text(
+                modifier = Modifier.padding(start = 24.dp, bottom = 10.dp),
+                text = "刪除角色", fontSize = 14.sp, color = LocalColor.current.text.default_100
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(LocalColor.current.background)
+                    .clickable {
+                        onDelete.invoke()
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = "刪除角色", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+            }
+
+        }
     }
 }
 
@@ -154,10 +165,15 @@ fun StyleScreen(
 @Composable
 fun StyleScreenPreview() {
     FanciTheme {
-        StyleScreen(mainActivity = MainActivity(),
+        StyleScreen(
+            mainActivity = MainActivity(),
             roleName = "",
-            roleColor = com.cmoney.fanciapi.fanci.model.Color()
-        ) { _, _ ->
-        }
+            roleColor = com.cmoney.fanciapi.fanci.model.Color(),
+            showDelete = true,
+            onDelete = {},
+            onChange = { _, _ ->
+
+            }
+        )
     }
 }
