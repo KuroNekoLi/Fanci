@@ -9,12 +9,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -23,21 +25,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.GroupReportMessageScreenDestination
 import com.cmoney.fanci.destinations.GroupReporterScreenDestination
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
+import com.cmoney.fanci.ui.common.GrayButton
 import com.cmoney.fanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.dialog.AlertDialogScreen
+import com.cmoney.fanci.ui.screens.shared.dialog.item.BanDayItemScreen
+import com.cmoney.fanci.ui.screens.shared.dialog.item.KickOutItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanci.utils.Utils
-import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.ReportInformation
-import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.fanciapi.fanci.model.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -53,10 +57,11 @@ import org.koin.core.parameter.parametersOf
 fun GroupReportScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
+    group: Group,
     reportList: Array<ReportInformation>,
     viewModel: GroupReportViewModel = koinViewModel(
         parameters = {
-            parametersOf(reportList.toList())
+            parametersOf(reportList.toList(), group)
         }
     ),
     resultBackNavigator: ResultBackNavigator<Boolean>
@@ -74,13 +79,124 @@ fun GroupReportScreen(
             resultBackNavigator.navigateBack(
                 result = (reportList.size != uiState.reportList.size)
             )
+        },
+        onReport = {
+            viewModel.showReportDialog(it)
         }
     )
 
+    //懲處 dialog
+    if (uiState.showReportDialog != null) {
+        ReportDialog(
+            reportInformation = uiState.showReportDialog,
+            onDismiss = {
+                viewModel.dismissReportDialog()
+            },
+            onSilence = {
+                viewModel.dismissReportDialog()
+                viewModel.showSilenceDialog(it)
+            },
+            onKick = {
+                viewModel.dismissReportDialog()
+                viewModel.showKickDialog(it)
+            }
+        )
+    }
+
+    //禁言 dialog
+    if (uiState.showSilenceDialog != null) {
+        val name = uiState.showSilenceDialog.reportee?.name.orEmpty()
+        AlertDialogScreen(
+            onDismiss = {
+                viewModel.dismissSilenceDialog()
+            },
+            title = "禁言 $name",
+        ) {
+            BanDayItemScreen(
+                name = name,
+                onDismiss = {
+                    viewModel.dismissSilenceDialog()
+                },
+                onClick = {
+                    viewModel.silenceUser(uiState.showSilenceDialog, it)
+                }
+            )
+        }
+    }
+
+    //踢出 dialog
+    if (uiState.kickDialog != null) {
+        val name = uiState.kickDialog.reportee?.name.orEmpty()
+
+        AlertDialogScreen(
+            onDismiss = {
+                viewModel.dismissKickDialog()
+            },
+            title = "將 $name 踢出社團",
+        ) {
+            KickOutItemScreen(
+                name = name,
+                onDismiss = {
+                    viewModel.dismissKickDialog()
+                },
+                onConfirm = {
+                    viewModel.kickOutMember(uiState.kickDialog)
+                }
+            )
+        }
+    }
+
+    //返回
     BackHandler {
         resultBackNavigator.navigateBack(
             result = (reportList.size != uiState.reportList.size)
         )
+    }
+}
+
+@Composable
+private fun ReportDialog(
+    modifier: Modifier = Modifier,
+    reportInformation: ReportInformation,
+    onDismiss: () -> Unit,
+    onSilence: (ReportInformation) -> Unit,
+    onKick: (ReportInformation) -> Unit
+) {
+    Dialog(onDismissRequest = {
+        onDismiss()
+    }) {
+        Surface(
+            modifier = modifier.fillMaxSize(),
+            color = Color.Transparent
+        ) {
+            Column(
+                modifier = Modifier.padding(bottom = 25.dp),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                GrayButton(
+                    text = "禁言",
+                    shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+                ) {
+                    onSilence.invoke(reportInformation)
+                }
+
+                GrayButton(
+                    text = "踢出社團",
+                    shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                ) {
+                    onKick.invoke(reportInformation)
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                GrayButton(
+                    text = "返回"
+                ) {
+                    onDismiss()
+                }
+            }
+        }
     }
 }
 
@@ -90,7 +206,8 @@ private fun GroupReportScreenView(
     navigator: DestinationsNavigator,
     reportList: List<ReportInformation>,
     onIgnore: (ReportInformation) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onReport: (ReportInformation) -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -129,6 +246,9 @@ private fun GroupReportScreenView(
                     },
                     onIgnore = {
                         onIgnore.invoke(it)
+                    },
+                    onReportClick = {
+                        onReport.invoke(it)
                     }
                 )
             }
@@ -141,7 +261,8 @@ private fun ReportItem(
     reportInformation: ReportInformation,
     onFullMessageClick: (ReportInformation) -> Unit,
     onReporterClick: (ReportInformation) -> Unit,
-    onIgnore: (ReportInformation) -> Unit
+    onIgnore: (ReportInformation) -> Unit,
+    onReportClick: (ReportInformation) -> Unit
 ) {
     val reportUser = reportInformation.reportee
     val channel = reportInformation.channel
@@ -291,7 +412,7 @@ private fun ReportItem(
                     .height(40.dp),
                 text = "懲處"
             ) {
-                // TODO:
+                onReportClick.invoke(reportInformation)
             }
         }
     }
@@ -324,7 +445,8 @@ fun GroupReportScreenPreview() {
                 )
             ),
             onIgnore = {},
-            onBack = {}
+            onBack = {},
+            onReport = {}
         )
     }
 }

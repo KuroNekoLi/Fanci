@@ -47,7 +47,8 @@ fun GroupRuleManageScreen(
                     reportList?.let {
                         navController.navigate(
                             GroupReportScreenDestination(
-                                reportList = it.toTypedArray()
+                                reportList = it.toTypedArray(),
+                                group = group
                             )
                         )
                     }

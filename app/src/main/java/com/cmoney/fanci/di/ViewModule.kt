@@ -43,7 +43,9 @@ val viewModule = module {
     viewModel { params ->
         GroupReportViewModel(
             get(),
-            reportList = params.get()
+            reportList = params.get(),
+            group = params.get(),
+            banUseCase = get()
         )
     }
 }

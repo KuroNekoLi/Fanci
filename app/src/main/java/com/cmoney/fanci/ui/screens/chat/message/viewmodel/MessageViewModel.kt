@@ -59,7 +59,7 @@ class MessageViewModel(
 
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
 
-    private val pollingInterval = 30000L
+    private val pollingInterval = 3000L
 
     /**
      * 圖片上傳 callback
@@ -485,7 +485,6 @@ class MessageViewModel(
         )
     }
 
-    // TODO: 驗證 刪除他人訊息
     /**
      * 確定 刪除 訊息
      * 要先判斷 刪除自己的貼文 or 刪除他人(需要有該權限)

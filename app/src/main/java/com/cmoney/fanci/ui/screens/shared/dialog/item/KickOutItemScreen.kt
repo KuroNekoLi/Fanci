@@ -29,7 +29,7 @@ fun KickOutItemScreen(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = "你確定要將 %s 踢出社團嗎？\n日後可以從禁言列表中取消懲處".format(name),
+            text = "你確定要將 %s 踢出社團嗎？".format(name),
             fontSize = 17.sp,
             color = Color.White
         )

@@ -46,6 +46,9 @@ class BanUseCase(
 
     /**
      * 禁言使用者
+     * @param groupId 社團 id
+     * @param userId
+     * @param banPeriodOption 被ban週期
      */
     suspend fun banUser(groupId: String, userId: String, banPeriodOption: BanPeriodOption) =
         kotlin.runCatching {
