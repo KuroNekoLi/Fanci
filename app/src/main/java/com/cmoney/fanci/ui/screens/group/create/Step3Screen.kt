@@ -40,7 +40,7 @@ fun Step3Screen(
 ) {
     Scaffold(
         modifier = modifier
-    ) {
+    ) { padding ->
         Column {
             Spacer(modifier = Modifier.height(1.dp))
             DescWithImage(desc = "社團圖示", groupIcon) {

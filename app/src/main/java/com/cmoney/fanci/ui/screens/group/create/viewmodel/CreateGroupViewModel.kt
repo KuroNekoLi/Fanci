@@ -1,16 +1,23 @@
 package com.cmoney.fanci.ui.screens.group.create.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanci.BuildConfig
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.ImageChangeData
 import com.cmoney.fanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.imagelibrary.UploadImage
+import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class UiState(
     val currentStep: Int = 1,           //目前步驟
@@ -21,7 +28,10 @@ data class UiState(
     val groupTheme: GroupTheme? = null  //社團主題
 )
 
-class CreateGroupViewModel(val groupUseCase: GroupUseCase) : ViewModel() {
+class CreateGroupViewModel(
+    val context: Context,
+    val groupUseCase: GroupUseCase
+) : ViewModel() {
     private val TAG = CreateGroupViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(UiState())
@@ -81,9 +91,26 @@ class CreateGroupViewModel(val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun changeGroupAvatar(data: ImageChangeData) {
         KLog.i(TAG, "changeGroupAvatar")
-        uiState = uiState.copy(
-            groupIcon = data.url.orEmpty()
-        )
+        viewModelScope.launch {
+            var imageUrl = data.url.orEmpty()
+            if (data.uri != null) {
+                imageUrl = withContext(Dispatchers.IO) {
+                    val uploadImage =
+                        UploadImage(
+                            context,
+                            listOf(data.uri),
+                            XLoginHelper.accessToken,
+                            BuildConfig.DEBUG
+                        )
+
+                    val uploadResult = uploadImage.upload().first()
+                    uploadResult.second
+                }
+            }
+            uiState = uiState.copy(
+                groupIcon = imageUrl
+            )
+        }
     }
 
     /**
@@ -91,9 +118,26 @@ class CreateGroupViewModel(val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun changeGroupCover(data: ImageChangeData) {
         KLog.i(TAG, "changeGroupCover")
-        uiState = uiState.copy(
-            groupBackground = data.url.orEmpty()
-        )
+        viewModelScope.launch {
+            var imageUrl = data.url.orEmpty()
+            if (data.uri != null) {
+                imageUrl = withContext(Dispatchers.IO) {
+                    val uploadImage =
+                        UploadImage(
+                            context,
+                            listOf(data.uri),
+                            XLoginHelper.accessToken,
+                            BuildConfig.DEBUG
+                        )
+
+                    val uploadResult = uploadImage.upload().first()
+                    uploadResult.second
+                }
+            }
+            uiState = uiState.copy(
+                groupBackground = imageUrl
+            )
+        }
     }
 
     /**

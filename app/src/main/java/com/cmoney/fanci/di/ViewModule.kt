@@ -15,6 +15,7 @@ import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.RoleManag
 import com.cmoney.fanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.member.viewmodel.MemberViewModel
+import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -37,7 +38,7 @@ val viewModule = module {
         )
     }
     viewModel {
-        CreateGroupViewModel(get())
+        CreateGroupViewModel(androidApplication(), get())
     }
     viewModel { ApplyForGroupViewModel(get(), get()) }
     viewModel { params ->

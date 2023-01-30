@@ -245,7 +245,7 @@ private fun CreateGroupScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
