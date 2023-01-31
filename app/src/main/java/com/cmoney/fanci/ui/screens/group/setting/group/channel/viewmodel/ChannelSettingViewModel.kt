@@ -312,7 +312,7 @@ class ChannelSettingViewModel(
     }
 
     /**
-     * 刪除 分類
+     * 刪除 分類, 並將該分類下的頻道分配至 預設
      */
     fun deleteCategory(group: Group, category: Category) {
         KLog.i(TAG, "deleteCategory")
@@ -320,9 +320,25 @@ class ChannelSettingViewModel(
             channelUseCase.deleteCategory(categoryId = category.id.orEmpty()).fold({
             }, {
                 if (it is EmptyBodyException) {
-                    val newCategory = group.categories?.filter { groupCategory ->
+
+                    var newCategory = group.categories?.filter { groupCategory ->
                         groupCategory.id != category.id
                     }
+
+                    //將刪除分類下的頻道移至預設分類下
+                    val channels = category.channels ?: emptyList()
+                    newCategory = newCategory?.map { category ->
+                        if (category.isDefault == true) {
+                            val newChannel = category.channels?.toMutableList() ?: mutableListOf()
+                            newChannel.addAll(channels)
+                            category.copy(
+                                channels = newChannel
+                            )
+                        } else {
+                            category
+                        }
+                    }
+
                     uiState = uiState.copy(
                         group = group.copy(
                             categories = newCategory

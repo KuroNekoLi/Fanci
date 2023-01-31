@@ -98,9 +98,9 @@ fun ShareAddRoleScreenView(
                 }
             )
         }
-    ) {
+    ) { innerPadding ->
         if (roleList.isNotEmpty()) {
-            Column {
+            Column(modifier = Modifier.padding(innerPadding)) {
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(roleList) { roleModel ->
                         RoleItemScreen(roleModel) {

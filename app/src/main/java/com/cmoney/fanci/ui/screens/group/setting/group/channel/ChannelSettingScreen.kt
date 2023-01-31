@@ -125,12 +125,13 @@ fun ChannelSettingScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .background(LocalColor.current.env_80)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .padding(padding)
         ) {
             Row(
                 modifier = Modifier.padding(24.dp)
