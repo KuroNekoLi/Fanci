@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.camera.ChooseImagePickDialog
@@ -100,7 +101,7 @@ fun MessageInput(
             }
         )
 
-        if (isShowSend) {
+        if (isShowSend && Constant.MyChannelPermission.canPost == true) {
             IconButton(
                 onClick = {
                     onMessageSend.invoke(textState)

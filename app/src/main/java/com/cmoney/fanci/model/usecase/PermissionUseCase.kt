@@ -7,6 +7,10 @@ class PermissionUseCase(
     private val permissionApi: PermissionApi
 ) {
 
+    suspend fun getPermissionByChannel(channelId: String) = kotlin.runCatching {
+        permissionApi.apiV1PermissionChannelChannelIdGet(channelId = channelId).checkResponseBody()
+    }
+
     /**
      * 取得在此群組下的權限
      */

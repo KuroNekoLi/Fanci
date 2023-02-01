@@ -38,7 +38,7 @@ fun MessageScreen(
     channelId: String,
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
-    onMsgDismissHide: (ChatMessage) -> Unit,
+    onMsgDismissHide: (ChatMessage) -> Unit
 ) {
     val isScrollToBottom = messageViewModel.uiState.isSendComplete
     val onInteractClick = object : (MessageInteract) -> Unit {

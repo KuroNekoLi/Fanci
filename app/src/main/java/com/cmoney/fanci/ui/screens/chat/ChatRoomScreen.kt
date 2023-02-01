@@ -1,5 +1,6 @@
 package com.cmoney.fanci.ui.screens.chat
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanci.destinations.AnnouncementScreenDestination
 import com.cmoney.fanci.extension.showToast
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.fanci.ui.screens.chat.dialog.HideUserDialogScreen
 import com.cmoney.fanci.ui.screens.chat.dialog.ReportUserDialogScreen
@@ -18,12 +20,14 @@ import com.cmoney.fanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.fanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.fanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
+import com.cmoney.fanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.fanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
@@ -45,10 +49,15 @@ fun ChatRoomScreen(
 
     KLog.i(TAG, "channelId:$channelId")
 
-    messageViewModel.startPolling(channelId)
+    if (Constant.MyChannelPermission.canRead == true) {
+        messageViewModel.startPolling(channelId)
+    }
 
     //抓取 公告
     viewModel.fetchAnnounceMessage(channelId)
+
+    //抓取在頻道的權限
+    viewModel.fetchChannelPermission(channelId)
 
     BackHandler {
         messageViewModel.stopPolling()
@@ -81,6 +90,102 @@ fun ChatRoomScreen(
         messageViewModel.copyDone()
     }
 
+    ChatRoomScreenView(
+        channelId = channelId,
+        channelTitle = channelTitle,
+        navController = navController,
+        announceMessage = uiState.announceMessage,
+        onMsgDismissHide = {
+            viewModel.onMsgDismissHide(it)
+        },
+        replyMessage = messageViewModel.uiState.replyMessage,
+        onDeleteReply = {
+            messageViewModel.removeReply(it)
+        },
+        imageAttach = messageViewModel.uiState.imageAttach,
+        onDeleteAttach = {
+            messageViewModel.removeAttach(it)
+        },
+        onMessageSend = {
+            messageViewModel.messageSend(channelId, it)
+        },
+        onAttach = {
+            messageViewModel.attachImage(it)
+        },
+        snackBarMessage = messageViewModel.uiState.snackBarMessage,
+        onSnackBarDismiss = {
+            messageViewModel.snackBarDismiss()
+        }
+    )
+
+    //Alert Dialog
+    //檢舉用戶
+    messageViewModel.uiState.reportMessage?.author?.apply {
+        ReportUserDialogScreen(user = this,
+            onConfirm = {
+                messageViewModel.onReportUser(
+                    reason = it,
+                    channelId = channelId,
+                    contentId = messageViewModel.uiState.reportMessage?.id.orEmpty()
+                )
+            }
+        ) {
+            messageViewModel.onReportUserDialogDismiss()
+        }
+    }
+
+    //刪除訊息 彈窗
+    messageViewModel.uiState.deleteMessage?.apply {
+        DeleteMessageDialogScreen(chatMessageModel = this,
+            onConfirm = {
+                messageViewModel.onDeleteMessageDialogDismiss()
+                messageViewModel.onDeleteClick(it)
+            }) {
+            messageViewModel.onDeleteMessageDialogDismiss()
+        }
+    }
+
+    //封鎖用戶 彈窗
+    messageViewModel.uiState.hideUserMessage?.author?.apply {
+        HideUserDialogScreen(
+            this,
+            onConfirm = {
+                viewModel.onBlockingUserConfirm(it)
+                messageViewModel.onHideUserDialogDismiss()
+            }
+        ) {
+            messageViewModel.onHideUserDialogDismiss()
+        }
+    }
+
+    //Route
+    //跳轉 公告 page
+    messageViewModel.uiState.routeAnnounceMessage?.apply {
+        navController.navigate(
+            AnnouncementScreenDestination(
+                this
+            )
+        )
+        messageViewModel.announceRouteDone()
+    }
+}
+
+@Composable
+private fun ChatRoomScreenView(
+    channelId: String,
+    channelTitle: String,
+    navController: DestinationsNavigator,
+    announceMessage: ChatMessage?,
+    onMsgDismissHide: (ChatMessage) -> Unit,
+    replyMessage: ChatMessage?,
+    onDeleteReply: (ChatMessage) -> Unit,
+    imageAttach: List<Uri>,
+    onDeleteAttach: (Uri) -> Unit,
+    onMessageSend: (text: String) -> Unit,
+    onAttach: (Uri) -> Unit,
+    snackBarMessage: CustomMessage?,
+    onSnackBarDismiss: () -> Unit
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -101,7 +206,7 @@ fun ChatRoomScreen(
             verticalArrangement = Arrangement.Bottom
         ) {
             //公告訊息 display
-            uiState.announceMessage?.let {
+            announceMessage?.let {
                 MessageAnnounceScreen(
                     it,
                     modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
@@ -116,91 +221,41 @@ fun ChatRoomScreen(
                     .weight(1f),
                 channelId = channelId,
                 onMsgDismissHide = {
-                    viewModel.onMsgDismissHide(it)
+                    onMsgDismissHide.invoke(it)
                 }
             )
 
             //回覆
-            messageViewModel.uiState.replyMessage?.apply {
+            replyMessage?.apply {
                 ChatReplyScreen(this) {
-                    messageViewModel.removeReply(it)
+                    onDeleteReply.invoke(it)
                 }
             }
 
             //附加圖片
-            MessageAttachImageScreen(messageViewModel.uiState.imageAttach) {
-                messageViewModel.removeAttach(it)
+            MessageAttachImageScreen(imageAttach) {
+                onDeleteAttach.invoke(it)
             }
 
             //輸入匡
             MessageInput(
                 onMessageSend = {
-                    messageViewModel.messageSend(channelId, it)
+                    onMessageSend.invoke(it)
                 },
                 onAttach = {
-                    messageViewModel.attachImage(it)
+                    onAttach.invoke(it)
                 }
             )
-        }
-
-        //Alert Dialog
-        //檢舉用戶
-        messageViewModel.uiState.reportMessage?.author?.apply {
-            ReportUserDialogScreen(user = this,
-                onConfirm = {
-                    messageViewModel.onReportUser(
-                        reason = it,
-                        channelId = channelId,
-                        contentId = messageViewModel.uiState.reportMessage?.id.orEmpty()
-                    )
-                }
-            ) {
-                messageViewModel.onReportUserDialogDismiss()
-            }
-        }
-
-        //刪除訊息 彈窗
-        messageViewModel.uiState.deleteMessage?.apply {
-            DeleteMessageDialogScreen(chatMessageModel = this,
-                onConfirm = {
-                    messageViewModel.onDeleteMessageDialogDismiss()
-                    messageViewModel.onDeleteClick(it)
-                }) {
-                messageViewModel.onDeleteMessageDialogDismiss()
-            }
-        }
-
-        //封鎖用戶 彈窗
-        messageViewModel.uiState.hideUserMessage?.author?.apply {
-            HideUserDialogScreen(
-                this,
-                onConfirm = {
-                    viewModel.onBlockingUserConfirm(it)
-                    messageViewModel.onHideUserDialogDismiss()
-                }
-            ) {
-                messageViewModel.onHideUserDialogDismiss()
-            }
         }
 
         //SnackBar
         FanciSnackBarScreen(
             modifier = Modifier.padding(bottom = 70.dp),
-            message = messageViewModel.uiState.snackBarMessage
+            message = snackBarMessage
         ) {
-            messageViewModel.snackBarDismiss()
+            onSnackBarDismiss.invoke()
         }
 
-        //Route
-        //跳轉 公告 page
-        messageViewModel.uiState.routeAnnounceMessage?.apply {
-            navController.navigate(
-                AnnouncementScreenDestination(
-                    this
-                )
-            )
-            messageViewModel.announceRouteDone()
-        }
     }
 }
 
@@ -208,5 +263,20 @@ fun ChatRoomScreen(
 @Composable
 fun ChatRoomScreenPreview() {
     FanciTheme {
+        ChatRoomScreenView(
+            channelId = "",
+            channelTitle = "",
+            navController = EmptyDestinationsNavigator,
+            announceMessage = ChatMessage(),
+            onMsgDismissHide = {},
+            replyMessage = ChatMessage(),
+            onDeleteReply = {},
+            imageAttach = emptyList(),
+            onDeleteAttach = {},
+            onMessageSend = {},
+            onAttach = {},
+            snackBarMessage = null,
+            onSnackBarDismiss = {}
+        )
     }
 }

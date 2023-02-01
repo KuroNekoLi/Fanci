@@ -12,14 +12,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.EmptyBodyException
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
+import com.cmoney.fanci.model.usecase.PermissionUseCase
 import com.cmoney.fanci.model.usecase.RelationUseCase
 import com.cmoney.fanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.fanci.ui.theme.White_494D54
 import com.cmoney.fanci.ui.theme.White_767A7F
-import com.cmoney.fanci.utils.Utils
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
 import com.socks.library.KLog
@@ -47,7 +47,8 @@ data class ChatRoomUiState(
 class ChatRoomViewModel(
     val context: Context,
     val chatRoomUseCase: ChatRoomUseCase,
-    val relationUseCase: RelationUseCase
+    val relationUseCase: RelationUseCase,
+    val permissionUseCase: PermissionUseCase
 ) : ViewModel() {
 
     private val TAG = ChatRoomViewModel::class.java.simpleName
@@ -315,5 +316,19 @@ class ChatRoomViewModel(
         uiState = uiState.copy(
             errorMessage = null
         )
+    }
+
+    /**
+     *  抓取頻道權限
+     */
+    fun fetchChannelPermission(channelId: String) {
+        KLog.i(TAG, "fetchChannelPermission:$channelId")
+        viewModelScope.launch {
+            permissionUseCase.getPermissionByChannel(channelId = channelId).fold({
+                Constant.MyChannelPermission = it
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
     }
 }

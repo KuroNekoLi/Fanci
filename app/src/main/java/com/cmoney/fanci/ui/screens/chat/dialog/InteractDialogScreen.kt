@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.model.usecase.ChatRoomUseCase
 import com.cmoney.fanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -55,56 +56,72 @@ fun InteractDialogScreen(
                 bottom = 10.dp
             )
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp)
-                    .horizontalScroll(rememberScrollState()),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                emojiLit.forEach {
-                    EmojiIcon(it) { resId ->
-                        onClose(coroutineScope, modalBottomSheetState)
-                        onInteractClick.invoke(MessageInteract.EmojiClick(message, resId))
+            if (Constant.MyChannelPermission.canEmoji == true) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp)
+                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    emojiLit.forEach {
+                        EmojiIcon(it) { resId ->
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(MessageInteract.EmojiClick(message, resId))
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            FeatureText(R.drawable.reply, "回覆") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(MessageInteract.Reply(message))
+            if (Constant.MyChannelPermission.canReply == true) {
+                FeatureText(R.drawable.reply, "回覆") {
+                    onClose(coroutineScope, modalBottomSheetState)
+                    onInteractClick.invoke(MessageInteract.Reply(message))
+                }
             }
 
-            FeatureText(R.drawable.recycle, "收回訊息") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(MessageInteract.Recycle(message))
+            if (Constant.MyChannelPermission.canTakeback == true) {
+                FeatureText(R.drawable.recycle, "收回訊息") {
+                    onClose(coroutineScope, modalBottomSheetState)
+                    onInteractClick.invoke(MessageInteract.Recycle(message))
+                }
             }
 
-            FeatureText(R.drawable.copy, "複製訊息") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(MessageInteract.Copy(message))
+            if (Constant.MyChannelPermission.canCopy == true) {
+                FeatureText(R.drawable.copy, "複製訊息") {
+                    onClose(coroutineScope, modalBottomSheetState)
+                    onInteractClick.invoke(MessageInteract.Copy(message))
+                }
             }
 
-            FeatureText(R.drawable.top, "置頂訊息") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(MessageInteract.Announcement(message))
+            if (Constant.MyChannelPermission.canManage == true) {
+                FeatureText(R.drawable.top, "置頂訊息") {
+                    onClose(coroutineScope, modalBottomSheetState)
+                    onInteractClick.invoke(MessageInteract.Announcement(message))
+                }
             }
 
-            FeatureText(R.drawable.hide, "封鎖此用戶") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(MessageInteract.HideUser(message))
+            if (Constant.MyChannelPermission.canBlock == true) {
+                FeatureText(R.drawable.hide, "封鎖此用戶") {
+                    onClose(coroutineScope, modalBottomSheetState)
+                    onInteractClick.invoke(MessageInteract.HideUser(message))
+                }
             }
 
-            FeatureText(R.drawable.report, "向管理員檢舉此用戶") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(MessageInteract.Report(message))
+            if (Constant.MyChannelPermission.canReport == true) {
+                FeatureText(R.drawable.report, "向管理員檢舉此用戶") {
+                    onClose(coroutineScope, modalBottomSheetState)
+                    onInteractClick.invoke(MessageInteract.Report(message))
+                }
             }
 
-            FeatureText(R.drawable.delete, "刪除訊息") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(MessageInteract.Delete(message))
+            if (Constant.MyChannelPermission.canManage == true) {
+                FeatureText(R.drawable.delete, "刪除訊息") {
+                    onClose(coroutineScope, modalBottomSheetState)
+                    onInteractClick.invoke(MessageInteract.Delete(message))
+                }
             }
         }
     }

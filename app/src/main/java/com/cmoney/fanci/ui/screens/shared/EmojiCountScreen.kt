@@ -1,7 +1,6 @@
 package com.cmoney.fanci.ui.screens.shared
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,11 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.common.EmojiText
 import com.cmoney.fanci.ui.theme.LocalColor
 
@@ -29,7 +28,9 @@ fun EmojiCountScreen(
         modifier = modifier
             .clip(RoundedCornerShape(6.dp))
             .clickable {
-                onClick.invoke(emojiResource)
+                if (Constant.MyChannelPermission.canEmoji == true) {
+                    onClick.invoke(emojiResource)
+                }
             }
             .background(LocalColor.current.background)
     ) {
