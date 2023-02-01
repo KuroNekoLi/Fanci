@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.model.usecase.GroupUseCase
+import com.cmoney.fanci.model.usecase.OrderUseCase
 import com.cmoney.fanciapi.fanci.model.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -36,7 +37,8 @@ data class FanciRoleCallback(
 ) : Parcelable
 
 class RoleManageViewModel(
-    private val groupUseCase: GroupUseCase
+    private val groupUseCase: GroupUseCase,
+    private val orderUseCase: OrderUseCase
 ) : ViewModel() {
     private val TAG = RoleManageViewModel::class.java.simpleName
 
@@ -416,6 +418,41 @@ class RoleManageViewModel(
         }
         uiState = uiState.copy(
             fanciRole = roleList
+        )
+    }
+
+    /**
+     * 重新排序 角色清單
+     */
+    fun sortRole(
+        groupId: String,
+        roleList: List<FanciRole>
+    ) {
+        KLog.i(TAG, "sortRole:$roleList")
+        viewModelScope.launch {
+            orderUseCase.orderRole(
+                groupId = groupId,
+                roleIds = roleList.map { it.id.orEmpty() }
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    KLog.i(TAG, "sortRole complete.")
+                    uiState = uiState.copy(
+                        fanciRole = roleList
+                    )
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
+
+    /**
+     * re-assign data to screen
+     */
+    fun setSortResult(fanciRoleList: List<FanciRole>) {
+        uiState = uiState.copy(
+            fanciRole = fanciRoleList
         )
     }
 }

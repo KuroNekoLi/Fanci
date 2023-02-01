@@ -15,4 +15,5 @@ val useCaseModule = module {
     factory { GroupApplyUseCase(get()) }
     factory { RelationUseCase(get()) }
     factory { PermissionUseCase(get()) }
+    factory { OrderUseCase(get()) }
 }

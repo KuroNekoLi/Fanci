@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.toColor
+import com.cmoney.fanci.ui.theme.Blue_4F70E5
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.FanciRole
@@ -34,6 +35,7 @@ fun RoleItemScreen(
     isShowIndex: Boolean = false,
     fanciRole: FanciRole,
     editText: String = "編輯",
+    isSortMode: Boolean = false,
     onEditClick: (FanciRole) -> Unit
 ) {
     Row(
@@ -41,7 +43,9 @@ fun RoleItemScreen(
             .fillMaxWidth()
             .background(LocalColor.current.background)
             .clickable {
-                onEditClick.invoke(fanciRole)
+                if (!isSortMode) {
+                    onEditClick.invoke(fanciRole)
+                }
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -103,10 +107,19 @@ fun RoleItemScreen(
             )
         }
 
-        Text(
-            modifier = Modifier.padding(end = 24.dp),
-            text = editText, fontSize = 14.sp, color = LocalColor.current.primary
-        )
+        if (!isSortMode) {
+            Text(
+                modifier = Modifier.padding(end = 24.dp),
+                text = editText, fontSize = 14.sp, color = LocalColor.current.primary
+            )
+        }
+        else {
+            Image(
+                modifier = Modifier.padding(end = 24.dp),
+                painter = painterResource(id = R.drawable.menu),
+                colorFilter = ColorFilter.tint(color = Blue_4F70E5),
+                contentDescription = null)
+        }
     }
 }
 

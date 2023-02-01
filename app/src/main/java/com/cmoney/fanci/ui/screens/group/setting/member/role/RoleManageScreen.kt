@@ -16,9 +16,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.destinations.AddRoleScreenDestination
+import com.cmoney.fanci.destinations.RoleSortScreenDestination
 import com.cmoney.fanci.model.Constant
-import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
+import com.cmoney.fanci.ui.screens.group.setting.member.role.sort.SortedRole
 import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
 import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -45,7 +46,8 @@ fun RoleManageScreen(
     navigator: DestinationsNavigator,
     group: Group,
     viewModel: RoleManageViewModel = koinViewModel(),
-    roleResult: ResultRecipient<AddRoleScreenDestination, FanciRoleCallback>
+    roleResult: ResultRecipient<AddRoleScreenDestination, FanciRoleCallback>,
+    sortRoleResult: ResultRecipient<RoleSortScreenDestination, SortedRole>
 ) {
     val TAG = "RoleManageScreen"
 
@@ -58,10 +60,20 @@ fun RoleManageScreen(
                 val fanciRoleCallback = result.value
                 if (fanciRoleCallback.isAdd) {
                     viewModel.addMemberRole(fanciRoleCallback.fanciRole)
-                }
-                else {
+                } else {
                     viewModel.removeRole(fanciRoleCallback.fanciRole)
                 }
+            }
+        }
+    }
+
+    sortRoleResult.onNavResult {result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                val sortedRole = result.value
+                viewModel.setSortResult(sortedRole.roleList)
             }
         }
     }
@@ -133,7 +145,12 @@ fun RoleManageScreenView(
                         borderColor = LocalColor.current.component.other,
                         textColor = Color.White
                     ) {
-                        // TODO:
+                        navigator.navigate(
+                            RoleSortScreenDestination(
+                                group = group,
+                                roleList = roleList.toTypedArray()
+                            )
+                        )
                     }
                 }
             }

@@ -27,7 +27,7 @@ val viewModule = module {
     viewModel { DiscoverViewModel(get()) }
     viewModel { GroupSettingViewModel(get(), get(), get()) }
     viewModel { ChannelSettingViewModel(get(), get()) }
-    viewModel { RoleManageViewModel(get()) }
+    viewModel { RoleManageViewModel(get(), get()) }
     viewModel { MemberViewModel(get(), get()) }
     viewModel { BanListViewModel(get()) }
     viewModel { GroupApplyViewModel(get()) }

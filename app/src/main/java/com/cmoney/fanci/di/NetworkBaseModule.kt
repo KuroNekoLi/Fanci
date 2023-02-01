@@ -102,6 +102,10 @@ val networkBaseModule = module {
         get<ApiClient>().createService(UserReportApi::class.java)
     }
 
+    single {
+        get<ApiClient>().createService(OrderApi::class.java)
+    }
+
 }
 
 private fun getDomain(context: Context): String {
