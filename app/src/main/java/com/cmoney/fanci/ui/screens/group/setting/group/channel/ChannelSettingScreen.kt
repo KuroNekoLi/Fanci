@@ -15,6 +15,7 @@ import com.cmoney.fanci.destinations.AddCategoryScreenDestination
 import com.cmoney.fanci.destinations.AddChannelScreenDestination
 import com.cmoney.fanci.destinations.EditCategoryScreenDestination
 import com.cmoney.fanci.destinations.EditChannelScreenDestination
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
@@ -136,31 +137,38 @@ fun ChannelSettingScreenView(
             Row(
                 modifier = Modifier.padding(24.dp)
             ) {
-                BorderButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    text = "新增分類",
-                    borderColor = LocalColor.current.text.default_100
-                ) {
-                    KLog.i(TAG, "new category click.")
-                    navigator.navigate(
-                        AddCategoryScreenDestination(
-                            group = group
+
+                if (Constant.MyGroupPermission.createOrEditCategory == true) {
+                    BorderButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp),
+                        text = "新增分類",
+                        borderColor = LocalColor.current.text.default_100
+                    ) {
+                        KLog.i(TAG, "new category click.")
+                        navigator.navigate(
+                            AddCategoryScreenDestination(
+                                group = group
+                            )
                         )
-                    )
+                    }
+
+                    Spacer(modifier = Modifier.width(23.dp))
                 }
 
-                Spacer(modifier = Modifier.width(23.dp))
+                if (Constant.MyGroupPermission.rearrangeChannelCategory == true) {
+                    BorderButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp),
+                        text = "重新排列",
+                        borderColor = LocalColor.current.text.default_100
+                    ) {
+                        // TODO: sort
+                        KLog.i(TAG, "category sort click.")
 
-                BorderButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    text = "重新排列",
-                    borderColor = LocalColor.current.text.default_100
-                ) {
-                    KLog.i(TAG, "category sort click.")
+                    }
                 }
             }
 

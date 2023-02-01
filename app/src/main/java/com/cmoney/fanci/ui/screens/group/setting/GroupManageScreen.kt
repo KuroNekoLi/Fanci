@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -15,6 +14,7 @@ import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.ChannelSettingScreenDestination
 import com.cmoney.fanci.destinations.GroupOpennessScreenDestination
 import com.cmoney.fanci.destinations.GroupSettingSettingScreenDestination
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -31,7 +31,6 @@ fun GroupManageScreen(
     group: Group,
     navController: DestinationsNavigator
 ) {
-
     Column(
         modifier = modifier
     ) {
@@ -40,52 +39,73 @@ fun GroupManageScreen(
             text = "社團管理", fontSize = 14.sp, color = LocalColor.current.text.default_100
         )
 
-        SettingItemScreen(
-            iconRes = R.drawable.info,
-            text = "社團設定",
-            onItemClick = {
-                navController.navigate(
-                    GroupSettingSettingScreenDestination(
-                        group = group
+        if (Constant.MyGroupPermission.editGroup == true) {
+            SettingItemScreen(
+                iconRes = R.drawable.info,
+                text = "社團設定",
+                onItemClick = {
+                    navController.navigate(
+                        GroupSettingSettingScreenDestination(
+                            group = group
+                        )
                     )
+                }
+            )
+
+            Spacer(modifier = Modifier.height(1.dp))
+        }
+
+        if (isShowChannelManage()) {
+            SettingItemScreen(
+                iconRes = R.drawable.channel_setting,
+                text = "頻道管理",
+                onItemClick = {
+                    navController.navigate(
+                        ChannelSettingScreenDestination(
+                            group = group
+                        )
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.height(1.dp))
+        }
+
+        if (Constant.MyGroupPermission.setGroupPublicity == true) {
+            SettingItemScreen(
+                iconRes = R.drawable.lock,
+                text = "社團公開度",
+                onItemClick = {
+                    navController.navigate(
+                        GroupOpennessScreenDestination(
+                            group = group
+                        )
+                    )
+                }
+            ) {
+                val publicText = if (group.isNeedApproval == true) {
+                    "不公開"
+                } else {
+                    "公開"
+                }
+                Text(
+                    text = publicText,
+                    fontSize = 17.sp,
+                    color = LocalColor.current.specialColor.red
                 )
             }
-        )
-
-        Spacer(modifier = Modifier.height(1.dp))
-
-        SettingItemScreen(
-            iconRes = R.drawable.channel_setting,
-            text = "頻道管理",
-            onItemClick = {
-                navController.navigate(
-                    ChannelSettingScreenDestination(
-                        group = group
-                    )
-                )
-            }
-        )
-        Spacer(modifier = Modifier.height(1.dp))
-
-        SettingItemScreen(
-            iconRes = R.drawable.lock,
-            text = "社團公開度",
-            onItemClick = {
-                navController.navigate(
-                    GroupOpennessScreenDestination(
-                        group = group
-                    )
-                )
-            }
-        ) {
-            val publicText = if (group.isNeedApproval == true) {
-                "不公開"
-            } else {
-                "公開"
-            }
-            Text(text = publicText, fontSize = 17.sp, color = LocalColor.current.specialColor.red)
         }
     }
+}
+
+/**
+ * 是否呈現 頻道管理
+ */
+private fun isShowChannelManage(): Boolean {
+    return Constant.MyGroupPermission.createOrEditChannel == true ||
+            Constant.MyGroupPermission.rearrangeChannelCategory == true ||
+            Constant.MyGroupPermission.createOrEditCategory == true ||
+            Constant.MyGroupPermission.deleteCategory == true ||
+            Constant.MyGroupPermission.deleteChannel == true
 }
 
 @Preview(showBackground = true)

@@ -22,6 +22,7 @@ import com.cmoney.fanci.destinations.MemberManageScreenDestination
 import com.cmoney.fanci.destinations.MemberRoleManageScreenDestination
 import com.cmoney.fanci.extension.fromJsonTypeToken
 import com.cmoney.fanci.extension.toColor
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.common.CircleImage
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.member.viewmodel.MemberViewModel
@@ -108,10 +109,12 @@ fun AllMemberScreenView(
             items(groupMemberList) { groupMember ->
                 MemberItem(groupMember = groupMember) {
                     KLog.i(TAG, "member click:$it")
-                    navController.navigate(MemberManageScreenDestination(
-                        group = group,
-                        groupMember =  groupMember
-                    ))
+                    if (Constant.MyGroupPermission.createOrEditRole == true) {
+                        navController.navigate(MemberManageScreenDestination(
+                            group = group,
+                            groupMember =  groupMember
+                        ))    
+                    }
                 }
                 Spacer(modifier = Modifier.height(1.dp))
             }
@@ -181,7 +184,9 @@ private fun MemberItem(
             }
         }
 
-        Text(text = "管理", fontSize = 14.sp, color = LocalColor.current.primary)
+        if (Constant.MyGroupPermission.createOrEditRole == true) {
+            Text(text = "管理", fontSize = 14.sp, color = LocalColor.current.primary)
+        }
     }
 }
 

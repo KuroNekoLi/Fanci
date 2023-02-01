@@ -21,6 +21,7 @@ import com.cmoney.fanci.MainActivity
 import com.cmoney.fanci.R
 import com.cmoney.fanci.extension.showColorPickerDialogBottomSheet
 import com.cmoney.fanci.extension.toColor
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
 import com.socks.library.KLog
@@ -135,7 +136,7 @@ fun StyleScreen(
             )
         }
 
-        if (showDelete) {
+        if (showDelete && Constant.MyGroupPermission.deleteRole == true) {
             Spacer(modifier = Modifier.height(40.dp))
 
             Text(

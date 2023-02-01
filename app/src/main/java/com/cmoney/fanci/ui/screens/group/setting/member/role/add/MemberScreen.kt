@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.AddMemberScreenDestination
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -39,19 +40,21 @@ fun MemberScreen(
     val TAG = "MemberScreen"
 
     Column(modifier = modifier.fillMaxSize()) {
-        BorderButton(
-            modifier = Modifier
-                .background(LocalColor.current.env_80)
-                .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 20.dp)
-                .fillMaxWidth()
-                .height(40.dp),
-            text = "新增成員", borderColor = LocalColor.current.text.default_100
-        ) {
-            navigator.navigate(
-                AddMemberScreenDestination(
-                    group = group
+        if (Constant.MyGroupPermission.assignRole == true) {
+            BorderButton(
+                modifier = Modifier
+                    .background(LocalColor.current.env_80)
+                    .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 20.dp)
+                    .fillMaxWidth()
+                    .height(40.dp),
+                text = "新增成員", borderColor = LocalColor.current.text.default_100
+            ) {
+                navigator.navigate(
+                    AddMemberScreenDestination(
+                        group = group
+                    )
                 )
-            )
+            }
         }
 
         LazyColumn(
@@ -103,12 +106,14 @@ private fun MemberItem(
             )
         }
 
-        Text(
-            modifier = Modifier.clickable {
-                onMemberClick.invoke(groupMember)
-            },
-            text = "移除", fontSize = 14.sp, color = LocalColor.current.primary
-        )
+        if (Constant.MyGroupPermission.assignRole == true) {
+            Text(
+                modifier = Modifier.clickable {
+                    onMemberClick.invoke(groupMember)
+                },
+                text = "移除", fontSize = 14.sp, color = LocalColor.current.primary
+            )
+        }
     }
 }
 

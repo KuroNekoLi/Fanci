@@ -144,11 +144,12 @@ fun EditCategoryScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(LocalColor.current.env_80)
+                .padding(padding)
         ) {
 
             Column(modifier = Modifier.weight(1f)) {

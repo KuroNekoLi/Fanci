@@ -9,14 +9,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.model.persistence.SettingsDataStore
+import com.cmoney.fanci.model.usecase.PermissionUseCase
 import com.cmoney.fanci.model.usecase.ThemeUseCase
 import com.cmoney.fanci.model.usecase.UserUseCase
-import com.cmoney.fanci.ui.theme.CoffeeThemeColor
 import com.cmoney.fanci.ui.theme.DefaultThemeColor
 import com.cmoney.fanci.ui.theme.FanciColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 sealed class ThemeSetting {
@@ -34,13 +33,11 @@ data class UiState(
 class MainViewModel(
     private val userUseCase: UserUseCase,
     private val themeUseCase: ThemeUseCase,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val permissionUseCase: PermissionUseCase
 ) :
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
-
-//    private val _theme = MutableLiveData<ThemeSetting>(ThemeSetting.Coffee)
-//    val theme: LiveData<ThemeSetting> = _theme
 
     private val _isOpenTutorial = MutableLiveData<Boolean>()
     val isOpenTutorial: LiveData<Boolean> = _isOpenTutorial
@@ -56,17 +53,6 @@ class MainViewModel(
         }
     }
 
-
-//    fun setCoffeeTheme() {
-//        KLog.i(TAG, "setCoffeeTheme")
-//        _theme.value = ThemeSetting.Coffee
-//    }
-//
-//    fun settingTheme(themeSetting: ThemeSetting) {
-//        KLog.i(TAG, "settingTheme:$themeSetting")
-//        _theme.value = themeSetting
-//    }
-
     /**
      * 登入成功之後,要向 Fanci後台註冊
      */
@@ -76,7 +62,7 @@ class MainViewModel(
             userUseCase.registerUser()
             userUseCase.fetchMyInfo().fold({
                 Constant.MyInfo = it
-            },{
+            }, {
                 KLog.e(TAG, it)
             })
         }
@@ -89,6 +75,7 @@ class MainViewModel(
         KLog.i(TAG, "setCurrentGroup:$group")
         if (group != uiState.currentGroup && group.id != null) {
             KLog.i(TAG, "setCurrentGroup diff:$group")
+            fetchGroupPermission(group)
             uiState = uiState.copy(
                 currentGroup = group
             )
@@ -105,6 +92,24 @@ class MainViewModel(
             }
         }
     }
+
+    /**
+     * 抓取在該社團的權限
+     */
+    private fun fetchGroupPermission(group: Group) {
+        KLog.i(TAG, "fetchGroupPermission:$group")
+        viewModelScope.launch {
+            permissionUseCase.getPermissionByGroup(groupId = group.id.orEmpty()).fold(
+                {
+                    KLog.i(TAG, it)
+                    Constant.MyGroupPermission = it
+                }, {
+                    KLog.e(TAG, it)
+                }
+            )
+        }
+    }
+
 
     /**
      * 看過 tutorial

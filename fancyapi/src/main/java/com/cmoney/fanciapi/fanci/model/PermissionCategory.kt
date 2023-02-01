@@ -24,7 +24,6 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param categoryName 
  * @param displayCategoryName 
  * @param permissions 
  */
@@ -32,9 +31,6 @@ import kotlinx.parcelize.Parcelize
 
 
 data class PermissionCategory (
-
-    @Json(name = "categoryName")
-    val categoryName: kotlin.String? = null,
 
     @Json(name = "displayCategoryName")
     val displayCategoryName: kotlin.String? = null,

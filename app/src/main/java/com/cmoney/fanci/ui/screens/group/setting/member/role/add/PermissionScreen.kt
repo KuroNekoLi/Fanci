@@ -112,7 +112,6 @@ fun PermissionScreenPreview() {
         PermissionScreen(
             permissionList = listOf(
                 PermissionCategory(
-                    categoryName = "01-GroupEdit",
                     displayCategoryName = "社團編輯",
                     permissions = listOf(
                         Permission(
@@ -120,21 +119,18 @@ fun PermissionScreenPreview() {
                             description = "編輯社團名稱、簡介、頭像與背景。",
                             displayName = "編輯社團",
                             highlight = false,
-                            displayCategoryName = "社團編輯"
                         ),
                         Permission(
                             name = "編輯社團2",
                             description = "編輯社團名稱、簡介、頭像與背景。",
                             displayName = "編輯社團",
                             highlight = false,
-                            displayCategoryName = "社團編輯"
                         ),
                         Permission(
                             name = "編輯社團3",
                             description = "編輯社團名稱、簡介、頭像與背景。",
                             displayName = "編輯社團",
                             highlight = true,
-                            displayCategoryName = "社團編輯"
                         )
                     )
                 )

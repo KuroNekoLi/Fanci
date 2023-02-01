@@ -6,6 +6,8 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
+import com.cmoney.fanciapi.fanci.model.ChannelPermission
+import com.cmoney.fanciapi.fanci.model.GroupPermission
 import com.cmoney.fanciapi.fanci.model.PatchPermissionParam
 import com.cmoney.fanciapi.fanci.model.Permission
 import com.cmoney.fanciapi.fanci.model.PermissionCategory
@@ -21,10 +23,10 @@ interface PermissionApi {
      *  - 404: 找不到該頻道
      *
      * @param channelId 聊天室頻道Id
-     * @return [kotlin.collections.List<Permission>]
+     * @return [ChannelPermission]
      */
     @GET("api/v1/Permission/Channel/{channelId}")
-    suspend fun apiV1PermissionChannelChannelIdGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<Permission>>
+    suspend fun apiV1PermissionChannelChannelIdGet(@Path("channelId") channelId: kotlin.String): Response<ChannelPermission>
 
     /**
      * 取得管理權限表
@@ -47,10 +49,10 @@ interface PermissionApi {
      *  - 404: 找不到該社團
      *
      * @param groupId 社團Id
-     * @return [kotlin.collections.List<Permission>]
+     * @return [GroupPermission]
      */
     @GET("api/v1/Permission/Group/{groupId}")
-    suspend fun apiV1PermissionGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<Permission>>
+    suspend fun apiV1PermissionGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<GroupPermission>
 
     /**
      * 取得單一權限資訊

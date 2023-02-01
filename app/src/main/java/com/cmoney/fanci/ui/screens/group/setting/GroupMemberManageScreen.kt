@@ -14,6 +14,7 @@ import com.cmoney.fanci.R
 import com.cmoney.fanci.destinations.AllMemberScreenDestination
 import com.cmoney.fanci.destinations.GroupApplyScreenDestination
 import com.cmoney.fanci.destinations.RoleManageScreenDestination
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -37,15 +38,17 @@ fun GroupMemberManageScreen(
             text = "成員管理", fontSize = 14.sp, color = LocalColor.current.text.default_100
         )
 
-        SettingItemScreen(
-            iconRes = R.drawable.rule_manage,
-            text = "角色管理",
-            onItemClick = {
-                navController.navigate(RoleManageScreenDestination(group = group))
-            }
-        )
+        if (Constant.MyGroupPermission.createOrEditRole == true) {
+            SettingItemScreen(
+                iconRes = R.drawable.rule_manage,
+                text = "角色管理",
+                onItemClick = {
+                    navController.navigate(RoleManageScreenDestination(group = group))
+                }
+            )
 
-        Spacer(modifier = Modifier.height(1.dp))
+            Spacer(modifier = Modifier.height(1.dp))
+        }
 
         SettingItemScreen(
             iconRes = R.drawable.all_member,
@@ -60,19 +63,21 @@ fun GroupMemberManageScreen(
         )
         Spacer(modifier = Modifier.height(1.dp))
 
-        SettingItemScreen(
-            iconRes = R.drawable.join_apply,
-            text = "加入申請",
-            onItemClick = {
-                navController.navigate(
-                    GroupApplyScreenDestination(
-                        group = group
+        if (Constant.MyGroupPermission.approveJoinApplies == true) {
+            SettingItemScreen(
+                iconRes = R.drawable.join_apply,
+                text = "加入申請",
+                onItemClick = {
+                    navController.navigate(
+                        GroupApplyScreenDestination(
+                            group = group
+                        )
                     )
-                )
+                }
+            ) {
+                val text = if (unApplyCount != 0L) unApplyCount.toString() else ""
+                Text(text = text, fontSize = 17.sp, color = LocalColor.current.text.default_100)
             }
-        ) {
-            val text = if (unApplyCount != 0L) unApplyCount.toString() else ""
-            Text(text = text, fontSize = 17.sp, color = LocalColor.current.text.default_100)
         }
     }
 }

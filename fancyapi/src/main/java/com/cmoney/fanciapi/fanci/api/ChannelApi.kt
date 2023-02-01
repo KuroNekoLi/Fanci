@@ -69,7 +69,7 @@ interface ChannelApi {
      *  - 405: 要新增的角色不存在
      *
      * @param channelId 頻道Id
-     * @param roleIdsParam  (optional)
+     * @param roleIdsParam 角色Id (optional)
      * @return [Unit]
      */
     @HTTP(method = "DELETE", path = "api/v1/Channel/{channelId}/Role", hasBody = true)

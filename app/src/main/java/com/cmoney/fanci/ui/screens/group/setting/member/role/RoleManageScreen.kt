@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.destinations.AddRoleScreenDestination
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.common.BlueButton
 import com.cmoney.fanci.ui.common.BorderButton
 import com.cmoney.fanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
@@ -121,17 +122,19 @@ fun RoleManageScreenView(
                     navigator.navigate(AddRoleScreenDestination(group = group))
                 }
 
-                Spacer(modifier = Modifier.width(23.dp))
+                if (Constant.MyGroupPermission.rearrangeRoles == true) {
+                    Spacer(modifier = Modifier.width(23.dp))
 
-                BorderButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    text = "重新排列",
-                    borderColor = LocalColor.current.component.other,
-                    textColor = Color.White
-                ) {
-                    // TODO:
+                    BorderButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp),
+                        text = "重新排列",
+                        borderColor = LocalColor.current.component.other,
+                        textColor = Color.White
+                    ) {
+                        // TODO:
+                    }
                 }
             }
 

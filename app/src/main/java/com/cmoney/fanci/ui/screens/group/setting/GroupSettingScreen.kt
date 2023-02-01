@@ -15,7 +15,7 @@ import com.cmoney.fanci.LocalDependencyContainer
 import com.cmoney.fanci.destinations.GroupApplyScreenDestination
 import com.cmoney.fanci.destinations.GroupOpennessScreenDestination
 import com.cmoney.fanci.destinations.GroupReportScreenDestination
-import com.cmoney.fanci.destinations.GroupReporterScreenDestination
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.theme.FanciTheme
@@ -144,12 +144,14 @@ fun GroupSettingScreenView(
             Spacer(modifier = Modifier.height(28.dp))
 
             //社團管理
-            GroupManageScreen(
-                group = group,
-                navController = navController
-            )
+            if (isShowGroupManage()) {
+                GroupManageScreen(
+                    group = group,
+                    navController = navController
+                )
 
-            Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(28.dp))
+            }
 
             //成員管理
             GroupMemberManageScreen(
@@ -161,15 +163,29 @@ fun GroupSettingScreenView(
             Spacer(modifier = Modifier.height(28.dp))
 
             //秩序管理
-            GroupRuleManageScreen(
-                group = group,
-                reportList = reportList,
-                navController = navController
-            )
+            if (Constant.MyGroupPermission.banOrKickMember == true) {
+                GroupRuleManageScreen(
+                    group = group,
+                    reportList = reportList,
+                    navController = navController
+                )
+            }
         }
     }
 }
 
+/**
+ * 是否呈現 社團管理 區塊
+ */
+private fun isShowGroupManage(): Boolean {
+    return (Constant.MyGroupPermission.editGroup == true) ||
+            (Constant.MyGroupPermission.createOrEditChannel == true) ||
+            (Constant.MyGroupPermission.createOrEditCategory == true) ||
+            (Constant.MyGroupPermission.setGroupPublicity == true) ||
+            (Constant.MyGroupPermission.rearrangeChannelCategory == true) ||
+            (Constant.MyGroupPermission.deleteCategory == true) ||
+            (Constant.MyGroupPermission.deleteChannel == true)
+}
 
 @Preview(showBackground = true)
 @Composable

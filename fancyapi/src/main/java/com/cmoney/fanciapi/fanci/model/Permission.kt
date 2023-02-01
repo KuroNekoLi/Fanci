@@ -26,11 +26,8 @@ import kotlinx.parcelize.Parcelize
  * @param id 
  * @param name 權限名稱
  * @param description 權限描述
- * @param authType 0. group(space) level  1. channel(board) level
- * @param allowedActions 
  * @param displayName 
  * @param highlight 
- * @param displayCategoryName 權限分類名稱
  */
 @Parcelize
 
@@ -48,22 +45,11 @@ data class Permission (
     @Json(name = "description")
     val description: kotlin.String? = null,
 
-    /* 0. group(space) level  1. channel(board) level */
-    @Json(name = "authType")
-    val authType: kotlin.Int? = null,
-
-    @Json(name = "allowedActions")
-    val allowedActions: kotlin.collections.List<kotlin.String>? = null,
-
     @Json(name = "displayName")
     val displayName: kotlin.String? = null,
 
     @Json(name = "highlight")
-    val highlight: kotlin.Boolean? = null,
-
-    /* 權限分類名稱 */
-    @Json(name = "displayCategoryName")
-    val displayCategoryName: kotlin.String? = null
+    val highlight: kotlin.Boolean? = null
 
 ) : Parcelable
 

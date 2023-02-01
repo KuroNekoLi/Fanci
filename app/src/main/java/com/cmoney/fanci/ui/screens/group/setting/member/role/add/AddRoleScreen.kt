@@ -249,7 +249,6 @@ fun AddRoleScreenPreview() {
             mainActivity = MainActivity(),
             permissionList = listOf(
                 PermissionCategory(
-                    categoryName = "01-GroupEdit",
                     displayCategoryName = "社團編輯",
                     permissions = listOf(
                         Permission(
@@ -257,7 +256,6 @@ fun AddRoleScreenPreview() {
                             description = "編輯社團名稱、簡介、頭像與背景。",
                             displayName = "編輯社團",
                             highlight = false,
-                            displayCategoryName = "社團編輯"
                         )
                     )
                 )

@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanci.R
+import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.common.ChannelText
 import com.cmoney.fanci.ui.theme.FanciTheme
 import com.cmoney.fanci.ui.theme.LocalColor
@@ -36,7 +37,9 @@ fun ChannelBarScreen(
             .clip(RoundedCornerShape(10.dp))
             .background(LocalColor.current.background)
             .clickable {
-                onClick.invoke(channel)
+                if (Constant.MyGroupPermission.createOrEditChannel == true || Constant.MyGroupPermission.deleteChannel == true) {
+                    onClick.invoke(channel)
+                }
             },
         contentAlignment = Alignment.CenterStart
     ) {
@@ -53,7 +56,10 @@ fun ChannelBarScreen(
                 modifier = Modifier.weight(1f),
                 channel.name.orEmpty()
             )
-            if (isEditMode) {
+            if (isEditMode && (Constant.MyGroupPermission.createOrEditChannel == true ||
+                        Constant.MyGroupPermission.deleteChannel == true
+                        )
+            ) {
                 Text(
                     text = "編輯", fontSize = 14.sp, color = LocalColor.current.primary
                 )
