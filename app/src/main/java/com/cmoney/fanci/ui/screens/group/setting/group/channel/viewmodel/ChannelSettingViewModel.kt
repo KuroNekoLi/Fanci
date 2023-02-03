@@ -9,6 +9,7 @@ import com.cmoney.fanci.extension.EmptyBodyException
 import com.cmoney.fanci.extension.fromJsonTypeToken
 import com.cmoney.fanci.model.usecase.ChannelUseCase
 import com.cmoney.fanci.model.usecase.GroupUseCase
+import com.cmoney.fanci.model.usecase.OrderUseCase
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.FanciRole
@@ -23,14 +24,16 @@ data class UiState(
     val channelRole: List<FanciRole>? = null,   //目前頻道顯示角色List
     val groupRoleList: List<AddChannelRoleModel> = emptyList(),
     val confirmRoleList: String = "",
-    val tabSelected: Int = 0    //record tab position
+    val tabSelected: Int = 0,    //record tab position
+    val isOpenSortDialog: Boolean = false
 )
 
 data class AddChannelRoleModel(val role: FanciRole, val isChecked: Boolean = false)
 
 class ChannelSettingViewModel(
     private val channelUseCase: ChannelUseCase,
-    private val groupUseCase: GroupUseCase
+    private val groupUseCase: GroupUseCase,
+    private val orderUseCase: OrderUseCase
 ) : ViewModel() {
     private val TAG = ChannelSettingViewModel::class.java.simpleName
 
@@ -423,5 +426,45 @@ class ChannelSettingViewModel(
         uiState = uiState.copy(
             channelRole = filterRoleList
         )
+    }
+
+    /**
+     * 點擊重新排序
+     */
+    fun onSortClick() {
+        KLog.i(TAG, "onSortClick.")
+        uiState = uiState.copy(
+            isOpenSortDialog = true
+        )
+    }
+
+    fun closeSortDialog() {
+        uiState = uiState.copy(
+            isOpenSortDialog = false
+        )
+    }
+
+    /**
+     * 儲存 分類排序
+     */
+    fun onSortCategory(group: Group, categories: List<Category>) {
+        KLog.i(TAG, "onSortCategory:$categories")
+        viewModelScope.launch {
+            orderUseCase.orderCategoryOrChannel(
+                groupId = group.id.orEmpty(),
+                category = categories
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    uiState = uiState.copy(
+                        group = group.copy(
+                            categories = categories
+                        )
+                    )
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
     }
 }

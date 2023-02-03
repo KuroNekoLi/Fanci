@@ -3,20 +3,23 @@ package com.cmoney.fanci.ui.screens.group.setting.group.channel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.cmoney.fanci.LocalDependencyContainer
-import com.cmoney.fanci.destinations.AddCategoryScreenDestination
-import com.cmoney.fanci.destinations.AddChannelScreenDestination
-import com.cmoney.fanci.destinations.EditCategoryScreenDestination
-import com.cmoney.fanci.destinations.EditChannelScreenDestination
+import com.cmoney.fanci.destinations.*
 import com.cmoney.fanci.model.Constant
 import com.cmoney.fanci.ui.common.BorderButton
+import com.cmoney.fanci.ui.common.GrayButton
 import com.cmoney.fanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.fanci.ui.screens.shared.TopBarScreen
 import com.cmoney.fanci.ui.screens.shared.channel.ChannelEditScreen
@@ -46,17 +49,30 @@ fun ChannelSettingScreen(
     setChannelResult: ResultRecipient<AddChannelScreenDestination, Group>,
     setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>,
     setEditChannelResult: ResultRecipient<EditChannelScreenDestination, Group>,
-    setEditCategoryResult: ResultRecipient<EditCategoryScreenDestination, Group>
+    setEditCategoryResult: ResultRecipient<EditCategoryScreenDestination, Group>,
+    sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var groupParam = group
 
-    viewModel.uiState.group?.let {
+    val uiState = viewModel.uiState
+
+    uiState.group?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
     }
 
     //========== Result callback Start ==========
+    sortCategoryResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                viewModel.setGroup(result.value)
+            }
+        }
+    }
+
     setEditCategoryResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -97,19 +113,40 @@ fun ChannelSettingScreen(
         }
     }
     //========== Result callback End ==========
-
     ChannelSettingScreenView(
         modifier,
         navigator,
         groupParam
-    )
+    ) {
+        viewModel.onSortClick()
+    }
+
+    if (uiState.isOpenSortDialog) {
+        SortDialog(
+            onDismiss = {
+                viewModel.closeSortDialog()
+            },
+            onChannelSort = {
+
+            },
+            onCategorySort = {
+                viewModel.closeSortDialog()
+                navigator.navigate(
+                    SortCategoryScreenDestination(
+                        group = uiState.group ?: group
+                    )
+                )
+            }
+        )
+    }
 }
 
 @Composable
 fun ChannelSettingScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    group: Group
+    group: Group,
+    onSortClick: () -> Unit
 ) {
     val TAG = "ChannelSettingScreenView"
 
@@ -165,9 +202,8 @@ fun ChannelSettingScreenView(
                         text = "重新排列",
                         borderColor = LocalColor.current.text.default_100
                     ) {
-                        // TODO: sort
                         KLog.i(TAG, "category sort click.")
-
+                        onSortClick.invoke()
                     }
                 }
             }
@@ -211,6 +247,51 @@ fun ChannelSettingScreenView(
     }
 }
 
+@Composable
+private fun SortDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onChannelSort: () -> Unit,
+    onCategorySort: () -> Unit
+) {
+    Dialog(onDismissRequest = {
+        onDismiss()
+    }) {
+        Surface(
+            modifier = modifier.fillMaxSize(),
+            color = Color.Transparent
+        ) {
+            Column(
+                modifier = Modifier.padding(bottom = 25.dp),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                GrayButton(
+                    text = "頻道排序",
+                    shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+                ) {
+                    onChannelSort.invoke()
+                }
+
+                GrayButton(
+                    text = "分類排序",
+                    shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                ) {
+                    onCategorySort.invoke()
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                GrayButton(
+                    text = "返回"
+                ) {
+                    onDismiss()
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ChannelSettingScreenPreview() {
@@ -242,7 +323,8 @@ fun ChannelSettingScreenPreview() {
                         )
                     )
                 )
-            )
+            ),
+            onSortClick = {}
         )
     }
 }

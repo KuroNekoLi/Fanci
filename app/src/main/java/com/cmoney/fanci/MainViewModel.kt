@@ -14,6 +14,8 @@ import com.cmoney.fanci.model.usecase.ThemeUseCase
 import com.cmoney.fanci.model.usecase.UserUseCase
 import com.cmoney.fanci.ui.theme.DefaultThemeColor
 import com.cmoney.fanci.ui.theme.FanciColor
+import com.cmoney.fanciapi.fanci.model.Category
+import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
@@ -27,7 +29,45 @@ data class UiState(
     val currentGroup: Group? = null, //目前選擇中的社團
 //    val theme: FanciColor = CoffeeThemeColor,
     val theme: FanciColor = DefaultThemeColor,
-    val isLoginSuccess: Boolean = false
+    val isLoginSuccess: Boolean = false,
+    val testCategory: List<Category> = listOf(
+        Category(
+            id = "1",
+            name = "Title1",
+            channels = listOf(
+                Channel(
+                    id = "1",
+                    name = "Channel1"
+                ),
+                Channel(
+                    id = "2",
+                    name = "Channel2"
+                ),
+                Channel(
+                    id = "3",
+                    name = "Channel3"
+                )
+            )
+        ),
+        Category(
+            id = "2",
+            name = "Title2",
+            channels = listOf(
+                Channel(
+                    id = "4",
+                    name = "Channel4"
+                ),
+                Channel(
+                    id = "5",
+                    name = "Channel5"
+                ),
+                Channel(
+                    id = "6",
+                    name = "Channel6"
+                )
+            )
+        )
+    )
 )
 
 class MainViewModel(
@@ -129,6 +169,12 @@ class MainViewModel(
         KLog.i(TAG, "loginSuccess")
         uiState = uiState.copy(
             isLoginSuccess = true
+        )
+    }
+
+    fun sortCallback(categoryList: List<Category>) {
+        uiState = uiState.copy(
+            testCategory = categoryList
         )
     }
 
