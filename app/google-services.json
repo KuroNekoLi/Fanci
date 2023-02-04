@@ -1,0 +1,92 @@
+{
+  "project_info": {
+    "project_number": "951137938331",
+    "project_id": "kolfanci",
+    "storage_bucket": "kolfanci.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951137938331:android:da4b928502941ed13d0f3e",
+        "android_client_info": {
+          "package_name": "com.cmoney.kolfanci"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "951137938331-3g1oc5se0vp3haop4clbjkrsu1mbt7t5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cmoney.kolfanci",
+            "certificate_hash": "e5661d40461800ad6e4ef9959d6626f92e1e290d"
+          }
+        },
+        {
+          "client_id": "951137938331-psm7s4fef1vdpe8lq9br5an77vl5qk71.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYX7WauojWMq9V3QXChxg5e6hIbxaIOV4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "951137938331-psm7s4fef1vdpe8lq9br5an77vl5qk71.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "951137938331-9cjdok226uukl82i5tob9iec2ktmvjmt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "CMoney.KOLfanci",
+                "app_store_id": "6443794078"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951137938331:android:494c77eb0250eec43d0f3e",
+        "android_client_info": {
+          "package_name": "com.cmoney.kolfanci.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "951137938331-psm7s4fef1vdpe8lq9br5an77vl5qk71.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYX7WauojWMq9V3QXChxg5e6hIbxaIOV4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "951137938331-psm7s4fef1vdpe8lq9br5an77vl5qk71.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "951137938331-9cjdok226uukl82i5tob9iec2ktmvjmt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "CMoney.KOLfanci",
+                "app_store_id": "6443794078"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

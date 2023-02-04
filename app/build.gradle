@@ -4,10 +4,11 @@ plugins {
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp' version '1.7.20-1.0.6'
+    id 'com.google.gms.google-services'
 }
 
 android {
-    namespace 'com.cmoney.fanci'
+    namespace 'com.cmoney.kolfanci'
     compileSdk 33
 
     defaultConfig {
@@ -22,10 +23,19 @@ android {
             useSupportLibrary true
         }
     }
+    signingConfigs {
+        release {
+            keyAlias "cmoney_fanci"
+            keyPassword "kol_fanci"
+            storeFile file("../key/keystore.jks")
+            storePassword "kol_fanci"
+        }
+    }
 
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             resValue 'string', 'cm_server_url', '"https://www.cmoney.tw/"'
         }
@@ -142,6 +152,11 @@ dependencies {
 
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+
+    //=============== Firebase ===============
+    implementation platform('com.google.firebase:firebase-bom:31.2.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-perf-ktx'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
