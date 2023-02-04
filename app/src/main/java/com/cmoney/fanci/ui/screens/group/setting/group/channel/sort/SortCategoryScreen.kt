@@ -55,7 +55,7 @@ fun SortCategoryScreen(
         navigator = navigator,
         category = group.categories.orEmpty(),
         onSave = {
-            viewModel.onSortCategory(group, it)
+            viewModel.onSortCategoryOrChannel(group, it)
         }
     )
 

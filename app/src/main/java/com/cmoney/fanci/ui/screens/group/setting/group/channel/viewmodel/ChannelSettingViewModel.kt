@@ -10,6 +10,7 @@ import com.cmoney.fanci.extension.fromJsonTypeToken
 import com.cmoney.fanci.model.usecase.ChannelUseCase
 import com.cmoney.fanci.model.usecase.GroupUseCase
 import com.cmoney.fanci.model.usecase.OrderUseCase
+import com.cmoney.fanci.ui.screens.group.setting.group.channel.sort.MoveItem
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.FanciRole
@@ -25,7 +26,8 @@ data class UiState(
     val groupRoleList: List<AddChannelRoleModel> = emptyList(),
     val confirmRoleList: String = "",
     val tabSelected: Int = 0,    //record tab position
-    val isOpenSortDialog: Boolean = false
+    val isOpenSortDialog: Boolean = false,
+    val isSoredToServerComplete: Boolean = false    //完成將排序結果給 server
 )
 
 data class AddChannelRoleModel(val role: FanciRole, val isChecked: Boolean = false)
@@ -447,7 +449,7 @@ class ChannelSettingViewModel(
     /**
      * 儲存 分類排序
      */
-    fun onSortCategory(group: Group, categories: List<Category>) {
+    fun onSortCategoryOrChannel(group: Group, categories: List<Category>) {
         KLog.i(TAG, "onSortCategory:$categories")
         viewModelScope.launch {
             orderUseCase.orderCategoryOrChannel(
@@ -459,12 +461,56 @@ class ChannelSettingViewModel(
                     uiState = uiState.copy(
                         group = group.copy(
                             categories = categories
-                        )
+                        ),
+                        isSoredToServerComplete = true
                     )
                 } else {
                     KLog.e(TAG, it)
                 }
             })
+        }
+    }
+
+    /**
+     * 排序 頻道
+     */
+    fun sortChannel(moveItem: MoveItem) {
+        KLog.i(TAG, "sortChannel:$moveItem")
+        uiState.group?.let {group ->
+
+            val removedCategoryList = group.categories?.map {category ->
+                if (category.id == moveItem.fromCategory.id) {
+                    category.copy(
+                        channels = category.channels?.filter {channel ->
+                            channel.id != moveItem.channel.id
+                        }
+                    )
+                }
+                else {
+                    category
+                }
+            }
+
+            val sortedCategory = removedCategoryList?.map {category ->
+                if (category.id == moveItem.toCategory?.id) {
+                    val channels = category.channels?.toMutableList()
+                    channels?.add(moveItem.channel)
+                    category.copy(
+                        channels = channels?.distinctBy {
+                            it.id
+                        }
+                    )
+                }
+                else {
+                    category
+                }
+            }
+
+            uiState = uiState.copy(
+                group = group.copy(
+                    categories = sortedCategory
+                )
+            )
         }
     }
 }

@@ -50,7 +50,8 @@ fun ChannelSettingScreen(
     setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>,
     setEditChannelResult: ResultRecipient<EditChannelScreenDestination, Group>,
     setEditCategoryResult: ResultRecipient<EditCategoryScreenDestination, Group>,
-    sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>
+    sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>,
+    sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var groupParam = group
@@ -63,6 +64,16 @@ fun ChannelSettingScreen(
     }
 
     //========== Result callback Start ==========
+    sortChannelResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                viewModel.setGroup(result.value)
+            }
+        }
+    }
+
     sortCategoryResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -127,7 +138,12 @@ fun ChannelSettingScreen(
                 viewModel.closeSortDialog()
             },
             onChannelSort = {
-
+                viewModel.closeSortDialog()
+                navigator.navigate(
+                    SortChannelScreenDestination(
+                        group = uiState.group ?: group
+                    )
+                )
             },
             onCategorySort = {
                 viewModel.closeSortDialog()
