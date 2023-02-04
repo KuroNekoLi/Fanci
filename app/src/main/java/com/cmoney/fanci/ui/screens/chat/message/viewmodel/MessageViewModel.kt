@@ -79,7 +79,7 @@ class MessageViewModel(
         viewModelScope.launch {
             if (channelId?.isNotEmpty() == true) {
                 chatRoomPollUseCase.poll(pollingInterval, channelId).collect {
-                    KLog.i(TAG, it)
+//                    KLog.i(TAG, it)
                     val newMessage = it.items?.map { chatMessage ->
                         ChatMessageWrapper(message = chatMessage)
                     }.orEmpty().reversed()
@@ -117,8 +117,9 @@ class MessageViewModel(
         val distinctMessage = oldMessage.distinctBy { combineMessage ->
             combineMessage.message.id
         }
+
         uiState = uiState.copy(
-            message = distinctMessage,
+            message = distinctMessage
         )
     }
 
@@ -215,6 +216,8 @@ class MessageViewModel(
      * @param text 發送文字
      */
     private fun generatePreviewBeforeSend(text: String) {
+        // TODO: TBD
+        return
         uiState = uiState.copy(
             message = uiState.message.toMutableList().apply {
                 add(0,
