@@ -1,0 +1,54 @@
+image: openjdk:8-jdk
+
+variables:
+  ANDROID_COMPILE_SDK: "29"
+  ANDROID_BUILD_TOOLS: "29.0.2"
+  ANDROID_SDK_TOOLS:   "4333796"
+  BOT_VERSION: "2.1.0.2"
+  BOT_HASH1: "7a31cc6"
+  BOT_HASH2: "HEAD"
+  BOT_TITLE: "Fanci-Android"
+  BOT_IMG: "https://firebasestorage.googleapis.com/v0/b/kolfanci.appspot.com/o/ic_launcher_round.png?alt=media&token=feb6387b-a0e0-4675-9657-0fc31a024a66"
+
+before_script:
+  - echo MR Commit Ref Name, $CI_COMMIT_REF_SLUG
+  - echo user email, $GITLAB_USER_EMAIL
+  - echo Builder DIR, $CI_BUILDS_DIR
+  - echo Project Name, $CI_PROJECT_NAME
+  - echo Project Url, $CI_PROJECT_URL
+  - echo Runner ID, $CI_RUNNER_ID
+  - echo Runner Description, $CI_RUNNER_DESCRIPTION
+  - pwd
+  - export ANDROID_HOME=~/Library/Android/sdk
+  - export PATH=$PATH:~/Library/Android/sdk/platform-tools/
+  - chmod +x ./gradlew
+  - chmod +x ./auto_bot.sh
+
+stages:  
+  - review
+#  - report
+
+upload_to_test:
+  stage: review
+  script:
+    - curl -sL firebase.tools | bash
+    - ./gradlew app:assembleRelease
+    - firebase appdistribution:distribute app/build/outputs/apk/release/*.apk --app 1:951137938331:android:da4b928502941ed13d0f3e --release-notes "Fanci" --groups "xlab"
+    - ./gradlew app:assembleDebug
+    - firebase appdistribution:distribute app/build/outputs/apk/debug/*.apk --app 1:951137938331:android:494c77eb0250eec43d0f3e --release-notes "Fanci" --groups "xlab"
+    - ./auto_bot.sh $BOT_HASH1 $BOT_HASH2 $BOT_TITLE $BOT_IMG $BOT_VERSION
+  only:
+    - /^release/.*$/
+
+#REMOVE
+#report_failure:
+#  script:
+#    - sh ~/2swift/CMoney/MobilePlugin/Android/CICD/AfterScriptFailure.sh $CI_PROJECT_NAME $CI_PROJECT_URL $CI_RUNNER_ID $CI_RUNNER_DESCRIPTION $CI_COMMIT_REF_SLUG $GITLAB_USER_EMAIL
+#  when: on_failure
+#  stage: report
+#
+#report_success:
+#  script:
+#    - sh ~/2swift/CMoney/MobilePlugin/Android/CICD/AfterScriptSuccess.sh $CI_PROJECT_NAME $CI_PROJECT_URL $CI_RUNNER_ID $CI_RUNNER_DESCRIPTION $CI_COMMIT_REF_SLUG $GITLAB_USER_EMAIL
+#  when: on_success
+#  stage: report
