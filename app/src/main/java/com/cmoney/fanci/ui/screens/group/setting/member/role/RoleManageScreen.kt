@@ -51,7 +51,6 @@ fun RoleManageScreen(
 ) {
     val TAG = "RoleManageScreen"
 
-
     roleResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {

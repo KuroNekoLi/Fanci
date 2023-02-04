@@ -32,7 +32,7 @@ data class UiState(
 
 @Parcelize
 data class FanciRoleCallback(
-    val isAdd: Boolean = false,
+    val isAdd: Boolean = true,
     val fanciRole: FanciRole
 ) : Parcelable
 
