@@ -52,18 +52,23 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun fetchMyGroup() {
         KLog.i(TAG, "fetchMyGroup")
-        viewModelScope.launch {
-            groupUseCase.groupToSelectGroupItem().fold({
-                if (it.isNotEmpty()) {
-                    //所有群組
-                    _myGroupList.value = it
+        if (XLoginHelper.isLogin) {
+            viewModelScope.launch {
+                groupUseCase.groupToSelectGroupItem().fold({
+                    if (it.isNotEmpty()) {
+                        //我的所有群組
+                        _myGroupList.value = it
 //                    _followData.value = it.first().groupModel
-                } else {
-                    fetchAllGroupList()
-                }
-            }, {
-                KLog.e(TAG, it)
-            })
+                    } else {
+                        fetchAllGroupList()
+                    }
+                }, {
+                    KLog.e(TAG, it)
+                })
+            }
+        }
+        else {
+            fetchAllGroupList()
         }
     }
 

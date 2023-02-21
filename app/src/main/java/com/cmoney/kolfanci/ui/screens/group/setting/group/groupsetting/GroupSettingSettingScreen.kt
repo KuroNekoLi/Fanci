@@ -57,7 +57,7 @@ fun GroupSettingSettingScreen(
         setDescResult = setDescResult,
         setAvatarResult = setAvatarResult,
         setBackgroundResult = setBackgroundResult,
-        group = group
+        group = viewModel.uiState.settingGroup ?: group
     )
 
     var groupParam = group
