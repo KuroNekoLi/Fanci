@@ -27,18 +27,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.MainViewModel
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.ChatRoomScreenDestination
 import com.cmoney.kolfanci.destinations.DiscoverGroupScreenDestination
 import com.cmoney.kolfanci.destinations.GroupSettingScreenDestination
+import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.state.FollowScreenState
 import com.cmoney.kolfanci.ui.screens.follow.state.rememberFollowScreenState
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -86,35 +88,25 @@ fun FollowScreen(
             .fillMaxSize(),
         backgroundColor = LocalColor.current.env_60,
         scaffoldState = followScreenState.scaffoldState,
-        drawerContent = {
-            DrawerMenuScreen(
-                groupList = groupList.value.orEmpty(),
-                onClick = {
-                    globalViewModel.setCurrentGroup(it.groupModel)
-                    followScreenState.viewModel.groupItemClick(it)
-                    followScreenState.closeDrawer()
-                },
-                onSearch = {
-                    followScreenState.closeDrawer()
-                    val arrayGroupItems = arrayListOf<Group>()
-                    arrayGroupItems.addAll(groupList.value.orEmpty().map {
-                        it.groupModel
-                    })
-                    navigator.navigate(
-                        DiscoverGroupScreenDestination(
-                            groupItems = arrayGroupItems
-                        )
+        drawerContent = DrawerContent(groupListItem = groupList.value.orEmpty(),
+            onClick = {
+                globalViewModel.setCurrentGroup(it.groupModel)
+                followScreenState.viewModel.groupItemClick(it)
+                followScreenState.closeDrawer()
+            },
+            onSearch = {
+                followScreenState.closeDrawer()
+                val arrayGroupItems = arrayListOf<Group>()
+                arrayGroupItems.addAll(groupList.value.orEmpty().map {
+                    it.groupModel
+                })
+                navigator.navigate(
+                    DiscoverGroupScreenDestination(
+                        groupItems = arrayGroupItems
                     )
-                },
-                onLogout = {
-                    XLoginHelper.logOut(context)
-                    val intent = Intent(context, MainActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    context.startActivity(intent)
-                    Runtime.getRuntime().exit(0)
-                }
-            )
-        },
+                )
+            }
+        ),
         drawerBackgroundColor = Color.Transparent,
         drawerElevation = 0.dp,
         drawerScrimColor = Black_99000000
@@ -253,6 +245,36 @@ fun FollowScreen(
                 navigator = navigator
             )
         }
+    }
+}
+
+/**
+ * 側欄UI
+ */
+@Composable
+private fun DrawerContent(
+    groupListItem: List<GroupItem>,
+    onClick: (GroupItem) -> Unit,
+    onSearch: () -> Unit
+): @Composable (ColumnScope.() -> Unit)? {
+    val context = LocalContext.current
+    return if (XLoginHelper.isLogin) {
+        {
+            DrawerMenuScreen(
+                groupList = groupListItem,
+                onClick = onClick,
+                onSearch = onSearch,
+                onLogout = {
+                    XLoginHelper.logOut(context)
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    context.findActivity().finish()
+                    context.startActivity(intent)
+                }
+            )
+        }
+    } else {
+        null
     }
 }
 
