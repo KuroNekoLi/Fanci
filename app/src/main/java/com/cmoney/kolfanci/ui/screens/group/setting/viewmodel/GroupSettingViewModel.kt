@@ -39,6 +39,13 @@ class GroupSettingViewModel(
     var uiState by mutableStateOf(GroupSettingUiState())
         private set
 
+    fun settingGroup(group: Group) {
+        KLog.i(TAG, "settingGroup:$group")
+        uiState = uiState.copy(
+            settingGroup = group
+        )
+    }
+
     /**
      * 抓取 檢舉清單
      */

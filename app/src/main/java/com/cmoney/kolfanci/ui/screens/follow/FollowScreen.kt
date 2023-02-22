@@ -81,30 +81,46 @@ fun FollowScreen(
         followScreenState.viewModel.fetchMyGroup()
     }
 
+    val context = LocalContext.current
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         backgroundColor = LocalColor.current.env_60,
         scaffoldState = followScreenState.scaffoldState,
-        drawerContent = DrawerContent(groupListItem = groupList.value.orEmpty(),
-            onClick = {
-                globalViewModel.setCurrentGroup(it.groupModel)
-                followScreenState.viewModel.groupItemClick(it)
-                followScreenState.closeDrawer()
-            },
-            onSearch = {
-                followScreenState.closeDrawer()
-                val arrayGroupItems = arrayListOf<Group>()
-                arrayGroupItems.addAll(groupList.value.orEmpty().map {
-                    it.groupModel
-                })
-                navigator.navigate(
-                    DiscoverGroupScreenDestination(
-                        groupItems = arrayGroupItems
-                    )
+        drawerContent = if (XLoginHelper.isLogin) {
+            {
+                DrawerMenuScreen(
+                    groupList = groupList.value.orEmpty(),
+                    onClick = {
+                        globalViewModel.setCurrentGroup(it.groupModel)
+                        followScreenState.viewModel.groupItemClick(it)
+                        followScreenState.closeDrawer()
+                    },
+                    onSearch = {
+                        followScreenState.closeDrawer()
+                        val arrayGroupItems = arrayListOf<Group>()
+                        arrayGroupItems.addAll(groupList.value.orEmpty().map {
+                            it.groupModel
+                        })
+                        navigator.navigate(
+                            DiscoverGroupScreenDestination(
+                                groupItems = arrayGroupItems
+                            )
+                        )
+                    },
+                    onLogout = {
+                        XLoginHelper.logOut(context)
+                        val intent = Intent(context, MainActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        context.findActivity().finish()
+                        context.startActivity(intent)
+                    }
                 )
             }
-        ),
+        } else {
+            null
+        },
         drawerBackgroundColor = Color.Transparent,
         drawerElevation = 0.dp,
         drawerScrimColor = Black_99000000
@@ -243,36 +259,6 @@ fun FollowScreen(
                 navigator = navigator
             )
         }
-    }
-}
-
-/**
- * 側欄UI
- */
-@Composable
-private fun DrawerContent(
-    groupListItem: List<GroupItem>,
-    onClick: (GroupItem) -> Unit,
-    onSearch: () -> Unit
-): @Composable (ColumnScope.() -> Unit)? {
-    val context = LocalContext.current
-    return if (XLoginHelper.isLogin) {
-        {
-            DrawerMenuScreen(
-                groupList = groupListItem,
-                onClick = onClick,
-                onSearch = onSearch,
-                onLogout = {
-                    XLoginHelper.logOut(context)
-                    val intent = Intent(context, MainActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    context.findActivity().finish()
-                    context.startActivity(intent)
-                }
-            )
-        }
-    } else {
-        null
     }
 }
 

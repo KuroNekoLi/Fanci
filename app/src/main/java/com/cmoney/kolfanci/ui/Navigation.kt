@@ -115,22 +115,6 @@ fun MainNavHost(
                 TabItem.Follow -> {
                     composable(TabItem.Follow.route) {
                         FollowScreen(
-//                            onChannelClick = {
-//                                route.invoke(
-//                                    MainStateHolder.Route.Channel(
-//                                        channelId = it.id.orEmpty(),
-//                                        channelName = it.name.orEmpty()
-//                                    )
-//                                )
-//                            },
-//                            onSearchClick = {
-//                                route.invoke(MainStateHolder.Route.DiscoverGroup())
-//                            },
-//                            onGroupSettingClick = {
-//                                //前往社團設定
-//                                route.invoke(MainStateHolder.GroupRoute.GroupSetting(group = it))
-//                            },
-//                            navController = navController,
                             globalViewModel = globalViewModel,
                             navigator = navigator
                         )

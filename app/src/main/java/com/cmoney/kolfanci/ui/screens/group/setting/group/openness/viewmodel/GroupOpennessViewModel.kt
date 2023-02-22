@@ -18,6 +18,7 @@ data class UiState(
     val orgQuestion: String = "",
     val saveComplete: Boolean = false,
     val isFirstFetchQuestion: Boolean = true
+
 )
 
 class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) : ViewModel() {
