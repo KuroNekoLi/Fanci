@@ -264,6 +264,8 @@ class MessageViewModel(
             isStaging = BuildConfig.DEBUG
         )
 
+        val completeImageUrl = mutableListOf<String>()
+
         withContext(Dispatchers.IO) {
             uploadImage.upload().catch { e ->
                 KLog.e(TAG, e)
@@ -273,43 +275,52 @@ class MessageViewModel(
                 KLog.i(TAG, "uploadImage:$it")
                 val uri = it.first
                 val imageUrl = it.second
-                //將 上傳成功的圖片 message overwrite 更改狀態
-                uiState = uiState.copy(
-                    message = uiState.message.map { chatMessageWrapper ->
-                        if (chatMessageWrapper.message.id == preSendChatId) {
-                            chatMessageWrapper.copy(
-                                uploadAttachPreview = chatMessageWrapper.uploadAttachPreview.map { attachImage ->
-                                    if (attachImage.uri == uri) {
-                                        ChatRoomUiState.ImageAttachState(
-                                            uri = uri,
-                                            serverUrl = imageUrl,
-                                            isUploadComplete = true
-                                        )
-                                    } else {
-                                        attachImage
-                                    }
-                                }
-                            )
-                        } else {
-                            chatMessageWrapper
-                        }
-                    }
-                )
 
-                //check is all image upload complete
-                val preSendAttach = uiState.message.find {
-                    it.message.id == preSendChatId
-                }?.uploadAttachPreview
+                completeImageUrl.add(imageUrl)
 
-                val isComplete = preSendAttach?.none { imageAttach ->
-                    !imageAttach.isUploadComplete
+                if (completeImageUrl.size == uriLis.size) {
+                    imageUploadCallback.complete(completeImageUrl)
                 }
 
-                if (isComplete == true) {
-                    imageUploadCallback.complete(preSendAttach.map { attach ->
-                        attach.serverUrl
-                    })
-                }
+                //TODO 目前不會先產生 preview message 在畫面上,先註解起來
+//                //將 上傳成功的圖片 message overwrite 更改狀態
+//                uiState = uiState.copy(
+//                    message = uiState.message.map { chatMessageWrapper ->
+//                        if (chatMessageWrapper.message.id == preSendChatId) {
+//                            chatMessageWrapper.copy(
+//                                uploadAttachPreview = chatMessageWrapper.uploadAttachPreview.map { attachImage ->
+//                                    if (attachImage.uri == uri) {
+//                                        ChatRoomUiState.ImageAttachState(
+//                                            uri = uri,
+//                                            serverUrl = imageUrl,
+//                                            isUploadComplete = true
+//                                        )
+//                                    } else {
+//                                        attachImage
+//                                    }
+//                                }
+//                            )
+//                        } else {
+//                            chatMessageWrapper
+//                        }
+//                    }
+//                )
+//
+//                //check is all image upload complete
+//                val preSendAttach = uiState.message.find {
+//                    it.message.id == preSendChatId
+//                }?.uploadAttachPreview
+//
+//                val isComplete = preSendAttach?.none { imageAttach ->
+//                    !imageAttach.isUploadComplete
+//                }
+//
+//                if (isComplete == true) {
+//                    imageUploadCallback.complete(preSendAttach.map { attach ->
+//                        attach.serverUrl
+//                    })
+//                }
+
             }
         }
     }

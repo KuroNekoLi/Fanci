@@ -75,8 +75,6 @@ fun FollowScreen(
         it
     }
 
-    val context = LocalContext.current
-
     KLog.i(TAG, "FollowScreen create.")
 
     if (globalUiState.isLoginSuccess) {
@@ -124,7 +122,7 @@ fun FollowScreen(
                     //Cover Image
                     AsyncImage(
                         alignment = Alignment.TopCenter,
-                        model = group?.coverImageUrl,
+                        model = group.coverImageUrl,
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
