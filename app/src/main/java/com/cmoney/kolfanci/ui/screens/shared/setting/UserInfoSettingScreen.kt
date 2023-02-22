@@ -68,7 +68,7 @@ fun UserInfoSettingScreen(
                         .size(84.dp)
                         .clip(CircleShape),
                     model = state.onAttachImage.value,
-                    placeholder = painterResource(id = R.drawable.resource_default),
+                    placeholder = painterResource(id = R.drawable.placeholder),
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )

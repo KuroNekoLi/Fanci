@@ -21,10 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.kolfanci.destinations.CreateApplyQuestionScreenDestination
-import com.cmoney.kolfanci.destinations.GroupSettingAvatarScreenDestination
-import com.cmoney.kolfanci.destinations.GroupSettingBackgroundScreenDestination
-import com.cmoney.kolfanci.destinations.GroupSettingThemeScreenDestination
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.LocalDependencyContainer
+import com.cmoney.kolfanci.destinations.*
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
@@ -37,7 +36,6 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
 import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -67,6 +65,9 @@ fun CreateGroupScreen(
     val TAG = "CreateGroupScreen"
     val uiState = viewModel.uiState
     val approvalUiState = groupOpennessViewModel.uiState
+
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
@@ -97,8 +98,9 @@ fun CreateGroupScreen(
         onNextStep = {
             if (uiState.currentStep == viewModel.finalStep) {
                 viewModel.createGroup {
-                    groupOpennessViewModel.onSave(it.id.orEmpty())
+                    groupOpennessViewModel.onSave(it)
                 }
+
             } else {
                 viewModel.nextStep()
             }
@@ -210,8 +212,19 @@ fun CreateGroupScreen(
         }
     }
 
+    /**
+     * 建立完成, 回到首頁並顯示所建立群組
+     */
     if (approvalUiState.saveComplete) {
-        navigator.popBackStack()
+        uiState.createdGroup?.let {
+            globalViewModel.setCurrentGroup(it)
+            navigator.popBackStack(
+                route = MainScreenDestination,
+                inclusive = false
+            )
+        } ?: run {
+            navigator.popBackStack()
+        }
     }
 }
 

@@ -105,7 +105,7 @@ fun GroupOpennessScreen(
             showEditDialog.value = Pair(true, it)
         },
         onSave = {
-            viewModel.onSave(groupId = group.id.orEmpty())
+            viewModel.onSave(group = group)
         }
     )
 
@@ -183,7 +183,7 @@ fun GroupOpennessScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column {
             Row(
                 modifier = Modifier

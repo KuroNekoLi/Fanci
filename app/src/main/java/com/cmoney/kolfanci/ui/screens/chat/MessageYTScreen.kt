@@ -42,7 +42,7 @@ fun MessageYTScreen(
                     .clip(RoundedCornerShape(6.dp)),
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
-                placeholder = painterResource(id = R.drawable.resource_default)
+                placeholder = painterResource(id = R.drawable.placeholder)
             )
             Text(
                 modifier = Modifier.padding(top = 5.6.dp),

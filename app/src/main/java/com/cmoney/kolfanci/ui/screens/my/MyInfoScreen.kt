@@ -27,7 +27,7 @@ fun MyInfoScreen(modifier: Modifier = Modifier) {
                 .size(60.dp)
                 .clip(CircleShape),
             model = "https://picsum.photos/300/300",
-            placeholder = painterResource(id = R.drawable.resource_default),
+            placeholder = painterResource(id = R.drawable.placeholder),
             contentScale = ContentScale.Crop,
             contentDescription = null
         )

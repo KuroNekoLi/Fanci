@@ -80,7 +80,7 @@ fun GroupItemScreen(
                 .clip(RoundedCornerShape(18.dp)),
             contentScale = ContentScale.Crop,
             contentDescription = null,
-            placeholder = painterResource(id = R.drawable.resource_default)
+            placeholder = painterResource(id = R.drawable.placeholder)
         )
     }
 }

@@ -75,7 +75,7 @@ class GroupUseCase(
      * @param isNeedApproval 是否需要認證
      * @param coverImageUrl 背景圖
      * @param thumbnailImageUrl 小圖
-     * @param themeName 背景主題名稱
+     * @param themeId 背景主題Id
      */
     suspend fun createGroup(
         name: String,
@@ -83,7 +83,7 @@ class GroupUseCase(
         isNeedApproval: Boolean,
         coverImageUrl: String,
         thumbnailImageUrl: String,
-        themeName: String
+        themeId: String
     ) = kotlin.runCatching {
         groupApi.apiV1GroupPost(
             groupParam = GroupParam(
@@ -92,7 +92,7 @@ class GroupUseCase(
                 isNeedApproval = isNeedApproval,
                 coverImageUrl = coverImageUrl,
                 thumbnailImageUrl = thumbnailImageUrl,
-                colorSchemeGroupKey = ColorTheme.decode(themeName)
+                colorSchemeGroupKey = ColorTheme.decode(themeId)
             )
         ).checkResponseBody()
     }
