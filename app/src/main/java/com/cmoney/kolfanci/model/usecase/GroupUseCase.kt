@@ -2,12 +2,12 @@ package com.cmoney.kolfanci.model.usecase
 
 import android.content.Context
 import android.net.Uri
-import com.cmoney.kolfanci.BuildConfig
-import com.cmoney.kolfanci.extension.checkResponseBody
-import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanciapi.fanci.api.*
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.imagelibrary.UploadImage
+import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.xlogin.XLoginHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +25,13 @@ class GroupUseCase(
     private val groupRequirement: GroupRequirementApi,
     private val userReport: UserReportApi
 ) {
+
+    /**
+     * 刪除/解散 社團
+     */
+    suspend fun deleteGroup(groupId: String) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdDelete(groupId = groupId).checkResponseBody()
+    }
 
     /**
      * 刪除 角色

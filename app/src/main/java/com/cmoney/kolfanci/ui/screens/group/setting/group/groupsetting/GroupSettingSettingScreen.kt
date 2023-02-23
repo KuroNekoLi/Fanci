@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
 
+import android.content.Intent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,23 +11,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.LocalDependencyContainer
+import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.*
+import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -70,7 +77,104 @@ fun GroupSettingSettingScreen(
         modifier,
         navController,
         groupParam,
+        onDelectClick = {
+            viewModel.onDelectClick()
+        }
     )
+
+    //第一次確認解散
+    if (viewModel.uiState.showDelectDialog) {
+        AlertDialogScreen(
+            onDismiss = {
+                viewModel.onDismissDelectDialog()
+            },
+            title = "你確定要把社團解散嗎？",
+        ) {
+            Column {
+                Text(
+                    text = "社團解散，所有內容、成員將會消失 平台「不會」有備份、復原功能。", fontSize = 17.sp, color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = "返回",
+                    borderColor = LocalColor.current.component.other,
+                    textColor = Color.White
+                ) {
+                    viewModel.onDismissDelectDialog()
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = "確定解散",
+                    borderColor = LocalColor.current.specialColor.red,
+                    textColor = LocalColor.current.specialColor.red
+                ) {
+                    viewModel.onDismissDelectDialog()
+                    viewModel.onDelectReConfirm()
+                }
+            }
+        }
+    }
+
+    //最終確認刪除
+    if (viewModel.uiState.showFinalDelectDialog) {
+        AlertDialogScreen(
+            onDismiss = {
+                viewModel.onDismissFinalDelectDialog()
+            },
+            title = "社團解散，最後確認通知！",
+        ) {
+            Column {
+                Text(
+                    text = "社團解散，所有內容、成員將會消失 平台「不會」有備份、復原功能。", fontSize = 17.sp, color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = "返回",
+                    borderColor = LocalColor.current.component.other,
+                    textColor = Color.White
+                ) {
+                    viewModel.onDismissFinalDelectDialog()
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = "確定解散",
+                    borderColor = LocalColor.current.specialColor.red,
+                    textColor = LocalColor.current.specialColor.red
+                ) {
+                    viewModel.onFinalConfirmDelete(group)
+                }
+            }
+        }
+    }
+
+    //最終解散社團, 動作
+    if (viewModel.uiState.popToMain) {
+        val intent = Intent(LocalContext.current, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        LocalContext.current.findActivity().finish()
+        LocalContext.current.startActivity(intent)
+    }
+
 }
 
 /**
@@ -138,7 +242,8 @@ private fun setCallbackHandle(
 fun GroupSettingSettingView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    group: Group
+    group: Group,
+    onDelectClick: () -> Unit
 ) {
     val TAG = "GroupSettingSettingScreen"
 
@@ -368,6 +473,22 @@ fun GroupSettingSettingView(
                     env_60 = LocalColor.current.env_60
                 )
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            //========== 解散社團 ==========
+            Box(
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth()
+                    .background(LocalColor.current.background)
+                    .clickable {
+                        onDelectClick.invoke()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "解散社團", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+            }
         }
     }
 }
@@ -382,6 +503,6 @@ fun GroupSettingSettingView() {
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
             ),
             navController = EmptyDestinationsNavigator
-        )
+        ) {}
     }
 }
