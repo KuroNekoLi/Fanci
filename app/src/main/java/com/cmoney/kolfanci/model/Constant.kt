@@ -31,16 +31,34 @@ object Constant {
     )
 
     //我在目前頻道的權限
-//    var MyChannelPermission: ChannelPermission = ChannelPermission()
-    var MyChannelPermission: ChannelPermission = ChannelPermission(
-        canRead = true,
-        canPost = false,
-        canReply = false,
-        canEmoji = false,
-        canManage = false,
-        canCopy = false,
-        canBlock = false,
-        canReport = false,
-        canTakeback = false
-    )
+    var MyChannelPermission: ChannelPermission = ChannelPermission()
+//    var MyChannelPermission: ChannelPermission = ChannelPermission(
+//        canRead = true,
+//        canPost = false,
+//        canReply = false,
+//        canEmoji = false,
+//        canManage = false,
+//        canCopy = false,
+//        canBlock = false,
+//        canReport = false,
+//        canTakeback = false
+//    )
+
+
+    /**
+     * 是否可以編輯 頻道
+     */
+    fun isChannelEditPermission(): Boolean =
+        (MyGroupPermission.createOrEditChannel == true || MyGroupPermission.deleteChannel == true)
+
+    /**
+     * 是否可以 增加頻道
+     */
+    fun isAddChannelPermission(): Boolean = (MyGroupPermission.createOrEditChannel == true)
+
+    /**
+     * 是否可以編輯分類 新增/刪除
+     */
+    fun isEditCategoryPermission(): Boolean = (MyGroupPermission.createOrEditCategory == true ||
+            MyGroupPermission.deleteCategory == true)
 }

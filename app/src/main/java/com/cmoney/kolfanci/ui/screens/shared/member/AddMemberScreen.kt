@@ -24,21 +24,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.chat.message.OnBottomReached
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.GroupMemberSelect
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
-import com.cmoney.kolfanci.R
+
 @Destination
 @Composable
 fun AddMemberScreen(
@@ -65,9 +66,11 @@ fun AddMemberScreen(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
-            modifier = Modifier.background(LocalColor.current.env_80)
+            modifier = Modifier
+                .background(LocalColor.current.env_80)
+                .padding(padding)
         ) {
             LazyColumn(
                 modifier = Modifier.weight(1f),

@@ -109,6 +109,7 @@ class RoleManageViewModel(
      * 選擇assign的 成員
      */
     fun addMember(memberStr: String) {
+        KLog.i(TAG, "addMember:$memberStr")
         val gson = Gson()
         val listType: Type =
             object : TypeToken<List<GroupMember>>() {}.type
@@ -116,12 +117,11 @@ class RoleManageViewModel(
 
         val newList = uiState.memberList.toMutableList()
         newList.addAll(responseMemberList)
-        newList.distinctBy {
-            it.id
-        }
 
         uiState = uiState.copy(
-            memberList = newList
+            memberList = newList.distinctBy {
+                it.id
+            }
         )
     }
 

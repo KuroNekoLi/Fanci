@@ -16,13 +16,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Category
+import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.CategoryText
 import com.cmoney.kolfanci.ui.screens.shared.ChannelBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Category
-import com.cmoney.fanciapi.fanci.model.Channel
 
 @Composable
 fun ChannelEditScreen(
@@ -52,10 +52,7 @@ fun ChannelEditScreen(
                 }
             )
 
-            if (category.isDefault != true &&
-                (Constant.MyGroupPermission.createOrEditCategory == true ||
-                        Constant.MyGroupPermission.deleteCategory == true)
-            ) {
+            if (category.isDefault != true && Constant.isEditCategoryPermission()) {
                 Box(
                     modifier =
                     Modifier
@@ -80,7 +77,9 @@ fun ChannelEditScreen(
                 horizontalPadding = 0.dp,
                 isEditMode = true,
                 onClick = {
-                    onChanelEdit.invoke(it)
+                    if (Constant.isChannelEditPermission()) {
+                        onChanelEdit.invoke(it)
+                    }
                 }
             )
         }
@@ -88,7 +87,7 @@ fun ChannelEditScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         //Add chanel block
-        if (Constant.MyGroupPermission.createOrEditChannel == true) {
+        if (Constant.isAddChannelPermission()) {
             val stroke = Stroke(
                 width = 2f,
                 pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 10f), 0f)

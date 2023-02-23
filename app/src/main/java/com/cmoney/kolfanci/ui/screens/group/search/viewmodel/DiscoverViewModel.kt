@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 data class UiState(
     val groupList: List<Group> = emptyList(),
     val searchGroupClick: Group? = null,
-    val joinSuccess: Boolean = false,
+    val joinSuccess: Group? = null,
     val tabIndex: Int = 0
 )
 
@@ -76,10 +76,10 @@ class DiscoverViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
         KLog.i(TAG, "joinGroup:$group")
         viewModelScope.launch {
             groupUseCase.joinGroup(group).fold({
-                uiState = uiState.copy(joinSuccess = true)
+                uiState = uiState.copy(joinSuccess = group)
             }, {
                 if (it is EmptyBodyException) {
-                    uiState = uiState.copy(joinSuccess = true)
+                    uiState = uiState.copy(joinSuccess = group)
                 }
             })
         }
