@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -48,10 +48,16 @@ class BanListViewModel(private val banUseCase: BanUseCase) : ViewModel() {
                         duration = (second / oneDaySecond).toInt()
                     }
 
+                    val durationStr = if (duration > 365) {
+                        "永久"
+                    } else {
+                        "%d日".format(duration)
+                    }
+
                     BanUiModel(
                         user = userBanInformation.user,
                         startDay = startDay,
-                        duration = "%d日".format(duration)
+                        duration = durationStr
                     )
                 }
 

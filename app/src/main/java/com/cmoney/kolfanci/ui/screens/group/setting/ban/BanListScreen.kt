@@ -36,6 +36,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 import com.cmoney.kolfanci.R
+
 @Destination
 @Composable
 fun BanListScreen(
@@ -109,7 +110,7 @@ private fun BanListScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
