@@ -58,7 +58,7 @@ fun ColorPickerScreen(
             .fillMaxWidth()
             .height(260.dp)
             .background(LocalColor.current.env_60)
-    ) {
+    ) {padding ->
         Column {
             Row(
                 modifier = Modifier.padding(
@@ -111,7 +111,7 @@ fun ColorPickerScreen(
                         Canvas(modifier = Modifier.size(57.dp)) {
                             drawCircle(
                                 color = circleColor,
-                                radius = 65f,
+                                radius = 25.dp.toPx(),
                                 style = Stroke(width = 2.dp.toPx())
                             )
                         }

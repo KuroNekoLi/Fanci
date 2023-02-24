@@ -191,7 +191,7 @@ class RoleManageViewModel(
                     } else {
                         // TODO: 判斷server error type
                         uiState = uiState.copy(
-                            addRoleError = "已有相同名稱的腳色"
+                            addRoleError = "已有相同名稱的角色"
                         )
                     }
                 })
