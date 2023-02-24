@@ -284,7 +284,7 @@ private fun ApplyQuestionItem(
         }
 
         val date =
-            Date(groupRequirementApply.updateUnixTime?.times(10001) ?: System.currentTimeMillis())
+            Date(groupRequirementApply.updateUnixTime?.times(1000) ?: System.currentTimeMillis())
         val dayString = SimpleDateFormat("yyyy/MM/dd").format(date)
 
         Row {
