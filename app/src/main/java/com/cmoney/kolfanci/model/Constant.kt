@@ -63,6 +63,11 @@ object Constant {
             MyGroupPermission.deleteCategory == true)
 
     /**
+     * 是否 可以刪除分類
+     */
+    fun isCanDeleteCategory(): Boolean = (MyGroupPermission.deleteCategory == true)
+
+    /**
      * 是否可以按 Emoji
      */
     fun isCanEmoji(): Boolean = (MyChannelPermission.canEmoji == true)
