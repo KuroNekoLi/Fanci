@@ -61,4 +61,39 @@ object Constant {
      */
     fun isEditCategoryPermission(): Boolean = (MyGroupPermission.createOrEditCategory == true ||
             MyGroupPermission.deleteCategory == true)
+
+    /**
+     * 是否可以按 Emoji
+     */
+    fun isCanEmoji(): Boolean = (MyChannelPermission.canEmoji == true)
+
+    /**
+     * 是否可以 回覆訊息
+     */
+    fun isCanReply(): Boolean = (MyChannelPermission.canReply == true)
+
+    /**
+     * 是否可以 收回訊息
+     */
+    fun isCanTakeBack(): Boolean = (MyChannelPermission.canTakeback == true)
+
+    /**
+     * 是否可以 複製
+     */
+    fun isCanCopy(): Boolean = (MyChannelPermission.canCopy == true)
+
+    /**
+     * 是否可以 置頂/刪除 訊息
+     */
+    fun isCanManage(): Boolean = (MyChannelPermission.canManage == true)
+
+    /**
+     * 是否可以 封鎖用戶
+     */
+    fun isCanBlock(): Boolean = (MyChannelPermission.canBlock == true)
+
+    /**
+     * 是否可以 檢舉用戶
+     */
+    fun isCanReport(): Boolean = (MyChannelPermission.canReport == true)
 }
