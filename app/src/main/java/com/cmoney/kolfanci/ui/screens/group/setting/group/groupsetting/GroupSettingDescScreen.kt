@@ -47,7 +47,7 @@ fun GroupSettingDescView(
     onChangeDesc: (String) -> Unit
 ) {
     var textState by remember { mutableStateOf(group.description.orEmpty()) }
-    val maxLength = 150
+    val maxLength = 100
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

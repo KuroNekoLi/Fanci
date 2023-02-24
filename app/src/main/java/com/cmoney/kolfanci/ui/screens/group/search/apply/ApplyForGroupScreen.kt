@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.IGroupRequirementQuestion
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -34,8 +36,6 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.IGroupRequirementQuestion
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -100,6 +100,10 @@ fun ApplyForGroupScreen(
         )
     }
 
+    if (uiState.isPopupBack) {
+        navigator.popBackStack()
+    }
+
     BackHandler {
         viewModel.checkAnswer()
     }
@@ -132,7 +136,7 @@ private fun ApplyForGroupScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -190,7 +194,7 @@ private fun ApplyForGroupScreenView(
                                 .height(120.dp),
                             value = if (index < answerList.size) answerList[index] else "",
                             colors = TextFieldDefaults.textFieldColors(
-                                textColor = LocalColor.current.inputText.input_100,
+                                textColor = LocalColor.current.text.default_100,
                                 backgroundColor = LocalColor.current.background,
                                 cursorColor = LocalColor.current.primary,
                                 disabledLabelColor = LocalColor.current.text.default_30,
