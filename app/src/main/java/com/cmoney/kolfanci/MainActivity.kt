@@ -142,28 +142,6 @@ fun MainScreen(
     }
 }
 
-//@Composable
-//fun MainScreen(
-//    mainNavController: NavHostController,
-//    route: (MainStateHolder.Route) -> Unit,
-//    globalViewModel: MainViewModel
-//) {
-//    Scaffold(
-//        bottomBar = {
-//            BottomBarScreen(
-//                mainNavController
-//            )
-//        }
-//    ) { innerPadding ->
-//        MainNavHost(
-//            modifier = Modifier.padding(innerPadding),
-//            navController = mainNavController,
-//            route = route,
-//            globalViewModel = globalViewModel
-//        )
-//    }
-//}
-
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {

@@ -3,16 +3,17 @@ package com.cmoney.kolfanci.ui.screens.follow
 import android.content.Intent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,8 +37,7 @@ import com.cmoney.kolfanci.destinations.DiscoverGroupScreenDestination
 import com.cmoney.kolfanci.destinations.GroupSettingScreenDestination
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
-import com.cmoney.kolfanci.ui.screens.follow.state.FollowScreenState
-import com.cmoney.kolfanci.ui.screens.follow.state.rememberFollowScreenState
+import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -45,84 +45,103 @@ import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FollowScreen(
-    followScreenState: FollowScreenState = rememberFollowScreenState(),
     globalViewModel: MainViewModel,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: FollowViewModel = koinViewModel()
 ) {
     val TAG = "FollowScreen"
 
-    val globalUiState = globalViewModel.uiState
-    val group = globalUiState.currentGroup
-    val groupList = followScreenState.viewModel.myGroupList.observeAsState()
-    if (group == null) {
-        groupList.value?.first()?.let {
-            globalViewModel.setCurrentGroup(it.groupModel)
-        }
-    } else {
-        followScreenState.viewModel.checkGroupMenu(group)
-    }
+    val uiState = viewModel.uiState
 
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val scrollableState = rememberScrollableState {
-        followScreenState.viewModel.scrollOffset(it, density, configuration)
+        viewModel.scrollOffset(it, density, configuration)
         it
     }
 
-    KLog.i(TAG, "FollowScreen create.")
+    FollowScreenView(
+        navigator = navigator,
+        groupList = uiState.myGroupList,
+        group = uiState.myGroupList.find {
+            it.isSelected
+        }?.groupModel,
+        imageOffset = viewModel.uiState.imageOffset,
+        spaceHeight = viewModel.uiState.spaceHeight,
+        scrollableState = scrollableState,
+        visibleAvatar = viewModel.uiState.visibleAvatar,
+        lazyColumnScrollEnabled = viewModel.uiState.lazyColumnScrollEnabled,
+        onGroupItemClick = {
+            globalViewModel.setCurrentGroup(it.groupModel)
+            viewModel.groupItemClick(it)
+        },
+        lazyColumnAtTop = {
+            viewModel.lazyColumnAtTop()
+        }
+    )
+}
 
-    if (globalUiState.isLoginSuccess) {
-        followScreenState.viewModel.fetchMyGroup()
-    }
+fun LazyListState.isScrolledToTop() = firstVisibleItemScrollOffset == 0
 
-//    val drawerContent = DrawerContent(groupListItem = groupList.value.orEmpty(),
-//        onClick = {
-//            globalViewModel.setCurrentGroup(it.groupModel)
-//            followScreenState.viewModel.groupItemClick(it)
-//            followScreenState.closeDrawer()
-//        },
-//        onSearch = {
-//            followScreenState.closeDrawer()
-//            val arrayGroupItems = arrayListOf<Group>()
-//            arrayGroupItems.addAll(groupList.value.orEmpty().map {
-//                it.groupModel
-//            })
-//            navigator.navigate(
-//                DiscoverGroupScreenDestination(
-//                    groupItems = arrayGroupItems
-//                )
-//            )
-//        }
-//    )
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FollowScreenView(
+    navigator: DestinationsNavigator,
+    groupList: List<GroupItem>,
+    group: Group?,
+    imageOffset: Int,
+    spaceHeight: Int,
+    scrollableState: ScrollableState,
+    visibleAvatar: Boolean,
+    lazyColumnScrollEnabled: Boolean,
+    onGroupItemClick: (GroupItem) -> Unit,
+    lazyColumnAtTop: () -> Unit
+) {
+    val TAG = "FollowScreenView"
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val scaffoldState: ScaffoldState =
+        rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
 
     val context = LocalContext.current
+
+    val lazyListState = rememberLazyListState()
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         backgroundColor = LocalColor.current.env_60,
-        scaffoldState = followScreenState.scaffoldState,
+        scaffoldState = scaffoldState,
         drawerContent = if (XLoginHelper.isLogin) {
             {
                 DrawerMenuScreen(
-                    groupList = groupList.value.orEmpty(),
+                    groupList = groupList,
                     onClick = {
-                        globalViewModel.setCurrentGroup(it.groupModel)
-                        followScreenState.viewModel.groupItemClick(it)
-                        followScreenState.closeDrawer()
+                        //Close Drawer
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.close()
+                        }
+
+                        onGroupItemClick.invoke(it)
                     },
                     onSearch = {
-                        followScreenState.closeDrawer()
+                        //Close Drawer
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.close()
+                        }
+
                         val arrayGroupItems = arrayListOf<Group>()
-                        arrayGroupItems.addAll(groupList.value.orEmpty().map {
+                        arrayGroupItems.addAll(groupList.map {
                             it.groupModel
                         })
+
                         navigator.navigate(
                             DiscoverGroupScreenDestination(
                                 groupItems = arrayGroupItems
@@ -165,7 +184,7 @@ fun FollowScreen(
                             .offset {
                                 IntOffset(
                                     x = 0,
-                                    y = followScreenState.viewModel.uiState.imageOffset
+                                    y = imageOffset
                                 ) //设置偏移量
                             },
                         contentScale = ContentScale.Crop,
@@ -181,7 +200,10 @@ fun FollowScreen(
                             .clip(RoundedCornerShape(12.dp))
                             .background(LocalColor.current.env_80)
                             .clickable {
-                                followScreenState.openDrawer()
+                                //Open Drawer
+                                coroutineScope.launch {
+                                    scaffoldState.drawerState.open()
+                                }
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -203,12 +225,15 @@ fun FollowScreen(
                     Spacer(modifier = Modifier
                         .height(
                             with(LocalDensity.current) {
-                                followScreenState.viewModel.uiState.spaceHeight.toDp()
+                                spaceHeight.toDp()
                             }
                         )
                         .width(65.dp)
                         .clickable {
-                            followScreenState.openDrawer()
+                            //Open Drawer
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.open()
+                            }
                         })
                     Card(
                         modifier = Modifier
@@ -227,18 +252,17 @@ fun FollowScreen(
                         // observer when reached end of list
                         val endOfListReached by remember {
                             derivedStateOf {
-                                followScreenState.scrollState.isScrolledToTop()
+                                lazyListState.isScrolledToTop()
                             }
                         }
 
                         LaunchedEffect(endOfListReached) {
-                            // do your stuff
-                            followScreenState.viewModel.lazyColumnAtTop()
+                            lazyColumnAtTop.invoke()
                         }
 
                         LazyColumn(
-                            state = followScreenState.scrollState,
-                            userScrollEnabled = followScreenState.viewModel.uiState.lazyColumnScrollEnabled,
+                            state = lazyListState,
+                            userScrollEnabled = lazyColumnScrollEnabled,
                             verticalArrangement = Arrangement.spacedBy(15.dp),
                             modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
                         ) {
@@ -246,10 +270,10 @@ fun FollowScreen(
                             stickyHeader {
                                 GroupHeaderScreen(
                                     followGroup = group,
-                                    visibleAvatar = followScreenState.viewModel.uiState.visibleAvatar,
+                                    visibleAvatar = visibleAvatar,
                                     modifier = Modifier.background(LocalColor.current.env_80)
                                 ) { group ->
-                                    navigator?.navigate(
+                                    navigator.navigate(
                                         GroupSettingScreenDestination(
                                             initGroup = group
                                         )
@@ -282,45 +306,23 @@ fun FollowScreen(
     }
 }
 
-/**
- * 側欄UI
- */
-@Composable
-private fun DrawerContent(
-    groupListItem: List<GroupItem>,
-    onClick: (GroupItem) -> Unit,
-    onSearch: () -> Unit
-): @Composable (ColumnScope.() -> Unit)? {
-    val context = LocalContext.current
-    return if (XLoginHelper.isLogin) {
-        {
-            DrawerMenuScreen(
-                groupList = groupListItem,
-                onClick = onClick,
-                onSearch = onSearch,
-                onLogout = {
-                    XLoginHelper.logOut(context)
-                    val intent = Intent(context, MainActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    context.findActivity().finish()
-                    context.startActivity(intent)
-                }
-            )
-        }
-    } else {
-        null
-    }
-}
-
-fun LazyListState.isScrolledToTop() = firstVisibleItemScrollOffset == 0
-
 @Preview(showBackground = true)
 @Composable
 fun FollowScreenPreview() {
     FanciTheme {
-        FollowScreen(
-            globalViewModel = koinViewModel(),
-            navigator = EmptyDestinationsNavigator
+        FollowScreenView(
+            navigator = EmptyDestinationsNavigator,
+            groupList = emptyList(),
+            group = Group(),
+            imageOffset = 0,
+            spaceHeight = 0,
+            scrollableState = rememberScrollableState {
+                it
+            },
+            visibleAvatar = false,
+            lazyColumnScrollEnabled = true,
+            onGroupItemClick = {},
+            lazyColumnAtTop = {}
         )
     }
 }
