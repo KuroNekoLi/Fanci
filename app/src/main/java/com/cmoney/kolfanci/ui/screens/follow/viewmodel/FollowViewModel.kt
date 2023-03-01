@@ -38,9 +38,9 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     var uiState by mutableStateOf(FollowUiState())
         private set
 
-    init {
-        fetchMyGroup()
-    }
+//    init {
+//        fetchMyGroup()
+//    }
 
     /**
      * 取得 我的群組

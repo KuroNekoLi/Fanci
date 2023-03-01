@@ -25,6 +25,7 @@ import com.socks.library.KLog
 /**
  * 決定頁面跳轉路徑
  */
+@Deprecated("replace with DestinationsNavigator")
 @Composable
 fun MyAppNavHost(
     navController: NavHostController,

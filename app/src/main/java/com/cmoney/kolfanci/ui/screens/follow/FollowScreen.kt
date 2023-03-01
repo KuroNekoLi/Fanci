@@ -58,12 +58,21 @@ fun FollowScreen(
     val TAG = "FollowScreen"
 
     val uiState = viewModel.uiState
+    val firstFetchData = remember {
+        mutableStateOf(true)
+    }
 
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val scrollableState = rememberScrollableState {
         viewModel.scrollOffset(it, density, configuration)
         it
+    }
+
+    //登入成功後觸發一次
+    if (globalViewModel.uiState.isLoginSuccess && firstFetchData.value) {
+        viewModel.fetchMyGroup()
+        firstFetchData.value = false
     }
 
     FollowScreenView(
