@@ -53,7 +53,8 @@ import org.koin.androidx.compose.koinViewModel
 fun FollowScreen(
     globalViewModel: MainViewModel,
     navigator: DestinationsNavigator,
-    viewModel: FollowViewModel = koinViewModel()
+    viewModel: FollowViewModel = koinViewModel(),
+    mainViewModel: MainViewModel = koinViewModel()
 ) {
     val TAG = "FollowScreen"
 
@@ -71,12 +72,18 @@ fun FollowScreen(
         viewModel.fetchMyGroup()
     }
 
+    val group = uiState.myGroupList.find {
+        it.isSelected
+    }?.groupModel
+
+    group?.let {
+        mainViewModel.setCurrentGroup(it)
+    }
+
     FollowScreenView(
         navigator = navigator,
         groupList = uiState.myGroupList,
-        group = uiState.myGroupList.find {
-            it.isSelected
-        }?.groupModel,
+        group = group,
         imageOffset = viewModel.uiState.imageOffset,
         spaceHeight = viewModel.uiState.spaceHeight,
         scrollableState = scrollableState,

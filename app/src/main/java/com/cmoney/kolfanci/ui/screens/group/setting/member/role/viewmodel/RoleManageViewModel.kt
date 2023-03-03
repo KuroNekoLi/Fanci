@@ -341,9 +341,9 @@ class RoleManageViewModel(
 
             viewModelScope.launch {
                 //Color
-                val roleColor = roleColors.first { color ->
+                val roleColor = roleColors.firstOrNull { color ->
                     color.name == fanciRole.color
-                }
+                } ?: Color()
 
                 //Permission
                 val checkedPermission = fanciRole.permissionIds.orEmpty()
