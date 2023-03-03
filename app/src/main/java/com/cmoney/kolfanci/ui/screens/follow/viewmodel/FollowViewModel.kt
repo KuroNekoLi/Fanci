@@ -26,7 +26,8 @@ data class FollowUiState(
     val showLoginDialog: Boolean = false,        //呈現登入彈窗
     val navigateToCreateGroup: Boolean = false,  //前往建立社團
     val navigateToApproveGroup: Group? = null,  //前往社團認證
-    val myGroupList: List<GroupItem> = emptyList()  //我的社團
+    val myGroupList: List<GroupItem> = emptyList(),  //我的社團
+    val firstFetchData: Boolean = true  //標記是否第一次拿過初始化資料
 )
 
 class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
@@ -63,7 +64,8 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                                         isSelected = false
                                     )
                                 }
-                            }
+                            },
+                            firstFetchData = false
                         )
                     } else {
                         fetchAllGroupList()
