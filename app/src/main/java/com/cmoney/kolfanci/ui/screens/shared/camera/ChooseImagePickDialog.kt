@@ -41,21 +41,7 @@ fun ChooseImagePickDialog(
 ) {
     val TAG = "chooseImagePickDialog"
 
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
-
-    val externalPermissionState =
-        rememberPermissionState(Manifest.permission.READ_EXTERNAL_STORAGE)
-
-    val choosePhotoResult =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                it.data?.data?.let { uri ->
-                    KLog.i(TAG, "get uri:$uri")
-                    onAttach.invoke(uri)
-                    onDismiss.invoke()
-                }
-            }
-        }
+    val context = LocalContext.current
 
     val captureResult =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -68,7 +54,58 @@ fun ChooseImagePickDialog(
             }
         }
 
-    val context = LocalContext.current
+    /**
+     * 啟動相機頁面
+     */
+    fun startCameraPicker() {
+        if (captureUri == null) {
+            captureUri =
+                getCaptureUri(context)
+        }
+        val captureIntent =
+            Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
+                MediaStore.EXTRA_OUTPUT,
+                getCaptureUri(context)
+            )
+        captureResult.launch(captureIntent)
+    }
+
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
+        if (granted) {
+            startCameraPicker()
+        }
+    }
+
+    val choosePhotoResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                it.data?.data?.let { uri ->
+                    KLog.i(TAG, "get uri:$uri")
+                    onAttach.invoke(uri)
+                    onDismiss.invoke()
+                }
+            }
+        }
+
+    /**
+     * 啟動相簿選相片
+     */
+    fun startImagePicker() {
+        val intent =
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.setDataAndType(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            "image/*"
+        )
+        choosePhotoResult.launch(intent)
+    }
+
+    val externalPermissionState =
+        rememberPermissionState(Manifest.permission.READ_EXTERNAL_STORAGE) { granted ->
+            if (granted) {
+                startImagePicker()
+            }
+        }
 
     AlertDialog(
         backgroundColor = LocalColor.current.env_80,
@@ -81,15 +118,7 @@ fun ChooseImagePickDialog(
                     .fillMaxWidth(),
                 onClick = {
                     if (cameraPermissionState.status.isGranted) {
-                        if (captureUri == null) {
-                            captureUri = getCaptureUri(context)
-                        }
-                        val captureIntent =
-                            Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
-                                MediaStore.EXTRA_OUTPUT,
-                                getCaptureUri(context)
-                            )
-                        captureResult.launch(captureIntent)
+                        startCameraPicker()
                     } else {
                         cameraPermissionState.launchPermissionRequest()
                     }
@@ -105,13 +134,7 @@ fun ChooseImagePickDialog(
                     .fillMaxWidth(),
                 onClick = {
                     if (externalPermissionState.status.isGranted) {
-                        val intent =
-                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                        intent.setDataAndType(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            "image/*"
-                        )
-                        choosePhotoResult.launch(intent)
+                        startImagePicker()
                     } else {
                         externalPermissionState.launchPermissionRequest()
                     }
@@ -140,6 +163,6 @@ fun ChooseImagePickDialogPreview() {
     FanciTheme {
         ChooseImagePickDialog(
             onDismiss = {}
-        ){}
+        ) {}
     }
 }
