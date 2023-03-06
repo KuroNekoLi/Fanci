@@ -30,11 +30,11 @@ fun Context.showToast(msg: String) {
 
 fun Context.getCaptureUri(): Uri {
     val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-    if (storageDir?.isDirectory == true) {
-        storageDir.listFiles()?.forEach { file ->
-            file.delete()
-        }
-    }
+//    if (storageDir?.isDirectory == true) {
+//        storageDir.listFiles()?.forEach { file ->
+//            file.delete()
+//        }
+//    }
 
     val file = File(storageDir, System.currentTimeMillis().toString() + ".jpg")
 
