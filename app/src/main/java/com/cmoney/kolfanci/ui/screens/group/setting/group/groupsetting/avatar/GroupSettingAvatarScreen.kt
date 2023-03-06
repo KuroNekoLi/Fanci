@@ -1,7 +1,8 @@
-package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
+package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar
 
 import android.net.Uri
 import android.os.Parcelable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,17 +19,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.FanciDefaultAvatarScreenDestination
 import com.cmoney.kolfanci.ui.common.TransparentButton
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.state.GroupSettingSettingState
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.state.rememberGroupSettingSettingState
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -52,10 +52,13 @@ fun GroupSettingAvatarScreen(
     navController: DestinationsNavigator,
     group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
+    groupSettingAvatarViewModel: GroupSettingAvatarViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<ImageChangeData>,
     fanciAvatarResult: ResultRecipient<FanciDefaultAvatarScreenDestination, String>
 ) {
     val state = viewModel.uiState
+
+    val uiState = groupSettingAvatarViewModel.uiState
 
     fanciAvatarResult.onNavResult { result ->
         when (result) {
@@ -73,12 +76,31 @@ fun GroupSettingAvatarScreen(
         navController,
         isLoading = viewModel.uiState.isLoading,
         group = state.settingGroup ?: group,
+        avatarImage = uiState.avatarImage,
         onImageChange = {
             resultNavigator.navigateBack(
                 it
             )
+        },
+        openCameraDialog = {
+            groupSettingAvatarViewModel.openCameraDialog()
         }
     )
+
+    if (uiState.openCameraDialog) {
+        GroupPhotoPickDialogScreen(
+            onDismiss = {
+                groupSettingAvatarViewModel.closeCameraDialog()
+            },
+            onAttach = {
+                groupSettingAvatarViewModel.setAvatarImage(it)
+            },
+            onFanciClick = {
+                groupSettingAvatarViewModel.closeCameraDialog()
+                navController.navigate(FanciDefaultAvatarScreenDestination)
+            }
+        )
+    }
 }
 
 @Composable
@@ -86,9 +108,10 @@ fun GroupSettingAvatarView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     group: Group,
-    state: GroupSettingSettingState = rememberGroupSettingSettingState(),
     isLoading: Boolean,
-    onImageChange: (ImageChangeData) -> Unit
+    onImageChange: (ImageChangeData) -> Unit,
+    avatarImage: Uri?,
+    openCameraDialog: () -> Unit
 ) {
     val TAG = "GroupSettingAvatarView"
     Scaffold(
@@ -124,7 +147,7 @@ fun GroupSettingAvatarView(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
-                    model = state.avatarImage.value ?: group.thumbnailImageUrl,
+                    model = avatarImage ?: group.thumbnailImageUrl,
                     modifier = Modifier
                         .size(182.dp)
                         .aspectRatio(1f)
@@ -148,7 +171,7 @@ fun GroupSettingAvatarView(
                 text = "更換圖片"
             ) {
                 KLog.i(TAG, "button click.")
-                state.openCameraDialog()
+                openCameraDialog.invoke()
             }
 
             Spacer(modifier = Modifier.height(50.dp))
@@ -168,7 +191,7 @@ fun GroupSettingAvatarView(
                     colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                     onClick = {
                         KLog.i(TAG, "on image save click.")
-                        state.avatarImage.value?.let {
+                        avatarImage?.let {
                             onImageChange.invoke(
                                 ImageChangeData(
                                     uri = it,
@@ -192,25 +215,7 @@ fun GroupSettingAvatarView(
                 }
             }
         }
-
-        if (state.openCameraDialog.value) {
-            GroupPhotoPickDialogScreen(
-                onDismiss = {
-                    state.closeCameraDialog()
-                },
-                onAttach = {
-                    KLog.i(TAG, "onAttach click.")
-                    state.setAvatarImage(it)
-                },
-                onFanciClick = {
-                    KLog.i(TAG, "onFanciClick")
-                    state.closeCameraDialog()
-                    navController.navigate(FanciDefaultAvatarScreenDestination)
-                }
-            )
-        }
     }
-
 }
 
 
@@ -222,7 +227,9 @@ fun GroupSettingAvatarScreenPreview() {
             navController = EmptyDestinationsNavigator,
             group = Group(),
             isLoading = true,
-            onImageChange = {}
+            onImageChange = {},
+            avatarImage = null,
+            openCameraDialog = {}
         )
     }
 }

@@ -10,7 +10,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.ImageChangeData
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog

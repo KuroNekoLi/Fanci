@@ -12,7 +12,7 @@ import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.ImageChangeData
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.socks.library.KLog
 import kotlinx.coroutines.launch

@@ -2,10 +2,8 @@ package com.cmoney.kolfanci.ui.screens.shared.camera
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,14 +19,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
+import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.socks.library.KLog
-import java.io.File
 
 /**
  * 附加圖片 Dialog
@@ -58,14 +55,11 @@ fun ChooseImagePickDialog(
      * 啟動相機頁面
      */
     fun startCameraPicker() {
-        if (captureUri == null) {
-            captureUri =
-                getCaptureUri(context)
-        }
+        captureUri = context.getCaptureUri()
         val captureIntent =
             Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
                 MediaStore.EXTRA_OUTPUT,
-                getCaptureUri(context)
+                captureUri
             )
         captureResult.launch(captureIntent)
     }
@@ -146,16 +140,6 @@ fun ChooseImagePickDialog(
 }
 
 private var captureUri: Uri? = null //Camera result callback
-
-private fun getCaptureUri(context: Context): Uri {
-    val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-    val file = File(storageDir, "captureImage.jpg")
-    return FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.provider",
-        file
-    )
-}
 
 @Preview(showBackground = true)
 @Composable
