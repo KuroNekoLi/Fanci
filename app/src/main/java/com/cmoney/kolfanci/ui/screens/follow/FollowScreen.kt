@@ -67,8 +67,16 @@ fun FollowScreen(
         it
     }
 
-    //登入成功後觸發一次
-    if (globalViewModel.uiState.isLoginSuccess && uiState.firstFetchData) {
+    /**
+     * 抓取資料時機點,
+     * 登入成功後觸發一次
+     * 還未登入
+     */
+    fun triggerFetchGroup(): Boolean {
+        return (globalViewModel.uiState.isLoginSuccess && uiState.firstFetchData) || !XLoginHelper.isLogin
+    }
+
+    if (triggerFetchGroup()) {
         viewModel.fetchMyGroup()
     }
 
