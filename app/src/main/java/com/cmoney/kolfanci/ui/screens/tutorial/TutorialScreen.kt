@@ -26,8 +26,10 @@ fun TutorialScreen(modifier: Modifier = Modifier, onStart: () -> Unit) {
         modifier = modifier
             .fillMaxSize(),
         backgroundColor = Black_242424
-    ) {
-        Column {
+    ) { padding ->
+        Column(
+            modifier = Modifier.padding(padding)
+        ) {
             val pagerState = rememberPagerState()
 
             HorizontalPager(

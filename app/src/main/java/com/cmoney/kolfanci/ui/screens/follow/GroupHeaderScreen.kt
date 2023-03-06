@@ -30,7 +30,6 @@ fun GroupHeaderScreen(
     visibleAvatar: Boolean,
     onMoreClick: (Group) -> Unit
 ) {
-    val tag = "GroupHeaderScreen"
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
