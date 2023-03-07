@@ -110,7 +110,9 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 nextWeight = it.nextWeight
                 val orgGroupList = _groupList.value.orEmpty().toMutableList()
                 orgGroupList.addAll(it.items.orEmpty())
-                _groupList.value = orgGroupList
+                _groupList.value = orgGroupList.distinctBy { group ->
+                    group.id
+                }
             }, {
                 dismissLoading()
                 KLog.e(TAG, it)
