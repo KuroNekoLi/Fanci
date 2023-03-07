@@ -27,7 +27,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.screens.chat.message.OnBottomReached
+import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.GroupMemberSelect
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel

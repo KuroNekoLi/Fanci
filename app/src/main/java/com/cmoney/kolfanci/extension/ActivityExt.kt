@@ -2,16 +2,22 @@ package com.cmoney.kolfanci.extension
 
 import android.app.Activity
 import android.view.ViewGroup
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.ColorPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.InteractBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 
 /**
  * Show 聊天室 互動彈窗
@@ -87,4 +93,21 @@ private fun addContentToView(
             }
         }
     )
+}
+
+@Composable
+fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
+    val eventHandler by rememberUpdatedState(newValue = event)
+    val lifecycle = this@LifecycleEventListener.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            eventHandler(event)
+        }
+
+        lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
+    }
 }

@@ -1,8 +1,14 @@
 package com.cmoney.kolfanci.ui.screens.follow
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -19,28 +25,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.LocalDependencyContainer
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.destinations.CreateGroupScreenDestination
-import com.cmoney.kolfanci.ui.screens.follow.state.FollowScreenState
-import com.cmoney.kolfanci.ui.screens.follow.state.rememberFollowScreenState
+import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EmptyFollowScreen(
-    followScreenState: FollowScreenState = rememberFollowScreenState(),
+    viewModel: FollowViewModel = koinViewModel(),
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator
 ) {
-    val uiState = followScreenState.viewModel.uiState
-    val viewModel = followScreenState.viewModel
+    val uiState = viewModel.uiState
     val groupList = viewModel.groupList.observeAsState()
     val mainActivity = LocalDependencyContainer.current
 
@@ -48,21 +54,25 @@ fun EmptyFollowScreen(
         modifier = modifier,
         groupList = groupList,
         onJoinClick = {
-            followScreenState.openGroupItemDialog(it)
+            viewModel.openGroupItemDialog(it)
         },
         onCreateClick = {
             viewModel.onCreateGroupClick()
-        }
+        },
+        onLoadMore = {
+            viewModel.onLoadMore()
+        },
+        isLoading = uiState.isLoading
     )
 
-    followScreenState.openGroupDialog.value?.let { group ->
+    uiState.openGroupDialog?.let { group ->
         GroupItemDialogScreen(
             groupModel = group,
             onDismiss = {
-                followScreenState.closeGroupItemDialog()
+                viewModel.closeGroupItemDialog()
             },
             onConfirm = {
-                followScreenState.viewModel.joinGroup(it)
+                viewModel.joinGroup(it)
             }
         )
     }
@@ -102,57 +112,68 @@ private fun EmptyFollowScreenView(
     modifier: Modifier = Modifier,
     groupList: State<List<Group>?>,
     onJoinClick: (Group) -> Unit,
-    onCreateClick: () -> Unit
+    onCreateClick: () -> Unit,
+    onLoadMore: () -> Unit,
+    isLoading: Boolean
 ) {
-    Column(
-        modifier = modifier
-            .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.fanci),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(
-                color = LocalColor.current.primary
-            )
-        )
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1.3f),
-            contentScale = ContentScale.Fit,
-            painter = painterResource(id = R.drawable.follow_empty),
-            contentDescription = null,
-        )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = "加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團",
-            fontSize = 14.sp,
-            color = LocalColor.current.text.default_100,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(20.dp))
+    val listState = rememberLazyListState()
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .background(LocalColor.current.primary)
-                .clip(RoundedCornerShape(4.dp))
-                .clickable {
-                    onCreateClick.invoke()
-                },
-            contentAlignment = Alignment.Center
-        ) {
+    listState.OnBottomReached {
+        onLoadMore.invoke()
+    }
+
+    LazyColumn(
+        modifier = modifier
+            .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+        state = listState
+    ) {
+        //Header
+        item {
+            Image(
+                painter = painterResource(id = R.drawable.fanci),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(
+                    color = LocalColor.current.primary
+                )
+            )
+            Image(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1.3f),
+                contentScale = ContentScale.Fit,
+                painter = painterResource(id = R.drawable.follow_empty),
+                contentDescription = null,
+            )
             Text(
-                text = "建立社團",
-                fontSize = 16.sp,
-                color = LocalColor.current.text.other,
+                modifier = Modifier.fillMaxWidth(),
+                text = "加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團",
+                fontSize = 14.sp,
+                color = LocalColor.current.text.default_100,
                 textAlign = TextAlign.Center
             )
-        }
+            Spacer(modifier = Modifier.height(20.dp))
 
-        groupList.value?.forEach {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(LocalColor.current.primary)
+                    .clip(RoundedCornerShape(4.dp))
+                    .clickable {
+                        onCreateClick.invoke()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "建立社團",
+                    fontSize = 16.sp,
+                    color = LocalColor.current.text.other,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        //List group
+        items(groupList.value.orEmpty()) {
             Spacer(modifier = Modifier.height(10.dp))
             GroupItemScreen(
                 groupModel = it
@@ -160,6 +181,20 @@ private fun EmptyFollowScreenView(
                 onJoinClick.invoke(groupModel)
             }
             Spacer(modifier = Modifier.height(10.dp))
+        }
+        if (isLoading) {
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(size = 32.dp),
+                        color = LocalColor.current.primary
+                    )
+                }
+            }
         }
     }
 }
@@ -171,6 +206,9 @@ fun EmptyFollowScreenPreview() {
         EmptyFollowScreenView(
             groupList = remember { mutableStateOf(emptyList()) },
             onJoinClick = {},
-            onCreateClick = {})
+            onCreateClick = {},
+            onLoadMore = {},
+            isLoading = true
+        )
     }
 }

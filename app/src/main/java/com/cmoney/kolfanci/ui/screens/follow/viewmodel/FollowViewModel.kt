@@ -27,7 +27,9 @@ data class FollowUiState(
     val navigateToCreateGroup: Boolean = false,  //前往建立社團
     val navigateToApproveGroup: Group? = null,  //前往社團認證
     val myGroupList: List<GroupItem> = emptyList(),  //我的社團
-    val firstFetchData: Boolean = true  //標記是否第一次拿過初始化資料
+    val firstFetchData: Boolean = true,  //標記是否第一次拿過初始化資料
+    val openGroupDialog: Group? = null,  //點擊加入群組彈窗
+    val isLoading: Boolean = false
 )
 
 class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
@@ -39,9 +41,21 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     var uiState by mutableStateOf(FollowUiState())
         private set
 
-//    init {
-//        fetchMyGroup()
-//    }
+    var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
+    var nextWeight: Long? = null            //下一分頁權重
+
+    private fun loading() {
+        uiState = uiState.copy(
+            isLoading = true
+        )
+    }
+
+    private fun dismissLoading() {
+        uiState = uiState.copy(
+            isLoading = false,
+            firstFetchData = false
+        )
+    }
 
     /**
      * 取得 我的群組
@@ -50,7 +64,9 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
         KLog.i(TAG, "fetchMyGroup")
         if (XLoginHelper.isLogin) {
             viewModelScope.launch {
+                loading()
                 groupUseCase.groupToSelectGroupItem().fold({
+                    dismissLoading()
                     if (it.isNotEmpty()) {
                         //我的所有群組
                         uiState = uiState.copy(
@@ -64,13 +80,13 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                                         isSelected = false
                                     )
                                 }
-                            },
-                            firstFetchData = false
+                            }
                         )
                     } else {
                         fetchAllGroupList()
                     }
                 }, {
+                    dismissLoading()
                     KLog.e(TAG, it)
                 })
             }
@@ -80,13 +96,23 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     }
 
     /**
-     * 當沒有 社團的時候, 取得目前 所有群組
+     * 當沒有 社團的時候, 取得目前群組
      */
     private fun fetchAllGroupList() {
         viewModelScope.launch {
-            groupUseCase.getPopularGroup().fold({
-                _groupList.value = it.items.orEmpty()
+            loading()
+            groupUseCase.getPopularGroup(
+                pageSize = 10,
+                startWeight = nextWeight ?: 0
+            ).fold({
+                dismissLoading()
+                haveNextPage = it.haveNextPage == true
+                nextWeight = it.nextWeight
+                val orgGroupList = _groupList.value.orEmpty().toMutableList()
+                orgGroupList.addAll(it.items.orEmpty())
+                _groupList.value = orgGroupList
             }, {
+                dismissLoading()
                 KLog.e(TAG, it)
             })
         }
@@ -222,5 +248,36 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             navigateToCreateGroup = false,
             navigateToApproveGroup = null
         )
+    }
+
+    /**
+     * 點擊加入彈窗
+     */
+    fun openGroupItemDialog(group: Group) {
+        KLog.i(TAG, "openGroupItemDialog:$group")
+        uiState = uiState.copy(
+            openGroupDialog = group
+        )
+    }
+
+    /**
+     * 關閉 社團 彈窗
+     */
+    fun closeGroupItemDialog() {
+        KLog.i(TAG, "closeGroupItemDialog")
+        uiState = uiState.copy(
+            openGroupDialog = null
+        )
+    }
+
+    // TODO: 驗證分頁功能
+    /**
+     * 讀取社團 下一分頁
+     */
+    fun onLoadMore() {
+        KLog.i(TAG, "onLoadMore: haveNextPage:$haveNextPage nextWeight:$nextWeight")
+        if (haveNextPage && nextWeight != null && nextWeight!! > 0) {
+            fetchAllGroupList()
+        }
     }
 }

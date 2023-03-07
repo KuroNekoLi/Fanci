@@ -7,10 +7,15 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showInteractDialogBottomSheet
 import com.cmoney.kolfanci.model.ChatMessageWrapper
@@ -19,8 +24,6 @@ import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -144,36 +147,6 @@ private fun MessageScreenView(
                 }
             }
         }
-    }
-}
-
-
-@Composable
-fun LazyListState.OnBottomReached(
-    loadMore: () -> Unit
-) {
-    // state object which tells us if we should load more
-    val shouldLoadMore = remember {
-        derivedStateOf {
-            // get last visible item
-            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-                ?:
-                // list is empty
-                // return false here if loadMore should not be invoked if the list is empty
-                return@derivedStateOf true
-
-            // Check if last visible item is the last item in the list
-            lastVisibleItem.index == layoutInfo.totalItemsCount - 1
-        }
-    }
-
-    // Convert the state into a cold flow and collect
-    LaunchedEffect(shouldLoadMore) {
-        snapshotFlow { shouldLoadMore.value }
-            .collect {
-                // if should load more, then invoke loadMore
-                if (it) loadMore()
-            }
     }
 }
 
