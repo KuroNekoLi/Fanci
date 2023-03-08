@@ -112,8 +112,10 @@ private fun MemberRoleManageScreenView(
                 }
             )
         }
-    ) {
-        Column {
+    ) {padding ->
+        Column(
+            modifier = Modifier.padding(padding)
+        ) {
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())

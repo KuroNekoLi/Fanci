@@ -113,6 +113,7 @@ private fun BanListScreenView(
     ) { padding ->
         LazyColumn(
             modifier = Modifier
+                .padding(padding)
                 .fillMaxSize()
                 .background(LocalColor.current.env_80),
             verticalArrangement = Arrangement.spacedBy(1.dp)
