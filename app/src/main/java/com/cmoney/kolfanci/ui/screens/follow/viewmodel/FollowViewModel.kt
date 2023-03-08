@@ -66,7 +66,6 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             viewModelScope.launch {
                 loading()
                 groupUseCase.groupToSelectGroupItem().fold({
-                    dismissLoading()
                     if (it.isNotEmpty()) {
                         //我的所有群組
                         uiState = uiState.copy(
@@ -85,6 +84,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                     } else {
                         fetchAllGroupList()
                     }
+                    dismissLoading()
                 }, {
                     dismissLoading()
                     KLog.e(TAG, it)
@@ -105,7 +105,6 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 pageSize = 10,
                 startWeight = nextWeight ?: Long.MAX_VALUE
             ).fold({
-                dismissLoading()
                 haveNextPage = it.haveNextPage == true
                 nextWeight = it.nextWeight
                 val orgGroupList = _groupList.value.orEmpty().toMutableList()
@@ -113,6 +112,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 _groupList.value = orgGroupList.distinctBy { group ->
                     group.id
                 }
+                dismissLoading()
             }, {
                 dismissLoading()
                 KLog.e(TAG, it)
