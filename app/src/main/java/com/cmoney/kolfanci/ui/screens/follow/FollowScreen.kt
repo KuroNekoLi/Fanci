@@ -387,7 +387,8 @@ fun LoadingView() {
             horizontalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator(
-                modifier = Modifier.size(size = 64.dp)
+                modifier = Modifier.size(size = 64.dp),
+                color = LocalColor.current.primary
             )
         }
     }

@@ -103,7 +103,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             loading()
             groupUseCase.getPopularGroup(
                 pageSize = 10,
-                startWeight = nextWeight ?: 0
+                startWeight = nextWeight ?: Long.MAX_VALUE
             ).fold({
                 dismissLoading()
                 haveNextPage = it.haveNextPage == true

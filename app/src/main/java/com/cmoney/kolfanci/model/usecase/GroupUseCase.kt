@@ -463,7 +463,7 @@ class GroupUseCase(
     /**
      * 取得 熱門 社團列表
      */
-    suspend fun getPopularGroup(pageSize: Int = 100, startWeight: Long = 0) =
+    suspend fun getPopularGroup(pageSize: Int = 100, startWeight: Long = Long.MAX_VALUE) =
         kotlin.runCatching {
             groupApi.apiV1GroupGet(
                 startWeight = startWeight,
