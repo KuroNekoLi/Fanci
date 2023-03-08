@@ -454,11 +454,14 @@ class GroupUseCase(
     /**
      * 取得 最新 社團列表
      */
-    suspend fun getNewestGroup() = kotlin.runCatching {
-        groupApi.apiV1GroupGet(
-            orderType = OrderType.latest
-        ).checkResponseBody()
-    }
+    suspend fun getNewestGroup(pageSize: Int = 100, startWeight: Long = Long.MAX_VALUE) =
+        kotlin.runCatching {
+            groupApi.apiV1GroupGet(
+                startWeight = startWeight,
+                orderType = OrderType.latest,
+                pageSize = pageSize
+            ).checkResponseBody()
+        }
 
     /**
      * 取得 熱門 社團列表

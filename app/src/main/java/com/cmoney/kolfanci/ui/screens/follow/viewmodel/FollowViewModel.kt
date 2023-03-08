@@ -272,7 +272,6 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
         )
     }
 
-    // TODO: 驗證分頁功能
     /**
      * 讀取社團 下一分頁
      */

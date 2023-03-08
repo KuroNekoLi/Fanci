@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -27,6 +28,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.destinations.CreateGroupScreenDestination
 import com.cmoney.kolfanci.destinations.MainScreenDestination
+import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
@@ -57,6 +59,7 @@ fun DiscoverGroupScreen(
         navController = navController,
         selectedIndex = uiState.tabIndex,
         groupList = uiState.groupList,
+        isLoading = uiState.isLoading,
         onTabClick = {
             viewModel.onTabClick(it)
         },
@@ -65,6 +68,9 @@ fun DiscoverGroupScreen(
         },
         onCreateClick = {
             navController.navigate(CreateGroupScreenDestination())
+        },
+        onLoadMore = {
+            viewModel.onLoadMore()
         }
     )
 
@@ -134,9 +140,17 @@ private fun DiscoverGroupScreenView(
     groupList: List<Group>,
     onTabClick: (Int) -> Unit,
     onGroupItemClick: (Group) -> Unit,
-    onCreateClick: () -> Unit
+    onCreateClick: () -> Unit,
+    onLoadMore: () -> Unit,
+    isLoading: Boolean
 ) {
     val list = listOf("熱門社團", "最新社團")
+
+    val listState = rememberLazyListState()
+
+    listState.OnBottomReached {
+        onLoadMore.invoke()
+    }
 
     Scaffold(
         modifier = modifier,
@@ -223,7 +237,10 @@ private fun DiscoverGroupScreenView(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                state = listState
+            ) {
                 items(groupList) { group ->
                     GroupItemScreen(
                         groupModel = group,
@@ -233,6 +250,20 @@ private fun DiscoverGroupScreenView(
                         descColor = LocalColor.current.text.default_80
                     ) { groupModel ->
                         onGroupItemClick.invoke(groupModel)
+                    }
+                }
+
+                if (isLoading) {
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(size = 32.dp),
+                                color = LocalColor.current.primary
+                            )
+                        }
                     }
                 }
             }
@@ -254,7 +285,9 @@ fun DiscoverGroupScreenPreview() {
             ),
             onTabClick = {},
             onGroupItemClick = {},
-            onCreateClick = {}
+            onCreateClick = {},
+            onLoadMore = {},
+            isLoading = true
         )
     }
 }
