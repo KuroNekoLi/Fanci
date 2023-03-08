@@ -95,6 +95,7 @@ fun GroupApplyScreen(
 
     if (uiState.tips?.isNotEmpty() == true) {
         LocalContext.current.showToast(uiState.tips)
+        viewModel.dismissTips()
     }
 
     //通知前一頁,是否需要刷新
