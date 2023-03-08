@@ -78,6 +78,7 @@ class MessageViewModel(
         KLog.i(TAG, "startPolling:$channelId")
         viewModelScope.launch {
             if (channelId?.isNotEmpty() == true) {
+                stopPolling()
                 chatRoomPollUseCase.poll(pollingInterval, channelId).collect {
 //                    KLog.i(TAG, it)
                     val newMessage = it.items?.map { chatMessage ->

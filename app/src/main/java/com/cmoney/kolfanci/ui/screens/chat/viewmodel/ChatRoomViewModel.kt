@@ -35,7 +35,8 @@ data class ChatRoomUiState(
     val announceMessage: ChatMessage? = null,          //公告訊息,顯示用
     val errorMessage: String? = null,
     var blockingList: List<User> = emptyList(), //封鎖用戶
-    var blockerList: List<User> = emptyList()   //封鎖我的用戶
+    var blockerList: List<User> = emptyList(),  //封鎖我的用戶
+    val startPolling: Boolean = false
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -326,6 +327,9 @@ class ChatRoomViewModel(
         viewModelScope.launch {
             permissionUseCase.getPermissionByChannel(channelId = channelId).fold({
                 Constant.MyChannelPermission = it
+                uiState = uiState.copy(
+                    startPolling = true
+                )
             }, {
                 KLog.e(TAG, it)
             })

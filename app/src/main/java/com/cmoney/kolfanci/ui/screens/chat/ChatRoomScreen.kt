@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
@@ -24,7 +25,6 @@ import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -49,15 +49,17 @@ fun ChatRoomScreen(
 
     KLog.i(TAG, "channelId:$channelId")
 
-    if (Constant.MyChannelPermission.canRead == true) {
+    //抓取在頻道的權限
+    viewModel.fetchChannelPermission(channelId)
+
+    if (uiState.startPolling && Constant.MyChannelPermission.canRead == true) {
         messageViewModel.startPolling(channelId)
+    } else {
+        KLog.i(TAG, "channelId:$channelId can't read.")
     }
 
     //抓取 公告
     viewModel.fetchAnnounceMessage(channelId)
-
-    //抓取在頻道的權限
-    viewModel.fetchChannelPermission(channelId)
 
     BackHandler {
         messageViewModel.stopPolling()
