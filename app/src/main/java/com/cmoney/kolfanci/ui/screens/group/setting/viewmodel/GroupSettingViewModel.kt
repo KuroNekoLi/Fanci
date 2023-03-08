@@ -26,7 +26,7 @@ data class GroupSettingUiState(
     val groupThemeList: List<GroupTheme> = emptyList(),     //社團 主題色彩
     val previewTheme: GroupTheme? = null,                   //社團 設定主題 Preview
     val unApplyCount: Long? = null,                         //等待加入申請數量
-    val reportList: List<ReportInformation>? = null,        //檢舉清單
+    val reportList: List<ReportInformation> = emptyList(),  //檢舉清單
     val showDelectDialog: Boolean = false,                  //是否呈現解散彈窗
     val showFinalDelectDialog: Boolean = false,             //是否呈現最後解散彈窗
     val popToMain: Boolean = false                          //跳回首頁
