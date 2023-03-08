@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -81,11 +82,9 @@ fun RoleManageScreen(
         modifier,
         navigator,
         viewModel.uiState.fanciRole.orEmpty(),
-        group
-    ) {
-        KLog.i(TAG, "on save click.")
-        // TODO()
-    }
+        group,
+        loading = viewModel.uiState.loading
+    )
 
     if (viewModel.uiState.fanciRole == null) {
         viewModel.fetchRoleList(group.id.orEmpty())
@@ -98,7 +97,7 @@ fun RoleManageScreenView(
     navigator: DestinationsNavigator,
     roleList: List<FanciRole>,
     group: Group,
-    onSave: () -> Unit
+    loading: Boolean
 ) {
     val TAG = "RoleManageScreenView"
 
@@ -154,47 +153,60 @@ fun RoleManageScreenView(
                 }
             }
 
-            if (roleList.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+            if (loading) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(
-                        text = "尚未建立任何角色",
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center,
-                        color = LocalColor.current.component.other
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(size = 32.dp),
+                        color = LocalColor.current.primary
                     )
                 }
-            } else {
-                Text(
-                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 20.dp),
-                    text = "成員們的暱稱顏色，會顯示最高階身份的顏色可透過重新排列來拖動角色的階級。",
-                    fontSize = 14.sp,
-                    color = LocalColor.current.component.other
-                )
-
-                //Role List
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(1.dp)
-                ) {
-                    itemsIndexed(roleList) { index, item ->
-                        RoleItemScreen(
-                            index = index + 1,
-                            fanciRole = item,
-                            onEditClick = {
-                                KLog.i(TAG, "onEditClick")
-                                navigator.navigate(
-                                    AddRoleScreenDestination(
-                                        group = group,
-                                        fanciRole = it
-                                    )
-                                )
-                            }
+            }
+            else {
+                if (roleList.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "尚未建立任何角色",
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center,
+                            color = LocalColor.current.component.other
                         )
+                    }
+                } else {
+                    Text(
+                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 20.dp),
+                        text = "成員們的暱稱顏色，會顯示最高階身份的顏色可透過重新排列來拖動角色的階級。",
+                        fontSize = 14.sp,
+                        color = LocalColor.current.component.other
+                    )
+
+                    //Role List
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(1.dp)
+                    ) {
+                        itemsIndexed(roleList) { index, item ->
+                            RoleItemScreen(
+                                index = index + 1,
+                                fanciRole = item,
+                                onEditClick = {
+                                    KLog.i(TAG, "onEditClick")
+                                    navigator.navigate(
+                                        AddRoleScreenDestination(
+                                            group = group,
+                                            fanciRole = it
+                                        )
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -230,9 +242,8 @@ fun RoleManageScreenPreview() {
                     color = "FF38B035"
                 )
             ),
-            group = Group()
-        ) {
-
-        }
+            group = Group(),
+            loading = true
+        )
     }
 }

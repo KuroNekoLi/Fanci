@@ -68,6 +68,7 @@ fun GroupApplyScreen(
         modifier = modifier,
         navigator = navigator,
         groupRequirementApplyList = uiState.applyList.orEmpty(),
+        loading = uiState.loading,
         onApplyClick = {
             KLog.i(TAG, "onApplyClick:$it")
             viewModel.onApplyItemClick(it)
@@ -109,6 +110,7 @@ private fun GroupApplyScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     groupRequirementApplyList: List<GroupRequirementApplySelected>,
+    loading: Boolean,
     onApplyClick: (GroupRequirementApplySelected) -> Unit,
     onSelectAllClick: () -> Unit,
     onReject: () -> Unit,
@@ -140,6 +142,20 @@ private fun GroupApplyScreenView(
                 items(groupRequirementApplyList) { question ->
                     ApplyQuestionItem(question) {
                         onApplyClick.invoke(it)
+                    }
+                }
+
+                if (loading) {
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(size = 32.dp),
+                                color = LocalColor.current.primary
+                            )
+                        }
                     }
                 }
             }
@@ -386,7 +402,8 @@ fun GroupApplyScreenPreview() {
             onSelectAllClick = {},
             onReject = {},
             onApply = {},
-            onBackClick = {}
+            onBackClick = {},
+            loading = true
         )
     }
 }

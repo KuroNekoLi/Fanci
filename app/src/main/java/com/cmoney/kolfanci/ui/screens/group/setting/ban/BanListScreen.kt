@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -61,7 +62,8 @@ fun BanListScreen(
         onClick = {
             KLog.i(TAG, "on fix click:$it")
             showDisBanDialog.value = Pair(true, it)
-        }
+        },
+        loading = uiState.loading
     )
 
     //解除禁言 彈窗
@@ -95,7 +97,8 @@ private fun BanListScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     banUserList: List<BanUiModel>,
-    onClick: (BanUiModel) -> Unit
+    onClick: (BanUiModel) -> Unit,
+    loading: Boolean
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -121,6 +124,20 @@ private fun BanListScreenView(
             items(banUserList) { banUser ->
                 BanUserItem(banUser) {
                     onClick.invoke(banUser)
+                }
+            }
+
+            if (loading) {
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(size = 32.dp),
+                            color = LocalColor.current.primary
+                        )
+                    }
                 }
             }
         }
@@ -216,7 +233,8 @@ fun BanListScreenPreview() {
                     duration = "1日"
                 )
             ),
-            onClick = {}
+            onClick = {},
+            loading = true
         )
     }
 }

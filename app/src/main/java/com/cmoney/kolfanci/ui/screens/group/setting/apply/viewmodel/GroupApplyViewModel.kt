@@ -16,7 +16,8 @@ import kotlinx.coroutines.launch
 data class UiState(
     val applyList: List<GroupRequirementApplySelected>? = null,
     val tips: String? = null,
-    val isComplete: Boolean = false
+    val isComplete: Boolean = false,
+    val loading: Boolean = true
 )
 
 data class GroupRequirementApplySelected(
@@ -32,6 +33,18 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
 
     var groupRequirementApplyPaging: GroupRequirementApplyPaging? = null
 
+    private fun showLoading() {
+        uiState = uiState.copy(
+            loading = true
+        )
+    }
+
+    private fun dismissLoading() {
+        uiState = uiState.copy(
+            loading = false
+        )
+    }
+
     /**
      * 取得 申請清單
      * @param groupId 社團id
@@ -39,6 +52,7 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
     fun fetchApplyQuestion(groupId: String) {
         KLog.i(TAG, "fetchApplyQuestion:$groupId")
         viewModelScope.launch {
+            showLoading()
             groupApplyUseCase.fetchGroupApplyList(
                 groupId = groupId
             ).fold({
@@ -52,8 +66,9 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
                         )
                     }
                 )
-
+                dismissLoading()
             }, {
+                dismissLoading()
                 KLog.e(TAG, it)
             })
         }

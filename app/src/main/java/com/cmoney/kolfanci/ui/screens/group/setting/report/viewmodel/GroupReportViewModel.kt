@@ -19,7 +19,8 @@ data class UiState(
     val reportList: List<ReportInformation> = emptyList(),
     val showReportDialog: ReportInformation? = null,  //懲處 dialog
     val showSilenceDialog: ReportInformation? = null, //禁言 dialog
-    val kickDialog: ReportInformation? = null         //踢除社團 dialog
+    val kickDialog: ReportInformation? = null,         //踢除社團 dialog
+    val loading: Boolean = true
 )
 
 class GroupReportViewModel(
@@ -37,6 +38,18 @@ class GroupReportViewModel(
     init {
         uiState = uiState.copy(
             reportList = reportList
+        )
+    }
+
+    private fun showLoading() {
+        uiState = uiState.copy(
+            loading = true
+        )
+    }
+
+    private fun dismissLoading() {
+        uiState = uiState.copy(
+            loading = false
         )
     }
 
