@@ -87,11 +87,11 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-    implementation 'androidx.activity:activity-compose:1.6.0'
+    implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
     //==================== Compose ====================
@@ -130,7 +130,7 @@ dependencies {
     implementation 'com.cmoney.remoteconfig:remoteconfig-android:5.0.0'
 
     //=============== Flurry ===============
-    implementation 'com.flurry.android:analytics:13.1.0'
+    implementation 'com.flurry.android:analytics:13.3.0'
 
     implementation "androidx.work:work-runtime-ktx:2.7.1"
 
