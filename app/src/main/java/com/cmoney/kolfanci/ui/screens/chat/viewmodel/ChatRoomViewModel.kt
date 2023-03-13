@@ -10,6 +10,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
@@ -19,9 +22,6 @@ import com.cmoney.kolfanci.model.usecase.RelationUseCase
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
-import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.User
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -303,9 +303,16 @@ class ChatRoomViewModel(
                     announceMessage = chatMessage
                 )
             }, {
-                uiState = uiState.copy(
-                    errorMessage = it.toString()
-                )
+                uiState = if (it is EmptyBodyException) {
+                    uiState.copy(
+                        announceMessage = chatMessage
+                    )
+                } else {
+                    uiState.copy(
+                        errorMessage = it.toString()
+                    )
+                }
+
             })
         }
     }
