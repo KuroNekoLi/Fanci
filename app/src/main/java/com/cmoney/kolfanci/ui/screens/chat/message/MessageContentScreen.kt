@@ -1,18 +1,27 @@
 package com.cmoney.kolfanci.ui.screens.chat.message
 
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.DeleteStatus
+import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.common.AutoLinkText
@@ -24,10 +33,6 @@ import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
-import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.DeleteStatus
-import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -49,6 +54,7 @@ fun MessageContentScreen(
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onMessageContentCallback: (MessageContentCallback) -> Unit,
+    onReSendClick: (ChatMessageWrapper) -> Unit
 ) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp)
     val defaultColor = LocalColor.current.env_80
@@ -63,7 +69,8 @@ fun MessageContentScreen(
         backgroundColor = longPressColor
         coroutineScope.launch {
             delay(300)
-            if (longTap && messageModel.isDeleted != true) {
+            //不是刪除訊息  以及 不是未送出訊息
+            if (longTap && messageModel.isDeleted != true && !chatMessageWrapper.isPendingSendMessage) {
                 onMessageContentCallback.invoke(
                     MessageContentCallback.LongClick(messageModel)
                 )
@@ -86,6 +93,14 @@ fun MessageContentScreen(
     ) {
         Column(
             modifier = modifier
+                .alpha(
+                    //發送失敗 淡化訊息
+                    if (chatMessageWrapper.isPendingSendMessage) {
+                        0.5f
+                    } else {
+                        1f
+                    }
+                )
                 .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
                 .fillMaxWidth()
         ) {
@@ -97,6 +112,7 @@ fun MessageContentScreen(
                 ) {
                     onMessageContentCallback.invoke(MessageContentCallback.MsgDismissHideClick(it))
                 }
+                //刪除
             } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
                 MessageRemoveScreen()
             } else {
@@ -157,7 +173,11 @@ fun MessageContentScreen(
                     if (chatMessageWrapper.uploadAttachPreview.isNotEmpty()) {
                         MessageImageScreen(
                             images = chatMessageWrapper.uploadAttachPreview.map {
-                                it.uri
+                                if (it.uri == Uri.EMPTY) {
+                                    it.serverUrl
+                                } else {
+                                    it.uri
+                                }
                             },
                             modifier = contentPaddingModifier,
                             isShowLoading = chatMessageWrapper.uploadAttachPreview.map {
@@ -191,6 +211,20 @@ fun MessageContentScreen(
                                     }
                                 }
                             }
+                        }
+                    }
+
+                    //Re-Send
+                    if (chatMessageWrapper.isPendingSendMessage) {
+                        Box(modifier = contentPaddingModifier
+                            .clickable {
+                                onReSendClick.invoke(chatMessageWrapper)
+                            }
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.resend),
+                                contentDescription = ""
+                            )
                         }
                     }
                 }
@@ -229,12 +263,12 @@ fun MessageContentScreenPreview() {
                     ChatRoomUiState.ImageAttachState(
                         uri = Uri.parse("")
                     )
-                )
+                ),
+                isPendingSendMessage = true
             ),
             coroutineScope = rememberCoroutineScope(),
-            onMessageContentCallback = {
-
-            }
+            onMessageContentCallback = {},
+            onReSendClick = {}
         )
     }
 }

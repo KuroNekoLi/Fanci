@@ -29,6 +29,7 @@ import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
+import com.cmoney.kolfanci.ui.screens.shared.dialog.MessageReSendDialogScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -51,17 +52,20 @@ fun MessageScreen(
     viewModel: ChatRoomViewModel = koinViewModel(),
     onMsgDismissHide: (ChatMessage) -> Unit
 ) {
-    val isScrollToBottom = messageViewModel.uiState.isSendComplete
+    val TAG = "MessageScreen"
+
+    val uiState = messageViewModel.uiState
+    val isScrollToBottom = uiState.isSendComplete
     val onInteractClick = object : (MessageInteract) -> Unit {
         override fun invoke(messageInteract: MessageInteract) {
             messageViewModel.onInteractClick(messageInteract)
         }
     }
 
-    if (messageViewModel.uiState.message.isNotEmpty()) {
+    if (uiState.message.isNotEmpty()) {
         MessageScreenView(
             modifier = modifier,
-            message = messageViewModel.uiState.message,
+            message = uiState.message,
             blockingList = viewModel.uiState.blockingList.map {
                 it.id.orEmpty()
             },
@@ -75,6 +79,9 @@ fun MessageScreen(
             isScrollToBottom = isScrollToBottom,
             onLoadMore = {
                 messageViewModel.onLoadMore(channelId)
+            },
+            onReSendClick = {
+                messageViewModel.onReSendClick(it)
             }
         )
     } else {
@@ -82,6 +89,21 @@ fun MessageScreen(
         EmptyMessageContent(modifier = modifier)
     }
 
+    if (uiState.showReSendDialog != null) {
+        KLog.i(TAG, "showReSendDialog")
+        MessageReSendDialogScreen(
+            onDismiss = {
+                messageViewModel.onReSendDialogDismiss()
+            },
+            onReSend = {
+                messageViewModel.onResendMessage(channelId, uiState.showReSendDialog)
+            },
+            onDelete = {
+                messageViewModel.onDeleteReSend(uiState.showReSendDialog)
+            }
+        )
+    }
+    
 }
 
 @Composable
@@ -95,7 +117,8 @@ private fun MessageScreenView(
     onInteractClick: (MessageInteract) -> Unit,
     onMsgDismissHide: (ChatMessage) -> Unit,
     isScrollToBottom: Boolean,
-    onLoadMore: () -> Unit
+    onLoadMore: () -> Unit,
+    onReSendClick: (ChatMessageWrapper) -> Unit
 ) {
     Surface(
         color = LocalColor.current.env_80,
@@ -121,6 +144,9 @@ private fun MessageScreenView(
                             isBlocker = isBlocker
                         ),
                         coroutineScope = coroutineScope,
+                        onReSendClick = {
+                            onReSendClick.invoke(it)
+                        },
                         onMessageContentCallback = {
                             when (it) {
                                 is MessageContentCallback.EmojiClick -> {
@@ -214,7 +240,7 @@ fun MessageScreenPreview() {
                 ChatMessageWrapper(
                     message = ChatMessage(
                         content = MediaIChatContent(
-                            text = "Message"
+                            text = "Message 1234"
                         )
                     )
                 )
@@ -226,7 +252,8 @@ fun MessageScreenPreview() {
             onMsgDismissHide = {},
             onLoadMore = {},
             blockingList = emptyList(),
-            blockerList = emptyList()
+            blockerList = emptyList(),
+            onReSendClick = {}
         )
     }
 }

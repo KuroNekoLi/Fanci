@@ -1,13 +1,15 @@
 package com.cmoney.kolfanci.ui.screens.chat.message.viewmodel
 
-import android.content.Context
+import android.app.Application
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
@@ -21,8 +23,6 @@ import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.Utils
-import com.cmoney.fanciapi.fanci.model.*
-import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
@@ -41,17 +41,19 @@ data class MessageUiState(
     val copyMessage: ChatMessage? = null,    //複製訊息
     val hideUserMessage: ChatMessage? = null,    //封鎖用戶
     val reportMessage: ChatMessage? = null,
-    val deleteMessage: ChatMessage? = null
+    val deleteMessage: ChatMessage? = null,
+    val showReSendDialog: ChatMessageWrapper? = null   //是否要show re-send dialog
 )
 
 /**
  * 處理聊天室 相關訊息
  */
 class MessageViewModel(
-    val context: Context,
-    val chatRoomUseCase: ChatRoomUseCase,
+    val context: Application,
+    private val chatRoomUseCase: ChatRoomUseCase,
     private val chatRoomPollUseCase: ChatRoomPollUseCase
-) : ViewModel() {
+) : AndroidViewModel(context) {
+
     private val TAG = MessageViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(MessageUiState())
@@ -201,6 +203,37 @@ class MessageViewModel(
 
                     override fun onFailure(e: Throwable) {
                         KLog.e(TAG, "onFailure:$e")
+
+                        //Create pending message
+                        uiState = uiState.copy(
+                            message = uiState.message.toMutableList().apply {
+                                add(
+                                    0,
+                                    ChatMessageWrapper(
+                                        message = ChatMessage(
+                                            id = preSendChatId,
+                                            author = GroupMember(
+                                                name = XLoginHelper.nickName,
+                                                thumbNail = XLoginHelper.headImagePath
+                                            ),
+                                            content = MediaIChatContent(
+                                                text = text
+                                            ),
+                                            createUnixTime = System.currentTimeMillis() / 1000,
+                                            replyMessage = uiState.replyMessage
+                                        ),
+                                        uploadAttachPreview = uiState.imageAttach.map {
+                                            ChatRoomUiState.ImageAttachState(
+                                                uri = it,
+                                                isUploadComplete = true
+                                            )
+                                        },
+                                        isPendingSendMessage = true
+                                    )
+                                )
+                            }
+                        )
+
                     }
                 })
                 uiState = uiState.copy(imageAttach = emptyList())
@@ -270,6 +303,10 @@ class MessageViewModel(
         withContext(Dispatchers.IO) {
             uploadImage.upload().catch { e ->
                 KLog.e(TAG, e)
+                uiState = uiState.copy(
+                    imageAttach = uriLis
+                )
+
                 imageUploadCallback.onFailure(e)
 
             }.collect {
@@ -361,7 +398,54 @@ class MessageViewModel(
 
             }, {
                 KLog.e(TAG, it)
-                // TODO: send error
+
+                //將發送失敗訊息 標註為Pending
+                uiState = uiState.copy(
+                    message = uiState.message.toMutableList().apply {
+                        add(
+                            0,
+                            ChatMessageWrapper(
+                                message = ChatMessage(
+                                    id = preSendChatId,
+                                    author = GroupMember(
+                                        name = XLoginHelper.nickName,
+                                        thumbNail = XLoginHelper.headImagePath
+                                    ),
+                                    content = MediaIChatContent(
+                                        text = text
+                                    ),
+                                    createUnixTime = System.currentTimeMillis() / 1000,
+                                    replyMessage = uiState.replyMessage
+                                ),
+                                uploadAttachPreview = images.map {
+                                    ChatRoomUiState.ImageAttachState(
+                                        uri = Uri.EMPTY,
+                                        serverUrl = it
+                                    )
+                                },
+                                isPendingSendMessage = true
+                            )
+                        )
+                    }
+                )
+
+
+//                //將發送失敗訊息放至Pending清單中
+//                val pendingMessage = uiState.pendingSendMessage.pendingSendMessage.toMutableList()
+//
+//                pendingMessage.add(
+//                    PendingSendMessage(
+//                        channelId = channelId,
+//                        text = text,
+//                        images = images
+//                    )
+//                )
+//
+//                uiState = uiState.copy(
+//                    pendingSendMessage = ChatMessageWrapper(
+//                        pendingSendMessage = pendingMessage
+//                    )
+//                )
             })
         }
     }
@@ -701,5 +785,47 @@ class MessageViewModel(
         uiState = uiState.copy(
             snackBarMessage = null
         )
+    }
+
+    /**
+     * 點擊 再次發送
+     */
+    fun onReSendClick(it: ChatMessageWrapper) {
+        KLog.i(TAG, "onReSendClick:$it")
+        uiState = uiState.copy(
+            showReSendDialog = it
+        )
+    }
+
+    /**
+     * 關閉 重新發送 Dialog
+     */
+    fun onReSendDialogDismiss() {
+        uiState = uiState.copy(
+            showReSendDialog = null
+        )
+    }
+
+    /**
+     * 刪除 未發送訊息
+     */
+    fun onDeleteReSend(message: ChatMessageWrapper) {
+        KLog.i(TAG, "onDeleteReSend:$message")
+        uiState = uiState.copy(
+            message = uiState.message.filter {
+                !it.isPendingSendMessage && it != message
+            },
+            showReSendDialog = null
+        )
+    }
+
+    /**
+     *  重新發送訊息
+     */
+    fun onResendMessage(channelId: String, message: ChatMessageWrapper) {
+        KLog.i(TAG, "onResendMessage:$message")
+        onDeleteReSend(message)
+        messageSend(channelId = channelId, text = message.message.content?.text.orEmpty())
+        onReSendDialogDismiss()
     }
 }
