@@ -109,13 +109,25 @@ class MessageViewModel(
         newChatMessage: List<ChatMessageWrapper>,
         isLatest: Boolean = false
     ) {
+
+        //TODO pending message sort
+
         //combine old message
-        val oldMessage = uiState.message.toMutableList()
+        val oldMessage = uiState.message.filter {
+            !it.isPendingSendMessage
+        }.toMutableList()
+
+        val pendingSendMessage = uiState.message.filter {
+            it.isPendingSendMessage
+        }
+
         if (isLatest) {
             oldMessage.addAll(0, newChatMessage)
         } else {
             oldMessage.addAll(newChatMessage)
         }
+
+        oldMessage.addAll(0, pendingSendMessage)
 
         val distinctMessage = oldMessage.distinctBy { combineMessage ->
             combineMessage.message.id
@@ -211,7 +223,7 @@ class MessageViewModel(
                                     0,
                                     ChatMessageWrapper(
                                         message = ChatMessage(
-                                            id = preSendChatId,
+                                            id = System.currentTimeMillis().toString(),
                                             author = GroupMember(
                                                 name = XLoginHelper.nickName,
                                                 thumbNail = XLoginHelper.headImagePath
@@ -406,7 +418,7 @@ class MessageViewModel(
                             0,
                             ChatMessageWrapper(
                                 message = ChatMessage(
-                                    id = preSendChatId,
+                                    id = System.currentTimeMillis().toString(),
                                     author = GroupMember(
                                         name = XLoginHelper.nickName,
                                         thumbNail = XLoginHelper.headImagePath
