@@ -1,0 +1,6063 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Fanci.Api",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://34.80.212.140/fanci/"
+    }
+  ],
+  "paths": {
+    "/api/v1/Ban/Group/{groupId}": {
+      "get": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "取得社團的禁言用戶清單 __________🔒 禁言",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBanInformation"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBanInformation"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBanInformation"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_禁言_0_groupId_groupId"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "解除禁言 __________🔒 禁言",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_禁言_0_groupId_groupId"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "新增或調整某個用戶的禁言狀態 __________🔒 禁言",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_禁言_0_groupId_groupId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Ban/Group/{groupId}/me": {
+      "get": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "取得自己在社團的禁言狀態 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Ban/Group/{groupId}/{userId}": {
+      "get": {
+        "tags": [
+          "Ban"
+        ],
+        "summary": "取得特定會員在社團的禁言狀態 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBanInformation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Category/{categoryId}": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "取得特定分類 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "分類id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該分類"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "刪除分類 __________🔒 刪除分類",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "分類Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該分類"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_刪除分類_0_categoryId_categoryId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Category/{categoryId}/Channel": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "取得分類下的頻道 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "分類id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startWeight",
+            "in": "query",
+            "description": "起始權重",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "分頁筆數",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelPaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelPaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelPaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該分類"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "在分類下新增頻道 __________🔒 建立頻道",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "分類id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "新增頻道參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該分類"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_建立頻道_0_categoryId_categoryId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Category/{categoryId}/Name": {
+      "put": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "重命名分類 __________🔒 編輯分類",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "分類Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "分類參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該分類"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_編輯分類_0_categoryId_categoryId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Channel/{channelId}": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "取得特定頻道 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "編輯頻道 __________🔒 編輯頻道",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "頻道參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditChannelParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditChannelParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditChannelParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "刪除頻道 __________🔒 刪除頻道",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "聊天室Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_刪除頻道_0_channelId_channelGroupId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Channel/{channelId}/Role": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "取得角色清單",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          },
+          "403": {
+            "description": "沒有權限"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "新增更新 多個 頻道角色 __________🔒 指派頻道管理員",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "新增的 role id 清單",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          },
+          "405": {
+            "description": "要新增的角色不存在"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_指派頻道管理員_0_channelId_channelGroupId"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "從頻道移除 多個 角色 __________🔒 指派頻道管理員",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "角色Id",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "找不到該頻道"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "405": {
+            "description": "要新增的角色不存在"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_指派頻道管理員_0_channelId_channelGroupId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ChatRoom/{chatRoomChannelId}/Message": {
+      "post": {
+        "tags": [
+          "ChatRoom"
+        ],
+        "summary": "對聊天室新增一則聊天訊息 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "chatRoomChannelId",
+            "in": "path",
+            "description": "聊天室頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "訊息參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_1_chatRoomChannelId"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "ChatRoom"
+        ],
+        "summary": "取得聊天室訊息列表 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "chatRoomChannelId",
+            "in": "path",
+            "description": "聊天室頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "取得筆數",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "排序依據(預設為新到舊)",
+            "schema": {
+              "$ref": "#/components/schemas/OrderType"
+            }
+          },
+          {
+            "name": "fromSerialNumber",
+            "in": "query",
+            "description": "從哪一個序列號開始往回找",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessagePaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessagePaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessagePaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage": {
+      "get": {
+        "tags": [
+          "ChatRoom"
+        ],
+        "summary": "取得聊天室的公告訊息 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "chatRoomChannelId",
+            "in": "path",
+            "description": "聊天室頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "ChatRoom"
+        ],
+        "summary": "公告聊天室的一則聊天訊息 __________🔒 可管理",
+        "parameters": [
+          {
+            "name": "chatRoomChannelId",
+            "in": "path",
+            "description": "聊天室頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "公告訊息參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIdParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIdParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIdParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_1_chatRoomChannelId",
+              "PERMISSION_可管理_1_chatRoomChannelId_channelId"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "ChatRoom"
+        ],
+        "summary": "取消聊天室公告 __________🔒 可管理",
+        "parameters": [
+          {
+            "name": "chatRoomChannelId",
+            "in": "path",
+            "description": "聊天室頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_1_chatRoomChannelId",
+              "PERMISSION_可管理_1_chatRoomChannelId_channelId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/DefaultImage": {
+      "get": {
+        "tags": [
+          "DefaultImage"
+        ],
+        "summary": "取得預設圖片",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultImageResource"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultImageResource"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultImageResource"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Group": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "取得社團列表",
+        "parameters": [
+          {
+            "name": "startWeight",
+            "in": "query",
+            "description": "起始權重",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每頁筆數",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "orderType",
+            "in": "query",
+            "description": "排序類型",
+            "schema": {
+              "$ref": "#/components/schemas/OrderType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPaging"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "新增社團 __________🔒 已註冊的fanci使用者",
+        "requestBody": {
+          "description": "新增社團參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Group/{groupId}": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "取得特定社團",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "刪除/解散社團 __________🔒 社長",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_0_groupId_none"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "編輯社團資訊 __________🔒 編輯社團",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "編輯社團參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditGroupParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditGroupParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditGroupParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_編輯社團_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Group/{groupId}/isNeedApproval": {
+      "put": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "更新社團是否公開 __________🔒 設定社團公開私密",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "更新參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIsNeedApprovalParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIsNeedApprovalParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIsNeedApprovalParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_設定社團公開私密_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Group/{groupId}/Category": {
+      "post": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "新增社團 頻道分類 __________🔒 建立分類",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "分類參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_建立分類_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Group/me": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "取得我加入的社團清單 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "startWeight",
+            "in": "query",
+            "description": "起始權重",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每頁筆數",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Group/{groupId}/Role": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "取得角色列表",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "新增角色 __________🔒 新增角色",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "角色參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FanciRole"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FanciRole"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FanciRole"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "已有相同名稱的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_新增角色_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Group/{groupId}/Role/{roleId}": {
+      "put": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "編輯角色 __________🔒 編輯角色",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "path",
+            "description": "角色Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "角色參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "已有相同名稱的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_編輯角色_0_groupId_none"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "刪除角色 __________🔒 刪除角色",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "path",
+            "description": "角色Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "找不到要刪除的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_刪除角色_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupApply/group/{groupId}": {
+      "put": {
+        "tags": [
+          "GroupApply"
+        ],
+        "summary": "新增社團申請 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "社團申請參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupApplyParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupApplyParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupApplyParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "409": {
+            "description": "Conflict"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "GroupApply"
+        ],
+        "summary": "取得社團申請清單 __________🔒 審核入社申請",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applyStatus",
+            "in": "query",
+            "description": "申請狀態",
+            "schema": {
+              "$ref": "#/components/schemas/ApplyStatus"
+            }
+          },
+          {
+            "name": "startWeight",
+            "in": "query",
+            "description": "起始權重",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每頁筆數",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyPaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyPaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyPaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          },
+          "409": {
+            "description": "社團id 不合法"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_審核入社申請_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupApply/group/{groupId}/me": {
+      "get": {
+        "tags": [
+          "GroupApply"
+        ],
+        "summary": "取得我的社團申請 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupApply/group/{groupId}/Count": {
+      "get": {
+        "tags": [
+          "GroupApply"
+        ],
+        "summary": "查詢未處理的入社申請筆數 __________🔒 審核入社申請",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applyStatus",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/ApplyStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_審核入社申請_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupApply/group/{groupId}/Approval": {
+      "put": {
+        "tags": [
+          "GroupApply"
+        ],
+        "summary": "整批更新審核狀態(通過/拒絕) __________🔒 審核入社申請",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "審核狀態參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupApplyStatusParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupApplyStatusParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupApplyStatusParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_審核入社申請_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupMember/group/{groupId}": {
+      "get": {
+        "tags": [
+          "GroupMember"
+        ],
+        "summary": "取得社團會員清單 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "跳脫筆數",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "取得筆數",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupMemberPaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupMemberPaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupMemberPaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupMember/group/{groupId}/me": {
+      "put": {
+        "tags": [
+          "GroupMember"
+        ],
+        "summary": "加入社團 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "該社團須申請審核"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "GroupMember"
+        ],
+        "summary": "離開社團 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "社長不得離開社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupMember/group/{groupId}/{userId}": {
+      "delete": {
+        "tags": [
+          "GroupMember"
+        ],
+        "summary": "踢除成員離開社團 __________🔒 踢除",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "要剔除的成員id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "社長不得離開社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_踢除_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupRequirement/group/{groupId}": {
+      "get": {
+        "tags": [
+          "GroupRequirement"
+        ],
+        "summary": "取得加入社團的要求題目",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirement"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirement"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirement"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到社團"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "GroupRequirement"
+        ],
+        "summary": "新增或更新社團題目 __________🔒 建立與編輯入社問題",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "題目參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupRequirementParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupRequirementParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupRequirementParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "409": {
+            "description": "Conflict"
+          },
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirement"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirement"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupRequirement"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_建立與編輯入社問題_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Info": {
+      "get": {
+        "tags": [
+          "Info"
+        ],
+        "summary": "密碼是 xlabxlab",
+        "parameters": [
+          {
+            "name": "passcode",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string",
+              "default": "1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/Message/{messageId}": {
+      "get": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "取得單一訊息 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "編輯訊息內容 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "異動訊息參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "不是發文者"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_2_messageId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Message/role/{messageId}": {
+      "delete": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "角色刪除他人訊息 __________🔒 可管理",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_2_messageId",
+              "PERMISSION_可管理_1_messageId_messageId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Message/me/{messageId}": {
+      "delete": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "收回我的訊息 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限(代表不是自己發的訊息)"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_2_messageId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Message/{messageId}/Emoji": {
+      "get": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "取得訊息表情符號來自誰 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "對訊息新增表情符號 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "訊息Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "表情符號參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmojiParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmojiParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmojiParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_2_messageId"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "收回表情符號 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到訊息"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_2_messageId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Order/Group/{groupId}": {
+      "put": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "調整群組/頻道排序 __________🔒 重新排列",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "排序參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_重新排列_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Order/Group/{groupId}/Role/Order": {
+      "put": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "編輯角色列表排序 __________🔒 管理角色層級",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleOrderParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleOrderParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleOrderParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_管理角色層級_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Permission": {
+      "get": {
+        "tags": [
+          "Permission"
+        ],
+        "summary": "取得管理權限表",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionCategory"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionCategory"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Permission/Group/{groupId}": {
+      "get": {
+        "tags": [
+          "Permission"
+        ],
+        "summary": "取得user在此社團擁有的權限 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPermission"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPermission"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupPermission"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Permission/Channel/{channelId}": {
+      "get": {
+        "tags": [
+          "Permission"
+        ],
+        "summary": "取得user在此頻道擁有的權限 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "聊天室頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelPermission"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelPermission"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelPermission"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Permission/{id}": {
+      "patch": {
+        "tags": [
+          "Permission"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "passCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchPermissionParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchPermissionParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchPermissionParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "get": {
+        "tags": [
+          "Permission"
+        ],
+        "summary": "取得單一權限資訊",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v1/Relation/{relation}/me": {
+      "get": {
+        "tags": [
+          "Relation"
+        ],
+        "summary": "取得有此關係的用戶清單 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "relation",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Relation"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Relation/{relation}/me/{blockUserId}": {
+      "put": {
+        "tags": [
+          "Relation"
+        ],
+        "summary": "增加與用戶的關係 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "relation",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Relation"
+            }
+          },
+          {
+            "name": "blockUserId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Relation"
+        ],
+        "summary": "解除與用戶的關係 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "relation",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Relation"
+            }
+          },
+          {
+            "name": "blockUserId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/RoleUser/Group/{groupId}/Role/{roleId}": {
+      "get": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "取得具有此角色身分的用戶清單 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "找不到指派的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "指派使用者角色身分 __________🔒 指派身分",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "path",
+            "description": "角色Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "使用者清單",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "找不到指派的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_指派身分_0_groupId_none"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "移除使用者的角色身分 __________🔒 指派身分",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "path",
+            "description": "角色Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "使用者清單",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "找不到指派的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_指派身分_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/RoleUser/Group/{groupId}/Member/{userId}": {
+      "put": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "指派一個使用者的角色身分(可以設定多個role) __________🔒 指派身分",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "成員Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "使用者清單",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "找不到指派的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_指派身分_0_groupId_none"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "移除使用者的(多個)角色身分 __________🔒 指派身分",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "成員Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "使用者清單",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIdsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "找不到指派的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_指派身分_0_groupId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/RoleUser/Group/{groupId}": {
+      "get": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "取得用戶ID清單的腳色列表 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "UserIds",
+            "in": "query",
+            "description": "Fanci 用戶 ID",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMemberRoleInfos"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMemberRoleInfos"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMemberRoleInfos"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ThemeColor": {
+      "get": {
+        "tags": [
+          "ThemeColor"
+        ],
+        "summary": "取得所有主題色卡包",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/Theme"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/Theme"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/Theme"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ThemeColor/{colorTheme}": {
+      "get": {
+        "tags": [
+          "ThemeColor"
+        ],
+        "summary": "取得特定主題色卡包",
+        "parameters": [
+          {
+            "name": "colorTheme",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ColorTheme"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Theme"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Theme"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Theme"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/User/{id}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "取得使用者 __________🔒 cmoney token",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "使用者Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到使用者"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/User/me": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "向fanci註冊使用者 __________🔒 cmoney token",
+        "requestBody": {
+          "description": "註冊參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "取得我的個人資訊 __________🔒 已註冊的fanci使用者",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到使用者"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/UserReport/Channel/{channelId}": {
+      "post": {
+        "tags": [
+          "UserReport"
+        ],
+        "summary": "檢舉某頻道的內容 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportParm"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportParm"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportParm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportInformation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "204": {
+            "description": "成功"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/UserReport/Channel/{channelId}/{id}": {
+      "put": {
+        "tags": [
+          "UserReport"
+        ],
+        "summary": "更新檢舉處理狀態 __________🔒 讀取被檢舉名單",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportStatusUpdateParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportStatusUpdateParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportStatusUpdateParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "204": {
+            "description": "成功"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_讀取被檢舉名單_0_channelId_channelGroupId",
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/UserReport/Group/{groupId}": {
+      "get": {
+        "tags": [
+          "UserReport"
+        ],
+        "summary": "取得社團的檢舉審核清單 __________🔒 讀取被檢舉名單",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportInformation"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportInformation"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportInformation"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_讀取被檢舉名單_0_groupId_none",
+              "user"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApplyStatus": {
+        "enum": [
+          "UnConfirmed",
+          "Confirmed",
+          "Denied"
+        ],
+        "type": "string"
+      },
+      "BanParam": {
+        "type": "object",
+        "properties": {
+          "userid": {
+            "type": "string",
+            "nullable": true
+          },
+          "periodOption": {
+            "$ref": "#/components/schemas/BanPeriodOption"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BanPeriodOption": {
+        "enum": [
+          "OneDay",
+          "ThreeDay",
+          "OneWeek",
+          "OneMonth",
+          "Forever"
+        ],
+        "type": "string"
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "分類ID",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "分類標籤名稱",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "description": "排序權重",
+            "format": "int64"
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "description": "分類建立時間",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "description": "分類更新時間",
+            "format": "int64"
+          },
+          "creatorId": {
+            "type": "string",
+            "description": "建立分類UserId",
+            "nullable": true
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "是否被刪除"
+          },
+          "groupId": {
+            "type": "string",
+            "description": "所屬社團",
+            "nullable": true
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Channel"
+            },
+            "description": "分類下的頻道",
+            "nullable": true
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "前端顯示是否為隱藏"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CategoryOrder": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "nullable": true
+          },
+          "channelIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CategoryParam": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "分類命名"
+          }
+        },
+        "additionalProperties": false,
+        "description": "分類參數"
+      },
+      "Channel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "頻道Id",
+            "nullable": true
+          },
+          "creatorId": {
+            "type": "string",
+            "description": "頻道創立者",
+            "nullable": true
+          },
+          "channelType": {
+            "$ref": "#/components/schemas/ChannelType"
+          },
+          "name": {
+            "type": "string",
+            "description": "頻道命名",
+            "nullable": true
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "description": "頻道建立時間",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "description": "頻道更新時間",
+            "format": "int64"
+          },
+          "weight": {
+            "type": "integer",
+            "description": "排序權重",
+            "format": "int64"
+          },
+          "groupId": {
+            "type": "string",
+            "description": "頻道所屬社團Id",
+            "nullable": true
+          },
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "是否為公開頻道"
+          }
+        },
+        "additionalProperties": false,
+        "description": "頻道"
+      },
+      "ChannelPaging": {
+        "type": "object",
+        "properties": {
+          "haveNextPage": {
+            "type": "boolean"
+          },
+          "nextWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Channel"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChannelParam": {
+        "type": "object",
+        "properties": {
+          "channelType": {
+            "$ref": "#/components/schemas/ChannelType"
+          },
+          "name": {
+            "type": "string",
+            "description": "頻道名稱",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "新增頻道參數"
+      },
+      "ChannelPermission": {
+        "type": "object",
+        "properties": {
+          "canRead": {
+            "type": "boolean"
+          },
+          "canPost": {
+            "type": "boolean"
+          },
+          "canReply": {
+            "type": "boolean"
+          },
+          "canEmoji": {
+            "type": "boolean"
+          },
+          "canManage": {
+            "type": "boolean"
+          },
+          "canCopy": {
+            "type": "boolean"
+          },
+          "canBlock": {
+            "type": "boolean"
+          },
+          "canReport": {
+            "type": "boolean"
+          },
+          "canTakeback": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChannelType": {
+        "enum": [
+          "ChatRoom"
+        ],
+        "type": "string"
+      },
+      "ChatMessage": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "$ref": "#/components/schemas/GroupMember"
+          },
+          "replyMessage": {
+            "$ref": "#/components/schemas/ChatMessage"
+          },
+          "content": {
+            "$ref": "#/components/schemas/MediaIChatContent"
+          },
+          "emojiCount": {
+            "$ref": "#/components/schemas/IEmojiCount"
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "是否刪除"
+          },
+          "myProperty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "serialNumber": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "messageType": {
+            "$ref": "#/components/schemas/MessageType"
+          },
+          "messageReaction": {
+            "$ref": "#/components/schemas/IUserMessageReaction"
+          },
+          "deleteStatus": {
+            "$ref": "#/components/schemas/DeleteStatus"
+          },
+          "deleteFrom": {
+            "$ref": "#/components/schemas/GroupMember"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessagePaging": {
+        "type": "object",
+        "properties": {
+          "haveNextPage": {
+            "type": "boolean"
+          },
+          "nextWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessageParam": {
+        "type": "object",
+        "properties": {
+          "replyMessageId": {
+            "type": "string",
+            "description": "回覆的messageid",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "description": "文字訊息內容",
+            "nullable": true
+          },
+          "medias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media"
+            },
+            "description": "附帶媒體內容",
+            "nullable": true
+          },
+          "messageType": {
+            "$ref": "#/components/schemas/MessageType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Color": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "hexColorCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ColorTheme": {
+        "enum": [
+          "ThemeFanciBlue",
+          "ThemeSmokePink",
+          "ThemeMidnightBlue",
+          "ThemeClassicGreen",
+          "ThemeNeonBlack",
+          "ThemeCoffeeBrown",
+          "ThemeMintGreen",
+          "ThemePeachPink",
+          "ThemeDreamyPurple",
+          "ThemeBabyBlue"
+        ],
+        "type": "string"
+      },
+      "CountResult": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DefaultImageResource": {
+        "type": "object",
+        "properties": {
+          "defaultImages": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeleteStatus": {
+        "enum": [
+          "None",
+          "Deleted",
+          "TakeBack"
+        ],
+        "type": "string"
+      },
+      "EditChannelParam": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "頻道名稱"
+          }
+        },
+        "additionalProperties": false,
+        "description": "編輯頻道參數"
+      },
+      "EditGroupParam": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "社團命名"
+          },
+          "description": {
+            "type": "string",
+            "description": "社團簡介",
+            "nullable": true
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "description": "社團封面",
+            "nullable": true
+          },
+          "thumbnailImageUrl": {
+            "type": "string",
+            "description": "社團縮圖",
+            "nullable": true
+          },
+          "colorSchemeGroupKey": {
+            "$ref": "#/components/schemas/ColorTheme"
+          }
+        },
+        "additionalProperties": false,
+        "description": "編輯社團參數"
+      },
+      "EmojiParam": {
+        "type": "object",
+        "properties": {
+          "emoji": {
+            "$ref": "#/components/schemas/Emojis"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Emojis": {
+        "enum": [
+          "Like",
+          "Dislike",
+          "Laugh",
+          "Money",
+          "Shock",
+          "Cry",
+          "Think",
+          "Angry"
+        ],
+        "type": "string"
+      },
+      "FanciRole": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userCount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "唯一識別",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "社團命名",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "社團描述",
+            "nullable": true
+          },
+          "isNeedApproval": {
+            "type": "boolean",
+            "description": "加入是否需要審核"
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "description": "封面圖",
+            "nullable": true
+          },
+          "thumbnailImageUrl": {
+            "type": "string",
+            "description": "縮圖",
+            "nullable": true
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Category"
+            },
+            "description": "社團下的分類",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "description": "系統排序權重",
+            "format": "int64"
+          },
+          "creatorId": {
+            "type": "string",
+            "description": "創立者",
+            "nullable": true
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "description": "創立時間",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "description": "更新時間",
+            "format": "int64"
+          },
+          "memberCount": {
+            "type": "integer",
+            "description": "會員總數",
+            "format": "int32"
+          },
+          "ColorSchemeGroupKey": {
+            "$ref": "#/components/schemas/ColorTheme"
+          }
+        },
+        "additionalProperties": false,
+        "description": "群組"
+      },
+      "GroupApplyParam": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupRequirementAnswer"
+            },
+            "description": "回答",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "申請加入社團參數"
+      },
+      "GroupApplyStatusParam": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ApplyStatus"
+          },
+          "applyIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "處理的申請ID清單",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "申請狀態參數"
+      },
+      "GroupMember": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "使用者id",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "名稱",
+            "nullable": true
+          },
+          "thumbNail": {
+            "type": "string",
+            "description": "頭像",
+            "nullable": true
+          },
+          "serialNumber": {
+            "type": "integer",
+            "description": "會員識別號",
+            "format": "int64"
+          },
+          "roleInfos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FanciRole"
+            },
+            "description": "角色資訊(全部)",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "社團會員"
+      },
+      "GroupMemberPaging": {
+        "type": "object",
+        "properties": {
+          "haveNextPage": {
+            "type": "boolean"
+          },
+          "nextWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupMember"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GroupMemberRoleInfos": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "使用者id",
+            "nullable": true
+          },
+          "roleInfos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FanciRole"
+            },
+            "description": "角色資訊(最高)",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "社團會員 全部角色資訊"
+      },
+      "GroupPaging": {
+        "type": "object",
+        "properties": {
+          "haveNextPage": {
+            "type": "boolean"
+          },
+          "nextWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GroupParam": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "社團命名"
+          },
+          "description": {
+            "type": "string",
+            "description": "社團簡介",
+            "nullable": true
+          },
+          "isNeedApproval": {
+            "type": "boolean",
+            "description": "true: 非公開(需審核)  false: 公開(不用審核)"
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "description": "社團封面",
+            "nullable": true
+          },
+          "thumbnailImageUrl": {
+            "type": "string",
+            "description": "社團縮圖",
+            "nullable": true
+          },
+          "colorSchemeGroupKey": {
+            "$ref": "#/components/schemas/ColorTheme"
+          }
+        },
+        "additionalProperties": false,
+        "description": "新增社團的參數"
+      },
+      "GroupPermission": {
+        "type": "object",
+        "properties": {
+          "editGroup": {
+            "type": "boolean"
+          },
+          "createOrEditApplyQuestions": {
+            "type": "boolean"
+          },
+          "rearrangeChannelCategory": {
+            "type": "boolean"
+          },
+          "setGroupPublicity": {
+            "type": "boolean"
+          },
+          "createOrEditCategory": {
+            "type": "boolean"
+          },
+          "deleteCategory": {
+            "type": "boolean"
+          },
+          "createOrEditChannel": {
+            "type": "boolean"
+          },
+          "setAnnouncement": {
+            "type": "boolean"
+          },
+          "deleteChannel": {
+            "type": "boolean"
+          },
+          "createOrEditRole": {
+            "type": "boolean"
+          },
+          "deleteRole": {
+            "type": "boolean"
+          },
+          "rearrangeRoles": {
+            "type": "boolean"
+          },
+          "assignRole": {
+            "type": "boolean"
+          },
+          "approveJoinApplies": {
+            "type": "boolean"
+          },
+          "deleteMemberMessage": {
+            "type": "boolean"
+          },
+          "banOrKickMember": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GroupRequirement": {
+        "type": "object",
+        "properties": {
+          "createUnixTime": {
+            "type": "integer",
+            "description": "創建時間",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "description": "更新時間",
+            "format": "int64"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IGroupRequirementQuestion"
+            },
+            "description": "題目",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "加入社團的要求項目"
+      },
+      "GroupRequirementAnswer": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "nullable": true
+          },
+          "answer": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GroupRequirementApply": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id",
+            "nullable": true
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IGroupRequirementAnswer"
+            },
+            "description": "回答",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplyStatus"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "description": "更新時間",
+            "format": "int64"
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "wasKicked": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "description": "社團申請"
+      },
+      "GroupRequirementApplyInfo": {
+        "type": "object",
+        "properties": {
+          "hasApplied": {
+            "type": "boolean",
+            "description": "是否有申請過"
+          },
+          "apply": {
+            "$ref": "#/components/schemas/GroupRequirementApply"
+          }
+        },
+        "additionalProperties": false,
+        "description": "社團申請資訊"
+      },
+      "GroupRequirementApplyPaging": {
+        "type": "object",
+        "properties": {
+          "haveNextPage": {
+            "type": "boolean"
+          },
+          "nextWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupRequirementApply"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GroupRequirementParam": {
+        "type": "object",
+        "properties": {
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupRequirementQuestion"
+            },
+            "description": "題目組合",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "新增社團申請的題目"
+      },
+      "GroupRequirementQuestion": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/GroupRequirementQuestionType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GroupRequirementQuestionType": {
+        "enum": [
+          "Written"
+        ],
+        "type": "string"
+      },
+      "IEmojiCount": {
+        "type": "object",
+        "properties": {
+          "like": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dislike": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "laugh": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "money": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cry": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "think": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "angry": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IGroupRequirementAnswer": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string",
+            "nullable": true
+          },
+          "question": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "IGroupRequirementQuestion": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/GroupRequirementQuestionType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IUserMessageReaction": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "emoji": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Media": {
+        "type": "object",
+        "properties": {
+          "resourceLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/MediaType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaIChatContent": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "medias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaType": {
+        "enum": [
+          "Image",
+          "Video"
+        ],
+        "type": "string"
+      },
+      "MessageIdParam": {
+        "required": [
+          "messageId"
+        ],
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "minLength": 1,
+            "type": "string",
+            "description": "訊息id"
+          }
+        },
+        "additionalProperties": false,
+        "description": "訊息id 參數"
+      },
+      "MessageType": {
+        "enum": [
+          "TextMessage"
+        ],
+        "type": "string"
+      },
+      "OrderParam": {
+        "type": "object",
+        "properties": {
+          "categoryOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryOrder"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderType": {
+        "enum": [
+          "Latest",
+          "Oldest",
+          "Popular"
+        ],
+        "type": "string"
+      },
+      "PatchPermissionParam": {
+        "type": "object",
+        "properties": {
+          "spacePermissionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "isAdd": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "權限名稱",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "權限描述",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "highlight": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PermissionCategory": {
+        "type": "object",
+        "properties": {
+          "displayCategoryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PinnedMessageInfo": {
+        "type": "object",
+        "properties": {
+          "isAnnounced": {
+            "type": "boolean",
+            "description": "是否有公告訊息"
+          },
+          "message": {
+            "$ref": "#/components/schemas/ChatMessage"
+          }
+        },
+        "additionalProperties": false,
+        "description": "公告訊息資訊"
+      },
+      "Relation": {
+        "enum": [
+          "Blocking",
+          "Blocker"
+        ],
+        "type": "string"
+      },
+      "ReportInformation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "reportee": {
+            "$ref": "#/components/schemas/GroupMember"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/Channel"
+          },
+          "contentId": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentSnapshot": {
+            "type": "string",
+            "nullable": true
+          },
+          "processStatus": {
+            "$ref": "#/components/schemas/ReportProcessStatus"
+          },
+          "mostReason": {
+            "$ref": "#/components/schemas/ReportReason"
+          },
+          "reporters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupMember"
+            },
+            "nullable": true
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReportParm": {
+        "type": "object",
+        "properties": {
+          "contentId": {
+            "type": "string",
+            "nullable": true
+          },
+          "reason": {
+            "$ref": "#/components/schemas/ReportReason"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReportProcessStatus": {
+        "enum": [
+          "Pending",
+          "Ignored",
+          "Punished"
+        ],
+        "type": "string"
+      },
+      "ReportReason": {
+        "enum": [
+          "SpamAds",
+          "AdultContent",
+          "Harass",
+          "NotRelated",
+          "Other"
+        ],
+        "type": "string"
+      },
+      "ReportStatusUpdateParam": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ReportProcessStatus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RoleColor": {
+        "enum": [
+          "SpecialColor_Red",
+          "SpecialColor_Orange",
+          "SpecialColor_Yellow",
+          "SpecialColor_Green",
+          "SpecialColor_BlueGreen",
+          "SpecialColor_Blue",
+          "SpecialColor_Purple",
+          "SpecialColor_Pink"
+        ],
+        "type": "string"
+      },
+      "RoleIdsParam": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "多個角色id參數"
+      },
+      "RoleOrderParam": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "角色排序參數"
+      },
+      "RoleParam": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "角色名稱",
+            "nullable": true
+          },
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fanci權限ID清單\r\n參考 /api/v1/Permission 清單內容",
+            "nullable": true
+          },
+          "color": {
+            "$ref": "#/components/schemas/RoleColor"
+          }
+        },
+        "additionalProperties": false,
+        "description": "新增角色參數"
+      },
+      "Theme": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "previewThumbnail": {
+            "type": "string",
+            "nullable": true
+          },
+          "previewImage": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "categoryColors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Color"
+              }
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateIsNeedApprovalParam": {
+        "type": "object",
+        "properties": {
+          "isNeedApproval": {
+            "type": "boolean",
+            "description": "true: 非公開(需審核)  false: 公開(不用審核)"
+          }
+        },
+        "additionalProperties": false,
+        "description": "更新 社團 公開或非公開"
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "使用者id",
+            "nullable": true
+          },
+          "cmoneyMemberId": {
+            "type": "integer",
+            "description": "CMoney 會員編號",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "使用者名稱",
+            "nullable": true
+          },
+          "thumbNail": {
+            "type": "string",
+            "description": "使用者頭像",
+            "nullable": true
+          },
+          "serialNumber": {
+            "type": "integer",
+            "description": "使用者序列號",
+            "format": "int64"
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "description": "使用者創建時間",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "description": "使用者更新時間",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "使用者"
+      },
+      "UserBanInformation": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "startDateTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "endDateTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "panaltySeconds": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "periodOption": {
+            "$ref": "#/components/schemas/BanPeriodOption"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserPaging": {
+        "type": "object",
+        "properties": {
+          "haveNextPage": {
+            "type": "boolean"
+          },
+          "nextWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserParam": {
+        "required": [
+          "name",
+          "thumbNail"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "使用者名稱"
+          },
+          "thumbNail": {
+            "minLength": 1,
+            "type": "string",
+            "description": "使用者頭像"
+          }
+        },
+        "additionalProperties": false,
+        "description": "使用者參數"
+      },
+      "UseridsParam": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fanci 用戶 ID",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "使用者陣列參數"
+      }
+    },
+    "securitySchemes": {
+      "oauth2": {
+        "type": "apiKey",
+        "description": "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  }
+}
