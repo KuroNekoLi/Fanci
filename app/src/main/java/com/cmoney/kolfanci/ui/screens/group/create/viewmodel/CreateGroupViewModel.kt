@@ -6,12 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.kolfanci.BuildConfig
-import com.cmoney.kolfanci.model.usecase.GroupUseCase
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.ImageChangeData
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.imagelibrary.UploadImage
+import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +25,8 @@ data class UiState(
     val warningText: String = "",       //錯誤提示
     val groupIcon: String = "",         //社團圖示
     val groupBackground: String = "",   //社團背景
-    val groupTheme: GroupTheme? = null  //社團主題
+    val groupTheme: GroupTheme? = null, //社團主題
+    val createdGroup: Group? = null     //建立完成的 Group
 )
 
 class CreateGroupViewModel(
@@ -183,10 +184,13 @@ class CreateGroupViewModel(
                 isNeedApproval = false,
                 coverImageUrl = uiState.groupBackground,
                 thumbnailImageUrl = uiState.groupIcon,
-                themeName = uiState.groupTheme?.name.orEmpty()
+                themeId = uiState.groupTheme?.id.orEmpty()
             ).fold({
                 KLog.i(TAG, "createGroup success:$it")
                 onComplete.invoke(it)
+                uiState = uiState.copy(
+                    createdGroup = it
+                )
             }, {
             })
         }

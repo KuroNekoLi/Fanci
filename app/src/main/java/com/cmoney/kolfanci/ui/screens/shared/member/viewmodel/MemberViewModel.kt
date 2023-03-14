@@ -102,11 +102,17 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                     duration = (second / oneDaySecond).toInt()
                 }
 
+                val durationStr = if (duration > 365) {
+                    "永久"
+                } else {
+                    "%d日".format(duration)
+                }
+
                 uiState = uiState.copy(
                     banUiModel = BanUiModel(
                         user = userBanInformation.user,
                         startDay = startDay,
-                        duration = "%d日".format(duration)
+                        duration = durationStr
                     )
                 )
             }, {

@@ -31,6 +31,7 @@ import com.cmoney.kolfanci.ui.theme.Color_2B313C
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.LocalDependencyContainer
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -105,7 +106,7 @@ fun GroupOpennessScreen(
             showEditDialog.value = Pair(true, it)
         },
         onSave = {
-            viewModel.onSave(groupId = group.id.orEmpty())
+            viewModel.onSave(group = group)
         }
     )
 
@@ -183,7 +184,7 @@ fun GroupOpennessScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column {
             Row(
                 modifier = Modifier

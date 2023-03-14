@@ -5,15 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.ColorTheme
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.ImageChangeData
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
-import com.cmoney.fanciapi.fanci.model.ColorTheme
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,10 @@ data class GroupSettingUiState(
     val groupThemeList: List<GroupTheme> = emptyList(),     //社團 主題色彩
     val previewTheme: GroupTheme? = null,                   //社團 設定主題 Preview
     val unApplyCount: Long? = null,                         //等待加入申請數量
-    val reportList: List<ReportInformation>? = null         //檢舉清單
+    val reportList: List<ReportInformation> = emptyList(),  //檢舉清單
+    val showDelectDialog: Boolean = false,                  //是否呈現解散彈窗
+    val showFinalDelectDialog: Boolean = false,             //是否呈現最後解散彈窗
+    val popToMain: Boolean = false                          //跳回首頁
 )
 
 class GroupSettingViewModel(
@@ -38,6 +41,13 @@ class GroupSettingViewModel(
 
     var uiState by mutableStateOf(GroupSettingUiState())
         private set
+
+    fun settingGroup(group: Group) {
+        KLog.i(TAG, "settingGroup:$group")
+        uiState = uiState.copy(
+            settingGroup = group
+        )
+    }
 
     /**
      * 抓取 檢舉清單
@@ -252,10 +262,10 @@ class GroupSettingViewModel(
      * @param group 目前的主題
      * @param isFromCreate 是否從 create 來
      */
-    fun fetchAllTheme(group: Group, isFromCreate: Boolean) {
+    fun fetchAllTheme(group: Group?, isFromCreate: Boolean) {
         KLog.i(TAG, "fetchAllTheme:$group")
         viewModelScope.launch {
-            val currentThemeName = group.colorSchemeGroupKey?.name.orEmpty()
+            val currentThemeName = group?.colorSchemeGroupKey?.name.orEmpty()
 
             themeUseCase.fetchAllThemeConfig().fold({
                 uiState = uiState.copy(
@@ -341,4 +351,64 @@ class GroupSettingViewModel(
         )
     }
 
+    /**
+     * 點擊 解散社團
+     */
+    fun onDelectClick() {
+        KLog.i(TAG, "onDelectClick")
+        uiState = uiState.copy(
+            showDelectDialog = true
+        )
+    }
+
+    /**
+     * 關閉 解散彈窗
+     */
+    fun onDismissDelectDialog() {
+        KLog.i(TAG, "onDismissDelectDialog")
+        uiState = uiState.copy(
+            showDelectDialog = false
+        )
+    }
+
+    /**
+     * 二次確認要刪除
+     */
+    fun onDelectReConfirm() {
+        KLog.i(TAG, "onDelectReConfirm")
+        uiState = uiState.copy(
+            showFinalDelectDialog = true
+        )
+    }
+
+    /**
+     * 關閉 最後解散彈窗
+     */
+    fun onDismissFinalDelectDialog() {
+        KLog.i(TAG, "onDismissDelectDialog")
+        uiState = uiState.copy(
+            showFinalDelectDialog = false
+        )
+    }
+
+    /**
+     * 最終 確認刪除
+     */
+    fun onFinalConfirmDelete(group: Group) {
+        KLog.i(TAG, "onFinalConfirmDelete:$group")
+        viewModelScope.launch {
+            groupUseCase.deleteGroup(groupId = group.id.orEmpty()).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    KLog.i(TAG, "Group delete complete.")
+                    onDismissFinalDelectDialog()
+                    uiState = uiState.copy(
+                        popToMain = true
+                    )
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
 }

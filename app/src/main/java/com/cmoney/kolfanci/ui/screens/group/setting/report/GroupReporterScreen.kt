@@ -93,7 +93,7 @@ private fun ReporterItem(reportUser: GroupMember) {
             model = reportUser.thumbNail,
             contentScale = ContentScale.Crop,
             contentDescription = null,
-            placeholder = painterResource(id = R.drawable.resource_default)
+            placeholder = painterResource(id = R.drawable.placeholder)
         )
 
         Spacer(modifier = Modifier.width(15.dp))

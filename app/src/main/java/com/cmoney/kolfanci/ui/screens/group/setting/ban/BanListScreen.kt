@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -36,6 +37,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 import com.cmoney.kolfanci.R
+
 @Destination
 @Composable
 fun BanListScreen(
@@ -60,7 +62,8 @@ fun BanListScreen(
         onClick = {
             KLog.i(TAG, "on fix click:$it")
             showDisBanDialog.value = Pair(true, it)
-        }
+        },
+        loading = uiState.loading
     )
 
     //解除禁言 彈窗
@@ -94,7 +97,8 @@ private fun BanListScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     banUserList: List<BanUiModel>,
-    onClick: (BanUiModel) -> Unit
+    onClick: (BanUiModel) -> Unit,
+    loading: Boolean
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -109,9 +113,10 @@ private fun BanListScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         LazyColumn(
             modifier = Modifier
+                .padding(padding)
                 .fillMaxSize()
                 .background(LocalColor.current.env_80),
             verticalArrangement = Arrangement.spacedBy(1.dp)
@@ -119,6 +124,20 @@ private fun BanListScreenView(
             items(banUserList) { banUser ->
                 BanUserItem(banUser) {
                     onClick.invoke(banUser)
+                }
+            }
+
+            if (loading) {
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(size = 32.dp),
+                            color = LocalColor.current.primary
+                        )
+                    }
                 }
             }
         }
@@ -146,7 +165,7 @@ private fun BanUserItem(banUiModel: BanUiModel, onClick: () -> Unit) {
                 model = user?.thumbNail,
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
-                placeholder = painterResource(id = R.drawable.resource_default)
+                placeholder = painterResource(id = R.drawable.placeholder)
             )
 
             Spacer(modifier = Modifier.width(15.dp))
@@ -214,7 +233,8 @@ fun BanListScreenPreview() {
                     duration = "1日"
                 )
             ),
-            onClick = {}
+            onClick = {},
+            loading = true
         )
     }
 }

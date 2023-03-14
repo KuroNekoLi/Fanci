@@ -15,13 +15,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.isMyPostMessage
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -56,7 +57,7 @@ fun InteractDialogScreen(
                 bottom = 10.dp
             )
         ) {
-            if (Constant.MyChannelPermission.canEmoji == true) {
+            if (Constant.isCanEmoji()) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,49 +76,49 @@ fun InteractDialogScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            if (Constant.MyChannelPermission.canReply == true) {
+            if (Constant.isCanReply()) {
                 FeatureText(R.drawable.reply, "回覆") {
                     onClose(coroutineScope, modalBottomSheetState)
                     onInteractClick.invoke(MessageInteract.Reply(message))
                 }
             }
 
-            if (Constant.MyChannelPermission.canTakeback == true) {
+            if (Constant.isCanTakeBack() && message.isMyPostMessage(Constant.MyInfo)) {
                 FeatureText(R.drawable.recycle, "收回訊息") {
                     onClose(coroutineScope, modalBottomSheetState)
                     onInteractClick.invoke(MessageInteract.Recycle(message))
                 }
             }
 
-            if (Constant.MyChannelPermission.canCopy == true) {
+            if (Constant.isCanCopy()) {
                 FeatureText(R.drawable.copy, "複製訊息") {
                     onClose(coroutineScope, modalBottomSheetState)
                     onInteractClick.invoke(MessageInteract.Copy(message))
                 }
             }
 
-            if (Constant.MyChannelPermission.canManage == true) {
+            if (Constant.isCanManage()) {
                 FeatureText(R.drawable.top, "置頂訊息") {
                     onClose(coroutineScope, modalBottomSheetState)
                     onInteractClick.invoke(MessageInteract.Announcement(message))
                 }
             }
 
-            if (Constant.MyChannelPermission.canBlock == true) {
+            if (Constant.isCanBlock() && !message.isMyPostMessage(Constant.MyInfo)) {
                 FeatureText(R.drawable.hide, "封鎖此用戶") {
                     onClose(coroutineScope, modalBottomSheetState)
                     onInteractClick.invoke(MessageInteract.HideUser(message))
                 }
             }
 
-            if (Constant.MyChannelPermission.canReport == true) {
+            if (Constant.isCanReport() && !message.isMyPostMessage(Constant.MyInfo)) {
                 FeatureText(R.drawable.report, "向管理員檢舉此用戶") {
                     onClose(coroutineScope, modalBottomSheetState)
                     onInteractClick.invoke(MessageInteract.Report(message))
                 }
             }
 
-            if (Constant.MyChannelPermission.canManage == true) {
+            if (Constant.isCanManage()) {
                 FeatureText(R.drawable.delete, "刪除訊息") {
                     onClose(coroutineScope, modalBottomSheetState)
                     onInteractClick.invoke(MessageInteract.Delete(message))

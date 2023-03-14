@@ -3,7 +3,10 @@ package com.cmoney.kolfanci.ui.screens.shared.dialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,13 +19,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
 import com.cmoney.kolfanci.ui.theme.Color_2B313C
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
 
+/**
+ * 登入彈窗
+ */
 @Composable
 fun LoginDialogScreen(
     modifier: Modifier = Modifier,
@@ -53,7 +59,7 @@ fun LoginDialogScreen(
                         contentScale = ContentScale.Crop,
                         model = modelResource,
                         contentDescription = null,
-                        placeholder = painterResource(id = R.drawable.resource_default)
+                        placeholder = painterResource(id = R.drawable.placeholder)
                     )
 
                     Text(
@@ -171,7 +177,7 @@ fun LoginDialogScreen(
                         }) {
                         Row {
                             Text(
-                                text = "信箱登入 / 註冊",
+                                text = "社群帳號登入",
                                 color = Color.White,
                                 fontSize = 16.sp
                             )

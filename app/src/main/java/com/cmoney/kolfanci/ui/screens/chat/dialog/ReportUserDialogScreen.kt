@@ -54,7 +54,7 @@ fun ReportUserDialogScreen(
         "取消檢舉" to null
     )
 
-//    val reportReason = listOf("濫發廣告訊息", "傳送色情訊息", "騷擾行為", "內容與主題無關", "其他", "取消檢舉")
+    val reportReason = listOf("濫發廣告訊息", "傳送色情訊息", "騷擾行為", "內容與主題無關", "其他", "取消檢舉")
 
     if (openDialog.value) {
         Dialog(
@@ -83,7 +83,11 @@ fun ReportUserDialogScreen(
                             contentDescription = null
                         )
                         Spacer(modifier = Modifier.width(9.dp))
-                        Text(text = "向管理員檢舉此用戶", fontSize = 19.sp, color = LocalColor.current.text.default_100)
+                        Text(
+                            text = "向管理員檢舉此用戶",
+                            fontSize = 19.sp,
+                            color = LocalColor.current.text.default_100
+                        )
                     }
                     Spacer(modifier = Modifier.height(25.dp))
                     Text(
@@ -107,7 +111,7 @@ fun ReportUserDialogScreen(
 
                     //檢舉原因
                     if (showReason.value) {
-                        reportReasonMap.keys.forEachIndexed { index, reason ->
+                        reportReason.forEachIndexed { index, reason ->
                             Button(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -117,13 +121,17 @@ fun ReportUserDialogScreen(
                                     backgroundColor = LocalColor.current.env_80
                                 ),
                                 onClick = {
-                                    if (index == reportReasonMap.size - 1) {
+                                    if (reportReasonMap[reason] == null) {
                                         onDismiss.invoke()
                                     } else {
                                         onConfirm.invoke(reportReasonMap[reason]!!)
                                     }
                                 }) {
-                                Text(text = reason, fontSize = 16.sp, color = LocalColor.current.text.default_100)
+                                Text(
+                                    text = reason,
+                                    fontSize = 16.sp,
+                                    color = LocalColor.current.text.default_100
+                                )
                             }
                             Spacer(modifier = Modifier.height(20.dp))
                         }
@@ -155,7 +163,11 @@ fun ReportUserDialogScreen(
                                 openDialog.value = false
                                 onDismiss.invoke()
                             }) {
-                            Text(text = "取消", fontSize = 16.sp, color = LocalColor.current.text.default_100)
+                            Text(
+                                text = "取消",
+                                fontSize = 16.sp,
+                                color = LocalColor.current.text.default_100
+                            )
                         }
                     }
                 }

@@ -243,9 +243,11 @@ private fun MemberManageScreenView(
                 }
             )
         }
-    ) {
+    ) {padding ->
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
+            modifier = Modifier
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 

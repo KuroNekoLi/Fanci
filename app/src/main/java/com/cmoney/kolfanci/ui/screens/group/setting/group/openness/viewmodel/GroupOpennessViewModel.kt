@@ -18,6 +18,7 @@ data class UiState(
     val orgQuestion: String = "",
     val saveComplete: Boolean = false,
     val isFirstFetchQuestion: Boolean = true
+
 )
 
 class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) : ViewModel() {
@@ -123,10 +124,11 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
 
     /**
      * 儲存 設定結果
-     * @param groupId 社團 id
+     * @param group 社團
      */
-    fun onSave(groupId: String) {
+    fun onSave(group: Group) {
         KLog.i(TAG, "onSave:$uiState")
+        val groupId = group.id.orEmpty()
         viewModelScope.launch {
             //公開 or 不公開
             val isNeedApproval = uiState.isNeedApproval

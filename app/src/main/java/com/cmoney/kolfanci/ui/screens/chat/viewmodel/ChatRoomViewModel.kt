@@ -10,6 +10,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
@@ -19,9 +22,6 @@ import com.cmoney.kolfanci.model.usecase.RelationUseCase
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
-import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.User
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -35,7 +35,8 @@ data class ChatRoomUiState(
     val announceMessage: ChatMessage? = null,          //公告訊息,顯示用
     val errorMessage: String? = null,
     var blockingList: List<User> = emptyList(), //封鎖用戶
-    var blockerList: List<User> = emptyList()   //封鎖我的用戶
+    var blockerList: List<User> = emptyList(),  //封鎖我的用戶
+    val startPolling: Boolean = false
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -302,9 +303,16 @@ class ChatRoomViewModel(
                     announceMessage = chatMessage
                 )
             }, {
-                uiState = uiState.copy(
-                    errorMessage = it.toString()
-                )
+                uiState = if (it is EmptyBodyException) {
+                    uiState.copy(
+                        announceMessage = chatMessage
+                    )
+                } else {
+                    uiState.copy(
+                        errorMessage = it.toString()
+                    )
+                }
+
             })
         }
     }
@@ -326,6 +334,9 @@ class ChatRoomViewModel(
         viewModelScope.launch {
             permissionUseCase.getPermissionByChannel(channelId = channelId).fold({
                 Constant.MyChannelPermission = it
+                uiState = uiState.copy(
+                    startPolling = true
+                )
             }, {
                 KLog.e(TAG, it)
             })

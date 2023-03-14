@@ -43,15 +43,13 @@ fun GroupRuleManageScreen(
             iconRes = R.drawable.report_apply,
             text = "檢舉審核",
             onItemClick = {
-                if (reportCount != 0) {
-                    reportList?.let {
-                        navController.navigate(
-                            GroupReportScreenDestination(
-                                reportList = it.toTypedArray(),
-                                group = group
-                            )
+                reportList?.let {
+                    navController.navigate(
+                        GroupReportScreenDestination(
+                            reportList = it.toTypedArray(),
+                            group = group
                         )
-                    }
+                    )
                 }
             }
         ) {

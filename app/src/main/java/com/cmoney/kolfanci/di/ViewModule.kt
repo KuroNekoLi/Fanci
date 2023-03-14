@@ -10,6 +10,7 @@ import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.apply.viewmodel.GroupApplyViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
@@ -48,5 +49,8 @@ val viewModule = module {
             group = params.get(),
             banUseCase = get()
         )
+    }
+    viewModel {
+        GroupSettingAvatarViewModel()
     }
 }

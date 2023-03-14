@@ -1,26 +1,38 @@
 package com.cmoney.kolfanci.ui.screens.chat.message
 
 import android.app.Activity
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showInteractDialogBottomSheet
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
+import com.cmoney.kolfanci.ui.screens.shared.dialog.MessageReSendDialogScreen
+import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,31 +52,58 @@ fun MessageScreen(
     viewModel: ChatRoomViewModel = koinViewModel(),
     onMsgDismissHide: (ChatMessage) -> Unit
 ) {
-    val isScrollToBottom = messageViewModel.uiState.isSendComplete
+    val TAG = "MessageScreen"
+
+    val uiState = messageViewModel.uiState
+    val isScrollToBottom = uiState.isSendComplete
     val onInteractClick = object : (MessageInteract) -> Unit {
         override fun invoke(messageInteract: MessageInteract) {
             messageViewModel.onInteractClick(messageInteract)
         }
     }
 
-    MessageScreenView(
-        modifier = modifier,
-        message = messageViewModel.uiState.message,
-        blockingList = viewModel.uiState.blockingList.map {
-            it.id.orEmpty()
-        },
-        blockerList = viewModel.uiState.blockerList.map {
-            it.id.orEmpty()
-        },
-        listState = listState,
-        coroutineScope = coroutineScope,
-        onInteractClick = onInteractClick,
-        onMsgDismissHide = onMsgDismissHide,
-        isScrollToBottom = isScrollToBottom,
-        onLoadMore = {
-            messageViewModel.onLoadMore(channelId)
-        }
-    )
+    if (uiState.message.isNotEmpty()) {
+        MessageScreenView(
+            modifier = modifier,
+            message = uiState.message,
+            blockingList = viewModel.uiState.blockingList.map {
+                it.id.orEmpty()
+            },
+            blockerList = viewModel.uiState.blockerList.map {
+                it.id.orEmpty()
+            },
+            listState = listState,
+            coroutineScope = coroutineScope,
+            onInteractClick = onInteractClick,
+            onMsgDismissHide = onMsgDismissHide,
+            isScrollToBottom = isScrollToBottom,
+            onLoadMore = {
+                messageViewModel.onLoadMore(channelId)
+            },
+            onReSendClick = {
+                messageViewModel.onReSendClick(it)
+            }
+        )
+    } else {
+        //Empty Message
+        EmptyMessageContent(modifier = modifier)
+    }
+
+    if (uiState.showReSendDialog != null) {
+        KLog.i(TAG, "showReSendDialog")
+        MessageReSendDialogScreen(
+            onDismiss = {
+                messageViewModel.onReSendDialogDismiss()
+            },
+            onReSend = {
+                messageViewModel.onResendMessage(channelId, uiState.showReSendDialog)
+            },
+            onDelete = {
+                messageViewModel.onDeleteReSend(uiState.showReSendDialog)
+            }
+        )
+    }
+    
 }
 
 @Composable
@@ -78,7 +117,8 @@ private fun MessageScreenView(
     onInteractClick: (MessageInteract) -> Unit,
     onMsgDismissHide: (ChatMessage) -> Unit,
     isScrollToBottom: Boolean,
-    onLoadMore: () -> Unit
+    onLoadMore: () -> Unit,
+    onReSendClick: (ChatMessageWrapper) -> Unit
 ) {
     Surface(
         color = LocalColor.current.env_80,
@@ -104,6 +144,9 @@ private fun MessageScreenView(
                             isBlocker = isBlocker
                         ),
                         coroutineScope = coroutineScope,
+                        onReSendClick = {
+                            onReSendClick.invoke(it)
+                        },
                         onMessageContentCallback = {
                             when (it) {
                                 is MessageContentCallback.EmojiClick -> {
@@ -147,33 +190,31 @@ private fun MessageScreenView(
     }
 }
 
-
 @Composable
-fun LazyListState.OnBottomReached(
-    loadMore: () -> Unit
-) {
-    // state object which tells us if we should load more
-    val shouldLoadMore = remember {
-        derivedStateOf {
-            // get last visible item
-            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-                ?:
-                // list is empty
-                // return false here if loadMore should not be invoked if the list is empty
-                return@derivedStateOf true
+private fun EmptyMessageContent(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(LocalColor.current.env_80),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-            // Check if last visible item is the last item in the list
-            lastVisibleItem.index == layoutInfo.totalItemsCount - 1
-        }
+        AsyncImage(
+            modifier = Modifier.size(186.dp, 248.dp),
+            model = R.drawable.empty_message, contentDescription = "empty message"
+        )
+
+        Spacer(modifier = Modifier.height(43.dp))
+
+        Text(text = "快成為第一個在聊天室發言的人！", fontSize = 16.sp, color = Color_80FFFFFF)
     }
+}
 
-    // Convert the state into a cold flow and collect
-    LaunchedEffect(shouldLoadMore) {
-        snapshotFlow { shouldLoadMore.value }
-            .collect {
-                // if should load more, then invoke loadMore
-                if (it) loadMore()
-            }
+@Preview(showBackground = true)
+@Composable
+fun EmptyMessageContentPreview() {
+    FanciTheme {
+        EmptyMessageContent()
     }
 }
 
@@ -199,7 +240,7 @@ fun MessageScreenPreview() {
                 ChatMessageWrapper(
                     message = ChatMessage(
                         content = MediaIChatContent(
-                            text = "Message"
+                            text = "Message 1234"
                         )
                     )
                 )
@@ -211,7 +252,8 @@ fun MessageScreenPreview() {
             onMsgDismissHide = {},
             onLoadMore = {},
             blockingList = emptyList(),
-            blockerList = emptyList()
+            blockerList = emptyList(),
+            onReSendClick = {}
         )
     }
 }

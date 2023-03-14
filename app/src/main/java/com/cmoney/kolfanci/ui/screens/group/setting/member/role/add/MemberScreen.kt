@@ -87,7 +87,7 @@ private fun MemberItem(
             model = groupMember.thumbNail.orEmpty(),
             contentScale = ContentScale.Crop,
             contentDescription = null,
-            placeholder = painterResource(id = R.drawable.resource_default)
+            placeholder = painterResource(id = R.drawable.placeholder)
         )
 
         Spacer(modifier = Modifier.width(15.dp))

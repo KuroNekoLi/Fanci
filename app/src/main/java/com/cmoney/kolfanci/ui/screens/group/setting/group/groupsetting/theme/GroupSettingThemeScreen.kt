@@ -52,7 +52,7 @@ fun GroupSettingThemeScreen(
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     val state = viewModel.uiState
 
-    var groupParam = globalViewModel.uiState.currentGroup!!
+    var groupParam = globalViewModel.uiState.currentGroup
     viewModel.uiState.settingGroup?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
@@ -84,7 +84,9 @@ fun GroupSettingThemeScreen(
                 resultNavigator.navigateBack(gson.toJson(it))
             }
             else {
-                viewModel.changeTheme(groupParam, it)
+                groupParam?.let {groupParam ->
+                    viewModel.changeTheme(groupParam, it)
+                }
             }
         }
     )

@@ -30,6 +30,7 @@ data class UiState(
 //    val theme: FanciColor = CoffeeThemeColor,
     val theme: FanciColor = DefaultThemeColor,
     val isLoginSuccess: Boolean = false,
+    val isFetchFollowData: Boolean = false,
     val testCategory: List<Category> = listOf(
         Category(
             id = "1",
@@ -112,7 +113,7 @@ class MainViewModel(
      * 設定 目前所選的社團, 並設定Theme
      */
     fun setCurrentGroup(group: Group) {
-        KLog.i(TAG, "setCurrentGroup:$group")
+        KLog.i(TAG, "setCurrentGroup")
         if (group != uiState.currentGroup && group.id != null) {
             KLog.i(TAG, "setCurrentGroup diff:$group")
             fetchGroupPermission(group)
@@ -168,7 +169,17 @@ class MainViewModel(
     fun loginSuccess() {
         KLog.i(TAG, "loginSuccess")
         uiState = uiState.copy(
-            isLoginSuccess = true
+            isLoginSuccess = true,
+            isFetchFollowData = true
+        )
+    }
+
+    /**
+     * 執行完抓取社團資料
+     */
+    fun fetchFollowDataDone() {
+        uiState = uiState.copy(
+            isFetchFollowData = false
         )
     }
 

@@ -166,7 +166,7 @@ private fun DescWithImage(desc: String, thumbnail: String, onClick: () -> Unit) 
                     .clip(RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
-                placeholder = painterResource(id = R.drawable.resource_default)
+                placeholder = painterResource(id = R.drawable.placeholder)
             )
         } else {
             Box(

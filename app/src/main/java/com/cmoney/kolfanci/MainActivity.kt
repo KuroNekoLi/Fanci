@@ -11,6 +11,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -83,12 +84,6 @@ class MainActivity : BaseWebLoginActivity() {
         }
     }
 
-
-
-
-
-
-
     override fun autoLoginFailCallback() {
         KLog.i(TAG, "autoLoginFailCallback")
     }
@@ -119,7 +114,6 @@ fun MainScreen(
     val state = globalViewModel.uiState
 
     FanciTheme(fanciColor = state.theme) {
-        KLog.i("TAG", "FanciTheme create.")
         val mainState = rememberMainState()
 
         Scaffold(
@@ -141,28 +135,6 @@ fun MainScreen(
         }
     }
 }
-
-//@Composable
-//fun MainScreen(
-//    mainNavController: NavHostController,
-//    route: (MainStateHolder.Route) -> Unit,
-//    globalViewModel: MainViewModel
-//) {
-//    Scaffold(
-//        bottomBar = {
-//            BottomBarScreen(
-//                mainNavController
-//            )
-//        }
-//    ) { innerPadding ->
-//        MainNavHost(
-//            modifier = Modifier.padding(innerPadding),
-//            navController = mainNavController,
-//            route = route,
-//            globalViewModel = globalViewModel
-//        )
-//    }
-//}
 
 @Preview(showBackground = true)
 @Composable

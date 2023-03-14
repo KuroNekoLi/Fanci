@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp' version '1.7.20-1.0.6'
     id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -16,7 +17,7 @@ android {
         minSdk 24
         targetSdk 33
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -86,11 +87,11 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-    implementation 'androidx.activity:activity-compose:1.6.0'
+    implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
     //==================== Compose ====================
@@ -120,7 +121,7 @@ dependencies {
     releaseImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
     debugImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
 
-    implementation('com.cmoney.xlab:login:1.2.3')
+    implementation('com.cmoney.xlab:login:1.2.5')
     implementation('com.cmoney.xlab:imagelibrary:1.0.6')
     implementation('com.cmoney.xlab:ratingview:1.1.8') { // 導入模組
         exclude group: 'androidx.constraintlayout', module: 'constraintlayout'
@@ -129,7 +130,7 @@ dependencies {
     implementation 'com.cmoney.remoteconfig:remoteconfig-android:5.0.0'
 
     //=============== Flurry ===============
-    implementation 'com.flurry.android:analytics:13.1.0'
+    implementation 'com.flurry.android:analytics:13.3.0'
 
     implementation "androidx.work:work-runtime-ktx:2.7.1"
 
@@ -154,9 +155,10 @@ dependencies {
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
     //=============== Firebase ===============
-    implementation platform('com.google.firebase:firebase-bom:31.2.0')
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-perf-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

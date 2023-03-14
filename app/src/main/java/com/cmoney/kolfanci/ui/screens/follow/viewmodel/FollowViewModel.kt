@@ -9,14 +9,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.extension.px
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
-import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
-import com.cmoney.kolfanci.extension.px
-import com.cmoney.xlogin.XLoginHelper
 
 data class FollowUiState(
     val spaceHeight: Int = 190.px,  //滑動時的間距
@@ -25,17 +25,15 @@ data class FollowUiState(
     val lazyColumnScrollEnabled: Boolean = false,    //LazyColumn 是否可以滑動
     val showLoginDialog: Boolean = false,        //呈現登入彈窗
     val navigateToCreateGroup: Boolean = false,  //前往建立社團
-    val navigateToApproveGroup: Group? = null  //前往社團認證
+    val navigateToApproveGroup: Group? = null,  //前往社團認證
+    val myGroupList: List<GroupItem> = emptyList(),  //我的社團
+    val firstFetchData: Boolean = true,  //標記是否第一次拿過初始化資料
+    val openGroupDialog: Group? = null,  //點擊加入群組彈窗
+    val isLoading: Boolean = false
 )
 
 class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     private val TAG = FollowViewModel::class.java.simpleName
-
-//    private val _followData = MutableLiveData<Group>()
-//    val followData: LiveData<Group> = _followData
-
-    private val _myGroupList = MutableLiveData<List<GroupItem>>()
-    val myGroupList: LiveData<List<GroupItem>> = _myGroupList
 
     private val _groupList = MutableLiveData<List<Group>>()
     val groupList: LiveData<List<Group>> = _groupList
@@ -43,8 +41,20 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     var uiState by mutableStateOf(FollowUiState())
         private set
 
-    init {
-        fetchMyGroup()
+    var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
+    var nextWeight: Long? = null            //下一分頁權重
+
+    private fun loading() {
+        uiState = uiState.copy(
+            isLoading = true
+        )
+    }
+
+    private fun dismissLoading() {
+        uiState = uiState.copy(
+            isLoading = false,
+            firstFetchData = false
+        )
     }
 
     /**
@@ -52,29 +62,59 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun fetchMyGroup() {
         KLog.i(TAG, "fetchMyGroup")
-        viewModelScope.launch {
-            groupUseCase.groupToSelectGroupItem().fold({
-                if (it.isNotEmpty()) {
-                    //所有群組
-                    _myGroupList.value = it
-//                    _followData.value = it.first().groupModel
-                } else {
-                    fetchAllGroupList()
-                }
-            }, {
-                KLog.e(TAG, it)
-            })
+        if (XLoginHelper.isLogin) {
+            viewModelScope.launch {
+                loading()
+                groupUseCase.groupToSelectGroupItem().fold({
+                    if (it.isNotEmpty()) {
+                        //我的所有群組
+                        uiState = uiState.copy(
+                            myGroupList = it.mapIndexed { index, groupItem ->
+                                if (index == 0) {
+                                    groupItem.copy(
+                                        isSelected = true
+                                    )
+                                } else {
+                                    groupItem.copy(
+                                        isSelected = false
+                                    )
+                                }
+                            }
+                        )
+                    } else {
+                        fetchAllGroupList()
+                    }
+                    dismissLoading()
+                }, {
+                    dismissLoading()
+                    KLog.e(TAG, it)
+                })
+            }
+        } else {
+            fetchAllGroupList()
         }
     }
 
     /**
-     * 當沒有 社團的時候, 取得目前 所有群組
+     * 當沒有 社團的時候, 取得目前群組
      */
     private fun fetchAllGroupList() {
         viewModelScope.launch {
-            groupUseCase.getPopularGroup().fold({
-                _groupList.value = it.items.orEmpty()
+            loading()
+            groupUseCase.getPopularGroup(
+                pageSize = 10,
+                startWeight = nextWeight ?: Long.MAX_VALUE
+            ).fold({
+                haveNextPage = it.haveNextPage == true
+                nextWeight = it.nextWeight
+                val orgGroupList = _groupList.value.orEmpty().toMutableList()
+                orgGroupList.addAll(it.items.orEmpty())
+                _groupList.value = orgGroupList.distinctBy { group ->
+                    group.id
+                }
+                dismissLoading()
             }, {
+                dismissLoading()
                 KLog.e(TAG, it)
             })
         }
@@ -84,14 +124,17 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      * 點擊 側邊 切換 群組
      */
     fun groupItemClick(groupItem: GroupItem) {
-//        _followData.value = groupItem.groupModel
-        _myGroupList.value = _myGroupList.value?.map {
-            return@map if (it.groupModel == groupItem.groupModel) {
-                it.copy(isSelected = true)
-            } else {
-                it.copy(isSelected = false)
+        val currentGroupItemList = uiState.myGroupList
+
+        uiState = uiState.copy(
+            myGroupList = currentGroupItemList.map {
+                if (it.groupModel == groupItem.groupModel) {
+                    it.copy(isSelected = true)
+                } else {
+                    it.copy(isSelected = false)
+                }
             }
-        }
+        )
     }
 
     /**
@@ -105,7 +148,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                     uiState = uiState.copy(
                         navigateToApproveGroup = group
                     )
-                }else {
+                } else {
                     groupUseCase.joinGroup(group).fold({
                         fetchMyGroup()
                     }, {
@@ -117,8 +160,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                     })
                 }
             }
-        }
-        else {
+        } else {
             uiState = uiState.copy(
                 showLoginDialog = true
             )
@@ -208,5 +250,35 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             navigateToCreateGroup = false,
             navigateToApproveGroup = null
         )
+    }
+
+    /**
+     * 點擊加入彈窗
+     */
+    fun openGroupItemDialog(group: Group) {
+        KLog.i(TAG, "openGroupItemDialog:$group")
+        uiState = uiState.copy(
+            openGroupDialog = group
+        )
+    }
+
+    /**
+     * 關閉 社團 彈窗
+     */
+    fun closeGroupItemDialog() {
+        KLog.i(TAG, "closeGroupItemDialog")
+        uiState = uiState.copy(
+            openGroupDialog = null
+        )
+    }
+
+    /**
+     * 讀取社團 下一分頁
+     */
+    fun onLoadMore() {
+        KLog.i(TAG, "onLoadMore: haveNextPage:$haveNextPage nextWeight:$nextWeight")
+        if (haveNextPage && nextWeight != null && nextWeight!! > 0) {
+            fetchAllGroupList()
+        }
     }
 }

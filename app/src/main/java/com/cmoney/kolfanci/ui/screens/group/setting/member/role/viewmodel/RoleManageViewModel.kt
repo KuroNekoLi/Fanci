@@ -6,10 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
-import com.cmoney.fanciapi.fanci.model.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
@@ -27,7 +27,8 @@ data class UiState(
     val addRoleError: String = "",          //新增角色 錯誤
     val roleName: String = "",              //角色名稱
     val roleColor: Color = Color(),         //角色顏色
-    val fanciRoleCallback: FanciRoleCallback? = null // 新增 or 刪除 角色
+    val fanciRoleCallback: FanciRoleCallback? = null, // 新增 or 刪除 角色
+    val loading: Boolean = true
 )
 
 @Parcelize
@@ -49,17 +50,33 @@ class RoleManageViewModel(
     private var editFanciRole: FanciRole? = null  //要編輯的角色
     private var editMemberList: List<GroupMember> = emptyList() //編輯模式下原本的成員清單
 
+    private fun showLoading() {
+        uiState = uiState.copy(
+            loading = true
+        )
+    }
+
+    private fun dismissLoading() {
+        uiState = uiState.copy(
+            loading = false
+        )
+    }
+
+
     /**
      * 取得 角色清單
      */
     fun fetchRoleList(groupId: String) {
         viewModelScope.launch {
+            showLoading()
             groupUseCase.fetchGroupRole(groupId).fold({
                 uiState = uiState.copy(
                     fanciRole = it
                 )
+                dismissLoading()
             }, {
                 KLog.e(TAG, it)
+                dismissLoading()
             })
         }
     }
@@ -109,6 +126,7 @@ class RoleManageViewModel(
      * 選擇assign的 成員
      */
     fun addMember(memberStr: String) {
+        KLog.i(TAG, "addMember:$memberStr")
         val gson = Gson()
         val listType: Type =
             object : TypeToken<List<GroupMember>>() {}.type
@@ -116,12 +134,11 @@ class RoleManageViewModel(
 
         val newList = uiState.memberList.toMutableList()
         newList.addAll(responseMemberList)
-        newList.distinctBy {
-            it.id
-        }
 
         uiState = uiState.copy(
-            memberList = newList
+            memberList = newList.distinctBy {
+                it.id
+            }
         )
     }
 
@@ -191,7 +208,7 @@ class RoleManageViewModel(
                     } else {
                         // TODO: 判斷server error type
                         uiState = uiState.copy(
-                            addRoleError = "已有相同名稱的腳色"
+                            addRoleError = "已有相同名稱的角色"
                         )
                     }
                 })
@@ -341,9 +358,9 @@ class RoleManageViewModel(
 
             viewModelScope.launch {
                 //Color
-                val roleColor = roleColors.first { color ->
+                val roleColor = roleColors.firstOrNull { color ->
                     color.name == fanciRole.color
-                }
+                } ?: Color()
 
                 //Permission
                 val checkedPermission = fanciRole.permissionIds.orEmpty()

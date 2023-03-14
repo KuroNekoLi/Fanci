@@ -61,7 +61,7 @@ fun GroupItemDialogScreen(
                             .fillMaxWidth(),
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
-                        placeholder = painterResource(id = R.drawable.resource_default)
+                        placeholder = painterResource(id = R.drawable.placeholder)
                     )
 
                     GroupText(
@@ -117,7 +117,7 @@ fun GroupItemDialogScreen(
                         .clip(RoundedCornerShape(25.dp)),
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.resource_default)
+                    placeholder = painterResource(id = R.drawable.placeholder)
                 )
             }
         }

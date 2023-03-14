@@ -63,7 +63,7 @@ private fun CreateApplyQuestionScreenView(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier.padding(25.dp)
         ) {
@@ -93,7 +93,6 @@ private fun CreateApplyQuestionScreenView(
                         textState = it
                     }
                 },
-                maxLines = 1,
                 textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                 placeholder = {
                     Text(

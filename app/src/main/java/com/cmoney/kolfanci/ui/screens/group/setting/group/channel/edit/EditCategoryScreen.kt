@@ -13,14 +13,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Category
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Category
-import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -201,29 +202,31 @@ fun EditCategoryScreenView(
                     }
                 )
 
-                Spacer(modifier = Modifier.height(35.dp))
+                if (Constant.isCanDeleteCategory()) {
+                    Spacer(modifier = Modifier.height(35.dp))
 
-                Text(
-                    modifier = Modifier.padding(start = 24.dp, bottom = 10.dp),
-                    text = "刪除分類", fontSize = 14.sp, color = LocalColor.current.text.default_100
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .background(LocalColor.current.background)
-                        .clickable {
-                            onDelete.invoke()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
                     Text(
-                        text = "刪除分類",
-                        fontSize = 17.sp,
-                        color = LocalColor.current.specialColor.red
+                        modifier = Modifier.padding(start = 24.dp, bottom = 10.dp),
+                        text = "刪除分類", fontSize = 14.sp, color = LocalColor.current.text.default_100
                     )
 
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(LocalColor.current.background)
+                            .clickable {
+                                onDelete.invoke()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "刪除分類",
+                            fontSize = 17.sp,
+                            color = LocalColor.current.specialColor.red
+                        )
+
+                    }
                 }
             }
 

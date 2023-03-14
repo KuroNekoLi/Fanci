@@ -137,7 +137,7 @@ private fun GroupSettingThemePreviewView(
                             model = it,
                             contentScale = ContentScale.FillBounds,
                             contentDescription = null,
-                            placeholder = painterResource(id = R.drawable.resource_default)
+                            placeholder = painterResource(id = R.drawable.placeholder)
                         )
                     }
                 }

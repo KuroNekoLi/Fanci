@@ -68,6 +68,7 @@ fun GroupApplyScreen(
         modifier = modifier,
         navigator = navigator,
         groupRequirementApplyList = uiState.applyList.orEmpty(),
+        loading = uiState.loading,
         onApplyClick = {
             KLog.i(TAG, "onApplyClick:$it")
             viewModel.onApplyItemClick(it)
@@ -95,6 +96,7 @@ fun GroupApplyScreen(
 
     if (uiState.tips?.isNotEmpty() == true) {
         LocalContext.current.showToast(uiState.tips)
+        viewModel.dismissTips()
     }
 
     //通知前一頁,是否需要刷新
@@ -108,6 +110,7 @@ private fun GroupApplyScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     groupRequirementApplyList: List<GroupRequirementApplySelected>,
+    loading: Boolean,
     onApplyClick: (GroupRequirementApplySelected) -> Unit,
     onSelectAllClick: () -> Unit,
     onReject: () -> Unit,
@@ -139,6 +142,20 @@ private fun GroupApplyScreenView(
                 items(groupRequirementApplyList) { question ->
                     ApplyQuestionItem(question) {
                         onApplyClick.invoke(it)
+                    }
+                }
+
+                if (loading) {
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(size = 32.dp),
+                                color = LocalColor.current.primary
+                            )
+                        }
                     }
                 }
             }
@@ -217,7 +234,7 @@ private fun ApplyQuestionItem(
                 model = user?.thumbNail,
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
-                placeholder = painterResource(id = R.drawable.resource_default)
+                placeholder = painterResource(id = R.drawable.placeholder)
             )
 
             Spacer(modifier = Modifier.width(15.dp))
@@ -284,7 +301,7 @@ private fun ApplyQuestionItem(
         }
 
         val date =
-            Date(groupRequirementApply.updateUnixTime?.times(10001) ?: System.currentTimeMillis())
+            Date(groupRequirementApply.updateUnixTime?.times(1000) ?: System.currentTimeMillis())
         val dayString = SimpleDateFormat("yyyy/MM/dd").format(date)
 
         Row {
@@ -385,7 +402,8 @@ fun GroupApplyScreenPreview() {
             onSelectAllClick = {},
             onReject = {},
             onApply = {},
-            onBackClick = {}
+            onBackClick = {},
+            loading = true
         )
     }
 }

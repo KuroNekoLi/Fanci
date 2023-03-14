@@ -2,12 +2,12 @@ package com.cmoney.kolfanci.model.usecase
 
 import android.content.Context
 import android.net.Uri
-import com.cmoney.kolfanci.BuildConfig
-import com.cmoney.kolfanci.extension.checkResponseBody
-import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.fanciapi.fanci.api.*
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.imagelibrary.UploadImage
+import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.xlogin.XLoginHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +25,13 @@ class GroupUseCase(
     private val groupRequirement: GroupRequirementApi,
     private val userReport: UserReportApi
 ) {
+
+    /**
+     * 刪除/解散 社團
+     */
+    suspend fun deleteGroup(groupId: String) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdDelete(groupId = groupId).checkResponseBody()
+    }
 
     /**
      * 刪除 角色
@@ -75,7 +82,7 @@ class GroupUseCase(
      * @param isNeedApproval 是否需要認證
      * @param coverImageUrl 背景圖
      * @param thumbnailImageUrl 小圖
-     * @param themeName 背景主題名稱
+     * @param themeId 背景主題Id
      */
     suspend fun createGroup(
         name: String,
@@ -83,7 +90,7 @@ class GroupUseCase(
         isNeedApproval: Boolean,
         coverImageUrl: String,
         thumbnailImageUrl: String,
-        themeName: String
+        themeId: String
     ) = kotlin.runCatching {
         groupApi.apiV1GroupPost(
             groupParam = GroupParam(
@@ -92,7 +99,7 @@ class GroupUseCase(
                 isNeedApproval = isNeedApproval,
                 coverImageUrl = coverImageUrl,
                 thumbnailImageUrl = thumbnailImageUrl,
-                colorSchemeGroupKey = ColorTheme.decode(themeName)
+                colorSchemeGroupKey = ColorTheme.decode(themeId)
             )
         ).checkResponseBody()
     }
@@ -447,19 +454,24 @@ class GroupUseCase(
     /**
      * 取得 最新 社團列表
      */
-    suspend fun getNewestGroup() = kotlin.runCatching {
-        groupApi.apiV1GroupGet(
-            orderType = OrderType.latest
-        ).checkResponseBody()
-    }
+    suspend fun getNewestGroup(pageSize: Int = 100, startWeight: Long = Long.MAX_VALUE) =
+        kotlin.runCatching {
+            groupApi.apiV1GroupGet(
+                startWeight = startWeight,
+                orderType = OrderType.latest,
+                pageSize = pageSize
+            ).checkResponseBody()
+        }
 
     /**
      * 取得 熱門 社團列表
      */
-    suspend fun getPopularGroup() =
+    suspend fun getPopularGroup(pageSize: Int = 100, startWeight: Long = Long.MAX_VALUE) =
         kotlin.runCatching {
             groupApi.apiV1GroupGet(
-                orderType = OrderType.popular
+                startWeight = startWeight,
+                orderType = OrderType.popular,
+                pageSize = pageSize
             ).checkResponseBody()
         }
 

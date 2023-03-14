@@ -30,7 +30,6 @@ fun GroupHeaderScreen(
     visibleAvatar: Boolean,
     onMoreClick: (Group) -> Unit
 ) {
-    val tag = "GroupHeaderScreen"
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -76,7 +75,7 @@ fun GroupHeaderScreen(
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.resource_default)
+                    placeholder = painterResource(id = R.drawable.placeholder)
                 )
             }
         }

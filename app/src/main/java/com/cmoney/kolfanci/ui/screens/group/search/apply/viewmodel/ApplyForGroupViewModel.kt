@@ -5,11 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
+import com.cmoney.fanciapi.fanci.model.IGroupRequirementQuestion
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
-import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
-import com.cmoney.fanciapi.fanci.model.IGroupRequirementQuestion
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -18,7 +18,8 @@ data class UiState(
     val answerList: List<String>? = null,       //作答清單
     val warning: String = "",                   //錯誤訊息
     val isComplete: Boolean = false,            //是否成功 送出
-    val isFromBackCheck: Boolean = false        //是否為返回時的檢查
+    val isFromBackCheck: Boolean = false,       //是否為返回時的檢查
+    val isPopupBack: Boolean = false            //是否直接返回
 )
 
 class ApplyForGroupViewModel(
@@ -141,7 +142,15 @@ class ApplyForGroupViewModel(
 
             if (isExistsNoAnswer) {
                 warning("答案未送出", isFromBackCheck = true)
+            } else {
+                uiState = uiState.copy(
+                    isPopupBack = true
+                )
             }
+        } ?: kotlin.run {
+            uiState = uiState.copy(
+                isPopupBack = true
+            )
         }
     }
 

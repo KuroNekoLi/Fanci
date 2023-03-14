@@ -34,7 +34,7 @@ fun ChatUsrAvatarScreen(
                 .clip(CircleShape),
             contentScale = ContentScale.Crop,
             contentDescription = null,
-            placeholder = painterResource(id = R.drawable.resource_default)
+            placeholder = painterResource(id = R.drawable.placeholder)
         )
 
         Text(

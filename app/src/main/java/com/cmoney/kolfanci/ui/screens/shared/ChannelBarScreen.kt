@@ -36,9 +36,7 @@ fun ChannelBarScreen(
             .clip(RoundedCornerShape(10.dp))
             .background(LocalColor.current.background)
             .clickable {
-                if (Constant.MyGroupPermission.createOrEditChannel == true || Constant.MyGroupPermission.deleteChannel == true) {
-                    onClick.invoke(channel)
-                }
+                onClick.invoke(channel)
             },
         contentAlignment = Alignment.CenterStart
     ) {

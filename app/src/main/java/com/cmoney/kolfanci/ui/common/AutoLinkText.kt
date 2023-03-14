@@ -35,10 +35,10 @@ fun AutoLinkText(
         textView.setTextColor(color.toArgb())
         textView.textSize = fontSize.value
         LinkifyCompat.addLinks(textView, Linkify.WEB_URLS)
-        Linkify.addLinks(
-            textView, Patterns.PHONE, "tel:",
-            Linkify.sPhoneNumberMatchFilter, Linkify.sPhoneNumberTransformFilter
-        )
+//        Linkify.addLinks(
+//            textView, Patterns.PHONE, "tel:",
+//            Linkify.sPhoneNumberMatchFilter, Linkify.sPhoneNumberTransformFilter
+//        )
         textView.movementMethod = LinkMovementMethod.getInstance()
         textView.setOnLongClickListener {
             onLongClick?.invoke()

@@ -60,6 +60,9 @@ fun AnnouncementScreen(
                     .weight(1f),
                 onMessageContentCallback = {
 
+                },
+                onReSendClick = {
+
                 }
             )
             Box(

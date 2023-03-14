@@ -5,18 +5,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.kolfanci.extension.EmptyBodyException
-import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.fanciapi.fanci.model.ApplyStatus
 import com.cmoney.fanciapi.fanci.model.GroupRequirementApply
 import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyPaging
+import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
 data class UiState(
     val applyList: List<GroupRequirementApplySelected>? = null,
     val tips: String? = null,
-    val isComplete: Boolean = false
+    val isComplete: Boolean = false,
+    val loading: Boolean = true
 )
 
 data class GroupRequirementApplySelected(
@@ -32,6 +33,18 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
 
     var groupRequirementApplyPaging: GroupRequirementApplyPaging? = null
 
+    private fun showLoading() {
+        uiState = uiState.copy(
+            loading = true
+        )
+    }
+
+    private fun dismissLoading() {
+        uiState = uiState.copy(
+            loading = false
+        )
+    }
+
     /**
      * 取得 申請清單
      * @param groupId 社團id
@@ -39,6 +52,7 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
     fun fetchApplyQuestion(groupId: String) {
         KLog.i(TAG, "fetchApplyQuestion:$groupId")
         viewModelScope.launch {
+            showLoading()
             groupApplyUseCase.fetchGroupApplyList(
                 groupId = groupId
             ).fold({
@@ -52,8 +66,9 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
                         )
                     }
                 )
-
+                dismissLoading()
             }, {
+                dismissLoading()
                 KLog.e(TAG, it)
             })
         }
@@ -110,20 +125,23 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
                 val selectedApplyId = applyList.filter { it.isSelected }.map {
                     it.groupRequirementApply.id.orEmpty()
                 }
-                groupApplyUseCase.approval(
-                    groupId = groupId,
-                    applyId = selectedApplyId,
-                    applyStatus = applyStatus
-                ).fold({
 
-                }, {
-                    if (it is EmptyBodyException) {
-                        removeSelectedItem()
-                        showTips("審核完成")
-                    } else {
-                        KLog.e(TAG, it)
-                    }
-                })
+                if (selectedApplyId.isNotEmpty()) {
+                    groupApplyUseCase.approval(
+                        groupId = groupId,
+                        applyId = selectedApplyId,
+                        applyStatus = applyStatus
+                    ).fold({
+
+                    }, {
+                        if (it is EmptyBodyException) {
+                            removeSelectedItem()
+                            showTips("審核完成")
+                        } else {
+                            KLog.e(TAG, it)
+                        }
+                    })
+                }
             }
         }
     }
@@ -131,6 +149,15 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
     private fun showTips(text: String) {
         uiState = uiState.copy(
             tips = text
+        )
+    }
+
+    /**
+     * 取消 Toast 狀態
+     */
+    fun dismissTips() {
+        uiState = uiState.copy(
+            tips = null
         )
     }
 

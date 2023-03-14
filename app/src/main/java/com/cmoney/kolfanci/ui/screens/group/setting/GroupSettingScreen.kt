@@ -41,17 +41,21 @@ fun GroupSettingScreen(
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
-    var group = initGroup
+//    var group = initGroup
 
     val uiState = viewModel.uiState
 
+//    viewModel.settingGroup(initGroup)
+
+    //公開度
     resultRecipient.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
             is NavResult.Value -> {
                 val resultGroup = result.value
-                group = resultGroup
+                viewModel.settingGroup(resultGroup)
+                globalViewModel.setCurrentGroup(resultGroup)
             }
         }
     }
@@ -64,7 +68,7 @@ fun GroupSettingScreen(
             is NavResult.Value -> {
                 val refreshReport = result.value
                 if (refreshReport) {
-                    viewModel.fetchReportList(groupId = group.id.orEmpty())
+                    viewModel.fetchReportList(groupId = initGroup.id.orEmpty())
                 }
             }
         }
@@ -77,7 +81,7 @@ fun GroupSettingScreen(
             is NavResult.Value -> {
                 val isNeedRefresh = result.value
                 if (isNeedRefresh) {
-                    viewModel.fetchUnApplyCount(groupId = group.id.orEmpty())
+                    viewModel.fetchUnApplyCount(groupId = initGroup.id.orEmpty())
                 }
             }
         }
@@ -91,7 +95,7 @@ fun GroupSettingScreen(
     GroupSettingScreenView(
         modifier = modifier,
         navController = navController,
-        group = group,
+        group = uiState.settingGroup ?: initGroup,
         unApplyCount = uiState.unApplyCount ?: 0,
         reportList = uiState.reportList,
         onBackClick = {
@@ -102,12 +106,12 @@ fun GroupSettingScreen(
 
     //抓取加入申請 數量
     if (uiState.unApplyCount == null) {
-        viewModel.fetchUnApplyCount(groupId = group.id.orEmpty())
+        viewModel.fetchUnApplyCount(groupId = initGroup.id.orEmpty())
     }
 
     //抓取檢舉內容
     if (uiState.reportList == null) {
-        viewModel.fetchReportList(groupId = group.id.orEmpty())
+        viewModel.fetchReportList(groupId = initGroup.id.orEmpty())
     }
 }
 
