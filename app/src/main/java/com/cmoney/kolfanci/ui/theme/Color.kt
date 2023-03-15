@@ -28,6 +28,8 @@ val White_DDDEDF = Color(0xFFDDDEDF)
 val White_262C34 = Color(0xFF262C34)
 val White_C7C7C7 = Color(0xFFC7C7C7)
 
+val Color_99FFFFFF = Color(0x99FFFFFF)
+
 val Color_B3FB9304 = Color(0xB3FB9304)
 
 val Color_CB4A4A = Color(0xFFCB4A4A)

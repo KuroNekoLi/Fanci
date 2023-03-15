@@ -50,7 +50,8 @@ fun MemberScreen(
             ) {
                 navigator.navigate(
                     AddMemberScreenDestination(
-                        group = group
+                        group = group,
+                        excludeMember = memberList.toTypedArray()
                     )
                 )
             }

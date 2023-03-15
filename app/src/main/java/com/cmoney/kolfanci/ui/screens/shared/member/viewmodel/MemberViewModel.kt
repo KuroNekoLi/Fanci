@@ -5,13 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.BanPeriodOption
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
-import com.cmoney.fanciapi.fanci.model.BanPeriodOption
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.google.gson.Gson
 import com.socks.library.KLog
 import kotlinx.coroutines.async
@@ -24,7 +24,9 @@ import java.util.concurrent.TimeUnit
 data class UiState(
     val groupMember: List<GroupMemberSelect>? = null,  //社團會員
     val kickMember: GroupMember? = null,     //踢除會員
-    val banUiModel: BanUiModel? = null      //禁言中 info
+    val banUiModel: BanUiModel? = null,      //禁言中 info
+    val showAddSuccessTip: Boolean = false,  //show 新增成功 toast
+    val loading: Boolean = true
 )
 
 data class GroupMemberSelect(val groupMember: GroupMember, val isSelected: Boolean = false)
@@ -35,6 +37,24 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
 
     var uiState by mutableStateOf(UiState())
         private set
+
+    //群組會員清單
+    val orgGroupMemberList = mutableListOf<GroupMemberSelect>()
+
+    //新增的會員
+    private val addGroupMemberQueue = mutableListOf<GroupMember>()
+
+    private fun showLoading() {
+        uiState = uiState.copy(
+            loading = true
+        )
+    }
+
+    private fun dismissLoading() {
+        uiState = uiState.copy(
+            loading = false
+        )
+    }
 
     /**
      * 解除 禁言
@@ -144,9 +164,14 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
     /**
      * 獲取群組會員清單
      */
-    fun fetchGroupMember(groupId: String, skip: Int = 0) {
+    fun fetchGroupMember(
+        groupId: String,
+        skip: Int = 0,
+        excludeMember: List<GroupMember> = emptyList()
+    ) {
         KLog.i(TAG, "fetchGroupMember:$groupId")
         viewModelScope.launch {
+            showLoading()
             groupUseCase.getGroupMember(groupId = groupId, skipCount = skip).fold({
                 val responseMembers = it.items.orEmpty()
                 if (responseMembers.isNotEmpty()) {
@@ -159,11 +184,22 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                     val orgMemberList = uiState.groupMember.orEmpty().toMutableList()
                     orgMemberList.addAll(wrapMember)
 
+                    val filterMember = orgMemberList.filter {
+                        excludeMember.find { exclude ->
+                            exclude.id == it.groupMember.id
+                        } == null
+                    }
+
+                    orgGroupMemberList.clear()
+                    orgGroupMemberList.addAll(filterMember)
+
                     uiState = uiState.copy(
-                        groupMember = orgMemberList
+                        groupMember = filterMember
                     )
                 }
+                dismissLoading()
             }, {
+                dismissLoading()
                 KLog.e(TAG, it)
             })
         }
@@ -205,12 +241,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
      */
     fun fetchSelectedMember(): String {
         val gson = Gson()
-        val list = uiState.groupMember?.filter {
-            it.isSelected
-        }?.map {
-            it.groupMember
-        }.orEmpty()
-        return gson.toJson(list)
+        return gson.toJson(addGroupMemberQueue)
     }
 
     /**
@@ -293,5 +324,76 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                 groupMember = newGroupList
             )
         }
+    }
+
+    private var timer: Timer? = null
+
+    /**
+     * 搜尋成員
+     */
+    fun onSearchMember(keyword: String) {
+        KLog.i(TAG, "onSearchMember:$keyword")
+        timer?.cancel()
+
+        timer = Timer().apply {
+            schedule(object : TimerTask() {
+                override fun run() {
+                    //searching
+                    KLog.i(TAG, "searching:$keyword")
+                    //return all
+                    uiState = if (keyword.isEmpty()) {
+                        uiState.copy(
+                            groupMember = orgGroupMemberList
+                        )
+                    } else {
+                        uiState.copy(
+                            groupMember = orgGroupMemberList.filter {
+                                it.groupMember.name?.startsWith(keyword) == true
+                            }
+                        )
+                    }
+                }
+            }, 400)
+        }
+    }
+
+    /**
+     * 點擊 新增 會員, 將選中的會員暫存, 並從畫面上移除
+     */
+    fun onAddSelectedMember() {
+        KLog.i(TAG, "onAddSelectedMember")
+        val selectedMember = uiState.groupMember?.filter {
+            it.isSelected
+        }?.map {
+            it.groupMember
+        }.orEmpty()
+
+        if (selectedMember.isNotEmpty()) {
+            addGroupMemberQueue.addAll(selectedMember)
+            val distinctList = addGroupMemberQueue.distinct()
+            addGroupMemberQueue.clear()
+            addGroupMemberQueue.addAll(distinctList)
+
+            val orgMemberList = uiState.groupMember.orEmpty()
+            val filterMember = orgMemberList.filter {
+                addGroupMemberQueue.find { exclude ->
+                    exclude.id == it.groupMember.id
+                } == null
+            }
+
+            uiState = uiState.copy(
+                groupMember = filterMember,
+                showAddSuccessTip = true
+            )
+        }
+    }
+
+    /**
+     * 取消 toast
+     */
+    fun dismissAddSuccessTip() {
+        uiState = uiState.copy(
+            showAddSuccessTip = false
+        )
     }
 }
