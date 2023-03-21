@@ -15,29 +15,29 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
+import com.cmoney.fanciapi.fanci.model.AccessorTypes
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 編輯頻道參數
+ * 設定自定義存取權限參數
  *
- * @param name 頻道名稱
- * @param privacy 
+ * @param type 
+ * @param ids 可存取此頻道的RoleIds/UserId
  */
 @Parcelize
 
 
-data class EditChannelParam (
+data class AccessorParam (
 
-    /* 頻道名稱 */
-    @Json(name = "name")
-    val name: kotlin.String,
+    @Json(name = "type")
+    val type: AccessorTypes? = null,
 
-    @Json(name = "privacy")
-    val privacy: ChannelPrivacy? = null
+    /* 可存取此頻道的RoleIds/UserId */
+    @Json(name = "ids")
+    val ids: kotlin.collections.List<kotlin.String>? = null
 
 ) : Parcelable
 

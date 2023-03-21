@@ -31,6 +31,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.koinViewModel
 
 val LocalDependencyContainer = staticCompositionLocalOf<MainActivity> {
     error("No dependency container provided!")
@@ -46,9 +47,9 @@ class MainActivity : BaseWebLoginActivity() {
         setContent {
             CompositionLocalProvider(LocalDependencyContainer provides this) {
                 val state = globalViewModel.uiState
-                val isOpenTutorial = globalViewModel.isOpenTutorial.observeAsState()
+//                val isOpenTutorial = globalViewModel.isOpenTutorial.observeAsState()
 
-                isOpenTutorial.value?.let { isOpenTutorial ->
+                state.isOpenTutorial.let { isOpenTutorial ->
                     if (isOpenTutorial) {
                         FanciTheme(fanciColor = state.theme) {
                             val mainState = rememberMainState()

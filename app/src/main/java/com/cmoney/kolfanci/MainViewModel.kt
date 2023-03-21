@@ -17,6 +17,7 @@ import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.ui.theme.CoffeeThemeColor
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -31,44 +32,45 @@ data class UiState(
     val theme: FanciColor = DefaultThemeColor,
     val isLoginSuccess: Boolean = false,
     val isFetchFollowData: Boolean = false,
-    val testCategory: List<Category> = listOf(
-        Category(
-            id = "1",
-            name = "Title1",
-            channels = listOf(
-                Channel(
-                    id = "1",
-                    name = "Channel1"
-                ),
-                Channel(
-                    id = "2",
-                    name = "Channel2"
-                ),
-                Channel(
-                    id = "3",
-                    name = "Channel3"
-                )
-            )
-        ),
-        Category(
-            id = "2",
-            name = "Title2",
-            channels = listOf(
-                Channel(
-                    id = "4",
-                    name = "Channel4"
-                ),
-                Channel(
-                    id = "5",
-                    name = "Channel5"
-                ),
-                Channel(
-                    id = "6",
-                    name = "Channel6"
-                )
-            )
-        )
-    )
+    val isOpenTutorial: Boolean = false
+//    val testCategory: List<Category> = listOf(
+//        Category(
+//            id = "1",
+//            name = "Title1",
+//            channels = listOf(
+//                Channel(
+//                    id = "1",
+//                    name = "Channel1"
+//                ),
+//                Channel(
+//                    id = "2",
+//                    name = "Channel2"
+//                ),
+//                Channel(
+//                    id = "3",
+//                    name = "Channel3"
+//                )
+//            )
+//        ),
+//        Category(
+//            id = "2",
+//            name = "Title2",
+//            channels = listOf(
+//                Channel(
+//                    id = "4",
+//                    name = "Channel4"
+//                ),
+//                Channel(
+//                    id = "5",
+//                    name = "Channel5"
+//                ),
+//                Channel(
+//                    id = "6",
+//                    name = "Channel6"
+//                )
+//            )
+//        )
+//    )
 )
 
 class MainViewModel(
@@ -80,8 +82,8 @@ class MainViewModel(
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
-    private val _isOpenTutorial = MutableLiveData<Boolean>()
-    val isOpenTutorial: LiveData<Boolean> = _isOpenTutorial
+//    private val _isOpenTutorial = MutableLiveData<Boolean>()
+//    val isOpenTutorial: LiveData<Boolean> = _isOpenTutorial
 
     var uiState by mutableStateOf(UiState())
         private set
@@ -89,7 +91,10 @@ class MainViewModel(
     init {
         viewModelScope.launch {
             settingsDataStore.isTutorial.collect {
-                _isOpenTutorial.value = it
+                uiState = uiState.copy(
+                    isOpenTutorial = it
+                )
+//                _isOpenTutorial.value = it
             }
         }
     }
@@ -116,6 +121,7 @@ class MainViewModel(
         KLog.i(TAG, "setCurrentGroup")
         if (group != uiState.currentGroup && group.id != null) {
             KLog.i(TAG, "setCurrentGroup diff:$group")
+
             fetchGroupPermission(group)
             uiState = uiState.copy(
                 currentGroup = group
@@ -159,7 +165,10 @@ class MainViewModel(
         KLog.i(TAG, "tutorialOnOpen")
         viewModelScope.launch {
             settingsDataStore.onTutorialOpen()
-            _isOpenTutorial.value = true
+//            _isOpenTutorial.value = true
+            uiState = uiState.copy(
+                isOpenTutorial = true
+            )
         }
     }
 
@@ -183,10 +192,10 @@ class MainViewModel(
         )
     }
 
-    fun sortCallback(categoryList: List<Category>) {
-        uiState = uiState.copy(
-            testCategory = categoryList
-        )
-    }
+//    fun sortCallback(categoryList: List<Category>) {
+//        uiState = uiState.copy(
+//            testCategory = categoryList
+//        )
+//    }
 
 }

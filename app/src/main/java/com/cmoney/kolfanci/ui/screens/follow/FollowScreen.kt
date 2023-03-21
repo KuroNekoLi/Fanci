@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.LocalDependencyContainer
 import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.MainViewModel
 import com.cmoney.kolfanci.R
@@ -56,7 +57,6 @@ fun FollowScreen(
     globalViewModel: MainViewModel,
     navigator: DestinationsNavigator,
     viewModel: FollowViewModel = koinViewModel(),
-    mainViewModel: MainViewModel = koinViewModel()
 ) {
     val uiState = viewModel.uiState
     val density = LocalDensity.current
@@ -91,7 +91,7 @@ fun FollowScreen(
     }?.groupModel
 
     group?.let {
-        mainViewModel.setCurrentGroup(it)
+        globalViewModel.setCurrentGroup(it)
     }
 
     FollowScreenView(

@@ -13,6 +13,13 @@ class ChannelUseCase(
 ) {
 
     /**
+     * 抓取 私密頻道 權限類型清單
+     */
+    suspend fun getChanelAccessType() = kotlin.runCatching {
+        channelApi.apiV1ChannelAccessTypeGet().checkResponseBody()
+    }
+
+    /**
      * 頻道 移除多個角色
      * @param channelId 頻道id
      * @param roleIds 角色id清單

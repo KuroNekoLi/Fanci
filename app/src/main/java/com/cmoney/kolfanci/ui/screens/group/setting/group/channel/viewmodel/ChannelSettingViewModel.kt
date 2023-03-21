@@ -5,16 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.sort.MoveItem
-import com.cmoney.fanciapi.fanci.model.Category
-import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.Group
 import com.google.gson.Gson
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
@@ -22,12 +19,15 @@ import kotlinx.coroutines.launch
 data class UiState(
     val isLoading: Boolean = false,
     val group: Group? = null,
-    val channelRole: List<FanciRole>? = null,   //目前頻道顯示角色List
+    val channelRole: List<FanciRole>? = null,        //目前頻道顯示角色List
     val groupRoleList: List<AddChannelRoleModel> = emptyList(),
     val confirmRoleList: String = "",
-    val tabSelected: Int = 0,    //record tab position
+    val tabSelected: Int = 0,                        //record tab position
     val isOpenSortDialog: Boolean = false,
-    val isSoredToServerComplete: Boolean = false    //完成將排序結果給 server
+    val isSoredToServerComplete: Boolean = false,    //完成將排序結果給 server
+    val channelSettingTabIndex: Int = 0,             //新增頻道 tab position
+    val isNeedApproval: Boolean = false,             //是否公開
+    val channelAccessTypeList: List<ChannelAccessOptionModel> = emptyList() //私密頻道 權限清單
 )
 
 data class AddChannelRoleModel(val role: FanciRole, val isChecked: Boolean = false)
@@ -476,22 +476,21 @@ class ChannelSettingViewModel(
      */
     fun sortChannel(moveItem: MoveItem) {
         KLog.i(TAG, "sortChannel:$moveItem")
-        uiState.group?.let {group ->
+        uiState.group?.let { group ->
 
-            val removedCategoryList = group.categories?.map {category ->
+            val removedCategoryList = group.categories?.map { category ->
                 if (category.id == moveItem.fromCategory.id) {
                     category.copy(
-                        channels = category.channels?.filter {channel ->
+                        channels = category.channels?.filter { channel ->
                             channel.id != moveItem.channel.id
                         }
                     )
-                }
-                else {
+                } else {
                     category
                 }
             }
 
-            val sortedCategory = removedCategoryList?.map {category ->
+            val sortedCategory = removedCategoryList?.map { category ->
                 if (category.id == moveItem.toCategory?.id) {
                     val channels = category.channels?.toMutableList()
                     channels?.add(moveItem.channel)
@@ -500,8 +499,7 @@ class ChannelSettingViewModel(
                             it.id
                         }
                     )
-                }
-                else {
+                } else {
                     category
                 }
             }
@@ -511,6 +509,40 @@ class ChannelSettingViewModel(
                     categories = sortedCategory
                 )
             )
+        }
+    }
+
+    /**
+     * 新增頻道 tab selection
+     */
+    fun onChannelSettingTabSelected(position: Int) {
+        KLog.i(TAG, "onChannelSettingTabSelected:$position")
+        uiState = uiState.copy(tabSelected = position)
+    }
+
+    /**
+     * 設定 頻道 公開度
+     */
+    fun setChannelApproval(isNeedApproval: Boolean) {
+        KLog.i(TAG, "setChannelApproval:$isNeedApproval")
+        uiState = uiState.copy(
+            isNeedApproval = isNeedApproval
+        )
+    }
+
+    /**
+     * 抓取 目前私密頻道所有權限
+     */
+    fun fetchChannelPermissionList() {
+        KLog.i(TAG, "fetchChannelPermissionList")
+        viewModelScope.launch {
+            channelUseCase.getChanelAccessType().fold({
+                uiState = uiState.copy(
+                    channelAccessTypeList = it
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
         }
     }
 }

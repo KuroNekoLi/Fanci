@@ -15,29 +15,31 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 編輯頻道參數
+ * 
  *
- * @param name 頻道名稱
- * @param privacy 
+ * @param title 
+ * @param icon 
+ * @param isEnabled 
  */
 @Parcelize
 
 
-data class EditChannelParam (
+data class AuthBulliten (
 
-    /* 頻道名稱 */
-    @Json(name = "name")
-    val name: kotlin.String,
+    @Json(name = "title")
+    val title: kotlin.String? = null,
 
-    @Json(name = "privacy")
-    val privacy: ChannelPrivacy? = null
+    @Json(name = "icon")
+    val icon: kotlin.String? = null,
+
+    @Json(name = "isEnabled")
+    val isEnabled: kotlin.Boolean? = null
 
 ) : Parcelable
 
