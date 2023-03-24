@@ -67,10 +67,18 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 loading()
                 groupUseCase.groupToSelectGroupItem().fold({
                     if (it.isNotEmpty()) {
+                        var currentSelectedPos = uiState.myGroupList.indexOfFirst {groupItem ->
+                            groupItem.isSelected
+                        }
+
+                        if (currentSelectedPos < 0) {
+                            currentSelectedPos = 0
+                        }
+
                         //我的所有群組
                         uiState = uiState.copy(
                             myGroupList = it.mapIndexed { index, groupItem ->
-                                if (index == 0) {
+                                if (index == currentSelectedPos) {
                                     groupItem.copy(
                                         isSelected = true
                                     )

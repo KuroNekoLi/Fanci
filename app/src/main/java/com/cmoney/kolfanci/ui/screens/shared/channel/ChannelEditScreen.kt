@@ -30,7 +30,7 @@ fun ChannelEditScreen(
     category: Category,
     channelList: List<Channel>,
     onCategoryEdit: (Category) -> Unit,
-    onChanelEdit: (Channel) -> Unit,
+    onChanelEdit: (Category, Channel) -> Unit,
     onAddChannel: (Category) -> Unit
 ) {
     Column(
@@ -78,7 +78,7 @@ fun ChannelEditScreen(
                 isEditMode = true,
                 onClick = {
                     if (Constant.isChannelEditPermission()) {
-                        onChanelEdit.invoke(it)
+                        onChanelEdit.invoke(category, it)
                     }
                 }
             )
@@ -142,7 +142,7 @@ fun ChannelEditScreenPreview() {
                 )
             ),
             onCategoryEdit = {},
-            onChanelEdit = {},
+            onChanelEdit = {_,_ ->},
             onAddChannel = {}
         )
     }

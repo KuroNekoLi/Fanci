@@ -122,28 +122,10 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdRolePut(@Path("channelId") channelId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**
-     * 設定私密頻道白名單 (Role/Users) __________🔒 編輯頻道
-     * 
-     * Responses:
-     *  - 204: No Content
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
-     *
-     * @param channelId 頻道ID
-     * @param authType 指定加入成員的權限類型)
-     * @param accessorParam  (optional)
-     * @return [Unit]
-     */
-    @DELETE("api/v1/Channel/{channelId}/WhiteList/{authType}")
-    suspend fun apiV1ChannelChannelIdWhiteListAuthTypeDelete(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: kotlin.String, @Body accessorParam: AccessorParam? = null): Response<Unit>
-
-    /**
-     * 取得私密頻道白名單 __________🔒 編輯頻道
+     * 取得私密頻道白名單
      * 
      * Responses:
      *  - 200: Success
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
      *
      * @param channelId 
      * @param authType 
@@ -165,16 +147,14 @@ interface ChannelApi {
      * @param accessorParam  (optional)
      * @return [Unit]
      */
-    @PATCH("api/v1/Channel/{channelId}/WhiteList/{authType}")
-    suspend fun apiV1ChannelChannelIdWhiteListAuthTypePatch(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: kotlin.String, @Body accessorParam: AccessorParam? = null): Response<Unit>
+    @PUT("api/v1/Channel/{channelId}/WhiteList/{authType}")
+    suspend fun apiV1ChannelChannelIdWhiteListAuthTypePut(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: kotlin.String, @Body accessorParam: kotlin.collections.List<AccessorParam>? = null): Response<Unit>
 
     /**
-     * 取得私密頻道白名單 __________🔒 編輯頻道
+     * 取得私密頻道白名單
      * 
      * Responses:
      *  - 200: Success
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
      *
      * @param channelId 
      * @return [kotlin.collections.List<ChannelWhiteList>]

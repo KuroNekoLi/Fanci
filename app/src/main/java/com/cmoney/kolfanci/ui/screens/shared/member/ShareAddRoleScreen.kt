@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.shared.member
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -23,34 +25,46 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.kolfanci.extension.toColor
-import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.AddChannelRoleModel
-import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
-import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.toColor
+import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.AddChannelRoleModel
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
+import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
+import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
+import com.cmoney.kolfanci.ui.theme.Color_99FFFFFF
+import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
-import com.cmoney.kolfanci.R
+
+/**
+ * 選擇挑選角色
+ */
 @Destination
 @Composable
 fun ShareAddRoleScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    viewModel: ChannelSettingViewModel = koinViewModel(),
+    viewModel: RoleViewModel = koinViewModel(),
     group: Group,
+    title: String = "新增角色",
+    subTitle: String = "",
     buttonText: String,
     existsRole: Array<FanciRole>,
     resultNavigator: ResultBackNavigator<String>
 ) {
-
+    val TAG = "ShareAddRoleScreen"
     val uiState = viewModel.uiState
+    val loadingState = viewModel.loadingState
 
     if (uiState.groupRoleList.isEmpty()) {
         viewModel.getGroupRoleList(group.id.orEmpty(), existsRole)
@@ -64,66 +78,123 @@ fun ShareAddRoleScreen(
     ShareAddRoleScreenView(
         modifier,
         navigator,
+        title,
+        subTitle,
         uiState.groupRoleList,
         buttonText = buttonText,
+        isLoading = loadingState.isLoading,
         onRoleClick = {
             viewModel.onRoleClick(it)
         },
         onConfirm = {
             viewModel.onAddRoleConfirm()
+        },
+        onBack = {
+            resultNavigator.navigateBack(
+                result = viewModel.fetchSelectedRole()
+            )
         }
     )
+
+    if (uiState.showAddSuccessTip) {
+        FanciSnackBarScreen(
+            modifier = Modifier.padding(bottom = 70.dp),
+            message = CustomMessage(
+                textString = "角色新增成功！",
+                iconRes = R.drawable.all_member,
+                iconColor = Color_99FFFFFF,
+                textColor = Color.White
+            )
+        ) {
+            viewModel.dismissAddSuccessTip()
+        }
+    }
+
+    BackHandler {
+        KLog.i(TAG, "BackHandler")
+        resultNavigator.navigateBack(
+            result = viewModel.fetchSelectedRole()
+        )
+    }
+
 }
 
 @Composable
 fun ShareAddRoleScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
+    title: String,
+    subTitle: String,
     roleList: List<AddChannelRoleModel>,
     buttonText: String,
+    isLoading: Boolean,
     onRoleClick: (AddChannelRoleModel) -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    onBack: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "新增角色",
+                title = title,
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
-                    navigator.popBackStack()
+                    onBack.invoke()
                 }
             )
         }
     ) { innerPadding ->
-        if (roleList.isNotEmpty()) {
-            Column(modifier = Modifier.padding(innerPadding)) {
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    items(roleList) { roleModel ->
-                        RoleItemScreen(roleModel) {
-                            onRoleClick.invoke(it)
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(size = 32.dp),
+                    color = LocalColor.current.primary
+                )
+            }
+        } else {
+            if (roleList.isNotEmpty()) {
+                Column(modifier = Modifier.padding(innerPadding)) {
+
+                    if (subTitle.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier.padding(20.dp),
+                            text = subTitle, fontSize = 14.sp, color = Color_80FFFFFF
+                        )
+                    }
+
+                    LazyColumn(modifier = Modifier.weight(1f)) {
+
+                        items(roleList) { roleModel ->
+                            RoleItemScreen(roleModel) {
+                                onRoleClick.invoke(it)
+                            }
                         }
+                    }
+
+                    BottomButtonScreen(
+                        text = buttonText
+                    ) {
+                        onConfirm.invoke()
                     }
                 }
 
-                BottomButtonScreen(
-                    text = buttonText
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    onConfirm.invoke()
+                    Text(
+                        text = "尚未建立任何角色",
+                        fontSize = 14.sp,
+                        color = LocalColor.current.component.other
+                    )
                 }
-            }
-
-        } else {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "尚未建立任何角色", fontSize = 14.sp, color = LocalColor.current.component.other
-                )
             }
         }
     }
@@ -140,10 +211,10 @@ private fun RoleItemScreen(
         modifier = Modifier
             .fillMaxWidth()
             .background(LocalColor.current.background)
-            .padding(start = 25.dp)
             .clickable {
                 onRoleClick.invoke(addChannelRoleModel)
-            },
+            }
+            .padding(start = 25.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val roleColor = if (fanciRole.color?.isNotEmpty() == true) {
@@ -216,6 +287,9 @@ fun ShareAddRoleScreenViewPreview() {
     FanciTheme {
         ShareAddRoleScreenView(
             navigator = EmptyDestinationsNavigator,
+            title = "新增角色",
+            subTitle = "直接指定角色，讓一批成員進入私密頻道。",
+            isLoading = false,
             roleList = listOf(
                 AddChannelRoleModel(
                     role = FanciRole(
@@ -232,7 +306,8 @@ fun ShareAddRoleScreenViewPreview() {
             ),
             onRoleClick = {},
             onConfirm = {},
-            buttonText = "新增角色成為頻道管理員"
+            buttonText = "新增角色成為頻道管理員",
+            onBack = {}
         )
     }
 }

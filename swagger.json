@@ -993,7 +993,7 @@
         "tags": [
           "Channel"
         ],
-        "summary": "取得私密頻道白名單 __________🔒 編輯頻道",
+        "summary": "取得私密頻道白名單",
         "parameters": [
           {
             "name": "channelId",
@@ -1034,21 +1034,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
           }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
-            ]
-          }
-        ]
+        }
       }
     },
     "/api/v1/Channel/{channelId}/WhiteList/{authType}": {
@@ -1056,7 +1043,7 @@
         "tags": [
           "Channel"
         ],
-        "summary": "取得私密頻道白名單 __________🔒 編輯頻道",
+        "summary": "取得私密頻道白名單",
         "parameters": [
           {
             "name": "channelId",
@@ -1096,23 +1083,10 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
           }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
-            ]
-          }
-        ]
+        }
       },
-      "patch": {
+      "put": {
         "tags": [
           "Channel"
         ],
@@ -1142,81 +1116,26 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AccessorParam"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AccessorParam"
+                }
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AccessorParam"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AccessorParam"
+                }
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AccessorParam"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
-            ]
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Channel"
-        ],
-        "summary": "設定私密頻道白名單 (Role/Users) __________🔒 編輯頻道",
-        "parameters": [
-          {
-            "name": "channelId",
-            "in": "path",
-            "description": "頻道ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authType",
-            "in": "path",
-            "description": "指定加入成員的權限類型)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AccessorParam"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AccessorParam"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AccessorParam"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AccessorParam"
+                }
               }
             }
           }
@@ -1246,7 +1165,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "對聊天室新增一則聊天訊息 __________🔒 已註冊的fanci使用者",
+        "summary": "對聊天室新增一則聊天訊息 __________🔒 可發文",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1313,7 +1232,8 @@
           {
             "oauth2": [
               "user",
-              "BANNED_1_chatRoomChannelId"
+              "BANNED_1_chatRoomChannelId",
+              "PERMISSION_canPost_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -1322,7 +1242,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取得聊天室訊息列表 __________🔒 已註冊的fanci使用者",
+        "summary": "取得聊天室訊息列表 __________🔒 可看",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1395,7 +1315,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_canRead_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -1406,7 +1327,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取得聊天室的公告訊息 __________🔒 已註冊的fanci使用者",
+        "summary": "取得聊天室的公告訊息 __________🔒 可看",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1452,7 +1373,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_canRead_1_chatRoomChannelId_none"
             ]
           }
         ]

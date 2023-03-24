@@ -1,11 +1,12 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.channel.add
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,6 +20,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.EditChannelOpennessScreenDestination
+import com.cmoney.kolfanci.destinations.MemberAndRoleManageScreenDestination
 import com.cmoney.kolfanci.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -27,6 +29,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.Chan
 import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -50,10 +53,12 @@ fun AddChannelScreen(
     navigator: DestinationsNavigator,
     group: Group,
     category: Category,
+    channel: Channel? = null,
     viewModel: ChannelSettingViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<Group>,
     approvalResult: ResultRecipient<EditChannelOpennessScreenDestination, Boolean>,
-    addRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>
+    addRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
+    permissionMemberResult: ResultRecipient<MemberAndRoleManageScreenDestination, SelectedModel>
 ) {
     val context = LocalContext.current
     val uiState = viewModel.uiState
@@ -63,17 +68,44 @@ fun AddChannelScreen(
         resultNavigator.navigateBack(result = it)
     }
 
+    //Edit mode
+    channel?.let {
+        if (viewModel.channel == null) {
+            viewModel.initChannel(it)
+        }
+    }
+
     AddChannelScreenView(
         modifier,
         navigator,
+        topBarTitle = (if ((channel != null)) {
+            "頻道設定"
+        } else {
+            "新增頻道"
+        }),
+        buttonTitle = (if ((channel != null)) {
+            "儲存變更"
+        } else {
+            "建立"
+        }),
+        channelName = uiState.channelName,
         fanciRole = uiState.channelRole,
         group = group,
         selectedIndex = uiState.tabSelected,
         isNeedApproval = uiState.isNeedApproval,
         channelAccessTypeList = uiState.channelAccessTypeList,
+        isLoading = uiState.isLoading,
         onConfirm = {
             if (it.isNotEmpty()) {
-                viewModel.addChannel(group, category.id.orEmpty(), it)
+                if (channel == null) {
+                    viewModel.addChannel(group, category.id.orEmpty(), it)
+                } else {
+                    viewModel.editChannel(
+                        group = group,
+                        channel = channel,
+                        name = it
+                    )
+                }
             } else {
                 context.showToast("請輸入頻道名稱")
             }
@@ -83,10 +115,29 @@ fun AddChannelScreen(
         },
         onRemoveRole = {
             viewModel.onRemoveRole(it)
+        },
+        onPermissionClick = { channelPermissionModel ->
+            viewModel.onPermissionClick(channelPermissionModel)
+        },
+        onChannelNameInput = {
+            viewModel.setChannelName(it)
         }
     )
 
-    viewModel.fetchChannelPermissionList()
+    if (uiState.channelAccessTypeList.isEmpty()) {
+        viewModel.fetchChannelPermissionList()
+    }
+
+    uiState.clickPermissionMemberModel?.let {
+        navigator.navigate(
+            MemberAndRoleManageScreenDestination(
+                group = group,
+                topBarTitle = it.first.title.orEmpty(),
+                selectedModel = it.second
+            )
+        )
+        viewModel.dismissPermissionNavigator()
+    }
 
     //========== Result callback Start ==========
     approvalResult.onNavResult { result ->
@@ -108,6 +159,16 @@ fun AddChannelScreen(
             }
         }
     }
+
+    permissionMemberResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+            is NavResult.Value -> {
+                viewModel.setPermissionMemberSelected(result.value)
+            }
+        }
+    }
     //========== Result callback End ==========
 }
 
@@ -115,16 +176,21 @@ fun AddChannelScreen(
 fun AddChannelScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
+    topBarTitle: String = "新增頻道",
+    buttonTitle: String = "建立",
     selectedIndex: Int,
+    channelName: String,
     isNeedApproval: Boolean,
     fanciRole: List<FanciRole>?,
     group: Group,
     channelAccessTypeList: List<ChannelAccessOptionModel>,
+    isLoading: Boolean,
     onConfirm: (String) -> Unit,
     onTabClick: (Int) -> Unit,
-    onRemoveRole: (FanciRole) -> Unit
+    onRemoveRole: (FanciRole) -> Unit,
+    onPermissionClick: (ChannelAccessOptionModel) -> Unit,
+    onChannelNameInput: (String) -> Unit
 ) {
-    var textState by remember { mutableStateOf("") }
     val list = listOf("樣式", "權限", "管理員")
 
     Scaffold(
@@ -132,7 +198,7 @@ fun AddChannelScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "新增頻道",
+                title = topBarTitle,
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
@@ -141,6 +207,7 @@ fun AddChannelScreenView(
             )
         }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -160,19 +227,20 @@ fun AddChannelScreenView(
                     }
                 )
 
-
                 when (selectedIndex) {
                     //樣式
                     0 -> {
-                        StyleTabScreen(textState) {
-                            textState = it
+                        StyleTabScreen(channelName) {
+                            onChannelNameInput.invoke(it)
                         }
                     }
                     //權限
                     1 -> {
                         PermissionTabScreen(
                             isNeedApproval, navigator,
-                            channelPermissionModel = channelAccessTypeList
+                            channelPermissionModel = channelAccessTypeList,
+                            group = group,
+                            onPermissionClick = onPermissionClick
                         )
                     }
                     //管理員
@@ -200,10 +268,22 @@ fun AddChannelScreenView(
                 contentAlignment = Alignment.Center
             ) {
                 BlueButton(
-                    text = "建立"
+                    text = buttonTitle
                 ) {
-                    onConfirm.invoke(textState)
+                    onConfirm.invoke(channelName)
                 }
+            }
+        }
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(size = 32.dp),
+                    color = LocalColor.current.primary
+                )
             }
         }
     }
@@ -271,7 +351,9 @@ private fun StyleTabScreen(textState: String, onValueChange: (String) -> Unit) {
 private fun PermissionTabScreen(
     isNeedApproval: Boolean,
     navigator: DestinationsNavigator,
-    channelPermissionModel: List<ChannelAccessOptionModel>
+    group: Group,
+    channelPermissionModel: List<ChannelAccessOptionModel>,
+    onPermissionClick: (ChannelAccessOptionModel) -> Unit
 ) {
     Column {
         Spacer(modifier = Modifier.height(10.dp))
@@ -307,8 +389,11 @@ private fun PermissionTabScreen(
             Spacer(modifier = Modifier.height(25.dp))
             Text(text = "管理頻道成員（0人）", fontSize = 14.sp, color = Color_80FFFFFF)
             Spacer(modifier = Modifier.height(15.dp))
-            channelPermissionModel.forEach {
-                ChannelPermissionItem(it)
+            channelPermissionModel.forEach { it ->
+                ChannelPermissionItem(it) { channelPermissionModel ->
+                    KLog.i("PermissionTabScreen", "click:$channelPermissionModel")
+                    onPermissionClick.invoke(channelPermissionModel)
+                }
                 Spacer(modifier = Modifier.height(1.dp))
             }
         }
@@ -320,10 +405,16 @@ private fun PermissionTabScreen(
  * 頻道 權限 item
  */
 @Composable
-private fun ChannelPermissionItem(channelAccessOptionModel: ChannelAccessOptionModel) {
+private fun ChannelPermissionItem(
+    channelAccessOptionModel: ChannelAccessOptionModel,
+    onClick: (ChannelAccessOptionModel) -> Unit
+) {
     Row(
         modifier = Modifier
             .background(LocalColor.current.background)
+            .clickable {
+                onClick.invoke(channelAccessOptionModel)
+            }
             .fillMaxWidth()
             .padding(top = 20.dp, bottom = 20.dp, start = 10.dp, end = 10.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -456,7 +547,7 @@ fun AddChannelScreenPreview() {
     FanciTheme {
         AddChannelScreenView(
             navigator = EmptyDestinationsNavigator,
-            selectedIndex = 2,
+            selectedIndex = 1,
             isNeedApproval = true,
             channelAccessTypeList = listOf(
                 ChannelAccessOptionModel(
@@ -480,8 +571,12 @@ fun AddChannelScreenPreview() {
             onConfirm = {},
             onTabClick = {},
             group = Group(),
+            isLoading = true,
+            channelName = "",
             fanciRole = emptyList(),
-            onRemoveRole = {}
+            onRemoveRole = {},
+            onPermissionClick = {},
+            onChannelNameInput = {}
         )
     }
 }

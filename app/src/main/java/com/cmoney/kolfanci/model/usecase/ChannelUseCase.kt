@@ -1,16 +1,41 @@
 package com.cmoney.kolfanci.model.usecase
 
-import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.CategoryApi
 import com.cmoney.fanciapi.fanci.api.ChannelApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.kolfanci.extension.checkResponseBody
 
 class ChannelUseCase(
     private val categoryApi: CategoryApi,
     private val groupApi: GroupApi,
     private val channelApi: ChannelApi
 ) {
+
+    /**
+     * 取得 私密頻道 用戶清單
+     */
+    suspend fun getPrivateChannelWhiteList(channelId: String) = kotlin.runCatching {
+        channelApi.apiV1ChannelChannelIdWhiteListGet(
+            channelId
+        ).checkResponseBody()
+    }
+
+    /**
+     * 設定 私密頻道 白名單 (用戶/角色)
+     */
+    suspend fun putPrivateChannelWhiteList(
+        channelId: String,
+        authType: String,
+        accessorList: List<AccessorParam>
+    ) =
+        kotlin.runCatching {
+            channelApi.apiV1ChannelChannelIdWhiteListAuthTypePut(
+                channelId = channelId,
+                authType = authType,
+                accessorParam = accessorList
+            ).checkResponseBody()
+        }
 
     /**
      * 抓取 私密頻道 權限類型清單
@@ -77,10 +102,13 @@ class ChannelUseCase(
     /**
      * 編輯 頻道名稱
      */
-    suspend fun editChannelName(channelId: String, name: String) = kotlin.runCatching {
+    suspend fun editChannelName(channelId: String, name: String, privacy: ChannelPrivacy) = kotlin.runCatching {
         channelApi.apiV1ChannelChannelIdPut(
             channelId = channelId,
-            editChannelParam = EditChannelParam(name)
+            editChannelParam = EditChannelParam(
+                name,
+                privacy
+            )
         ).checkResponseBody()
     }
 
@@ -110,15 +138,18 @@ class ChannelUseCase(
      * 新增 頻道
      * @param categoryId 分類id, 在此分類下建立
      * @param name 頻道名稱
+     * @param privacy 公開/私密
      */
-    suspend fun addChannel(categoryId: String, name: String) = kotlin.runCatching {
-        categoryApi.apiV1CategoryCategoryIdChannelPost(
-            categoryId = categoryId,
-            channelParam = ChannelParam(
-                channelType = ChannelType.chatRoom,
-                name = name
-            )
-        ).checkResponseBody()
-    }
+    suspend fun addChannel(categoryId: String, name: String, privacy: ChannelPrivacy) =
+        kotlin.runCatching {
+            categoryApi.apiV1CategoryCategoryIdChannelPost(
+                categoryId = categoryId,
+                channelParam = ChannelParam(
+                    channelType = ChannelType.chatRoom,
+                    name = name,
+                    privacy = privacy
+                )
+            ).checkResponseBody()
+        }
 
 }

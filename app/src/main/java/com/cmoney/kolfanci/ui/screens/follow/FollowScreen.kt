@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.LocalDependencyContainer
 import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.MainViewModel
 import com.cmoney.kolfanci.R
@@ -57,7 +56,11 @@ fun FollowScreen(
     globalViewModel: MainViewModel,
     navigator: DestinationsNavigator,
     viewModel: FollowViewModel = koinViewModel(),
+    firstInitData: MutableState<Boolean> = remember {
+        mutableStateOf(true)
+    }
 ) {
+    val globalUiState = globalViewModel.uiState
     val uiState = viewModel.uiState
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -86,13 +89,35 @@ fun FollowScreen(
         }
     }
 
-    val group = uiState.myGroupList.find {
-        it.isSelected
-    }?.groupModel
+    val group = globalUiState.currentGroup
 
-    group?.let {
-        globalViewModel.setCurrentGroup(it)
+    if (group == null && uiState.myGroupList.isNotEmpty()) {
+        uiState.myGroupList.find {
+            it.isSelected
+        }?.groupModel?.apply {
+            globalViewModel.setCurrentGroup(this)
+            firstInitData.value = false
+        }
     }
+
+//    if (firstInitData.value) {
+//        if (group == null && uiState.myGroupList.isNotEmpty()) {
+//            uiState.myGroupList.find {
+//                it.isSelected
+//            }?.groupModel?.apply {
+//                globalViewModel.setCurrentGroup(this)
+//                firstInitData.value = false
+//            }
+//        }
+//    }
+
+//    val group = uiState.myGroupList.find {
+//        it.isSelected
+//    }?.groupModel
+//
+//    group?.let {
+//        globalViewModel.setCurrentGroup(it)
+//    }
 
     FollowScreenView(
         navigator = navigator,

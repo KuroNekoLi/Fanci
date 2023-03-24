@@ -300,6 +300,7 @@ class GroupUseCase(
         ).checkResponseBody()
     }
 
+    //TODO: 調整 search param, 因為 server 目前有問題 這樣才會過
     /**
      * 取得群組會員清單, 預設抓取20筆
      *
@@ -309,7 +310,8 @@ class GroupUseCase(
     suspend fun getGroupMember(groupId: String, skipCount: Int = 0) = kotlin.runCatching {
         groupMemberApi.apiV1GroupMemberGroupGroupIdGet(
             groupId = groupId,
-            skip = skipCount
+            skip = skipCount,
+            search = "a"
         ).checkResponseBody()
     }
 

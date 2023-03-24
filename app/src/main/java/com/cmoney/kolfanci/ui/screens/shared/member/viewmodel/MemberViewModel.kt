@@ -1,22 +1,25 @@
 package com.cmoney.kolfanci.ui.screens.shared.member.viewmodel
 
+import android.os.Parcelable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanciapi.fanci.model.BanPeriodOption
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
+import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -26,10 +29,41 @@ data class UiState(
     val kickMember: GroupMember? = null,     //踢除會員
     val banUiModel: BanUiModel? = null,      //禁言中 info
     val showAddSuccessTip: Boolean = false,  //show 新增成功 toast
-    val loading: Boolean = true
+    val loading: Boolean = true,
+    var selectedMember: List<GroupMember> = emptyList(), //選中的會員
+    var selectedRole: List<FanciRole> = emptyList(), //選中的角色
+    val tabIndex: Int = 0
 )
 
 data class GroupMemberSelect(val groupMember: GroupMember, val isSelected: Boolean = false)
+
+/**
+ * 選擇的成員/角色 清單
+ */
+@Parcelize
+data class SelectedModel(
+    val selectedMember: List<GroupMember> = emptyList(),
+    val selectedRole: List<FanciRole> = emptyList()
+) : Parcelable {
+
+    fun toAccessorList(): List<AccessorParam> {
+        val memberAccessor = AccessorParam(
+            type = AccessorTypes.users,
+            ids = selectedMember.map {
+                it.id.orEmpty()
+            }
+        )
+
+        val roleAccessor = AccessorParam(
+            type = AccessorTypes.role,
+            ids = selectedRole.map {
+                it.id.orEmpty()
+            }
+        )
+
+        return listOf(memberAccessor, roleAccessor)
+    }
+}
 
 class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUseCase: BanUseCase) :
     ViewModel() {
@@ -201,6 +235,9 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
             }, {
                 dismissLoading()
                 KLog.e(TAG, it)
+                uiState = uiState.copy(
+                    groupMember = emptyList()
+                )
             })
         }
     }
@@ -394,6 +431,96 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
     fun dismissAddSuccessTip() {
         uiState = uiState.copy(
             showAddSuccessTip = false
+        )
+    }
+
+    /**
+     * 將選中的 會員加入清單
+     */
+    fun addSelectedMember(member: String) {
+        val gson = Gson()
+        val listType: Type =
+            object : TypeToken<List<GroupMember>>() {}.type
+        val responseMemberList = gson.fromJson(member, listType) as List<GroupMember>
+
+        if (responseMemberList.isNotEmpty()) {
+            val newList = uiState.selectedMember.toMutableList()
+            newList.addAll(responseMemberList)
+            uiState = uiState.copy(
+                selectedMember = newList.distinct()
+            )
+        }
+    }
+
+    fun addSelectedMember(selectedMember: List<GroupMember>) {
+        if (selectedMember.isNotEmpty()) {
+            uiState.selectedMember = selectedMember
+        }
+    }
+
+    /**
+     * 增加 角色
+     */
+    fun addSelectedRole(roleListStr: String) {
+        KLog.i(TAG, "addSelectedRole:$roleListStr")
+        val gson = Gson()
+        val roleList = gson.fromJsonTypeToken<List<FanciRole>>(roleListStr)
+        val orgRoleList = uiState.selectedRole
+        val unionList = roleList.union(orgRoleList).toMutableList()
+        uiState = uiState.copy(
+            selectedRole = unionList
+        )
+    }
+
+    fun addSelectedRole(selectedRole: List<FanciRole>) {
+        if (selectedRole.isNotEmpty()) {
+            uiState.selectedRole = selectedRole
+        }
+    }
+
+    /**
+     * 點擊 tab
+     */
+    fun onTabClick(pos: Int) {
+        KLog.i(TAG, "onTabClick:$pos")
+        uiState = uiState.copy(
+            tabIndex = pos
+        )
+    }
+
+    /**
+     * 將選擇的 member remove
+     */
+    fun removeSelectedMember(groupMember: GroupMember) {
+        KLog.i(TAG, "removeSelectedMember:$groupMember")
+        val filterList = uiState.selectedMember.filter {
+            it.id != groupMember.id
+        }
+        uiState = uiState.copy(
+            selectedMember = filterList
+        )
+    }
+
+    /**
+     * 將選擇的 role remove
+     */
+    fun removeSelectedRole(fanciRole: FanciRole) {
+        KLog.i(TAG, "removeSelectedRole:$fanciRole")
+        val filterList = uiState.selectedRole.filter {
+            it.id != fanciRole.id
+        }
+        uiState = uiState.copy(
+            selectedRole = filterList
+        )
+    }
+
+    /**
+     * 抓取 所選擇的成員以及角色
+     */
+    fun fetchSelected(): SelectedModel {
+        return SelectedModel(
+            selectedMember = uiState.selectedMember,
+            selectedRole = uiState.selectedRole
         )
     }
 }

@@ -237,12 +237,13 @@ fun ChannelSettingScreenView(
                             )
                         )
                     },
-                    onChanelEdit = {
-                        KLog.i(TAG, "onChanelEdit:$it")
+                    onChanelEdit = { category, channel ->
+                        KLog.i(TAG, "onChanelEdit:$channel")
                         navigator.navigate(
-                            EditChannelScreenDestination(
+                            AddChannelScreenDestination(
                                 group = group,
-                                channel = it
+                                category = category,
+                                channel = channel
                             )
                         )
                     },
