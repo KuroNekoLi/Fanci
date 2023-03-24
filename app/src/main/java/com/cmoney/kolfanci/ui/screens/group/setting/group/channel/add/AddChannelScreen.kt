@@ -7,6 +7,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +31,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.Chan
 import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
@@ -62,6 +65,7 @@ fun AddChannelScreen(
 ) {
     val context = LocalContext.current
     val uiState = viewModel.uiState
+    val showDeleteDialog = remember { mutableStateOf(false) }
 
     uiState.group?.let {
         KLog.i("TAG", "channel add.")
@@ -88,6 +92,7 @@ fun AddChannelScreen(
         } else {
             "建立"
         }),
+        withDelete = (channel != null),
         channelName = uiState.channelName,
         fanciRole = uiState.channelRole,
         group = group,
@@ -121,6 +126,9 @@ fun AddChannelScreen(
         },
         onChannelNameInput = {
             viewModel.setChannelName(it)
+        },
+        onDeleteClick = {
+            showDeleteDialog.value = true
         }
     )
 
@@ -137,6 +145,22 @@ fun AddChannelScreen(
             )
         )
         viewModel.dismissPermissionNavigator()
+    }
+
+    //DeleteDialog
+    if (showDeleteDialog.value) {
+        channel?.let {
+            showDeleteAlert(
+                channelName = channel.name.orEmpty(),
+                onConfirm = {
+                    showDeleteDialog.value = false
+                    viewModel.deleteChannel(group, channel)
+                },
+                onCancel = {
+                    showDeleteDialog.value = false
+                }
+            )
+        }
     }
 
     //========== Result callback Start ==========
@@ -185,11 +209,13 @@ fun AddChannelScreenView(
     group: Group,
     channelAccessTypeList: List<ChannelAccessOptionModel>,
     isLoading: Boolean,
+    withDelete: Boolean,
     onConfirm: (String) -> Unit,
     onTabClick: (Int) -> Unit,
     onRemoveRole: (FanciRole) -> Unit,
     onPermissionClick: (ChannelAccessOptionModel) -> Unit,
-    onChannelNameInput: (String) -> Unit
+    onChannelNameInput: (String) -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     val list = listOf("樣式", "權限", "管理員")
 
@@ -230,9 +256,14 @@ fun AddChannelScreenView(
                 when (selectedIndex) {
                     //樣式
                     0 -> {
-                        StyleTabScreen(channelName) {
-                            onChannelNameInput.invoke(it)
-                        }
+                        StyleTabScreen(
+                            channelName,
+                            withDelete,
+                            onValueChange = {
+                                onChannelNameInput.invoke(it)
+                            },
+                            onDeleteClick = onDeleteClick
+                        )
                     }
                     //權限
                     1 -> {
@@ -293,7 +324,12 @@ fun AddChannelScreenView(
  * 樣式 Tab Screen
  */
 @Composable
-private fun StyleTabScreen(textState: String, onValueChange: (String) -> Unit) {
+private fun StyleTabScreen(
+    textState: String,
+    withDelete: Boolean,
+    onValueChange: (String) -> Unit,
+    onDeleteClick: () -> Unit
+) {
     val maxLength = 10
     Row(
         modifier = Modifier.padding(
@@ -342,6 +378,29 @@ private fun StyleTabScreen(textState: String, onValueChange: (String) -> Unit) {
             )
         }
     )
+
+    if (withDelete) {
+        Spacer(modifier = Modifier.height(35.dp))
+
+        Text(
+            modifier = Modifier.padding(start = 24.dp, bottom = 10.dp),
+            text = "刪除頻道", fontSize = 14.sp, color = LocalColor.current.text.default_100
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(LocalColor.current.background)
+                .clickable {
+                    onDeleteClick.invoke()
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "刪除頻道", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+
+        }
+    }
 }
 
 /**
@@ -531,12 +590,31 @@ private fun ManagerTabScreen(
     }
 }
 
+@Composable
+private fun showDeleteAlert(
+    channelName: String,
+    onConfirm: () -> Unit, onCancel: () -> Unit
+) {
+    DeleteAlertDialogScreen(
+        title = "確定刪除頻道「%s」".format(channelName),
+        subTitle = "頻道刪除後，內容將會完全消失。",
+        onConfirm = onConfirm,
+        onCancel = onCancel
+    )
+}
 
+
+//==================== Preview ====================
 @Preview(showBackground = true)
 @Composable
 fun StyleTabScreenPreview() {
     FanciTheme {
-        StyleTabScreen("") {}
+        StyleTabScreen(
+            "",
+            true,
+            onValueChange = {},
+            onDeleteClick = {}
+        )
     }
 }
 
@@ -547,8 +625,9 @@ fun AddChannelScreenPreview() {
     FanciTheme {
         AddChannelScreenView(
             navigator = EmptyDestinationsNavigator,
-            selectedIndex = 1,
+            selectedIndex = 0,
             isNeedApproval = true,
+            withDelete = true,
             channelAccessTypeList = listOf(
                 ChannelAccessOptionModel(
                     authType = "basic",
@@ -576,7 +655,8 @@ fun AddChannelScreenPreview() {
             fanciRole = emptyList(),
             onRemoveRole = {},
             onPermissionClick = {},
-            onChannelNameInput = {}
+            onChannelNameInput = {},
+            onDeleteClick = {}
         )
     }
 }

@@ -41,6 +41,7 @@ import org.koin.androidx.compose.koinViewModel
 /**
  * 編輯頻道
  */
+@Deprecated("replace AddChanelScreen")
 @Destination
 @Composable
 fun EditChannelScreen(
