@@ -2,27 +2,30 @@ package com.cmoney.kolfanci.ui.screens.group.setting.member.role.add
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.LocalDependencyContainer
 import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.destinations.AddMemberScreenDestination
-import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -44,6 +47,9 @@ fun AddRoleScreen(
 ) {
     val mainActivity = LocalDependencyContainer.current
     val uiState = viewModel.uiState
+    var showDeleteConfirmDialog by remember {
+        mutableStateOf(false)
+    }
 
     //Add Member Callback
     memberResult.onNavResult { result ->
@@ -86,10 +92,59 @@ fun AddRoleScreen(
         },
         onDelete = {
             fanciRole?.let {
-                viewModel.onDelete(it, group)
+                showDeleteConfirmDialog = true
             }
         }
     )
+
+    //Delete double check dialog
+    if (showDeleteConfirmDialog) {
+        AlertDialogScreen(
+            onDismiss = {
+                showDeleteConfirmDialog = false
+            },
+            title = "確定刪除角色「%s」".format(fanciRole?.name),
+            content = {
+                Column(
+                    modifier = modifier
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = "角色刪除後，具有該角色的成員將會自動移除角色相關權限。", fontSize = 17.sp, color = Color.White
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    BorderButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "確定刪除",
+                        borderColor = LocalColor.current.component.other,
+                        textColor = Color.White
+                    ) {
+                        viewModel.onDelete(fanciRole!!, group)
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    BorderButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "返回",
+                        borderColor = LocalColor.current.component.other,
+                        textColor = Color.White
+                    ) {
+                        kotlin.run {
+                            showDeleteConfirmDialog = false
+                        }
+                    }
+                }
+            }
+        )
+    }
+
 
     //是否為編輯
     if (fanciRole != null) {
@@ -100,10 +155,34 @@ fun AddRoleScreen(
         }
     }
 
-    if (uiState.addRoleError.isNotEmpty()) {
-        LocalContext.current.showToast(uiState.addRoleError)
-        viewModel.errorShowDone()
+    uiState.addRoleError?.let {
+        DialogScreen(
+            onDismiss = {
+                viewModel.errorShowDone()
+            },
+            title = it.first,
+            subTitle = it.second
+        ) {
+
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "修改",
+                borderColor = LocalColor.current.component.other,
+                textColor = Color.White
+            ) {
+                run {
+                    viewModel.errorShowDone()
+                }
+            }
+        }
     }
+
+//    if (uiState.addRoleError.isNotEmpty()) {
+//        LocalContext.current.showToast(uiState.addRoleError)
+//        viewModel.errorShowDone()
+//    }
 
     uiState.fanciRoleCallback?.let {
         resultNavigator.navigateBack(it)
