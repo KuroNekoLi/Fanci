@@ -300,20 +300,21 @@ class GroupUseCase(
         ).checkResponseBody()
     }
 
-    //TODO: 調整 search param, 因為 server 目前有問題 這樣才會過
     /**
      * 取得群組會員清單, 預設抓取20筆
      *
      * @param groupId 群組id
      * @param skipCount 因為分頁關係,要跳過前幾筆
+     * @param search 關鍵字搜尋
      */
-    suspend fun getGroupMember(groupId: String, skipCount: Int = 0) = kotlin.runCatching {
-        groupMemberApi.apiV1GroupMemberGroupGroupIdGet(
-            groupId = groupId,
-            skip = skipCount,
-            search = "a"
-        ).checkResponseBody()
-    }
+    suspend fun getGroupMember(groupId: String, skipCount: Int = 0, search: String? = null) =
+        kotlin.runCatching {
+            groupMemberApi.apiV1GroupMemberGroupGroupIdGet(
+                groupId = groupId,
+                skip = skipCount,
+                search = search
+            ).checkResponseBody()
+        }
 
     /**
      * 取得管理權限清單

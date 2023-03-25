@@ -47,7 +47,7 @@ import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * 分類下新增頻道
+ * 分類下 新增/編輯 頻道
  */
 @Destination
 @Composable

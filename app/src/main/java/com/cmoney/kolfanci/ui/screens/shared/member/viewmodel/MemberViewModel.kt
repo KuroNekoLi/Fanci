@@ -78,6 +78,12 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
     //新增的會員
     private val addGroupMemberQueue = mutableListOf<GroupMember>()
 
+    //排除顯示的會員清單
+    private val excludeMember: MutableList<GroupMember> = mutableListOf()
+
+    //目前輸入的 keyword
+    private var currentKeyword: String = ""
+
     private fun showLoading() {
         uiState = uiState.copy(
             loading = true
@@ -201,44 +207,51 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
     fun fetchGroupMember(
         groupId: String,
         skip: Int = 0,
-        excludeMember: List<GroupMember> = emptyList()
+        excludeMember: List<GroupMember> = emptyList(),
+        searchKeyword: String? = null
     ) {
         KLog.i(TAG, "fetchGroupMember:$groupId")
+
+        this.excludeMember.addAll(excludeMember)
+
         viewModelScope.launch {
             showLoading()
-            groupUseCase.getGroupMember(groupId = groupId, skipCount = skip).fold({
-                val responseMembers = it.items.orEmpty()
-                if (responseMembers.isNotEmpty()) {
-                    val wrapMember = responseMembers.map { member ->
-                        GroupMemberSelect(
-                            groupMember = member
+            groupUseCase.getGroupMember(groupId = groupId, skipCount = skip, search = searchKeyword)
+                .fold({
+                    val responseMembers = it.items.orEmpty()
+                    if (responseMembers.isNotEmpty()) {
+                        val wrapMember = responseMembers.map { member ->
+                            GroupMemberSelect(
+                                groupMember = member
+                            )
+                        }
+
+                        val orgMemberList = uiState.groupMember.orEmpty().toMutableList()
+                        orgMemberList.addAll(wrapMember)
+
+                        val filterMember = orgMemberList.filter {
+                            excludeMember.find { exclude ->
+                                exclude.id == it.groupMember.id
+                            } == null
+                        }
+
+                        orgGroupMemberList.addAll(filterMember)
+                        val distinct = orgGroupMemberList.distinct()
+                        orgGroupMemberList.clear()
+                        orgGroupMemberList.addAll(distinct)
+
+                        uiState = uiState.copy(
+                            groupMember = orgGroupMemberList
                         )
                     }
-
-                    val orgMemberList = uiState.groupMember.orEmpty().toMutableList()
-                    orgMemberList.addAll(wrapMember)
-
-                    val filterMember = orgMemberList.filter {
-                        excludeMember.find { exclude ->
-                            exclude.id == it.groupMember.id
-                        } == null
-                    }
-
-                    orgGroupMemberList.clear()
-                    orgGroupMemberList.addAll(filterMember)
-
+                    dismissLoading()
+                }, {
+                    dismissLoading()
+                    KLog.e(TAG, it)
                     uiState = uiState.copy(
-                        groupMember = filterMember
+                        groupMember = emptyList()
                     )
-                }
-                dismissLoading()
-            }, {
-                dismissLoading()
-                KLog.e(TAG, it)
-                uiState = uiState.copy(
-                    groupMember = emptyList()
-                )
-            })
+                })
         }
     }
 
@@ -249,7 +262,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
         KLog.i(TAG, "onLoadMoreGroupMember")
         val skip = uiState.groupMember.orEmpty().size
         if (skip != 0) {
-            fetchGroupMember(groupId, skip)
+            fetchGroupMember(groupId, skip, searchKeyword = currentKeyword)
         }
     }
 
@@ -368,8 +381,14 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
     /**
      * 搜尋成員
      */
-    fun onSearchMember(keyword: String) {
+    fun onSearchMember(
+        groupId: String,
+        keyword: String
+    ) {
         KLog.i(TAG, "onSearchMember:$keyword")
+
+        currentKeyword = keyword
+
         timer?.cancel()
 
         timer = Timer().apply {
@@ -377,18 +396,31 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                 override fun run() {
                     //searching
                     KLog.i(TAG, "searching:$keyword")
-                    //return all
-                    uiState = if (keyword.isEmpty()) {
-                        uiState.copy(
+                    if (keyword.isEmpty()) {
+                        uiState = uiState.copy(
                             groupMember = orgGroupMemberList
                         )
                     } else {
-                        uiState.copy(
-                            groupMember = orgGroupMemberList.filter {
-                                it.groupMember.name?.startsWith(keyword) == true
-                            }
+                        fetchGroupMember(
+                            groupId = groupId,
+                            excludeMember = excludeMember,
+                            searchKeyword = keyword
                         )
                     }
+
+                    //Local Searching
+//                    //return all
+//                    uiState = if (keyword.isEmpty()) {
+//                        uiState.copy(
+//                            groupMember = orgGroupMemberList
+//                        )
+//                    } else {
+//                        uiState.copy(
+//                            groupMember = orgGroupMemberList.filter {
+//                                it.groupMember.name?.startsWith(keyword) == true
+//                            }
+//                        )
+//                    }
                 }
             }, 400)
         }

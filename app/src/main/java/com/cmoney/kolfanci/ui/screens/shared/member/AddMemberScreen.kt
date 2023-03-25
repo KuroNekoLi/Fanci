@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -33,6 +34,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.GroupMemberSelect
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
@@ -63,7 +65,7 @@ fun AddMemberScreen(
     viewModel: MemberViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<String>,
     title: String = "新增成員",
-    subTitle: String = "直接指定成員進入私密頻道。",
+    subTitle: String = "",
     btnTitle: String = "新增"
 ) {
     val TAG = "AddMemberScreen"
@@ -87,7 +89,10 @@ fun AddMemberScreen(
             viewModel.onLoadMoreGroupMember(group.id.orEmpty())
         },
         onSearch = {
-            viewModel.onSearchMember(it)
+            viewModel.onSearchMember(
+                groupId = group.id.orEmpty(),
+                keyword = it
+            )
         },
         onBack = {
             resultNavigator.navigateBack(
@@ -209,9 +214,11 @@ private fun AddMemberScreenPreview(
                 modifier = Modifier.padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp)
             ) {
 
-                Text(text = subTitle, fontSize = 14.sp, color = Color_80FFFFFF)
+                if (subTitle.isNotEmpty()) {
+                    Text(text = subTitle, fontSize = 14.sp, color = Color_80FFFFFF)
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
 
                 //Search bar
                 TextField(
@@ -261,7 +268,6 @@ private fun AddMemberScreenPreview(
                         }
                     }
                 )
-
             }
 
             LazyColumn(
@@ -331,31 +337,9 @@ private fun MemberItem(
             )
         }
 
-        Box(
-            modifier = Modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(17.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (groupMemberSelect.isSelected) {
-                            LocalColor.current.primary
-                        } else {
-                            Color.Transparent
-                        }
-                    )
-            )
-
-            Canvas(modifier = Modifier.size(57.dp)) {
-                drawCircle(
-                    color = Color.White,
-                    radius = 30f,
-                    style = Stroke(width = 2.dp.toPx())
-                )
-            }
-        }
+        CircleCheckedScreen(
+            isChecked = groupMemberSelect.isSelected
+        )
     }
 }
 

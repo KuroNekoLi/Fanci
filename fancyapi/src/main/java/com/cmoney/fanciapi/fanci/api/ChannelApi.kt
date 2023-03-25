@@ -6,12 +6,12 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
-import com.cmoney.fanciapi.fanci.model.AccessorParam
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
 import com.cmoney.fanciapi.fanci.model.ChannelWhiteList
 import com.cmoney.fanciapi.fanci.model.EditChannelParam
 import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.PutWhiteListRequest
 import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 
 interface ChannelApi {
@@ -144,11 +144,11 @@ interface ChannelApi {
      *
      * @param channelId 頻道ID
      * @param authType 指定加入成員的權限類型)
-     * @param accessorParam  (optional)
+     * @param putWhiteListRequest  (optional)
      * @return [Unit]
      */
     @PUT("api/v1/Channel/{channelId}/WhiteList/{authType}")
-    suspend fun apiV1ChannelChannelIdWhiteListAuthTypePut(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: kotlin.String, @Body accessorParam: kotlin.collections.List<AccessorParam>? = null): Response<Unit>
+    suspend fun apiV1ChannelChannelIdWhiteListAuthTypePut(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: kotlin.String, @Body putWhiteListRequest: PutWhiteListRequest? = null): Response<Unit>
 
     /**
      * 取得私密頻道白名單

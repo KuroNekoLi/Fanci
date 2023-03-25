@@ -1116,26 +1116,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/AccessorParam"
-                }
+                "$ref": "#/components/schemas/PutWhiteListRequest"
               }
             },
             "text/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/AccessorParam"
-                }
+                "$ref": "#/components/schemas/PutWhiteListRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/AccessorParam"
-                }
+                "$ref": "#/components/schemas/PutWhiteListRequest"
               }
             }
           }
@@ -1233,7 +1224,7 @@
             "oauth2": [
               "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_canPost_1_chatRoomChannelId_none"
+              "PERMISSION_CanPost_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -1316,7 +1307,7 @@
           {
             "oauth2": [
               "user",
-              "PERMISSION_canRead_1_chatRoomChannelId_none"
+              "PERMISSION_CanRead_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -1374,7 +1365,7 @@
           {
             "oauth2": [
               "user",
-              "PERMISSION_canRead_1_chatRoomChannelId_none"
+              "PERMISSION_CanRead_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -4963,10 +4954,6 @@
           "category": {
             "$ref": "#/components/schemas/Category"
           },
-          "isPublic": {
-            "type": "boolean",
-            "description": "是否為公開頻道"
-          },
           "privacy": {
             "$ref": "#/components/schemas/ChannelPrivacy"
           }
@@ -6054,6 +6041,19 @@
         },
         "additionalProperties": false,
         "description": "公告訊息資訊"
+      },
+      "PutWhiteListRequest": {
+        "type": "object",
+        "properties": {
+          "parameter": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccessorParam"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "Relation": {
         "enum": [

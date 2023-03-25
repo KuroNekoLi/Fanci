@@ -29,6 +29,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toColor
+import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.AddChannelRoleModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
@@ -253,31 +254,9 @@ private fun RoleItemScreen(
             )
         }
 
-        Box(
-            modifier = Modifier.padding(end = 24.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(17.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (addChannelRoleModel.isChecked) {
-                            LocalColor.current.primary
-                        } else {
-                            Color.Transparent
-                        }
-                    )
-            )
-
-            Canvas(modifier = Modifier.size(57.dp)) {
-                drawCircle(
-                    color = Color.White,
-                    radius = 30f,
-                    style = Stroke(width = 2.dp.toPx())
-                )
-            }
-        }
+        CircleCheckedScreen(
+            isChecked = addChannelRoleModel.isChecked
+        )
     }
 }
 

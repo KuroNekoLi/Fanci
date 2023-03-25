@@ -33,7 +33,9 @@ class ChannelUseCase(
             channelApi.apiV1ChannelChannelIdWhiteListAuthTypePut(
                 channelId = channelId,
                 authType = authType,
-                accessorParam = accessorList
+                putWhiteListRequest = PutWhiteListRequest(
+                    parameter = accessorList
+                )
             ).checkResponseBody()
         }
 
@@ -102,15 +104,16 @@ class ChannelUseCase(
     /**
      * 編輯 頻道名稱
      */
-    suspend fun editChannelName(channelId: String, name: String, privacy: ChannelPrivacy) = kotlin.runCatching {
-        channelApi.apiV1ChannelChannelIdPut(
-            channelId = channelId,
-            editChannelParam = EditChannelParam(
-                name,
-                privacy
-            )
-        ).checkResponseBody()
-    }
+    suspend fun editChannelName(channelId: String, name: String, privacy: ChannelPrivacy) =
+        kotlin.runCatching {
+            channelApi.apiV1ChannelChannelIdPut(
+                channelId = channelId,
+                editChannelParam = EditChannelParam(
+                    name,
+                    privacy
+                )
+            ).checkResponseBody()
+        }
 
 
     /**
