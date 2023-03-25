@@ -9,7 +9,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -28,6 +30,9 @@ fun CreateApplyQuestionScreen(
     resultBackNavigator: ResultBackNavigator<String>
 ) {
     val TAG = "CreateApplyQuestionScreen"
+    var showEmptyTipDialog by remember {
+        mutableStateOf(false)
+    }
 
     CreateApplyQuestionScreenView(
         modifier = modifier,
@@ -35,9 +40,35 @@ fun CreateApplyQuestionScreen(
         question = question,
         onAdd = {
             KLog.i(TAG, "onAdd click.")
-            resultBackNavigator.navigateBack(it)
+            if (it.isEmpty()) {
+                showEmptyTipDialog = true
+            } else {
+                resultBackNavigator.navigateBack(it)
+            }
         }
     )
+
+    if (showEmptyTipDialog) {
+        DialogScreen(
+            onDismiss = { showEmptyTipDialog = false },
+            title = "審核題目空白",
+            subTitle = "審核題目不可以是空白的唷！"
+        ) {
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "修改",
+                borderColor = LocalColor.current.component.other,
+                textColor = Color.White
+            ) {
+                run {
+                    showEmptyTipDialog = false
+                }
+            }
+        }
+    }
+
 }
 
 @Composable

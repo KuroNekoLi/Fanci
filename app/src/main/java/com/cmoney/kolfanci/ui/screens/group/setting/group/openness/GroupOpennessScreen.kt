@@ -1,14 +1,10 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.openness
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.CreateApplyQuestionScreenDestination
@@ -25,6 +22,7 @@ import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.*
@@ -57,6 +55,9 @@ fun GroupOpennessScreen(
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
+    var showDeleteConfirmDialog by remember {
+        mutableStateOf(false)
+    }
 
     //不公開社團, 抓取問題清單
     group.isNeedApproval?.let {
@@ -139,8 +140,64 @@ fun GroupOpennessScreen(
             },
             onRemove = {
                 KLog.i(TAG, "onRemove click.")
-                viewModel.removeQuestion(showEditDialog.value.second)
-                showEditDialog.value = Pair(false, "")
+                showDeleteConfirmDialog = true
+                // TODO:
+//                viewModel.removeQuestion(showEditDialog.value.second)
+//                showEditDialog.value = Pair(false, "")
+            }
+        )
+    }
+
+    //再次確認刪除
+    if (showDeleteConfirmDialog) {
+        AlertDialogScreen(
+            onDismiss = {
+                showDeleteConfirmDialog = false
+            },
+            title = "確定移除這則題目",
+            content = {
+                Column {
+                    Column(
+                        modifier = modifier
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            text = "移除題目之前已答題的人不會受影響。", fontSize = 17.sp, color = Color.White
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        BorderButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            text = "確定刪除",
+                            borderColor = LocalColor.current.component.other,
+                            textColor = Color.White
+                        ) {
+                            kotlin.run {
+                                showDeleteConfirmDialog = false
+                                viewModel.removeQuestion(showEditDialog.value.second)
+                                showEditDialog.value = Pair(false, "")
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        BorderButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            text = "返回",
+                            borderColor = LocalColor.current.component.other,
+                            textColor = Color.White
+                        ) {
+                            kotlin.run {
+                                showDeleteConfirmDialog = false
+                            }
+                        }
+                    }
+                }
             }
         )
     }
