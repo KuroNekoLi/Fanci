@@ -11,8 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,6 +21,7 @@ import com.cmoney.kolfanci.destinations.GroupSettingThemePreviewScreenDestinatio
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -51,6 +51,9 @@ fun GroupSettingThemeScreen(
     val TAG = "GroupSettingThemeScreen"
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     val state = viewModel.uiState
+    var showConfirmDialog: GroupTheme? by remember {
+        mutableStateOf(null)
+    }
 
     var groupParam = globalViewModel.uiState.currentGroup
     viewModel.uiState.settingGroup?.let {
@@ -79,17 +82,29 @@ fun GroupSettingThemeScreen(
         isFromCreate = isFromCreate,
         onThemeConfirmClick = {
             KLog.i(TAG, "on theme click.")
-            if (isFromCreate) {
-                val gson = Gson()
-                resultNavigator.navigateBack(gson.toJson(it))
-            }
-            else {
-                groupParam?.let {groupParam ->
-                    viewModel.changeTheme(groupParam, it)
-                }
-            }
+            showConfirmDialog = it
         }
     )
+
+    showConfirmDialog?.let {
+        ChangeThemeDialogScreen(
+            groupTheme = it,
+            onDismiss = {
+                showConfirmDialog = null
+            },
+            onConfirm = {
+                showConfirmDialog = null
+                if (isFromCreate) {
+                    val gson = Gson()
+                    resultNavigator.navigateBack(gson.toJson(it))
+                } else {
+                    groupParam?.let { groupParam ->
+                        viewModel.changeTheme(groupParam, it)
+                    }
+                }
+            }
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchAllTheme(groupParam, isFromCreate)

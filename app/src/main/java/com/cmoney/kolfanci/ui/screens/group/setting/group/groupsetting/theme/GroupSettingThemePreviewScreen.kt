@@ -7,8 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -32,6 +31,8 @@ import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
+
 /**
  * 主題預覽
  */
@@ -48,6 +49,10 @@ fun GroupSettingThemePreviewScreen(
     val TAG = "GroupSettingThemePreviewScreen"
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var groupParam = globalViewModel.uiState.currentGroup!!
+    var showConfirmDialog: GroupTheme? by remember {
+        mutableStateOf(null)
+    }
+
     viewModel.uiState.settingGroup?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
@@ -59,13 +64,25 @@ fun GroupSettingThemePreviewScreen(
         groupTheme = viewModel.uiState.previewTheme,
     ) {
         KLog.i(TAG, "on theme click.")
-        if (isFromCreate) {
-            val gson = Gson()
-            resultNavigator.navigateBack(gson.toJson(it))
-        }
-        else {
-            viewModel.changeTheme(groupParam, it)
-        }
+        showConfirmDialog = it
+    }
+
+    showConfirmDialog?.let {
+        ChangeThemeDialogScreen(
+            groupTheme = it,
+            onDismiss = {
+                showConfirmDialog = null
+            },
+            onConfirm = {
+                showConfirmDialog = null
+                if (isFromCreate) {
+                    val gson = Gson()
+                    resultNavigator.navigateBack(gson.toJson(it))
+                } else {
+                    viewModel.changeTheme(groupParam, it)
+                }
+            }
+        )
     }
 
     LaunchedEffect(Unit) {

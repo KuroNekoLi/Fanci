@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.shared.dialog
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,12 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
 import com.cmoney.kolfanci.ui.theme.Color_2B313C
+import com.cmoney.kolfanci.ui.theme.Color_CA4848
 import com.cmoney.kolfanci.ui.theme.Color_CCFFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
@@ -23,6 +27,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 fun DialogScreen(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
+    titleIconRes: Int? = null,
     title: String,
     subTitle: String,
     content: @Composable () -> Unit
@@ -40,7 +45,20 @@ fun DialogScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column {
-                    Text(text = title, fontSize = 19.sp, color = Color_CCFFFFFF)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (titleIconRes != null) {
+                            Image(
+                                painter = painterResource(id = titleIconRes),
+                                contentDescription = null
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+
+                        Text(text = title, fontSize = 19.sp, color = Color_CCFFFFFF)
+                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -71,6 +89,7 @@ fun DialogScreenPreview() {
     FanciTheme {
         DialogScreen(
             onDismiss = {},
+            titleIconRes = R.drawable.dialog_ban,
             title = "Hello",
             subTitle = "社團名稱不可以是空白的唷！"
         ) {
