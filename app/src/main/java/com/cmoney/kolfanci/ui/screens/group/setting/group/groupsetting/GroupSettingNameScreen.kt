@@ -20,6 +20,8 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -33,11 +35,44 @@ fun GroupSettingNameScreen(
     group: Group,
     resultNavigator: ResultBackNavigator<String>
 ) {
+    var showEmptyTip by remember {
+        mutableStateOf(false)
+    }
+
     GroupSettingNameView(
         modifier = modifier,
-        navController = navController, group = group, onChangeName = { name ->
+        navController = navController,
+        group = group,
+        onChangeName = { name ->
             resultNavigator.navigateBack(name)
+        },
+        onShowEmptyTip = {
+            showEmptyTip = true
         })
+
+    if (showEmptyTip) {
+        DialogScreen(
+            onDismiss = {
+                showEmptyTip = false
+            },
+            title = "社團名稱空白",
+            subTitle = "社團名稱不可以是空白的唷！",
+            content = {
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = "修改",
+                    borderColor = LocalColor.current.component.other,
+                    textColor = Color.White,
+                    onClick = {
+                        showEmptyTip = false
+                        Unit
+                    }
+                )
+            }
+        )
+    }
 }
 
 @Composable
@@ -45,7 +80,8 @@ fun GroupSettingNameView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     group: Group,
-    onChangeName: (String) -> Unit
+    onChangeName: (String) -> Unit,
+    onShowEmptyTip: () -> Unit
 ) {
     val context = LocalContext.current
     var textState by remember { mutableStateOf(group.name.orEmpty()) }
@@ -135,6 +171,7 @@ fun GroupSettingNameView(
                     colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                     onClick = {
                         if (textState.isEmpty()) {
+                            onShowEmptyTip.invoke()
                             context.showToast("社團名稱不可以是空白的唷！")
                         } else {
                             onChangeName.invoke(textState)
@@ -161,7 +198,9 @@ fun GroupSettingNameScreenPreview() {
                 name = "韓勾ㄟ金針菇討論區",
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
             ),
-            navController = EmptyDestinationsNavigator
-        ) {}
+            navController = EmptyDestinationsNavigator,
+            onChangeName = {},
+            onShowEmptyTip = {}
+        )
     }
 }

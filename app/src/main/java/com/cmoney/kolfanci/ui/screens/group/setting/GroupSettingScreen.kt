@@ -11,17 +11,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.LocalDependencyContainer
 import com.cmoney.kolfanci.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.destinations.GroupReportScreenDestination
-import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.Constant.isShowApproval
+import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -167,7 +168,7 @@ fun GroupSettingScreenView(
             Spacer(modifier = Modifier.height(28.dp))
 
             //秩序管理
-            if (Constant.MyGroupPermission.banOrKickMember == true) {
+            if (isShowApproval()) {
                 GroupRuleManageScreen(
                     group = group,
                     reportList = reportList,
@@ -176,19 +177,6 @@ fun GroupSettingScreenView(
             }
         }
     }
-}
-
-/**
- * 是否呈現 社團管理 區塊
- */
-private fun isShowGroupManage(): Boolean {
-    return (Constant.MyGroupPermission.editGroup == true) ||
-            (Constant.MyGroupPermission.createOrEditChannel == true) ||
-            (Constant.MyGroupPermission.createOrEditCategory == true) ||
-            (Constant.MyGroupPermission.setGroupPublicity == true) ||
-            (Constant.MyGroupPermission.rearrangeChannelCategory == true) ||
-            (Constant.MyGroupPermission.deleteCategory == true) ||
-            (Constant.MyGroupPermission.deleteChannel == true)
 }
 
 @Preview(showBackground = true)
