@@ -101,18 +101,14 @@ fun AddChannelScreen(
         channelAccessTypeList = uiState.channelAccessTypeList,
         isLoading = uiState.isLoading,
         onConfirm = {
-            if (it.isNotEmpty()) {
-                if (channel == null) {
-                    viewModel.addChannel(group, category.id.orEmpty(), it)
-                } else {
-                    viewModel.editChannel(
-                        group = group,
-                        channel = channel,
-                        name = it
-                    )
-                }
+            if (channel == null) {
+                viewModel.addChannel(group, category.id.orEmpty(), it)
             } else {
-                context.showToast("請輸入頻道名稱")
+                viewModel.editChannel(
+                    group = group,
+                    channel = channel,
+                    name = it
+                )
             }
         },
         onTabClick = {

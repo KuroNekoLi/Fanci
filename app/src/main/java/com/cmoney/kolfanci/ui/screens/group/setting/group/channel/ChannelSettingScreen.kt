@@ -48,7 +48,6 @@ fun ChannelSettingScreen(
     viewModel: ChannelSettingViewModel = koinViewModel(),
     setChannelResult: ResultRecipient<AddChannelScreenDestination, Group>,
     setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>,
-    setEditChannelResult: ResultRecipient<EditChannelScreenDestination, Group>,
     setEditCategoryResult: ResultRecipient<EditCategoryScreenDestination, Group>,
     sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>,
     sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
@@ -85,16 +84,6 @@ fun ChannelSettingScreen(
     }
 
     setEditCategoryResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-
-    setEditChannelResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }

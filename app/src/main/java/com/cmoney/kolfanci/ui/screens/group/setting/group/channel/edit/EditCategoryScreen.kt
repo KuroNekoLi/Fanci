@@ -20,6 +20,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -55,11 +56,7 @@ fun EditCategoryScreen(
         navigator,
         category,
         onConfirm = {
-            if (it.isNotEmpty()) {
-                viewModel.editCategory(group, category, it)
-            } else {
-                context.showToast("請輸入類別名稱")
-            }
+            viewModel.editCategory(group, category, it)
         },
         onDelete = {
             KLog.i(TAG, "onDelete click")
@@ -68,8 +65,9 @@ fun EditCategoryScreen(
     )
 
     if (showDialog.value) {
-        showDeleteAlert(
-            categoryName = category.name.orEmpty(),
+        DeleteAlertDialogScreen(
+            title = "確定刪除分類「%s」".format(category.name),
+            subTitle = "分類刪除後，頻道會保留下來。",
             onConfirm = {
                 showDialog.value = false
                 viewModel.deleteCategory(group, category)
@@ -79,46 +77,6 @@ fun EditCategoryScreen(
             }
         )
     }
-}
-
-@Composable
-private fun showDeleteAlert(
-    categoryName: String,
-    onConfirm: () -> Unit, onCancel: () -> Unit
-) {
-    AlertDialog(
-        backgroundColor = LocalColor.current.env_80,
-        onDismissRequest = {
-            onCancel.invoke()
-        },
-        title = {
-            Text(
-                text = "確定刪除分類「%s」".format(categoryName),
-                color = LocalColor.current.specialColor.red
-            )
-        },
-        text = {
-            Text(
-                text = "分類刪除後，頻道會保留下來。", color = LocalColor.current.text.default_100
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onConfirm.invoke()
-                }) {
-                Text("確定刪除")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = {
-                    onCancel.invoke()
-                }) {
-                Text("返回")
-            }
-        }
-    )
 }
 
 @Composable
