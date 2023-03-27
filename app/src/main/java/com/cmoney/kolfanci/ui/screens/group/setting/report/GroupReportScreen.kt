@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.GroupReportMessageScreenDestination
 import com.cmoney.kolfanci.destinations.GroupReporterScreenDestination
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -34,20 +36,18 @@ import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.KickOutItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.BanDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.KickOutDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
-import com.cmoney.fanciapi.fanci.model.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import com.cmoney.kolfanci.R
+
 /**
  * 檢舉審核
  */
@@ -105,45 +105,37 @@ fun GroupReportScreen(
     //禁言 dialog
     if (uiState.showSilenceDialog != null) {
         val name = uiState.showSilenceDialog.reportee?.name.orEmpty()
-        AlertDialogScreen(
+
+        BanDialogScreen(
+            name = name,
             onDismiss = {
                 viewModel.dismissSilenceDialog()
             },
-            title = "禁言 $name",
-        ) {
-            BanDayItemScreen(
-                name = name,
-                onDismiss = {
-                    viewModel.dismissSilenceDialog()
-                },
-                onClick = {
-                    viewModel.silenceUser(uiState.showSilenceDialog, it)
+            onConfirm = {
+                viewModel.dismissSilenceDialog()
+                uiState.showSilenceDialog.let { reportInfo ->
+                    viewModel.silenceUser(reportInfo, it)
                 }
-            )
-        }
+            }
+        )
     }
 
     //踢出 dialog
     if (uiState.kickDialog != null) {
         val name = uiState.kickDialog.reportee?.name.orEmpty()
 
-        AlertDialogScreen(
+        KickOutDialogScreen(
+            name = name,
             onDismiss = {
                 viewModel.dismissKickDialog()
             },
-            title = "將 $name 踢出社團",
-        ) {
-            //TODO
-            KickOutItemScreen(
-                name = name,
-                onDismiss = {
-                    viewModel.dismissKickDialog()
-                },
-                onConfirm = {
-                    viewModel.kickOutMember(uiState.kickDialog)
+            onConfirm = {
+                viewModel.dismissKickDialog()
+                uiState.kickDialog.let {
+                    viewModel.kickOutMember(it)
                 }
-            )
-        }
+            }
+        )
     }
 
     //返回

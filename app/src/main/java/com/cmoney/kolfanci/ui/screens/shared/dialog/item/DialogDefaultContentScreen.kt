@@ -33,11 +33,13 @@ fun DialogDefaultContentScreen(
         modifier = modifier
             .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = content, fontSize = 17.sp, color = Color.White
-        )
+        if (content.isNotEmpty()) {
+            Text(
+                text = content, fontSize = 17.sp, color = Color.White
+            )
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+        }
 
         BorderButton(
             modifier = Modifier

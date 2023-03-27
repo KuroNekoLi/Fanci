@@ -33,11 +33,8 @@ import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogDefaultContentScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.*
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DisBanItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.KickOutItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -88,16 +85,6 @@ fun MemberManageScreen(
     //再次確認禁言 彈窗
     val showBanDoubleConfirmDialog: MutableState<BanPeriodOption?> =
         remember { mutableStateOf(null) }
-
-    //再次確認 解除禁言 彈窗
-    val showDisBanDoubleConfirmDialog = remember {
-        mutableStateOf(false)
-    }
-
-    //再次確認 踢出社團 彈窗
-    val showKickOutDoubleConfirmDialog = remember {
-        mutableStateOf(false)
-    }
 
     //Add role callback
     setRoleResult.onNavResult { result ->
@@ -164,148 +151,56 @@ fun MemberManageScreen(
     }
 
     //==================== Dialog ====================
-
     //禁言 彈窗
     if (showBanDialog.value) {
-        AlertDialogScreen(
+        BanDialogScreen(
+            name = groupMember.name.orEmpty(),
             onDismiss = {
                 showBanDialog.value = false
             },
-            title = "禁言 " + groupMember.name,
-        ) {
-            BanDayItemScreen(
-                name = groupMember.name.orEmpty(),
-                onClick = {
-                    showBanDialog.value = false
-                    showBanDoubleConfirmDialog.value = it
-                },
-                onDismiss = {
-                    showBanDialog.value = false
-                }
-            )
-        }
-    }
-
-    //再次確認 禁言彈窗
-    showBanDoubleConfirmDialog.value?.let {
-        AlertDialogScreen(
-            onDismiss = {
-                showBanDoubleConfirmDialog.value = null
-            },
-            title = "確定禁言 %s %s".format(groupMember.name.orEmpty(), it.toDisplayDay())
-        ) {
-            DialogDefaultContentScreen(
-                content = "一旦被禁言，將會無法對頻道做出任何社群行為：留言、按讚等等。",
-                confirmTitle = "確定禁言",
-                cancelTitle = "返回",
-                onConfirm = {
-                    viewModel.banUser(
-                        groupId = group.id.orEmpty(),
-                        userId = groupMember.id.orEmpty(),
-                        banPeriodOption = it
-                    )
-                },
-                onCancel = {
-                    showBanDoubleConfirmDialog.value = null
-                }
-            )
-        }
+            onConfirm = {
+                showBanDialog.value = false
+                viewModel.banUser(
+                    groupId = group.id.orEmpty(),
+                    userId = groupMember.id.orEmpty(),
+                    banPeriodOption = it
+                )
+            }
+        )
     }
 
     //解除禁言 彈窗
     if (showDisBanDialog.value) {
-        AlertDialogScreen(
+        DisBanDialogScreen(
+            name = groupMember.name.orEmpty(),
             onDismiss = {
                 showDisBanDialog.value = false
             },
-            title = groupMember.name + " 禁言中",
-        ) {
-            DisBanItemScreen(
-                onConfirm = {
-                    showDisBanDialog.value = false
-                    showDisBanDoubleConfirmDialog.value = true
-                },
-                onDismiss = {
-                    showDisBanDialog.value = false
-                }
-            )
-        }
-    }
-
-    //再次確認 解除禁言 彈窗
-    if (showDisBanDoubleConfirmDialog.value) {
-        AlertDialogScreen(
-            onDismiss = {
-                showDisBanDoubleConfirmDialog.value = false
-            },
-            title = "解除 %s 禁言".format(groupMember.name.orEmpty())
-        ) {
-            DialogDefaultContentScreen(
-                content = "你確定要將 %s 解除禁言嗎？".format(groupMember.name.orEmpty()),
-                confirmTitle = "確定解除 放他自由",
-                cancelTitle = "返回",
-                onConfirm = {
-                    viewModel.liftBanUser(
-                        groupId = group.id.orEmpty(),
-                        userId = groupMember.id.orEmpty()
-                    )
-                },
-                onCancel = {
-                    showDisBanDoubleConfirmDialog.value = false
-                }
-            )
-        }
+            onConfirm = {
+                showDisBanDialog.value = false
+                viewModel.liftBanUser(
+                    groupId = group.id.orEmpty(),
+                    userId = groupMember.id.orEmpty()
+                )
+            }
+        )
     }
 
     //踢出社團 彈窗
     if (showKickOutDialog.value) {
-        AlertDialogScreen(
+        KickOutDialogScreen(
+            name = groupMember.name.orEmpty(),
             onDismiss = {
                 showKickOutDialog.value = false
             },
-            title = "將 " + groupMember.name + " 踢出社團",
-        ) {
-            DialogDefaultContentScreen(
-                content = "你確定要將 %s 踢出社團嗎？\n".format(groupMember.name) +
-                        "一旦踢出他下次要進入，需要重新申請",
-                confirmTitle = "確定",
-                cancelTitle = "返回",
-                onConfirm = {
-                    showKickOutDialog.value = false
-                    showKickOutDoubleConfirmDialog.value = true
-                },
-                onCancel = {
-                    showKickOutDialog.value = false
-                }
-            )
-        }
-    }
-
-    //再次確認 踢出社團 彈窗
-    if (showKickOutDoubleConfirmDialog.value) {
-        AlertDialogScreen(
-            onDismiss = {
-                showKickOutDoubleConfirmDialog.value = false
-            },
-            title = "確定要將 " + groupMember.name + " 踢出社團",
-        ) {
-            DialogDefaultContentScreen(
-                content = "你確定要將 %s 踢出社團嗎？\n".format(groupMember.name) +
-                        "一旦踢出他下次要進入，需要重新申請",
-                confirmTitle = "確定踢出",
-                cancelTitle = "返回",
-                onConfirm = {
-                    showKickOutDoubleConfirmDialog.value = true
-                    viewModel.kickOutMember(
-                        groupId = group.id.orEmpty(),
-                        groupMember
-                    )
-                },
-                onCancel = {
-                    showKickOutDoubleConfirmDialog.value = false
-                }
-            )
-        }
+            onConfirm = {
+                showKickOutDialog.value = false
+                viewModel.kickOutMember(
+                    groupId = group.id.orEmpty(),
+                    groupMember
+                )
+            }
+        )
     }
 }
 

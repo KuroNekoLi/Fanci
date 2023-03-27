@@ -244,6 +244,23 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                             groupMember = orgGroupMemberList
                         )
                     }
+                    //TODO
+//                    else {
+//                        //test
+//                        uiState = uiState.copy(
+//                            groupMember = listOf(
+//                                GroupMemberSelect(
+//                                    groupMember = GroupMember(
+//                                        name = "Hello",
+//                                        thumbNail = "https://i.pinimg.com/564x/6f/4a/bd/6f4abd8a21e444296e3f0cc2f8801fdb.jpg",
+//                                        roleInfos = listOf(FanciRole(
+//                                            name = "哇哈哈權限",
+//                                        ))
+//                                    )
+//                                )
+//                            )
+//                        )
+//                    }
                     dismissLoading()
                 }, {
                     dismissLoading()
