@@ -133,6 +133,7 @@ fun GroupReportScreen(
             },
             title = "將 $name 踢出社團",
         ) {
+            //TODO
             KickOutItemScreen(
                 name = name,
                 onDismiss = {

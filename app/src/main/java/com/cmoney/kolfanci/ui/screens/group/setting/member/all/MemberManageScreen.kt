@@ -8,6 +8,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,24 +20,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.BanPeriodOption
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.MemberRoleManageScreenDestination
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
+import com.cmoney.kolfanci.extension.toDisplayDay
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogDefaultContentScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DisBanItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.KickOutItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -79,6 +83,20 @@ fun MemberManageScreen(
 
     val member = remember {
         mutableStateOf(groupMember)
+    }
+
+    //再次確認禁言 彈窗
+    val showBanDoubleConfirmDialog: MutableState<BanPeriodOption?> =
+        remember { mutableStateOf(null) }
+
+    //再次確認 解除禁言 彈窗
+    val showDisBanDoubleConfirmDialog = remember {
+        mutableStateOf(false)
+    }
+
+    //再次確認 踢出社團 彈窗
+    val showKickOutDoubleConfirmDialog = remember {
+        mutableStateOf(false)
     }
 
     //Add role callback
@@ -145,6 +163,8 @@ fun MemberManageScreen(
         )
     }
 
+    //==================== Dialog ====================
+
     //禁言 彈窗
     if (showBanDialog.value) {
         AlertDialogScreen(
@@ -157,14 +177,36 @@ fun MemberManageScreen(
                 name = groupMember.name.orEmpty(),
                 onClick = {
                     showBanDialog.value = false
+                    showBanDoubleConfirmDialog.value = it
+                },
+                onDismiss = {
+                    showBanDialog.value = false
+                }
+            )
+        }
+    }
+
+    //再次確認 禁言彈窗
+    showBanDoubleConfirmDialog.value?.let {
+        AlertDialogScreen(
+            onDismiss = {
+                showBanDoubleConfirmDialog.value = null
+            },
+            title = "確定禁言 %s %s".format(groupMember.name.orEmpty(), it.toDisplayDay())
+        ) {
+            DialogDefaultContentScreen(
+                content = "一旦被禁言，將會無法對頻道做出任何社群行為：留言、按讚等等。",
+                confirmTitle = "確定禁言",
+                cancelTitle = "返回",
+                onConfirm = {
                     viewModel.banUser(
                         groupId = group.id.orEmpty(),
                         userId = groupMember.id.orEmpty(),
                         banPeriodOption = it
                     )
                 },
-                onDismiss = {
-                    showBanDialog.value = false
+                onCancel = {
+                    showBanDoubleConfirmDialog.value = null
                 }
             )
         }
@@ -180,14 +222,36 @@ fun MemberManageScreen(
         ) {
             DisBanItemScreen(
                 onConfirm = {
+                    showDisBanDialog.value = false
+                    showDisBanDoubleConfirmDialog.value = true
+                },
+                onDismiss = {
+                    showDisBanDialog.value = false
+                }
+            )
+        }
+    }
+
+    //再次確認 解除禁言 彈窗
+    if (showDisBanDoubleConfirmDialog.value) {
+        AlertDialogScreen(
+            onDismiss = {
+                showDisBanDoubleConfirmDialog.value = false
+            },
+            title = "解除 %s 禁言".format(groupMember.name.orEmpty())
+        ) {
+            DialogDefaultContentScreen(
+                content = "你確定要將 %s 解除禁言嗎？".format(groupMember.name.orEmpty()),
+                confirmTitle = "確定解除 放他自由",
+                cancelTitle = "返回",
+                onConfirm = {
                     viewModel.liftBanUser(
                         groupId = group.id.orEmpty(),
                         userId = groupMember.id.orEmpty()
                     )
-                    showDisBanDialog.value = false
                 },
-                onDismiss = {
-                    showDisBanDialog.value = false
+                onCancel = {
+                    showDisBanDoubleConfirmDialog.value = false
                 }
             )
         }
@@ -201,17 +265,44 @@ fun MemberManageScreen(
             },
             title = "將 " + groupMember.name + " 踢出社團",
         ) {
-            KickOutItemScreen(
-                name = groupMember.name.orEmpty(),
+            DialogDefaultContentScreen(
+                content = "你確定要將 %s 踢出社團嗎？\n".format(groupMember.name) +
+                        "一旦踢出他下次要進入，需要重新申請",
+                confirmTitle = "確定",
+                cancelTitle = "返回",
                 onConfirm = {
+                    showKickOutDialog.value = false
+                    showKickOutDoubleConfirmDialog.value = true
+                },
+                onCancel = {
+                    showKickOutDialog.value = false
+                }
+            )
+        }
+    }
+
+    //再次確認 踢出社團 彈窗
+    if (showKickOutDoubleConfirmDialog.value) {
+        AlertDialogScreen(
+            onDismiss = {
+                showKickOutDoubleConfirmDialog.value = false
+            },
+            title = "確定要將 " + groupMember.name + " 踢出社團",
+        ) {
+            DialogDefaultContentScreen(
+                content = "你確定要將 %s 踢出社團嗎？\n".format(groupMember.name) +
+                        "一旦踢出他下次要進入，需要重新申請",
+                confirmTitle = "確定踢出",
+                cancelTitle = "返回",
+                onConfirm = {
+                    showKickOutDoubleConfirmDialog.value = true
                     viewModel.kickOutMember(
                         groupId = group.id.orEmpty(),
                         groupMember
                     )
-                    showKickOutDialog.value = false
                 },
-                onDismiss = {
-                    showKickOutDialog.value = false
+                onCancel = {
+                    showKickOutDoubleConfirmDialog.value = false
                 }
             )
         }
@@ -243,7 +334,7 @@ private fun MemberManageScreenView(
                 }
             )
         }
-    ) {padding ->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -362,8 +453,7 @@ private fun MemberManageScreenView(
                 ) {
                     onBanClick.invoke()
                 }
-            }
-            else {
+            } else {
                 BanInfo(
                     banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
                     banStartDay = banInfo.startDay,
@@ -409,10 +499,12 @@ private fun BanItem(banTitle: String, desc: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun BanInfo(banTitle: String,
-                    banStartDay: String,
-                    banDuration: String,
-                    onClick: () -> Unit) {
+private fun BanInfo(
+    banTitle: String,
+    banStartDay: String,
+    banDuration: String,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -426,9 +518,17 @@ private fun BanInfo(banTitle: String,
         Column(modifier = Modifier.weight(1f)) {
             Text(text = banTitle, fontSize = 16.sp, color = LocalColor.current.text.default_100)
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = "被禁言日：%s".format(banStartDay), fontSize = 12.sp, color = LocalColor.current.text.default_80)
+            Text(
+                text = "被禁言日：%s".format(banStartDay),
+                fontSize = 12.sp,
+                color = LocalColor.current.text.default_80
+            )
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = "禁言時長：%s".format(banDuration), fontSize = 12.sp, color = LocalColor.current.text.default_80)
+            Text(
+                text = "禁言時長：%s".format(banDuration),
+                fontSize = 12.sp,
+                color = LocalColor.current.text.default_80
+            )
             Spacer(modifier = Modifier.height(10.dp))
         }
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -47,7 +48,7 @@ fun AllMemberScreen(
     setMemberResult: ResultRecipient<MemberManageScreenDestination, MemberManageResult>
 ) {
     val uiState = viewModel.uiState
-    if (uiState.groupMember == null) {
+    if (uiState.groupMember == null && uiState.loading) {
         viewModel.fetchGroupMember(groupId = group.id.orEmpty())
     }
 
@@ -73,6 +74,7 @@ fun AllMemberScreen(
     AllMemberScreenView(
         modifier = modifier,
         navController = navController,
+        isLoading = uiState.loading,
         group = group,
         groupMemberList = uiState.groupMember.orEmpty().map {
             it.groupMember
@@ -85,7 +87,8 @@ fun AllMemberScreenView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     group: Group,
-    groupMemberList: List<GroupMember>
+    groupMemberList: List<GroupMember>,
+    isLoading: Boolean
 ) {
     val TAG = "AllMemberScreenView"
     Scaffold(
@@ -114,6 +117,21 @@ fun AllMemberScreenView(
                     }
                 }
                 Spacer(modifier = Modifier.height(1.dp))
+            }
+
+            if (isLoading) {
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(size = 32.dp),
+                            color = LocalColor.current.primary
+                        )
+                    }
+                }
             }
         }
 
@@ -242,6 +260,7 @@ fun AllMemberScreenPreview() {
     FanciTheme {
         AllMemberScreenView(
             navController = EmptyDestinationsNavigator,
+            isLoading = false,
             groupMemberList = listOf(
                 GroupMember(
                     thumbNail = "",
