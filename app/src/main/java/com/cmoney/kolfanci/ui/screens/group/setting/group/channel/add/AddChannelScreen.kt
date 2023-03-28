@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,7 +21,6 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.EditChannelOpennessScreenDestination
 import com.cmoney.kolfanci.destinations.MemberAndRoleManageScreenDestination
 import com.cmoney.kolfanci.destinations.ShareAddRoleScreenDestination
-import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
@@ -32,6 +28,7 @@ import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
@@ -65,6 +62,9 @@ fun AddChannelScreen(
 ) {
     val uiState = viewModel.uiState
     val showDeleteDialog = remember { mutableStateOf(false) }
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
 
     uiState.group?.let {
         KLog.i("TAG", "channel add.")
@@ -125,6 +125,20 @@ fun AddChannelScreen(
         },
         onDeleteClick = {
             showDeleteDialog.value = true
+        },
+        onBack = {
+            showSaveTip = true
+        }
+    )
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navigator.popBackStack()
         }
     )
 
@@ -212,7 +226,8 @@ fun AddChannelScreenView(
     onRemoveRole: (FanciRole) -> Unit,
     onPermissionClick: (ChannelAccessOptionModel) -> Unit,
     onChannelNameInput: (String) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onBack: () -> Unit
 ) {
     val list = listOf("樣式", "權限", "管理員")
 
@@ -224,9 +239,7 @@ fun AddChannelScreenView(
                 title = topBarTitle,
                 leadingEnable = true,
                 moreEnable = false,
-                backClick = {
-                    navigator.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { padding ->
@@ -658,7 +671,8 @@ fun AddChannelScreenPreview() {
             onRemoveRole = {},
             onPermissionClick = {},
             onChannelNameInput = {},
-            onDeleteClick = {}
+            onDeleteClick = {},
+            onBack = {}
         )
     }
 }

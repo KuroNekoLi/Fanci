@@ -22,6 +22,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -39,6 +40,10 @@ fun GroupSettingNameScreen(
         mutableStateOf(false)
     }
 
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
+
     GroupSettingNameView(
         modifier = modifier,
         navController = navController,
@@ -48,6 +53,9 @@ fun GroupSettingNameScreen(
         },
         onShowEmptyTip = {
             showEmptyTip = true
+        },
+        onBack = {
+            showSaveTip = true
         })
 
     if (showEmptyTip) {
@@ -73,6 +81,17 @@ fun GroupSettingNameScreen(
             }
         )
     }
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navController.popBackStack()
+        }
+    )
 }
 
 @Composable
@@ -81,7 +100,8 @@ fun GroupSettingNameView(
     navController: DestinationsNavigator,
     group: Group,
     onChangeName: (String) -> Unit,
-    onShowEmptyTip: () -> Unit
+    onShowEmptyTip: () -> Unit,
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
     var textState by remember { mutableStateOf(group.name.orEmpty()) }
@@ -97,9 +117,7 @@ fun GroupSettingNameView(
                 moreEnable = false,
                 moreClick = {
                 },
-                backClick = {
-                    navController.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { innerPadding ->
@@ -200,7 +218,8 @@ fun GroupSettingNameScreenPreview() {
             ),
             navController = EmptyDestinationsNavigator,
             onChangeName = {},
-            onShowEmptyTip = {}
+            onShowEmptyTip = {},
+            onBack = {}
         )
     }
 }

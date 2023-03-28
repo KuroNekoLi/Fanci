@@ -18,6 +18,7 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -31,12 +32,29 @@ fun GroupSettingDescScreen(
     group: Group,
     resultNavigator: ResultBackNavigator<String>
 ) {
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
+
     GroupSettingDescView(
         modifier = modifier,
         navController = navController, group = group, onChangeDesc = { desc ->
             resultNavigator.navigateBack(desc)
+        },
+        onBack = {
+            showSaveTip = true
         })
 
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navController.popBackStack()
+        }
+    )
 }
 
 @Composable
@@ -44,7 +62,8 @@ fun GroupSettingDescView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     group: Group,
-    onChangeDesc: (String) -> Unit
+    onChangeDesc: (String) -> Unit,
+    onBack: () -> Unit
 ) {
     var textState by remember { mutableStateOf(group.description.orEmpty()) }
     val maxLength = 100
@@ -59,9 +78,7 @@ fun GroupSettingDescView(
                 moreEnable = false,
                 moreClick = {
                 },
-                backClick = {
-                    navController.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { innerPadding ->
@@ -155,7 +172,9 @@ fun GroupSettingDescViewPreview() {
                 name = "韓勾ㄟ金針菇討論區",
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
             ),
-            navController = EmptyDestinationsNavigator
-        ){}
+            navController = EmptyDestinationsNavigator,
+            onChangeDesc = {},
+            onBack = {}
+        )
     }
 }

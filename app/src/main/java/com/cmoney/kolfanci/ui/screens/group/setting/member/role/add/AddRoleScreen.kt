@@ -23,6 +23,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleMa
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -48,6 +49,9 @@ fun AddRoleScreen(
     val mainActivity = LocalDependencyContainer.current
     val uiState = viewModel.uiState
     var showDeleteConfirmDialog by remember {
+        mutableStateOf(false)
+    }
+    var showSaveTip by remember {
         mutableStateOf(false)
     }
 
@@ -94,6 +98,9 @@ fun AddRoleScreen(
             fanciRole?.let {
                 showDeleteConfirmDialog = true
             }
+        },
+        onBack = {
+            showSaveTip = true
         }
     )
 
@@ -187,6 +194,18 @@ fun AddRoleScreen(
     uiState.fanciRoleCallback?.let {
         resultNavigator.navigateBack(it)
     }
+
+    //離開再次 確認
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navigator.popBackStack()
+        }
+    )
 }
 
 @Composable
@@ -207,7 +226,8 @@ private fun AddRoleScreenView(
     onConfirm: () -> Unit,
     onDelete: () -> Unit,
     onPermissionSwitch: (String, Boolean) -> Unit,
-    onRoleStyleChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit
+    onRoleStyleChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit,
+    onBack: () -> Unit
 ) {
     val tabList = listOf("樣式", "權限", "成員")
 
@@ -219,9 +239,7 @@ private fun AddRoleScreenView(
                 title = fanciRole?.name ?: "新增角色",
                 leadingEnable = true,
                 moreEnable = false,
-                backClick = {
-                    navigator.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { padding ->
@@ -348,7 +366,8 @@ fun AddRoleScreenPreview() {
             onConfirm = {},
             onPermissionSwitch = { key, selected -> },
             onRoleStyleChange = { _, _ -> },
-            onDelete = {}
+            onDelete = {},
+            onBack = {}
         )
     }
 }

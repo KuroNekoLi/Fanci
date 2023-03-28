@@ -24,6 +24,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.Gro
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
@@ -56,6 +57,9 @@ fun GroupOpennessScreen(
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
     var showDeleteConfirmDialog by remember {
+        mutableStateOf(false)
+    }
+    var showSaveTip by remember {
         mutableStateOf(false)
     }
 
@@ -104,6 +108,9 @@ fun GroupOpennessScreen(
         },
         onSave = {
             viewModel.onSave(group = group)
+        },
+        onBack = {
+            showSaveTip = true
         }
     )
 
@@ -211,6 +218,17 @@ fun GroupOpennessScreen(
         )
     }
 
+    //離開再次 確認
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navigator.popBackStack()
+        }
+    )
 }
 
 @Composable
@@ -222,7 +240,8 @@ fun GroupOpennessScreenView(
     onSwitch: (Boolean) -> Unit,
     onAddQuestion: () -> Unit,
     onEditClick: (String) -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    onBack: () -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -232,9 +251,7 @@ fun GroupOpennessScreenView(
                 title = "社團公開度",
                 leadingEnable = true,
                 moreEnable = false,
-                backClick = {
-                    navigator.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { padding ->
@@ -471,7 +488,8 @@ fun GroupOpennessScreenPreview() {
             onSwitch = {},
             onAddQuestion = {},
             onEditClick = {},
-            onSave = {}
+            onSave = {},
+            onBack = {}
         )
     }
 }
