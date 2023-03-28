@@ -15,29 +15,27 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 編輯頻道參數
+ * 
  *
- * @param name 頻道名稱
- * @param privacy 
+ * @param roleIds 
+ * @param userIds 
  */
 @Parcelize
 
 
-data class EditChannelParam (
+data class GetWhiteListCountParam (
 
-    /* 頻道名稱 */
-    @Json(name = "name")
-    val name: kotlin.String? = null,
+    @Json(name = "roleIds")
+    val roleIds: kotlin.collections.List<kotlin.String>? = null,
 
-    @Json(name = "privacy")
-    val privacy: ChannelPrivacy? = null
+    @Json(name = "userIds")
+    val userIds: kotlin.collections.List<kotlin.String>? = null
 
 ) : Parcelable
 

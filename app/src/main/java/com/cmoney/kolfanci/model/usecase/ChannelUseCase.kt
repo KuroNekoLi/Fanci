@@ -13,6 +13,19 @@ class ChannelUseCase(
 ) {
 
     /**
+     * 取得 私密頻道 不重複用戶總數
+     */
+    suspend fun getPrivateChannelUserCount(roleIds: List<String>, userIds: List<String>) =
+        kotlin.runCatching {
+            channelApi.apiV1ChannelWhiteListUsersCountPost(
+                getWhiteListCountParam = GetWhiteListCountParam(
+                    roleIds = roleIds,
+                    userIds = userIds
+                )
+            ).checkResponseBody()
+        }
+
+    /**
      * 取得 私密頻道 用戶清單
      */
     suspend fun getPrivateChannelWhiteList(channelId: String) = kotlin.runCatching {

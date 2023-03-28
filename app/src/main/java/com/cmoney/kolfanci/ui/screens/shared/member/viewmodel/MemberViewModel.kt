@@ -244,7 +244,12 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                             groupMember = orgGroupMemberList
                         )
                     }
-                    //TODO
+                    else {
+                        uiState = uiState.copy(
+                            groupMember = emptyList()
+                        )
+                    }
+                    //TODO just for test
 //                    else {
 //                        //test
 //                        uiState = uiState.copy(

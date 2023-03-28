@@ -988,6 +988,55 @@
         }
       }
     },
+    "/api/v1/Channel/WhiteList/Users/Count": {
+      "post": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "取得私密頻道白名單覆蓋人數",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetWhiteListCountParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetWhiteListCountParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetWhiteListCountParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhiteListCount"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhiteListCount"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhiteListCount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Channel/{channelId}/WhiteList": {
       "get": {
         "tags": [
@@ -2582,7 +2631,8 @@
             "in": "query",
             "description": "搜尋用戶暱稱的關鍵字",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "default": ""
             }
           },
           {
@@ -5263,15 +5313,12 @@
         "type": "string"
       },
       "EditChannelParam": {
-        "required": [
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
-            "minLength": 1,
             "type": "string",
-            "description": "頻道名稱"
+            "description": "頻道名稱",
+            "nullable": true
           },
           "privacy": {
             "$ref": "#/components/schemas/ChannelPrivacy"
@@ -5368,6 +5415,26 @@
           "userCount": {
             "type": "integer",
             "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetWhiteListCountParam": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6381,6 +6448,16 @@
         },
         "additionalProperties": false,
         "description": "使用者陣列參數"
+      },
+      "WhiteListCount": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

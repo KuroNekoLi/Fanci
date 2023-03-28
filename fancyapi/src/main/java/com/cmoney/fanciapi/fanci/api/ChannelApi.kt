@@ -11,8 +11,10 @@ import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
 import com.cmoney.fanciapi.fanci.model.ChannelWhiteList
 import com.cmoney.fanciapi.fanci.model.EditChannelParam
 import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.GetWhiteListCountParam
 import com.cmoney.fanciapi.fanci.model.PutWhiteListRequest
 import com.cmoney.fanciapi.fanci.model.RoleIdsParam
+import com.cmoney.fanciapi.fanci.model.WhiteListCount
 
 interface ChannelApi {
     /**
@@ -161,5 +163,17 @@ interface ChannelApi {
      */
     @GET("api/v1/Channel/{channelId}/WhiteList")
     suspend fun apiV1ChannelChannelIdWhiteListGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<ChannelWhiteList>>
+
+    /**
+     * 取得私密頻道白名單覆蓋人數
+     * 
+     * Responses:
+     *  - 200: Success
+     *
+     * @param getWhiteListCountParam  (optional)
+     * @return [WhiteListCount]
+     */
+    @POST("api/v1/Channel/WhiteList/Users/Count")
+    suspend fun apiV1ChannelWhiteListUsersCountPost(@Body getWhiteListCountParam: GetWhiteListCountParam? = null): Response<WhiteListCount>
 
 }

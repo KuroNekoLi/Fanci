@@ -63,7 +63,6 @@ fun AddChannelScreen(
     addRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
     permissionMemberResult: ResultRecipient<MemberAndRoleManageScreenDestination, SelectedModel>
 ) {
-    val context = LocalContext.current
     val uiState = viewModel.uiState
     val showDeleteDialog = remember { mutableStateOf(false) }
 
@@ -100,6 +99,7 @@ fun AddChannelScreen(
         isNeedApproval = uiState.isNeedApproval,
         channelAccessTypeList = uiState.channelAccessTypeList,
         isLoading = uiState.isLoading,
+        uniqueUserCount = uiState.uniqueUserCount,
         onConfirm = {
             if (channel == null) {
                 viewModel.addChannel(group, category.id.orEmpty(), it)
@@ -206,6 +206,7 @@ fun AddChannelScreenView(
     channelAccessTypeList: List<ChannelAccessOptionModel>,
     isLoading: Boolean,
     withDelete: Boolean,
+    uniqueUserCount: Int,
     onConfirm: (String) -> Unit,
     onTabClick: (Int) -> Unit,
     onRemoveRole: (FanciRole) -> Unit,
@@ -267,6 +268,7 @@ fun AddChannelScreenView(
                             isNeedApproval, navigator,
                             channelPermissionModel = channelAccessTypeList,
                             group = group,
+                            uniqueUserCount = uniqueUserCount,
                             onPermissionClick = onPermissionClick
                         )
                     }
@@ -407,6 +409,7 @@ private fun PermissionTabScreen(
     isNeedApproval: Boolean,
     navigator: DestinationsNavigator,
     group: Group,
+    uniqueUserCount: Int,
     channelPermissionModel: List<ChannelAccessOptionModel>,
     onPermissionClick: (ChannelAccessOptionModel) -> Unit
 ) {
@@ -442,7 +445,9 @@ private fun PermissionTabScreen(
 
         if (isNeedApproval) {
             Spacer(modifier = Modifier.height(25.dp))
-            Text(text = "管理頻道成員（0人）", fontSize = 14.sp, color = Color_80FFFFFF)
+            Text(
+                modifier = Modifier.padding(start = 16.dp),
+                text = "管理頻道成員（%d人）".format(uniqueUserCount), fontSize = 14.sp, color = Color_80FFFFFF)
             Spacer(modifier = Modifier.height(15.dp))
             channelPermissionModel.forEach { it ->
                 ChannelPermissionItem(it) { channelPermissionModel ->
@@ -621,7 +626,7 @@ fun AddChannelScreenPreview() {
     FanciTheme {
         AddChannelScreenView(
             navigator = EmptyDestinationsNavigator,
-            selectedIndex = 0,
+            selectedIndex = 1,
             isNeedApproval = true,
             withDelete = true,
             channelAccessTypeList = listOf(
@@ -649,6 +654,7 @@ fun AddChannelScreenPreview() {
             isLoading = true,
             channelName = "",
             fanciRole = emptyList(),
+            uniqueUserCount = 0,
             onRemoveRole = {},
             onPermissionClick = {},
             onChannelNameInput = {},

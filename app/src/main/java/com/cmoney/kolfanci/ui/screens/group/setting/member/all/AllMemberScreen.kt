@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.member.all
 
 import FlowRow
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,14 +9,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +31,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.R
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -78,6 +80,12 @@ fun AllMemberScreen(
         group = group,
         groupMemberList = uiState.groupMember.orEmpty().map {
             it.groupMember
+        },
+        onSearch = {
+            viewModel.onSearchMember(
+                groupId = group.id.orEmpty(),
+                keyword = it
+            )
         }
     )
 }
@@ -88,9 +96,13 @@ fun AllMemberScreenView(
     navController: DestinationsNavigator,
     group: Group,
     groupMemberList: List<GroupMember>,
-    isLoading: Boolean
+    isLoading: Boolean,
+    onSearch: (String) -> Unit
 ) {
     val TAG = "AllMemberScreenView"
+    var textState by remember { mutableStateOf("") }
+    val maxLength = 20
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -105,36 +117,87 @@ fun AllMemberScreenView(
             )
         }
     ) { innerPadding ->
-        LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(groupMemberList) { groupMember ->
-                MemberItem(groupMember = groupMember) {
-                    KLog.i(TAG, "member click:$it")
-                    if (Constant.MyGroupPermission.createOrEditRole == true) {
-                        navController.navigate(MemberManageScreenDestination(
-                            group = group,
-                            groupMember =  groupMember
-                        ))    
+        Column {
+            //Search bar
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                value = textState,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = LocalColor.current.text.default_100,
+                    backgroundColor = LocalColor.current.background,
+                    cursorColor = LocalColor.current.primary,
+                    disabledLabelColor = LocalColor.current.text.default_30,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                onValueChange = {
+                    if (it.length <= maxLength) {
+                        textState = it
+                        onSearch.invoke(it)
+                    }
+                },
+                shape = RoundedCornerShape(4.dp),
+                maxLines = 1,
+                textStyle = TextStyle.Default.copy(fontSize = 16.sp),
+                placeholder = {
+                    Text(
+                        text = "輸入名稱搜尋成員",
+                        fontSize = 16.sp,
+                        color = LocalColor.current.text.default_30
+                    )
+                },
+                leadingIcon = {
+                    Image(
+                        painter = painterResource(id = R.drawable.member_search),
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    if (textState.isNotEmpty()) {
+                        Image(
+                            modifier = Modifier.clickable {
+                                textState = ""
+                                onSearch.invoke("")
+                            },
+                            painter = painterResource(id = R.drawable.clear),
+                            contentDescription = null
+                        )
                     }
                 }
-                Spacer(modifier = Modifier.height(1.dp))
-            }
+            )
 
-            if (isLoading) {
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(size = 32.dp),
-                            color = LocalColor.current.primary
-                        )
+            LazyColumn(modifier = Modifier.padding(innerPadding)) {
+                items(groupMemberList) { groupMember ->
+                    MemberItem(groupMember = groupMember) {
+                        KLog.i(TAG, "member click:$it")
+                        if (Constant.MyGroupPermission.createOrEditRole == true) {
+                            navController.navigate(MemberManageScreenDestination(
+                                group = group,
+                                groupMember =  groupMember
+                            ))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
+
+                if (isLoading) {
+                    item {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(size = 32.dp),
+                                color = LocalColor.current.primary
+                            )
+                        }
                     }
                 }
             }
         }
-
     }
 }
 
@@ -274,7 +337,8 @@ fun AllMemberScreenPreview() {
                     )
                 )
             ),
-            group = Group()
+            group = Group(),
+            onSearch = {}
         )
     }
 }

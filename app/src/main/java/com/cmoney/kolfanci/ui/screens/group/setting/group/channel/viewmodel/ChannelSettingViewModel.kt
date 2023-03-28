@@ -30,7 +30,8 @@ data class UiState(
     val channelSettingTabIndex: Int = 0,             //新增頻道 tab position
     var isNeedApproval: Boolean = false,             //是否公開
     val channelAccessTypeList: List<ChannelAccessOptionModel> = emptyList(), //私密頻道 權限清單
-    val clickPermissionMemberModel: Pair<ChannelAccessOptionModel, SelectedModel>? = null //點擊的 Permission 資料
+    val clickPermissionMemberModel: Pair<ChannelAccessOptionModel, SelectedModel>? = null, //點擊的 Permission 資料
+    val uniqueUserCount: Int = 0                     //私密頻道成員人數
 )
 
 data class AddChannelRoleModel(val role: FanciRole, val isChecked: Boolean = false)
@@ -79,7 +80,7 @@ class ChannelSettingViewModel(
     }
 
     /**
-     * 取得 私密頻道 人員/角色
+     * 取得 私密頻道 人員/角色 以及 抓取人數
      */
     private fun getPrivateChannelMember(channelId: String) {
         KLog.i(TAG, "getPrivateChannelMember:$channelId")
@@ -94,6 +95,7 @@ class ChannelSettingViewModel(
                         selectedRole = channelWhiteList.roles.orEmpty()
                     )
                 }
+                fetchPrivateChannelUserCount()
 
             }, {
                 KLog.e(TAG, it)
@@ -602,6 +604,8 @@ class ChannelSettingViewModel(
         currentSelectedPermission?.let {
             listPermissionSelected[it.authType.orEmpty()] = selectedModel
             currentSelectedPermission = null
+
+            fetchPrivateChannelUserCount()
         }
     }
 
@@ -635,5 +639,36 @@ class ChannelSettingViewModel(
      */
     fun setChannelName(name: String) {
         uiState = uiState.copy(channelName = name)
+    }
+
+    /**
+     * 取得 私密頻道不重複人數
+     */
+    private fun fetchPrivateChannelUserCount() {
+        KLog.i(TAG, "fetchPrivateChannelUserCount")
+        viewModelScope.launch {
+            val userList = listPermissionSelected.flatMap {
+                it.value.selectedMember
+            }.map {
+                it.id.orEmpty()
+            }.distinct()
+
+            val roleList = listPermissionSelected.flatMap {
+                it.value.selectedRole
+            }.map {
+                it.id.orEmpty()
+            }.distinct()
+
+            channelUseCase.getPrivateChannelUserCount(
+                roleIds = roleList,
+                userIds = userList
+            ).fold({
+                uiState = uiState.copy(
+                    uniqueUserCount = it.count ?: 0
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
     }
 }

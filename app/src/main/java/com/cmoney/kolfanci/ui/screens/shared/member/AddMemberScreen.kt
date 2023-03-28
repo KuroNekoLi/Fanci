@@ -261,6 +261,7 @@ private fun AddMemberScreenPreview(
                             Image(
                                 modifier = Modifier.clickable {
                                     textState = ""
+                                    onSearch.invoke("")
                                 },
                                 painter = painterResource(id = R.drawable.clear),
                                 contentDescription = null
