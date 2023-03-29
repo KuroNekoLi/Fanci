@@ -236,7 +236,11 @@ private fun AddRoleScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = fanciRole?.name ?: "新增角色",
+                title = (if ((fanciRole != null)) {
+                    "編輯角色"
+                } else {
+                    "新增角色"
+                }),
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = onBack

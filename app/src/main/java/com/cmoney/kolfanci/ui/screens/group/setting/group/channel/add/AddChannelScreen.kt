@@ -82,7 +82,7 @@ fun AddChannelScreen(
         modifier,
         navigator,
         topBarTitle = (if ((channel != null)) {
-            "頻道設定"
+            "編輯頻道"
         } else {
             "新增頻道"
         }),

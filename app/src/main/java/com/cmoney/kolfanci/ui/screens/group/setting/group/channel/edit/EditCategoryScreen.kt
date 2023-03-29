@@ -21,6 +21,7 @@ import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -46,6 +47,9 @@ fun EditCategoryScreen(
     val context = LocalContext.current
     val TAG = "EditCategoryScreen"
     val showDialog = remember { mutableStateOf(false) }
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
 
     viewModel.uiState.group?.let {
         resultNavigator.navigateBack(result = it)
@@ -61,6 +65,9 @@ fun EditCategoryScreen(
         onDelete = {
             KLog.i(TAG, "onDelete click")
             showDialog.value = true
+        },
+        onBack = {
+            showSaveTip = true
         }
     )
 
@@ -77,6 +84,19 @@ fun EditCategoryScreen(
             }
         )
     }
+
+    //離開再次 確認
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navigator.popBackStack()
+        }
+    )
+
 }
 
 @Composable
@@ -85,7 +105,8 @@ fun EditCategoryScreenView(
     navigator: DestinationsNavigator,
     category: Category,
     onConfirm: (String) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onBack: () -> Unit
 ) {
     var textState by remember { mutableStateOf(category.name.orEmpty()) }
     val maxLength = 10
@@ -95,12 +116,10 @@ fun EditCategoryScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "編輯分類:" + category.name.orEmpty(),
+                title = "編輯分類",
                 leadingEnable = true,
                 moreEnable = false,
-                backClick = {
-                    navigator.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { padding ->
@@ -214,7 +233,9 @@ fun EditCategoryScreenViewPreview() {
         EditCategoryScreenView(
             navigator = EmptyDestinationsNavigator,
             category = Category(name = "嘿嘿分類"),
-            onConfirm = {}
-        ) {}
+            onConfirm = {},
+            onDelete = {},
+            onBack = {}
+        )
     }
 }
