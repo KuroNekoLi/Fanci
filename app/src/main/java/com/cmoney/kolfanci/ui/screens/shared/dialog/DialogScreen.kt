@@ -26,10 +26,10 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 @Composable
 fun DialogScreen(
     modifier: Modifier = Modifier,
-    onDismiss: () -> Unit,
     titleIconRes: Int? = null,
     title: String,
     subTitle: String,
+    onDismiss: () -> Unit,
     content: @Composable () -> Unit
 ) {
     Dialog(onDismissRequest = {

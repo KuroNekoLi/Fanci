@@ -116,6 +116,7 @@ fun MainNavHost(
                 TabItem.Follow -> {
                     composable(TabItem.Follow.route) {
                         FollowScreen(
+                            modifier = Modifier,
                             globalViewModel = globalViewModel,
                             navigator = navigator
                         )
@@ -142,15 +143,15 @@ fun MainNavHost(
                     }
                 }
                 TabItem.My -> {
-                    composable(TabItem.My.route) {
-                        MyScreen {
-                            when (it) {
-                                MyCallback.ChangeAvatar -> {
-                                    route.invoke(MainStateHolder.Route.UserInfo())
-                                }
-                            }
-                        }
-                    }
+//                    composable(TabItem.My.route) {
+//                        MyScreen {
+//                            when (it) {
+//                                MyCallback.ChangeAvatar -> {
+//                                    route.invoke(MainStateHolder.Route.UserInfo())
+//                                }
+//                            }
+//                        }
+//                    }
                 }
             }
         }

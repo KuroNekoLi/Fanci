@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.di
 
 import com.cmoney.kolfanci.MainViewModel
+import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
@@ -60,5 +61,8 @@ val viewModule = module {
     }
     viewModel {
         RoleViewModel(get(), get(), get())
+    }
+    viewModel {
+        UserViewModel(androidApplication())
     }
 }

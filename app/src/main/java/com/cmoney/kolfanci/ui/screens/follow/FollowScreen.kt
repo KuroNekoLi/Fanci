@@ -37,9 +37,11 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.ChatRoomScreenDestination
 import com.cmoney.kolfanci.destinations.DiscoverGroupScreenDestination
 import com.cmoney.kolfanci.destinations.GroupSettingScreenDestination
+import com.cmoney.kolfanci.destinations.MyScreenDestination
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.kolfanci.ui.screens.my.MyInfoScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -53,6 +55,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun FollowScreen(
+    modifier: Modifier,
     globalViewModel: MainViewModel,
     navigator: DestinationsNavigator,
     viewModel: FollowViewModel = koinViewModel(),
@@ -78,10 +81,6 @@ fun FollowScreen(
         return (globalViewModel.uiState.isFetchFollowData) || (!XLoginHelper.isLogin && uiState.firstFetchData)
     }
 
-//    LaunchedEffect(Unit) {
-//        viewModel.fetchMyGroup()
-//    }
-
     if (triggerFetchGroup()) {
         viewModel.fetchMyGroup()
         if (XLoginHelper.isLogin) {
@@ -99,25 +98,6 @@ fun FollowScreen(
             firstInitData.value = false
         }
     }
-
-//    if (firstInitData.value) {
-//        if (group == null && uiState.myGroupList.isNotEmpty()) {
-//            uiState.myGroupList.find {
-//                it.isSelected
-//            }?.groupModel?.apply {
-//                globalViewModel.setCurrentGroup(this)
-//                firstInitData.value = false
-//            }
-//        }
-//    }
-
-//    val group = uiState.myGroupList.find {
-//        it.isSelected
-//    }?.groupModel
-//
-//    group?.let {
-//        globalViewModel.setCurrentGroup(it)
-//    }
 
     FollowScreenView(
         navigator = navigator,
@@ -201,12 +181,15 @@ fun FollowScreenView(
                             )
                         )
                     },
-                    onLogout = {
-                        XLoginHelper.logOut(context)
-                        val intent = Intent(context, MainActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        context.findActivity().finish()
-                        context.startActivity(intent)
+                    onProfile = {
+                        navigator.navigate(MyScreenDestination)
+
+                        //TODO Deprecate Logout
+//                        XLoginHelper.logOut(context)
+//                        val intent = Intent(context, MainActivity::class.java)
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//                        context.findActivity().finish()
+//                        context.startActivity(intent)
                     }
                 )
             }

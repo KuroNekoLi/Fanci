@@ -31,7 +31,7 @@ fun DrawerMenuScreen(
     groupList: List<GroupItem>,
     onClick: (GroupItem) -> Unit,
     onSearch: () -> Unit,
-    onLogout: () -> Unit
+    onProfile: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -71,20 +71,21 @@ fun DrawerMenuScreen(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(22.dp))
-                .background(LocalColor.current.env_80),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.bell),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
-            )
-        }
-        Spacer(modifier = Modifier.height(17.dp))
+        //TODO: 暫時沒有通知中心功能
+//        Box(
+//            modifier = Modifier
+//                .size(60.dp)
+//                .clip(RoundedCornerShape(22.dp))
+//                .background(LocalColor.current.env_80),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Image(
+//                painter = painterResource(id = R.drawable.bell),
+//                contentDescription = null,
+//                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+//            )
+//        }
+//        Spacer(modifier = Modifier.height(17.dp))
 
         Box(
             modifier = Modifier
@@ -110,12 +111,12 @@ fun DrawerMenuScreen(
                 .clip(RoundedCornerShape(22.dp))
                 .background(LocalColor.current.env_80)
                 .clickable {
-                    onLogout.invoke()
+                    onProfile.invoke()
                 },
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.menu_setting),
+                painter = painterResource(id = R.drawable.menu_profile),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
             )
@@ -143,7 +144,7 @@ fun DrawerMenuScreenPreview() {
             ),
             onClick = {},
             onSearch = {},
-            onLogout = {}
+            onProfile = {}
         )
     }
 }
