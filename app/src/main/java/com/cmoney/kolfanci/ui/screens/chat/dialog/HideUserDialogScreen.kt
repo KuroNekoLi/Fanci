@@ -1,12 +1,9 @@
 package com.cmoney.kolfanci.ui.screens.chat.dialog
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -19,14 +16,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
-import com.cmoney.kolfanci.ui.theme.Color_CB4A4A
-import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
+import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
+
 /**
- * 隱藏用戶 彈窗
+ * 封鎖用戶 彈窗
  */
 @Composable
 fun HideUserDialogScreen(
@@ -88,39 +86,30 @@ fun HideUserDialogScreen(
                         ChatUsrAvatarScreen(user)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
-                    Button(
+
+                    BorderButton(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        elevation = ButtonDefaults.elevation(0.dp),
-                        border = BorderStroke(1.dp, LocalColor.current.text.default_100),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = LocalColor.current.env_80,
-                        ),
-                        onClick = {
-                            onConfirm.invoke(user)
-                        }) {
-                        Text(text = "確定封鎖", fontSize = 16.sp, color = Color_CB4A4A)
+                        text = "確定封鎖",
+                        textColor = LocalColor.current.specialColor.red,
+                        borderColor = LocalColor.current.text.default_50
+                    ) {
+                        onConfirm.invoke(user)
                     }
+
                     Spacer(modifier = Modifier.height(20.dp))
-                    Button(
+
+                    BorderButton(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        elevation = ButtonDefaults.elevation(0.dp),
-                        border = BorderStroke(1.dp, LocalColor.current.text.default_100),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = LocalColor.current.env_80,
-                        ),
-                        onClick = {
-                            openDialog.value = false
-                            onDismiss.invoke()
-                        }) {
-                        Text(
-                            text = "取消",
-                            fontSize = 16.sp,
-                            color = LocalColor.current.text.default_100
-                        )
+                        text = "取消",
+                        textColor = LocalColor.current.text.default_100,
+                        borderColor = LocalColor.current.text.default_50
+                    ) {
+                        openDialog.value = false
+                        onDismiss.invoke()
                     }
                 }
             }
