@@ -18,10 +18,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
-import com.cmoney.kolfanci.ui.theme.Color_2B313C
-import com.cmoney.kolfanci.ui.theme.Color_CA4848
-import com.cmoney.kolfanci.ui.theme.Color_CCFFFFFF
-import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.*
+import com.cmoney.kolfanci.ui.theme.LocalColor
 
 @Composable
 fun DialogScreen(
@@ -57,7 +55,7 @@ fun DialogScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                         }
 
-                        Text(text = title, fontSize = 19.sp, color = Color_CCFFFFFF)
+                        Text(text = title, fontSize = 19.sp, color = LocalColor.current.text.default_100)
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -69,7 +67,7 @@ fun DialogScreen(
                         Text(
                             text = subTitle,
                             fontSize = 17.sp,
-                            color = Color.White
+                            color = LocalColor.current.text.default_100
                         )
                     }
 

@@ -17,6 +17,8 @@ data class UiState(
     val questionList: List<IGroupRequirementQuestion>? = null, //題目
     val answerList: List<String>? = null,       //作答清單
     val warning: String = "",                   //錯誤訊息
+    val notComplete: Boolean = false,           //未完成
+    val notSend: Boolean = false,               //答案未送出
     val isComplete: Boolean = false,            //是否成功 送出
     val isFromBackCheck: Boolean = false,       //是否為返回時的檢查
     val isPopupBack: Boolean = false            //是否直接返回
@@ -79,7 +81,9 @@ class ApplyForGroupViewModel(
             }
 
             if (isExistsNoAnswer) {
-                warning("尚有題目未完成")
+                uiState = uiState.copy(
+                    notComplete = true
+                )
                 return
             }
 
@@ -116,17 +120,19 @@ class ApplyForGroupViewModel(
         }
     }
 
-    private fun warning(text: String, isFromBackCheck: Boolean = false) {
-        uiState = uiState.copy(
-            warning = text,
-            isFromBackCheck = isFromBackCheck
-        )
-    }
+//    private fun warning(text: String, isFromBackCheck: Boolean = false) {
+//        uiState = uiState.copy(
+//            warning = text,
+//            isFromBackCheck = isFromBackCheck
+//        )
+//    }
 
     fun dismissWarning() {
         uiState = uiState.copy(
             warning = "",
-            isFromBackCheck = false
+            isFromBackCheck = false,
+            notComplete = false,
+            notSend = false
         )
     }
 
@@ -140,10 +146,12 @@ class ApplyForGroupViewModel(
                 it.isEmpty()
             }
 
-            if (isExistsNoAnswer) {
-                warning("答案未送出", isFromBackCheck = true)
+            uiState = if (isExistsNoAnswer) {
+                uiState.copy(
+                    notSend = true
+                )
             } else {
-                uiState = uiState.copy(
+                uiState.copy(
                     isPopupBack = true
                 )
             }
