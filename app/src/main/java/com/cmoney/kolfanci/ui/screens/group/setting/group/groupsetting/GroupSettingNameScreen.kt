@@ -20,6 +20,8 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
@@ -63,21 +65,18 @@ fun GroupSettingNameScreen(
             onDismiss = {
                 showEmptyTip = false
             },
+            titleIconRes = R.drawable.edit,
             title = "社團名稱空白",
             subTitle = "社團名稱不可以是空白的唷！",
             content = {
-                BorderButton(
+                BlueButton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    text = "修改",
-                    borderColor = LocalColor.current.component.other,
-                    textColor = Color.White,
-                    onClick = {
-                        showEmptyTip = false
-                        Unit
-                    }
-                )
+                    text = "修改"
+                ) {
+                    showEmptyTip = false
+                }
             }
         )
     }
@@ -190,7 +189,6 @@ fun GroupSettingNameView(
                     onClick = {
                         if (textState.isEmpty()) {
                             onShowEmptyTip.invoke()
-                            context.showToast("社團名稱不可以是空白的唷！")
                         } else {
                             onChangeName.invoke(textState)
                         }
