@@ -6,9 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,6 +23,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -45,6 +44,10 @@ fun MemberRoleManageScreen(
 ) {
     val roleList = remember {
         mutableStateOf(groupMember.roleInfos.orEmpty())
+    }
+
+    var showSaveTip by remember {
+        mutableStateOf(false)
     }
 
     //Add role callback
@@ -85,6 +88,20 @@ fun MemberRoleManageScreen(
             resultNavigator.navigateBack(
                 gson.toJson(roleList.value)
             )
+        },
+        onBack = {
+            showSaveTip = true
+        }
+    )
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navController.popBackStack()
         }
     )
 }
@@ -97,7 +114,8 @@ private fun MemberRoleManageScreenView(
     roleList: List<FanciRole>,
     group: Group,
     onRemove: (FanciRole) -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    onBack: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -203,7 +221,8 @@ fun MemberRoleManageScreenPreview() {
             ),
             roleList = listOf(),
             onRemove = {},
-            onSave = {}
+            onSave = {},
+            onBack = {}
         )
     }
 }

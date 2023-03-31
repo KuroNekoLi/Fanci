@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,30 +57,27 @@ fun SaveConfirmDialogScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column {
-                        Row {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Image(
-                                painter = painterResource(id = R.drawable.save_icon),
+                                painter = painterResource(id = R.drawable.dialog_ban),
+                                colorFilter = ColorFilter.tint(color = LocalColor.current.specialColor.red),
                                 contentDescription = null
                             )
 
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            Text(text = "此次變更尚未儲存！", fontSize = 19.sp, color = Color.White)
+                            Text(
+                                text = "此次變更尚未儲存！",
+                                fontSize = 19.sp,
+                                color = LocalColor.current.specialColor.red
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        BorderButton(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                            text = "繼續編輯",
-                            borderColor = LocalColor.current.component.other,
-                            textColor = Color.White
-                        ) {
-                            showDialog.value = false
-                            onContinue.invoke()
-                        }
+                        Text(text = "你所設定的內容，尚未儲存喔！", fontSize = 17.sp, color = Color.White)
 
                         Spacer(modifier = Modifier.height(20.dp))
 
@@ -94,6 +92,20 @@ fun SaveConfirmDialogScreen(
                             showDialog.value = false
                             onGiveUp.invoke()
                         }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        BorderButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            text = "繼續編輯",
+                            borderColor = LocalColor.current.component.other,
+                            textColor = LocalColor.current.text.default_100
+                        ) {
+                            showDialog.value = false
+                            onContinue.invoke()
+                        }
                     }
                 }
             }
@@ -107,6 +119,7 @@ fun SaveConfirmDialogScreen(
 fun SaveConfirmDialogScreenPreview() {
     FanciTheme {
         SaveConfirmDialogScreen(
+            isShow = true,
             onContinue = {},
             onGiveUp = {}
         )
