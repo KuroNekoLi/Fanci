@@ -16,9 +16,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.kolfanci.LocalDependencyContainer
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -30,8 +32,6 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
-import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
 
 /**
  * 主題預覽
@@ -68,21 +68,22 @@ fun GroupSettingThemePreviewScreen(
     }
 
     showConfirmDialog?.let {
-        ChangeThemeDialogScreen(
-            groupTheme = it,
-            onDismiss = {
-                showConfirmDialog = null
-            },
-            onConfirm = {
-                showConfirmDialog = null
-                if (isFromCreate) {
-                    val gson = Gson()
-                    resultNavigator.navigateBack(gson.toJson(it))
-                } else {
+        //如果是建立 直接確定並返回
+        if (isFromCreate) {
+            val gson = Gson()
+            resultNavigator.navigateBack(gson.toJson(it))
+        } else {
+            ChangeThemeDialogScreen(
+                groupTheme = it,
+                onDismiss = {
+                    showConfirmDialog = null
+                },
+                onConfirm = {
+                    showConfirmDialog = null
                     viewModel.changeTheme(groupParam, it)
                 }
-            }
-        )
+            )
+        }
     }
 
     LaunchedEffect(Unit) {

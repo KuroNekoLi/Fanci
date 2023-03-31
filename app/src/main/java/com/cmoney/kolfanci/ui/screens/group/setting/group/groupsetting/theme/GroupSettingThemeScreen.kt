@@ -87,23 +87,25 @@ fun GroupSettingThemeScreen(
     )
 
     showConfirmDialog?.let {
-        ChangeThemeDialogScreen(
-            groupTheme = it,
-            onDismiss = {
-                showConfirmDialog = null
-            },
-            onConfirm = {
-                showConfirmDialog = null
-                if (isFromCreate) {
-                    val gson = Gson()
-                    resultNavigator.navigateBack(gson.toJson(it))
-                } else {
+        //如果是建立 直接確定並返回
+        if (isFromCreate) {
+            val gson = Gson()
+            resultNavigator.navigateBack(gson.toJson(it))
+        }
+        else {
+            ChangeThemeDialogScreen(
+                groupTheme = it,
+                onDismiss = {
+                    showConfirmDialog = null
+                },
+                onConfirm = {
+                    showConfirmDialog = null
                     groupParam?.let { groupParam ->
                         viewModel.changeTheme(groupParam, it)
                     }
                 }
-            }
-        )
+            )
+        }
     }
 
     LaunchedEffect(Unit) {

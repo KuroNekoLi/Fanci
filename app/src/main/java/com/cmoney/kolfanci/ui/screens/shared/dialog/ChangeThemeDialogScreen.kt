@@ -30,11 +30,13 @@ fun ChangeThemeDialogScreen(
         subTitle = "主題套用後，所有成員的社團主題將會同步更改。",
         content = {
             Column {
+                Spacer(modifier = Modifier.height(10.dp))
+
                 BorderButton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    text = "確定套用",
+                    text = "確定",
                     borderColor = LocalColor.current.component.other,
                     textColor = Color.White
                 ) {
