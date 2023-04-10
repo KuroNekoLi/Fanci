@@ -27,7 +27,6 @@ data class FollowUiState(
     val navigateToCreateGroup: Boolean = false,  //前往建立社團
     val navigateToApproveGroup: Group? = null,  //前往社團認證
     val myGroupList: List<GroupItem> = emptyList(),  //我的社團
-    val firstFetchData: Boolean = true,  //標記是否第一次拿過初始化資料
     val openGroupDialog: Group? = null,  //點擊加入群組彈窗
     val isLoading: Boolean = false
 )
@@ -45,15 +44,16 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     var nextWeight: Long? = null            //下一分頁權重
 
     private fun loading() {
+        KLog.i(TAG, "loading")
         uiState = uiState.copy(
             isLoading = true
         )
     }
 
     private fun dismissLoading() {
+        KLog.i(TAG, "dismissLoading")
         uiState = uiState.copy(
             isLoading = false,
-            firstFetchData = false
         )
     }
 
@@ -107,6 +107,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      * 當沒有 社團的時候, 取得目前群組
      */
     private fun fetchAllGroupList() {
+        KLog.i(TAG, "fetchAllGroupList")
         viewModelScope.launch {
             loading()
             groupUseCase.getPopularGroup(

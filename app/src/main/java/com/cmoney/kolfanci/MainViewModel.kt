@@ -19,6 +19,9 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.ui.theme.CoffeeThemeColor
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 sealed class ThemeSetting {
@@ -31,46 +34,7 @@ data class UiState(
 //    val theme: FanciColor = CoffeeThemeColor,
     val theme: FanciColor = DefaultThemeColor,
     val isLoginSuccess: Boolean = false,
-    val isFetchFollowData: Boolean = false,
-    val isOpenTutorial: Boolean = false
-//    val testCategory: List<Category> = listOf(
-//        Category(
-//            id = "1",
-//            name = "Title1",
-//            channels = listOf(
-//                Channel(
-//                    id = "1",
-//                    name = "Channel1"
-//                ),
-//                Channel(
-//                    id = "2",
-//                    name = "Channel2"
-//                ),
-//                Channel(
-//                    id = "3",
-//                    name = "Channel3"
-//                )
-//            )
-//        ),
-//        Category(
-//            id = "2",
-//            name = "Title2",
-//            channels = listOf(
-//                Channel(
-//                    id = "4",
-//                    name = "Channel4"
-//                ),
-//                Channel(
-//                    id = "5",
-//                    name = "Channel5"
-//                ),
-//                Channel(
-//                    id = "6",
-//                    name = "Channel6"
-//                )
-//            )
-//        )
-//    )
+    val isOpenTutorial: Boolean = false,
 )
 
 class MainViewModel(
@@ -82,11 +46,12 @@ class MainViewModel(
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
-//    private val _isOpenTutorial = MutableLiveData<Boolean>()
-//    val isOpenTutorial: LiveData<Boolean> = _isOpenTutorial
-
     var uiState by mutableStateOf(UiState())
         private set
+
+    private val _fetchFollowData = MutableStateFlow(false)
+    val fetchFollowData: StateFlow<Boolean>
+        get() = _fetchFollowData
 
     init {
         viewModelScope.launch {
@@ -94,7 +59,6 @@ class MainViewModel(
                 uiState = uiState.copy(
                     isOpenTutorial = it
                 )
-//                _isOpenTutorial.value = it
             }
         }
     }
@@ -179,7 +143,6 @@ class MainViewModel(
         KLog.i(TAG, "loginSuccess")
         uiState = uiState.copy(
             isLoginSuccess = true,
-            isFetchFollowData = true
         )
     }
 
@@ -187,9 +150,11 @@ class MainViewModel(
      * 執行完抓取社團資料
      */
     fun fetchFollowDataDone() {
-        uiState = uiState.copy(
-            isFetchFollowData = false
-        )
+        _fetchFollowData.value = false
+    }
+
+    fun loginProcessDone() {
+        _fetchFollowData.value = true
     }
 
 //    fun sortCallback(categoryList: List<Category>) {

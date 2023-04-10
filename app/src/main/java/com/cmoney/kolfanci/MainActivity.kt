@@ -91,6 +91,7 @@ class MainActivity : BaseWebLoginActivity() {
 
     override fun autoLoginFailCallback() {
         KLog.i(TAG, "autoLoginFailCallback")
+        globalViewModel.loginProcessDone()
     }
 
     override fun loginCancel() {
@@ -105,6 +106,7 @@ class MainActivity : BaseWebLoginActivity() {
         KLog.i(TAG, "loginSuccessCallback")
         globalViewModel.registerUser()
         globalViewModel.loginSuccess()
+        globalViewModel.loginProcessDone()
     }
 }
 
