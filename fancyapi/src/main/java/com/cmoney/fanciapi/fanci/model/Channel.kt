@@ -16,6 +16,7 @@
 package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.Category
+import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ChannelType
 
 import com.squareup.moshi.Json
@@ -34,7 +35,7 @@ import kotlinx.parcelize.Parcelize
  * @param weight 排序權重
  * @param groupId 頻道所屬社團Id
  * @param category 
- * @param isPublic 是否為公開頻道
+ * @param privacy 
  */
 @Parcelize
 
@@ -75,9 +76,8 @@ data class Channel (
     @Json(name = "category")
     val category: Category? = null,
 
-    /* 是否為公開頻道 */
-    @Json(name = "isPublic")
-    val isPublic: kotlin.Boolean? = null
+    @Json(name = "privacy")
+    val privacy: ChannelPrivacy? = null
 
 ) : Parcelable
 

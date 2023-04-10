@@ -5,16 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
+import com.cmoney.kolfanci.extension.toGroupMember
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
-import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.sort.MoveItem
-import com.cmoney.fanciapi.fanci.model.Category
-import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.google.gson.Gson
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
@@ -22,19 +20,24 @@ import kotlinx.coroutines.launch
 data class UiState(
     val isLoading: Boolean = false,
     val group: Group? = null,
-    val channelRole: List<FanciRole>? = null,   //目前頻道顯示角色List
+    var channelName: String = "",                    //頻道名稱
+    val channelRole: List<FanciRole>? = null,        //目前頻道顯示角色List, 管理員
     val groupRoleList: List<AddChannelRoleModel> = emptyList(),
     val confirmRoleList: String = "",
-    val tabSelected: Int = 0,    //record tab position
+    val tabSelected: Int = 0,                        //record tab position
     val isOpenSortDialog: Boolean = false,
-    val isSoredToServerComplete: Boolean = false    //完成將排序結果給 server
+    val isSoredToServerComplete: Boolean = false,    //完成將排序結果給 server
+    val channelSettingTabIndex: Int = 0,             //新增頻道 tab position
+    var isNeedApproval: Boolean = false,             //是否公開
+    val channelAccessTypeList: List<ChannelAccessOptionModel> = emptyList(), //私密頻道 權限清單
+    val clickPermissionMemberModel: Pair<ChannelAccessOptionModel, SelectedModel>? = null, //點擊的 Permission 資料
+    val uniqueUserCount: Int = 0                     //私密頻道成員人數
 )
 
 data class AddChannelRoleModel(val role: FanciRole, val isChecked: Boolean = false)
 
 class ChannelSettingViewModel(
     private val channelUseCase: ChannelUseCase,
-    private val groupUseCase: GroupUseCase,
     private val orderUseCase: OrderUseCase
 ) : ViewModel() {
     private val TAG = ChannelSettingViewModel::class.java.simpleName
@@ -44,30 +47,61 @@ class ChannelSettingViewModel(
 
     var orgChannelRoleList = emptyList<FanciRole>() //原本頻道裡的角色清單
 
+    var currentSelectedPermission: ChannelAccessOptionModel? = null
+
+    //每個權限所勾選的人員/角色 清單, key = authType
+    private val listPermissionSelected: HashMap<String, SelectedModel> = hashMapOf()
+
+    //預編輯的頻道
+    var channel: Channel? = null
+
     /**
-     * 取得 社團下角色清單
-     * @param groupId 社團 id
-     * @param exclusiveRole 排除的 Role
+     * 設定 要編輯的 channel
      */
-    fun getGroupRoleList(groupId: String, exclusiveRole: Array<FanciRole>) {
-        KLog.i(TAG, "getGroupRole:$groupId")
+    fun initChannel(channel: Channel) {
+        KLog.i(TAG, "initChannel:$channel")
+        this.channel = channel
+
+        //頻道名稱
+        uiState.channelName = channel.name.orEmpty()
+
+        //取得管理員
+        getChannelRole(channel.id.orEmpty())
+
+        //公開/不公開
+        uiState.isNeedApproval = channel.privacy == ChannelPrivacy.private
+
+        //取得 私密頻道 人員/角色
+        channel.privacy?.let { privacy ->
+            if (privacy == ChannelPrivacy.private) {
+                getPrivateChannelMember(channel.id.orEmpty())
+            }
+        }
+    }
+
+    /**
+     * 取得 私密頻道 人員/角色 以及 抓取人數
+     */
+    private fun getPrivateChannelMember(channelId: String) {
+        KLog.i(TAG, "getPrivateChannelMember:$channelId")
         viewModelScope.launch {
-            groupUseCase.fetchGroupRole(
-                groupId = groupId
+            channelUseCase.getPrivateChannelWhiteList(
+                channelId
             ).fold({
-                uiState = uiState.copy(
-                    groupRoleList = it.filter {
-                        !exclusiveRole.contains(it)
-                    }.map {
-                        AddChannelRoleModel(role = it)
-                    }
-                )
+                it.map { channelWhiteList ->
+                    listPermissionSelected[channelWhiteList.authType.orEmpty()] = SelectedModel(
+                        selectedMember = channelWhiteList.users?.map { it.toGroupMember() }
+                            .orEmpty(),
+                        selectedRole = channelWhiteList.roles.orEmpty()
+                    )
+                }
+                fetchPrivateChannelUserCount()
+
             }, {
                 KLog.e(TAG, it)
             })
         }
     }
-
 
     /**
      * 取得 頻道角色清單
@@ -77,7 +111,7 @@ class ChannelSettingViewModel(
         viewModelScope.launch {
             channelUseCase.getChannelRole(channelId).fold({
                 orgChannelRoleList = it
-                uiState = uiState.copy(isLoading = true, channelRole = it)
+                uiState = uiState.copy(isLoading = false, channelRole = it)
             }, {
                 KLog.e(TAG, it)
                 uiState = uiState.copy(isLoading = false)
@@ -126,14 +160,34 @@ class ChannelSettingViewModel(
      */
     fun addChannel(group: Group, categoryId: String, name: String) {
         KLog.i(TAG, "addChannel: $categoryId, $name")
-        uiState = uiState.copy(
-            isLoading = true
-        )
+
         viewModelScope.launch {
+            uiState = uiState.copy(
+                isLoading = true
+            )
+
+            val privacy = if (uiState.isNeedApproval) {
+                ChannelPrivacy.private
+            } else {
+                ChannelPrivacy.public
+            }
+
             channelUseCase.addChannel(
-                categoryId = categoryId, name = name
-            ).fold({
-                addChannelToGroup(it, group)
+                categoryId = categoryId,
+                name = name,
+                privacy = privacy
+            ).fold({ channel ->
+                //新增管理員
+                if (uiState.channelRole?.isNotEmpty() == true) {
+                    editChannelRole(channel)
+                }
+
+                //私密頻道處理
+                if (privacy == ChannelPrivacy.private) {
+                    setPrivateChannelWhiteList(channelId = channel.id.orEmpty())
+                }
+
+                addChannelToGroup(channel, group)
             }, {
                 KLog.e(TAG, it)
                 uiState = uiState.copy(
@@ -144,7 +198,27 @@ class ChannelSettingViewModel(
     }
 
     /**
-     * 將新的 channel append 至 原本 group 顯示
+     * 設定 私密頻道 白名單
+     */
+    private suspend fun setPrivateChannelWhiteList(channelId: String) {
+        KLog.i(TAG, "setPrivateChannelWhiteList:$channelId")
+        listPermissionSelected.map {
+            val authType = it.key
+            val selectedModel = it.value
+            val job = viewModelScope.launch {
+                channelUseCase.putPrivateChannelWhiteList(
+                    channelId = channelId,
+                    authType = authType,
+                    accessorList = selectedModel.toAccessorList()
+                ).isSuccess
+            }
+            job.join()
+        }
+    }
+
+
+    /**
+     * 將新的 channel append 至 原本 group 做顯示
      */
     private fun addChannelToGroup(channel: Channel, group: Group) {
         val channelCategory = channel.category
@@ -184,8 +258,16 @@ class ChannelSettingViewModel(
      */
     fun editChannel(group: Group, channel: Channel, name: String) {
         KLog.i(TAG, "editChannel")
-        editChannelName(group, channel, name)
-        editChannelRole(channel)
+        viewModelScope.launch {
+            //私密頻道處理
+            if (uiState.isNeedApproval) {
+                setPrivateChannelWhiteList(channelId = channel.id.orEmpty())
+            }
+
+            editChannelRole(channel)
+
+            editChannelName(group, channel, name)
+        }
     }
 
     /**
@@ -194,7 +276,15 @@ class ChannelSettingViewModel(
     private fun editChannelName(group: Group, channel: Channel, name: String) {
         KLog.i(TAG, "editChanelName")
         viewModelScope.launch {
-            channelUseCase.editChannelName(channelId = channel.id.orEmpty(), name = name).fold({}, {
+            channelUseCase.editChannelName(
+                channelId = channel.id.orEmpty(),
+                name = name,
+                privacy = if (uiState.isNeedApproval) {
+                    ChannelPrivacy.private
+                } else {
+                    ChannelPrivacy.public
+                }
+            ).fold({}, {
                 if (it is EmptyBodyException) {
                     val newCategory = group.categories?.map { category ->
                         val newChannel = category.channels?.map { groupChannel ->
@@ -226,38 +316,37 @@ class ChannelSettingViewModel(
     /**
      * 編輯 頻道 管理員
      */
-    private fun editChannelRole(channel: Channel) {
+    private suspend fun editChannelRole(channel: Channel) {
         KLog.i(TAG, "editChannelRole")
-        viewModelScope.launch {
+        val job1 = viewModelScope.launch {
             //新增角色至channel
             val addRoleList =
                 uiState.channelRole?.filter { !orgChannelRoleList.contains(it) }.orEmpty()
             if (addRoleList.isNotEmpty()) {
-                channelUseCase.addRoleToChannel(
+                val isSuccess = channelUseCase.addRoleToChannel(
                     channelId = channel.id.orEmpty(),
                     roleIds = addRoleList.map {
                         it.id.orEmpty()
-                    }).fold({
-                }, {
-                    KLog.e(TAG, it)
-                })
+                    }).getOrNull()
+                KLog.i(TAG, "editChannelRole addRole: $isSuccess")
             }
+        }
+        job1.join()
 
-
+        val job2 = viewModelScope.launch {
             //要移除的角色
             val removeRoleList =
                 orgChannelRoleList.filter { !uiState.channelRole.orEmpty().contains(it) }
             if (removeRoleList.isNotEmpty()) {
-                channelUseCase.deleteRoleFromChannel(channelId = channel.id.orEmpty(),
-                    roleIds = removeRoleList.map {
-                        it.id.orEmpty()
-                    }).fold({
-
-                }, {
-                    KLog.e(TAG, it)
-                })
+                val isSuccess =
+                    channelUseCase.deleteRoleFromChannel(channelId = channel.id.orEmpty(),
+                        roleIds = removeRoleList.map {
+                            it.id.orEmpty()
+                        }).isSuccess
+                KLog.i(TAG, "editChannelRole removeRole: $isSuccess")
             }
         }
+        job2.join()
     }
 
     /**
@@ -357,45 +446,6 @@ class ChannelSettingViewModel(
     }
 
     /**
-     * 點擊 新增角色
-     */
-    fun onRoleClick(addChannelRoleModel: AddChannelRoleModel) {
-        val role = addChannelRoleModel.copy(
-            isChecked = !addChannelRoleModel.isChecked
-        )
-
-        val newList = uiState.groupRoleList.map {
-            if (it.role.id == addChannelRoleModel.role.id) {
-                role
-            } else {
-                it
-            }
-        }
-
-        uiState = uiState.copy(
-            groupRoleList = newList
-        )
-    }
-
-    /**
-     * 確定新增 角色
-     */
-    fun onAddRoleConfirm() {
-        KLog.i(TAG, "onAddRoleConfirm.")
-        val confirmRole = uiState.groupRoleList.filter {
-            it.isChecked
-        }
-        val finalRoleList = confirmRole.map {
-            it.role
-        }
-
-        val gson = Gson()
-        uiState = uiState.copy(
-            confirmRoleList = gson.toJson(finalRoleList)
-        )
-    }
-
-    /**
      * 增加 角色
      */
     fun addChannelRole(roleListStr: String) {
@@ -476,22 +526,21 @@ class ChannelSettingViewModel(
      */
     fun sortChannel(moveItem: MoveItem) {
         KLog.i(TAG, "sortChannel:$moveItem")
-        uiState.group?.let {group ->
+        uiState.group?.let { group ->
 
-            val removedCategoryList = group.categories?.map {category ->
+            val removedCategoryList = group.categories?.map { category ->
                 if (category.id == moveItem.fromCategory.id) {
                     category.copy(
-                        channels = category.channels?.filter {channel ->
+                        channels = category.channels?.filter { channel ->
                             channel.id != moveItem.channel.id
                         }
                     )
-                }
-                else {
+                } else {
                     category
                 }
             }
 
-            val sortedCategory = removedCategoryList?.map {category ->
+            val sortedCategory = removedCategoryList?.map { category ->
                 if (category.id == moveItem.toCategory?.id) {
                     val channels = category.channels?.toMutableList()
                     channels?.add(moveItem.channel)
@@ -500,8 +549,7 @@ class ChannelSettingViewModel(
                             it.id
                         }
                     )
-                }
-                else {
+                } else {
                     category
                 }
             }
@@ -511,6 +559,116 @@ class ChannelSettingViewModel(
                     categories = sortedCategory
                 )
             )
+        }
+    }
+
+    /**
+     * 新增頻道 tab selection
+     */
+    fun onChannelSettingTabSelected(position: Int) {
+        KLog.i(TAG, "onChannelSettingTabSelected:$position")
+        uiState = uiState.copy(tabSelected = position)
+    }
+
+    /**
+     * 設定 頻道 公開度
+     */
+    fun setChannelApproval(isNeedApproval: Boolean) {
+        KLog.i(TAG, "setChannelApproval:$isNeedApproval")
+        uiState = uiState.copy(
+            isNeedApproval = isNeedApproval
+        )
+    }
+
+    /**
+     * 抓取 目前私密頻道所有權限
+     */
+    fun fetchChannelPermissionList() {
+        KLog.i(TAG, "fetchChannelPermissionList")
+        viewModelScope.launch {
+            channelUseCase.getChanelAccessType().fold({
+                uiState = uiState.copy(
+                    channelAccessTypeList = it
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 設定 所選擇的成員以及角色
+     */
+    fun setPermissionMemberSelected(selectedModel: SelectedModel) {
+        KLog.i(TAG, "setPermissionMemberSelected:$selectedModel")
+        currentSelectedPermission?.let {
+            listPermissionSelected[it.authType.orEmpty()] = selectedModel
+            currentSelectedPermission = null
+
+            fetchPrivateChannelUserCount()
+        }
+    }
+
+    /**
+     * 設定目前 所點擊的 權限設定
+     */
+    fun onPermissionClick(channelPermissionModel: ChannelAccessOptionModel) {
+        KLog.i(TAG, "onPermissionClick:$channelPermissionModel")
+        currentSelectedPermission = channelPermissionModel
+
+        listPermissionSelected[channelPermissionModel.authType.orEmpty()]?.let {
+            uiState = uiState.copy(
+                clickPermissionMemberModel = Pair(channelPermissionModel, it)
+            )
+        } ?: kotlin.run {
+            uiState = uiState.copy(
+                clickPermissionMemberModel = Pair(channelPermissionModel, SelectedModel())
+            )
+        }
+    }
+
+    /**
+     * 跳轉後關閉參數
+     */
+    fun dismissPermissionNavigator() {
+        uiState = uiState.copy(clickPermissionMemberModel = null)
+    }
+
+    /**
+     * 設定頻道名稱
+     */
+    fun setChannelName(name: String) {
+        uiState = uiState.copy(channelName = name)
+    }
+
+    /**
+     * 取得 私密頻道不重複人數
+     */
+    private fun fetchPrivateChannelUserCount() {
+        KLog.i(TAG, "fetchPrivateChannelUserCount")
+        viewModelScope.launch {
+            val userList = listPermissionSelected.flatMap {
+                it.value.selectedMember
+            }.map {
+                it.id.orEmpty()
+            }.distinct()
+
+            val roleList = listPermissionSelected.flatMap {
+                it.value.selectedRole
+            }.map {
+                it.id.orEmpty()
+            }.distinct()
+
+            channelUseCase.getPrivateChannelUserCount(
+                roleIds = roleList,
+                userIds = userList
+            ).fold({
+                uiState = uiState.copy(
+                    uniqueUserCount = it.count ?: 0
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
         }
     }
 }

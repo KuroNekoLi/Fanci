@@ -138,6 +138,6 @@ fun BorderButton(
 @Composable
 fun BorderButtonPreview() {
     FanciTheme {
-        BorderButton(text = "Hello", borderColor = Color.Gray) {}
+        BorderButton(text = "Hello BorderButtonPreview", borderColor = Color.Gray) {}
     }
 }

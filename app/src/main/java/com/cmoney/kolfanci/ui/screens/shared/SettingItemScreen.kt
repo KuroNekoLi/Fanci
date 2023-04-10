@@ -57,6 +57,8 @@ fun SettingItemScreen(
 
         otherContent?.let { it() }
 
+        Spacer(modifier = Modifier.width(5.dp))
+
         Image(
             painter = painterResource(id = R.drawable.next),
             contentDescription = null,

@@ -15,7 +15,7 @@ import com.cmoney.fanciapi.fanci.model.PinnedMessageInfo
 
 interface ChatRoomApi {
     /**
-     * 取得聊天室訊息列表 __________🔒 已註冊的fanci使用者
+     * 取得聊天室訊息列表 __________🔒 可看
      * 
      * Responses:
      *  - 200: 成功
@@ -33,7 +33,7 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdMessageGet(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Query("take") take: kotlin.Int? = 20, @Query("order") order: OrderType? = null, @Query("fromSerialNumber") fromSerialNumber: kotlin.Long? = null): Response<ChatMessagePaging>
 
     /**
-     * 對聊天室新增一則聊天訊息 __________🔒 已註冊的fanci使用者
+     * 對聊天室新增一則聊天訊息 __________🔒 可發文
      * 
      * Responses:
      *  - 200: 成功
@@ -65,7 +65,7 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessageDelete(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<Unit>
 
     /**
-     * 取得聊天室的公告訊息 __________🔒 已註冊的fanci使用者
+     * 取得聊天室的公告訊息 __________🔒 可看
      * 
      * Responses:
      *  - 200: 成功

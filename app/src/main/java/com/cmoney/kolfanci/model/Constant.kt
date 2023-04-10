@@ -48,6 +48,29 @@ object Constant {
 
 
     /**
+     * 是否可以管理 加入申請
+     */
+    fun isShowApproval(): Boolean = MyGroupPermission.approveJoinApplies == true
+
+    /**
+     * 是否可以 角色管理
+     */
+    fun isShowRoleManage(): Boolean = MyGroupPermission.createOrEditRole == true
+
+    /**
+     * 是否呈現 社團管理 區塊
+     */
+    fun isShowGroupManage(): Boolean {
+        return (MyGroupPermission.editGroup == true) ||
+                (MyGroupPermission.createOrEditChannel == true) ||
+                (MyGroupPermission.createOrEditCategory == true) ||
+                (MyGroupPermission.setGroupPublicity == true) ||
+                (MyGroupPermission.rearrangeChannelCategory == true) ||
+                (MyGroupPermission.deleteCategory == true) ||
+                (MyGroupPermission.deleteChannel == true)
+    }
+
+    /**
      * 是否可以編輯 頻道
      */
     fun isChannelEditPermission(): Boolean =

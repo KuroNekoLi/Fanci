@@ -24,13 +24,13 @@ interface GroupApi {
      * Responses:
      *  - 200: 成功
      *
-     * @param startWeight 起始權重 (optional, default to 0L)
+     * @param startWeight 起始權重 (optional, default to 2147483647L)
      * @param pageSize 每頁筆數 (optional, default to 100)
      * @param orderType 排序類型 (optional)
      * @return [GroupPaging]
      */
     @GET("api/v1/Group")
-    suspend fun apiV1GroupGet(@Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 100, @Query("orderType") orderType: OrderType? = null): Response<GroupPaging>
+    suspend fun apiV1GroupGet(@Query("startWeight") startWeight: kotlin.Long? = 2147483647L, @Query("pageSize") pageSize: kotlin.Int? = 100, @Query("orderType") orderType: OrderType? = null): Response<GroupPaging>
 
     /**
      * 新增社團 頻道分類 __________🔒 建立分類
@@ -122,7 +122,7 @@ interface GroupApi {
     suspend fun apiV1GroupGroupIdRoleGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
 
     /**
-     * 新增角色 __________🔒 新增角色
+     * 新增角色(管理員) __________🔒 新增角色
      * 
      * Responses:
      *  - 200: 成功

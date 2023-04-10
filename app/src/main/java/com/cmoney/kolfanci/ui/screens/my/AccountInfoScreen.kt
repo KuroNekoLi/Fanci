@@ -13,33 +13,42 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.kolfanci.R
+
 @Composable
-fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> Unit) {
+fun AccountInfoScreen(
+    modifier: Modifier = Modifier,
+    account: String,
+    accountNumber: String,
+    onChangeAvatarClick: () -> Unit,
+    onAccountManageClick: () -> Unit
+) {
     Column(modifier = modifier) {
         Text(
             modifier = Modifier
                 .padding(
                     start = 25.dp,
                 ),
-            text = "帳號資料", fontSize = 14.sp, color = LocalColor.current.text.default_100
+            text = "帳號資料", fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Column(modifier = Modifier.background(LocalColor.current.background)) {
+        Column {
             Row(
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .background(LocalColor.current.background)
+                    .clickable {
+                        onChangeAvatarClick.invoke()
+                    }
                     .padding(
                         top = 10.dp,
                         bottom = 10.dp,
                         start = 25.dp,
                         end = 10.dp
-                    )
-                    .fillMaxWidth()
-                    .clickable {
-                        onChangeAvatarClick.invoke()
-                    },
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -60,8 +69,14 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
                 )
             }
 
+            Spacer(modifier = Modifier.height(1.dp))
+
             Row(
                 modifier = Modifier
+                    .background(LocalColor.current.background)
+                    .clickable {
+                        onAccountManageClick.invoke()
+                    }
                     .padding(
                         top = 10.dp,
                         bottom = 10.dp,
@@ -83,7 +98,7 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
                     text = "帳號管理", fontSize = 17.sp, color = LocalColor.current.text.default_100
                 )
                 Text(
-                    text = "emily1112@gmail.com", fontSize = 14.sp, color = LocalColor.current.text.default_100
+                    text = account, fontSize = 14.sp, color = LocalColor.current.text.default_100
                 )
                 Image(
                     painter = painterResource(id = R.drawable.next),
@@ -92,8 +107,11 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
                 )
             }
 
+            Spacer(modifier = Modifier.height(1.dp))
+
             Row(
                 modifier = Modifier
+                    .background(LocalColor.current.background)
                     .padding(
                         top = 10.dp,
                         bottom = 10.dp,
@@ -115,7 +133,9 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
                     text = "使用者編號", fontSize = 17.sp, color = LocalColor.current.text.default_100
                 )
                 Text(
-                    text = "13029", fontSize = 14.sp, color = LocalColor.current.text.default_80
+                    text = accountNumber,
+                    fontSize = 14.sp,
+                    color = LocalColor.current.text.default_80
                 )
             }
         }
@@ -127,6 +147,9 @@ fun AccountInfoScreen(modifier: Modifier = Modifier, onChangeAvatarClick: () -> 
 fun AccountInfoScreenPreview() {
     FanciTheme {
         AccountInfoScreen(
+            account = "Account",
+            accountNumber = "12345",
+            onAccountManageClick = {},
             onChangeAvatarClick = {}
         )
     }

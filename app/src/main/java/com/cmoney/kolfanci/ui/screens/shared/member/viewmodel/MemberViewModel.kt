@@ -1,22 +1,25 @@
 package com.cmoney.kolfanci.ui.screens.shared.member.viewmodel
 
+import android.os.Parcelable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
-import com.cmoney.fanciapi.fanci.model.BanPeriodOption
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
+import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -24,10 +27,43 @@ import java.util.concurrent.TimeUnit
 data class UiState(
     val groupMember: List<GroupMemberSelect>? = null,  //社團會員
     val kickMember: GroupMember? = null,     //踢除會員
-    val banUiModel: BanUiModel? = null      //禁言中 info
+    val banUiModel: BanUiModel? = null,      //禁言中 info
+    val showAddSuccessTip: Boolean = false,  //show 新增成功 toast
+    val loading: Boolean = true,
+    var selectedMember: List<GroupMember> = emptyList(), //選中的會員
+    var selectedRole: List<FanciRole> = emptyList(), //選中的角色
+    val tabIndex: Int = 0
 )
 
 data class GroupMemberSelect(val groupMember: GroupMember, val isSelected: Boolean = false)
+
+/**
+ * 選擇的成員/角色 清單
+ */
+@Parcelize
+data class SelectedModel(
+    val selectedMember: List<GroupMember> = emptyList(),
+    val selectedRole: List<FanciRole> = emptyList()
+) : Parcelable {
+
+    fun toAccessorList(): List<AccessorParam> {
+        val memberAccessor = AccessorParam(
+            type = AccessorTypes.users,
+            ids = selectedMember.map {
+                it.id.orEmpty()
+            }
+        )
+
+        val roleAccessor = AccessorParam(
+            type = AccessorTypes.role,
+            ids = selectedRole.map {
+                it.id.orEmpty()
+            }
+        )
+
+        return listOf(memberAccessor, roleAccessor)
+    }
+}
 
 class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUseCase: BanUseCase) :
     ViewModel() {
@@ -35,6 +71,30 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
 
     var uiState by mutableStateOf(UiState())
         private set
+
+    //群組會員清單
+    val orgGroupMemberList = mutableListOf<GroupMemberSelect>()
+
+    //新增的會員
+    private val addGroupMemberQueue = mutableListOf<GroupMember>()
+
+    //排除顯示的會員清單
+    private val excludeMember: MutableList<GroupMember> = mutableListOf()
+
+    //目前輸入的 keyword
+    private var currentKeyword: String = ""
+
+    private fun showLoading() {
+        uiState = uiState.copy(
+            loading = true
+        )
+    }
+
+    private fun dismissLoading() {
+        uiState = uiState.copy(
+            loading = false
+        )
+    }
 
     /**
      * 解除 禁言
@@ -144,28 +204,76 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
     /**
      * 獲取群組會員清單
      */
-    fun fetchGroupMember(groupId: String, skip: Int = 0) {
+    fun fetchGroupMember(
+        groupId: String,
+        skip: Int = 0,
+        excludeMember: List<GroupMember> = emptyList(),
+        searchKeyword: String? = null
+    ) {
         KLog.i(TAG, "fetchGroupMember:$groupId")
+
+        this.excludeMember.addAll(excludeMember)
+
         viewModelScope.launch {
-            groupUseCase.getGroupMember(groupId = groupId, skipCount = skip).fold({
-                val responseMembers = it.items.orEmpty()
-                if (responseMembers.isNotEmpty()) {
-                    val wrapMember = responseMembers.map { member ->
-                        GroupMemberSelect(
-                            groupMember = member
+            showLoading()
+            groupUseCase.getGroupMember(groupId = groupId, skipCount = skip, search = searchKeyword)
+                .fold({
+                    val responseMembers = it.items.orEmpty()
+                    if (responseMembers.isNotEmpty()) {
+                        val wrapMember = responseMembers.map { member ->
+                            GroupMemberSelect(
+                                groupMember = member
+                            )
+                        }
+
+                        val orgMemberList = uiState.groupMember.orEmpty().toMutableList()
+                        orgMemberList.addAll(wrapMember)
+
+                        val filterMember = orgMemberList.filter {
+                            excludeMember.find { exclude ->
+                                exclude.id == it.groupMember.id
+                            } == null
+                        }
+
+                        orgGroupMemberList.addAll(filterMember)
+                        val distinct = orgGroupMemberList.distinct()
+                        orgGroupMemberList.clear()
+                        orgGroupMemberList.addAll(distinct)
+
+                        uiState = uiState.copy(
+                            groupMember = orgGroupMemberList
                         )
                     }
-
-                    val orgMemberList = uiState.groupMember.orEmpty().toMutableList()
-                    orgMemberList.addAll(wrapMember)
-
+                    else {
+                        uiState = uiState.copy(
+                            groupMember = emptyList()
+                        )
+                    }
+                    //TODO just for test
+//                    else {
+//                        //test
+//                        uiState = uiState.copy(
+//                            groupMember = listOf(
+//                                GroupMemberSelect(
+//                                    groupMember = GroupMember(
+//                                        name = "Hello",
+//                                        thumbNail = "https://i.pinimg.com/564x/6f/4a/bd/6f4abd8a21e444296e3f0cc2f8801fdb.jpg",
+//                                        roleInfos = listOf(FanciRole(
+//                                            name = "哇哈哈權限",
+//                                        ))
+//                                    )
+//                                )
+//                            )
+//                        )
+//                    }
+                    dismissLoading()
+                }, {
+                    dismissLoading()
+                    KLog.e(TAG, it)
                     uiState = uiState.copy(
-                        groupMember = orgMemberList
+                        groupMember = emptyList()
                     )
-                }
-            }, {
-                KLog.e(TAG, it)
-            })
+                })
         }
     }
 
@@ -176,7 +284,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
         KLog.i(TAG, "onLoadMoreGroupMember")
         val skip = uiState.groupMember.orEmpty().size
         if (skip != 0) {
-            fetchGroupMember(groupId, skip)
+            fetchGroupMember(groupId, skip, searchKeyword = currentKeyword)
         }
     }
 
@@ -205,12 +313,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
      */
     fun fetchSelectedMember(): String {
         val gson = Gson()
-        val list = uiState.groupMember?.filter {
-            it.isSelected
-        }?.map {
-            it.groupMember
-        }.orEmpty()
-        return gson.toJson(list)
+        return gson.toJson(addGroupMemberQueue)
     }
 
     /**
@@ -293,5 +396,185 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                 groupMember = newGroupList
             )
         }
+    }
+
+    private var timer: Timer? = null
+
+    /**
+     * 搜尋成員
+     */
+    fun onSearchMember(
+        groupId: String,
+        keyword: String
+    ) {
+        KLog.i(TAG, "onSearchMember:$keyword")
+
+        currentKeyword = keyword
+
+        timer?.cancel()
+
+        timer = Timer().apply {
+            schedule(object : TimerTask() {
+                override fun run() {
+                    //searching
+                    KLog.i(TAG, "searching:$keyword")
+                    if (keyword.isEmpty()) {
+                        uiState = uiState.copy(
+                            groupMember = orgGroupMemberList
+                        )
+                    } else {
+                        fetchGroupMember(
+                            groupId = groupId,
+                            excludeMember = excludeMember,
+                            searchKeyword = keyword
+                        )
+                    }
+
+                    //Local Searching
+//                    //return all
+//                    uiState = if (keyword.isEmpty()) {
+//                        uiState.copy(
+//                            groupMember = orgGroupMemberList
+//                        )
+//                    } else {
+//                        uiState.copy(
+//                            groupMember = orgGroupMemberList.filter {
+//                                it.groupMember.name?.startsWith(keyword) == true
+//                            }
+//                        )
+//                    }
+                }
+            }, 400)
+        }
+    }
+
+    /**
+     * 點擊 新增 會員, 將選中的會員暫存, 並從畫面上移除
+     */
+    fun onAddSelectedMember() {
+        KLog.i(TAG, "onAddSelectedMember")
+        val selectedMember = uiState.groupMember?.filter {
+            it.isSelected
+        }?.map {
+            it.groupMember
+        }.orEmpty()
+
+        if (selectedMember.isNotEmpty()) {
+            addGroupMemberQueue.addAll(selectedMember)
+            val distinctList = addGroupMemberQueue.distinct()
+            addGroupMemberQueue.clear()
+            addGroupMemberQueue.addAll(distinctList)
+
+            val orgMemberList = uiState.groupMember.orEmpty()
+            val filterMember = orgMemberList.filter {
+                addGroupMemberQueue.find { exclude ->
+                    exclude.id == it.groupMember.id
+                } == null
+            }
+
+            uiState = uiState.copy(
+                groupMember = filterMember,
+                showAddSuccessTip = true
+            )
+        }
+    }
+
+    /**
+     * 取消 toast
+     */
+    fun dismissAddSuccessTip() {
+        uiState = uiState.copy(
+            showAddSuccessTip = false
+        )
+    }
+
+    /**
+     * 將選中的 會員加入清單
+     */
+    fun addSelectedMember(member: String) {
+        val gson = Gson()
+        val listType: Type =
+            object : TypeToken<List<GroupMember>>() {}.type
+        val responseMemberList = gson.fromJson(member, listType) as List<GroupMember>
+
+        if (responseMemberList.isNotEmpty()) {
+            val newList = uiState.selectedMember.toMutableList()
+            newList.addAll(responseMemberList)
+            uiState = uiState.copy(
+                selectedMember = newList.distinct()
+            )
+        }
+    }
+
+    fun addSelectedMember(selectedMember: List<GroupMember>) {
+        if (selectedMember.isNotEmpty()) {
+            uiState.selectedMember = selectedMember
+        }
+    }
+
+    /**
+     * 增加 角色
+     */
+    fun addSelectedRole(roleListStr: String) {
+        KLog.i(TAG, "addSelectedRole:$roleListStr")
+        val gson = Gson()
+        val roleList = gson.fromJsonTypeToken<List<FanciRole>>(roleListStr)
+        val orgRoleList = uiState.selectedRole
+        val unionList = roleList.union(orgRoleList).toMutableList()
+        uiState = uiState.copy(
+            selectedRole = unionList
+        )
+    }
+
+    fun addSelectedRole(selectedRole: List<FanciRole>) {
+        if (selectedRole.isNotEmpty()) {
+            uiState.selectedRole = selectedRole
+        }
+    }
+
+    /**
+     * 點擊 tab
+     */
+    fun onTabClick(pos: Int) {
+        KLog.i(TAG, "onTabClick:$pos")
+        uiState = uiState.copy(
+            tabIndex = pos
+        )
+    }
+
+    /**
+     * 將選擇的 member remove
+     */
+    fun removeSelectedMember(groupMember: GroupMember) {
+        KLog.i(TAG, "removeSelectedMember:$groupMember")
+        val filterList = uiState.selectedMember.filter {
+            it.id != groupMember.id
+        }
+        uiState = uiState.copy(
+            selectedMember = filterList
+        )
+    }
+
+    /**
+     * 將選擇的 role remove
+     */
+    fun removeSelectedRole(fanciRole: FanciRole) {
+        KLog.i(TAG, "removeSelectedRole:$fanciRole")
+        val filterList = uiState.selectedRole.filter {
+            it.id != fanciRole.id
+        }
+        uiState = uiState.copy(
+            selectedRole = filterList
+        )
+    }
+
+    /**
+     * 抓取 所選擇的成員以及角色
+     */
+    fun fetchSelected(): SelectedModel {
+        return SelectedModel(
+            selectedMember = uiState.selectedMember,
+            selectedRole = uiState.selectedRole
+        )
     }
 }

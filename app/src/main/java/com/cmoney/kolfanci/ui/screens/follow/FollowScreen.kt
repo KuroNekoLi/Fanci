@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.follow
 
-import android.content.Intent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableState
@@ -31,13 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.MainViewModel
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.ChatRoomScreenDestination
 import com.cmoney.kolfanci.destinations.DiscoverGroupScreenDestination
 import com.cmoney.kolfanci.destinations.GroupSettingScreenDestination
-import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.destinations.MyScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.theme.Black_99000000
@@ -53,11 +51,15 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun FollowScreen(
+    modifier: Modifier,
     globalViewModel: MainViewModel,
     navigator: DestinationsNavigator,
     viewModel: FollowViewModel = koinViewModel(),
-    mainViewModel: MainViewModel = koinViewModel()
+    firstInitData: MutableState<Boolean> = remember {
+        mutableStateOf(true)
+    }
 ) {
+    val globalUiState = globalViewModel.uiState
     val uiState = viewModel.uiState
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -66,32 +68,22 @@ fun FollowScreen(
         it
     }
 
-    /**
-     * 抓取資料時機點,
-     * 登入成功後觸發一次
-     * 還未登入
-     */
-    fun triggerFetchGroup(): Boolean {
-        return (globalViewModel.uiState.isFetchFollowData) || (!XLoginHelper.isLogin && uiState.firstFetchData)
-    }
+    val fetchDataState = globalViewModel.fetchFollowData.collectAsState()
 
-//    LaunchedEffect(Unit) {
-//        viewModel.fetchMyGroup()
-//    }
-
-    if (triggerFetchGroup()) {
+    if (fetchDataState.value) {
         viewModel.fetchMyGroup()
-        if (XLoginHelper.isLogin) {
-            globalViewModel.fetchFollowDataDone()
-        }
+        globalViewModel.fetchFollowDataDone()
     }
 
-    val group = uiState.myGroupList.find {
-        it.isSelected
-    }?.groupModel
+    val group = globalUiState.currentGroup
 
-    group?.let {
-        mainViewModel.setCurrentGroup(it)
+    if (group == null && uiState.myGroupList.isNotEmpty()) {
+        uiState.myGroupList.find {
+            it.isSelected
+        }?.groupModel?.apply {
+            globalViewModel.setCurrentGroup(this)
+            firstInitData.value = false
+        }
     }
 
     FollowScreenView(
@@ -176,12 +168,8 @@ fun FollowScreenView(
                             )
                         )
                     },
-                    onLogout = {
-                        XLoginHelper.logOut(context)
-                        val intent = Intent(context, MainActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        context.findActivity().finish()
-                        context.startActivity(intent)
+                    onProfile = {
+                        navigator.navigate(MyScreenDestination)
                     }
                 )
             }

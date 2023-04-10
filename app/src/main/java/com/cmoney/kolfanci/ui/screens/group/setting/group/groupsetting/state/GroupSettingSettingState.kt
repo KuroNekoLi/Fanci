@@ -29,6 +29,7 @@ class GroupSettingSettingState(
     }
 }
 
+//TODO: Remove it change to viewModel
 @Composable
 fun rememberGroupSettingSettingState(
     openCameraDialog: MutableState<Boolean> = mutableStateOf(false),

@@ -830,7 +830,7 @@
         "tags": [
           "Channel"
         ],
-        "summary": "新增更新 多個 頻道角色 __________🔒 指派頻道管理員",
+        "summary": "新增更新 多個管理員 到 頻道 __________🔒 指派頻道管理員",
         "parameters": [
           {
             "name": "channelId",
@@ -891,7 +891,7 @@
         "tags": [
           "Channel"
         ],
-        "summary": "從頻道移除 多個 角色 __________🔒 指派頻道管理員",
+        "summary": "從頻道移除 多個 管理員角色 __________🔒 指派頻道管理員",
         "parameters": [
           {
             "name": "channelId",
@@ -949,12 +949,263 @@
         ]
       }
     },
+    "/api/v1/Channel/AccessType": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "取得私密頻道權限設定文案\r\n提供權限類型，以及權限描述的文案",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelAccessOptionModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelAccessOptionModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelAccessOptionModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Channel/WhiteList/Users/Count": {
+      "post": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "取得私密頻道白名單覆蓋人數",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetWhiteListCountParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetWhiteListCountParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetWhiteListCountParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhiteListCount"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhiteListCount"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhiteListCount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Channel/{channelId}/WhiteList": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "取得私密頻道白名單",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelWhiteList"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelWhiteList"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelWhiteList"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Channel/{channelId}/WhiteList/{authType}": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "取得私密頻道白名單",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelWhiteList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelWhiteList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelWhiteList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "設定私密頻道白名單 (Role/Users) __________🔒 編輯頻道",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authType",
+            "in": "path",
+            "description": "指定加入成員的權限類型)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutWhiteListRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutWhiteListRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutWhiteListRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/ChatRoom/{chatRoomChannelId}/Message": {
       "post": {
         "tags": [
           "ChatRoom"
         ],
-        "summary": "對聊天室新增一則聊天訊息 __________🔒 已註冊的fanci使用者",
+        "summary": "對聊天室新增一則聊天訊息 __________🔒 可發文",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1021,7 +1272,8 @@
           {
             "oauth2": [
               "user",
-              "BANNED_1_chatRoomChannelId"
+              "BANNED_1_chatRoomChannelId",
+              "PERMISSION_CanPost_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -1030,7 +1282,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取得聊天室訊息列表 __________🔒 已註冊的fanci使用者",
+        "summary": "取得聊天室訊息列表 __________🔒 可看",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1103,7 +1355,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_CanRead_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -1114,7 +1367,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取得聊天室的公告訊息 __________🔒 已註冊的fanci使用者",
+        "summary": "取得聊天室的公告訊息 __________🔒 可看",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -1160,7 +1413,8 @@
         "security": [
           {
             "oauth2": [
-              "user"
+              "user",
+              "PERMISSION_CanRead_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -1316,7 +1570,7 @@
             "schema": {
               "type": "integer",
               "format": "int64",
-              "default": 0
+              "default": 2147483647
             }
           },
           {
@@ -1825,7 +2079,7 @@
         "tags": [
           "Group"
         ],
-        "summary": "新增角色 __________🔒 新增角色",
+        "summary": "新增角色(管理員) __________🔒 新增角色",
         "parameters": [
           {
             "name": "groupId",
@@ -2370,6 +2624,15 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "搜尋用戶暱稱的關鍵字",
+            "schema": {
+              "type": "string",
+              "default": ""
             }
           },
           {
@@ -4535,6 +4798,31 @@
   },
   "components": {
     "schemas": {
+      "AccessorParam": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/AccessorTypes"
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "可存取此頻道的RoleIds/UserId",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "設定自定義存取權限參數"
+      },
+      "AccessorTypes": {
+        "enum": [
+          "Role",
+          "Users"
+        ],
+        "type": "string"
+      },
       "ApplyStatus": {
         "enum": [
           "UnConfirmed",
@@ -4542,6 +4830,23 @@
           "Denied"
         ],
         "type": "string"
+      },
+      "AuthBulliten": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "isEnabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
       },
       "BanParam": {
         "type": "object",
@@ -4699,13 +5004,37 @@
           "category": {
             "$ref": "#/components/schemas/Category"
           },
-          "isPublic": {
-            "type": "boolean",
-            "description": "是否為公開頻道"
+          "privacy": {
+            "$ref": "#/components/schemas/ChannelPrivacy"
           }
         },
         "additionalProperties": false,
         "description": "頻道"
+      },
+      "ChannelAccessOptionModel": {
+        "type": "object",
+        "properties": {
+          "authType": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "bullitens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthBulliten"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ChannelPaging": {
         "type": "object",
@@ -4737,6 +5066,9 @@
             "type": "string",
             "description": "頻道名稱",
             "nullable": true
+          },
+          "privacy": {
+            "$ref": "#/components/schemas/ChannelPrivacy"
           }
         },
         "additionalProperties": false,
@@ -4775,11 +5107,42 @@
         },
         "additionalProperties": false
       },
+      "ChannelPrivacy": {
+        "enum": [
+          "Public",
+          "Private"
+        ],
+        "type": "string"
+      },
       "ChannelType": {
         "enum": [
           "ChatRoom"
         ],
         "type": "string"
+      },
+      "ChannelWhiteList": {
+        "type": "object",
+        "properties": {
+          "authType": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FanciRole"
+            },
+            "nullable": true
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ChatMessage": {
         "type": "object",
@@ -4950,15 +5313,15 @@
         "type": "string"
       },
       "EditChannelParam": {
-        "required": [
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
-            "minLength": 1,
             "type": "string",
-            "description": "頻道名稱"
+            "description": "頻道名稱",
+            "nullable": true
+          },
+          "privacy": {
+            "$ref": "#/components/schemas/ChannelPrivacy"
           }
         },
         "additionalProperties": false,
@@ -5052,6 +5415,26 @@
           "userCount": {
             "type": "integer",
             "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetWhiteListCountParam": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5726,6 +6109,19 @@
         "additionalProperties": false,
         "description": "公告訊息資訊"
       },
+      "PutWhiteListRequest": {
+        "type": "object",
+        "properties": {
+          "parameter": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccessorParam"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "Relation": {
         "enum": [
           "Blocking",
@@ -5877,6 +6273,9 @@
           },
           "color": {
             "$ref": "#/components/schemas/RoleColor"
+          },
+          "isAdmin": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false,
@@ -6049,6 +6448,16 @@
         },
         "additionalProperties": false,
         "description": "使用者陣列參數"
+      },
+      "WhiteListCount": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

@@ -7,8 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -17,9 +16,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.kolfanci.LocalDependencyContainer
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -31,7 +32,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
-import com.cmoney.kolfanci.R
+
 /**
  * 主題預覽
  */
@@ -48,6 +49,10 @@ fun GroupSettingThemePreviewScreen(
     val TAG = "GroupSettingThemePreviewScreen"
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     var groupParam = globalViewModel.uiState.currentGroup!!
+    var showConfirmDialog: GroupTheme? by remember {
+        mutableStateOf(null)
+    }
+
     viewModel.uiState.settingGroup?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
@@ -59,12 +64,25 @@ fun GroupSettingThemePreviewScreen(
         groupTheme = viewModel.uiState.previewTheme,
     ) {
         KLog.i(TAG, "on theme click.")
+        showConfirmDialog = it
+    }
+
+    showConfirmDialog?.let {
+        //如果是建立 直接確定並返回
         if (isFromCreate) {
             val gson = Gson()
             resultNavigator.navigateBack(gson.toJson(it))
-        }
-        else {
-            viewModel.changeTheme(groupParam, it)
+        } else {
+            ChangeThemeDialogScreen(
+                groupTheme = it,
+                onDismiss = {
+                    showConfirmDialog = null
+                },
+                onConfirm = {
+                    showConfirmDialog = null
+                    viewModel.changeTheme(groupParam, it)
+                }
+            )
         }
     }
 

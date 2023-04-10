@@ -20,6 +20,8 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -45,6 +47,9 @@ fun EditCategoryScreen(
     val context = LocalContext.current
     val TAG = "EditCategoryScreen"
     val showDialog = remember { mutableStateOf(false) }
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
 
     viewModel.uiState.group?.let {
         resultNavigator.navigateBack(result = it)
@@ -55,21 +60,21 @@ fun EditCategoryScreen(
         navigator,
         category,
         onConfirm = {
-            if (it.isNotEmpty()) {
-                viewModel.editCategory(group, category, it)
-            } else {
-                context.showToast("請輸入類別名稱")
-            }
+            viewModel.editCategory(group, category, it)
         },
         onDelete = {
             KLog.i(TAG, "onDelete click")
             showDialog.value = true
+        },
+        onBack = {
+            showSaveTip = true
         }
     )
 
     if (showDialog.value) {
-        showDeleteAlert(
-            categoryName = category.name.orEmpty(),
+        DeleteAlertDialogScreen(
+            title = "確定刪除分類「%s」".format(category.name),
+            subTitle = "分類刪除後，頻道會保留下來。",
             onConfirm = {
                 showDialog.value = false
                 viewModel.deleteCategory(group, category)
@@ -79,46 +84,19 @@ fun EditCategoryScreen(
             }
         )
     }
-}
 
-@Composable
-private fun showDeleteAlert(
-    categoryName: String,
-    onConfirm: () -> Unit, onCancel: () -> Unit
-) {
-    AlertDialog(
-        backgroundColor = LocalColor.current.env_80,
-        onDismissRequest = {
-            onCancel.invoke()
+    //離開再次 確認
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
         },
-        title = {
-            Text(
-                text = "確定刪除分類「%s」".format(categoryName),
-                color = LocalColor.current.specialColor.red
-            )
-        },
-        text = {
-            Text(
-                text = "分類刪除後，頻道會保留下來。", color = LocalColor.current.text.default_100
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onConfirm.invoke()
-                }) {
-                Text("確定刪除")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = {
-                    onCancel.invoke()
-                }) {
-                Text("返回")
-            }
+        onGiveUp = {
+            showSaveTip = false
+            navigator.popBackStack()
         }
     )
+
 }
 
 @Composable
@@ -127,7 +105,8 @@ fun EditCategoryScreenView(
     navigator: DestinationsNavigator,
     category: Category,
     onConfirm: (String) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onBack: () -> Unit
 ) {
     var textState by remember { mutableStateOf(category.name.orEmpty()) }
     val maxLength = 10
@@ -137,12 +116,10 @@ fun EditCategoryScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "編輯分類:" + category.name.orEmpty(),
+                title = "編輯分類",
                 leadingEnable = true,
                 moreEnable = false,
-                backClick = {
-                    navigator.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { padding ->
@@ -256,7 +233,9 @@ fun EditCategoryScreenViewPreview() {
         EditCategoryScreenView(
             navigator = EmptyDestinationsNavigator,
             category = Category(name = "嘿嘿分類"),
-            onConfirm = {}
-        ) {}
+            onConfirm = {},
+            onDelete = {},
+            onBack = {}
+        )
     }
 }

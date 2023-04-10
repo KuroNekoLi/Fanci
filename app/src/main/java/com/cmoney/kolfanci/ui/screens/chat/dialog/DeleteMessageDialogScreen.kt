@@ -25,6 +25,8 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.common.BorderButton
+
 /**
  * 隱藏用戶 彈窗
  */
@@ -95,35 +97,30 @@ fun DeleteMessageDialogScreen(
 
                     }
                     Spacer(modifier = Modifier.height(20.dp))
-                    Button(
+
+                    BorderButton(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        border = BorderStroke(1.dp, LocalColor.current.text.default_100),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = LocalColor.current.env_80
-                        ),
-                        onClick = { onConfirm.invoke(chatMessageModel) }) {
-                        Text(text = "確定刪除", fontSize = 16.sp, color = Color_CB4A4A)
+                        text = "確定刪除",
+                        textColor = LocalColor.current.specialColor.red,
+                        borderColor = LocalColor.current.text.default_50
+                    ) {
+                        onConfirm.invoke(chatMessageModel)
                     }
+
                     Spacer(modifier = Modifier.height(20.dp))
-                    Button(
+
+                    BorderButton(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        border = BorderStroke(1.dp, LocalColor.current.text.default_100),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = LocalColor.current.env_80
-                        ),
-                        onClick = {
-                            openDialog.value = false
-                            onDismiss.invoke()
-                        }) {
-                        Text(
-                            text = "取消",
-                            fontSize = 16.sp,
-                            color = LocalColor.current.text.default_100
-                        )
+                        text = "取消",
+                        textColor = LocalColor.current.text.default_100,
+                        borderColor = LocalColor.current.text.default_50
+                    ) {
+                        openDialog.value = false
+                        onDismiss.invoke()
                     }
                 }
             }

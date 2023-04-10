@@ -16,19 +16,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.ShareAddRoleScreenDestination
-import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -41,6 +41,7 @@ import org.koin.androidx.compose.koinViewModel
 /**
  * 編輯頻道
  */
+@Deprecated("replace AddChanelScreen")
 @Destination
 @Composable
 fun EditChannelScreen(
@@ -80,11 +81,7 @@ fun EditChannelScreen(
         group = group,
         selectedIndex = uiState.tabSelected,
         onConfirm = {
-            if (it.isNotEmpty()) {
-                viewModel.editChannel(group, channel, it)
-            } else {
-                context.showToast("請輸入頻道名稱")
-            }
+            viewModel.editChannel(group, channel, it)
         },
         onDelete = {
             KLog.i(TAG, "onDelete click")
@@ -99,8 +96,9 @@ fun EditChannelScreen(
     )
 
     if (showDialog.value) {
-        showDeleteAlert(
-            channelName = channel.name.orEmpty(),
+        DeleteAlertDialogScreen(
+            title = "確定刪除頻道「%s」".format(channel.name.orEmpty()),
+            subTitle = "頻道刪除後，內容將會完全消失。",
             onConfirm = {
                 showDialog.value = false
                 viewModel.deleteChannel(group, channel)
@@ -114,45 +112,6 @@ fun EditChannelScreen(
     if (viewModel.uiState.channelRole == null) {
         viewModel.getChannelRole(channel.id.orEmpty())
     }
-}
-
-@Composable
-private fun showDeleteAlert(
-    channelName: String,
-    onConfirm: () -> Unit, onCancel: () -> Unit
-) {
-    AlertDialog(
-        backgroundColor = LocalColor.current.env_80,
-        onDismissRequest = {
-            onCancel.invoke()
-        },
-        title = {
-            Text(
-                text = "確定刪除頻道「%s」".format(channelName), color = LocalColor.current.specialColor.red
-            )
-        },
-        text = {
-            Text(
-                text = "頻道刪除後，內容將會完全消失。", color = LocalColor.current.text.default_100
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onConfirm.invoke()
-                }) {
-                Text("確定刪除")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = {
-                    onCancel.invoke()
-                }) {
-                Text("返回")
-            }
-        }
-    )
 }
 
 @Composable
@@ -184,7 +143,7 @@ fun EditChannelScreenView(
                 }
             )
         }
-    ) {padding ->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -249,7 +208,7 @@ fun EditChannelScreenView(
                         navigator,
                         fanciRole,
                         group
-                    ){
+                    ) {
                         onRemoveRole.invoke(it)
                     }
                 }

@@ -33,7 +33,7 @@ fun DisBanItemScreen(
                 .height(50.dp),
             text = "解除禁言",
             borderColor = LocalColor.current.component.other,
-            textColor = Color.White
+            textColor = LocalColor.current.specialColor.red
         ) {
             onConfirm.invoke()
         }

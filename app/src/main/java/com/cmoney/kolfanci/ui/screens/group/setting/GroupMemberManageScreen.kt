@@ -19,6 +19,7 @@ import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.model.Constant.isShowRoleManage
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
@@ -38,7 +39,7 @@ fun GroupMemberManageScreen(
             text = "成員管理", fontSize = 14.sp, color = LocalColor.current.text.default_100
         )
 
-        if (Constant.MyGroupPermission.createOrEditRole == true) {
+        if (isShowRoleManage()) {
             SettingItemScreen(
                 iconRes = R.drawable.rule_manage,
                 text = "角色管理",

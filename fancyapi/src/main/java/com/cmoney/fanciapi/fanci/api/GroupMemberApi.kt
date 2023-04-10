@@ -19,12 +19,13 @@ interface GroupMemberApi {
      *  - 404: 找不到社團
      *
      * @param groupId 社團id
+     * @param search 搜尋用戶暱稱的關鍵字 (optional, default to "")
      * @param skip 跳脫筆數 (optional, default to 0)
      * @param take 取得筆數 (optional, default to 20)
      * @return [GroupMemberPaging]
      */
     @GET("api/v1/GroupMember/group/{groupId}")
-    suspend fun apiV1GroupMemberGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("skip") skip: kotlin.Int? = 0, @Query("take") take: kotlin.Int? = 20): Response<GroupMemberPaging>
+    suspend fun apiV1GroupMemberGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("search") search: kotlin.String? = "", @Query("skip") skip: kotlin.Int? = 0, @Query("take") take: kotlin.Int? = 20): Response<GroupMemberPaging>
 
     /**
      * 離開社團 __________🔒 已註冊的fanci使用者
