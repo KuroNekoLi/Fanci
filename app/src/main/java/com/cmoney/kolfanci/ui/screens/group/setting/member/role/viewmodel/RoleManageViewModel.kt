@@ -230,6 +230,15 @@ class RoleManageViewModel(
                     assignMemberRole(group.id.orEmpty(), it)
                 }, {
                     KLog.e(TAG, it)
+                    //Conflict error
+                    if ((it as HttpException).code() == 409) {
+                        uiState = uiState.copy(
+                            addRoleError = Pair(
+                                "角色名稱重複", "名稱「%s」與現有角色重複\n".format(name) +
+                                        "請修改後再次儲存！"
+                            )
+                        )
+                    }
                 })
             }
         }

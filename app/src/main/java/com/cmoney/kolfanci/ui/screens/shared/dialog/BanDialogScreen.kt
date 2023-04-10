@@ -52,7 +52,7 @@ fun BanDialogScreen(
             DialogDefaultContentScreen(
                 content = "一旦被禁言，將會無法對頻道做出任何社群行為：留言、按讚等等。",
                 confirmTitle = "確定禁言",
-                cancelTitle = "返回",
+                cancelTitle = "取消",
                 onConfirm = {
                     showBanDoubleConfirmDialog.value = null
                     onConfirm.invoke(it)

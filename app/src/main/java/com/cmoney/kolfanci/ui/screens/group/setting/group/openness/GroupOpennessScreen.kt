@@ -180,7 +180,7 @@ fun GroupOpennessScreen(
                                 .height(50.dp),
                             text = "確定刪除",
                             borderColor = LocalColor.current.component.other,
-                            textColor = Color.White
+                            textColor = LocalColor.current.specialColor.red
                         ) {
                             kotlin.run {
                                 showDeleteConfirmDialog = false

@@ -33,7 +33,7 @@ fun KickOutDialogScreen(
                 content = "你確定要將 %s 踢出社團嗎？\n".format(name) +
                         "一旦踢出他下次要進入，需要重新申請",
                 confirmTitle = "確定",
-                cancelTitle = "返回",
+                cancelTitle = "取消",
                 onConfirm = {
                     showFirstDialog = false
                     showKickOutDoubleConfirmDialog.value = true
@@ -57,8 +57,8 @@ fun KickOutDialogScreen(
             DialogDefaultContentScreen(
                 content = "你確定要將 %s 踢出社團嗎？\n".format(name) +
                         "一旦踢出他下次要進入，需要重新申請",
-                confirmTitle = "確定踢出",
-                cancelTitle = "返回",
+                confirmTitle = "確定，踢出社團",
+                cancelTitle = "取消",
                 onConfirm = {
                     showKickOutDoubleConfirmDialog.value = false
                     onConfirm.invoke()

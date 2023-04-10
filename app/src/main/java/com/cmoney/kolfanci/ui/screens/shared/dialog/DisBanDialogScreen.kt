@@ -33,7 +33,7 @@ fun DisBanDialogScreen(
             DialogDefaultContentScreen(
                 content = "",
                 confirmTitle = "解除禁言",
-                cancelTitle = "返回",
+                cancelTitle = "取消",
                 onConfirm = {
                     showFirstDialog = false
                     showDisBanDoubleConfirmDialog = true
@@ -55,8 +55,8 @@ fun DisBanDialogScreen(
         ) {
             DialogDefaultContentScreen(
                 content = "你確定要將 %s 解除禁言嗎？".format(name),
-                confirmTitle = "確定解除 放他自由",
-                cancelTitle = "返回",
+                confirmTitle = "確認，解除禁言",
+                cancelTitle = "取消",
                 onConfirm = {
                     showDisBanDoubleConfirmDialog = false
                     onConfirm.invoke()

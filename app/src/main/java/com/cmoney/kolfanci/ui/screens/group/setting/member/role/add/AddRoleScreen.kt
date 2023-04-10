@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.LocalDependencyContainer
 import com.cmoney.kolfanci.MainActivity
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.destinations.AddMemberScreenDestination
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
@@ -164,20 +166,18 @@ fun AddRoleScreen(
 
     uiState.addRoleError?.let {
         DialogScreen(
+            titleIconRes = R.drawable.edit,
             onDismiss = {
                 viewModel.errorShowDone()
             },
             title = it.first,
             subTitle = it.second
         ) {
-
-            BorderButton(
+            BlueButton(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 text = "修改",
-                borderColor = LocalColor.current.component.other,
-                textColor = Color.White
             ) {
                 run {
                     viewModel.errorShowDone()
