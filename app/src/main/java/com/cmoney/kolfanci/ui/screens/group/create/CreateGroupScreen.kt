@@ -218,6 +218,9 @@ fun CreateGroupScreen(
     if (approvalUiState.saveComplete) {
         uiState.createdGroup?.let {
             globalViewModel.setCurrentGroup(it)
+
+            globalViewModel.startFetchFollowData()
+
             navigator.popBackStack(
                 route = MainScreenDestination,
                 inclusive = false

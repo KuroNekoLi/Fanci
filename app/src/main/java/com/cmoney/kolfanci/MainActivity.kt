@@ -11,21 +11,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.key
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.backend2.base.di.BACKEND2_SETTING
 import com.cmoney.kolfanci.destinations.MainScreenDestination
-import com.cmoney.kolfanci.ui.MainNavHost
-import com.cmoney.kolfanci.ui.screens.BottomBarScreen
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
 import com.cmoney.kolfanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.loginlibrary.module.LoginModule
 import com.cmoney.xlogin.base.BaseWebLoginActivity
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
@@ -33,9 +27,7 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.androidx.compose.koinViewModel
 
 val LocalDependencyContainer = staticCompositionLocalOf<MainActivity> {
     error("No dependency container provided!")
@@ -91,7 +83,7 @@ class MainActivity : BaseWebLoginActivity() {
 
     override fun autoLoginFailCallback() {
         KLog.i(TAG, "autoLoginFailCallback")
-        globalViewModel.loginProcessDone()
+        globalViewModel.startFetchFollowData()
     }
 
     override fun loginCancel() {
@@ -106,7 +98,7 @@ class MainActivity : BaseWebLoginActivity() {
         KLog.i(TAG, "loginSuccessCallback")
         globalViewModel.registerUser()
         globalViewModel.loginSuccess()
-        globalViewModel.loginProcessDone()
+        globalViewModel.startFetchFollowData()
     }
 }
 

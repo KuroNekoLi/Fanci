@@ -3,8 +3,6 @@ package com.cmoney.kolfanci
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.model.Constant
@@ -14,12 +12,8 @@ import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UserUseCase
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciColor
-import com.cmoney.fanciapi.fanci.model.Category
-import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.ui.theme.CoffeeThemeColor
 import com.socks.library.KLog
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -85,7 +79,6 @@ class MainViewModel(
         KLog.i(TAG, "setCurrentGroup")
         if (group != uiState.currentGroup && group.id != null) {
             KLog.i(TAG, "setCurrentGroup diff:$group")
-
             fetchGroupPermission(group)
             uiState = uiState.copy(
                 currentGroup = group
@@ -153,7 +146,8 @@ class MainViewModel(
         _fetchFollowData.value = false
     }
 
-    fun loginProcessDone() {
+    fun startFetchFollowData() {
+        KLog.i(TAG, "startFetchFollowData")
         _fetchFollowData.value = true
     }
 
