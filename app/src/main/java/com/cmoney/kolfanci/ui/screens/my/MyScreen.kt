@@ -49,6 +49,7 @@ fun MyScreen(
                 moreClick = {
                 },
                 backClick = {
+                    navController.popBackStack()
                 }
             )
         }
