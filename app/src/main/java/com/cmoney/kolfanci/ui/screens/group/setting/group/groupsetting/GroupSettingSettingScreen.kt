@@ -22,12 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.LocalDependencyContainer
-import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.*
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.*
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen

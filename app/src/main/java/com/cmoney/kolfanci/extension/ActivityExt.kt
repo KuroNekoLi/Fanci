@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.kolfanci.MainActivity
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.ColorPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.InteractBottomSheet

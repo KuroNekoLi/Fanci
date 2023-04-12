@@ -14,12 +14,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.*
-import com.cmoney.kolfanci.LocalDependencyContainer
-import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.AddMemberScreenDestination
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen

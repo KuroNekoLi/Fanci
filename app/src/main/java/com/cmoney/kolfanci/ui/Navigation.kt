@@ -11,9 +11,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.kolfanci.MainStateHolder
 import com.cmoney.kolfanci.MainViewModel
 import com.cmoney.kolfanci.databinding.MyFragmentLayoutBinding
+import com.cmoney.kolfanci.ui.main.MainStateHolder
 import com.cmoney.kolfanci.ui.screens.TabItem
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
 import com.cmoney.kolfanci.ui.screens.my.MyCallback

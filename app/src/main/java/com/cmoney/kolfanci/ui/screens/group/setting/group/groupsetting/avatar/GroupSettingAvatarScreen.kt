@@ -2,7 +2,6 @@ package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar
 
 import android.net.Uri
 import android.os.Parcelable
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -19,11 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.FanciDefaultAvatarScreenDestination
 import com.cmoney.kolfanci.ui.common.TransparentButton
+import com.cmoney.kolfanci.ui.destinations.FanciDefaultAvatarScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen

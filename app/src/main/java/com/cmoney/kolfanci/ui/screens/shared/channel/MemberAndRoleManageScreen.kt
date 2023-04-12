@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.kolfanci.destinations.AddMemberScreenDestination
-import com.cmoney.kolfanci.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
+import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen

@@ -15,8 +15,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.cmoney.kolfanci.LocalDependencyContainer
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -114,7 +114,9 @@ private fun GroupSettingThemePreviewView(
             )
         }
     ) { innerPadding ->
-        Column {
+        Column(
+            modifier.padding(innerPadding)
+        ) {
             groupTheme?.let { groupTheme ->
                 Box(
                     modifier = Modifier

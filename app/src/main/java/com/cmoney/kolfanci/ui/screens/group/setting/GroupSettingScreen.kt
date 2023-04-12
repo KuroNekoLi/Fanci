@@ -13,12 +13,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
-import com.cmoney.kolfanci.LocalDependencyContainer
-import com.cmoney.kolfanci.destinations.GroupApplyScreenDestination
-import com.cmoney.kolfanci.destinations.GroupOpennessScreenDestination
-import com.cmoney.kolfanci.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.model.Constant.isShowApproval
 import com.cmoney.kolfanci.model.Constant.isShowGroupManage
+import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme

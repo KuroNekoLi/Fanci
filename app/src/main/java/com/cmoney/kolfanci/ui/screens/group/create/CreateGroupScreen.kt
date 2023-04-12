@@ -22,10 +22,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.LocalDependencyContainer
-import com.cmoney.kolfanci.destinations.*
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.ui.destinations.*
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData

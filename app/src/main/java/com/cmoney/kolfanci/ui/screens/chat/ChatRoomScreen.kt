@@ -11,9 +11,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.kolfanci.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen

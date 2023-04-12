@@ -10,6 +10,33 @@ import android.widget.Toast
 import androidx.core.content.FileProvider
 import java.io.File
 
+inline fun <reified T : Activity> Context.startActivity(block: Intent.() -> Unit = {}) {
+    startActivity(Intent(this, T::class.java).apply(block))
+}
+
+inline fun <reified T : Any> Context.intent(body: Intent.() -> Unit): Intent {
+    val intent = Intent(this, T::class.java)
+    intent.body()
+    return intent
+}
+
+inline fun <reified T : Any> Context.intent(): Intent {
+    return Intent(this, T::class.java)
+}
+
+fun Context.goAppStore() {
+    try {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+    } catch (e: android.content.ActivityNotFoundException) {
+        startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+            )
+        )
+    }
+}
+
 fun Context.findActivity(): Activity {
     var context = this
     while (context is ContextWrapper) {

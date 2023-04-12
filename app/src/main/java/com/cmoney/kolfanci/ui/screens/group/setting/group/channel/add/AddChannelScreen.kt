@@ -18,11 +18,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.EditChannelOpennessScreenDestination
-import com.cmoney.kolfanci.destinations.MemberAndRoleManageScreenDestination
-import com.cmoney.kolfanci.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.EditChannelOpennessScreenDestination
+import com.cmoney.kolfanci.ui.destinations.MemberAndRoleManageScreenDestination
+import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen

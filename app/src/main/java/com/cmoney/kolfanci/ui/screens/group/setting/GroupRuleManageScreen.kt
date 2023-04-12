@@ -10,14 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.BanListScreenDestination
-import com.cmoney.kolfanci.destinations.GroupReportScreenDestination
+import com.cmoney.kolfanci.ui.destinations.BanListScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 

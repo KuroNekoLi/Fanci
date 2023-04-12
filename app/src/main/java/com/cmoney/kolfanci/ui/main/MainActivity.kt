@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci
+package com.cmoney.kolfanci.ui.main
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -15,12 +15,16 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.kolfanci.destinations.MainScreenDestination
+import com.cmoney.kolfanci.MainViewModel
+import com.cmoney.kolfanci.ui.NavGraphs
+import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
 import com.cmoney.kolfanci.ui.screens.tutorial.TutorialScreen
+import com.cmoney.kolfanci.ui.theme.Black_242424
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.xlogin.base.BaseWebLoginActivity
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -68,6 +72,10 @@ class MainActivity : BaseWebLoginActivity() {
                             }
                         }
                     } else {
+                        rememberSystemUiController().setStatusBarColor(
+                            color = Black_242424,
+                            darkIcons = false
+                        )
                         MaterialTheme {
                             TutorialScreen(
                                 modifier = Modifier.fillMaxWidth()

@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.FanciDefaultCoverScreenDestination
 import com.cmoney.kolfanci.ui.common.TransparentButton
+import com.cmoney.kolfanci.ui.destinations.FanciDefaultCoverScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.state.GroupSettingSettingState
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.state.rememberGroupSettingSettingState

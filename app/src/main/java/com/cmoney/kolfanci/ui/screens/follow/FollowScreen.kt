@@ -32,10 +32,10 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.MainViewModel
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.ChatRoomScreenDestination
-import com.cmoney.kolfanci.destinations.DiscoverGroupScreenDestination
-import com.cmoney.kolfanci.destinations.GroupSettingScreenDestination
-import com.cmoney.kolfanci.destinations.MyScreenDestination
+import com.cmoney.kolfanci.ui.destinations.ChatRoomScreenDestination
+import com.cmoney.kolfanci.ui.destinations.DiscoverGroupScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
+import com.cmoney.kolfanci.ui.destinations.MyScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.theme.Black_99000000

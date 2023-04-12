@@ -40,10 +40,10 @@ fun TutorialItemScreen(
     }
 
     val title = when (page) {
-        1 -> {
+        0 -> {
             "一手掌握當紅名人所有資訊"
         }
-        2 -> {
+        1 -> {
             "跟同溫層一起聊天嘻嘻哈哈"
         }
         else -> {
@@ -52,11 +52,11 @@ fun TutorialItemScreen(
     }
 
     val desc = when (page) {
-        1 -> {
+        0 -> {
             "你喜歡的偶像、網紅、KOL都在這！\n" +
                     "最新消息、周邊搶賣，加入社團再也不錯過"
         }
-        2 -> {
+        1 -> {
             "生活中沒有人可以跟你一起聊喜愛事物？\n" +
                     "懂你的朋友都在這，快來一起嘰哩呱啦！"
         }
@@ -69,7 +69,8 @@ fun TutorialItemScreen(
     Column {
         Column(modifier = modifier
             .weight(1f)
-            .verticalScroll(rememberScrollState())) {
+            .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Center) {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()

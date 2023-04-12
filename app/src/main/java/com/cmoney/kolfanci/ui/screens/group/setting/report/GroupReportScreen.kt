@@ -29,11 +29,11 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.GroupReportMessageScreenDestination
-import com.cmoney.kolfanci.destinations.GroupReporterScreenDestination
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
+import com.cmoney.kolfanci.ui.destinations.GroupReportMessageScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupReporterScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.BanDialogScreen

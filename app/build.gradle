@@ -118,6 +118,8 @@ dependencies {
     //=============== CMoney ===============
     implementation 'com.cmoney.analytics:analytics-user:5.1.0'
     implementation project(path: ':fancyapi')
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     releaseImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
     debugImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
 
