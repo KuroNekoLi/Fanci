@@ -154,7 +154,9 @@ class CreateGroupViewModel(
     /**
      * 建立社團
      */
-    fun createGroup(onComplete: (Group) -> Unit) {
+    fun createGroup(
+        isNeedApproval: Boolean,
+        onComplete: (Group) -> Unit) {
         KLog.i(TAG, "onCreateGroup:$uiState")
 
         if (uiState.groupIcon.isEmpty()) {
@@ -181,7 +183,7 @@ class CreateGroupViewModel(
         viewModelScope.launch {
             groupUseCase.createGroup(
                 name = uiState.groupName,
-                isNeedApproval = false,
+                isNeedApproval = isNeedApproval,
                 coverImageUrl = uiState.groupBackground,
                 thumbnailImageUrl = uiState.groupIcon,
                 themeId = uiState.groupTheme?.id.orEmpty()

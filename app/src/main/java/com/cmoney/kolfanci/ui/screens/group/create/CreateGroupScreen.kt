@@ -97,7 +97,9 @@ fun CreateGroupScreen(
         },
         onNextStep = {
             if (uiState.currentStep == viewModel.finalStep) {
-                viewModel.createGroup {
+                viewModel.createGroup(
+                    isNeedApproval = groupOpennessViewModel.uiState.isNeedApproval
+                ) {
                     groupOpennessViewModel.onSave(it)
                 }
 
