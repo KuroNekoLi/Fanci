@@ -122,15 +122,19 @@ class RoleViewModel(
         addGroupRoleQueue.clear()
         addGroupRoleQueue.addAll(distinctList)
 
-        val orgRoleList = uiState.groupRoleList.orEmpty()
-        val filterRole = orgRoleList.filter {
-            addGroupRoleQueue.find { exclude ->
-                exclude.id == it.role.id
-            } == null
-        }
+//        val orgRoleList = uiState.groupRoleList.orEmpty()
+//        val filterRole = orgRoleList.filter {
+//            addGroupRoleQueue.find { exclude ->
+//                exclude.id == it.role.id
+//            } == null
+//        }
+//        uiState = uiState.copy(
+//            groupRoleList = filterRole,
+//            showAddSuccessTip = true
+//        )
 
         uiState = uiState.copy(
-            groupRoleList = filterRole,
+            confirmRoleList = Gson().toJson(addGroupRoleQueue),
             showAddSuccessTip = true
         )
     }

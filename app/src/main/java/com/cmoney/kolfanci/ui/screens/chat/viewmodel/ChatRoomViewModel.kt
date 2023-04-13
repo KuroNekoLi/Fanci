@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
@@ -36,7 +37,8 @@ data class ChatRoomUiState(
     val errorMessage: String? = null,
     var blockingList: List<User> = emptyList(), //封鎖用戶
     var blockerList: List<User> = emptyList(),  //封鎖我的用戶
-    val startPolling: Boolean = false
+    val startPolling: Boolean = false,
+    val enterChannel: Channel? = null
 ) {
     data class ImageAttachState(
         val uri: Uri,
@@ -329,17 +331,23 @@ class ChatRoomViewModel(
     /**
      *  抓取頻道權限
      */
-    fun fetchChannelPermission(channelId: String) {
-        KLog.i(TAG, "fetchChannelPermission:$channelId")
+    fun fetchChannelPermission(channel: Channel) {
+        KLog.i(TAG, "fetchChannelPermission:" + channel.id)
         viewModelScope.launch {
-            permissionUseCase.getPermissionByChannel(channelId = channelId).fold({
+            permissionUseCase.getPermissionByChannel(channelId = channel.id.orEmpty()).fold({
                 Constant.MyChannelPermission = it
                 uiState = uiState.copy(
-                    startPolling = true
+                    enterChannel = channel
                 )
             }, {
                 KLog.e(TAG, it)
             })
         }
+    }
+
+    fun resetChannel() {
+        uiState = uiState.copy(
+            enterChannel = null
+        )
     }
 }

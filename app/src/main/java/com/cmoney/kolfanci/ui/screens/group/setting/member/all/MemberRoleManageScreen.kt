@@ -84,12 +84,12 @@ fun MemberRoleManageScreen(
                 userId = groupMember.id.orEmpty(),
                 oldFanciRole = groupMember.roleInfos.orEmpty(),
                 newFanciRole = roleList.value
-            )
-            val gson = Gson()
-
-            resultNavigator.navigateBack(
-                gson.toJson(roleList.value)
-            )
+            ) {
+                val gson = Gson()
+                resultNavigator.navigateBack(
+                    gson.toJson(roleList.value)
+                )
+            }
         },
         onBack = {
             showSaveTip = true
@@ -132,7 +132,7 @@ private fun MemberRoleManageScreenView(
                 }
             )
         }
-    ) {padding ->
+    ) { padding ->
         Column(
             modifier = Modifier.padding(padding)
         ) {

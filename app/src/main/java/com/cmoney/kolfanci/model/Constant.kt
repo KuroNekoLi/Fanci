@@ -126,4 +126,9 @@ object Constant {
      * 是否可以 檢舉用戶
      */
     fun isCanReport(): Boolean = (MyChannelPermission.canReport == true)
+
+    /**
+     * 是否可以讀取聊天室內容
+     */
+    fun canReadMessage(): Boolean = (MyChannelPermission.canRead == true)
 }

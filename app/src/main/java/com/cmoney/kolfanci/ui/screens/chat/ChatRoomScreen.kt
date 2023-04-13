@@ -49,13 +49,8 @@ fun ChatRoomScreen(
 
     KLog.i(TAG, "channelId:$channelId")
 
-    //抓取在頻道的權限
-    viewModel.fetchChannelPermission(channelId)
-
-    if (uiState.startPolling && Constant.MyChannelPermission.canRead == true) {
+    if (Constant.canReadMessage()) {
         messageViewModel.startPolling(channelId)
-    } else {
-        KLog.i(TAG, "channelId:$channelId can't read.")
     }
 
     //抓取 公告

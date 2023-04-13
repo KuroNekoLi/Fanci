@@ -327,7 +327,9 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
     fun assignMemberRole(
         groupId: String,
         userId: String,
-        oldFanciRole: List<FanciRole>, newFanciRole: List<FanciRole>
+        oldFanciRole: List<FanciRole>,
+        newFanciRole: List<FanciRole>,
+        onDone: () -> Unit
     ) {
         KLog.i(TAG, "assignMemberRole")
         viewModelScope.launch {
@@ -355,6 +357,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
             )
 
             task.awaitAll()
+            onDone.invoke()
         }
     }
 
