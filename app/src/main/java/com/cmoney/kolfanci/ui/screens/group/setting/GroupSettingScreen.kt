@@ -8,6 +8,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,11 +44,11 @@ fun GroupSettingScreen(
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
-//    var group = initGroup
 
     val uiState = viewModel.uiState
 
-//    viewModel.settingGroup(initGroup)
+    //檢舉審核 清單
+    val reportList by viewModel.reportList.collectAsState()
 
     //公開度
     resultRecipient.onNavResult { result ->
@@ -98,7 +100,7 @@ fun GroupSettingScreen(
         navController = navController,
         group = uiState.settingGroup ?: initGroup,
         unApplyCount = uiState.unApplyCount ?: 0,
-        reportList = uiState.reportList,
+        reportList = reportList,
         onBackClick = {
 //            globalViewModel.setCurrentGroup(group)
             navController.popBackStack()
@@ -111,7 +113,7 @@ fun GroupSettingScreen(
     }
 
     //抓取檢舉內容
-    if (uiState.reportList == null) {
+    if (reportList.isEmpty()) {
         viewModel.fetchReportList(groupId = initGroup.id.orEmpty())
     }
 }
