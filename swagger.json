@@ -245,7 +245,7 @@
         "tags": [
           "Ban"
         ],
-        "summary": "取得特定會員在社團的禁言狀態 __________🔒 已註冊的fanci使用者",
+        "summary": "取得特定會員在社團的禁言狀態，沒有被ban會回傳404 __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "groupId",
@@ -5680,9 +5680,6 @@
         "type": "object",
         "properties": {
           "editGroup": {
-            "type": "boolean"
-          },
-          "createOrEditApplyQuestions": {
             "type": "boolean"
           },
           "rearrangeChannelCategory": {
