@@ -13,7 +13,6 @@ data class UiState(
     val coverImageUrl: Uri? = null
 )
 
-
 class GroupSettingAvatarViewModel : ViewModel() {
     private val TAG = GroupSettingAvatarViewModel::class.java.simpleName
 
@@ -51,6 +50,12 @@ class GroupSettingAvatarViewModel : ViewModel() {
 
         uiState = uiState.copy(
             avatarImage = uri
+        )
+    }
+
+    fun resetCameraUri() {
+        uiState = uiState.copy(
+            avatarImage = null
         )
     }
 }

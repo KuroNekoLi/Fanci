@@ -72,9 +72,8 @@ fun InteractDialogScreen(
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(20.dp))
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
 
             if (Constant.isCanReply()) {
                 FeatureText(R.drawable.reply, "回覆") {

@@ -70,6 +70,7 @@ fun GroupSettingAvatarScreen(
             is NavResult.Value -> {
                 val fanciUrl = result.value
                 viewModel.onGroupAvatarSelect(fanciUrl, group)
+                groupSettingAvatarViewModel.resetCameraUri()
             }
         }
     }
