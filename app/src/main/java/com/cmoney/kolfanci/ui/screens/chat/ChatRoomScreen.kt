@@ -109,6 +109,9 @@ fun ChatRoomScreen(
         onAttach = {
             messageViewModel.attachImage(it)
         },
+        showOnlyBasicPermissionTip = {
+            messageViewModel.showBasicPermissionTip()
+        },
         snackBarMessage = messageViewModel.uiState.snackBarMessage,
         onSnackBarDismiss = {
             messageViewModel.snackBarDismiss()
@@ -180,6 +183,7 @@ private fun ChatRoomScreenView(
     onDeleteAttach: (Uri) -> Unit,
     onMessageSend: (text: String) -> Unit,
     onAttach: (Uri) -> Unit,
+    showOnlyBasicPermissionTip: () -> Unit,
     snackBarMessage: CustomMessage?,
     onSnackBarDismiss: () -> Unit
 ) {
@@ -241,7 +245,8 @@ private fun ChatRoomScreenView(
                 },
                 onAttach = {
                     onAttach.invoke(it)
-                }
+                },
+                showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
             )
         }
 
@@ -272,6 +277,7 @@ fun ChatRoomScreenPreview() {
             onDeleteAttach = {},
             onMessageSend = {},
             onAttach = {},
+            showOnlyBasicPermissionTip = {},
             snackBarMessage = null,
             onSnackBarDismiss = {}
         )

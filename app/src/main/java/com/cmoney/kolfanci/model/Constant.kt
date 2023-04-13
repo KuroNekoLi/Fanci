@@ -131,4 +131,9 @@ object Constant {
      * 是否可以讀取聊天室內容
      */
     fun canReadMessage(): Boolean = (MyChannelPermission.canRead == true)
+
+    /**
+     * 是否可以發文
+     */
+    fun canPostMessage(): Boolean = (MyChannelPermission.canPost == true)
 }

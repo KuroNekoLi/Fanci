@@ -840,4 +840,19 @@ class MessageViewModel(
         messageSend(channelId = channelId, text = message.message.content?.text.orEmpty())
         onReSendDialogDismiss()
     }
+
+    /**
+     * show 基本權限，無法與頻道成員互動 tip
+     */
+    fun showBasicPermissionTip() {
+        KLog.i(TAG, "showBasicPermissionTip")
+        uiState = uiState.copy(
+            snackBarMessage = CustomMessage(
+                textString = "基本權限，無法與頻道成員互動",
+                iconRes = R.drawable.minus_people,
+                iconColor = White_767A7F,
+                textColor = Color.White
+            )
+        )
+    }
 }
