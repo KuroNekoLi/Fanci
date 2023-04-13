@@ -50,7 +50,7 @@ fun EditChannelOpennessScreen(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "頻公開度",
+                title = "頻道公開度",
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
