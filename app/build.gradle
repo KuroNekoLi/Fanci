@@ -162,7 +162,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-perf-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
-
     //=============== hyperion ===============
     def hyperion_version = "0.9.37"
     debugImplementation "com.willowtreeapps.hyperion:hyperion-core:$hyperion_version"
@@ -175,6 +174,10 @@ dependencies {
     debugImplementation "com.willowtreeapps.hyperion:hyperion-phoenix:$hyperion_version"
     debugImplementation "com.willowtreeapps.hyperion:hyperion-recorder:$hyperion_version"
     debugImplementation "com.willowtreeapps.hyperion:hyperion-shared-preferences:$hyperion_version"
+
+    //=============== image viewer ===============
+    implementation 'com.github.stfalcon-studio:StfalconImageViewer:v1.0.1'
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
