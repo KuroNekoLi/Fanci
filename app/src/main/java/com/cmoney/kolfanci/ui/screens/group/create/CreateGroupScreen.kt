@@ -10,9 +10,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +32,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.TipDialog
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.gson.Gson
@@ -71,6 +70,11 @@ fun CreateGroupScreen(
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
+
+    val currentStep by viewModel.currentStep.collectAsState()
 
     CreateGroupScreenView(
         navController = navigator,
@@ -78,6 +82,7 @@ fun CreateGroupScreen(
         uiState = uiState,
         approvalUiState = approvalUiState,
         question = approvalUiState.groupQuestionList.orEmpty(),
+        currentStep = currentStep,
         onGroupName = {
             KLog.i(TAG, "onGroupName:$it")
             viewModel.setGroupName(it)
@@ -96,7 +101,7 @@ fun CreateGroupScreen(
             showEditDialog.value = Pair(true, it)
         },
         onNextStep = {
-            if (uiState.currentStep == viewModel.finalStep) {
+            if (currentStep == viewModel.finalStep) {
                 viewModel.createGroup(
                     isNeedApproval = groupOpennessViewModel.uiState.isNeedApproval
                 ) {
@@ -109,6 +114,20 @@ fun CreateGroupScreen(
         },
         onPreStep = {
             viewModel.preStep()
+        },
+        onBack = {
+            showSaveTip = true
+        }
+    )
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navigator.popBackStack()
         }
     )
 
@@ -238,6 +257,7 @@ private fun CreateGroupScreenView(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
     uiState: UiState,
+    currentStep: Int,
     approvalUiState: com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.UiState,
     question: List<String>,
     onGroupName: (String) -> Unit,
@@ -245,7 +265,8 @@ private fun CreateGroupScreenView(
     onAddQuestion: () -> Unit,
     onEditClick: (String) -> Unit,
     onNextStep: () -> Unit,
-    onPreStep: () -> Unit
+    onPreStep: () -> Unit,
+    onBack: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -259,7 +280,7 @@ private fun CreateGroupScreenView(
                 moreClick = {
                 },
                 backClick = {
-                    navController.popBackStack()
+                    onBack.invoke()
                 }
             )
         }
@@ -284,11 +305,11 @@ private fun CreateGroupScreenView(
                     .fillMaxWidth()
                     .padding(top = 30.dp),
                 numberOfSteps = 3,
-                currentStep = uiState.currentStep,
+                currentStep = currentStep,
                 titleList = listOf("名稱", "權限", "佈置")
             )
 
-            when (uiState.currentStep) {
+            when (currentStep) {
                 //step 1.
                 1 -> {
                     Step1Screen(
@@ -454,8 +475,8 @@ fun CreateGroupScreenPreview() {
         CreateGroupScreenView(
             navController = EmptyDestinationsNavigator,
             uiState = UiState(
-                currentStep = 1
             ),
+            currentStep = 1,
             approvalUiState = com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.UiState(),
             onGroupName = {},
             onSwitchApprove = {},
@@ -463,7 +484,8 @@ fun CreateGroupScreenPreview() {
             question = emptyList(),
             onEditClick = {},
             onNextStep = {},
-            onPreStep = {}
+            onPreStep = {},
+            onBack = {}
         )
     }
 }

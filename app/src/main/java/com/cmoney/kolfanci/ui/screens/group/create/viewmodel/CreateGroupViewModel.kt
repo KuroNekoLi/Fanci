@@ -15,12 +15,13 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.mod
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 data class UiState(
-    val currentStep: Int = 1,           //目前步驟
     val groupName: String = "",         //社團名稱
     val warningText: String = "",       //錯誤提示
     val groupIcon: String = "",         //社團圖示
@@ -38,15 +39,16 @@ class CreateGroupViewModel(
     var uiState by mutableStateOf(UiState())
         private set
 
+    private val _currentStep = MutableStateFlow(1)  //目前步驟
+    val currentStep = _currentStep.asStateFlow()
+
     val finalStep = 3
 
     /**
      * 上一步
      */
     fun preStep() {
-        uiState = uiState.copy(
-            currentStep = uiState.currentStep - 1
-        )
+        _currentStep.value = _currentStep.value - 1
     }
 
     /**
@@ -54,7 +56,7 @@ class CreateGroupViewModel(
      */
     fun nextStep() {
         //step1 to next, check group name
-        if (uiState.currentStep == 1) {
+        if (_currentStep.value == 1) {
             if (uiState.groupName.isEmpty()) {
                 uiState = uiState.copy(
                     warningText = "請輸入社團名稱"
@@ -63,9 +65,7 @@ class CreateGroupViewModel(
             }
         }
 
-        uiState = uiState.copy(
-            currentStep = uiState.currentStep + 1
-        )
+        _currentStep.value = _currentStep.value + 1
     }
 
     /**
