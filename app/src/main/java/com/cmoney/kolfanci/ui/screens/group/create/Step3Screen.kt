@@ -25,12 +25,14 @@ import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.theme.FanciColor
+
 @Composable
 fun Step3Screen(
     modifier: Modifier = Modifier,
     groupIcon: String,
     groupBackground: String,
-    themeColor: GroupTheme?,
+    fanciColor: FanciColor?,
     onChangeIcon: () -> Unit,
     onChangeBackground: () -> Unit,
     onThemeChange: () -> Unit,
@@ -70,14 +72,14 @@ fun Step3Screen(
                     fontWeight = FontWeight.Bold
                 )
 
-                if (themeColor != null) {
+                if (fanciColor != null) {
                     ThemeColorCardScreen(
                         modifier = Modifier
                             .size(55.dp),
-                        primary = themeColor.theme.primary,
-                        env_100 = themeColor.theme.env_100,
-                        env_80 = themeColor.theme.env_80,
-                        env_60 = themeColor.theme.env_60
+                        primary = fanciColor.primary,
+                        env_100 = fanciColor.env_100,
+                        env_80 = fanciColor.env_80,
+                        env_60 = fanciColor.env_60
                     )
                 } else {
                     Box(
@@ -193,7 +195,7 @@ fun Step3ScreenPreview() {
         Step3Screen(
             groupIcon = "",
             groupBackground = "",
-            themeColor = null,
+            fanciColor = null,
             onChangeIcon = {},
             onChangeBackground = {},
             onThemeChange = {},

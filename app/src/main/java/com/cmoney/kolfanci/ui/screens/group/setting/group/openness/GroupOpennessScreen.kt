@@ -38,6 +38,7 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -214,12 +215,16 @@ fun GroupOpennessScreen(
     }
 
     //設定完成
-    if (uiState.saveComplete) {
-        resultBackNavigator.navigateBack(
-            group.copy(
-                isNeedApproval = uiState.isNeedApproval
-            )
-        )
+    LaunchedEffect(Unit) {
+        viewModel.saveComplete.collect { saveComplete ->
+            if (saveComplete) {
+                resultBackNavigator.navigateBack(
+                    group.copy(
+                        isNeedApproval = uiState.isNeedApproval
+                    )
+                )
+            }            
+        }    
     }
 
     //離開再次 確認

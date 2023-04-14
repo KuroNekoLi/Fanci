@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemePreviewScreenDestination
 import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
@@ -43,22 +44,31 @@ import org.koin.androidx.compose.koinViewModel
 fun GroupSettingThemeScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    isFromCreate: Boolean = false,
+    group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<String>,
     themeResult: ResultRecipient<GroupSettingThemePreviewScreenDestination, String>
 ) {
     val TAG = "GroupSettingThemeScreen"
+
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
+
     val state = viewModel.uiState
+
     var showConfirmDialog: GroupTheme? by remember {
         mutableStateOf(null)
     }
 
-    var groupParam = globalViewModel.uiState.currentGroup
+    var groupParam = group
     viewModel.uiState.settingGroup?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
+    }
+
+    val isFromCreate = group.id.isNullOrBlank()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchAllTheme(groupParam)
     }
 
     themeResult.onNavResult { result ->
@@ -91,8 +101,7 @@ fun GroupSettingThemeScreen(
         if (isFromCreate) {
             val gson = Gson()
             resultNavigator.navigateBack(gson.toJson(it))
-        }
-        else {
+        } else {
             ChangeThemeDialogScreen(
                 groupTheme = it,
                 onDismiss = {
@@ -106,10 +115,6 @@ fun GroupSettingThemeScreen(
                 }
             )
         }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchAllTheme(groupParam, isFromCreate)
     }
 }
 

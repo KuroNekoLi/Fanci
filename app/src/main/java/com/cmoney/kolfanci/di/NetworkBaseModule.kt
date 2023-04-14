@@ -1,7 +1,6 @@
 package com.cmoney.kolfanci.di
 
 import android.app.Application
-import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.cmoney.kolfanci.BuildConfig
@@ -31,7 +30,7 @@ val networkBaseModule = module {
 
     single {
         ApiClient(
-            baseUrl = getDomain(androidApplication()),
+            baseUrl = getDomain(),
             okHttpClientBuilder = createOkHttpClient(androidApplication()).newBuilder(),
         ).apply {
             addAuthorization("Bearer", AddBearerTokenInterceptor())
@@ -108,9 +107,8 @@ val networkBaseModule = module {
 
 }
 
-private fun getDomain(context: Context): String {
-//    return context.getString(R.string.server_url)
-    return "http://34.80.212.140/fanci/"
+private fun getDomain(): String {
+    return BuildConfig.FANCI_SERVER_URL
 }
 
 private fun createOkHttpClient(
