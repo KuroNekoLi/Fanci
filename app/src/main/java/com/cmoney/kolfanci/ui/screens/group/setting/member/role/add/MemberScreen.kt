@@ -40,7 +40,7 @@ fun MemberScreen(
     val TAG = "MemberScreen"
 
     Column(modifier = modifier.fillMaxSize()) {
-        if (Constant.MyGroupPermission.assignRole == true) {
+        if (Constant.isCanEditRole()) {
             BorderButton(
                 modifier = Modifier
                     .background(LocalColor.current.env_80)

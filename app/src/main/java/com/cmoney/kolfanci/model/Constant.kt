@@ -53,11 +53,6 @@ object Constant {
     fun isShowApproval(): Boolean = MyGroupPermission.approveJoinApplies == true
 
     /**
-     * 是否可以 角色管理
-     */
-    fun isShowRoleManage(): Boolean = MyGroupPermission.createOrEditRole == true
-
-    /**
      * 是否呈現 社團管理 區塊
      */
     fun isShowGroupManage(): Boolean {
@@ -102,6 +97,10 @@ object Constant {
      */
     fun isCanDeleteCategory(): Boolean = (MyGroupPermission.deleteCategory == true)
 
+    /**
+     * 是否可以 新增/編輯 角色
+     */
+    fun isCanEditRole(): Boolean = (MyGroupPermission.createOrEditRole == true)
 
     /**
      * 是否可以按 Emoji

@@ -172,7 +172,7 @@ fun AllMemberScreenView(
                 items(groupMemberList) { groupMember ->
                     MemberItem(groupMember = groupMember) {
                         KLog.i(TAG, "member click:$it")
-                        if (Constant.MyGroupPermission.createOrEditRole == true) {
+                        if (Constant.isCanEditRole()) {
                             navController.navigate(MemberManageScreenDestination(
                                 group = group,
                                 groupMember =  groupMember
@@ -262,7 +262,7 @@ private fun MemberItem(
             }
         }
 
-        if (Constant.MyGroupPermission.createOrEditRole == true) {
+        if (Constant.isCanEditRole()) {
             Text(text = "管理", fontSize = 14.sp, color = LocalColor.current.primary)
         }
     }

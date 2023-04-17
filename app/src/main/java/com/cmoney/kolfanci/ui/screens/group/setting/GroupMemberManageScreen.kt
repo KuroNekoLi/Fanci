@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.Constant.isShowRoleManage
 import com.cmoney.kolfanci.ui.destinations.AllMemberScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.RoleManageScreenDestination
@@ -39,7 +38,7 @@ fun GroupMemberManageScreen(
             text = "成員管理", fontSize = 14.sp, color = LocalColor.current.text.default_100
         )
 
-        if (isShowRoleManage()) {
+        if (Constant.isCanEditRole()) {
             SettingItemScreen(
                 iconRes = R.drawable.rule_manage,
                 text = "角色管理",
