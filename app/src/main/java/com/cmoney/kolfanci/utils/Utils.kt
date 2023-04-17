@@ -7,6 +7,7 @@ import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import java.text.SimpleDateFormat
+import java.util.*
 import java.util.regex.Matcher
 
 class Utils {
@@ -126,8 +127,11 @@ class Utils {
             return result
         }
 
+        /**
+         * Chat room message display send time.
+         */
         fun getDisplayTime(publishTime: Long): String {
-            val sdf = SimpleDateFormat("yyyy/MM/dd")
+            val sdf = SimpleDateFormat("a hh:mm")
             return sdf.format(publishTime)
         }
     }
