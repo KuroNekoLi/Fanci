@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -69,6 +70,8 @@ fun AddRoleScreen(
         }
     }
 
+    val isLoading by viewModel.loading.collectAsState()
+
     AddRoleScreenView(
         modifier,
         navigator,
@@ -81,6 +84,7 @@ fun AddRoleScreen(
         uiState.memberList,
         roleName = uiState.roleName,
         roleColor = uiState.roleColor,
+        isLoading = isLoading,
         onTabSelected = {
             viewModel.onTabSelected(it)
         },
@@ -227,7 +231,8 @@ private fun AddRoleScreenView(
     onDelete: () -> Unit,
     onPermissionSwitch: (String, Boolean) -> Unit,
     onRoleStyleChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    isLoading: Boolean
 ) {
     val tabList = listOf("樣式", "權限", "成員")
 
@@ -247,6 +252,7 @@ private fun AddRoleScreenView(
             )
         }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -336,6 +342,18 @@ private fun AddRoleScreenView(
                 onConfirm.invoke()
             }
         }
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(size = 32.dp),
+                    color = LocalColor.current.primary
+                )
+            }
+        }
     }
 }
 
@@ -363,15 +381,16 @@ fun AddRoleScreenPreview() {
             ),
             permissionSelected = emptyMap(),
             memberList = emptyList(),
-            roleColor = Color(),
             roleName = "Hi",
+            roleColor = Color(),
             onTabSelected = {},
             onMemberRemove = {},
             onConfirm = {},
+            onDelete = {},
             onPermissionSwitch = { key, selected -> },
             onRoleStyleChange = { _, _ -> },
-            onDelete = {},
-            onBack = {}
+            onBack = {},
+            isLoading = false
         )
     }
 }

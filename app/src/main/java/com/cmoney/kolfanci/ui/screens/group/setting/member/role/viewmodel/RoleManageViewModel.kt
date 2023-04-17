@@ -14,6 +14,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.lang.reflect.Type
@@ -47,17 +49,24 @@ class RoleManageViewModel(
     var uiState by mutableStateOf(UiState())
         private set
 
+    private val _loading = MutableStateFlow(false)
+    val loading = _loading.asStateFlow()
+
     private var isEdited = false    //是否已經初始化編輯資料
     private var editFanciRole: FanciRole? = null  //要編輯的角色
     private var editMemberList: List<GroupMember> = emptyList() //編輯模式下原本的成員清單
 
     private fun showLoading() {
+        _loading.value = true
+
         uiState = uiState.copy(
             loading = true
         )
     }
 
     private fun dismissLoading() {
+        _loading.value = false
+
         uiState = uiState.copy(
             loading = false
         )
@@ -171,11 +180,13 @@ class RoleManageViewModel(
     fun onConfirmAddRole(group: Group) {
         KLog.i(TAG, "onConfirmAddRole")
         viewModelScope.launch {
+            showLoading()
             val name = uiState.roleName
             if (name.isEmpty()) {
                 uiState = uiState.copy(
                     addRoleError = Pair("角色名稱空白", "角色名稱不可以是空白的唷！")
                 )
+                dismissLoading()
                 return@launch
             }
             val permissionIds = uiState.permissionSelected.toList().filter {
@@ -202,6 +213,7 @@ class RoleManageViewModel(
                     colorCode = uiState.roleColor
                 ).fold({
                 }, {
+                    dismissLoading()
                     KLog.e(TAG, it)
                     if (it is EmptyBodyException) {
                         assignMemberRole(group.id.orEmpty(), editFanciRole!!)
@@ -227,9 +239,11 @@ class RoleManageViewModel(
                     colorCode = uiState.roleColor
                 ).fold({
                     KLog.i(TAG, it)
+                    dismissLoading()
                     assignMemberRole(group.id.orEmpty(), it)
                 }, {
                     KLog.e(TAG, it)
+                    dismissLoading()
                     //Conflict error
                     if ((it as HttpException).code() == 409) {
                         uiState = uiState.copy(
