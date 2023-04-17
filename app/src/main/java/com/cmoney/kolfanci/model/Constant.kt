@@ -98,9 +98,19 @@ object Constant {
     fun isCanDeleteCategory(): Boolean = (MyGroupPermission.deleteCategory == true)
 
     /**
+     * 是否可以進入 新增/編輯/刪除 角色
+     */
+    fun isCanEnterEditRole(): Boolean = (MyGroupPermission.createOrEditRole == true || MyGroupPermission.deleteRole == true)
+
+    /**
      * 是否可以 新增/編輯 角色
      */
     fun isCanEditRole(): Boolean = (MyGroupPermission.createOrEditRole == true)
+
+    /**
+     * 是否可以 刪除 角色
+     */
+    fun isCanDeleteRole(): Boolean = (MyGroupPermission.deleteRole == true)
 
     /**
      * 是否可以按 Emoji

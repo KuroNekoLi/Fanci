@@ -121,15 +121,18 @@ fun RoleManageScreenView(
                 .background(LocalColor.current.env_80)
         ) {
             Row(modifier = Modifier.padding(24.dp)) {
-                BorderButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    text = "新增角色",
-                    borderColor = LocalColor.current.component.other,
-                    textColor = Color.White
-                ) {
-                    navigator.navigate(AddRoleScreenDestination(group = group))
+
+                if (Constant.isCanEditRole()) {
+                    BorderButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp),
+                        text = "新增角色",
+                        borderColor = LocalColor.current.component.other,
+                        textColor = Color.White
+                    ) {
+                        navigator.navigate(AddRoleScreenDestination(group = group))
+                    }
                 }
 
                 if (Constant.MyGroupPermission.rearrangeRoles == true) {

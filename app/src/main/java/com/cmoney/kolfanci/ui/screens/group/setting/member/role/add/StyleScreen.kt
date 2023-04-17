@@ -94,7 +94,8 @@ fun StyleScreen(
                     fontSize = 16.sp,
                     color = LocalColor.current.text.default_30
                 )
-            }
+            },
+            enabled = Constant.isCanEditRole()
         )
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -136,7 +137,7 @@ fun StyleScreen(
             )
         }
 
-        if (showDelete && Constant.MyGroupPermission.deleteRole == true) {
+        if (showDelete && Constant.isCanDeleteRole()) {
             Spacer(modifier = Modifier.height(40.dp))
 
             Text(

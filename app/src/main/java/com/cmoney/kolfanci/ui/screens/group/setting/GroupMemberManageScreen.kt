@@ -38,7 +38,7 @@ fun GroupMemberManageScreen(
             text = "成員管理", fontSize = 14.sp, color = LocalColor.current.text.default_100
         )
 
-        if (Constant.isCanEditRole()) {
+        if (Constant.isCanEnterEditRole()) {
             SettingItemScreen(
                 iconRes = R.drawable.rule_manage,
                 text = "角色管理",

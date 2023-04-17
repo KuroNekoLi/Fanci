@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
@@ -260,42 +261,44 @@ private fun AddRoleScreenView(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            TabRow(
-                selectedTabIndex = selectedIndex,
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
-                    .height(40.dp)
-                    .padding(1.dp)
-                    .clip(RoundedCornerShape(35)),
-                indicator = {
-                    Box {}
-                },
-                backgroundColor = LocalColor.current.env_100
-            ) {
-                tabList.forEachIndexed { index, text ->
-                    val selected = selectedIndex == index
-                    Tab(
-                        modifier = if (selected) Modifier
-                            .padding(2.dp)
-                            .clip(RoundedCornerShape(25))
-                            .background(
-                                LocalColor.current.env_60
-                            )
-                        else Modifier
-                            .clip(RoundedCornerShape(15))
-                            .background(
-                                Color.Transparent
-                            ),
-                        selected = selected,
-                        onClick = {
-                            onTabSelected.invoke(index)
-                        },
-                        text = {
-                            Text(
-                                text = text, color = Color.White, fontSize = 14.sp
-                            )
-                        }
-                    )
+            if (Constant.isCanEditRole()) {
+                TabRow(
+                    selectedTabIndex = selectedIndex,
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .height(40.dp)
+                        .padding(1.dp)
+                        .clip(RoundedCornerShape(35)),
+                    indicator = {
+                        Box {}
+                    },
+                    backgroundColor = LocalColor.current.env_100
+                ) {
+                    tabList.forEachIndexed { index, text ->
+                        val selected = selectedIndex == index
+                        Tab(
+                            modifier = if (selected) Modifier
+                                .padding(2.dp)
+                                .clip(RoundedCornerShape(25))
+                                .background(
+                                    LocalColor.current.env_60
+                                )
+                            else Modifier
+                                .clip(RoundedCornerShape(15))
+                                .background(
+                                    Color.Transparent
+                                ),
+                            selected = selected,
+                            onClick = {
+                                onTabSelected.invoke(index)
+                            },
+                            text = {
+                                Text(
+                                    text = text, color = Color.White, fontSize = 14.sp
+                                )
+                            }
+                        )
+                    }
                 }
             }
 
