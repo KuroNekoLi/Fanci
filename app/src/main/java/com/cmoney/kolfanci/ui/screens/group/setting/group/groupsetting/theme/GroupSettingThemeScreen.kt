@@ -59,7 +59,9 @@ fun GroupSettingThemeScreen(
         mutableStateOf(null)
     }
 
-    var groupParam = group
+    val currentGroup by globalViewModel.currentGroup.collectAsState()
+    var groupParam = currentGroup
+
     viewModel.uiState.settingGroup?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
