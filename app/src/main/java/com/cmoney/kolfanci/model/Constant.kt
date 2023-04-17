@@ -84,8 +84,9 @@ object Constant {
     /**
      * 是否可以進入編輯分類 新增/刪除
      */
-    fun isEnterEditCategoryPermission(): Boolean = (MyGroupPermission.createOrEditCategory == true ||
-            MyGroupPermission.deleteCategory == true)
+    fun isEnterEditCategoryPermission(): Boolean =
+        (MyGroupPermission.createOrEditCategory == true ||
+                MyGroupPermission.deleteCategory == true)
 
     /**
      * 是否可以編輯分類 新增
@@ -100,7 +101,8 @@ object Constant {
     /**
      * 是否可以進入 新增/編輯/刪除 角色
      */
-    fun isCanEnterEditRole(): Boolean = (MyGroupPermission.createOrEditRole == true || MyGroupPermission.deleteRole == true)
+    fun isCanEnterEditRole(): Boolean = (
+            MyGroupPermission.createOrEditRole == true || MyGroupPermission.deleteRole == true || MyGroupPermission.rearrangeRoles == true)
 
     /**
      * 是否可以 新增/編輯 角色
