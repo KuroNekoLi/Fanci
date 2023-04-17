@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditChannelOpennessScreenDestination
@@ -390,7 +391,7 @@ private fun StyleTabScreen(
         }
     )
 
-    if (withDelete) {
+    if (withDelete && Constant.isCanDeleteChannel()) {
         Spacer(modifier = Modifier.height(35.dp))
 
         Text(

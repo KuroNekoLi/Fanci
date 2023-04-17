@@ -73,8 +73,13 @@ object Constant {
     /**
      * 是否可以編輯 頻道
      */
-    fun isChannelEditPermission(): Boolean =
+    fun isEnterChannelEditPermission(): Boolean =
         (MyGroupPermission.createOrEditChannel == true || MyGroupPermission.deleteChannel == true)
+
+    /**
+     * 是否可以刪除頻道
+     */
+    fun isCanDeleteChannel(): Boolean = (MyGroupPermission.deleteChannel == true)
 
     /**
      * 是否可以 增加頻道
@@ -96,6 +101,7 @@ object Constant {
      * 是否 可以刪除分類
      */
     fun isCanDeleteCategory(): Boolean = (MyGroupPermission.deleteCategory == true)
+
 
     /**
      * 是否可以按 Emoji

@@ -77,7 +77,7 @@ fun ChannelEditScreen(
                 horizontalPadding = 0.dp,
                 isEditMode = true,
                 onClick = {
-                    if (Constant.isChannelEditPermission()) {
+                    if (Constant.isEnterChannelEditPermission()) {
                         onChanelEdit.invoke(category, it)
                     }
                 }

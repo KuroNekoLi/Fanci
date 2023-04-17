@@ -20,6 +20,7 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
@@ -385,25 +386,27 @@ private fun StyleView(
             )
         }
 
-        Spacer(modifier = Modifier.height(35.dp))
+        if (Constant.isCanDeleteChannel()) {
+            Spacer(modifier = Modifier.height(35.dp))
 
-        Text(
-            modifier = Modifier.padding(start = 24.dp, bottom = 10.dp),
-            text = "刪除頻道", fontSize = 14.sp, color = LocalColor.current.text.default_100
-        )
+            Text(
+                modifier = Modifier.padding(start = 24.dp, bottom = 10.dp),
+                text = "刪除頻道", fontSize = 14.sp, color = LocalColor.current.text.default_100
+            )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .background(LocalColor.current.background)
-                .clickable {
-                    onDelete.invoke()
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "刪除頻道", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(LocalColor.current.background)
+                    .clickable {
+                        onDelete.invoke()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "刪除頻道", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
 
+            }
         }
     }
 }
