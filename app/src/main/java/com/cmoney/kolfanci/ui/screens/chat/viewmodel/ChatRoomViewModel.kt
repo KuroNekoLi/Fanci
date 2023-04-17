@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.chat.viewmodel
 
+import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -8,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
@@ -27,11 +28,9 @@ import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
 data class ChatRoomUiState(
-//    val replyMessage: ChatMessage? = null,
     val snackBarMessage: CustomMessage? = null,
     val hideUserMessage: ChatMessage? = null,
     val deleteMessage: ChatMessage? = null,
-//    val reportUser: ChatMessage? = null,
     val emojiMessage: Pair<ChatMessage, Int>? = null,
     val announceMessage: ChatMessage? = null,          //公告訊息,顯示用
     val errorMessage: String? = null,
@@ -48,11 +47,11 @@ data class ChatRoomUiState(
 }
 
 class ChatRoomViewModel(
-    val context: Context,
-    val chatRoomUseCase: ChatRoomUseCase,
-    val relationUseCase: RelationUseCase,
-    val permissionUseCase: PermissionUseCase
-) : ViewModel() {
+    val context: Application,
+    private val chatRoomUseCase: ChatRoomUseCase,
+    private val relationUseCase: RelationUseCase,
+    private val permissionUseCase: PermissionUseCase
+) : AndroidViewModel(context) {
 
     private val TAG = ChatRoomViewModel::class.java.simpleName
 
@@ -102,37 +101,6 @@ class ChatRoomViewModel(
         }
     }
 
-
-//    /**
-//     * 檢舉 用戶
-//     */
-//    private fun reportUser(message: ChatMessage) {
-//        KLog.i(TAG, "reportUser:$message")
-//        uiState = uiState.copy(
-//            reportUser = message
-//        )
-//    }
-
-    /**
-     * 刪除 訊息
-     */
-    private fun deleteMessage(message: ChatMessage) {
-        KLog.i(TAG, "deleteMessage:$message")
-        uiState = uiState.copy(
-            deleteMessage = message
-        )
-    }
-
-    /**
-     * 隱藏 用戶
-     */
-    private fun hideUserMessage(message: ChatMessage) {
-        KLog.i(TAG, "hideUserMessage:$message")
-        uiState = uiState.copy(
-            hideUserMessage = message
-        )
-    }
-
     /**
      * 複製訊息
      */
@@ -151,97 +119,6 @@ class ChatRoomViewModel(
             )
         )
     }
-
-    /**
-     *  回收 訊息 並 show 回收成功 snackBar
-     */
-    private fun recycleMessage(message: ChatMessage) {
-        KLog.i(TAG, "recycleMessage:$message")
-//        val orgMessage = uiState.message.toMutableList()
-//        uiState = uiState.copy(
-//            snackBarMessage = CustomMessage(
-//                textString = "訊息收回成功！",
-//                textColor = Color.White,
-//                iconRes = R.drawable.recycle,
-//                iconColor = White_767A7F,
-//                backgroundColor = White_494D54
-//            ),
-//            message = orgMessage.map { chatModel ->
-//                if (chatModel.message == message) {
-//                    chatModel.copy(
-//                        isDeleted = true
-//                    )
-//                } else {
-//                    chatModel
-//                }
-//            }
-//        )
-    }
-
-    /**
-     * 隱藏 SnackBar
-     */
-    fun snackBarDismiss() {
-        uiState = uiState.copy(
-            snackBarMessage = null
-        )
-    }
-
-    /**
-     * 關閉 刪除訊息 彈窗
-     */
-    fun onDeleteMessageDialogDismiss() {
-        uiState = uiState.copy(
-            deleteMessage = null
-        )
-    }
-
-    /**
-     * 確定 刪除 訊息
-     */
-    fun onDeleteClick(chatMessageModel: ChatMessage) {
-        KLog.i(TAG, "onDeleteClick:$chatMessageModel")
-//        uiState = uiState.copy(
-//            message = uiState.message.filter {
-//                it != chatMessageModel
-//            },
-//            deleteMessage = null,
-//            snackBarMessage = CustomMessage(
-//                textString = "成功刪除訊息！",
-//                textColor = Color.White,
-//                iconRes = R.drawable.delete,
-//                iconColor = White_767A7F,
-//                backgroundColor = White_494D54
-//            )
-//        )
-    }
-
-//    /**
-//     * 關閉 檢舉用戶 彈窗
-//     */
-//    fun onReportUserDialogDismiss() {
-//        uiState = uiState.copy(
-//            reportUser = null
-//        )
-//    }
-
-    // TODO:
-//    /**
-//     * 檢舉 用戶
-//     */
-//    fun onReportUser(reason: String) {
-//        KLog.i(TAG, "onReportUser:$reason")
-//        uiState = uiState.copy(
-//            reportUser = null,
-//            snackBarMessage = CustomMessage(
-//                textString = "檢舉成立！",
-//                textColor = Color.White,
-//                iconRes = R.drawable.report,
-//                iconColor = White_767A7F,
-//                backgroundColor = White_494D54
-//            )
-//        )
-//    }
 
     /**
      * 確定 封鎖 用戶

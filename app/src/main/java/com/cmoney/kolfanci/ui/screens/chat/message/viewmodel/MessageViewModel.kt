@@ -86,11 +86,75 @@ class MessageViewModel(
                     val newMessage = it.items?.map { chatMessage ->
                         ChatMessageWrapper(message = chatMessage)
                     }.orEmpty().reversed()
-                    processMessageCombine(newMessage, true)
+
+                    //檢查插入時間 bar
+                    val timeBarMessage = insertTimeBar(newMessage)
+
+                    processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
+                        defineMessageType(chatMessageWrapper)
+                    }, true)
                 }
             }
         }
     }
+
+    /**
+     *  檢查內容,是否有跨日期,並在跨日中間插入 time bar,
+     *  或是 內容不滿分頁大小(訊息太少), 也插入
+     */
+    private fun insertTimeBar(newMessage: List<ChatMessageWrapper>): List<ChatMessageWrapper> {
+        if (newMessage.isEmpty()) {
+            return newMessage
+        }
+
+        //依照日期 分群
+        val groupList = newMessage.groupBy {
+            val createTime = it.message.createUnixTime?.times(1000) ?: 0L
+            Utils.getTimeGroupByKey(createTime)
+        }
+
+        //大於2群, 找出跨日交界並插入time bar
+        return if (groupList.size > 1) {
+            val groupMessage = groupList.map {
+                val newList = it.value.toMutableList()
+                newList.add(generateTimeBar(it.value.first()))
+                newList
+            }.flatten().toMutableList()
+            groupMessage
+        } else {
+            val newList = newMessage.toMutableList()
+            newList.add(generateTimeBar(newMessage.first()))
+            return newList
+        }
+    }
+
+    private fun generateTimeBar(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
+        return chatMessageWrapper.copy(
+            message = chatMessageWrapper.message.copy(
+                id = chatMessageWrapper.message.createUnixTime.toString()
+            ),
+            messageType = ChatMessageWrapper.MessageType.TimeBar
+        )
+    }
+
+    private fun defineMessageType(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
+        val messageType = if (chatMessageWrapper.isBlocking) {
+            ChatMessageWrapper.MessageType.Blocking
+        } else if (chatMessageWrapper.isBlocker) {
+            ChatMessageWrapper.MessageType.Blocker
+        } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
+            ChatMessageWrapper.MessageType.Delete
+        } else if (chatMessageWrapper.message.isDeleted == true) {
+            ChatMessageWrapper.MessageType.RecycleMessage
+        } else {
+            chatMessageWrapper.messageType
+        }
+
+        return chatMessageWrapper.copy(
+            messageType = messageType
+        )
+    }
+
 
     /**
      * 停止 Polling 聊天室 訊息
@@ -109,9 +173,6 @@ class MessageViewModel(
         newChatMessage: List<ChatMessageWrapper>,
         isLatest: Boolean = false
     ) {
-
-        //TODO pending message sort
-
         //combine old message
         val oldMessage = uiState.message.filter {
             !it.isPendingSendMessage

@@ -131,7 +131,12 @@ class Utils {
          * Chat room message display send time.
          */
         fun getDisplayTime(publishTime: Long): String {
-            val sdf = SimpleDateFormat("a hh:mm")
+            val sdf = SimpleDateFormat("a hh:mm E")
+            return sdf.format(publishTime)
+        }
+
+        fun getTimeGroupByKey(publishTime: Long): String {
+            val sdf = SimpleDateFormat("yyyy/MM/dd (E)")
             return sdf.format(publishTime)
         }
     }
