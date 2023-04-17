@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.MainViewModel
+import com.cmoney.kolfanci.ui.main.MainViewModel
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -65,7 +65,6 @@ fun FollowScreen(
         mutableStateOf(true)
     }
 ) {
-    val globalUiState = globalViewModel.uiState
     val uiState = viewModel.uiState
     val chatRoomUiState = chatRoomViewModel.uiState
 
@@ -83,7 +82,7 @@ fun FollowScreen(
         globalViewModel.fetchFollowDataDone()
     }
 
-    val group = globalUiState.currentGroup
+    val group by globalViewModel.currentGroup.collectAsState()
 
     if (group == null && uiState.myGroupList.isNotEmpty()) {
         uiState.myGroupList.find {
@@ -182,8 +181,6 @@ fun FollowScreenView(
 
     val scaffoldState: ScaffoldState =
         rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
-
-    val context = LocalContext.current
 
     val lazyListState = rememberLazyListState()
 

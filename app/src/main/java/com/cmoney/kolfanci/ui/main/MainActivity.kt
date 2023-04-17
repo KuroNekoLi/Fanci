@@ -9,13 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.kolfanci.MainViewModel
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
@@ -46,42 +43,41 @@ class MainActivity : BaseWebLoginActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CompositionLocalProvider(LocalDependencyContainer provides this) {
-                val state = globalViewModel.uiState
-//                val isOpenTutorial = globalViewModel.isOpenTutorial.observeAsState()
+                val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
 
-                state.isOpenTutorial.let { isOpenTutorial ->
-                    if (isOpenTutorial) {
-                        FanciTheme(fanciColor = state.theme) {
-                            val mainState = rememberMainState()
-                            mainState.setStatusBarColor()
+                val theme by globalViewModel.theme.collectAsState()
 
-                            Scaffold(
+                if (isOpenTutorial == true) {
+                    FanciTheme(fanciColor = theme) {
+                        val mainState = rememberMainState()
+                        mainState.setStatusBarColor()
+
+                        Scaffold(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(LocalColor.current.primary),
+                        ) { padding ->
+                            Column(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(LocalColor.current.primary),
-                            ) { padding ->
-                                Column(
-                                    modifier = Modifier
-                                        .padding(padding)
-                                ) {
-                                    DestinationsNavHost(
-                                        navGraph = NavGraphs.root,
-                                        startRoute = MainScreenDestination
-                                    )
-                                }
+                                    .padding(padding)
+                            ) {
+                                DestinationsNavHost(
+                                    navGraph = NavGraphs.root,
+                                    startRoute = MainScreenDestination
+                                )
                             }
                         }
-                    } else {
-                        rememberSystemUiController().setStatusBarColor(
-                            color = Black_242424,
-                            darkIcons = false
-                        )
-                        MaterialTheme {
-                            TutorialScreen(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                globalViewModel.tutorialOnOpen()
-                            }
+                    }
+                } else {
+                    rememberSystemUiController().setStatusBarColor(
+                        color = Black_242424,
+                        darkIcons = false
+                    )
+                    MaterialTheme {
+                        TutorialScreen(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            globalViewModel.tutorialOnOpen()
                         }
                     }
                 }
@@ -118,9 +114,9 @@ fun MainScreen(
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     val mainNavController = rememberNavController()
-    val state = globalViewModel.uiState
+    val theme by globalViewModel.theme.collectAsState()
 
-    FanciTheme(fanciColor = state.theme) {
+    FanciTheme(fanciColor = theme) {
         val mainState = rememberMainState()
         mainState.setStatusBarColor()
 

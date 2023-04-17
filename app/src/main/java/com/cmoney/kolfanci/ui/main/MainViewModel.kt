@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci
+package com.cmoney.kolfanci.ui.main
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,25 +11,15 @@ import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UserUseCase
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
-import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 sealed class ThemeSetting {
     object Default : ThemeSetting()
     object Coffee : ThemeSetting()
 }
-
-data class UiState(
-    val currentGroup: Group? = null, //目前選擇中的社團
-//    val theme: FanciColor = CoffeeThemeColor,
-    val theme: FanciColor = DefaultThemeColor,
-    val isLoginSuccess: Boolean = false,
-    val isOpenTutorial: Boolean = false,
-)
 
 class MainViewModel(
     private val userUseCase: UserUseCase,
@@ -40,20 +30,25 @@ class MainViewModel(
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
-    var uiState by mutableStateOf(UiState())
-        private set
-
     private val _fetchFollowData = MutableStateFlow(false)
     val fetchFollowData: StateFlow<Boolean>
         get() = _fetchFollowData
 
+    private val _isOpenTutorial: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    val isOpenTutorial = _isOpenTutorial.asStateFlow()
+
+    private val _theme = MutableStateFlow(DefaultThemeColor)
+    val theme = _theme.asStateFlow()
+
+    private val _isLoginSuccess = MutableStateFlow(false)
+    val isLoginSuccess = _isLoginSuccess.asStateFlow()
+
+    private val _currentGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
+    val currentGroup = _currentGroup.asStateFlow()
+
     init {
         viewModelScope.launch {
-            settingsDataStore.isTutorial.collect {
-                uiState = uiState.copy(
-                    isOpenTutorial = it
-                )
-            }
+            _isOpenTutorial.value = settingsDataStore.isTutorial.first()
         }
     }
 
@@ -77,18 +72,14 @@ class MainViewModel(
      */
     fun setCurrentGroup(group: Group) {
         KLog.i(TAG, "setCurrentGroup")
-        if (group != uiState.currentGroup && group.id != null) {
+        if (group != _currentGroup.value && group.id != null) {
             KLog.i(TAG, "setCurrentGroup diff:$group")
             fetchGroupPermission(group)
-            uiState = uiState.copy(
-                currentGroup = group
-            )
+            _currentGroup.value = group
             viewModelScope.launch {
                 group.colorSchemeGroupKey?.apply {
                     themeUseCase.fetchThemeConfig(this).fold({
-                        uiState = uiState.copy(
-                            theme = it.theme
-                        )
+                        _theme.value = it.theme
                     }, {
                         KLog.e(TAG, it)
                     })
@@ -122,10 +113,7 @@ class MainViewModel(
         KLog.i(TAG, "tutorialOnOpen")
         viewModelScope.launch {
             settingsDataStore.onTutorialOpen()
-//            _isOpenTutorial.value = true
-            uiState = uiState.copy(
-                isOpenTutorial = true
-            )
+            _isOpenTutorial.value = true
         }
     }
 
@@ -134,9 +122,7 @@ class MainViewModel(
      */
     fun loginSuccess() {
         KLog.i(TAG, "loginSuccess")
-        uiState = uiState.copy(
-            isLoginSuccess = true,
-        )
+        _isLoginSuccess.value = true
     }
 
     /**
@@ -150,11 +136,4 @@ class MainViewModel(
         KLog.i(TAG, "startFetchFollowData")
         _fetchFollowData.value = true
     }
-
-//    fun sortCallback(categoryList: List<Category>) {
-//        uiState = uiState.copy(
-//            testCategory = categoryList
-//        )
-//    }
-
 }

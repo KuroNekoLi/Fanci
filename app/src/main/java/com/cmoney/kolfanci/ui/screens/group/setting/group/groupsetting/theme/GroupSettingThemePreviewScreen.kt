@@ -48,7 +48,9 @@ fun GroupSettingThemePreviewScreen(
 ) {
     val TAG = "GroupSettingThemePreviewScreen"
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
-    var groupParam = globalViewModel.uiState.currentGroup!!
+    val currentGroup by globalViewModel.currentGroup.collectAsState()
+    var groupParam = currentGroup
+
     var showConfirmDialog: GroupTheme? by remember {
         mutableStateOf(null)
     }

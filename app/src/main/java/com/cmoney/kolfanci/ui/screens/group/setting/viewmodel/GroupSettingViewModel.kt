@@ -289,18 +289,20 @@ class GroupSettingViewModel(
      * 更換 主題
      * @param groupTheme 要更換的主題
      */
-    fun changeTheme(group: Group, groupTheme: GroupTheme) {
+    fun changeTheme(group: Group?, groupTheme: GroupTheme) {
         KLog.i(TAG, "changeTheme: $groupTheme")
         viewModelScope.launch {
-            if (group.id != null) {
-                themeUseCase.changeGroupTheme(group, groupTheme).fold({
+            group?.let { group ->
+                if (group.id != null) {
+                    themeUseCase.changeGroupTheme(group, groupTheme).fold({
 
-                }, {
-                    KLog.e(TAG, it)
-                    if (it is EmptyBodyException) {
-                        setSelectedTheme(group, groupTheme)
-                    }
-                })
+                    }, {
+                        KLog.e(TAG, it)
+                        if (it is EmptyBodyException) {
+                            setSelectedTheme(group, groupTheme)
+                        }
+                    })
+                }
             }
         }
     }
