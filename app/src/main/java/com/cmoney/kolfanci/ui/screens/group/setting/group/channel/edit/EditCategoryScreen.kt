@@ -8,14 +8,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
@@ -44,7 +42,6 @@ fun EditCategoryScreen(
     viewModel: ChannelSettingViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<Group>
 ) {
-    val context = LocalContext.current
     val TAG = "EditCategoryScreen"
     val showDialog = remember { mutableStateOf(false) }
     var showSaveTip by remember {
@@ -176,7 +173,8 @@ fun EditCategoryScreenView(
                             fontSize = 16.sp,
                             color = LocalColor.current.text.default_30
                         )
-                    }
+                    },
+                    enabled = Constant.isCanEditCategoryPermission()
                 )
 
                 if (Constant.isCanDeleteCategory()) {

@@ -52,7 +52,7 @@ fun ChannelEditScreen(
                 }
             )
 
-            if (category.isDefault != true && Constant.isEditCategoryPermission()) {
+            if (category.isDefault != true && Constant.isEnterEditCategoryPermission()) {
                 Box(
                     modifier =
                     Modifier

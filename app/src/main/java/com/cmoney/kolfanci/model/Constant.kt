@@ -82,10 +82,15 @@ object Constant {
     fun isAddChannelPermission(): Boolean = (MyGroupPermission.createOrEditChannel == true)
 
     /**
-     * 是否可以編輯分類 新增/刪除
+     * 是否可以進入編輯分類 新增/刪除
      */
-    fun isEditCategoryPermission(): Boolean = (MyGroupPermission.createOrEditCategory == true ||
+    fun isEnterEditCategoryPermission(): Boolean = (MyGroupPermission.createOrEditCategory == true ||
             MyGroupPermission.deleteCategory == true)
+
+    /**
+     * 是否可以編輯分類 新增
+     */
+    fun isCanEditCategoryPermission(): Boolean = (MyGroupPermission.createOrEditCategory == true)
 
     /**
      * 是否 可以刪除分類
