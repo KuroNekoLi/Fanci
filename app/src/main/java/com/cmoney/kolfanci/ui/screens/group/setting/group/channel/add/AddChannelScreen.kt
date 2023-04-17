@@ -253,16 +253,18 @@ fun AddChannelScreenView(
         ) {
             Column(modifier = Modifier.weight(1f)) {
 
-                TabScreen(
-                    modifier = Modifier
-                        .padding(18.dp)
-                        .height(40.dp),
-                    selectedIndex = selectedIndex,
-                    listItem = list,
-                    onTabClick = {
-                        onTabClick.invoke(it)
-                    }
-                )
+                if (Constant.isAddChannelPermission()) {
+                    TabScreen(
+                        modifier = Modifier
+                            .padding(18.dp)
+                            .height(40.dp),
+                        selectedIndex = selectedIndex,
+                        listItem = list,
+                        onTabClick = {
+                            onTabClick.invoke(it)
+                        }
+                    )
+                }
 
                 when (selectedIndex) {
                     //樣式
@@ -388,7 +390,8 @@ private fun StyleTabScreen(
                 fontSize = 16.sp,
                 color = LocalColor.current.text.default_30
             )
-        }
+        },
+        enabled = Constant.isAddChannelPermission()
     )
 
     if (withDelete && Constant.isCanDeleteChannel()) {
