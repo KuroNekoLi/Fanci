@@ -47,37 +47,39 @@ class MainActivity : BaseWebLoginActivity() {
 
                 val theme by globalViewModel.theme.collectAsState()
 
-                if (isOpenTutorial == true) {
-                    FanciTheme(fanciColor = theme) {
-                        val mainState = rememberMainState()
-                        mainState.setStatusBarColor()
+                isOpenTutorial?.let { isOpenTutorial ->
+                    if (isOpenTutorial) {
+                        FanciTheme(fanciColor = theme) {
+                            val mainState = rememberMainState()
+                            mainState.setStatusBarColor()
 
-                        Scaffold(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(LocalColor.current.primary),
-                        ) { padding ->
-                            Column(
+                            Scaffold(
                                 modifier = Modifier
-                                    .padding(padding)
-                            ) {
-                                DestinationsNavHost(
-                                    navGraph = NavGraphs.root,
-                                    startRoute = MainScreenDestination
-                                )
+                                    .fillMaxSize()
+                                    .background(LocalColor.current.primary),
+                            ) { padding ->
+                                Column(
+                                    modifier = Modifier
+                                        .padding(padding)
+                                ) {
+                                    DestinationsNavHost(
+                                        navGraph = NavGraphs.root,
+                                        startRoute = MainScreenDestination
+                                    )
+                                }
                             }
                         }
-                    }
-                } else {
-                    rememberSystemUiController().setStatusBarColor(
-                        color = Black_242424,
-                        darkIcons = false
-                    )
-                    MaterialTheme {
-                        TutorialScreen(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            globalViewModel.tutorialOnOpen()
+                    } else {
+                        rememberSystemUiController().setStatusBarColor(
+                            color = Black_242424,
+                            darkIcons = false
+                        )
+                        MaterialTheme {
+                            TutorialScreen(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                globalViewModel.tutorialOnOpen()
+                            }
                         }
                     }
                 }
