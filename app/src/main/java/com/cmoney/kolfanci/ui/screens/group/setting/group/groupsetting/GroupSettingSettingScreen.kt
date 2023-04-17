@@ -24,6 +24,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.*
 import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
@@ -482,17 +483,19 @@ fun GroupSettingSettingView(
             Spacer(modifier = Modifier.weight(1f))
 
             //========== 解散社團 ==========
-            Box(
-                modifier = Modifier
-                    .height(50.dp)
-                    .fillMaxWidth()
-                    .background(LocalColor.current.background)
-                    .clickable {
-                        onDelectClick.invoke()
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "解散社團", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+            if (group.creatorId == Constant.MyInfo?.id) {
+                Box(
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth()
+                        .background(LocalColor.current.background)
+                        .clickable {
+                            onDelectClick.invoke()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "解散社團", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+                }
             }
         }
     }
