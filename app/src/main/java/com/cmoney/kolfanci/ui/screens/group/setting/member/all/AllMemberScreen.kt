@@ -115,7 +115,8 @@ fun AllMemberScreenView(
                     navController.popBackStack()
                 }
             )
-        }
+        },
+        backgroundColor = LocalColor.current.env_80
     ) { innerPadding ->
         Column {
             //Search bar

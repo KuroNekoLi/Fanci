@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,18 +28,15 @@ import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
-import com.cmoney.kolfanci.ui.theme.Color_2B313C
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -96,7 +94,6 @@ fun GroupOpennessScreen(
 
     GroupOpennessScreenView(
         modifier = modifier,
-        navigator = navigator,
         isNeedApproval = uiState.isNeedApproval,
         question = uiState.groupQuestionList.orEmpty(),
         onSwitch = {
@@ -113,11 +110,10 @@ fun GroupOpennessScreen(
         },
         onSave = {
             viewModel.onSave(group = group)
-        },
-        onBack = {
-            showSaveTip = true
         }
-    )
+    ) {
+        showSaveTip = true
+    }
 
     //不公開 提示
     if (showDialog.value) {
@@ -153,9 +149,6 @@ fun GroupOpennessScreen(
             onRemove = {
                 KLog.i(TAG, "onRemove click.")
                 showDeleteConfirmDialog = true
-                // TODO:
-//                viewModel.removeQuestion(showEditDialog.value.second)
-//                showEditDialog.value = Pair(false, "")
             }
         )
     }
@@ -243,7 +236,6 @@ fun GroupOpennessScreen(
 @Composable
 fun GroupOpennessScreenView(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
     isNeedApproval: Boolean,
     question: List<String> = emptyList(),
     onSwitch: (Boolean) -> Unit,
@@ -401,7 +393,7 @@ fun TipDialog(
         Surface(
             modifier = Modifier,
             shape = RoundedCornerShape(16.dp),
-            color = Color_2B313C
+            color = LocalColor.current.env_80
         ) {
             Box(
                 modifier = Modifier.padding(20.dp),
@@ -411,6 +403,7 @@ fun TipDialog(
                     Row {
                         Image(
                             painter = painterResource(id = R.drawable.lock),
+                            colorFilter = ColorFilter.tint(LocalColor.current.primary),
                             contentDescription = null
                         )
 
@@ -491,14 +484,12 @@ fun QuestionItem(question: String, onClick: (String) -> Unit) {
 fun GroupOpennessScreenPreview() {
     FanciTheme {
         GroupOpennessScreenView(
-            navigator = EmptyDestinationsNavigator,
             isNeedApproval = true,
             question = listOf("1. 金針菇是哪國人？", "2. 金針菇第一隻破十萬觀看數的影片是哪一隻呢？（敘述即可不用寫出全名）"),
             onSwitch = {},
             onAddQuestion = {},
             onEditClick = {},
-            onSave = {},
-            onBack = {}
-        )
+            onSave = {}
+        ) {}
     }
 }

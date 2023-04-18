@@ -50,7 +50,7 @@ fun SaveConfirmDialogScreen(
             Surface(
                 modifier = modifier,
                 shape = RoundedCornerShape(16.dp),
-                color = Color_2B313C
+                color = LocalColor.current.env_80
             ) {
                 Box(
                     modifier = Modifier.padding(20.dp),
@@ -77,7 +77,11 @@ fun SaveConfirmDialogScreen(
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        Text(text = "你所設定的內容，尚未儲存喔！", fontSize = 17.sp, color = Color.White)
+                        Text(
+                            text = "你所設定的內容，尚未儲存喔！",
+                            fontSize = 17.sp,
+                            color = LocalColor.current.text.default_100
+                        )
 
                         Spacer(modifier = Modifier.height(20.dp))
 

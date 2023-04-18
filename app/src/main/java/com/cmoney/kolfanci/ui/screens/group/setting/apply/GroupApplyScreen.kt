@@ -133,7 +133,8 @@ private fun GroupApplyScreenView(
                     onSelectAllClick.invoke()
                 }
             )
-        }
+        },
+        backgroundColor = LocalColor.current.env_80
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             LazyColumn(

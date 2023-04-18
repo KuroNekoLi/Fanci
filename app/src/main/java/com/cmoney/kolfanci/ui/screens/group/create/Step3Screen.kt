@@ -1,8 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.create
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
@@ -18,14 +16,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
+import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.theme.FanciColor
 
 @Composable
 fun Step3Screen(
@@ -39,10 +36,14 @@ fun Step3Screen(
     onNext: () -> Unit,
     onPre: () -> Unit
 ) {
-    Scaffold(
-        modifier = modifier
-    ) { padding ->
-        Column {
+    Spacer(modifier = Modifier.height(20.dp))
+    Column {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .weight(1f)
+        ) {
+
             Spacer(modifier = Modifier.height(1.dp))
             DescWithImage(desc = "社團圖示", groupIcon) {
                 onChangeIcon.invoke()
@@ -99,37 +100,36 @@ fun Step3Screen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+        }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(115.dp)
-                    .background(LocalColor.current.env_100),
-                contentAlignment = Alignment.Center
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(115.dp)
+                .background(LocalColor.current.env_100),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                modifier = Modifier.padding(25.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.padding(25.dp),
-                    verticalAlignment = Alignment.CenterVertically
+
+                BorderButton(
+                    modifier = Modifier.weight(1f),
+                    text = "上一步",
+                    borderColor = LocalColor.current.text.default_50,
+                    textColor = LocalColor.current.text.default_100
                 ) {
+                    onPre.invoke()
+                }
 
-                    BorderButton(
-                        modifier = Modifier.weight(1f),
-                        text = "上一步",
-                        borderColor = LocalColor.current.text.default_50,
-                        textColor = LocalColor.current.text.default_100
-                    ) {
-                        onPre.invoke()
-                    }
+                Spacer(modifier = Modifier.width(27.dp))
 
-                    Spacer(modifier = Modifier.width(27.dp))
-
-                    BlueButton(
-                        modifier = Modifier.weight(1f),
-                        text = "建立社團 Go!"
-                    ) {
-                        onNext.invoke()
-                    }
+                BlueButton(
+                    modifier = Modifier.weight(1f),
+                    text = "建立社團 Go!"
+                ) {
+                    onNext.invoke()
                 }
             }
         }

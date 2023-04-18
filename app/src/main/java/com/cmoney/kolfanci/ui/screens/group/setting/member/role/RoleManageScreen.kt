@@ -129,7 +129,7 @@ fun RoleManageScreenView(
                             .height(40.dp),
                         text = "新增角色",
                         borderColor = LocalColor.current.component.other,
-                        textColor = Color.White
+                        textColor = LocalColor.current.text.default_100
                     ) {
                         navigator.navigate(AddRoleScreenDestination(group = group))
                     }
@@ -144,7 +144,7 @@ fun RoleManageScreenView(
                             .height(40.dp),
                         text = "重新排列",
                         borderColor = LocalColor.current.component.other,
-                        textColor = Color.White
+                        textColor = LocalColor.current.text.default_100
                     ) {
                         navigator.navigate(
                             RoleSortScreenDestination(

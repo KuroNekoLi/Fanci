@@ -32,7 +32,7 @@ fun TransparentButton(text: String, onClick: () -> Unit) {
         }) {
         Text(
             text = text,
-            color = LocalColor.current.text.other,
+            color = LocalColor.current.text.default_100,
             fontSize = 16.sp
         )
     }
@@ -94,7 +94,7 @@ fun GrayButton(
         }) {
         Text(
             text = text,
-            color = LocalColor.current.text.other,
+            color = LocalColor.current.text.default_100,
             fontSize = 16.sp
         )
     }

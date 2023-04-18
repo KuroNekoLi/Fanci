@@ -10,7 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
-import com.cmoney.kolfanci.ui.theme.*
+import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 @Composable
@@ -36,7 +36,7 @@ fun DialogScreen(
         Surface(
             modifier = modifier,
             shape = RoundedCornerShape(16.dp),
-            color = Color_2B313C
+            color = LocalColor.current.env_80
         ) {
             Box(
                 modifier = Modifier.padding(20.dp),
@@ -49,13 +49,18 @@ fun DialogScreen(
                         if (titleIconRes != null) {
                             Image(
                                 painter = painterResource(id = titleIconRes),
+                                colorFilter = ColorFilter.tint(LocalColor.current.primary),
                                 contentDescription = null
                             )
 
                             Spacer(modifier = Modifier.width(8.dp))
                         }
 
-                        Text(text = title, fontSize = 19.sp, color = LocalColor.current.text.default_100)
+                        Text(
+                            text = title,
+                            fontSize = 19.sp,
+                            color = LocalColor.current.text.default_100
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))

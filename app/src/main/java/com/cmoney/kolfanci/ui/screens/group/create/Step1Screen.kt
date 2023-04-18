@@ -46,7 +46,7 @@ fun Step1Screen(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "社團名稱：", fontSize = 14.sp, color = Color.White
+                    text = "社團名稱：", fontSize = 14.sp, color = LocalColor.current.text.default_100
                 )
                 Text(
                     text = "%d/20".format(textState.length),

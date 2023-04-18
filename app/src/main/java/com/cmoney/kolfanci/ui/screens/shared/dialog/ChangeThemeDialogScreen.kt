@@ -38,7 +38,7 @@ fun ChangeThemeDialogScreen(
                         .height(50.dp),
                     text = "確定",
                     borderColor = LocalColor.current.component.other,
-                    textColor = Color.White
+                    textColor = LocalColor.current.text.default_100
                 ) {
                     onConfirm.invoke(groupTheme)
                 }
@@ -51,7 +51,7 @@ fun ChangeThemeDialogScreen(
                         .height(50.dp),
                     text = "取消",
                     borderColor = LocalColor.current.component.other,
-                    textColor = Color.White
+                    textColor = LocalColor.current.text.default_100
                 ) {
                     onDismiss.invoke()
                 }
