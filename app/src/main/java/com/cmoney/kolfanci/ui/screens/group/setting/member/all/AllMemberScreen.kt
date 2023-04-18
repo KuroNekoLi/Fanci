@@ -172,7 +172,7 @@ fun AllMemberScreenView(
                 items(groupMemberList) { groupMember ->
                     MemberItem(groupMember = groupMember) {
                         KLog.i(TAG, "member click:$it")
-                        if (Constant.isCanEditRole()) {
+                        if (Constant.isCanEnterMemberManager()) {
                             navController.navigate(MemberManageScreenDestination(
                                 group = group,
                                 groupMember =  groupMember

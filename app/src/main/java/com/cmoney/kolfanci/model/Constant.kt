@@ -102,7 +102,9 @@ object Constant {
      * 是否可以進入 新增/編輯/刪除 角色
      */
     fun isCanEnterEditRole(): Boolean = (
-            MyGroupPermission.createOrEditRole == true || MyGroupPermission.deleteRole == true || MyGroupPermission.rearrangeRoles == true)
+            MyGroupPermission.createOrEditRole == true ||
+                    MyGroupPermission.deleteRole == true ||
+                    MyGroupPermission.rearrangeRoles == true)
 
     /**
      * 是否可以 新增/編輯 角色
@@ -110,9 +112,22 @@ object Constant {
     fun isCanEditRole(): Boolean = (MyGroupPermission.createOrEditRole == true)
 
     /**
+     * 是否可以 進入成員管理
+     */
+    fun isCanEnterMemberManager(): Boolean =
+        (MyGroupPermission.createOrEditRole == true ||
+                MyGroupPermission.assignRole == true ||
+                MyGroupPermission.banOrKickMember == true)
+
+    /**
      * 是否可以 刪除 角色
      */
     fun isCanDeleteRole(): Boolean = (MyGroupPermission.deleteRole == true)
+
+    /**
+     * 是否可以 禁言/踢出 社團
+     */
+    fun isCanBanKickMember(): Boolean = (MyGroupPermission.banOrKickMember == true)
 
     /**
      * 是否可以按 Emoji

@@ -26,6 +26,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
@@ -312,61 +313,65 @@ private fun MemberManageScreenView(
             }
 
             //編輯角色 按鈕
-            BorderButton(
-                modifier = Modifier
-                    .padding(
-                        top = 20.dp,
-                        start = 24.dp,
-                        end = 24.dp
-                    )
-                    .fillMaxWidth()
-                    .height(45.dp),
-                text = "編輯角色",
-                borderColor = LocalColor.current.text.default_50,
-                textColor = LocalColor.current.text.default_100,
-                onClick = {
-                    navController.navigate(
-                        MemberRoleManageScreenDestination(
-                            group = group,
-                            groupMember = groupMember
+            if (Constant.isCanEditRole()) {
+                BorderButton(
+                    modifier = Modifier
+                        .padding(
+                            top = 20.dp,
+                            start = 24.dp,
+                            end = 24.dp
                         )
-                    )
-                }
-            )
-
-            //權限管理
-            Text(
-                modifier = Modifier.padding(top = 40.dp, start = 24.dp, bottom = 10.dp),
-                text = "權限管理", fontSize = 14.sp, color = LocalColor.current.text.default_80
-            )
-
-            //禁言
-            if (banInfo == null) {
-                BanItem(
-                    banTitle = "禁言「%s」".format(groupMember.name),
-                    desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
-                ) {
-                    onBanClick.invoke()
-                }
-            } else {
-                BanInfo(
-                    banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
-                    banStartDay = banInfo.startDay,
-                    banDuration = banInfo.duration,
+                        .fillMaxWidth()
+                        .height(45.dp),
+                    text = "編輯角色",
+                    borderColor = LocalColor.current.text.default_50,
+                    textColor = LocalColor.current.text.default_100,
                     onClick = {
-                        onDisBanClick.invoke()
+                        navController.navigate(
+                            MemberRoleManageScreenDestination(
+                                group = group,
+                                groupMember = groupMember
+                            )
+                        )
                     }
                 )
             }
 
-            Spacer(modifier = Modifier.height(1.dp))
+            //權限管理
+            if (Constant.isCanBanKickMember()) {
+                Text(
+                    modifier = Modifier.padding(top = 40.dp, start = 24.dp, bottom = 10.dp),
+                    text = "權限管理", fontSize = 14.sp, color = LocalColor.current.text.default_80
+                )
 
-            //踢出社團
-            BanItem(
-                banTitle = "將「%s」踢出社團".format(groupMember.name),
-                desc = "讓 %s 離開社團".format(groupMember.name)
-            ) {
-                onKickClick.invoke()
+                //禁言
+                if (banInfo == null) {
+                    BanItem(
+                        banTitle = "禁言「%s」".format(groupMember.name),
+                        desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
+                    ) {
+                        onBanClick.invoke()
+                    }
+                } else {
+                    BanInfo(
+                        banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
+                        banStartDay = banInfo.startDay,
+                        banDuration = banInfo.duration,
+                        onClick = {
+                            onDisBanClick.invoke()
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(1.dp))
+
+                //踢出社團
+                BanItem(
+                    banTitle = "將「%s」踢出社團".format(groupMember.name),
+                    desc = "讓 %s 離開社團".format(groupMember.name)
+                ) {
+                    onKickClick.invoke()
+                }
             }
         }
 
