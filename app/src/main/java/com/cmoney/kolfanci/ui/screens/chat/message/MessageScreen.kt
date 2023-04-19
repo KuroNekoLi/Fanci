@@ -26,6 +26,7 @@ import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showInteractDialogBottomSheet
 import com.cmoney.kolfanci.model.ChatMessageWrapper
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
@@ -103,7 +104,7 @@ fun MessageScreen(
             }
         )
     }
-    
+
 }
 
 @Composable
@@ -120,6 +121,8 @@ private fun MessageScreenView(
     onLoadMore: () -> Unit,
     onReSendClick: (ChatMessageWrapper) -> Unit
 ) {
+    val TAG = "MessageScreenView"
+
     Surface(
         color = LocalColor.current.env_80,
         modifier = modifier,
@@ -158,11 +161,15 @@ private fun MessageScreenView(
                                     )
                                 }
                                 is MessageContentCallback.LongClick -> {
-                                    showInteractDialog(
-                                        context.findActivity(),
-                                        chatMessageWrapper.message,
-                                        onInteractClick
-                                    )
+                                    KLog.i(TAG, "LongClick.")
+                                    //非禁言才顯示 互動彈窗
+                                    if (!Constant.isBuffSilence()) {
+                                        showInteractDialog(
+                                            context.findActivity(),
+                                            chatMessageWrapper.message,
+                                            onInteractClick
+                                        )
+                                    }
                                 }
                                 is MessageContentCallback.MsgDismissHideClick -> {
                                     onMsgDismissHide.invoke(chatMessageWrapper.message)
