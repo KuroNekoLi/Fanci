@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.model.usecase
 
+import com.cmoney.fanciapi.fanci.api.BuffInformationApi
 import com.cmoney.fanciapi.fanci.api.CategoryApi
 import com.cmoney.fanciapi.fanci.api.ChannelApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
@@ -9,8 +10,17 @@ import com.cmoney.kolfanci.extension.checkResponseBody
 class ChannelUseCase(
     private val categoryApi: CategoryApi,
     private val groupApi: GroupApi,
-    private val channelApi: ChannelApi
+    private val channelApi: ChannelApi,
+    private val buffInformationApi: BuffInformationApi
 ) {
+
+    /**
+     * 取得User在此頻道 的狀態
+     */
+    suspend fun getChannelBuffer(channelId: String) = kotlin.runCatching {
+        buffInformationApi.apiV1BuffInformationChannelChannelIdMeGet(channelId = channelId)
+            .checkResponseBody()
+    }
 
     /**
      * 取得 私密頻道 不重複用戶總數

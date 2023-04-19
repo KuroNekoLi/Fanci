@@ -104,7 +104,12 @@ fun MessageInput(
                         text = if (Constant.canPostMessage()) {
                             "輸入你想說的話..."
                         } else {
-                            "基本權限，無法與頻道成員互動"
+                            if(Constant.isBuffSilence()) {
+                                Constant.getChannelSilenceDesc()
+                            }
+                            else {
+                                "基本權限，無法與頻道成員互動"
+                            }
                         },
                         fontSize = 16.sp,
                         color = LocalColor.current.inputText.input_30

@@ -303,6 +303,114 @@
         ]
       }
     },
+    "/api/v1/BuffInformation/Group/{groupId}/me": {
+      "get": {
+        "tags": [
+          "BuffInformation"
+        ],
+        "summary": "取得自己在社團的Buff/Debuff狀態 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBuffInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBuffInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBuffInformation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/BuffInformation/Channel/{channelId}/me": {
+      "get": {
+        "tags": [
+          "BuffInformation"
+        ],
+        "summary": "取得自己在頻道的Buff/Debuff狀態 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBuffInformation"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBuffInformation"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBuffInformation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/Category/{categoryId}": {
       "get": {
         "tags": [
@@ -4848,6 +4956,13 @@
         },
         "additionalProperties": false
       },
+      "AuthType": {
+        "enum": [
+          "Group",
+          "Channel"
+        ],
+        "type": "string"
+      },
       "BanParam": {
         "type": "object",
         "properties": {
@@ -4868,6 +4983,46 @@
           "OneWeek",
           "OneMonth",
           "Forever"
+        ],
+        "type": "string"
+      },
+      "BuffStatus": {
+        "type": "object",
+        "properties": {
+          "scopeType": {
+            "$ref": "#/components/schemas/AuthType"
+          },
+          "buffType": {
+            "$ref": "#/components/schemas/BuffType"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDateTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "endDateTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "dutationTime": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BuffType": {
+        "enum": [
+          "Buff",
+          "Debuff"
         ],
         "type": "string"
       },
@@ -5105,7 +5260,8 @@
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "頻道的權限列表"
       },
       "ChannelPrivacy": {
         "enum": [
@@ -6270,9 +6426,6 @@
           },
           "color": {
             "$ref": "#/components/schemas/RoleColor"
-          },
-          "isAdmin": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false,
@@ -6386,6 +6539,22 @@
           },
           "periodOption": {
             "$ref": "#/components/schemas/BanPeriodOption"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserBuffInformation": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "buffs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuffStatus"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

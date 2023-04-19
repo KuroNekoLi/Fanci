@@ -110,7 +110,7 @@ fun ChatRoomScreen(
             messageViewModel.attachImage(it)
         },
         showOnlyBasicPermissionTip = {
-            messageViewModel.showBasicPermissionTip()
+            messageViewModel.showPermissionTip()
         },
         snackBarMessage = messageViewModel.uiState.snackBarMessage,
         onSnackBarDismiss = {

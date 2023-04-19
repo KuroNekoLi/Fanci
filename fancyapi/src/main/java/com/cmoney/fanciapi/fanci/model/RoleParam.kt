@@ -27,7 +27,6 @@ import kotlinx.parcelize.Parcelize
  * @param name 角色名稱
  * @param permissionIds Fanci權限ID清單  參考 /api/v1/Permission 清單內容
  * @param color 
- * @param isAdmin 
  */
 @Parcelize
 
@@ -43,10 +42,7 @@ data class RoleParam (
     val permissionIds: kotlin.collections.List<kotlin.String>? = null,
 
     @Json(name = "color")
-    val color: RoleColor? = null,
-
-    @Json(name = "isAdmin")
-    val isAdmin: kotlin.Boolean? = null
+    val color: RoleColor? = null
 
 ) : Parcelable
 

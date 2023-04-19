@@ -18,6 +18,7 @@ import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.RelationUseCase
@@ -50,7 +51,8 @@ class ChatRoomViewModel(
     val context: Application,
     private val chatRoomUseCase: ChatRoomUseCase,
     private val relationUseCase: RelationUseCase,
-    private val permissionUseCase: PermissionUseCase
+    private val permissionUseCase: PermissionUseCase,
+    private val channelUseCase: ChannelUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = ChatRoomViewModel::class.java.simpleName
@@ -211,14 +213,14 @@ class ChatRoomViewModel(
     fun fetchChannelPermission(channel: Channel) {
         KLog.i(TAG, "fetchChannelPermission:" + channel.id)
         viewModelScope.launch {
-            permissionUseCase.getPermissionByChannel(channelId = channel.id.orEmpty()).fold({
-                Constant.MyChannelPermission = it
-                uiState = uiState.copy(
-                    enterChannel = channel
-                )
-            }, {
-                KLog.e(TAG, it)
-            })
+            permissionUseCase.updateChannelPermissionAndBuff(channelId = channel.id.orEmpty())
+                .fold({
+                    uiState = uiState.copy(
+                        enterChannel = channel
+                    )
+                }, {
+                    KLog.e(TAG, it)
+                })
         }
     }
 

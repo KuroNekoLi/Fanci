@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.model
 import com.cmoney.fanciapi.fanci.model.ChannelPermission
 import com.cmoney.fanciapi.fanci.model.GroupPermission
 import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.fanciapi.fanci.model.UserBuffInformation
 
 object Constant {
 
@@ -45,6 +46,9 @@ object Constant {
 //        canReport = false,
 //        canTakeback = false
 //    )
+
+    //我在目前頻道的Buffer
+    var MyChannelBuff: UserBuffInformation = UserBuffInformation()
 
 
     /**
@@ -173,4 +177,33 @@ object Constant {
      * 是否可以發文
      */
     fun canPostMessage(): Boolean = (MyChannelPermission.canPost == true)
+
+    /**
+     * channel 下 是否被禁言
+     */
+    fun isBuffSilence(): Boolean {
+        return MyChannelBuff.buffs?.let { buff ->
+            buff.forEach { status ->
+                if (status.name == "禁言") {
+                    return@let true
+                }
+            }
+            return@let false
+        } ?: false
+    }
+
+    /**
+     * 取得 頻道無法發言 原因
+     */
+    fun getChannelSilenceDesc(): String {
+        return MyChannelBuff.buffs?.let { buff ->
+            buff.forEach { status ->
+                if (status.name == "禁言") {
+                    return@let status.description.orEmpty()
+                }
+            }
+            return@let "基本權限，無法與頻道成員互動"
+        } ?: "基本權限，無法與頻道成員互動"
+    }
+
 }

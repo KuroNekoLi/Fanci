@@ -17,6 +17,7 @@ import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
+import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
@@ -51,7 +52,8 @@ data class MessageUiState(
 class MessageViewModel(
     val context: Application,
     private val chatRoomUseCase: ChatRoomUseCase,
-    private val chatRoomPollUseCase: ChatRoomPollUseCase
+    private val chatRoomPollUseCase: ChatRoomPollUseCase,
+    private val permissionUseCase: PermissionUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
@@ -472,35 +474,40 @@ class MessageViewModel(
             }, {
                 KLog.e(TAG, it)
 
-                //將發送失敗訊息 標註為Pending
-                uiState = uiState.copy(
-                    message = uiState.message.toMutableList().apply {
-                        add(
-                            0,
-                            ChatMessageWrapper(
-                                message = ChatMessage(
-                                    id = System.currentTimeMillis().toString(),
-                                    author = GroupMember(
-                                        name = XLoginHelper.nickName,
-                                        thumbNail = XLoginHelper.headImagePath
+                if (it.message?.contains("403") == true) {
+                    //檢查身上狀態
+                    checkChannelPermission(channelId)
+                } else {
+                    //將發送失敗訊息 標註為Pending
+                    uiState = uiState.copy(
+                        message = uiState.message.toMutableList().apply {
+                            add(
+                                0,
+                                ChatMessageWrapper(
+                                    message = ChatMessage(
+                                        id = System.currentTimeMillis().toString(),
+                                        author = GroupMember(
+                                            name = XLoginHelper.nickName,
+                                            thumbNail = XLoginHelper.headImagePath
+                                        ),
+                                        content = MediaIChatContent(
+                                            text = text
+                                        ),
+                                        createUnixTime = System.currentTimeMillis() / 1000,
+                                        replyMessage = uiState.replyMessage
                                     ),
-                                    content = MediaIChatContent(
-                                        text = text
-                                    ),
-                                    createUnixTime = System.currentTimeMillis() / 1000,
-                                    replyMessage = uiState.replyMessage
-                                ),
-                                uploadAttachPreview = images.map {
-                                    ChatRoomUiState.ImageAttachState(
-                                        uri = Uri.EMPTY,
-                                        serverUrl = it
-                                    )
-                                },
-                                isPendingSendMessage = true
+                                    uploadAttachPreview = images.map {
+                                        ChatRoomUiState.ImageAttachState(
+                                            uri = Uri.EMPTY,
+                                            serverUrl = it
+                                        )
+                                    },
+                                    isPendingSendMessage = true
+                                )
                             )
-                        )
-                    }
-                )
+                        }
+                    )
+                }
 
 
 //                //將發送失敗訊息放至Pending清單中
@@ -519,6 +526,20 @@ class MessageViewModel(
 //                        pendingSendMessage = pendingMessage
 //                    )
 //                )
+            })
+        }
+    }
+
+    /**
+     * 檢查 目前在此 channel permission 狀態, 並show tip
+     */
+    private fun checkChannelPermission(channelId: String) {
+        KLog.i(TAG, "checkChannelPermission:$channelId")
+        viewModelScope.launch {
+            permissionUseCase.updateChannelPermissionAndBuff(channelId = channelId).fold({
+                showPermissionTip()
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -903,13 +924,13 @@ class MessageViewModel(
     }
 
     /**
-     * show 基本權限，無法與頻道成員互動 tip
+     * show 無法與頻道成員互動 tip
      */
-    fun showBasicPermissionTip() {
+    fun showPermissionTip() {
         KLog.i(TAG, "showBasicPermissionTip")
         uiState = uiState.copy(
             snackBarMessage = CustomMessage(
-                textString = "基本權限，無法與頻道成員互動",
+                textString = Constant.getChannelSilenceDesc(),
                 iconRes = R.drawable.minus_people,
                 iconColor = White_767A7F,
                 textColor = Color.White
