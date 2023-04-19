@@ -542,10 +542,10 @@ class ChannelSettingViewModel(
 
             val sortedCategory = removedCategoryList?.map { category ->
                 if (category.id == moveItem.toCategory?.id) {
-                    val channels = category.channels?.toMutableList()
-                    channels?.add(moveItem.channel)
+                    val channels = category.channels.orEmpty().toMutableList()
+                    channels.add(moveItem.channel)
                     category.copy(
-                        channels = channels?.distinctBy {
+                        channels = channels.distinctBy {
                             it.id
                         }
                     )
