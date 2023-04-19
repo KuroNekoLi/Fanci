@@ -8,6 +8,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +38,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -56,13 +60,14 @@ fun MemberAndRoleManageScreen(
     val uiState = viewModel.uiState
 
     //init default data
-    if (selectedModel.selectedMember.isNotEmpty()) {
-        viewModel.addSelectedMember(selectedModel.selectedMember)
+    LaunchedEffect(Unit) {
+        if (selectedModel.selectedMember.isNotEmpty()) {
+            viewModel.addSelectedMember(selectedModel.selectedMember)
+        }
+        if (selectedModel.selectedRole.isNotEmpty()) {
+            viewModel.addSelectedRole(selectedModel.selectedRole)
+        }
     }
-    if (selectedModel.selectedRole.isNotEmpty()) {
-        viewModel.addSelectedRole(selectedModel.selectedRole)
-    }
-
 
     //Add Member Callback
     addMemberResult.onNavResult { result ->
@@ -87,13 +92,17 @@ fun MemberAndRoleManageScreen(
         }
     }
 
+    val selectedMember by viewModel.selectedMember.collectAsState()
+
+    KLog.i("TAG", "selectedMember:$selectedMember")
+
     MemberAndRoleManageScreenView(
         modifier = modifier,
         navigator = navigator,
         group = group,
         topBarTitle = topBarTitle,
         selectedIndex = uiState.tabIndex,
-        selectedMember = uiState.selectedMember,
+        selectedMember = selectedMember,
         selectedRole = uiState.selectedRole,
         onTabClick = {
             viewModel.onTabClick(it)

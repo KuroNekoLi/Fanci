@@ -17,6 +17,8 @@ import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.lang.reflect.Type
@@ -30,7 +32,7 @@ data class UiState(
     val banUiModel: BanUiModel? = null,      //禁言中 info
     val showAddSuccessTip: Boolean = false,  //show 新增成功 toast
     val loading: Boolean = true,
-    var selectedMember: List<GroupMember> = emptyList(), //選中的會員
+//    var selectedMember: List<GroupMember> = emptyList(), //選中的會員
     var selectedRole: List<FanciRole> = emptyList(), //選中的角色
     val tabIndex: Int = 0
 )
@@ -71,6 +73,10 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
 
     var uiState by mutableStateOf(UiState())
         private set
+
+    //選中的會員
+    private val _selectedMember = MutableStateFlow(emptyList<GroupMember>())
+    val selectedMember = _selectedMember.asStateFlow()
 
     //群組會員清單
     val orgGroupMemberList = mutableListOf<GroupMemberSelect>()
@@ -501,17 +507,15 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
         val responseMemberList = gson.fromJson(member, listType) as List<GroupMember>
 
         if (responseMemberList.isNotEmpty()) {
-            val newList = uiState.selectedMember.toMutableList()
+            val newList = _selectedMember.value.toMutableList()
             newList.addAll(responseMemberList)
-            uiState = uiState.copy(
-                selectedMember = newList.distinct()
-            )
+            _selectedMember.value = newList.distinct()
         }
     }
 
     fun addSelectedMember(selectedMember: List<GroupMember>) {
         if (selectedMember.isNotEmpty()) {
-            uiState.selectedMember = selectedMember
+            _selectedMember.value = selectedMember
         }
     }
 
@@ -550,12 +554,10 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
      */
     fun removeSelectedMember(groupMember: GroupMember) {
         KLog.i(TAG, "removeSelectedMember:$groupMember")
-        val filterList = uiState.selectedMember.filter {
+        val filterList = _selectedMember.value.filter {
             it.id != groupMember.id
         }
-        uiState = uiState.copy(
-            selectedMember = filterList
-        )
+        _selectedMember.value = filterList
     }
 
     /**
@@ -576,7 +578,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
      */
     fun fetchSelected(): SelectedModel {
         return SelectedModel(
-            selectedMember = uiState.selectedMember,
+            selectedMember = _selectedMember.value,
             selectedRole = uiState.selectedRole
         )
     }
