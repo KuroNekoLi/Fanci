@@ -125,7 +125,8 @@ class MessageViewModel(
             groupMessage
         } else {
             val newList = newMessage.toMutableList()
-            newList.add(generateTimeBar(newMessage.first()))
+            val timeBarMessage = generateTimeBar(newMessage.first())
+            newList.add(timeBarMessage)
             return newList
         }
     }
@@ -193,7 +194,13 @@ class MessageViewModel(
         oldMessage.addAll(0, pendingSendMessage)
 
         val distinctMessage = oldMessage.distinctBy { combineMessage ->
-            combineMessage.message.id
+
+            if (combineMessage.messageType == ChatMessageWrapper.MessageType.TimeBar) {
+                val createTime = combineMessage.message.createUnixTime?.times(1000) ?: 0L
+                Utils.getTimeGroupByKey(createTime)
+            } else {
+                combineMessage.message.id
+            }
         }
 
         uiState = uiState.copy(
