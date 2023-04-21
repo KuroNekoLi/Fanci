@@ -39,7 +39,7 @@ android {
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "CM_SERVER_URL", '"https://www.cmoney.tw/"'
-            buildConfigField "String", "FANCI_SERVER_URL", '"https://xlab1.cmoney.tw/fanci/"'
+            buildConfigField "String", "FANCI_SERVER_URL", '"https://fanci.cmoney.tw/"'
         }
 
         debug {

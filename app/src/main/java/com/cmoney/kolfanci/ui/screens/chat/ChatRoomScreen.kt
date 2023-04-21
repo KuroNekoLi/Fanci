@@ -33,7 +33,6 @@ import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
-@Destination
 @Composable
 fun ChatRoomScreen(
     channelId: String,
@@ -187,77 +186,62 @@ private fun ChatRoomScreenView(
     snackBarMessage: CustomMessage?,
     onSnackBarDismiss: () -> Unit
 ) {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopBarScreen(
-                title = channelTitle,
-                moreEnable = false,
-                backClick = {
-                    navController.popBackStack()
-                }
+    Column(
+        modifier = Modifier
+            .background(LocalColor.current.env_80)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        //公告訊息 display
+        announceMessage?.let {
+            MessageAnnounceScreen(
+                it,
+                modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
             )
         }
-    ) { innerPadding ->
-        Column(
+
+        //訊息 內文
+        MessageScreen(
             modifier = Modifier
-                .background(LocalColor.current.env_80)
-                .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            //公告訊息 display
-            announceMessage?.let {
-                MessageAnnounceScreen(
-                    it,
-                    modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
-                )
+                .fillMaxWidth()
+                .padding(bottom = 5.dp)
+                .weight(1f),
+            channelId = channelId,
+            onMsgDismissHide = {
+                onMsgDismissHide.invoke(it)
             }
+        )
 
-            //訊息 內文
-            MessageScreen(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp)
-                    .weight(1f),
-                channelId = channelId,
-                onMsgDismissHide = {
-                    onMsgDismissHide.invoke(it)
-                }
-            )
-
-            //回覆
-            replyMessage?.apply {
-                ChatReplyScreen(this) {
-                    onDeleteReply.invoke(it)
-                }
+        //回覆
+        replyMessage?.apply {
+            ChatReplyScreen(this) {
+                onDeleteReply.invoke(it)
             }
-
-            //附加圖片
-            MessageAttachImageScreen(imageAttach) {
-                onDeleteAttach.invoke(it)
-            }
-
-            //輸入匡
-            MessageInput(
-                onMessageSend = {
-                    onMessageSend.invoke(it)
-                },
-                onAttach = {
-                    onAttach.invoke(it)
-                },
-                showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
-            )
         }
 
-        //SnackBar
-        FanciSnackBarScreen(
-            modifier = Modifier.padding(bottom = 70.dp),
-            message = snackBarMessage
-        ) {
-            onSnackBarDismiss.invoke()
+        //附加圖片
+        MessageAttachImageScreen(imageAttach) {
+            onDeleteAttach.invoke(it)
         }
 
+        //輸入匡
+        MessageInput(
+            onMessageSend = {
+                onMessageSend.invoke(it)
+            },
+            onAttach = {
+                onAttach.invoke(it)
+            },
+            showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
+        )
+    }
+
+    //SnackBar
+    FanciSnackBarScreen(
+        modifier = Modifier.padding(bottom = 70.dp),
+        message = snackBarMessage
+    ) {
+        onSnackBarDismiss.invoke()
     }
 }
 

@@ -35,10 +35,7 @@ import com.cmoney.kolfanci.ui.main.MainViewModel
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.destinations.ChatRoomScreenDestination
-import com.cmoney.kolfanci.ui.destinations.DiscoverGroupScreenDestination
-import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
-import com.cmoney.kolfanci.ui.destinations.MyScreenDestination
+import com.cmoney.kolfanci.ui.destinations.*
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
@@ -99,12 +96,19 @@ fun FollowScreen(
     //點擊channel權限檢查完
     chatRoomUiState.enterChannel?.let { channel ->
         if (Constant.canReadMessage()) {
+            //TODO
             navigator.navigate(
-                ChatRoomScreenDestination(
-                    channelId = channel.id.orEmpty(),
-                    channelTitle = channel.name.orEmpty()
+                ChannelScreenDestination(
+                    channel = channel
                 )
             )
+
+//            navigator.navigate(
+//                ChatRoomScreenDestination(
+//                    channelId = channel.id.orEmpty(),
+//                    channelTitle = channel.name.orEmpty()
+//                )
+//            )
         } else {
             //禁止進入該頻道,show dialog
             openDialog.value = true
