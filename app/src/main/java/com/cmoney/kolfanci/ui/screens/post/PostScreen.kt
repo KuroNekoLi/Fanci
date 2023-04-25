@@ -4,8 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -23,11 +26,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
+import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -60,22 +66,27 @@ private fun PostScreenView(
     postList: List<ChatMessage>,
     navController: DestinationsNavigator
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        items(items = postList) { post ->
-            PostContentScreen(
-                post = post,
-                contentModifier = Modifier.padding(bottom = 15.dp),
-                bottomContent = {
-                    CommentCount(
-                        post = post,
-                        navController = navController
-                    )
-                }
-            )
+
+    if (postList.isEmpty()) {
+        EmptyPostContent(modifier = Modifier.fillMaxSize())
+    } else {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            items(items = postList) { post ->
+                PostContentScreen(
+                    post = post,
+                    contentModifier = Modifier.padding(bottom = 15.dp),
+                    bottomContent = {
+                        CommentCount(
+                            post = post,
+                            navController = navController
+                        )
+                    }
+                )
+            }
         }
     }
 }
@@ -112,6 +123,27 @@ fun CommentCount(navController: DestinationsNavigator? = null, post: ChatMessage
         )
 
         Text(text = "留言 142", fontSize = 14.sp, color = LocalColor.current.text.default_100)
+    }
+}
+
+
+@Composable
+private fun EmptyPostContent(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(LocalColor.current.env_80),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        AsyncImage(
+            modifier = Modifier.size(186.dp, 248.dp),
+            model = R.drawable.empty_message, contentDescription = "empty message"
+        )
+
+        Spacer(modifier = Modifier.height(43.dp))
+
+        Text(text = "快成為第一個在貼文區發文的人！", fontSize = 16.sp, color = Color_80FFFFFF)
     }
 }
 
