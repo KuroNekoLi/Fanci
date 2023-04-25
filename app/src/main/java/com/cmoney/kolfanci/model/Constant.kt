@@ -4,6 +4,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelPermission
 import com.cmoney.fanciapi.fanci.model.GroupPermission
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.fanciapi.fanci.model.UserBuffInformation
+import com.cmoney.kolfanci.R
 
 object Constant {
 
@@ -34,18 +35,19 @@ object Constant {
 //    )
 
     //我在目前頻道的權限
-    var MyChannelPermission: ChannelPermission = ChannelPermission()
-//    var MyChannelPermission: ChannelPermission = ChannelPermission(
-//        canRead = true,
-//        canPost = false,
-//        canReply = false,
-//        canEmoji = false,
-//        canManage = false,
-//        canCopy = false,
-//        canBlock = false,
-//        canReport = false,
-//        canTakeback = false
-//    )
+//    var MyChannelPermission: ChannelPermission = ChannelPermission()
+    //todo TEST
+    var MyChannelPermission: ChannelPermission = ChannelPermission(
+        canRead = true,
+        canPost = true,
+        canReply = true,
+        canEmoji = true,
+        canManage = true,
+        canCopy = true,
+        canBlock = true,
+        canReport = true,
+        canTakeback = true
+    )
 
     //我在目前頻道的Buffer
     var MyChannelBuff: UserBuffInformation = UserBuffInformation()
@@ -205,5 +207,15 @@ object Constant {
             return@let "基本權限，無法與頻道成員互動"
         } ?: "基本權限，無法與頻道成員互動"
     }
+
+    val emojiLit = listOf(
+        R.drawable.emoji_money,
+        R.drawable.emoji_shock,
+        R.drawable.emoji_laugh,
+        R.drawable.emoji_angry,
+        R.drawable.emoji_think,
+        R.drawable.emoji_cry,
+        R.drawable.emoji_like,
+    )
 
 }

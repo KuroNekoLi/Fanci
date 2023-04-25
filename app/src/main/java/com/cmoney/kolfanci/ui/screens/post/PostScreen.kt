@@ -68,6 +68,7 @@ private fun PostScreenView(
         items(items = postList) { post ->
             PostContentScreen(
                 post = post,
+                contentModifier = Modifier.padding(bottom = 15.dp),
                 bottomContent = {
                     CommentCount(
                         post = post,
@@ -84,15 +85,19 @@ fun CommentCount(navController: DestinationsNavigator? = null, post: ChatMessage
     Row(
         modifier = Modifier
             .wrapContentSize()
-            .clickable {
-                post?.apply {
-                    navController?.navigate(
-                        PostInfoScreenDestination(
-                            post = post
+            .then(
+                if (post != null) {
+                    Modifier.clickable {
+                        navController?.navigate(
+                            PostInfoScreenDestination(
+                                post = post
+                            )
                         )
-                    )
+                    }
+                } else {
+                    Modifier
                 }
-            }
+            )
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

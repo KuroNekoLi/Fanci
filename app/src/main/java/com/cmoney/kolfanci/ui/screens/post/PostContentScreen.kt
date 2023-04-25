@@ -2,31 +2,48 @@ package com.cmoney.kolfanci.ui.screens.post
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.PlainTooltipBox
+import androidx.compose.material3.PlainTooltipState
+import androidx.compose.material3.RichTooltipBox
+import androidx.compose.material3.RichTooltipState
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
@@ -37,15 +54,26 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
 import com.google.accompanist.flowlayout.FlowRow
+import com.socks.library.KLog
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostContentScreen(
     modifier: Modifier = Modifier,
     post: ChatMessage,
     defaultDisplayLine: Int = 4,
     contentModifier: Modifier = Modifier,
+    hasMoreAction: Boolean = true,
+//    backgroundColor: Color = Color.Black,
+    backgroundColor: Color = LocalColor.current.background,
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
+    //test
+    val scope = rememberCoroutineScope()
+    val tooltipStateRich = remember { RichTooltipState() }
+
+
     //最多顯示幾行
     var maxDisplayLine by remember {
         mutableStateOf(defaultDisplayLine)
@@ -58,8 +86,13 @@ fun PostContentScreen(
 
     Column(
         modifier = modifier
-            .background(LocalColor.current.background)
+            .background(backgroundColor)
             .padding(20.dp)
+            .pointerInput(Unit) {
+                detectTapGestures { offset ->
+                    KLog.i("TAG", offset)
+                }
+            }
     ) {
         //Avatar
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -71,16 +104,18 @@ fun PostContentScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             //More
-            Box(
-                modifier = Modifier
-                    .padding(end = 15.dp)
-                    .size(25.dp)
-                    .clickable {
+            if (hasMoreAction) {
+                Box(
+                    modifier = Modifier
+                        .padding(end = 15.dp)
+                        .size(25.dp)
+                        .clickable {
 
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                CircleDot()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircleDot()
+                }
             }
         }
 
@@ -144,6 +179,55 @@ fun PostContentScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
+//            RichTooltipBox(
+//                modifier = Modifier.padding(20.dp).fillMaxWidth(),
+//                action = {
+//                    TextButton(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .offset(y = -15.dp)
+//                            .background(Color.Red),
+//                        onClick = { scope.launch { tooltipStateRich.dismiss() } }
+//                    ) { Text("richTooltipActionText") }
+//                },
+//                text = { },
+//                shape = RoundedCornerShape(69.dp),
+//                tooltipState = tooltipStateRich,
+//                colors = TooltipDefaults.richTooltipColors(
+//                    containerColor = Color.DarkGray
+//                )
+//            ) {
+//                Box(
+//                    modifier = Modifier
+//                        .size(30.dp)
+//                        .background(Color.Blue)
+//                        .clickable {
+//                            scope.launch { tooltipStateRich.show() }
+//                        }
+//                ) {
+//
+//                }
+//            }
+
+//            PlainTooltipBox(
+//                tooltipState = tooltipState,
+//                tooltip = {
+//                    Text("Add to favorites")
+//                },
+//                contentColor = White,
+//            ) {
+//                Box(
+//                    modifier = Modifier
+//                        .size(30.dp)
+//                        .background(Color.Blue)
+//                        .clickable {
+//                            scope.launch { tooltipState.show() }
+//                        }
+//                ) {
+//
+//                }
+//            }
+
             //Emoji
             FlowRow(
                 crossAxisSpacing = 10.dp
@@ -162,14 +246,37 @@ fun PostContentScreen(
                     }
                 }
 
-                //Add Emoji
-                EmojiCountScreen(
-                    modifier = Modifier.height(30.dp),
-                    emojiResource = R.drawable.empty_emoji,
-                    emojiIconSize = 23.dp,
-                    countText = ""
+                RichTooltipBox(
+                    modifier = Modifier
+                        .padding(20.dp, bottom = 45.dp)
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    action = {
+                        EmojiFeedback(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(y = (-15).dp)
+                        ) {
+                            scope.launch { tooltipStateRich.dismiss() }
+                        }
+                    },
+                    text = { },
+                    shape = RoundedCornerShape(69.dp),
+                    tooltipState = tooltipStateRich,
+                    colors = TooltipDefaults.richTooltipColors(
+                        containerColor = LocalColor.current.env_80
+                    )
                 ) {
-
+                    //Add Emoji
+                    EmojiCountScreen(
+                        modifier = Modifier
+                            .height(30.dp),
+                        emojiResource = R.drawable.empty_emoji,
+                        emojiIconSize = 23.dp,
+                        countText = ""
+                    ) {
+                        scope.launch { tooltipStateRich.show() }
+                    }
                 }
             }
 
@@ -177,8 +284,29 @@ fun PostContentScreen(
 
             bottomContent()
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(15.dp))
+@Composable
+private fun EmojiFeedback(
+    modifier: Modifier = Modifier,
+    onClick: (Int) -> Unit
+) {
+    Row(modifier = modifier) {
+        Constant.emojiLit.forEach { res ->
+            AsyncImage(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f)
+                    .clickable {
+                        onClick.invoke(res)
+                    }
+                    .padding(10.dp)
+                    ,
+                model = res,
+                contentDescription = null
+            )
+        }
     }
 }
 
@@ -193,7 +321,11 @@ fun PostContentScreenPreview() {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "1天以前", fontSize = 14.sp, color = LocalColor.current.text.default_100)
+                    Text(
+                        text = "1天以前",
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_100
+                    )
 
                     Box(
                         modifier = Modifier
@@ -203,7 +335,11 @@ fun PostContentScreenPreview() {
                             .background(LocalColor.current.text.default_100)
                     )
 
-                    Text(text = "留言 142", fontSize = 14.sp, color = LocalColor.current.text.default_100)
+                    Text(
+                        text = "留言 142",
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_100
+                    )
                 }
             }
         )

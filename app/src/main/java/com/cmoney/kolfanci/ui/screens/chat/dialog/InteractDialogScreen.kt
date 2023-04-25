@@ -35,16 +35,6 @@ fun InteractDialogScreen(
     message: ChatMessage,
     onInteractClick: (MessageInteract) -> Unit
 ) {
-    val emojiLit = listOf(
-        R.drawable.emoji_money,
-        R.drawable.emoji_shock,
-        R.drawable.emoji_laugh,
-        R.drawable.emoji_angry,
-        R.drawable.emoji_think,
-        R.drawable.emoji_cry,
-        R.drawable.emoji_like,
-    )
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,7 +55,7 @@ fun InteractDialogScreen(
                         .horizontalScroll(rememberScrollState()),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    emojiLit.forEach {
+                    Constant.emojiLit.forEach {
                         EmojiIcon(it) { resId ->
                             onClose(coroutineScope, modalBottomSheetState)
                             onInteractClick.invoke(MessageInteract.EmojiClick(message, resId))

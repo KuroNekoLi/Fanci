@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -33,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
-import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
 import com.cmoney.kolfanci.ui.screens.post.PostContentScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -115,12 +113,14 @@ private fun PostInfoScreenView(
                 Spacer(modifier = Modifier.height(1.dp))
             }
 
+            //留言內容
             //TODO mock data
             items(ChatRoomUseCase.mockListMessage) { comment ->
                 PostContentScreen(
                     post = comment,
                     defaultDisplayLine = Int.MAX_VALUE,
                     contentModifier = Modifier.padding(start = 40.dp),
+                    hasMoreAction = false,
                     bottomContent = {
                         CommentBottomContent()
                     }
@@ -148,14 +148,17 @@ private fun CommentBottomContent() {
         Spacer(modifier = Modifier.height(15.dp))
 
         Row(
-            modifier = Modifier.clickable {
-                expandReply = !expandReply
-            },
+            modifier = Modifier
+                .clickable {
+                    expandReply = !expandReply
+                }
+                .padding(top = 10.dp, bottom = 10.dp, end = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Divider(
                 modifier = Modifier.width(30.dp),
-                color = LocalColor.current.component.other, thickness = 1.dp
+                color = LocalColor.current.component.other,
+                thickness = 1.dp
             )
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -163,7 +166,6 @@ private fun CommentBottomContent() {
             Text(
                 text = if (expandReply) {
                     "隱藏回覆"
-
                 } else {
                     "查看 %d 則 回覆".format(reply.size)
                 },
@@ -173,11 +175,16 @@ private fun CommentBottomContent() {
         }
 
         if (expandReply) {
+            Spacer(modifier = Modifier.height(5.dp))
+
+            //TODO improve performance, 改為上一層 item 一環
             reply.forEach { item ->
                 PostContentScreen(
                     post = item,
                     defaultDisplayLine = Int.MAX_VALUE,
                     contentModifier = Modifier.padding(start = 40.dp),
+                    hasMoreAction = false,
+                    backgroundColor = Color.Transparent,
                     bottomContent = {
                         Text(
                             text = "1天以前",
