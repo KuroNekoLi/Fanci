@@ -179,55 +179,6 @@ fun PostContentScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-//            RichTooltipBox(
-//                modifier = Modifier.padding(20.dp).fillMaxWidth(),
-//                action = {
-//                    TextButton(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .offset(y = -15.dp)
-//                            .background(Color.Red),
-//                        onClick = { scope.launch { tooltipStateRich.dismiss() } }
-//                    ) { Text("richTooltipActionText") }
-//                },
-//                text = { },
-//                shape = RoundedCornerShape(69.dp),
-//                tooltipState = tooltipStateRich,
-//                colors = TooltipDefaults.richTooltipColors(
-//                    containerColor = Color.DarkGray
-//                )
-//            ) {
-//                Box(
-//                    modifier = Modifier
-//                        .size(30.dp)
-//                        .background(Color.Blue)
-//                        .clickable {
-//                            scope.launch { tooltipStateRich.show() }
-//                        }
-//                ) {
-//
-//                }
-//            }
-
-//            PlainTooltipBox(
-//                tooltipState = tooltipState,
-//                tooltip = {
-//                    Text("Add to favorites")
-//                },
-//                contentColor = White,
-//            ) {
-//                Box(
-//                    modifier = Modifier
-//                        .size(30.dp)
-//                        .background(Color.Blue)
-//                        .clickable {
-//                            scope.launch { tooltipState.show() }
-//                        }
-//                ) {
-//
-//                }
-//            }
-
             //Emoji
             FlowRow(
                 crossAxisSpacing = 10.dp

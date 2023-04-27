@@ -33,11 +33,10 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MessageInput(
     onMessageSend: (text: String) -> Unit,
-    onAttach: (Uri) -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
-    viewModel: MessageViewModel = koinViewModel()
+    viewModel: MessageViewModel = koinViewModel(),
+    onAttachClick: () -> Unit
 ) {
-    val openDialog = remember { mutableStateOf(false) }
     var textState by remember { mutableStateOf("") }
 
     var isShowSend by remember {
@@ -61,7 +60,7 @@ fun MessageInput(
                 .background(LocalColor.current.background)
                 .clickable {
                     if (Constant.canPostMessage()) {
-                        openDialog.value = true
+                        onAttachClick.invoke()
                     }
                 },
             contentAlignment = Alignment.Center
@@ -148,14 +147,6 @@ fun MessageInput(
             }
         }
     }
-
-    if (openDialog.value) {
-        ChooseImagePickDialog(onDismiss = {
-            openDialog.value = false
-        }) {
-            onAttach.invoke(it)
-        }
-    }
 }
 
 @Preview(showBackground = true)
@@ -163,9 +154,9 @@ fun MessageInput(
 fun MessageInputPreview() {
     FanciTheme {
         MessageInput(
-            {},
-            {},
-            {}
+            onAttachClick = {},
+            onMessageSend = {},
+            showOnlyBasicPermissionTip = {}
         )
     }
 }

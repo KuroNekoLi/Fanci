@@ -4,8 +4,13 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +26,7 @@ import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -43,6 +49,8 @@ fun ChatRoomScreen(
     resultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>
 ) {
     val TAG = "ChatRoomScreen"
+
+    var openImagePickDialog by remember { mutableStateOf(false) }
 
     val uiState = viewModel.uiState
 
@@ -105,8 +113,8 @@ fun ChatRoomScreen(
         onMessageSend = {
             messageViewModel.messageSend(channelId, it)
         },
-        onAttach = {
-            messageViewModel.attachImage(it)
+        onAttachClick = {
+            openImagePickDialog = true
         },
         showOnlyBasicPermissionTip = {
             messageViewModel.showPermissionTip()
@@ -167,6 +175,19 @@ fun ChatRoomScreen(
         )
         messageViewModel.announceRouteDone()
     }
+
+    //圖片選擇
+    if (openImagePickDialog) {
+        PhotoPickDialogScreen(
+            onDismiss = {
+                openImagePickDialog = false
+            },
+            onAttach = {
+                openImagePickDialog = false
+                messageViewModel.attachImage(it)
+            }
+        )
+    }
 }
 
 @Composable
@@ -181,7 +202,7 @@ private fun ChatRoomScreenView(
     imageAttach: List<Uri>,
     onDeleteAttach: (Uri) -> Unit,
     onMessageSend: (text: String) -> Unit,
-    onAttach: (Uri) -> Unit,
+    onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
     snackBarMessage: CustomMessage?,
     onSnackBarDismiss: () -> Unit
@@ -220,17 +241,26 @@ private fun ChatRoomScreenView(
         }
 
         //附加圖片
-        MessageAttachImageScreen(imageAttach) {
-            onDeleteAttach.invoke(it)
-        }
+        MessageAttachImageScreen(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primary),
+            imageAttach = imageAttach,
+            onDelete = {
+                onDeleteAttach.invoke(it)
+            },
+            onAdd = {
+                onAttachClick.invoke()
+            }
+        )
 
         //輸入匡
         MessageInput(
             onMessageSend = {
                 onMessageSend.invoke(it)
             },
-            onAttach = {
-                onAttach.invoke(it)
+            onAttachClick = {
+                onAttachClick.invoke()
             },
             showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
         )
@@ -260,7 +290,7 @@ fun ChatRoomScreenPreview() {
             imageAttach = emptyList(),
             onDeleteAttach = {},
             onMessageSend = {},
-            onAttach = {},
+            onAttachClick = {},
             showOnlyBasicPermissionTip = {},
             snackBarMessage = null,
             onSnackBarDismiss = {}
