@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
@@ -29,8 +30,9 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param author 
  * @param replyMessage 
+ * @param author 
+ * @param replyMessageId 
  * @param content 
  * @param emojiCount 
  * @param id 
@@ -48,13 +50,16 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 
 
-data class ChatMessage (
+data class BulletinboardMessage (
+
+    @Json(name = "replyMessage")
+    val replyMessage: ChatMessage? = null,
 
     @Json(name = "author")
     val author: GroupMember? = null,
 
-    @Json(name = "replyMessage")
-    val replyMessage: ChatMessage? = null,
+    @Json(name = "replyMessageId")
+    val replyMessageId: kotlin.String? = null,
 
     @Json(name = "content")
     val content: MediaIChatContent? = null,

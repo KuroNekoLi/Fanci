@@ -21,13 +21,16 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * Values: chatRoom
+ * Values: chatRoom,bulletinboard
  */
 
-enum class ChannelType(val value: kotlin.String) {
+enum class ChannelTabType(val value: kotlin.String) {
 
     @Json(name = "ChatRoom")
-    chatRoom("ChatRoom");
+    chatRoom("ChatRoom"),
+
+    @Json(name = "Bulletinboard")
+    bulletinboard("Bulletinboard");
 
     /**
      * Override toString() to avoid using the enum variable name as the value, and instead use
@@ -42,12 +45,12 @@ enum class ChannelType(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is ChannelType) "$data" else null
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is ChannelTabType) "$data" else null
 
         /**
-         * Returns a valid [ChannelType] for [data], null otherwise.
+         * Returns a valid [ChannelTabType] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): ChannelType? = data?.let {
+        fun decode(data: kotlin.Any?): ChannelTabType? = data?.let {
           val normalizedData = "$it".lowercase()
           values().firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()

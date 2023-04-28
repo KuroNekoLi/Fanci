@@ -171,7 +171,7 @@ class ChannelUseCase(
             categoryApi.apiV1CategoryCategoryIdChannelPost(
                 categoryId = categoryId,
                 channelParam = ChannelParam(
-                    channelType = ChannelType.chatRoom,
+                    channelType = ChannelTabType.chatRoom,
                     name = name,
                     privacy = privacy
                 )

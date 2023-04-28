@@ -411,6 +411,508 @@
         ]
       }
     },
+    "/api/v1/BulletinBoard/{channelId}/Message": {
+      "post": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "對貼文區新增一則貼文 __________🔒 可發文",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "訊息參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulletingBoardMessageParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulletingBoardMessageParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulletingBoardMessageParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_1_channelId",
+              "PERMISSION_CanPost_1_channelId_none"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "取得貼文區貼文列表 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "貼文區頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "取得筆數",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "排序依據(預設為新到舊)",
+            "schema": {
+              "$ref": "#/components/schemas/OrderType"
+            }
+          },
+          {
+            "name": "fromSerialNumber",
+            "in": "query",
+            "description": "從哪一個序列號開始往回找",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessagePaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessagePaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessagePaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_CanRead_1_channelId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/BulletinBoard/{channelId}/PinnedMessage": {
+      "get": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "取得貼文區的公告訊息 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinnedMessageInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_CanRead_1_channelId_none"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "公告聊天室的一則聊天訊息 __________🔒 可管理",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "聊天室頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "公告訊息參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIdParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIdParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIdParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_1_chatRoomChannelId",
+              "PERMISSION_可管理_1_channelId_channelId"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "取消聊天室公告 __________🔒 可管理",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "聊天室頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "204": {
+            "description": "成功"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_1_channelId",
+              "PERMISSION_可管理_1_channelId_channelId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/BulletinBoard/{channelId}/Message/{messageId}/Comment": {
+      "post": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "對貼文新增一則 留言 / 回覆 __________🔒 CanReply",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulletingBoardMessageParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulletingBoardMessageParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulletingBoardMessageParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "BANNED_1_channelId",
+              "PERMISSION_CanReply_1_channelId_none"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/BulletinBoard/{channelId}/Message/{messageId}/Comments": {
+      "get": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "取得貼文的 留言 / 回覆 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/OrderType"
+            }
+          },
+          {
+            "name": "fromSerialNumber",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessagePaging"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessagePaging"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulletinboardMessagePaging"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_CanRead_1_channelId_none"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/Category/{categoryId}": {
       "get": {
         "tags": [
@@ -1306,6 +1808,76 @@
             ]
           }
         ]
+      }
+    },
+    "/api/v1/ChannelTab/{channelId}/{type}": {
+      "put": {
+        "tags": [
+          "ChannelTab"
+        ],
+        "summary": "啟用頻道功能區 __________🔒 編輯頻道",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChannelTabType"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ChannelTab/{channelId}/Tab": {
+      "get": {
+        "tags": [
+          "ChannelTab"
+        ],
+        "summary": "取得頻道功能區啟用狀態",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
       }
     },
     "/api/v1/ChatRoom/{chatRoomChannelId}/Message": {
@@ -5010,11 +5582,6 @@
           "endDateTime": {
             "type": "integer",
             "format": "int64"
-          },
-          "dutationTime": {
-            "type": "integer",
-            "format": "int64",
-            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -5025,6 +5592,108 @@
           "Debuff"
         ],
         "type": "string"
+      },
+      "BulletinboardMessage": {
+        "type": "object",
+        "properties": {
+          "replyMessage": {
+            "$ref": "#/components/schemas/ChatMessage"
+          },
+          "author": {
+            "$ref": "#/components/schemas/GroupMember"
+          },
+          "replyMessageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "$ref": "#/components/schemas/MediaIChatContent"
+          },
+          "emojiCount": {
+            "$ref": "#/components/schemas/IEmojiCount"
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "是否刪除"
+          },
+          "myProperty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "serialNumber": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "messageType": {
+            "$ref": "#/components/schemas/MessageType"
+          },
+          "messageReaction": {
+            "$ref": "#/components/schemas/IUserMessageReaction"
+          },
+          "deleteStatus": {
+            "$ref": "#/components/schemas/DeleteStatus"
+          },
+          "deleteFrom": {
+            "$ref": "#/components/schemas/GroupMember"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": ""
+      },
+      "BulletinboardMessagePaging": {
+        "type": "object",
+        "properties": {
+          "haveNextPage": {
+            "type": "boolean"
+          },
+          "nextWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BulletinboardMessage"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BulletingBoardMessageParam": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "文字訊息內容",
+            "nullable": true
+          },
+          "medias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media"
+            },
+            "description": "附帶媒體內容",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "Category": {
         "type": "object",
@@ -5129,7 +5798,7 @@
             "nullable": true
           },
           "channelType": {
-            "$ref": "#/components/schemas/ChannelType"
+            "$ref": "#/components/schemas/ChannelTabType"
           },
           "name": {
             "type": "string",
@@ -5215,7 +5884,7 @@
         "type": "object",
         "properties": {
           "channelType": {
-            "$ref": "#/components/schemas/ChannelType"
+            "$ref": "#/components/schemas/ChannelTabType"
           },
           "name": {
             "type": "string",
@@ -5270,9 +5939,10 @@
         ],
         "type": "string"
       },
-      "ChannelType": {
+      "ChannelTabType": {
         "enum": [
-          "ChatRoom"
+          "ChatRoom",
+          "Bulletinboard"
         ],
         "type": "string"
       },
@@ -5350,6 +6020,10 @@
           },
           "deleteFrom": {
             "$ref": "#/components/schemas/GroupMember"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
