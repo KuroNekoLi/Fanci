@@ -35,7 +35,6 @@ import kotlinx.parcelize.Parcelize
  * @param emojiCount 
  * @param id 
  * @param isDeleted 是否刪除
- * @param myProperty 
  * @param createUnixTime 
  * @param updateUnixTime 
  * @param serialNumber 
@@ -68,9 +67,6 @@ data class ChatMessage (
     /* 是否刪除 */
     @Json(name = "isDeleted")
     val isDeleted: kotlin.Boolean? = null,
-
-    @Json(name = "myProperty")
-    val myProperty: kotlin.Int? = null,
 
     @Json(name = "createUnixTime")
     val createUnixTime: kotlin.Long? = null,

@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
@@ -30,14 +29,11 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param replyMessage 
  * @param author 
- * @param replyMessageId 
  * @param content 
  * @param emojiCount 
  * @param id 
  * @param isDeleted 是否刪除
- * @param myProperty 
  * @param createUnixTime 
  * @param updateUnixTime 
  * @param serialNumber 
@@ -52,14 +48,8 @@ import kotlinx.parcelize.Parcelize
 
 data class BulletinboardMessage (
 
-    @Json(name = "replyMessage")
-    val replyMessage: ChatMessage? = null,
-
     @Json(name = "author")
     val author: GroupMember? = null,
-
-    @Json(name = "replyMessageId")
-    val replyMessageId: kotlin.String? = null,
 
     @Json(name = "content")
     val content: MediaIChatContent? = null,
@@ -73,9 +63,6 @@ data class BulletinboardMessage (
     /* 是否刪除 */
     @Json(name = "isDeleted")
     val isDeleted: kotlin.Boolean? = null,
-
-    @Json(name = "myProperty")
-    val myProperty: kotlin.Int? = null,
 
     @Json(name = "createUnixTime")
     val createUnixTime: kotlin.Long? = null,

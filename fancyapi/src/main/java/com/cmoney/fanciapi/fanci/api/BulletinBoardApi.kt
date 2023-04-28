@@ -9,7 +9,6 @@ import com.squareup.moshi.Json
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessagePaging
 import com.cmoney.fanciapi.fanci.model.BulletingBoardMessageParam
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.PinnedMessageInfo
@@ -78,10 +77,10 @@ interface BulletinBoardApi {
      *
      * @param channelId 頻道Id
      * @param bulletingBoardMessageParam 訊息參數 (optional)
-     * @return [ChatMessage]
+     * @return [BulletinboardMessage]
      */
     @POST("api/v1/BulletinBoard/{channelId}/Message")
-    suspend fun apiV1BulletinBoardChannelIdMessagePost(@Path("channelId") channelId: kotlin.String, @Body bulletingBoardMessageParam: BulletingBoardMessageParam? = null): Response<ChatMessage>
+    suspend fun apiV1BulletinBoardChannelIdMessagePost(@Path("channelId") channelId: kotlin.String, @Body bulletingBoardMessageParam: BulletingBoardMessageParam? = null): Response<BulletinboardMessage>
 
     /**
      * 取消聊天室公告 __________🔒 可管理
