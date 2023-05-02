@@ -75,7 +75,6 @@ fun PostContentScreen(
     //Popup emoji selector
     val tooltipStateRich = remember { RichTooltipState() }
 
-
     //最多顯示幾行
     var maxDisplayLine by remember {
         mutableStateOf(defaultDisplayLine)
@@ -201,7 +200,7 @@ fun PostContentScreen(
 
                 RichTooltipBox(
                     modifier = Modifier
-                        .padding(20.dp, bottom = 45.dp)
+                        .padding(20.dp, bottom = 25.dp)
                         .fillMaxWidth()
                         .height(60.dp),
                     action = {
