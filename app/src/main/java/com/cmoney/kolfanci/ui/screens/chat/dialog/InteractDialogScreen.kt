@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isMyPostMessage
+import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract

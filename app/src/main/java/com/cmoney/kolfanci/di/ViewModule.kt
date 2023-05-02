@@ -1,7 +1,7 @@
 package com.cmoney.kolfanci.di
 
-import com.cmoney.kolfanci.ui.main.MainViewModel
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
+import com.cmoney.kolfanci.ui.main.MainViewModel
 import com.cmoney.kolfanci.ui.screens.channel.ChannelViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
@@ -68,8 +68,8 @@ val viewModule = module {
     viewModel {
         UserViewModel(androidApplication())
     }
-    viewModel {
-        PostViewModel(get())
+    viewModel { params ->
+        PostViewModel(get(), params.get())
     }
     viewModel { params ->
         EditPostViewModel(

@@ -37,6 +37,10 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.extension.displayPostTime
+import com.cmoney.kolfanci.extension.isMyPost
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
@@ -47,17 +51,25 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun PostScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     channel: Channel,
-    viewModel: PostViewModel = koinViewModel(),
+    viewModel: PostViewModel = koinViewModel(
+        parameters = {
+            parametersOf(channel.id.orEmpty())
+        }
+    ),
     resultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>
 ) {
+    val TAG = "PostScreen"
+
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -75,7 +87,12 @@ fun PostScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.fetchPost(channel.id.orEmpty())
+        viewModel.fetchPost()
+    }
+
+    listState.OnBottomReached {
+        KLog.i(TAG, "load more....")
+        viewModel.onLoadMore()
     }
 
     //onPost callback
@@ -83,10 +100,11 @@ fun PostScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.onPostSuccess(result.value)
                 coroutineScope.launch {
-                    listState.scrollToItem(index = 0)    
+                    listState.scrollToItem(index = 0)
                 }
             }
         }
@@ -115,7 +133,7 @@ private fun PostScreenView(
                 items(items = postList) { post ->
                     PostContentScreen(
                         post = post,
-                        contentModifier = Modifier.padding(bottom = 15.dp),
+                        hasMoreAction = post.isMyPost(Constant.MyInfo),
                         bottomContent = {
                             CommentCount(
                                 post = post,
@@ -147,7 +165,10 @@ private fun PostScreenView(
 }
 
 @Composable
-fun CommentCount(navController: DestinationsNavigator? = null, post: BulletinboardMessage? = null) {
+fun CommentCount(
+    navController: DestinationsNavigator? = null,
+    post: BulletinboardMessage? = null
+) {
     Row(
         modifier = Modifier
             .wrapContentSize()
@@ -167,7 +188,11 @@ fun CommentCount(navController: DestinationsNavigator? = null, post: Bulletinboa
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "1天以前", fontSize = 14.sp, color = LocalColor.current.text.default_100)
+        Text(
+            text = post?.displayPostTime().orEmpty(),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
+        )
 
         Box(
             modifier = Modifier
@@ -177,7 +202,11 @@ fun CommentCount(navController: DestinationsNavigator? = null, post: Bulletinboa
                 .background(LocalColor.current.text.default_100)
         )
 
-        Text(text = "留言 142", fontSize = 14.sp, color = LocalColor.current.text.default_100)
+        Text(
+            text = "留言 %d".format(post?.commentCount ?: 0),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
+        )
     }
 }
 

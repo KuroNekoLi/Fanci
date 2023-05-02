@@ -16,25 +16,28 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class PostViewModel(
-    private val postUseCase: PostUseCase
+    private val postUseCase: PostUseCase,
+    val channelId: String
 ) : ViewModel() {
     private val TAG = PostViewModel::class.java.simpleName
 
     private val _post = MutableStateFlow<List<BulletinboardMessage>>(emptyList())
     val post = _post.asStateFlow()
 
+    var haveNextPage: Boolean = false
     var nextWeight: Long? = null    //貼文分頁 索引
 
     /**
      * 拿取 貼文清單
      */
-    fun fetchPost(channelId: String) {
+    fun fetchPost() {
         KLog.i(TAG, "fetchPost")
         viewModelScope.launch {
             postUseCase.getPost(
                 channelId = channelId,
                 fromSerialNumber = nextWeight
             ).fold({
+                haveNextPage = it.haveNextPage == true
                 nextWeight = it.nextWeight
 
                 val postList = _post.value.toMutableList()
@@ -53,6 +56,13 @@ class PostViewModel(
         val postList = _post.value.toMutableList()
         postList.add(0, bulletinboardMessage)
         _post.value = postList
+    }
+
+    fun onLoadMore() {
+        KLog.i(TAG, "onLoadMore:$haveNextPage")
+        if (haveNextPage) {
+            fetchPost()
+        }
     }
 
     companion object {
