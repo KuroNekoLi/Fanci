@@ -70,6 +70,7 @@ fun PostContentScreen(
 //    backgroundColor: Color = Color.Black,
     backgroundColor: Color = LocalColor.current.background,
     onMoreClick: () -> Unit? = {},
+    onEmojiClick: (Int) -> Unit,
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -210,6 +211,7 @@ fun PostContentScreen(
                                 .fillMaxWidth()
                                 .offset(y = (-15).dp)
                         ) {
+                            onEmojiClick.invoke(it)
                             scope.launch { tooltipStateRich.dismiss() }
                         }
                     },
@@ -295,7 +297,8 @@ fun PostContentScreenPreview() {
                     )
                 }
             },
-            onMoreClick = {}
+            onMoreClick = {},
+            onEmojiClick = {}
         )
     }
 }

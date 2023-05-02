@@ -86,6 +86,9 @@ private fun PostInfoScreenView(
                     defaultDisplayLine = Int.MAX_VALUE,
                     bottomContent = {
                         CommentCount()
+                    },
+                    onEmojiClick = {
+
                     }
                 )
             }
@@ -125,6 +128,9 @@ private fun PostInfoScreenView(
                     hasMoreAction = false,
                     bottomContent = {
                         CommentBottomContent()
+                    },
+                    onEmojiClick = {
+
                     }
                 )
             }
@@ -193,6 +199,9 @@ private fun CommentBottomContent() {
                             fontSize = 14.sp,
                             color = LocalColor.current.text.default_100
                         )
+                    },
+                    onEmojiClick = {
+
                     }
                 )
             }

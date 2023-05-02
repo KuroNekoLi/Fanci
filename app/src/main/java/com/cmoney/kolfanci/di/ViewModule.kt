@@ -69,7 +69,7 @@ val viewModule = module {
         UserViewModel(androidApplication())
     }
     viewModel { params ->
-        PostViewModel(get(), params.get())
+        PostViewModel(get(), params.get(), get())
     }
     viewModel { params ->
         EditPostViewModel(

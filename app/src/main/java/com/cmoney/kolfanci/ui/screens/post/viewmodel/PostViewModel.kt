@@ -3,12 +3,16 @@ package com.cmoney.kolfanci.ui.screens.post.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
+import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
+import com.cmoney.kolfanci.utils.Utils
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +21,8 @@ import kotlin.random.Random
 
 class PostViewModel(
     private val postUseCase: PostUseCase,
-    val channelId: String
+    val channelId: String,
+    private val chatRoomUseCase: ChatRoomUseCase
 ) : ViewModel() {
     private val TAG = PostViewModel::class.java.simpleName
 
@@ -62,6 +67,77 @@ class PostViewModel(
         KLog.i(TAG, "onLoadMore:$haveNextPage")
         if (haveNextPage) {
             fetchPost()
+        }
+    }
+
+    fun onEmojiClick(postMessage: BulletinboardMessage, resourceId: Int) {
+        KLog.i(TAG, "onEmojiClick:$resourceId")
+        viewModelScope.launch {
+            val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
+            //判斷是否為收回Emoji
+            var emojiCount = 1
+            postMessage.messageReaction?.let {
+                emojiCount = if (it.emoji.orEmpty().lowercase() == clickEmoji.value.lowercase()) {
+                    //收回
+                    -1
+                } else {
+                    //增加
+                    1
+                }
+            }
+
+            val orgEmoji = postMessage.emojiCount
+            val newEmoji = when (clickEmoji) {
+                Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(emojiCount))
+                Emojis.dislike -> orgEmoji?.copy(
+                    dislike = orgEmoji.dislike?.plus(
+                        emojiCount
+                    )
+                )
+
+                Emojis.laugh -> orgEmoji?.copy(laugh = orgEmoji.laugh?.plus(emojiCount))
+                Emojis.money -> orgEmoji?.copy(money = orgEmoji.money?.plus(emojiCount))
+                Emojis.shock -> orgEmoji?.copy(shock = orgEmoji.shock?.plus(emojiCount))
+                Emojis.cry -> orgEmoji?.copy(cry = orgEmoji.cry?.plus(emojiCount))
+                Emojis.think -> orgEmoji?.copy(think = orgEmoji.think?.plus(emojiCount))
+                Emojis.angry -> orgEmoji?.copy(angry = orgEmoji.angry?.plus(emojiCount))
+            }
+
+            //回填資料
+            val postMessage = postMessage.copy(
+                emojiCount = newEmoji,
+                messageReaction = if (emojiCount == -1) null else {
+                    IUserMessageReaction(
+                        emoji = clickEmoji.value
+                    )
+                }
+            )
+
+            //UI show
+            _post.value = _post.value.map {
+                if (it.id == postMessage.id) {
+                    postMessage
+                } else {
+                    it
+                }
+            }
+
+            //Call Emoji api
+            if (emojiCount == -1) {
+                //收回
+                chatRoomUseCase.deleteEmoji(postMessage.id.orEmpty()).fold({
+                    KLog.e(TAG, "delete emoji success.")
+                }, {
+                    KLog.e(TAG, it)
+                })
+            } else {
+                //增加
+                chatRoomUseCase.sendEmoji(postMessage.id.orEmpty(), clickEmoji).fold({
+                    KLog.i(TAG, "sendEmoji success.")
+                }, {
+                    KLog.e(TAG, it)
+                })
+            }
         }
     }
 

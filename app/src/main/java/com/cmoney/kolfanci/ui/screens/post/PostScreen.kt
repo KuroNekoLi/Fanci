@@ -92,6 +92,9 @@ fun PostScreen(
                     //todo
                 }
             )
+        },
+        onEmojiClick = { postMessage, emoji ->
+            viewModel.onEmojiClick(postMessage, emoji)
         }
     )
 
@@ -127,6 +130,7 @@ private fun PostScreenView(
     navController: DestinationsNavigator,
     onPostClick: () -> Unit,
     onMoreClick: (BulletinboardMessage) -> Unit,
+    onEmojiClick: (BulletinboardMessage, Int) -> Unit,
     listState: LazyListState
 ) {
 
@@ -151,6 +155,9 @@ private fun PostScreenView(
                         },
                         onMoreClick = {
                             onMoreClick.invoke(post)
+                        },
+                        onEmojiClick = {
+                            onEmojiClick.invoke(post, it)
                         }
                     )
                 }
@@ -252,7 +259,9 @@ fun PostScreenPreview() {
             navController = EmptyDestinationsNavigator,
             onPostClick = {},
             listState = rememberLazyListState(),
-            onMoreClick = {}
+            onMoreClick = {},
+            onEmojiClick = { postMessage, emoji ->
+            }
         )
     }
 }
