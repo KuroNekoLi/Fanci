@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.post.edit
 
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -39,42 +41,69 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.MessageAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
+import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.shared.CenterTopAppBar
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.xlogin.XLoginHelper
 import com.facebook.bolts.Task.Companion.delay
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Destination
 @Composable
 fun EditPostScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    viewModel: EditPostViewModel = koinViewModel()
+    channelId: String,
+    viewModel: EditPostViewModel = koinViewModel(
+        parameters = {
+            parametersOf(channelId)
+        }
+    ),
+    resultNavigator: ResultBackNavigator<BulletinboardMessage>
 ) {
     var showImagePick by remember { mutableStateOf(false) }
 
     val attachImages by viewModel.attachImages.collectAsState()
 
+    val uiState by viewModel.uiState.collectAsState()
+
+    val onSuccess by viewModel.postSuccess.collectAsState()
+
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
+
     EditPostScreenView(
-        navController = navController,
         modifier = modifier,
-        attachImages = attachImages,
         onShowImagePicker = {
             showImagePick = true
         },
+        attachImages = attachImages,
         onDeleteImage = {
             viewModel.onDeleteImageClick(it)
-        }
+        },
+        onPostClick = {
+            viewModel.onPost(it)
+        },
+        onBack = {
+            showSaveTip = true
+        },
+        showLoading = (uiState == UiState.ShowLoading)
     )
 
     //Show image picker
@@ -89,16 +118,61 @@ fun EditPostScreen(
             }
         )
     }
+
+    uiState?.apply {
+        when (uiState) {
+            UiState.ShowEditTip -> {
+                DialogScreen(
+                    onDismiss = { viewModel.dismissEditTip() },
+                    titleIconRes = R.drawable.edit,
+                    iconFilter = null,
+                    title = "文章內容空白",
+                    subTitle = "文章內容不可以是空白的唷！"
+                ) {
+                    BlueButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "修改",
+                    ) {
+                        run {
+                            viewModel.dismissEditTip()
+                        }
+                    }
+                }
+            }
+
+            else -> {}
+        }
+    }
+
+    //on post success
+    onSuccess?.apply {
+        resultNavigator.navigateBack(this)
+    }
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navController.popBackStack()
+        }
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun EditPostScreenView(
     modifier: Modifier = Modifier,
-    navController: DestinationsNavigator,
     onShowImagePicker: () -> Unit,
     attachImages: List<Uri>,
-    onDeleteImage: (Uri) -> Unit
+    onDeleteImage: (Uri) -> Unit,
+    onPostClick: (String) -> Unit,
+    onBack: () -> Unit,
+    showLoading: Boolean
 ) {
     var textState by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
@@ -110,118 +184,129 @@ private fun EditPostScreenView(
         topBar = {
             TopBarView(
                 backClick = {
-                    navController.popBackStack()
+                    onBack.invoke()
                 },
                 postClick = {
-
+                    onPostClick.invoke(textState)
                 }
             )
         },
         backgroundColor = LocalColor.current.background
     ) { innerPadding ->
 
-        Column(
+        Box(
             modifier = modifier
                 .fillMaxSize()
                 .background(LocalColor.current.background)
-                .padding(innerPadding)
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
         ) {
-            //Avatar
-            ChatUsrAvatarScreen(
-                modifier = Modifier.padding(20.dp),
-                user = GroupMember(
-                    thumbNail = "https://picsum.photos/300/300",
-                    name = "Hello"
-                )
-            )
 
-            //Edit
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .focusRequester(focusRequester),
-                value = textState,
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = LocalColor.current.text.default_100,
-                    backgroundColor = LocalColor.current.background,
-                    cursorColor = LocalColor.current.primary,
-                    disabledLabelColor = LocalColor.current.text.default_30,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                onValueChange = {
-                    textState = it
-                },
-                shape = RoundedCornerShape(4.dp),
-                textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-                placeholder = {
-                    Text(
-                        text = "輸入你想說的話...",
-                        fontSize = 16.sp,
-                        color = LocalColor.current.text.default_30
+            Column {
+                //Avatar
+                ChatUsrAvatarScreen(
+                    modifier = Modifier.padding(20.dp),
+                    user = GroupMember(
+                        thumbNail = XLoginHelper.headImagePath,
+                        name = XLoginHelper.nickName
                     )
-                }
-            )
+                )
 
-            //Attach Image
-            if (attachImages.isNotEmpty()) {
-                MessageAttachImageScreen(
+                //Edit
+                TextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(LocalColor.current.env_100),
-                    imageAttach = attachImages,
-                    onDelete = {
-                        onDeleteImage.invoke(it)
+                        .weight(1f)
+                        .focusRequester(focusRequester),
+                    value = textState,
+                    colors = TextFieldDefaults.textFieldColors(
+                        textColor = LocalColor.current.text.default_100,
+                        backgroundColor = LocalColor.current.background,
+                        cursorColor = LocalColor.current.primary,
+                        disabledLabelColor = LocalColor.current.text.default_30,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    onValueChange = {
+                        textState = it
                     },
-                    onAdd = {
-                        onShowImagePicker.invoke()
+                    shape = RoundedCornerShape(4.dp),
+                    textStyle = TextStyle.Default.copy(fontSize = 16.sp),
+                    placeholder = {
+                        Text(
+                            text = "輸入你想說的話...",
+                            fontSize = 16.sp,
+                            color = LocalColor.current.text.default_30
+                        )
                     }
                 )
-            }
 
-            //Bottom
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(45.dp)
-                    .background(LocalColor.current.env_100)
-                    .padding(top = 10.dp, bottom = 10.dp, start = 18.dp, end = 18.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                IconButton(
-                    modifier = Modifier.size(25.dp),
-                    onClick = {
-                        onShowImagePicker.invoke()
-                    }) {
-                    Icon(
-                        ImageVector.vectorResource(id = R.drawable.gallery),
-                        null,
-                        tint = LocalColor.current.text.default_100
-                    )
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                IconButton(
-                    modifier = Modifier.size(25.dp),
-                    onClick = {
-                        showKeyboard.value = !showKeyboard.value
-                    }) {
-                    Icon(
-                        ImageVector.vectorResource(id = R.drawable.keyboard),
-                        null,
-                        tint = if (showKeyboard.value) {
-                            LocalColor.current.text.default_100
-                        } else {
-                            LocalColor.current.text.default_50
+                //Attach Image
+                if (attachImages.isNotEmpty()) {
+                    MessageAttachImageScreen(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(LocalColor.current.env_100),
+                        imageAttach = attachImages,
+                        onDelete = {
+                            onDeleteImage.invoke(it)
+                        },
+                        onAdd = {
+                            onShowImagePicker.invoke()
                         }
                     )
                 }
+
+                //Bottom
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .background(LocalColor.current.env_100)
+                        .padding(top = 10.dp, bottom = 10.dp, start = 18.dp, end = 18.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    IconButton(
+                        modifier = Modifier.size(25.dp),
+                        onClick = {
+                            onShowImagePicker.invoke()
+                        }) {
+                        Icon(
+                            ImageVector.vectorResource(id = R.drawable.gallery),
+                            null,
+                            tint = LocalColor.current.text.default_100
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    IconButton(
+                        modifier = Modifier.size(25.dp),
+                        onClick = {
+                            showKeyboard.value = !showKeyboard.value
+                        }) {
+                        Icon(
+                            ImageVector.vectorResource(id = R.drawable.keyboard),
+                            null,
+                            tint = if (showKeyboard.value) {
+                                LocalColor.current.text.default_100
+                            } else {
+                                LocalColor.current.text.default_50
+                            }
+                        )
+                    }
+                }
+            }
+
+            if (showLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(45.dp),
+                    color = LocalColor.current.primary
+                )
             }
         }
-
     }
 
     LaunchedEffect(showKeyboard.value) {
@@ -280,10 +365,12 @@ private fun TopBarView(
 fun EditPostScreenPreview() {
     FanciTheme {
         EditPostScreenView(
-            navController = EmptyDestinationsNavigator,
             onShowImagePicker = {},
             attachImages = emptyList(),
-            onDeleteImage = {}
+            onDeleteImage = {},
+            onPostClick = {},
+            onBack = {},
+            showLoading = false
         )
     }
 }

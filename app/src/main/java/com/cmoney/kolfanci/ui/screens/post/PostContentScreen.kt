@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
@@ -48,6 +49,7 @@ import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.screens.chat.MessageImageScreen
+import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -61,7 +63,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PostContentScreen(
     modifier: Modifier = Modifier,
-    post: ChatMessage,
+    post: BulletinboardMessage,
     defaultDisplayLine: Int = 4,
     contentModifier: Modifier = Modifier,
     hasMoreAction: Boolean = true,
@@ -69,8 +71,8 @@ fun PostContentScreen(
     backgroundColor: Color = LocalColor.current.background,
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
-    //test
     val scope = rememberCoroutineScope()
+    //Popup emoji selector
     val tooltipStateRich = remember { RichTooltipState() }
 
 
@@ -267,7 +269,7 @@ private fun EmojiFeedback(
 fun PostContentScreenPreview() {
     FanciTheme {
         PostContentScreen(
-            post = ChatRoomUseCase.mockMessage,
+            post = PostViewModel.mockPost,
             bottomContent = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically

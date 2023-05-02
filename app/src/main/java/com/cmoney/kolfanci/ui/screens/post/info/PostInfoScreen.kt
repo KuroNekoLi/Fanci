@@ -30,10 +30,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
 import com.cmoney.kolfanci.ui.screens.post.PostContentScreen
+import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -46,7 +48,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 fun PostInfoScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    post: ChatMessage
+    post: BulletinboardMessage
 ) {
     PostInfoScreenView(
         modifier = modifier,
@@ -59,7 +61,7 @@ fun PostInfoScreen(
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    post: ChatMessage
+    post: BulletinboardMessage
 ) {
     Scaffold(
         modifier = modifier
@@ -115,7 +117,7 @@ private fun PostInfoScreenView(
 
             //留言內容
             //TODO mock data
-            items(ChatRoomUseCase.mockListMessage) { comment ->
+            items(PostViewModel.mockListMessage) { comment ->
                 PostContentScreen(
                     post = comment,
                     defaultDisplayLine = Int.MAX_VALUE,
@@ -136,7 +138,7 @@ private fun PostInfoScreenView(
 @Composable
 private fun CommentBottomContent() {
     //TODO mock data
-    val reply = ChatRoomUseCase.mockListMessage
+    val reply = PostViewModel.mockListMessage
 
     var expandReply by remember {
         mutableStateOf(false)
@@ -231,7 +233,7 @@ fun ReplyCount() {
 fun PostInfoScreenPreview() {
     FanciTheme {
         PostInfoScreenView(
-            post = ChatRoomUseCase.mockMessage,
+            post = PostViewModel.mockPost,
             navController = EmptyDestinationsNavigator
         )
     }

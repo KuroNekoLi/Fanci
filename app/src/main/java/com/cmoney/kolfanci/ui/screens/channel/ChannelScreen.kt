@@ -9,13 +9,19 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -31,15 +37,44 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalPagerApi::class)
 @Destination
 @Composable
 fun ChannelScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     channel: Channel,
-    announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>
+    viewMode: ChannelViewModel = koinViewModel(),
+    announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
+    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>
+) {
+
+    LaunchedEffect(Unit) {
+        viewMode.fetchChannelTabStatus(channel.id.orEmpty())
+    }
+
+    val channelTabStatus by viewMode.channelTabStatus.collectAsState()
+
+    ChannelScreenView(
+        modifier = modifier,
+        channel = channel,
+        navController = navController,
+        channelTabStatus = channelTabStatus,
+        announcementResultRecipient = announcementResultRecipient,
+        editPostResultRecipient = editPostResultRecipient
+    )
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun ChannelScreenView(
+    modifier: Modifier = Modifier,
+    channel: Channel,
+    navController: DestinationsNavigator,
+    announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
+    channelTabStatus: ChannelTabsStatus,
+    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -54,7 +89,15 @@ fun ChannelScreen(
         },
         backgroundColor = LocalColor.current.background
     ) { innerPadding ->
-        val pages = listOf("聊天", "貼文")
+        val pages = mutableListOf<String>()
+
+        if (channelTabStatus.chatRoom == true) {
+            pages.add("聊天")
+        }
+
+        if (channelTabStatus.bulletinboard == true) {
+            pages.add("貼文")
+        }
 
         val pagerState = rememberPagerState()
 
@@ -62,58 +105,63 @@ fun ChannelScreen(
 
         val coroutineScope = rememberCoroutineScope()
 
-        Column(modifier = Modifier.padding(innerPadding)) {
-            TabRow(
-                selectedTabIndex = tabIndex,
-                indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
-                        color = LocalColor.current.primary
-                    )
+        if (pages.isNotEmpty()) {
+            Column(modifier = Modifier.padding(innerPadding)) {
+                TabRow(
+                    selectedTabIndex = tabIndex,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+                            color = LocalColor.current.primary
+                        )
+                    }
+                ) {
+                    pages.forEachIndexed { index, title ->
+                        Tab(
+                            text = {
+                                Text(
+                                    title,
+                                    fontSize = 14.sp,
+                                    color = LocalColor.current.text.default_80
+                                )
+                            },
+                            selected = tabIndex == index,
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                        )
+                    }
                 }
-            ) {
-                pages.forEachIndexed { index, title ->
-                    Tab(
-                        text = {
-                            Text(
-                                title,
-                                fontSize = 14.sp,
-                                color = LocalColor.current.text.default_80
+
+                HorizontalPager(
+                    count = pages.size,
+                    state = pagerState,
+                ) { page ->
+                    when (page) {
+                        0 -> {
+                            ChatRoomScreen(
+                                channelId = channel.id.orEmpty(),
+                                channelTitle = channel.name.orEmpty(),
+                                navController = navController,
+                                resultRecipient = announcementResultRecipient
                             )
-                        },
-                        selected = tabIndex == index,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                    )
-                }
-            }
-
-            HorizontalPager(
-                count = pages.size,
-                state = pagerState,
-            ) { page ->
-                when (page) {
-                    0 -> {
-                        ChatRoomScreen(
-                            channelId = channel.id.orEmpty(),
-                            channelTitle = channel.name.orEmpty(),
-                            navController = navController,
-                            resultRecipient = announcementResultRecipient
-                        )
-                    }
-
-                    else -> {
-                        PostScreen(
-                            channel = channel,
-                            navController = navController,
-                        )
+                        }
+                        else -> {
+                            PostScreen(
+                                channel = channel,
+                                navController = navController,
+                                resultRecipient = editPostResultRecipient
+                            )
+                        }
                     }
                 }
-            }
 
+            }
+        }
+        else {
+            Text(text = "No Tab Display")
         }
 
     }
@@ -123,12 +171,14 @@ fun ChannelScreen(
 @Composable
 fun ChannelScreenPreview() {
     FanciTheme {
-        ChannelScreen(
-            navController = EmptyDestinationsNavigator,
+        ChannelScreenView(
             channel = Channel(
                 name = "\uD83D\uDC57｜金針菇穿什麼"
             ),
-            announcementResultRecipient = EmptyResultRecipient()
+            navController = EmptyDestinationsNavigator,
+            announcementResultRecipient = EmptyResultRecipient(),
+            channelTabStatus = ChannelTabsStatus(),
+            editPostResultRecipient = EmptyResultRecipient()
         )
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +26,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun DialogScreen(
     modifier: Modifier = Modifier,
     titleIconRes: Int? = null,
+    iconFilter: Color? = LocalColor.current.primary,
     title: String,
     subTitle: String,
     onDismiss: () -> Unit,
@@ -49,7 +51,9 @@ fun DialogScreen(
                         if (titleIconRes != null) {
                             Image(
                                 painter = painterResource(id = titleIconRes),
-                                colorFilter = ColorFilter.tint(LocalColor.current.primary),
+                                colorFilter = iconFilter?.let {
+                                    ColorFilter.tint(iconFilter)
+                                },
                                 contentDescription = null
                             )
 
