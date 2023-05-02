@@ -153,6 +153,8 @@ fun EditPostScreen(
 
     SaveConfirmDialogScreen(
         isShow = showSaveTip,
+        title = "是否放棄編輯的內容？",
+        content = "貼文尚未發布就離開，文字將會消失",
         onContinue = {
             showSaveTip = false
         },
