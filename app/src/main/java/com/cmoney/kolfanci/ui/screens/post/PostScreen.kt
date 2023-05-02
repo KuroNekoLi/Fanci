@@ -30,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,8 +40,8 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
-import com.cmoney.kolfanci.extension.isMyPost
-import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
@@ -72,8 +73,8 @@ fun PostScreen(
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
     val postList by viewModel.post.collectAsState()
+    val context = LocalContext.current
 
     PostScreenView(
         modifier = modifier,
@@ -83,6 +84,14 @@ fun PostScreen(
         onPostClick = {
             //OnClick Method
             navController.navigate(EditPostScreenDestination(channelId = channel.id.orEmpty()))
+        },
+        onMoreClick = {
+            context.findActivity().showPostMoreActionDialogBottomSheet(
+                postMessage = it,
+                onInteractClick = {
+                    //todo
+                }
+            )
         }
     )
 
@@ -117,6 +126,7 @@ private fun PostScreenView(
     postList: List<BulletinboardMessage>,
     navController: DestinationsNavigator,
     onPostClick: () -> Unit,
+    onMoreClick: (BulletinboardMessage) -> Unit,
     listState: LazyListState
 ) {
 
@@ -133,12 +143,14 @@ private fun PostScreenView(
                 items(items = postList) { post ->
                     PostContentScreen(
                         post = post,
-                        hasMoreAction = post.isMyPost(Constant.MyInfo),
                         bottomContent = {
                             CommentCount(
                                 post = post,
                                 navController = navController
                             )
+                        },
+                        onMoreClick = {
+                            onMoreClick.invoke(post)
                         }
                     )
                 }
@@ -239,7 +251,8 @@ fun PostScreenPreview() {
             postList = PostViewModel.mockListMessage,
             navController = EmptyDestinationsNavigator,
             onPostClick = {},
-            listState = rememberLazyListState()
+            listState = rememberLazyListState(),
+            onMoreClick = {}
         )
     }
 }

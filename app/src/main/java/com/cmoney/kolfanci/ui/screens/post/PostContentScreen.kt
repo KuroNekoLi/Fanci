@@ -69,6 +69,7 @@ fun PostContentScreen(
     hasMoreAction: Boolean = true,
 //    backgroundColor: Color = Color.Black,
     backgroundColor: Color = LocalColor.current.background,
+    onMoreClick: () -> Unit? = {},
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -111,7 +112,7 @@ fun PostContentScreen(
                         .padding(end = 15.dp)
                         .size(25.dp)
                         .clickable {
-
+                            onMoreClick.invoke()
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -293,7 +294,8 @@ fun PostContentScreenPreview() {
                         color = LocalColor.current.text.default_100
                     )
                 }
-            }
+            },
+            onMoreClick = {}
         )
     }
 }
