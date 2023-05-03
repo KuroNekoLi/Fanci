@@ -67,7 +67,8 @@ fun PostScreen(
             parametersOf(channel.id.orEmpty())
         }
     ),
-    resultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>
+    resultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>,
+    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, BulletinboardMessage>
 ) {
     val TAG = "PostScreen"
 
@@ -121,6 +122,19 @@ fun PostScreen(
             }
         }
     }
+
+    //post info callback
+    postInfoResultRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                viewModel.onUpdate(result.value)
+            }
+        }
+    }
+
 }
 
 @Composable

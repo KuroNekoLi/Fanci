@@ -3,13 +3,13 @@ package com.cmoney.kolfanci.ui.screens.post.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
-import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.utils.Utils
@@ -87,21 +87,7 @@ class PostViewModel(
             }
 
             val orgEmoji = postMessage.emojiCount
-            val newEmoji = when (clickEmoji) {
-                Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(emojiCount))
-                Emojis.dislike -> orgEmoji?.copy(
-                    dislike = orgEmoji.dislike?.plus(
-                        emojiCount
-                    )
-                )
-
-                Emojis.laugh -> orgEmoji?.copy(laugh = orgEmoji.laugh?.plus(emojiCount))
-                Emojis.money -> orgEmoji?.copy(money = orgEmoji.money?.plus(emojiCount))
-                Emojis.shock -> orgEmoji?.copy(shock = orgEmoji.shock?.plus(emojiCount))
-                Emojis.cry -> orgEmoji?.copy(cry = orgEmoji.cry?.plus(emojiCount))
-                Emojis.think -> orgEmoji?.copy(think = orgEmoji.think?.plus(emojiCount))
-                Emojis.angry -> orgEmoji?.copy(angry = orgEmoji.angry?.plus(emojiCount))
-            }
+            val newEmoji = clickEmoji.clickCount(emojiCount, orgEmoji)
 
             //回填資料
             val postMessage = postMessage.copy(
@@ -123,20 +109,26 @@ class PostViewModel(
             }
 
             //Call Emoji api
-            if (emojiCount == -1) {
-                //收回
-                chatRoomUseCase.deleteEmoji(postMessage.id.orEmpty()).fold({
-                    KLog.e(TAG, "delete emoji success.")
-                }, {
-                    KLog.e(TAG, it)
-                })
-            } else {
-                //增加
-                chatRoomUseCase.sendEmoji(postMessage.id.orEmpty(), clickEmoji).fold({
-                    KLog.i(TAG, "sendEmoji success.")
-                }, {
-                    KLog.e(TAG, it)
-                })
+            chatRoomUseCase.clickEmoji(
+                messageId = postMessage.id.orEmpty(),
+                emojiCount = emojiCount,
+                clickEmoji = clickEmoji
+            )
+        }
+    }
+
+    /**
+     * 更新 資料
+     */
+    fun onUpdate(bulletinboardMessage: BulletinboardMessage) {
+        KLog.i(TAG, "onUpdate:$bulletinboardMessage")
+        viewModelScope.launch {
+            _post.value = _post.value.map {
+                if (it.id == bulletinboardMessage.id) {
+                    bulletinboardMessage
+                } else {
+                    it
+                }
             }
         }
     }

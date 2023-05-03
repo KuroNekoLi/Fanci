@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.post.info
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,14 +29,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
 import com.cmoney.kolfanci.ui.screens.post.PostContentScreen
+import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -42,27 +48,52 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Destination
 @Composable
 fun PostInfoScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    post: BulletinboardMessage
+    post: BulletinboardMessage,
+    viewModel: PostInfoViewModel = koinViewModel(
+        parameters = {
+            parametersOf(post)
+        }
+    ),
+    resultNavigator: ResultBackNavigator<BulletinboardMessage>
 ) {
+    val postData by viewModel.post.collectAsState()
+
     PostInfoScreenView(
         modifier = modifier,
         navController = navController,
-        post = post
+        post = postData,
+        onEmojiClick = { post, resourceId ->
+            viewModel.onEmojiClick(post, resourceId)
+        },
+        onBackClick = {
+            resultNavigator.navigateBack(viewModel.post.value)
+        }
     )
+
+    BackHandler {
+        resultNavigator.navigateBack(viewModel.post.value)
+    }
 }
 
 @Composable
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    post: BulletinboardMessage
+    post: BulletinboardMessage,
+    onEmojiClick: (BulletinboardMessage, Int) -> Unit,
+    onBackClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
@@ -71,7 +102,7 @@ private fun PostInfoScreenView(
                 title = "貼文",
                 moreEnable = false,
                 backClick = {
-                    navController.popBackStack()
+                    onBackClick.invoke()
                 }
             )
         },
@@ -85,10 +116,21 @@ private fun PostInfoScreenView(
                     post = post,
                     defaultDisplayLine = Int.MAX_VALUE,
                     bottomContent = {
-                        CommentCount()
+                        CommentCount(
+                            post = post
+                        )
+                    },
+                    onMoreClick = {
+                        //TODO
+                        context.findActivity().showPostMoreActionDialogBottomSheet(
+                            postMessage = post,
+                            onInteractClick = {
+                                //todo
+                            }
+                        )
                     },
                     onEmojiClick = {
-
+                        onEmojiClick.invoke(post, it)
                     }
                 )
             }
@@ -243,7 +285,10 @@ fun PostInfoScreenPreview() {
     FanciTheme {
         PostInfoScreenView(
             post = PostViewModel.mockPost,
-            navController = EmptyDestinationsNavigator
+            navController = EmptyDestinationsNavigator,
+            onEmojiClick = { post, resourceId ->
+            },
+            onBackClick = {}
         )
     }
 }

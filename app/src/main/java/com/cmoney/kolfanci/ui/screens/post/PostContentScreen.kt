@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -18,10 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.PlainTooltipBox
-import androidx.compose.material3.PlainTooltipState
 import androidx.compose.material3.RichTooltipBox
 import androidx.compose.material3.RichTooltipState
 import androidx.compose.material3.TooltipDefaults
@@ -35,17 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.screens.chat.MessageImageScreen
@@ -195,6 +188,7 @@ fun PostContentScreen(
                                 emojiResource = emoji.first,
                                 countText = emoji.second.toString()
                             ) {
+                                onEmojiClick.invoke(it)
                             }
                         }
                     }
@@ -256,8 +250,7 @@ private fun EmojiFeedback(
                     .clickable {
                         onClick.invoke(res)
                     }
-                    .padding(10.dp)
-                    ,
+                    .padding(10.dp),
                 model = res,
                 contentDescription = null
             )

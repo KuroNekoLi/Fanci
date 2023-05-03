@@ -18,6 +18,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleMa
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
+import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
@@ -80,5 +81,8 @@ val viewModule = module {
     }
     viewModel {
         ChannelViewModel(get())
+    }
+    viewModel { params ->
+        PostInfoViewModel(get(), params.get())
     }
 }

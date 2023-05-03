@@ -22,6 +22,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
+import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -47,7 +48,8 @@ fun ChannelScreen(
     channel: Channel,
     viewMode: ChannelViewModel = koinViewModel(),
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
-    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>
+    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>,
+    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, BulletinboardMessage>
 ) {
 
     LaunchedEffect(Unit) {
@@ -62,7 +64,8 @@ fun ChannelScreen(
         navController = navController,
         channelTabStatus = channelTabStatus,
         announcementResultRecipient = announcementResultRecipient,
-        editPostResultRecipient = editPostResultRecipient
+        editPostResultRecipient = editPostResultRecipient,
+        postInfoResultRecipient = postInfoResultRecipient
     )
 }
 
@@ -74,7 +77,8 @@ private fun ChannelScreenView(
     navController: DestinationsNavigator,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     channelTabStatus: ChannelTabsStatus,
-    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>
+    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>,
+    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, BulletinboardMessage>
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -152,7 +156,8 @@ private fun ChannelScreenView(
                             PostScreen(
                                 channel = channel,
                                 navController = navController,
-                                resultRecipient = editPostResultRecipient
+                                resultRecipient = editPostResultRecipient,
+                                postInfoResultRecipient = postInfoResultRecipient
                             )
                         }
                     }
@@ -178,7 +183,8 @@ fun ChannelScreenPreview() {
             navController = EmptyDestinationsNavigator,
             announcementResultRecipient = EmptyResultRecipient(),
             channelTabStatus = ChannelTabsStatus(),
-            editPostResultRecipient = EmptyResultRecipient()
+            editPostResultRecipient = EmptyResultRecipient(),
+            postInfoResultRecipient = EmptyResultRecipient()
         )
     }
 }

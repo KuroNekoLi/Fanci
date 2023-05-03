@@ -5,6 +5,7 @@ import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.api.UserReportApi
 import com.cmoney.fanciapi.fanci.model.*
+import com.socks.library.KLog
 import kotlin.random.Random
 
 
@@ -98,6 +99,29 @@ class ChatRoomUseCase(
             messageId = messageId
         ).checkResponseBody()
     }
+
+    /**
+     * 點擊 emoji
+     */
+    suspend fun clickEmoji(messageId: String, emojiCount: Int, clickEmoji: Emojis) =
+        kotlin.runCatching {
+            if (emojiCount == -1) {
+                //收回
+                deleteEmoji(messageId).fold({
+                    KLog.e(TAG, "delete emoji success.")
+                }, {
+                    KLog.e(TAG, it)
+                })
+            } else {
+                //增加
+                sendEmoji(messageId, clickEmoji).fold({
+                    KLog.i(TAG, "sendEmoji success.")
+                }, {
+                    KLog.e(TAG, it)
+                })
+            }
+        }
+
 
     /**
      * 讀取更多 分頁訊息
