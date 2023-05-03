@@ -83,6 +83,6 @@ val viewModule = module {
         ChannelViewModel(get())
     }
     viewModel { params ->
-        PostInfoViewModel(get(), params.get())
+        PostInfoViewModel(androidApplication(), get(), get(), params.get(), params.get())
     }
 }

@@ -52,15 +52,17 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
+/**
+ * 顯示 貼文/留言/回覆 內容
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostContentScreen(
+fun BasePostContentScreen(
     modifier: Modifier = Modifier,
     post: BulletinboardMessage,
     defaultDisplayLine: Int = 4,
     contentModifier: Modifier = Modifier,
     hasMoreAction: Boolean = true,
-//    backgroundColor: Color = Color.Black,
     backgroundColor: Color = LocalColor.current.background,
     onMoreClick: () -> Unit? = {},
     onEmojiClick: (Int) -> Unit,
@@ -83,7 +85,7 @@ fun PostContentScreen(
     Column(
         modifier = modifier
             .background(backgroundColor)
-            .padding(20.dp)
+            .padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 5.dp)
             .pointerInput(Unit) {
                 detectTapGestures { offset ->
                     KLog.i("TAG", offset)
@@ -263,7 +265,7 @@ private fun EmojiFeedback(
 @Composable
 fun PostContentScreenPreview() {
     FanciTheme {
-        PostContentScreen(
+        BasePostContentScreen(
             post = PostViewModel.mockPost,
             bottomContent = {
                 Row(

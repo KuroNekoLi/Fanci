@@ -58,5 +58,60 @@ class PostUseCase(private val bulletinBoardApi: BulletinBoardApi) {
         }
     }
 
+    /**
+     * 取得 該貼文 留言
+     *
+     *  @param channelId 頻道id
+     *  @param messageId 原始貼文id
+     *  @param order 排序 (預設舊到新)
+     *  @param fromSerialNumber 分頁序號
+     */
+    suspend fun getComments(
+        channelId: String,
+        messageId: String,
+        order: OrderType = OrderType.oldest,
+        fromSerialNumber: Long? = null
+    ): Result<BulletinboardMessagePaging> {
+        return kotlin.runCatching {
+            bulletinBoardApi.apiV1BulletinBoardChannelIdMessageMessageIdCommentsGet(
+                channelId = channelId,
+                messageId = messageId,
+                order = order,
+                fromSerialNumber = fromSerialNumber
+            ).checkResponseBody()
+        }
+    }
 
+    /**
+     * 針對貼文 留言
+     *
+     *  @param channelId 頻道id
+     *  @param messageId 原始貼文id
+     *  @param text message
+     *  @param images attach
+     */
+    suspend fun writeComment(
+        channelId: String,
+        messageId: String,
+        text: String,
+        images: List<String>
+    ): Result<BulletinboardMessage> {
+        val bulletingBoardMessageParam = BulletingBoardMessageParam(
+            text = text,
+            medias = images.map {
+                Media(
+                    resourceLink = it,
+                    type = MediaType.image
+                )
+            }
+        )
+
+        return kotlin.runCatching {
+            bulletinBoardApi.apiV1BulletinBoardChannelIdMessageMessageIdCommentPost(
+                channelId = channelId,
+                messageId = messageId,
+                bulletingBoardMessageParam = bulletingBoardMessageParam
+            ).checkResponseBody()
+        }
+    }
 }

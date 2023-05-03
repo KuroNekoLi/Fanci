@@ -82,6 +82,7 @@ fun PostScreen(
         postList = postList,
         navController = navController,
         listState = listState,
+        channel = channel,
         onPostClick = {
             //OnClick Method
             navController.navigate(EditPostScreenDestination(channelId = channel.id.orEmpty()))
@@ -142,6 +143,7 @@ private fun PostScreenView(
     modifier: Modifier = Modifier,
     postList: List<BulletinboardMessage>,
     navController: DestinationsNavigator,
+    channel: Channel,
     onPostClick: () -> Unit,
     onMoreClick: (BulletinboardMessage) -> Unit,
     onEmojiClick: (BulletinboardMessage, Int) -> Unit,
@@ -159,12 +161,13 @@ private fun PostScreenView(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 items(items = postList) { post ->
-                    PostContentScreen(
+                    BasePostContentScreen(
                         post = post,
                         bottomContent = {
                             CommentCount(
                                 post = post,
-                                navController = navController
+                                navController = navController,
+                                channel = channel
                             )
                         },
                         onMoreClick = {
@@ -200,17 +203,19 @@ private fun PostScreenView(
 @Composable
 fun CommentCount(
     navController: DestinationsNavigator? = null,
-    post: BulletinboardMessage? = null
+    post: BulletinboardMessage? = null,
+    channel: Channel? =null
 ) {
     Row(
         modifier = Modifier
             .wrapContentSize()
             .then(
-                if (post != null) {
+                if (post != null && navController != null && channel != null) {
                     Modifier.clickable {
-                        navController?.navigate(
+                        navController.navigate(
                             PostInfoScreenDestination(
-                                post = post
+                                post = post,
+                                channel = channel
                             )
                         )
                     }
@@ -271,6 +276,7 @@ fun PostScreenPreview() {
         PostScreenView(
             postList = PostViewModel.mockListMessage,
             navController = EmptyDestinationsNavigator,
+            channel = Channel(),
             onPostClick = {},
             listState = rememberLazyListState(),
             onMoreClick = {},

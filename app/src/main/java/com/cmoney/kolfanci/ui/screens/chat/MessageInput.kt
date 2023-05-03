@@ -95,7 +95,7 @@ fun MessageInput(
                     textState = it
                     isShowSend = it.isNotEmpty()
                 },
-                shape = RoundedCornerShape(40.dp),
+                shape = RoundedCornerShape(25.dp),
                 maxLines = 5,
                 textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                 placeholder = {
