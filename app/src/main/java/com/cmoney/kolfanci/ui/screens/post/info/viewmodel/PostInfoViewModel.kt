@@ -418,4 +418,37 @@ class PostInfoViewModel(
         }
     }
 
+    /**
+     * 點擊 回覆的 Emoji
+     */
+    fun onReplyEmojiClick(
+        comment: BulletinboardMessage,
+        reply: BulletinboardMessage,
+        resourceId: Int
+    ) {
+        KLog.i(TAG, "onReplyEmojiClick.")
+        viewModelScope.launch {
+            //回填資料
+            val replyMessage = emojiHandler(reply, resourceId)
+            _replyMap.value[comment.id.orEmpty()]?.let { replyData ->
+                val replyList = replyData.replyList.map { replyItem ->
+                    if (replyItem.id == reply.id) {
+                        replyMessage
+                    } else {
+                        replyItem
+                    }
+                }
+
+                _replyMap.value[comment.id.orEmpty()] = replyData.copy(
+                    replyList = replyList
+                )
+
+                //Update cache
+                cacheReplyData[comment.id.orEmpty()] = replyData.copy(
+                    replyList = replyList
+                )
+            }
+        }
+    }
+
 }

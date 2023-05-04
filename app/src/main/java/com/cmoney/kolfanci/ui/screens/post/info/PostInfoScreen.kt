@@ -152,6 +152,9 @@ fun PostInfoScreen(
         },
         onLoadMoreReply = {
             viewModel.onLoadMoreReply(it)
+        },
+        onReplyEmojiClick = { comment, reply, resourceId ->
+            viewModel.onReplyEmojiClick(comment, reply, resourceId)
         }
     )
 
@@ -192,7 +195,8 @@ private fun PostInfoScreenView(
     onReplyExpandClick: (BulletinboardMessage) -> Unit,
     replyMapData: Map<String, ReplyData>,
     onCommentLoadMore: () -> Unit,
-    onLoadMoreReply: (BulletinboardMessage) -> Unit
+    onLoadMoreReply: (BulletinboardMessage) -> Unit,
+    onReplyEmojiClick: (BulletinboardMessage, BulletinboardMessage, Int) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -282,7 +286,8 @@ private fun PostInfoScreenView(
                                     onCommentReplyClick = onCommentReplyClick,
                                     onExpandClick = onReplyExpandClick,
                                     reply = replyMapData[comment.id],
-                                    onLoadMoreReply = onLoadMoreReply
+                                    onLoadMoreReply = onLoadMoreReply,
+                                    onReplyEmojiClick = onReplyEmojiClick
                                 )
                             },
                             onEmojiClick = {
@@ -351,7 +356,8 @@ private fun CommentBottomContent(
     reply: ReplyData?,
     onCommentReplyClick: (BulletinboardMessage) -> Unit,
     onExpandClick: (BulletinboardMessage) -> Unit,
-    onLoadMoreReply: (BulletinboardMessage) -> Unit
+    onLoadMoreReply: (BulletinboardMessage) -> Unit,
+    onReplyEmojiClick: (BulletinboardMessage, BulletinboardMessage, Int) -> Unit
 ) {
     Column {
         //貼文留言,底部 n天前, 回覆
@@ -406,7 +412,7 @@ private fun CommentBottomContent(
                         )
                     },
                     onEmojiClick = {
-                        //TODO
+                        onReplyEmojiClick.invoke(comment, item, it)
                     }
                 )
             }
@@ -443,7 +449,8 @@ fun CommentBottomContentPreview() {
             reply = ReplyData(
                 emptyList(), false
             ),
-            onLoadMoreReply = {}
+            onLoadMoreReply = {},
+            onReplyEmojiClick = { _, _, _ -> }
         )
     }
 }
@@ -555,7 +562,8 @@ fun PostInfoScreenPreview() {
             onReplyExpandClick = {},
             replyMapData = hashMapOf(),
             onCommentLoadMore = {},
-            onLoadMoreReply = {}
+            onLoadMoreReply = {},
+            onReplyEmojiClick = { _, _, _ -> }
         )
     }
 }
