@@ -83,6 +83,30 @@ class PostUseCase(private val bulletinBoardApi: BulletinBoardApi) {
     }
 
     /**
+     * 取得 該留言 的回覆
+     *
+     *  @param channelId 頻道id
+     *  @param commentId 原始留言id
+     *  @param order 排序 (預設舊到新)
+     *  @param fromSerialNumber 分頁序號
+     */
+    suspend fun getCommentReply(
+        channelId: String,
+        commentId: String,
+        order: OrderType = OrderType.oldest,
+        fromSerialNumber: Long? = null
+    ): Result<BulletinboardMessagePaging> {
+        return kotlin.runCatching {
+            bulletinBoardApi.apiV1BulletinBoardChannelIdMessageMessageIdCommentsGet(
+                channelId = channelId,
+                messageId = commentId,
+                order = order,
+                fromSerialNumber = fromSerialNumber
+            ).checkResponseBody()
+        }
+    }
+
+    /**
      * 針對貼文 留言
      *
      *  @param channelId 頻道id

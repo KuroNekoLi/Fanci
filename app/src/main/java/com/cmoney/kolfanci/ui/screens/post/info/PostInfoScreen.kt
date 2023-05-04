@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.post.info
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,9 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -26,21 +30,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
+import com.cmoney.kolfanci.ui.common.ReplyText
+import com.cmoney.kolfanci.ui.common.ReplyTitleText
 import com.cmoney.kolfanci.ui.screens.chat.MessageAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
-import com.cmoney.kolfanci.ui.screens.post.CommentCount
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
+import com.cmoney.kolfanci.ui.screens.post.CommentCount
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -49,11 +63,11 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Destination
 @Composable
 fun PostInfoScreen(
@@ -80,30 +94,58 @@ fun PostInfoScreen(
     //留言資料
     val comments by viewModel.comment.collectAsState()
 
+    //回覆留言
+    val commentReply by viewModel.commentReply.collectAsState()
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    //回覆資料
+    val replyMapData by viewModel.replyMap.collectAsState()
+
+    //Control keyboard
+    val keyboard = LocalSoftwareKeyboardController.current
 
     PostInfoScreenView(
         modifier = modifier,
-        navController = navController,
         post = postData,
-        imageAttachList = imageAttachList,
-        comments = comments,
         onEmojiClick = { message, resourceId ->
             viewModel.onEmojiClick(message, resourceId)
+        },
+        onCommentSend = {
+            viewModel.onCommentReplySend(it)
+            keyboard?.hide()
         },
         onBackClick = {
             resultNavigator.navigateBack(viewModel.post.value)
         },
-        onCommentSend = {
-            viewModel.onCommentSend(it)
-        },
+        imageAttachList = imageAttachList,
         onAttachClick = {
             openImagePickDialog = true
         },
         onDeleteAttach = {
             viewModel.onDeleteAttach(it)
         },
-        onCommentEmojiClick = {comment, resourceId ->
+        comments = comments,
+        onCommentEmojiClick = { comment, resourceId ->
             viewModel.onCommentEmojiClick(comment, resourceId)
+        },
+        onCommentReplyClick = {
+            viewModel.onCommentReplyClick(it)
+        },
+        commentReply = commentReply,
+        onCommentReplyClose = {
+            viewModel.onCommentReplyClose()
+        },
+        showLoading = (uiState == PostInfoViewModel.UiState.ShowLoading),
+        onReplyExpandClick = {
+            viewModel.onExpandOrCollapseClick(
+                channelId = channel.id.orEmpty(),
+                commentId = it.id.orEmpty()
+            )
+        },
+        replyMapData = replyMapData.toMap(),
+        onCommentLoadMore = {
+            viewModel.onCommentLoadMore()
         }
     )
 
@@ -128,7 +170,6 @@ fun PostInfoScreen(
 @Composable
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
-    navController: DestinationsNavigator,
     post: BulletinboardMessage,
     onEmojiClick: (BulletinboardMessage, Int) -> Unit,
     onCommentSend: (text: String) -> Unit,
@@ -138,8 +179,17 @@ private fun PostInfoScreenView(
     onDeleteAttach: (Uri) -> Unit,
     comments: List<BulletinboardMessage>,
     onCommentEmojiClick: (BulletinboardMessage, Int) -> Unit,
+    onCommentReplyClick: (BulletinboardMessage) -> Unit,
+    commentReply: BulletinboardMessage?,
+    onCommentReplyClose: () -> Unit,
+    showLoading: Boolean,
+    onReplyExpandClick: (BulletinboardMessage) -> Unit,
+    replyMapData: Map<String, List<BulletinboardMessage>>,
+    onCommentLoadMore: () -> Unit
 ) {
     val context = LocalContext.current
+
+    val listState = rememberLazyListState()
 
     Scaffold(
         modifier = modifier
@@ -155,97 +205,132 @@ private fun PostInfoScreenView(
         },
         backgroundColor = LocalColor.current.background
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                //貼文
-                item {
-                    BasePostContentScreen(
-                        post = post,
-                        defaultDisplayLine = Int.MAX_VALUE,
-                        bottomContent = {
-                            CommentCount(
-                                post = post
+
+        Box(
+            modifier = Modifier.padding(innerPadding),
+            contentAlignment = Alignment.Center
+        ) {
+            Column {
+                LazyColumn(modifier = Modifier.weight(1f), state = listState) {
+                    //貼文
+                    item {
+                        BasePostContentScreen(
+                            post = post,
+                            defaultDisplayLine = Int.MAX_VALUE,
+                            bottomContent = {
+                                CommentCount(
+                                    post = post
+                                )
+                            },
+                            onMoreClick = {
+                                //TODO
+                                context.findActivity().showPostMoreActionDialogBottomSheet(
+                                    postMessage = post,
+                                    onInteractClick = {
+                                        //todo
+                                    }
+                                )
+                            },
+                            onEmojiClick = {
+                                onEmojiClick.invoke(post, it)
+                            }
+                        )
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+
+                    //Comment title
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(45.dp)
+                                .background(LocalColor.current.background)
+                                .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
+                        ) {
+                            Text(
+                                text = "貼文留言",
+                                fontSize = 17.sp,
+                                color = LocalColor.current.text.default_100
                             )
-                        },
-                        onMoreClick = {
-                            //TODO
-                            context.findActivity().showPostMoreActionDialogBottomSheet(
-                                postMessage = post,
-                                onInteractClick = {
-                                    //todo
-                                }
-                            )
-                        },
-                        onEmojiClick = {
-                            onEmojiClick.invoke(post, it)
                         }
-                    )
-                }
+                    }
 
-                item {
-                    Spacer(modifier = Modifier.height(15.dp))
-                }
+                    item {
+                        Spacer(modifier = Modifier.height(1.dp))
+                    }
 
-                //Comment title
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(45.dp)
-                            .background(LocalColor.current.background)
-                            .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
-                    ) {
-                        Text(
-                            text = "貼文留言",
-                            fontSize = 17.sp,
-                            color = LocalColor.current.text.default_100
+                    //留言內容
+                    items(comments) { comment ->
+                        BasePostContentScreen(
+                            post = comment,
+                            defaultDisplayLine = Int.MAX_VALUE,
+                            contentModifier = Modifier.padding(start = 40.dp),
+                            hasMoreAction = false,
+                            bottomContent = {
+                                CommentBottomContent(
+                                    comment = comment,
+                                    onCommentReplyClick = onCommentReplyClick,
+                                    onExpandClick = onReplyExpandClick,
+                                    reply = replyMapData[comment.id].orEmpty()
+                                )
+                            },
+                            onEmojiClick = {
+                                onCommentEmojiClick.invoke(comment, it)
+                            }
                         )
                     }
                 }
 
-                item {
-                    Spacer(modifier = Modifier.height(1.dp))
+                //================== Bottom ==================
+
+                //回覆留言
+                commentReply?.let {
+                    CommentReplayScreen(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(LocalColor.current.env_100),
+                        comment = it,
+                    ) {
+                        onCommentReplyClose.invoke()
+                    }
                 }
 
-                //留言內容
-                items(comments) { comment ->
-                    BasePostContentScreen(
-                        post = comment,
-                        defaultDisplayLine = Int.MAX_VALUE,
-                        contentModifier = Modifier.padding(start = 40.dp),
-                        hasMoreAction = false,
-                        bottomContent = {
-                            CommentBottomContent(comment)
-                        },
-                        onEmojiClick = {
-                            onCommentEmojiClick.invoke(comment, it)
-                        }
-                    )
-                }
+                //附加圖片
+                MessageAttachImageScreen(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colors.primary),
+                    imageAttach = imageAttachList,
+                    onDelete = onDeleteAttach,
+                    onAdd = onAttachClick
+                )
+
+                //輸入匡
+                MessageInput(
+                    onMessageSend = onCommentSend,
+                    onAttachClick = {
+                        onAttachClick.invoke()
+                    },
+                    showOnlyBasicPermissionTip = {
+                    }
+                )
             }
 
-            //================== Bottom ==================
-
-            //附加圖片
-            MessageAttachImageScreen(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colors.primary),
-                imageAttach = imageAttachList,
-                onDelete = onDeleteAttach,
-                onAdd = onAttachClick
-            )
-
-            //輸入匡
-            MessageInput(
-                onMessageSend = onCommentSend,
-                onAttachClick = {
-                    onAttachClick.invoke()
-                },
-                showOnlyBasicPermissionTip = {
-                }
-            )
+            if (showLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(45.dp),
+                    color = LocalColor.current.primary
+                )
+            }
         }
+    }
+
+    listState.OnBottomReached {
+        onCommentLoadMore.invoke()
     }
 }
 
@@ -253,19 +338,15 @@ private fun PostInfoScreenView(
  * 留言 底部內容
  */
 @Composable
-private fun CommentBottomContent(comment: BulletinboardMessage) {
-    //TODO mock data
-    val reply = PostViewModel.mockListMessage
-
-    var expandReply by remember {
-        mutableStateOf(false)
-    }
-
+private fun CommentBottomContent(
+    comment: BulletinboardMessage,
+    reply: List<BulletinboardMessage>,
+    onCommentReplyClick: (BulletinboardMessage) -> Unit,
+    onExpandClick: (BulletinboardMessage) -> Unit
+) {
     Column {
         //貼文留言,底部 n天前, 回覆
-        CommentBottomView(comment) {
-
-        }
+        CommentBottomView(comment, onCommentReplyClick)
 
         if (comment.commentCount != 0) {
             Spacer(modifier = Modifier.height(15.dp))
@@ -273,7 +354,7 @@ private fun CommentBottomContent(comment: BulletinboardMessage) {
             Row(
                 modifier = Modifier
                     .clickable {
-                        expandReply = !expandReply
+                        onExpandClick.invoke(comment)
                     }
                     .padding(top = 10.dp, bottom = 10.dp, end = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -287,7 +368,7 @@ private fun CommentBottomContent(comment: BulletinboardMessage) {
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = if (expandReply) {
+                    text = if (reply.isNotEmpty()) {
                         "隱藏回覆"
                     } else {
                         "查看 %d 則 回覆".format(comment.commentCount ?: 0)
@@ -298,9 +379,7 @@ private fun CommentBottomContent(comment: BulletinboardMessage) {
             }
         }
 
-
-        //TODO
-        if (expandReply) {
+        if (reply.isNotEmpty()) {
             Spacer(modifier = Modifier.height(5.dp))
 
             //TODO improve performance, 改為上一層 item 一環
@@ -313,13 +392,13 @@ private fun CommentBottomContent(comment: BulletinboardMessage) {
                     backgroundColor = Color.Transparent,
                     bottomContent = {
                         Text(
-                            text = "1天以前",
+                            text = item.displayPostTime(),
                             fontSize = 14.sp,
                             color = LocalColor.current.text.default_100
                         )
                     },
                     onEmojiClick = {
-
+                        //TODO
                     }
                 )
             }
@@ -331,7 +410,12 @@ private fun CommentBottomContent(comment: BulletinboardMessage) {
 @Composable
 fun CommentBottomContentPreview() {
     FanciTheme {
-        CommentBottomContent(BulletinboardMessage())
+        CommentBottomContent(
+            BulletinboardMessage(),
+            onCommentReplyClick = {},
+            onExpandClick = {},
+            reply = emptyList()
+        )
     }
 }
 
@@ -363,24 +447,85 @@ fun CommentBottomView(
     }
 }
 
+/**
+ * 貼文 回覆
+ */
+@Composable
+fun CommentReplayScreen(
+    comment: BulletinboardMessage,
+    modifier: Modifier = Modifier,
+    onClose: () -> Unit
+) {
+    Box(
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(
+                top = 10.dp,
+                bottom = 10.dp,
+                start = 16.dp,
+                end = 16.dp
+            )
+        ) {
+            ReplyTitleText(text = "回覆・" + comment.author?.name)
+            Spacer(modifier = Modifier.height(10.dp))
+            ReplyText(text = comment.content?.text.orEmpty())
+        }
+
+        //Close icon
+        Image(
+            modifier = Modifier
+                .padding(5.dp)
+                .size(15.dp)
+                .align(Alignment.TopEnd)
+                .clickable {
+                    onClose.invoke()
+                },
+            painter = painterResource(id = R.drawable.white_close),
+            colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_100),
+            contentDescription = null
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CommentReplayScreenPreview() {
+    FanciTheme {
+        CommentReplayScreen(
+            comment = BulletinboardMessage(
+                author = GroupMember(name = "Hello"),
+                content = MediaIChatContent(text = "Content Text")
+            ),
+            onClose = {}
+        )
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun PostInfoScreenPreview() {
     FanciTheme {
         PostInfoScreenView(
-            navController = EmptyDestinationsNavigator,
             post = PostViewModel.mockPost,
             onEmojiClick = { post, resourceId ->
-            },
-            onCommentEmojiClick = { post, resourceId ->
             },
             onCommentSend = {},
             onBackClick = {},
             imageAttachList = emptyList(),
             onAttachClick = {},
             onDeleteAttach = {},
-            comments = emptyList()
+            comments = emptyList(),
+            onCommentEmojiClick = { post, resourceId ->
+            },
+            onCommentReplyClick = {},
+            commentReply = null,
+            onCommentReplyClose = {},
+            showLoading = false,
+            onReplyExpandClick = {},
+            replyMapData = hashMapOf(),
+            onCommentLoadMore = {}
         )
     }
 }

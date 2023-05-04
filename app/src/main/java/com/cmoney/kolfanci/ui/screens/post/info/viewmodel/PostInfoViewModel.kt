@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.post.info.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
@@ -13,7 +14,6 @@ import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
-import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -51,8 +51,22 @@ class PostInfoViewModel(
     private val _uiState: MutableStateFlow<UiState?> = MutableStateFlow(null)
     val uiState = _uiState.asStateFlow()
 
-    var haveNextPage: Boolean = false
-    var nextWeight: Long? = null    //貼文分頁 索引
+    private val _commentReply = MutableStateFlow<BulletinboardMessage?>(null)
+    val commentReply = _commentReply.asStateFlow()
+
+    //回覆有展開的資料
+    private val _replyMap =
+        MutableStateFlow<SnapshotStateMap<String, List<BulletinboardMessage>>>(SnapshotStateMap())
+    val replyMap = _replyMap.asStateFlow()
+
+    private val haveNextPageMap = hashMapOf<String, Boolean>() //紀錄是否有分頁
+    private val nextWeightMap = hashMapOf<String, Long?>() //紀錄 分頁索引值
+
+    //紀錄展開過的回覆資料
+    private val cacheReplyData = hashMapOf<String, List<BulletinboardMessage>>()
+
+    //紀錄目前展開狀態
+    private val replyExpandState = hashMapOf<String, Boolean>()
 
     init {
         fetchComment(
@@ -64,16 +78,16 @@ class PostInfoViewModel(
     /**
      * 取得 貼文留言
      */
-    fun fetchComment(channelId: String, messageId: String) {
+    private fun fetchComment(channelId: String, messageId: String) {
         KLog.i(TAG, "fetchComment:$channelId")
         viewModelScope.launch {
             postUseCase.getComments(
                 channelId = channelId,
                 messageId = messageId,
-                fromSerialNumber = nextWeight
+                fromSerialNumber = nextWeightMap[bulletinboardMessage.id]
             ).fold({
-                haveNextPage = it.haveNextPage == true
-                nextWeight = it.nextWeight
+                haveNextPageMap[bulletinboardMessage.id.orEmpty()] = (it.haveNextPage == true)
+                nextWeightMap[bulletinboardMessage.id.orEmpty()] = it.nextWeight
 
                 val commentList = _comment.value.toMutableList()
 
@@ -88,6 +102,78 @@ class PostInfoViewModel(
     }
 
     /**
+     * 展開 or 縮合 該留言回覆
+     */
+    fun onExpandOrCollapseClick(channelId: String, commentId: String) {
+        KLog.i(TAG, "fetchCommentReply")
+        viewModelScope.launch {
+            //目前為展開, 要隱藏起來
+            if (isReplyExpand(commentId)) {
+                setReplyCollapse(commentId)
+                //將顯示資料移除
+                _replyMap.value.remove(commentId)
+            }
+            //展開
+            else {
+                setReplyExpand(commentId)
+                //search cache
+                val replyCache = cacheReplyData[commentId]
+
+                if (replyCache.isNullOrEmpty()) {
+                    fetchCommentReply(channelId, commentId)
+                } else {
+                    _replyMap.value[commentId] = replyCache
+                }
+            }
+        }
+    }
+
+    /**
+     * Request reply data
+     */
+    private fun fetchCommentReply(channelId: String, commentId: String) {
+        KLog.i(TAG, "fetchCommentReply:$channelId, $commentId")
+        viewModelScope.launch {
+            postUseCase.getCommentReply(
+                channelId = channelId,
+                commentId = commentId,
+                fromSerialNumber = nextWeightMap[commentId]
+            ).fold({
+                haveNextPageMap[commentId] = (it.haveNextPage == true)
+                nextWeightMap[commentId] = it.nextWeight
+                cacheReplyData[commentId] = it.items.orEmpty()
+
+                val oldReplyList = _replyMap.value[commentId].orEmpty().toMutableList()
+                oldReplyList.addAll(it.items.orEmpty())
+
+                _replyMap.value[commentId] = oldReplyList
+            }, {
+                it.printStackTrace()
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 設定該留言回覆為展開狀態
+     */
+    private fun setReplyExpand(commentId: String) {
+        replyExpandState[commentId] = true
+    }
+
+    /**
+     * 設定該留言回覆為縮起來狀態
+     */
+    private fun setReplyCollapse(commentId: String) {
+        replyExpandState[commentId] = false
+    }
+
+    /**
+     * 檢查該留言,是否為展開狀態
+     */
+    private fun isReplyExpand(commentId: String): Boolean = (replyExpandState[commentId] == true)
+
+    /**
      * 點擊 emoji 處理
      */
     fun onEmojiClick(postMessage: BulletinboardMessage, resourceId: Int) {
@@ -98,7 +184,7 @@ class PostInfoViewModel(
         }
     }
 
-    fun onCommentSend(text: String) {
+    fun onCommentReplySend(text: String) {
         KLog.i(TAG, "onCommentSend:$text")
         viewModelScope.launch {
             loading()
@@ -108,7 +194,7 @@ class PostInfoViewModel(
                 uploadImages(_imageAttach.value, object : MessageViewModel.ImageUploadCallback {
                     override fun complete(images: List<String>) {
                         KLog.i(TAG, "all image upload complete:" + images.size)
-                        sendComment(text, images)
+                        sendCommentOrReply(text, images)
                     }
 
                     override fun onFailure(e: Throwable) {
@@ -118,26 +204,31 @@ class PostInfoViewModel(
                 })
                 _imageAttach.value = emptyList()
             } else {
-                sendComment(text, emptyList())
+                sendCommentOrReply(text, emptyList())
             }
         }
     }
 
     /**
-     * 發送留言給後端
+     * 發送留言/回覆給後端
      */
-    private fun sendComment(text: String, images: List<String>) {
+    private fun sendCommentOrReply(text: String, images: List<String>) {
         KLog.i(TAG, "sendComment")
         viewModelScope.launch {
             loading()
 
+            //看是要發送回覆 or 留言
+            val message = _commentReply.value ?: bulletinboardMessage
+
             postUseCase.writeComment(
                 channelId = channel.id.orEmpty(),
-                messageId = bulletinboardMessage.id.orEmpty(),
+                messageId = message.id.orEmpty(),
                 text = text,
                 images = images
             ).fold({
                 dismissLoading()
+                onCommentReplyClose()
+
                 KLog.i(TAG, "writeComment success.")
 
                 val comments = _comment.value.toMutableList()
@@ -146,6 +237,8 @@ class PostInfoViewModel(
                 _comment.value = comments
             }, {
                 dismissLoading()
+                onCommentReplyClose()
+
                 it.printStackTrace()
                 KLog.e(TAG, it)
             })
@@ -270,6 +363,38 @@ class PostInfoViewModel(
         )
 
         return postMessage
+    }
+
+    /**
+     * 點擊留言-回覆
+     */
+    fun onCommentReplyClick(bulletinboardMessage: BulletinboardMessage) {
+        KLog.i(TAG, "onCommentReplyClick:$bulletinboardMessage")
+        _commentReply.value = bulletinboardMessage
+    }
+
+    /**
+     * 關閉留言-回覆
+     */
+    fun onCommentReplyClose() {
+        KLog.i(TAG, "onCommentReplyClose")
+        _commentReply.value = null
+    }
+
+    /**
+     * 留言 讀取更多
+     */
+    fun onCommentLoadMore() {
+        KLog.i(TAG, "onCommentLoadMore:" + haveNextPageMap[bulletinboardMessage.id.orEmpty()])
+        viewModelScope.launch {
+            //check has next page
+            if (haveNextPageMap[bulletinboardMessage.id.orEmpty()] == true) {
+                fetchComment(
+                    channelId = channel.id.orEmpty(),
+                    messageId = bulletinboardMessage.id.orEmpty()
+                )
+            }
+        }
     }
 
 }
