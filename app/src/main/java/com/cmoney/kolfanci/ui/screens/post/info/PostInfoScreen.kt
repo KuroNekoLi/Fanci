@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,8 @@ import com.cmoney.kolfanci.ui.screens.chat.MessageAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
+import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
+import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -136,7 +139,7 @@ fun PostInfoScreen(
         onCommentReplyClose = {
             viewModel.onCommentReplyClose()
         },
-        showLoading = (uiState == PostInfoViewModel.UiState.ShowLoading),
+        showLoading = (uiState == UiState.ShowLoading),
         onReplyExpandClick = {
             viewModel.onExpandOrCollapseClick(
                 channelId = channel.id.orEmpty(),
@@ -146,6 +149,9 @@ fun PostInfoScreen(
         replyMapData = replyMapData.toMap(),
         onCommentLoadMore = {
             viewModel.onCommentLoadMore()
+        },
+        onLoadMoreReply = {
+            viewModel.onLoadMoreReply(it)
         }
     )
 
@@ -184,8 +190,9 @@ private fun PostInfoScreenView(
     onCommentReplyClose: () -> Unit,
     showLoading: Boolean,
     onReplyExpandClick: (BulletinboardMessage) -> Unit,
-    replyMapData: Map<String, List<BulletinboardMessage>>,
-    onCommentLoadMore: () -> Unit
+    replyMapData: Map<String, ReplyData>,
+    onCommentLoadMore: () -> Unit,
+    onLoadMoreReply: (BulletinboardMessage) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -274,7 +281,8 @@ private fun PostInfoScreenView(
                                     comment = comment,
                                     onCommentReplyClick = onCommentReplyClick,
                                     onExpandClick = onReplyExpandClick,
-                                    reply = replyMapData[comment.id].orEmpty()
+                                    reply = replyMapData[comment.id],
+                                    onLoadMoreReply = onLoadMoreReply
                                 )
                             },
                             onEmojiClick = {
@@ -340,9 +348,10 @@ private fun PostInfoScreenView(
 @Composable
 private fun CommentBottomContent(
     comment: BulletinboardMessage,
-    reply: List<BulletinboardMessage>,
+    reply: ReplyData?,
     onCommentReplyClick: (BulletinboardMessage) -> Unit,
-    onExpandClick: (BulletinboardMessage) -> Unit
+    onExpandClick: (BulletinboardMessage) -> Unit,
+    onLoadMoreReply: (BulletinboardMessage) -> Unit
 ) {
     Column {
         //貼文留言,底部 n天前, 回覆
@@ -368,7 +377,7 @@ private fun CommentBottomContent(
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = if (reply.isNotEmpty()) {
+                    text = if (reply?.replyList?.isNotEmpty() == true) {
                         "隱藏回覆"
                     } else {
                         "查看 %d 則 回覆".format(comment.commentCount ?: 0)
@@ -379,11 +388,10 @@ private fun CommentBottomContent(
             }
         }
 
-        if (reply.isNotEmpty()) {
+        if (reply != null && reply.replyList.isNotEmpty()) {
             Spacer(modifier = Modifier.height(5.dp))
 
-            //TODO improve performance, 改為上一層 item 一環
-            reply.forEach { item ->
+            reply.replyList.forEach { item ->
                 BasePostContentScreen(
                     post = item,
                     defaultDisplayLine = Int.MAX_VALUE,
@@ -402,6 +410,24 @@ private fun CommentBottomContent(
                     }
                 )
             }
+
+            //如果有分頁,顯示更多留言
+            if (reply.haveMore) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    modifier = Modifier
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            onLoadMoreReply.invoke(comment)
+                        }
+                        .padding(start = 40.dp),
+                    text = "顯示更多",
+                    fontSize = 14.sp,
+                    color = LocalColor.current.text.default_100
+                )
+            }
         }
     }
 }
@@ -414,7 +440,10 @@ fun CommentBottomContentPreview() {
             BulletinboardMessage(),
             onCommentReplyClick = {},
             onExpandClick = {},
-            reply = emptyList()
+            reply = ReplyData(
+                emptyList(), false
+            ),
+            onLoadMoreReply = {}
         )
     }
 }
@@ -525,7 +554,8 @@ fun PostInfoScreenPreview() {
             showLoading = false,
             onReplyExpandClick = {},
             replyMapData = hashMapOf(),
-            onCommentLoadMore = {}
+            onCommentLoadMore = {},
+            onLoadMoreReply = {}
         )
     }
 }

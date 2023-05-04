@@ -14,6 +14,8 @@ import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
+import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
+import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -32,11 +34,6 @@ class PostInfoViewModel(
     private val channel: Channel
 ) : AndroidViewModel(context) {
 
-    sealed class UiState {
-        object ShowLoading : UiState()
-        object DismissLoading : UiState()
-    }
-
     private val TAG = PostInfoViewModel::class.java.simpleName
 
     private val _post = MutableStateFlow(bulletinboardMessage)
@@ -51,19 +48,20 @@ class PostInfoViewModel(
     private val _uiState: MutableStateFlow<UiState?> = MutableStateFlow(null)
     val uiState = _uiState.asStateFlow()
 
+    //點擊留言回覆要顯示的資料
     private val _commentReply = MutableStateFlow<BulletinboardMessage?>(null)
     val commentReply = _commentReply.asStateFlow()
 
     //回覆有展開的資料
     private val _replyMap =
-        MutableStateFlow<SnapshotStateMap<String, List<BulletinboardMessage>>>(SnapshotStateMap())
+        MutableStateFlow<SnapshotStateMap<String, ReplyData>>(SnapshotStateMap())
     val replyMap = _replyMap.asStateFlow()
 
     private val haveNextPageMap = hashMapOf<String, Boolean>() //紀錄是否有分頁
     private val nextWeightMap = hashMapOf<String, Long?>() //紀錄 分頁索引值
 
     //紀錄展開過的回覆資料
-    private val cacheReplyData = hashMapOf<String, List<BulletinboardMessage>>()
+    private val cacheReplyData = hashMapOf<String, ReplyData>()
 
     //紀錄目前展開狀態
     private val replyExpandState = hashMapOf<String, Boolean>()
@@ -119,7 +117,7 @@ class PostInfoViewModel(
                 //search cache
                 val replyCache = cacheReplyData[commentId]
 
-                if (replyCache.isNullOrEmpty()) {
+                if (replyCache == null || replyCache.replyList.isNullOrEmpty()) {
                     fetchCommentReply(channelId, commentId)
                 } else {
                     _replyMap.value[commentId] = replyCache
@@ -141,12 +139,19 @@ class PostInfoViewModel(
             ).fold({
                 haveNextPageMap[commentId] = (it.haveNextPage == true)
                 nextWeightMap[commentId] = it.nextWeight
-                cacheReplyData[commentId] = it.items.orEmpty()
 
-                val oldReplyList = _replyMap.value[commentId].orEmpty().toMutableList()
+                val oldReplyList = _replyMap.value[commentId]?.replyList.orEmpty().toMutableList()
                 oldReplyList.addAll(it.items.orEmpty())
 
-                _replyMap.value[commentId] = oldReplyList
+                cacheReplyData[commentId] = ReplyData(
+                    replyList = oldReplyList,
+                    haveMore = (it.haveNextPage == true)
+                )
+
+                _replyMap.value[commentId] = ReplyData(
+                    replyList = oldReplyList,
+                    haveMore = (it.haveNextPage == true)
+                )
             }, {
                 it.printStackTrace()
                 KLog.e(TAG, it)
@@ -392,6 +397,22 @@ class PostInfoViewModel(
                 fetchComment(
                     channelId = channel.id.orEmpty(),
                     messageId = bulletinboardMessage.id.orEmpty()
+                )
+            }
+        }
+    }
+
+    /**
+     * 讀取 更多回覆資料
+     */
+    fun onLoadMoreReply(comment: BulletinboardMessage) {
+        KLog.i(TAG, "onLoadMoreReply:" + haveNextPageMap[bulletinboardMessage.id.orEmpty()])
+        viewModelScope.launch {
+            //check has next page
+            if (haveNextPageMap[bulletinboardMessage.id.orEmpty()] == true) {
+                fetchCommentReply(
+                    channelId = channel.id.orEmpty(),
+                    commentId = comment.id.orEmpty()
                 )
             }
         }
