@@ -10,7 +10,10 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.clickCount
+import com.cmoney.kolfanci.extension.isMyPost
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
@@ -39,6 +42,7 @@ class PostInfoViewModel(
     private val _post = MutableStateFlow(bulletinboardMessage)
     val post = _post.asStateFlow()
 
+    //留言
     private val _comment = MutableStateFlow<List<BulletinboardMessage>>(emptyList())
     val comment = _comment.asStateFlow()
 
@@ -224,6 +228,8 @@ class PostInfoViewModel(
 
             //看是要發送回覆 or 留言
             val message = _commentReply.value ?: bulletinboardMessage
+            //是否為回覆
+            val isReply = _commentReply.value != null
 
             postUseCase.writeComment(
                 channelId = channel.id.orEmpty(),
@@ -236,10 +242,23 @@ class PostInfoViewModel(
 
                 KLog.i(TAG, "writeComment success.")
 
-                val comments = _comment.value.toMutableList()
-                comments.add(it)
+                //如果是回覆, 將回覆資料寫回
+                if (isReply) {
+                    val replyData = _replyMap.value[message.id.orEmpty()]
+                    replyData?.let { replyData ->
+                        val replyList = replyData.replyList.toMutableList()
+                        replyList.add(it)
+                        _replyMap.value[message.id.orEmpty()] = replyData.copy(
+                            replyList = replyList
+                        )
+                    }
+                }
+                else {
+                    val comments = _comment.value.toMutableList()
+                    comments.add(it)
+                    _comment.value = comments
+                }
 
-                _comment.value = comments
             }, {
                 dismissLoading()
                 onCommentReplyClose()
@@ -447,6 +466,50 @@ class PostInfoViewModel(
                 cacheReplyData[comment.id.orEmpty()] = replyData.copy(
                     replyList = replyList
                 )
+            }
+        }
+    }
+
+    /**
+     * 刪除留言
+     */
+    fun onDeleteComment(comment: Any?) {
+        KLog.i(TAG, "onDeleteComment:$comment")
+        comment?.let { comment ->
+            if (comment is BulletinboardMessage) {
+                viewModelScope.launch {
+
+                    //TODO 優化
+                    //我的留言
+                    if (comment.isMyPost(Constant.MyInfo)) {
+                        chatRoomUseCase.takeBackMyMessage(comment.id.orEmpty()).fold({
+                        },{
+                            if (it is EmptyBodyException) {
+                                _comment.value = _comment.value.filter {
+                                    it.id != comment.id
+                                }
+                            }
+                            else {
+                                it.printStackTrace()
+                            }
+                        })
+                    }
+                    //他人
+                    else {
+                        chatRoomUseCase.deleteOtherMessage(comment.id.orEmpty()).fold({
+                        },{
+                            if (it is EmptyBodyException) {
+                                _comment.value = _comment.value.filter {
+                                    it.id != comment.id
+                                }
+                            }
+                            else {
+                                it.printStackTrace()
+                            }
+                        })
+                    }
+
+                }
             }
         }
     }

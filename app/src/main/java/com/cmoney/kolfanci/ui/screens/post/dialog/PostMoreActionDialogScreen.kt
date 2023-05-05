@@ -39,6 +39,14 @@ sealed class PostInteract(postMessage: BulletinboardMessage) {
     data class Delete(val post: BulletinboardMessage) : PostInteract(post)
 }
 
+/**
+ * 互動模式 來源
+ */
+sealed class PostMoreActionType {
+    object Post : PostMoreActionType()
+    object Comment : PostMoreActionType()
+    object Reply : PostMoreActionType()
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -46,8 +54,27 @@ fun PostMoreActionDialogScreen(
     coroutineScope: CoroutineScope,
     modalBottomSheetState: ModalBottomSheetState,
     postMessage: BulletinboardMessage,
+    postMoreActionType: PostMoreActionType,
     onInteractClick: (PostInteract) -> Unit
 ) {
+    fun getEditTitle(): String = when (postMoreActionType) {
+        PostMoreActionType.Comment -> "編輯留言"
+        PostMoreActionType.Post -> "編輯貼文"
+        PostMoreActionType.Reply -> "編輯回覆"
+    }
+
+    fun getDeleteTitle(): String = when (postMoreActionType) {
+        PostMoreActionType.Comment -> "刪除留言"
+        PostMoreActionType.Post -> "刪除貼文"
+        PostMoreActionType.Reply -> "刪除回覆"
+    }
+
+    fun getReportTitle(): String = when (postMoreActionType) {
+        PostMoreActionType.Comment -> "向管理員檢舉這則留言"
+        PostMoreActionType.Post -> "向管理員檢舉這則貼文"
+        PostMoreActionType.Reply -> "向管理員檢舉這則回覆"
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -60,30 +87,66 @@ fun PostMoreActionDialogScreen(
                 bottom = 10.dp
             )
         ) {
-            if (postMessage.isMyPost(Constant.MyInfo)) {
-                FeatureText(R.drawable.edit_post, "編輯貼文") {
-                    onClose(coroutineScope, modalBottomSheetState)
-                    onInteractClick.invoke(PostInteract.Edit(postMessage))
+            when (postMoreActionType) {
+                //文章
+                PostMoreActionType.Post -> {
+                    //自己
+                    if (postMessage.isMyPost(Constant.MyInfo)) {
+                        FeatureText(R.drawable.edit_post, getEditTitle()) {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Edit(postMessage))
+                        }
+                        FeatureText(R.drawable.top, "置頂貼文") {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Announcement(postMessage))
+                        }
+                        FeatureText(R.drawable.delete, getDeleteTitle()) {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Delete(postMessage))
+                        }
+                    }
+                    //他人
+                    else {
+                        FeatureText(R.drawable.top, "置頂貼文") {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Announcement(postMessage))
+                        }
+                        FeatureText(R.drawable.report, getReportTitle()) {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Report(postMessage))
+                        }
+                        FeatureText(R.drawable.delete, getDeleteTitle()) {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Delete(postMessage))
+                        }
+                    }
+                }
+                //留言, 回覆
+                PostMoreActionType.Comment, PostMoreActionType.Reply -> {
+                    //自己
+                    if (postMessage.isMyPost(Constant.MyInfo)) {
+                        FeatureText(R.drawable.edit_post, getEditTitle()) {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Edit(postMessage))
+                        }
+                        FeatureText(R.drawable.delete, getDeleteTitle()) {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Delete(postMessage))
+                        }
+                    }
+                    //他人
+                    else {
+                        FeatureText(R.drawable.report, getReportTitle()) {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Report(postMessage))
+                        }
+                        FeatureText(R.drawable.delete, getDeleteTitle()) {
+                            onClose(coroutineScope, modalBottomSheetState)
+                            onInteractClick.invoke(PostInteract.Delete(postMessage))
+                        }
+                    }
                 }
             }
-
-            FeatureText(R.drawable.top, "置頂貼文") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(PostInteract.Announcement(postMessage))
-            }
-
-            if (!postMessage.isMyPost(Constant.MyInfo)) {
-                FeatureText(R.drawable.report, "向管理員檢舉這則貼文") {
-                    onClose(coroutineScope, modalBottomSheetState)
-                    onInteractClick.invoke(PostInteract.Report(postMessage))
-                }
-            }
-
-            FeatureText(R.drawable.delete, "刪除貼文") {
-                onClose(coroutineScope, modalBottomSheetState)
-                onInteractClick.invoke(PostInteract.Delete(postMessage))
-            }
-
         }
     }
 }
@@ -155,7 +218,8 @@ fun MoreActionDialogScreenPreview() {
                     it != ModalBottomSheetValue.HalfExpanded
                 }
             ),
-            postMessage = BulletinboardMessage()
+            postMessage = BulletinboardMessage(),
+            postMoreActionType = PostMoreActionType.Post
         ) {
 
         }

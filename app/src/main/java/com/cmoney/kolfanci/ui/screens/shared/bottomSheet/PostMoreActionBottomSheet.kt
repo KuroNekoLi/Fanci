@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.ComposeView
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionDialogScreen
+import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -20,6 +21,7 @@ fun PostMoreActionBottomSheet(
     parent: ViewGroup,
     composeView: ComposeView,
     postMessage: BulletinboardMessage,
+    postMoreActionType: PostMoreActionType,
     onInteractClick: (PostInteract) -> Unit
 ) {
     val TAG = parent::class.java.simpleName
@@ -41,6 +43,7 @@ fun PostMoreActionBottomSheet(
                 coroutineScope,
                 modalBottomSheetState,
                 postMessage,
+                postMoreActionType,
                 onInteractClick
             )
         }

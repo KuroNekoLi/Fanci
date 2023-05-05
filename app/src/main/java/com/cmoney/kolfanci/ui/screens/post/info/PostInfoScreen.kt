@@ -54,13 +54,17 @@ import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
 import com.cmoney.kolfanci.ui.screens.chat.MessageAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
+import com.cmoney.kolfanci.ui.screens.post.BaseDeletedContentScreen
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
+import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
+import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -85,6 +89,10 @@ fun PostInfoScreen(
     ),
     resultNavigator: ResultBackNavigator<BulletinboardMessage>
 ) {
+    val context = LocalContext.current
+
+    var showCommentDeleteTip by remember { mutableStateOf(Pair<Boolean, BulletinboardMessage?>(false, null)) }
+
     //貼文資料
     val postData by viewModel.post.collectAsState()
 
@@ -108,54 +116,115 @@ fun PostInfoScreen(
     //Control keyboard
     val keyboard = LocalSoftwareKeyboardController.current
 
+    //貼文 callback listener
+    val postInfoListener = object : PostInfoListener {
+        override fun onEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
+            viewModel.onEmojiClick(comment, resourceId)
+        }
+
+        override fun onCommentSend(text: String) {
+            viewModel.onCommentReplySend(text)
+            keyboard?.hide()
+        }
+
+        override fun onBackClick() {
+            resultNavigator.navigateBack(viewModel.post.value)
+        }
+
+        override fun onAttachClick() {
+            openImagePickDialog = true
+        }
+
+        override fun onDeleteAttach(uri: Uri) {
+            viewModel.onDeleteAttach(uri)
+        }
+
+        override fun onCommentEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
+            viewModel.onCommentEmojiClick(comment, resourceId)
+        }
+
+        override fun onCommentReplyClose() {
+            viewModel.onCommentReplyClose()
+        }
+
+        override fun onCommentLoadMore() {
+            viewModel.onCommentLoadMore()
+        }
+
+        override fun onPostMoreClick(post: BulletinboardMessage) {
+            context.findActivity().showPostMoreActionDialogBottomSheet(
+                postMessage = post,
+                postMoreActionType = PostMoreActionType.Post,
+                onInteractClick = {
+                    //todo
+                }
+            )
+        }
+    }
+
+    //底部留言 callback listener
+    val commentBottomContentListener = object : CommentBottomContentListener {
+        override fun onCommentReplyClick(comment: BulletinboardMessage) {
+            viewModel.onCommentReplyClick(comment)
+        }
+
+        override fun onExpandClick(comment: BulletinboardMessage) {
+            viewModel.onExpandOrCollapseClick(
+                channelId = channel.id.orEmpty(),
+                commentId = comment.id.orEmpty()
+            )
+        }
+
+        override fun onLoadMoreReply(comment: BulletinboardMessage) {
+            viewModel.onLoadMoreReply(comment)
+        }
+
+        override fun onReplyEmojiClick(
+            comment: BulletinboardMessage,
+            reply: BulletinboardMessage,
+            resourceId: Int
+        ) {
+            viewModel.onReplyEmojiClick(comment, reply, resourceId)
+        }
+
+        override fun onCommentMoreActionClick(comment: BulletinboardMessage) {
+            context.findActivity().showPostMoreActionDialogBottomSheet(
+                postMessage = post,
+                postMoreActionType = PostMoreActionType.Comment,
+                onInteractClick = {
+                    when (it) {
+                        is PostInteract.Announcement -> TODO()
+                        is PostInteract.Delete -> {
+                            showCommentDeleteTip = Pair(true, comment)
+                        }
+                        is PostInteract.Edit -> TODO()
+                        is PostInteract.Report -> TODO()
+                    }
+                }
+            )
+        }
+
+        override fun onReplyMoreActionClick(comment: BulletinboardMessage) {
+            context.findActivity().showPostMoreActionDialogBottomSheet(
+                postMessage = post,
+                postMoreActionType = PostMoreActionType.Reply,
+                onInteractClick = {
+                    //todo
+                }
+            )
+        }
+    }
+
     PostInfoScreenView(
         modifier = modifier,
         post = postData,
-        onEmojiClick = { message, resourceId ->
-            viewModel.onEmojiClick(message, resourceId)
-        },
-        onCommentSend = {
-            viewModel.onCommentReplySend(it)
-            keyboard?.hide()
-        },
-        onBackClick = {
-            resultNavigator.navigateBack(viewModel.post.value)
-        },
         imageAttachList = imageAttachList,
-        onAttachClick = {
-            openImagePickDialog = true
-        },
-        onDeleteAttach = {
-            viewModel.onDeleteAttach(it)
-        },
         comments = comments,
-        onCommentEmojiClick = { comment, resourceId ->
-            viewModel.onCommentEmojiClick(comment, resourceId)
-        },
-        onCommentReplyClick = {
-            viewModel.onCommentReplyClick(it)
-        },
         commentReply = commentReply,
-        onCommentReplyClose = {
-            viewModel.onCommentReplyClose()
-        },
         showLoading = (uiState == UiState.ShowLoading),
-        onReplyExpandClick = {
-            viewModel.onExpandOrCollapseClick(
-                channelId = channel.id.orEmpty(),
-                commentId = it.id.orEmpty()
-            )
-        },
         replyMapData = replyMapData.toMap(),
-        onCommentLoadMore = {
-            viewModel.onCommentLoadMore()
-        },
-        onLoadMoreReply = {
-            viewModel.onLoadMoreReply(it)
-        },
-        onReplyEmojiClick = { comment, reply, resourceId ->
-            viewModel.onReplyEmojiClick(comment, reply, resourceId)
-        }
+        postInfoListener = postInfoListener,
+        commentBottomContentListener = commentBottomContentListener
     )
 
     //圖片選擇
@@ -171,6 +240,22 @@ fun PostInfoScreen(
         )
     }
 
+    //==================== 彈窗提示 ====================
+    //是否刪留言
+    DeleteConfirmDialogScreen(
+        date = showCommentDeleteTip.second,
+        isShow = showCommentDeleteTip.first,
+        title = "確定刪除留言",
+        content = "留言刪除後，內容將會完全消失。",
+        onCancel = {
+            showCommentDeleteTip = showCommentDeleteTip.copy(first = false)
+        },
+        onConfirm = {
+            showCommentDeleteTip = showCommentDeleteTip.copy(first = false)
+            viewModel.onDeleteComment(it)
+        }
+    )
+
     BackHandler {
         resultNavigator.navigateBack(viewModel.post.value)
     }
@@ -180,26 +265,14 @@ fun PostInfoScreen(
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
     post: BulletinboardMessage,
-    onEmojiClick: (BulletinboardMessage, Int) -> Unit,
-    onCommentSend: (text: String) -> Unit,
-    onBackClick: () -> Unit,
     imageAttachList: List<Uri>,
-    onAttachClick: () -> Unit,
-    onDeleteAttach: (Uri) -> Unit,
     comments: List<BulletinboardMessage>,
-    onCommentEmojiClick: (BulletinboardMessage, Int) -> Unit,
-    onCommentReplyClick: (BulletinboardMessage) -> Unit,
     commentReply: BulletinboardMessage?,
-    onCommentReplyClose: () -> Unit,
     showLoading: Boolean,
-    onReplyExpandClick: (BulletinboardMessage) -> Unit,
     replyMapData: Map<String, ReplyData>,
-    onCommentLoadMore: () -> Unit,
-    onLoadMoreReply: (BulletinboardMessage) -> Unit,
-    onReplyEmojiClick: (BulletinboardMessage, BulletinboardMessage, Int) -> Unit
+    postInfoListener: PostInfoListener,
+    commentBottomContentListener: CommentBottomContentListener
 ) {
-    val context = LocalContext.current
-
     val listState = rememberLazyListState()
 
     Scaffold(
@@ -210,7 +283,7 @@ private fun PostInfoScreenView(
                 title = "貼文",
                 moreEnable = false,
                 backClick = {
-                    onBackClick.invoke()
+                    postInfoListener.onBackClick()
                 }
             )
         },
@@ -234,16 +307,10 @@ private fun PostInfoScreenView(
                                 )
                             },
                             onMoreClick = {
-                                //TODO
-                                context.findActivity().showPostMoreActionDialogBottomSheet(
-                                    postMessage = post,
-                                    onInteractClick = {
-                                        //todo
-                                    }
-                                )
+                                postInfoListener.onPostMoreClick(post)
                             },
                             onEmojiClick = {
-                                onEmojiClick.invoke(post, it)
+                                postInfoListener.onEmojiClick(post, it)
                             }
                         )
                     }
@@ -275,25 +342,38 @@ private fun PostInfoScreenView(
 
                     //留言內容
                     items(comments) { comment ->
-                        BasePostContentScreen(
-                            post = comment,
-                            defaultDisplayLine = Int.MAX_VALUE,
-                            contentModifier = Modifier.padding(start = 40.dp),
-                            hasMoreAction = false,
-                            bottomContent = {
-                                CommentBottomContent(
-                                    comment = comment,
-                                    onCommentReplyClick = onCommentReplyClick,
-                                    onExpandClick = onReplyExpandClick,
-                                    reply = replyMapData[comment.id],
-                                    onLoadMoreReply = onLoadMoreReply,
-                                    onReplyEmojiClick = onReplyEmojiClick
-                                )
-                            },
-                            onEmojiClick = {
-                                onCommentEmojiClick.invoke(comment, it)
-                            }
-                        )
+                        //如果被刪除
+                        if (comment.isDeleted == true) {
+                            BaseDeletedContentScreen(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(LocalColor.current.background)
+                                    .padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 5.dp),
+                                title = "這則留言已被刪除",
+                                content = "已經刪除的留言，你是看不到的！"
+                            )
+                        }
+                        else {
+                            BasePostContentScreen(
+                                post = comment,
+                                defaultDisplayLine = Int.MAX_VALUE,
+                                contentModifier = Modifier.padding(start = 40.dp),
+                                hasMoreAction = true,
+                                bottomContent = {
+                                    CommentBottomContent(
+                                        comment = comment,
+                                        reply = replyMapData[comment.id],
+                                        listener = commentBottomContentListener
+                                    )
+                                },
+                                onEmojiClick = {
+                                    postInfoListener.onCommentEmojiClick(comment, it)
+                                },
+                                onMoreClick = {
+                                    commentBottomContentListener.onCommentMoreActionClick(comment)
+                                }
+                            )
+                        }
                     }
                 }
 
@@ -307,7 +387,7 @@ private fun PostInfoScreenView(
                             .background(LocalColor.current.env_100),
                         comment = it,
                     ) {
-                        onCommentReplyClose.invoke()
+                        postInfoListener.onCommentReplyClose()
                     }
                 }
 
@@ -317,15 +397,21 @@ private fun PostInfoScreenView(
                         .fillMaxWidth()
                         .background(MaterialTheme.colors.primary),
                     imageAttach = imageAttachList,
-                    onDelete = onDeleteAttach,
-                    onAdd = onAttachClick
+                    onDelete = {
+                        postInfoListener.onDeleteAttach(it)
+                    },
+                    onAdd = {
+                        postInfoListener.onAttachClick()
+                    }
                 )
 
                 //輸入匡
                 MessageInput(
-                    onMessageSend = onCommentSend,
+                    onMessageSend = {
+                        postInfoListener.onCommentSend(it)
+                    },
                     onAttachClick = {
-                        onAttachClick.invoke()
+                        postInfoListener.onAttachClick()
                     },
                     showOnlyBasicPermissionTip = {
                     }
@@ -343,7 +429,7 @@ private fun PostInfoScreenView(
     }
 
     listState.OnBottomReached {
-        onCommentLoadMore.invoke()
+        postInfoListener.onCommentLoadMore()
     }
 }
 
@@ -354,14 +440,13 @@ private fun PostInfoScreenView(
 private fun CommentBottomContent(
     comment: BulletinboardMessage,
     reply: ReplyData?,
-    onCommentReplyClick: (BulletinboardMessage) -> Unit,
-    onExpandClick: (BulletinboardMessage) -> Unit,
-    onLoadMoreReply: (BulletinboardMessage) -> Unit,
-    onReplyEmojiClick: (BulletinboardMessage, BulletinboardMessage, Int) -> Unit
+    listener: CommentBottomContentListener
 ) {
     Column {
         //貼文留言,底部 n天前, 回覆
-        CommentBottomView(comment, onCommentReplyClick)
+        CommentBottomView(comment) {
+            listener.onCommentReplyClick(it)
+        }
 
         if (comment.commentCount != 0) {
             Spacer(modifier = Modifier.height(15.dp))
@@ -369,7 +454,7 @@ private fun CommentBottomContent(
             Row(
                 modifier = Modifier
                     .clickable {
-                        onExpandClick.invoke(comment)
+                        listener.onExpandClick(comment)
                     }
                     .padding(top = 10.dp, bottom = 10.dp, end = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -397,24 +482,39 @@ private fun CommentBottomContent(
         if (reply != null && reply.replyList.isNotEmpty()) {
             Spacer(modifier = Modifier.height(5.dp))
 
+            //回覆 清單 內容
             reply.replyList.forEach { item ->
-                BasePostContentScreen(
-                    post = item,
-                    defaultDisplayLine = Int.MAX_VALUE,
-                    contentModifier = Modifier.padding(start = 40.dp),
-                    hasMoreAction = false,
-                    backgroundColor = Color.Transparent,
-                    bottomContent = {
-                        Text(
-                            text = item.displayPostTime(),
-                            fontSize = 14.sp,
-                            color = LocalColor.current.text.default_100
-                        )
-                    },
-                    onEmojiClick = {
-                        onReplyEmojiClick.invoke(comment, item, it)
-                    }
-                )
+                if (item.isDeleted == true) {
+                    BaseDeletedContentScreen(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp, start = 20.dp, bottom = 5.dp),
+                        title = "這則回覆已被本人刪除",
+                        content = "已經刪除的回覆，你是看不到的！"
+                    )
+                }
+                else {
+                    BasePostContentScreen(
+                        post = item,
+                        defaultDisplayLine = Int.MAX_VALUE,
+                        contentModifier = Modifier.padding(start = 40.dp),
+                        hasMoreAction = true,
+                        backgroundColor = Color.Transparent,
+                        bottomContent = {
+                            Text(
+                                text = item.displayPostTime(),
+                                fontSize = 14.sp,
+                                color = LocalColor.current.text.default_100
+                            )
+                        },
+                        onEmojiClick = {
+                            listener.onReplyEmojiClick(comment, item, it)
+                        },
+                        onMoreClick = {
+                            listener.onReplyMoreActionClick(item)
+                        }
+                    )
+                }
             }
 
             //如果有分頁,顯示更多留言
@@ -426,7 +526,7 @@ private fun CommentBottomContent(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
                         ) {
-                            onLoadMoreReply.invoke(comment)
+                            listener.onLoadMoreReply(comment)
                         }
                         .padding(start = 40.dp),
                     text = "顯示更多",
@@ -444,13 +544,10 @@ fun CommentBottomContentPreview() {
     FanciTheme {
         CommentBottomContent(
             BulletinboardMessage(),
-            onCommentReplyClick = {},
-            onExpandClick = {},
             reply = ReplyData(
                 emptyList(), false
             ),
-            onLoadMoreReply = {},
-            onReplyEmojiClick = { _, _, _ -> }
+            listener = EmptyCommentBottomContentListener
         )
     }
 }
@@ -538,32 +635,125 @@ fun CommentReplayScreenPreview() {
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun PostInfoScreenPreview() {
     FanciTheme {
         PostInfoScreenView(
             post = PostViewModel.mockPost,
-            onEmojiClick = { post, resourceId ->
-            },
-            onCommentSend = {},
-            onBackClick = {},
             imageAttachList = emptyList(),
-            onAttachClick = {},
-            onDeleteAttach = {},
             comments = emptyList(),
-            onCommentEmojiClick = { post, resourceId ->
-            },
-            onCommentReplyClick = {},
             commentReply = null,
-            onCommentReplyClose = {},
             showLoading = false,
-            onReplyExpandClick = {},
             replyMapData = hashMapOf(),
-            onCommentLoadMore = {},
-            onLoadMoreReply = {},
-            onReplyEmojiClick = { _, _, _ -> }
+            postInfoListener = EmptyPostInfoListener,
+            commentBottomContentListener = EmptyCommentBottomContentListener
         )
+    }
+}
+
+//==================== Callback ====================
+interface PostInfoListener {
+    fun onEmojiClick(comment: BulletinboardMessage, resourceId: Int)
+
+    //送出留言
+    fun onCommentSend(text: String)
+
+    //點擊返回
+    fun onBackClick()
+
+    //點擊附加圖片
+    fun onAttachClick()
+
+    //刪除附加圖片
+    fun onDeleteAttach(uri: Uri)
+
+    //點擊留言的 Emoji
+    fun onCommentEmojiClick(comment: BulletinboardMessage, resourceId: Int)
+
+    //關閉回覆UI
+    fun onCommentReplyClose()
+
+    //讀取更多留言
+    fun onCommentLoadMore()
+
+    //文章點擊更多
+    fun onPostMoreClick(post: BulletinboardMessage)
+}
+
+interface CommentBottomContentListener {
+    //點擊 回覆按鈕
+    fun onCommentReplyClick(comment: BulletinboardMessage)
+
+    //點擊 展開/隱藏
+    fun onExpandClick(comment: BulletinboardMessage)
+
+    //點擊 讀取更多回覆
+    fun onLoadMoreReply(comment: BulletinboardMessage)
+
+    //點擊 Emoji
+    fun onReplyEmojiClick(
+        comment: BulletinboardMessage,
+        reply: BulletinboardMessage,
+        resourceId: Int
+    )
+
+    //點擊 留言的更多
+    fun onCommentMoreActionClick(comment: BulletinboardMessage)
+
+    //點擊 回覆的更多
+    fun onReplyMoreActionClick(comment: BulletinboardMessage)
+}
+
+object EmptyPostInfoListener : PostInfoListener {
+    override fun onEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
+    }
+
+    override fun onCommentSend(text: String) {
+    }
+
+    override fun onBackClick() {
+    }
+
+    override fun onAttachClick() {
+    }
+
+    override fun onDeleteAttach(uri: Uri) {
+    }
+
+    override fun onCommentEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
+    }
+
+    override fun onCommentReplyClose() {
+    }
+
+    override fun onCommentLoadMore() {
+    }
+
+    override fun onPostMoreClick(post: BulletinboardMessage) {
+    }
+}
+
+object EmptyCommentBottomContentListener : CommentBottomContentListener {
+    override fun onCommentReplyClick(comment: BulletinboardMessage) {
+    }
+
+    override fun onExpandClick(comment: BulletinboardMessage) {
+    }
+
+    override fun onLoadMoreReply(comment: BulletinboardMessage) {
+    }
+
+    override fun onReplyEmojiClick(
+        comment: BulletinboardMessage,
+        reply: BulletinboardMessage,
+        resourceId: Int
+    ) {
+    }
+
+    override fun onCommentMoreActionClick(comment: BulletinboardMessage) {
+    }
+
+    override fun onReplyMoreActionClick(comment: BulletinboardMessage) {
     }
 }

@@ -44,6 +44,7 @@ import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
+import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -90,6 +91,7 @@ fun PostScreen(
         onMoreClick = {
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = it,
+                postMoreActionType = PostMoreActionType.Post,
                 onInteractClick = {
                     //todo
                 }

@@ -46,8 +46,9 @@ class PostViewModel(
                 nextWeight = it.nextWeight
 
                 val postList = _post.value.toMutableList()
-
-                postList.addAll(it.items.orEmpty())
+                postList.addAll(it.items?.filter { post ->
+                    post.isDeleted != true
+                }.orEmpty())
 
                 _post.value = postList
             }, {

@@ -166,9 +166,8 @@ private fun ChannelScreenView(
             }
         }
         else {
-            Text(text = "No Tab Display")
+//            Text(text = "No Tab Display")
         }
-
     }
 }
 

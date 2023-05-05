@@ -16,6 +16,7 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
+import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.ColorPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.InteractBottomSheet
@@ -73,6 +74,7 @@ fun Activity.showColorPickerDialogBottomSheet(
  */
 fun Activity.showPostMoreActionDialogBottomSheet(
     postMessage: BulletinboardMessage,
+    postMoreActionType: PostMoreActionType,
     onInteractClick: (PostInteract) -> Unit
 ) {
     val viewGroup = this.findViewById(android.R.id.content) as ViewGroup
@@ -86,6 +88,7 @@ fun Activity.showPostMoreActionDialogBottomSheet(
                             parent = viewGroup,
                             composeView = this,
                             postMessage = postMessage,
+                            postMoreActionType = postMoreActionType,
                             onInteractClick = onInteractClick
                         )
                     }
