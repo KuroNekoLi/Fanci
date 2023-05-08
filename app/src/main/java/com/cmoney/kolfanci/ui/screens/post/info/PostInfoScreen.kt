@@ -27,6 +27,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -71,6 +72,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -129,6 +131,9 @@ fun PostInfoScreen(
 
     //回覆資料
     val replyMapData by viewModel.replyMap.collectAsState()
+
+    //輸入匡預設值
+    val inputText by viewModel.inputText.collectAsState()
 
     //Control keyboard
     val keyboard = LocalSoftwareKeyboardController.current
@@ -215,7 +220,11 @@ fun PostInfoScreen(
                             showCommentDeleteTip = Pair(true, comment)
                         }
 
-                        is PostInteract.Edit -> TODO()
+                        is PostInteract.Edit -> {
+                            viewModel.onEditCommentClick(
+                                comment = comment,
+                            )
+                        }
                         is PostInteract.Report -> TODO()
                     }
                 }
@@ -236,7 +245,13 @@ fun PostInfoScreen(
                             showReplyDeleteTip = Triple(true, comment, reply)
                         }
 
-                        is PostInteract.Edit -> TODO()
+                        is PostInteract.Edit -> {
+                            viewModel.onEditReplyClick(
+                                comment = comment,
+                                reply = reply
+                            )
+                        }
+
                         is PostInteract.Report -> TODO()
                     }
                 }
@@ -253,7 +268,8 @@ fun PostInfoScreen(
         showLoading = (uiState == UiState.ShowLoading),
         replyMapData = replyMapData.toMap(),
         postInfoListener = postInfoListener,
-        commentBottomContentListener = commentBottomContentListener
+        commentBottomContentListener = commentBottomContentListener,
+        inputText = inputText
     )
 
     //圖片選擇
@@ -323,7 +339,8 @@ private fun PostInfoScreenView(
     showLoading: Boolean,
     replyMapData: Map<String, ReplyData>,
     postInfoListener: PostInfoListener,
-    commentBottomContentListener: CommentBottomContentListener
+    commentBottomContentListener: CommentBottomContentListener,
+    inputText: String
 ) {
     val listState = rememberLazyListState()
 
@@ -462,16 +479,19 @@ private fun PostInfoScreenView(
                 )
 
                 //輸入匡
-                MessageInput(
-                    onMessageSend = {
-                        postInfoListener.onCommentSend(it)
-                    },
-                    onAttachClick = {
-                        postInfoListener.onAttachClick()
-                    },
-                    showOnlyBasicPermissionTip = {
-                    }
-                )
+                key(inputText) {
+                    MessageInput(
+                        defaultText = inputText,
+                        onMessageSend = {
+                            postInfoListener.onCommentSend(it)
+                        },
+                        onAttachClick = {
+                            postInfoListener.onAttachClick()
+                        },
+                        showOnlyBasicPermissionTip = {
+                        }
+                    )
+                }
             }
 
             if (showLoading) {
@@ -705,7 +725,8 @@ fun PostInfoScreenPreview() {
             showLoading = false,
             replyMapData = hashMapOf(),
             postInfoListener = EmptyPostInfoListener,
-            commentBottomContentListener = EmptyCommentBottomContentListener
+            commentBottomContentListener = EmptyCommentBottomContentListener,
+            inputText = ""
         )
     }
 }

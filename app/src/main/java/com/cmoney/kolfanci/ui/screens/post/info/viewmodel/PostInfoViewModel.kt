@@ -8,6 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
+import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.extension.EmptyBodyException
@@ -61,6 +64,10 @@ class PostInfoViewModel(
         MutableStateFlow<SnapshotStateMap<String, ReplyData>>(SnapshotStateMap())
     val replyMap = _replyMap.asStateFlow()
 
+    //輸入匡 文字
+    private val _inputText: MutableStateFlow<String> = MutableStateFlow("")
+    val inputText = _inputText.asStateFlow()
+
     private val haveNextPageMap = hashMapOf<String, Boolean>() //紀錄是否有分頁
     private val nextWeightMap = hashMapOf<String, Long?>() //紀錄 分頁索引值
 
@@ -69,6 +76,9 @@ class PostInfoViewModel(
 
     //紀錄目前展開狀態
     private val replyExpandState = hashMapOf<String, Boolean>()
+
+    //目前正在編輯的訊息
+    private var currentEditMessage: BulletinboardMessage? = null
 
     init {
         fetchComment(
@@ -231,46 +241,130 @@ class PostInfoViewModel(
             //是否為回覆
             val isReply = _commentReply.value != null
 
-            postUseCase.writeComment(
-                channelId = channel.id.orEmpty(),
-                messageId = message.id.orEmpty(),
-                text = text,
-                images = images
-            ).fold({
-                dismissLoading()
-                onCommentReplyClose()
+            //是否為編輯
+            if (currentEditMessage != null) {
+                updateEditMessage(
+                    text, images, isReply
+                )
+            } else {
+                postUseCase.writeComment(
+                    channelId = channel.id.orEmpty(),
+                    messageId = message.id.orEmpty(),
+                    text = text,
+                    images = images
+                ).fold({
+                    dismissLoading()
+                    onCommentReplyClose()
 
-                KLog.i(TAG, "writeComment success.")
+                    KLog.i(TAG, "writeComment success.")
 
-                //如果是回覆, 將回覆資料寫回
-                if (isReply) {
-                    val replyData = _replyMap.value[message.id.orEmpty()]
-                    replyData?.let { replyData ->
-                        val replyList = replyData.replyList.toMutableList()
-                        replyList.add(it)
-                        _replyMap.value[message.id.orEmpty()] = replyData.copy(
-                            replyList = replyList
-                        )
-                    } ?: kotlin.run {
-                        //empty case
-                        _replyMap.value[message.id.orEmpty()] = ReplyData(
-                            replyList = listOf(it),
-                            haveMore = false
-                        )
+                    //如果是回覆, 將回覆資料寫回
+                    if (isReply) {
+                        val replyData = _replyMap.value[message.id.orEmpty()]
+                        replyData?.let { replyData ->
+                            val replyList = replyData.replyList.toMutableList()
+                            replyList.add(it)
+                            _replyMap.value[message.id.orEmpty()] = replyData.copy(
+                                replyList = replyList
+                            )
+                        } ?: kotlin.run {
+                            //empty case
+                            _replyMap.value[message.id.orEmpty()] = ReplyData(
+                                replyList = listOf(it),
+                                haveMore = false
+                            )
+                        }
+                    } else {
+                        val comments = _comment.value.toMutableList()
+                        comments.add(it)
+                        _comment.value = comments
                     }
-                } else {
-                    val comments = _comment.value.toMutableList()
-                    comments.add(it)
-                    _comment.value = comments
-                }
 
-            }, {
-                dismissLoading()
-                onCommentReplyClose()
+                }, {
+                    dismissLoading()
+                    onCommentReplyClose()
 
-                it.printStackTrace()
-                KLog.e(TAG, it)
-            })
+                    it.printStackTrace()
+                    KLog.e(TAG, it)
+                })
+            }
+        }
+    }
+
+    /**
+     * 編輯 更新資料
+     */
+    private fun updateEditMessage(text: String, images: List<String>, isReply: Boolean) {
+        KLog.i(TAG, "updateMessage")
+        viewModelScope.launch {
+            //看是 回覆 or 留言
+            val message = _commentReply.value ?: bulletinboardMessage
+
+            currentEditMessage?.let { currentEditMessage ->
+                this@PostInfoViewModel.currentEditMessage = null
+
+                chatRoomUseCase.updateMessage(
+                    messageId = currentEditMessage.id.orEmpty(),
+                    text = text,
+                    images = images
+                ).fold({
+                }, {
+                    if (it is EmptyBodyException) {
+                        //如果是回覆, 將回覆資料寫回
+                        if (isReply) {
+                            val replyData = _replyMap.value[message.id] ?: ReplyData(
+                                replyList = emptyList(),
+                                haveMore = false
+                            )
+                            val replyList = replyData.replyList.map {
+                                if (it.id == currentEditMessage.id) {
+                                    currentEditMessage.copy(
+                                        content = MediaIChatContent(
+                                            text = text,
+                                            medias = images.map { image ->
+                                                Media(
+                                                    resourceLink = image,
+                                                    type = MediaType.image
+                                                )
+                                            }
+                                        )
+                                    )
+                                } else {
+                                    it
+                                }
+                            }
+
+                            _replyMap.value[message.id.orEmpty()] = replyData.copy(
+                                replyList = replyList
+                            )
+                        } else {
+                            //更新回覆
+                            _comment.value = _comment.value.map {
+                                if (it.id == message.id) {
+                                    currentEditMessage.copy(
+                                        content = MediaIChatContent(
+                                            text = text,
+                                            medias = images.map { image ->
+                                                Media(
+                                                    resourceLink = image,
+                                                    type = MediaType.image
+                                                )
+                                            }
+                                        )
+                                    )
+                                }
+                                else {
+                                    it
+                                }
+                            }
+                        }
+                    }
+                    dismissLoading()
+                    onCommentReplyClose()
+                    it.printStackTrace()
+                    KLog.e(TAG, it)
+                })
+            }
         }
     }
 
@@ -408,7 +502,34 @@ class PostInfoViewModel(
     fun onCommentReplyClose() {
         KLog.i(TAG, "onCommentReplyClose")
         _commentReply.value = null
+        _inputText.value = ""
     }
+
+    /**
+     * 點擊 編輯留言
+     */
+    fun onEditCommentClick(comment: BulletinboardMessage) {
+        KLog.i(TAG, "onEditCommentClick:$comment")
+        currentEditMessage = comment
+        _inputText.value = comment.content?.text.orEmpty()
+        _imageAttach.value = comment.content?.medias?.map {
+            Uri.parse(it.resourceLink)
+        }.orEmpty()
+    }
+
+    /**
+     * 點擊 編輯回覆
+     */
+    fun onEditReplyClick(comment: BulletinboardMessage, reply: BulletinboardMessage) {
+        KLog.i(TAG, "onEditReplyClick.")
+        currentEditMessage = reply
+        onCommentReplyClick(comment)
+        _inputText.value = reply.content?.text.orEmpty()
+        _imageAttach.value = reply.content?.medias?.map {
+            Uri.parse(it.resourceLink)
+        }.orEmpty()
+    }
+
 
     /**
      * 留言 讀取更多

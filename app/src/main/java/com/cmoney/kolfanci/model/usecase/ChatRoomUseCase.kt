@@ -17,6 +17,30 @@ class ChatRoomUseCase(
     private val TAG = ChatRoomUseCase::class.java.simpleName
 
     /**
+     * 更新訊息
+     */
+    suspend fun updateMessage(messageId: String,
+                              text: String,
+                              images: List<String> = emptyList()
+        ) = kotlin.runCatching {
+
+        val chatMessageParam = ChatMessageParam(
+            text = text,
+            messageType = MessageType.textMessage,
+            medias = images.map {
+                Media(
+                    resourceLink = it,
+                    type = MediaType.image
+                )
+            }
+        )
+        messageApi.apiV1MessageMessageIdPut(
+            messageId = messageId,
+            chatMessageParam = chatMessageParam
+        ).checkResponseBody()
+    }
+
+    /**
      * 刪除他人訊息
      */
     suspend fun deleteOtherMessage(messageId: String) = kotlin.runCatching {
