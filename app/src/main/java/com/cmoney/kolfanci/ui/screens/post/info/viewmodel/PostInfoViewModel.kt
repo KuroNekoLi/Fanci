@@ -338,9 +338,9 @@ class PostInfoViewModel(
                                 replyList = replyList
                             )
                         } else {
-                            //更新回覆
+                            //更新留言
                             _comment.value = _comment.value.map {
-                                if (it.id == message.id) {
+                                if (it.id == currentEditMessage.id) {
                                     currentEditMessage.copy(
                                         content = MediaIChatContent(
                                             text = text,
