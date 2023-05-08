@@ -251,9 +251,14 @@ class PostInfoViewModel(
                         _replyMap.value[message.id.orEmpty()] = replyData.copy(
                             replyList = replyList
                         )
+                    } ?: kotlin.run {
+                        //empty case
+                        _replyMap.value[message.id.orEmpty()] = ReplyData(
+                            replyList = listOf(it),
+                            haveMore = false
+                        )
                     }
-                }
-                else {
+                } else {
                     val comments = _comment.value.toMutableList()
                     comments.add(it)
                     _comment.value = comments
@@ -470,45 +475,89 @@ class PostInfoViewModel(
         }
     }
 
+
     /**
-     * 刪除留言
+     * 刪除留言 or 回覆
+     *
+     * @param comment 要刪除資料
+     * @param isComment 是否為留言否則為回覆
      */
-    fun onDeleteComment(comment: Any?) {
-        KLog.i(TAG, "onDeleteComment:$comment")
+    fun onDeleteCommentOrReply(comment: Any?, reply: Any?, isComment: Boolean) {
+        KLog.i(TAG, "onDeleteCommentOrReply:$isComment,  $comment")
         comment?.let { comment ->
             if (comment is BulletinboardMessage) {
                 viewModelScope.launch {
+                    val deleteId = if (isComment) {
+                        comment.id
+                    } else {
+                        if (reply is BulletinboardMessage) {
+                            reply.id
+                        } else {
+                            ""
+                        }
+                    }
 
-                    //TODO 優化
-                    //我的留言
+                    //我發的
                     if (comment.isMyPost(Constant.MyInfo)) {
-                        chatRoomUseCase.takeBackMyMessage(comment.id.orEmpty()).fold({
-                        },{
+                        KLog.i(TAG, "delete my comment.")
+                        chatRoomUseCase.takeBackMyMessage(deleteId.orEmpty()).fold({
+                        }, {
                             if (it is EmptyBodyException) {
-                                _comment.value = _comment.value.filter {
-                                    it.id != comment.id
+                                if (isComment) {
+                                    deleteComment(comment)
+                                } else {
+                                    deleteReply(comment, reply)
                                 }
+                            } else {
+                                it.printStackTrace()
                             }
-                            else {
+                        })
+                    } else {
+                        KLog.i(TAG, "delete other comment.")
+                        //他人
+                        chatRoomUseCase.deleteOtherMessage(deleteId.orEmpty()).fold({
+                        }, {
+                            if (it is EmptyBodyException) {
+                                if (isComment) {
+                                    deleteComment(comment)
+                                } else {
+                                    deleteReply(comment, reply)
+                                }
+                            } else {
                                 it.printStackTrace()
                             }
                         })
                     }
-                    //他人
-                    else {
-                        chatRoomUseCase.deleteOtherMessage(comment.id.orEmpty()).fold({
-                        },{
-                            if (it is EmptyBodyException) {
-                                _comment.value = _comment.value.filter {
-                                    it.id != comment.id
-                                }
-                            }
-                            else {
-                                it.printStackTrace()
-                            }
-                        })
-                    }
+                }
+            }
+        }
+    }
 
+    /**
+     * 刪除 留言
+     */
+    private fun deleteComment(comment: BulletinboardMessage) {
+        KLog.i(TAG, "deleteComment:$comment")
+        _comment.value = _comment.value.filter {
+            it.id != comment.id
+        }
+    }
+
+    /**
+     * 刪除 回覆
+     */
+    private fun deleteReply(comment: BulletinboardMessage, reply: Any?) {
+        KLog.i(TAG, "deleteReply:$reply")
+        reply?.let {
+            if (reply is BulletinboardMessage) {
+                val replyData = _replyMap.value[comment.id]
+                replyData?.let { replyData ->
+                    val filterReplyList = replyData.replyList.filter {
+                        it.id != reply.id
+                    }
+                    _replyMap.value[comment.id.orEmpty()] = replyData.copy(
+                        replyList = filterReplyList
+                    )
                 }
             }
         }

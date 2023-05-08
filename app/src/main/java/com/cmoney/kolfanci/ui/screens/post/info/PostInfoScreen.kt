@@ -91,7 +91,24 @@ fun PostInfoScreen(
 ) {
     val context = LocalContext.current
 
-    var showCommentDeleteTip by remember { mutableStateOf(Pair<Boolean, BulletinboardMessage?>(false, null)) }
+    var showCommentDeleteTip by remember {
+        mutableStateOf(
+            Pair<Boolean, BulletinboardMessage?>(
+                false,
+                null
+            )
+        )
+    }
+    var showReplyDeleteTip by remember {
+        mutableStateOf(
+            //isShow, comment, reply
+            Triple<Boolean, BulletinboardMessage?, BulletinboardMessage?>(
+                false,
+                null,
+                null
+            )
+        )
+    }
 
     //貼文資料
     val postData by viewModel.post.collectAsState()
@@ -197,6 +214,7 @@ fun PostInfoScreen(
                         is PostInteract.Delete -> {
                             showCommentDeleteTip = Pair(true, comment)
                         }
+
                         is PostInteract.Edit -> TODO()
                         is PostInteract.Report -> TODO()
                     }
@@ -204,12 +222,23 @@ fun PostInfoScreen(
             )
         }
 
-        override fun onReplyMoreActionClick(comment: BulletinboardMessage) {
+        override fun onReplyMoreActionClick(
+            comment: BulletinboardMessage,
+            reply: BulletinboardMessage
+        ) {
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Reply,
                 onInteractClick = {
-                    //todo
+                    when (it) {
+                        is PostInteract.Announcement -> TODO()
+                        is PostInteract.Delete -> {
+                            showReplyDeleteTip = Triple(true, comment, reply)
+                        }
+
+                        is PostInteract.Edit -> TODO()
+                        is PostInteract.Report -> TODO()
+                    }
                 }
             )
         }
@@ -252,7 +281,30 @@ fun PostInfoScreen(
         },
         onConfirm = {
             showCommentDeleteTip = showCommentDeleteTip.copy(first = false)
-            viewModel.onDeleteComment(it)
+            viewModel.onDeleteCommentOrReply(
+                comment = showReplyDeleteTip.second,
+                reply = null,
+                isComment = false
+            )
+        }
+    )
+
+    //是否刪回覆
+    DeleteConfirmDialogScreen(
+        date = Pair(showReplyDeleteTip.second, showReplyDeleteTip.third),
+        isShow = showReplyDeleteTip.first,
+        title = "確定刪除回覆",
+        content = "回覆刪除後，內容將會完全消失。",
+        onCancel = {
+            showReplyDeleteTip = showReplyDeleteTip.copy(first = false)
+        },
+        onConfirm = {
+            showReplyDeleteTip = showReplyDeleteTip.copy(first = false)
+            viewModel.onDeleteCommentOrReply(
+                comment = showReplyDeleteTip.second,
+                reply = showReplyDeleteTip.third,
+                isComment = false
+            )
         }
     )
 
@@ -348,12 +400,16 @@ private fun PostInfoScreenView(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(LocalColor.current.background)
-                                    .padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 5.dp),
+                                    .padding(
+                                        top = 10.dp,
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        bottom = 5.dp
+                                    ),
                                 title = "這則留言已被刪除",
                                 content = "已經刪除的留言，你是看不到的！"
                             )
-                        }
-                        else {
+                        } else {
                             BasePostContentScreen(
                                 post = comment,
                                 defaultDisplayLine = Int.MAX_VALUE,
@@ -483,8 +539,8 @@ private fun CommentBottomContent(
             Spacer(modifier = Modifier.height(5.dp))
 
             //回覆 清單 內容
-            reply.replyList.forEach { item ->
-                if (item.isDeleted == true) {
+            reply.replyList.forEach { reply ->
+                if (reply.isDeleted == true) {
                     BaseDeletedContentScreen(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -492,26 +548,28 @@ private fun CommentBottomContent(
                         title = "這則回覆已被本人刪除",
                         content = "已經刪除的回覆，你是看不到的！"
                     )
-                }
-                else {
+                } else {
                     BasePostContentScreen(
-                        post = item,
+                        post = reply,
                         defaultDisplayLine = Int.MAX_VALUE,
                         contentModifier = Modifier.padding(start = 40.dp),
                         hasMoreAction = true,
                         backgroundColor = Color.Transparent,
                         bottomContent = {
                             Text(
-                                text = item.displayPostTime(),
+                                text = reply.displayPostTime(),
                                 fontSize = 14.sp,
                                 color = LocalColor.current.text.default_100
                             )
                         },
                         onEmojiClick = {
-                            listener.onReplyEmojiClick(comment, item, it)
+                            listener.onReplyEmojiClick(comment, reply, it)
                         },
                         onMoreClick = {
-                            listener.onReplyMoreActionClick(item)
+                            listener.onReplyMoreActionClick(
+                                comment = comment,
+                                reply = reply
+                            )
                         }
                     )
                 }
@@ -702,7 +760,7 @@ interface CommentBottomContentListener {
     fun onCommentMoreActionClick(comment: BulletinboardMessage)
 
     //點擊 回覆的更多
-    fun onReplyMoreActionClick(comment: BulletinboardMessage)
+    fun onReplyMoreActionClick(comment: BulletinboardMessage, reply: BulletinboardMessage)
 }
 
 object EmptyPostInfoListener : PostInfoListener {
@@ -754,6 +812,9 @@ object EmptyCommentBottomContentListener : CommentBottomContentListener {
     override fun onCommentMoreActionClick(comment: BulletinboardMessage) {
     }
 
-    override fun onReplyMoreActionClick(comment: BulletinboardMessage) {
+    override fun onReplyMoreActionClick(
+        comment: BulletinboardMessage,
+        reply: BulletinboardMessage
+    ) {
     }
 }
