@@ -9,8 +9,11 @@ import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.clickCount
+import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.utils.Utils
@@ -138,7 +141,7 @@ class PostViewModel(
                     it.isDeleted != true
                 }
 
-            },{ err ->
+            }, { err ->
                 KLog.e(TAG, err)
                 err.printStackTrace()
                 //local update
@@ -150,6 +153,40 @@ class PostViewModel(
                     }
                 }
             })
+        }
+    }
+
+    fun onDeletePostClick(post: BulletinboardMessage) {
+        KLog.i(TAG, "deletePost:$post")
+        viewModelScope.launch {
+            //我發的
+            if (post.isMyPost(Constant.MyInfo)) {
+                KLog.i(TAG, "delete my comment.")
+                chatRoomUseCase.takeBackMyMessage(post.id.orEmpty()).fold({
+                }, {
+                    if (it is EmptyBodyException) {
+                        _post.value = _post.value.filter {
+                            it.id != post.id
+                        }
+                    } else {
+                        it.printStackTrace()
+                    }
+                })
+            } else {
+                KLog.i(TAG, "delete other comment.")
+                //他人
+                chatRoomUseCase.deleteOtherMessage(post.id.orEmpty()).fold({
+                }, {
+                    if (it is EmptyBodyException) {
+                        _post.value = _post.value.filter {
+                            it.id != post.id
+                        }
+                    } else {
+                        it.printStackTrace()
+                    }
+                })
+            }
+
         }
     }
 

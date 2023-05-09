@@ -26,7 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,8 +47,10 @@ import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
+import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -78,6 +83,15 @@ fun PostScreen(
     val postList by viewModel.post.collectAsState()
     val context = LocalContext.current
 
+    var showPostDeleteTip by remember {
+        mutableStateOf(
+            Pair<Boolean, BulletinboardMessage?>(
+                false,
+                null
+            )
+        )
+    }
+
     PostScreenView(
         modifier = modifier,
         postList = postList,
@@ -92,12 +106,19 @@ fun PostScreen(
                 )
             )
         },
-        onMoreClick = {
+        onMoreClick = { post ->
             context.findActivity().showPostMoreActionDialogBottomSheet(
-                postMessage = it,
+                postMessage = post,
                 postMoreActionType = PostMoreActionType.Post,
                 onInteractClick = {
-                    //todo
+                    when (it) {
+                        is PostInteract.Announcement -> TODO()
+                        is PostInteract.Delete -> {
+                            showPostDeleteTip = Pair(true, post)
+                        }
+                        is PostInteract.Edit -> TODO()
+                        is PostInteract.Report -> TODO()
+                    }
                 }
             )
         },
@@ -142,6 +163,23 @@ fun PostScreen(
         }
     }
 
+    //==================== 彈窗提示 ====================
+    //是否刪貼文
+    DeleteConfirmDialogScreen(
+        date = showPostDeleteTip.second,
+        isShow = showPostDeleteTip.first,
+        title = "確定刪除貼文",
+        content = "貼文刪除後，內容將會完全消失。",
+        onCancel = {
+            showPostDeleteTip = showPostDeleteTip.copy(first = false)
+        },
+        onConfirm = {
+            showPostDeleteTip = showPostDeleteTip.copy(first = false)
+            showPostDeleteTip.second?.let {
+                viewModel.onDeletePostClick(it)
+            }
+        }
+    )
 }
 
 @Composable
