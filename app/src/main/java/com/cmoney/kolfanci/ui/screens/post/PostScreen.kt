@@ -116,7 +116,15 @@ fun PostScreen(
                         is PostInteract.Delete -> {
                             showPostDeleteTip = Pair(true, post)
                         }
-                        is PostInteract.Edit -> TODO()
+                        is PostInteract.Edit -> {
+                            KLog.i(TAG, "PostInteract.Edit click.")
+                            navController.navigate(
+                                EditPostScreenDestination(
+                                    channelId = channel.id.orEmpty(),
+                                    editPost = post
+                                )
+                            )
+                        }
                         is PostInteract.Report -> TODO()
                     }
                 }
