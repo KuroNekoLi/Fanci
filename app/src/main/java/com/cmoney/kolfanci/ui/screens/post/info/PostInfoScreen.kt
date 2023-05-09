@@ -364,9 +364,9 @@ fun PostInfoScreen(
         onConfirm = {
             showCommentDeleteTip = showCommentDeleteTip.copy(first = false)
             viewModel.onDeleteCommentOrReply(
-                comment = showReplyDeleteTip.second,
+                comment = showCommentDeleteTip.second,
                 reply = null,
-                isComment = false
+                isComment = true
             )
         }
     )
