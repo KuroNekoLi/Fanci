@@ -2,11 +2,16 @@ package com.cmoney.kolfanci.ui.screens.post.edit.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import android.webkit.URLUtil
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
+import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.xlogin.XLoginHelper
@@ -21,15 +26,14 @@ import kotlinx.coroutines.withContext
 sealed class UiState {
     object ShowEditTip : UiState()
     object HideEditTip : UiState()
-
     object ShowLoading : UiState()
     object DismissLoading : UiState()
 }
 
-
 class EditPostViewModel(
     val context: Application,
     val postUseCase: PostUseCase,
+    val chatRoomUseCase: ChatRoomUseCase,
     val channelId: String
 ) : AndroidViewModel(context) {
 
@@ -155,6 +159,108 @@ class EditPostViewModel(
                     imageUploadCallback.complete(completeImageUrl)
                 }
             }
+        }
+    }
+
+    /**
+     * 編輯貼文,初始化資料至UI
+     */
+    fun editPost(editPost: BulletinboardMessage) {
+        KLog.i(TAG, "editPost:$editPost")
+        _attachImages.value = editPost.content?.medias?.map {
+            Uri.parse(it.resourceLink)
+        }.orEmpty()
+    }
+
+    /**
+     * 更新貼文
+     */
+    fun onUpdatePostClick(editPost: BulletinboardMessage, text: String) {
+        KLog.i(TAG, "onUpdatePost:$text")
+        viewModelScope.launch {
+            if (text.isEmpty() && _attachImages.value.isEmpty()) {
+                showEditTip()
+                return@launch
+            }
+
+            loading()
+
+            //附加圖片, 獲取圖片 Url
+            val httpUrls = _attachImages.value.filter {
+                it.toString().startsWith("https")
+            }.map {
+                it.toString()
+            }.toMutableList()
+
+            val filesUri = _attachImages.value.filter {
+                !it.toString().startsWith("https")
+            }
+
+            if (filesUri.isNotEmpty()) {
+                uploadImages(filesUri, object : MessageViewModel.ImageUploadCallback {
+                    override fun complete(images: List<String>) {
+                        KLog.i(TAG, "all image upload complete:" + images.size)
+                        httpUrls.addAll(images)
+
+                        onSendUpdatePost(
+                            editPost = editPost,
+                            text = text,
+                            images = httpUrls
+                        )
+                    }
+
+                    override fun onFailure(e: Throwable) {
+                        KLog.e(TAG, "onFailure:$e")
+                        dismissLoading()
+                    }
+                })
+                _attachImages.value = emptyList()
+            } else {
+                onSendUpdatePost(
+                    editPost = editPost,
+                    text = text,
+                    images = httpUrls
+                )
+            }
+        }
+    }
+
+    /**
+     * 更新貼文
+     *
+     * @param editPost 被編輯的貼文
+     * @param text 內文
+     * @param images 附加圖片
+     */
+    private fun onSendUpdatePost(
+        editPost: BulletinboardMessage,
+        text: String,
+        images: List<String>
+    ) {
+        KLog.i(TAG, "onSendUpdatePost:$text")
+        viewModelScope.launch {
+            chatRoomUseCase.updateMessage(
+                messageId = editPost.id.orEmpty(),
+                text = text,
+                images = images
+            ).fold({
+            }, {
+                it.printStackTrace()
+                KLog.e(TAG, it)
+                if (it is EmptyBodyException) {
+                    _postSuccess.value = editPost.copy(
+                        content = editPost.content?.copy(
+                            text = text,
+                            medias = images.map { image ->
+                                Media(
+                                    resourceLink = image,
+                                    type = MediaType.image
+                                )
+                            }
+                        )
+                    )
+                }
+            })
         }
     }
 }

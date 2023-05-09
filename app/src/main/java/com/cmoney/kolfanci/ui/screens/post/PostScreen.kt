@@ -86,7 +86,11 @@ fun PostScreen(
         channel = channel,
         onPostClick = {
             //OnClick Method
-            navController.navigate(EditPostScreenDestination(channelId = channel.id.orEmpty()))
+            navController.navigate(
+                EditPostScreenDestination(
+                    channelId = channel.id.orEmpty()
+                )
+            )
         },
         onMoreClick = {
             context.findActivity().showPostMoreActionDialogBottomSheet(
@@ -206,7 +210,7 @@ private fun PostScreenView(
 fun CommentCount(
     navController: DestinationsNavigator? = null,
     post: BulletinboardMessage? = null,
-    channel: Channel? =null
+    channel: Channel? = null
 ) {
     Row(
         modifier = Modifier

@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.post.info.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import android.webkit.URLUtil
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -67,6 +68,10 @@ class PostInfoViewModel(
     //輸入匡 文字
     private val _inputText: MutableStateFlow<String> = MutableStateFlow("")
     val inputText = _inputText.asStateFlow()
+
+    //刪除貼文
+    private val _deletePost = MutableStateFlow<BulletinboardMessage?>(null)
+    val deletePost = _deletePost.asStateFlow()
 
     private val haveNextPageMap = hashMapOf<String, Boolean>() //紀錄是否有分頁
     private val nextWeightMap = hashMapOf<String, Long?>() //紀錄 分頁索引值
@@ -209,11 +214,22 @@ class PostInfoViewModel(
             loading()
 
             //附加圖片, 獲取圖片 Url
-            if (_imageAttach.value.isNotEmpty()) {
-                uploadImages(_imageAttach.value, object : MessageViewModel.ImageUploadCallback {
+            val httpUrls = _imageAttach.value.filter {
+                it.toString().startsWith("https")
+            }.map {
+                it.toString()
+            }.toMutableList()
+
+            val filesUri = _imageAttach.value.filter {
+                !it.toString().startsWith("https")
+            }
+
+            if (filesUri.isNotEmpty()) {
+                uploadImages(filesUri, object : MessageViewModel.ImageUploadCallback {
                     override fun complete(images: List<String>) {
                         KLog.i(TAG, "all image upload complete:" + images.size)
-                        sendCommentOrReply(text, images)
+                        httpUrls.addAll(images)
+                        sendCommentOrReply(text, httpUrls)
                     }
 
                     override fun onFailure(e: Throwable) {
@@ -682,6 +698,46 @@ class PostInfoViewModel(
                 }
             }
         }
+    }
+
+
+    /**
+     * 刪除貼文
+     */
+    fun onDeletePostClick(post: BulletinboardMessage) {
+        KLog.i(TAG, "onDeletePostClick:$post")
+        viewModelScope.launch {
+            //我發的
+            if (post.isMyPost(Constant.MyInfo)) {
+                KLog.i(TAG, "delete my comment.")
+                chatRoomUseCase.takeBackMyMessage(post.id.orEmpty()).fold({
+                }, {
+                    if (it is EmptyBodyException) {
+                        _deletePost.value = post
+                    } else {
+                        it.printStackTrace()
+                    }
+                })
+            } else {
+                KLog.i(TAG, "delete other comment.")
+                //他人
+                chatRoomUseCase.deleteOtherMessage(post.id.orEmpty()).fold({
+                }, {
+                    if (it is EmptyBodyException) {
+                        _deletePost.value = post
+                    } else {
+                        it.printStackTrace()
+                    }
+                })
+            }
+        }
+    }
+
+    /**
+     * 更新貼文
+     */
+    fun onUpdatePost(post: BulletinboardMessage) {
+        _post.value = post
     }
 
 }

@@ -10,6 +10,7 @@ import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.kolfanci.extension.clickCount
+import com.cmoney.kolfanci.extension.toBulletinboardMessage
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.utils.Utils
@@ -124,13 +125,31 @@ class PostViewModel(
     fun onUpdate(bulletinboardMessage: BulletinboardMessage) {
         KLog.i(TAG, "onUpdate:$bulletinboardMessage")
         viewModelScope.launch {
-            _post.value = _post.value.map {
-                if (it.id == bulletinboardMessage.id) {
-                    bulletinboardMessage
-                } else {
-                    it
+            chatRoomUseCase.getSingleMessage(
+                messageId = bulletinboardMessage.id.orEmpty()
+            ).fold({ result ->
+                _post.value = _post.value.map {
+                    if (it.id == result.id) {
+                        result.toBulletinboardMessage()
+                    } else {
+                        it
+                    }
+                }.filter {
+                    it.isDeleted != true
                 }
-            }
+
+            },{ err ->
+                KLog.e(TAG, err)
+                err.printStackTrace()
+                //local update
+                _post.value = _post.value.map {
+                    if (it.id == bulletinboardMessage.id) {
+                        bulletinboardMessage
+                    } else {
+                        it
+                    }
+                }
+            })
         }
     }
 

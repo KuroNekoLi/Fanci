@@ -69,6 +69,7 @@ fun EditPostScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     channelId: String,
+    editPost: BulletinboardMessage? = null,
     viewModel: EditPostViewModel = koinViewModel(
         parameters = {
             parametersOf(channelId)
@@ -88,8 +89,16 @@ fun EditPostScreen(
         mutableStateOf(false)
     }
 
+    //編輯貼文, 設定初始化資料
+    LaunchedEffect(Unit) {
+        if (editPost != null) {
+            viewModel.editPost(editPost)
+        }
+    }
+
     EditPostScreenView(
         modifier = modifier,
+        editPost = editPost,
         onShowImagePicker = {
             showImagePick = true
         },
@@ -97,8 +106,13 @@ fun EditPostScreen(
         onDeleteImage = {
             viewModel.onDeleteImageClick(it)
         },
-        onPostClick = {
-            viewModel.onPost(it)
+        onPostClick = { text ->
+            if (editPost != null) {
+                viewModel.onUpdatePostClick(editPost, text)
+            }
+            else {
+                viewModel.onPost(text)
+            }
         },
         onBack = {
             showSaveTip = true
@@ -169,6 +183,7 @@ fun EditPostScreen(
 @Composable
 private fun EditPostScreenView(
     modifier: Modifier = Modifier,
+    editPost: BulletinboardMessage? = null,
     onShowImagePicker: () -> Unit,
     attachImages: List<Uri>,
     onDeleteImage: (Uri) -> Unit,
@@ -176,7 +191,9 @@ private fun EditPostScreenView(
     onBack: () -> Unit,
     showLoading: Boolean
 ) {
-    var textState by remember { mutableStateOf("") }
+    val defaultContent = editPost?.content?.text.orEmpty() ?: ""
+
+    var textState by remember { mutableStateOf(defaultContent) }
     val focusRequester = remember { FocusRequester() }
     val showKeyboard = remember { mutableStateOf(true) }
     val keyboard = LocalSoftwareKeyboardController.current
@@ -185,6 +202,7 @@ private fun EditPostScreenView(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopBarView(
+                isEdit = (editPost != null),
                 backClick = {
                     onBack.invoke()
                 },
@@ -324,6 +342,7 @@ private fun EditPostScreenView(
 
 @Composable
 private fun TopBarView(
+    isEdit: Boolean,
     backClick: (() -> Unit)? = null,
     postClick: (() -> Unit)? = null
 ) {
@@ -341,7 +360,15 @@ private fun TopBarView(
                 )
             }
         },
-        title = { Text("發布貼文", fontSize = 17.sp, color = Color.White) },
+        title = {
+            Text(
+                if (isEdit) {
+                    "編輯貼文"
+                } else {
+                    "發布貼文"
+                }, fontSize = 17.sp, color = Color.White
+            )
+        },
         backgroundColor = LocalColor.current.env_100,
         contentColor = Color.White,
         trailing = {

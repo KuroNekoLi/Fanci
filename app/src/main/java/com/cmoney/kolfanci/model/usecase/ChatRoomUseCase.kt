@@ -1,10 +1,10 @@
 package com.cmoney.kolfanci.model.usecase
 
-import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.api.UserReportApi
 import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.kolfanci.extension.checkResponseBody
 import com.socks.library.KLog
 import kotlin.random.Random
 
@@ -17,12 +17,22 @@ class ChatRoomUseCase(
     private val TAG = ChatRoomUseCase::class.java.simpleName
 
     /**
+     * 取得單一訊息
+     */
+    suspend fun getSingleMessage(messageId: String) = kotlin.runCatching {
+        messageApi.apiV1MessageMessageIdGet(
+            messageId = messageId
+        ).checkResponseBody()
+    }
+
+    /**
      * 更新訊息
      */
-    suspend fun updateMessage(messageId: String,
-                              text: String,
-                              images: List<String> = emptyList()
-        ) = kotlin.runCatching {
+    suspend fun updateMessage(
+        messageId: String,
+        text: String,
+        images: List<String> = emptyList()
+    ) = kotlin.runCatching {
 
         val chatMessageParam = ChatMessageParam(
             text = text,

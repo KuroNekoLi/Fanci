@@ -76,6 +76,7 @@ val viewModule = module {
         EditPostViewModel(
             androidApplication(),
             get(),
+            get(),
             params.get()
         )
     }

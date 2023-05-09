@@ -53,6 +53,7 @@ import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
+import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.MessageAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
 import com.cmoney.kolfanci.ui.screens.post.BaseDeletedContentScreen
@@ -71,8 +72,9 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
-import com.socks.library.KLog
+import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -80,8 +82,8 @@ import org.koin.core.parameter.parametersOf
 @Destination
 @Composable
 fun PostInfoScreen(
-    modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
+    modifier: Modifier = Modifier,
     channel: Channel,
     post: BulletinboardMessage,
     viewModel: PostInfoViewModel = koinViewModel(
@@ -89,10 +91,19 @@ fun PostInfoScreen(
             parametersOf(post, channel)
         }
     ),
-    resultNavigator: ResultBackNavigator<BulletinboardMessage>
+    resultNavigator: ResultBackNavigator<BulletinboardMessage>,
+    editResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>
 ) {
     val context = LocalContext.current
 
+    var showPostDeleteTip by remember {
+        mutableStateOf(
+            Pair<Boolean, BulletinboardMessage?>(
+                false,
+                null
+            )
+        )
+    }
     var showCommentDeleteTip by remember {
         mutableStateOf(
             Pair<Boolean, BulletinboardMessage?>(
@@ -135,6 +146,12 @@ fun PostInfoScreen(
     //輸入匡預設值
     val inputText by viewModel.inputText.collectAsState()
 
+    //刪除貼文
+    val deletePost by viewModel.deletePost.collectAsState()
+    deletePost?.let {
+        resultNavigator.navigateBack(it)
+    }
+
     //Control keyboard
     val keyboard = LocalSoftwareKeyboardController.current
 
@@ -173,12 +190,29 @@ fun PostInfoScreen(
             viewModel.onCommentLoadMore()
         }
 
+        //貼文 更多動作
         override fun onPostMoreClick(post: BulletinboardMessage) {
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Post,
                 onInteractClick = {
-                    //todo
+                    when (it) {
+                        is PostInteract.Announcement -> TODO()
+                        is PostInteract.Delete -> {
+                            showPostDeleteTip = Pair(true, post)
+                        }
+
+                        is PostInteract.Edit -> {
+                            navController.navigate(
+                                EditPostScreenDestination(
+                                    channelId = channel.id.orEmpty(),
+                                    editPost = post
+                                )
+                            )
+                        }
+
+                        is PostInteract.Report -> TODO()
+                    }
                 }
             )
         }
@@ -209,6 +243,7 @@ fun PostInfoScreen(
             viewModel.onReplyEmojiClick(comment, reply, resourceId)
         }
 
+        //留言 更多動做
         override fun onCommentMoreActionClick(comment: BulletinboardMessage) {
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
@@ -225,12 +260,14 @@ fun PostInfoScreen(
                                 comment = comment,
                             )
                         }
+
                         is PostInteract.Report -> TODO()
                     }
                 }
             )
         }
 
+        //回覆 更多動做
         override fun onReplyMoreActionClick(
             comment: BulletinboardMessage,
             reply: BulletinboardMessage
@@ -285,7 +322,36 @@ fun PostInfoScreen(
         )
     }
 
+    //編輯貼文 callback
+    editResultRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                viewModel.onUpdatePost(result.value)
+            }
+        }
+    }
+
     //==================== 彈窗提示 ====================
+    //是否刪貼文
+    DeleteConfirmDialogScreen(
+        date = showPostDeleteTip.second,
+        isShow = showPostDeleteTip.first,
+        title = "確定刪除貼文",
+        content = "貼文刪除後，內容將會完全消失。",
+        onCancel = {
+            showPostDeleteTip = showPostDeleteTip.copy(first = false)
+        },
+        onConfirm = {
+            showPostDeleteTip = showPostDeleteTip.copy(first = false)
+            showPostDeleteTip.second?.let {
+                viewModel.onDeletePostClick(it)
+            }
+        }
+    )
+
     //是否刪留言
     DeleteConfirmDialogScreen(
         date = showCommentDeleteTip.second,
