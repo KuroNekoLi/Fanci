@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.ui.screens.post.info.viewmodel
 import android.app.Application
 import android.net.Uri
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
@@ -11,8 +12,10 @@ import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
@@ -22,6 +25,9 @@ import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
+import com.cmoney.kolfanci.ui.theme.White_494D54
+import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -71,6 +77,10 @@ class PostInfoViewModel(
     //更新貼文
     private val _updatePost = MutableStateFlow<BulletinboardMessage?>(null)
     val updatePost = _updatePost.asStateFlow()
+
+    //Toast message
+    private val _toast = MutableStateFlow<CustomMessage?>(null)
+    val toast = _toast.asStateFlow()
 
     //紀錄是否有分頁
     private val haveNextPageMap = hashMapOf<String, Boolean>()
@@ -788,4 +798,37 @@ class PostInfoViewModel(
         }
     }
 
+    /**
+     * 檢舉貼文
+     */
+    fun onReportPost(channelId: String, message: BulletinboardMessage?, reason: ReportReason) {
+        KLog.i(TAG, "onReportPost:$reason")
+        viewModelScope.launch {
+            chatRoomUseCase.reportContent(
+                channelId = channelId,
+                contentId = message?.id.orEmpty(),
+                reason = reason
+            ).fold({
+                KLog.i(TAG, "onReportUser success:$it")
+                _toast.value = CustomMessage(
+                    textString = "檢舉成立！",
+                    textColor = Color.White,
+                    iconRes = R.drawable.report,
+                    iconColor = White_767A7F,
+                    backgroundColor = White_494D54
+                )
+            }, {
+                KLog.e(TAG, it)
+                it.printStackTrace()
+            })
+        }
+    }
+
+    /**
+     * 取消 snackBar
+     */
+    fun dismissSnackBar() {
+        KLog.i(TAG, "dismissSnackBar")
+        _toast.value = null
+    }
 }

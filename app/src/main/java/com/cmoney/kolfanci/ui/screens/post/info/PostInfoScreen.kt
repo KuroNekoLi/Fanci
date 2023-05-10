@@ -62,6 +62,7 @@ import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
+import com.cmoney.kolfanci.ui.screens.post.dialog.ReportPostDialogScreenScreen
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
@@ -70,6 +71,7 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -77,6 +79,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -97,6 +100,7 @@ fun PostInfoScreen(
     resultNavigator: ResultBackNavigator<BulletinboardMessage>,
     editResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>
 ) {
+    val TAG = "PostInfoScreen"
     val context = LocalContext.current
 
     var showPostDeleteTip by remember {
@@ -135,6 +139,16 @@ fun PostInfoScreen(
         )
     }
 
+    //檢舉提示 dialog
+    var showReportTip by remember {
+        mutableStateOf(
+            Pair<Boolean, BulletinboardMessage?>(
+                false,
+                null
+            )
+        )
+    }
+
     //貼文資料
     val postData by viewModel.post.collectAsState()
 
@@ -163,6 +177,9 @@ fun PostInfoScreen(
     updatePost?.let {
         resultNavigator.navigateBack(it)
     }
+
+    //Snackbar
+    val toastMessage by viewModel.toast.collectAsState()
 
     //Control keyboard
     val keyboard = LocalSoftwareKeyboardController.current
@@ -226,7 +243,10 @@ fun PostInfoScreen(
                             )
                         }
 
-                        is PostInteract.Report -> TODO()
+                        is PostInteract.Report -> {
+                            KLog.i(TAG, "PostInteract.Report click.")
+                            showReportTip = Pair(true, post)
+                        }
                     }
                 }
             )
@@ -276,7 +296,10 @@ fun PostInfoScreen(
                             )
                         }
 
-                        is PostInteract.Report -> TODO()
+                        is PostInteract.Report -> {
+                            KLog.i(TAG, "PostInteract.Report click.")
+                            showReportTip = Pair(true, comment)
+                        }
                     }
                 }
             )
@@ -304,7 +327,10 @@ fun PostInfoScreen(
                             )
                         }
 
-                        is PostInteract.Report -> TODO()
+                        is PostInteract.Report -> {
+                            KLog.i(TAG, "PostInteract.Report click.")
+                            showReportTip = Pair(true, reply)
+                        }
                     }
                 }
             )
@@ -351,6 +377,30 @@ fun PostInfoScreen(
     }
 
     //==================== 彈窗提示 ====================
+    //提示 Snackbar
+    toastMessage?.let {
+        FanciSnackBarScreen(
+            modifier = Modifier.padding(bottom = 70.dp),
+            message = it
+        ) {
+            viewModel.dismissSnackBar()
+        }
+    }
+
+    //檢舉貼文
+    if (showReportTip.first) {
+        ReportPostDialogScreenScreen(
+            user = showReportTip.second?.author ?: GroupMember(),
+            onDismiss = {
+                showReportTip = Pair(false, null)
+            },
+            onConfirm = { reportReason ->
+                viewModel.onReportPost(channel.id.orEmpty(), showReportTip.second, reportReason)
+                showReportTip = Pair(false, null)
+            }
+        )
+    }
+
     //是否刪貼文
     DeleteConfirmDialogScreen(
         date = showPostDeleteTip.second,
