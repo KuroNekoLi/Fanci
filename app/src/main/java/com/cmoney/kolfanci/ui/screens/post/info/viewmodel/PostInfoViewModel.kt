@@ -296,12 +296,22 @@ class PostInfoViewModel(
                             _replyMap.value[message.id.orEmpty()] = replyData.copy(
                                 replyList = replyList
                             )
+
+                            //刷新上一層 留言裡面的回覆數量
+                            refreshCommentCount(message, replyList)
+
                         } ?: kotlin.run {
                             //empty case
                             _replyMap.value[message.id.orEmpty()] = ReplyData(
                                 replyList = listOf(it),
                                 haveMore = false
                             )
+
+                            //設定 expand status
+                            setReplyExpand(message.id.orEmpty())
+
+                            //刷新上一層 留言裡面的回覆數量
+                            refreshCommentCount(message, listOf(it))
                         }
                     } else {
                         val comments = _comment.value.toMutableList()
@@ -707,7 +717,26 @@ class PostInfoViewModel(
                     _replyMap.value[comment.id.orEmpty()] = replyData.copy(
                         replyList = filterReplyList
                     )
+
+                    //刷新上一層 留言裡面的回覆數量
+                    refreshCommentCount(comment, filterReplyList)
                 }
+            }
+        }
+    }
+
+    /**
+     * 刷新 留言數量
+     */
+    private fun refreshCommentCount(comment: BulletinboardMessage, replyList: List<BulletinboardMessage>) {
+        KLog.i(TAG, "refreshCommentCount")
+        _comment.value = _comment.value.map {
+            if (comment.id == it.id) {
+                it.copy(
+                    commentCount = replyList.size
+                )
+            } else {
+                it
             }
         }
     }
