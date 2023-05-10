@@ -25,6 +25,7 @@ interface MessageApi {
      * @param messageId 訊息Id
      * @return [Unit]
      */
+    @Deprecated("This api was deprecated")
     @DELETE("api/v1/Message/me/{messageId}")
     suspend fun apiV1MessageMeMessageIdDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
 
@@ -41,6 +42,7 @@ interface MessageApi {
      * @param messageId 
      * @return [Unit]
      */
+    @Deprecated("This api was deprecated")
     @DELETE("api/v1/Message/{messageId}/Emoji")
     suspend fun apiV1MessageMessageIdEmojiDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
 
@@ -57,6 +59,7 @@ interface MessageApi {
      * @param messageId 訊息Id
      * @return [kotlin.collections.Map<kotlin.String, kotlin.collections.List<User>>]
      */
+    @Deprecated("This api was deprecated")
     @GET("api/v1/Message/{messageId}/Emoji")
     suspend fun apiV1MessageMessageIdEmojiGet(@Path("messageId") messageId: kotlin.String): Response<kotlin.collections.Map<kotlin.String, kotlin.collections.List<User>>>
 
@@ -74,6 +77,7 @@ interface MessageApi {
      * @param emojiParam 表情符號參數 (optional)
      * @return [Unit]
      */
+    @Deprecated("This api was deprecated")
     @PUT("api/v1/Message/{messageId}/Emoji")
     suspend fun apiV1MessageMessageIdEmojiPut(@Path("messageId") messageId: kotlin.String, @Body emojiParam: EmojiParam? = null): Response<Unit>
 
@@ -89,6 +93,7 @@ interface MessageApi {
      * @param messageId 訊息id
      * @return [ChatMessage]
      */
+    @Deprecated("This api was deprecated")
     @GET("api/v1/Message/{messageId}")
     suspend fun apiV1MessageMessageIdGet(@Path("messageId") messageId: kotlin.String): Response<ChatMessage>
 
@@ -106,6 +111,7 @@ interface MessageApi {
      * @param chatMessageParam 異動訊息參數 (optional)
      * @return [Unit]
      */
+    @Deprecated("This api was deprecated")
     @PUT("api/v1/Message/{messageId}")
     suspend fun apiV1MessageMessageIdPut(@Path("messageId") messageId: kotlin.String, @Body chatMessageParam: ChatMessageParam? = null): Response<Unit>
 
@@ -122,6 +128,7 @@ interface MessageApi {
      * @param messageId 訊息Id
      * @return [Unit]
      */
+    @Deprecated("This api was deprecated")
     @DELETE("api/v1/Message/role/{messageId}")
     suspend fun apiV1MessageRoleMessageIdDelete(@Path("messageId") messageId: kotlin.String): Response<Unit>
 

@@ -634,12 +634,12 @@
         "tags": [
           "BulletinBoard"
         ],
-        "summary": "公告聊天室的一則聊天訊息 __________🔒 可管理",
+        "summary": "公告貼文區的一則訊息 __________🔒 可管理",
         "parameters": [
           {
             "name": "channelId",
             "in": "path",
-            "description": "聊天室頻道Id",
+            "description": "貼文區頻道Id",
             "required": true,
             "schema": {
               "type": "string"
@@ -687,7 +687,7 @@
           {
             "oauth2": [
               "user",
-              "BANNED_1_chatRoomChannelId",
+              "BANNED_1_channelId",
               "PERMISSION_可管理_1_channelId_channelId"
             ]
           }
@@ -697,12 +697,12 @@
         "tags": [
           "BulletinBoard"
         ],
-        "summary": "取消聊天室公告 __________🔒 可管理",
+        "summary": "取消貼文區公告 __________🔒 可管理",
         "parameters": [
           {
             "name": "channelId",
             "in": "path",
-            "description": "聊天室頻道Id",
+            "description": "頻道Id",
             "required": true,
             "schema": {
               "type": "string"
@@ -3769,6 +3769,7 @@
             "description": "找不到訊息"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "oauth2": [
@@ -3830,6 +3831,7 @@
             "description": "找不到訊息"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "oauth2": [
@@ -3874,6 +3876,7 @@
             "description": "找不到訊息"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "oauth2": [
@@ -3919,6 +3922,7 @@
             "description": "找不到訊息"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "oauth2": [
@@ -3998,6 +4002,7 @@
             "description": "找不到訊息"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "oauth2": [
@@ -4059,6 +4064,7 @@
             "description": "找不到訊息"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "oauth2": [
@@ -4101,6 +4107,7 @@
             "description": "找不到訊息"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "oauth2": [
@@ -7026,6 +7033,9 @@
           "reportee": {
             "$ref": "#/components/schemas/GroupMember"
           },
+          "tabType": {
+            "$ref": "#/components/schemas/ChannelTabType"
+          },
           "channel": {
             "$ref": "#/components/schemas/Channel"
           },
@@ -7064,6 +7074,9 @@
       "ReportParm": {
         "type": "object",
         "properties": {
+          "tabType": {
+            "$ref": "#/components/schemas/ChannelTabType"
+          },
           "contentId": {
             "type": "string",
             "nullable": true

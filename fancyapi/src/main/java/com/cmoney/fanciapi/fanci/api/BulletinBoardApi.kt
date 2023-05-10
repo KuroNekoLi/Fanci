@@ -83,7 +83,7 @@ interface BulletinBoardApi {
     suspend fun apiV1BulletinBoardChannelIdMessagePost(@Path("channelId") channelId: kotlin.String, @Body bulletingBoardMessageParam: BulletingBoardMessageParam? = null): Response<BulletinboardMessage>
 
     /**
-     * 取消聊天室公告 __________🔒 可管理
+     * 取消貼文區公告 __________🔒 可管理
      * 
      * Responses:
      *  - 200: Success
@@ -92,7 +92,7 @@ interface BulletinBoardApi {
      *  - 204: 成功
      *  - 404: 找不到該頻道
      *
-     * @param channelId 聊天室頻道Id
+     * @param channelId 頻道Id
      * @return [Unit]
      */
     @DELETE("api/v1/BulletinBoard/{channelId}/PinnedMessage")
@@ -114,7 +114,7 @@ interface BulletinBoardApi {
     suspend fun apiV1BulletinBoardChannelIdPinnedMessageGet(@Path("channelId") channelId: kotlin.String): Response<PinnedMessageInfo>
 
     /**
-     * 公告聊天室的一則聊天訊息 __________🔒 可管理
+     * 公告貼文區的一則訊息 __________🔒 可管理
      * 
      * Responses:
      *  - 200: Success
@@ -123,7 +123,7 @@ interface BulletinBoardApi {
      *  - 204: 成功
      *  - 404: 找不到該頻道
      *
-     * @param channelId 聊天室頻道Id
+     * @param channelId 貼文區頻道Id
      * @param messageIdParam 公告訊息參數 (optional)
      * @return [Unit]
      */

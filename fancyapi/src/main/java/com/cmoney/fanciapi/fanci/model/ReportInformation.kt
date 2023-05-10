@@ -16,6 +16,7 @@
 package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.ReportProcessStatus
 import com.cmoney.fanciapi.fanci.model.ReportReason
@@ -29,6 +30,7 @@ import kotlinx.parcelize.Parcelize
  *
  * @param id 
  * @param reportee 
+ * @param tabType 
  * @param channel 
  * @param contentId 
  * @param contentSnapshot 
@@ -48,6 +50,9 @@ data class ReportInformation (
 
     @Json(name = "reportee")
     val reportee: GroupMember? = null,
+
+    @Json(name = "tabType")
+    val tabType: ChannelTabType? = null,
 
     @Json(name = "channel")
     val channel: Channel? = null,
