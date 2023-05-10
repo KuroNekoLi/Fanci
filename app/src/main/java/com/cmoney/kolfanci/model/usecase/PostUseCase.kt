@@ -6,10 +6,39 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessagePaging
 import com.cmoney.fanciapi.fanci.model.BulletingBoardMessageParam
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.kolfanci.extension.checkResponseBody
 
 class PostUseCase(private val bulletinBoardApi: BulletinBoardApi) {
+
+    /**
+     * 取得 置頂貼文
+     */
+    suspend fun getPinMessage(channelId: String) = kotlin.runCatching {
+        bulletinBoardApi.apiV1BulletinBoardChannelIdPinnedMessageGet(channelId).checkResponseBody()
+    }
+
+    /**
+     * 取消置頂貼文
+     */
+    suspend fun unPinPost(channelId: String) = kotlin.runCatching {
+        bulletinBoardApi.apiV1BulletinBoardChannelIdPinnedMessageDelete(
+            channelId = channelId
+        ).checkResponseBody()
+    }
+
+    /**
+     * 置頂貼文
+     */
+    suspend fun pinPost(channelId: String, messageId: String) = kotlin.runCatching {
+        bulletinBoardApi.apiV1BulletinBoardChannelIdPinnedMessagePut(
+            channelId = channelId,
+            messageIdParam = MessageIdParam(
+                messageId = messageId
+            )
+        ).checkResponseBody()
+    }
 
     /**
      * 撰寫po 文

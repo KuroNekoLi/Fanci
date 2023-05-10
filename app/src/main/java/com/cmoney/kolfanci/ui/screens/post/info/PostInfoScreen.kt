@@ -51,6 +51,7 @@ import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
+import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
@@ -67,6 +68,7 @@ import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -86,6 +88,7 @@ fun PostInfoScreen(
     modifier: Modifier = Modifier,
     channel: Channel,
     post: BulletinboardMessage,
+    isPinPost: Boolean = false,
     viewModel: PostInfoViewModel = koinViewModel(
         parameters = {
             parametersOf(post, channel)
@@ -122,6 +125,15 @@ fun PostInfoScreen(
             )
         )
     }
+    //置頂 提示
+    var showPinDialogTip by remember {
+        mutableStateOf(
+            Pair<Boolean, BulletinboardMessage?>(
+                false,
+                null
+            )
+        )
+    }
 
     //貼文資料
     val postData by viewModel.post.collectAsState()
@@ -146,9 +158,9 @@ fun PostInfoScreen(
     //輸入匡預設值
     val inputText by viewModel.inputText.collectAsState()
 
-    //刪除貼文
-    val deletePost by viewModel.deletePost.collectAsState()
-    deletePost?.let {
+    //返回更新貼文
+    val updatePost by viewModel.updatePost.collectAsState()
+    updatePost?.let {
         resultNavigator.navigateBack(it)
     }
 
@@ -197,7 +209,10 @@ fun PostInfoScreen(
                 postMoreActionType = PostMoreActionType.Post,
                 onInteractClick = {
                     when (it) {
-                        is PostInteract.Announcement -> TODO()
+                        is PostInteract.Announcement -> {
+                            showPinDialogTip = Pair(true, post)
+                        }
+
                         is PostInteract.Delete -> {
                             showPostDeleteTip = Pair(true, post)
                         }
@@ -299,6 +314,7 @@ fun PostInfoScreen(
     PostInfoScreenView(
         modifier = modifier,
         post = postData,
+        isPinPost = isPinPost,
         imageAttachList = imageAttachList,
         comments = comments,
         commentReply = commentReply,
@@ -390,6 +406,60 @@ fun PostInfoScreen(
         }
     )
 
+    //置頂提示彈窗
+    if (showPinDialogTip.first) {
+        DialogScreen(
+            onDismiss = {
+                showPinDialogTip = Pair(false, null)
+            },
+            titleIconRes = R.drawable.pin,
+            iconFilter = LocalColor.current.component.other,
+            title = "置頂文章",
+            subTitle = if (isPinPost) {
+                ""
+            } else {
+                "置頂這篇文章，重要貼文不再被淹沒！"
+            }
+        ) {
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = if (isPinPost) {
+                    "取消置頂"
+                } else {
+                    "置頂文章"
+                },
+                borderColor = LocalColor.current.text.default_50,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                run {
+                    if (isPinPost) {
+                        viewModel.unPinPost(channel.id.orEmpty(), showPinDialogTip.second)
+                    } else {
+                        viewModel.pinPost(channel.id.orEmpty(), showPinDialogTip.second)
+                    }
+                    showPinDialogTip = Pair(false, null)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "取消",
+                borderColor = LocalColor.current.text.default_50,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                run {
+                    showPinDialogTip = Pair(false, null)
+                }
+            }
+        }
+    }
+
     BackHandler {
         resultNavigator.navigateBack(viewModel.post.value)
     }
@@ -399,6 +469,7 @@ fun PostInfoScreen(
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
     post: BulletinboardMessage,
+    isPinPost: Boolean,
     imageAttachList: List<Uri>,
     comments: List<BulletinboardMessage>,
     commentReply: BulletinboardMessage?,
@@ -438,7 +509,8 @@ private fun PostInfoScreenView(
                             defaultDisplayLine = Int.MAX_VALUE,
                             bottomContent = {
                                 CommentCount(
-                                    post = post
+                                    post = post,
+                                    isPinPost = isPinPost
                                 )
                             },
                             onMoreClick = {
@@ -792,7 +864,8 @@ fun PostInfoScreenPreview() {
             replyMapData = hashMapOf(),
             postInfoListener = EmptyPostInfoListener,
             commentBottomContentListener = EmptyCommentBottomContentListener,
-            inputText = ""
+            inputText = "",
+            isPinPost = false
         )
     }
 }

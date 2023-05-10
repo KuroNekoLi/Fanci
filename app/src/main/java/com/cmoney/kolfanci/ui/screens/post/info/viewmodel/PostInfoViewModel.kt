@@ -2,7 +2,6 @@ package com.cmoney.kolfanci.ui.screens.post.info.viewmodel
 
 import android.app.Application
 import android.net.Uri
-import android.webkit.URLUtil
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -69,12 +68,15 @@ class PostInfoViewModel(
     private val _inputText: MutableStateFlow<String> = MutableStateFlow("")
     val inputText = _inputText.asStateFlow()
 
-    //刪除貼文
-    private val _deletePost = MutableStateFlow<BulletinboardMessage?>(null)
-    val deletePost = _deletePost.asStateFlow()
+    //更新貼文
+    private val _updatePost = MutableStateFlow<BulletinboardMessage?>(null)
+    val updatePost = _updatePost.asStateFlow()
 
-    private val haveNextPageMap = hashMapOf<String, Boolean>() //紀錄是否有分頁
-    private val nextWeightMap = hashMapOf<String, Long?>() //紀錄 分頁索引值
+    //紀錄是否有分頁
+    private val haveNextPageMap = hashMapOf<String, Boolean>()
+
+    //紀錄 分頁索引值
+    private val nextWeightMap = hashMapOf<String, Long?>()
 
     //紀錄展開過的回覆資料
     private val cacheReplyData = hashMapOf<String, ReplyData>()
@@ -368,8 +370,7 @@ class PostInfoViewModel(
                                             }
                                         )
                                     )
-                                }
-                                else {
+                                } else {
                                     it
                                 }
                             }
@@ -713,7 +714,7 @@ class PostInfoViewModel(
                 chatRoomUseCase.takeBackMyMessage(post.id.orEmpty()).fold({
                 }, {
                     if (it is EmptyBodyException) {
-                        _deletePost.value = post
+                        _updatePost.value = post
                     } else {
                         it.printStackTrace()
                     }
@@ -724,7 +725,7 @@ class PostInfoViewModel(
                 chatRoomUseCase.deleteOtherMessage(post.id.orEmpty()).fold({
                 }, {
                     if (it is EmptyBodyException) {
-                        _deletePost.value = post
+                        _updatePost.value = post
                     } else {
                         it.printStackTrace()
                     }
@@ -738,6 +739,53 @@ class PostInfoViewModel(
      */
     fun onUpdatePost(post: BulletinboardMessage) {
         _post.value = post
+    }
+
+    /**
+     * 置頂貼文
+     *
+     * @param channelId 頻道id
+     * @param message 要置頂的文章
+     */
+    fun pinPost(channelId: String, message: BulletinboardMessage?) {
+        KLog.i(TAG, "pinPost:$message")
+        viewModelScope.launch {
+            postUseCase.pinPost(
+                channelId = channelId,
+                messageId = message?.id.orEmpty()
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    KLog.i(TAG, "pinPost success.")
+                    _updatePost.value = message
+                } else {
+                    it.printStackTrace()
+                    KLog.e(TAG, it)
+                }
+            })
+
+        }
+    }
+
+    /**
+     * 取消置頂貼文
+     * @param channelId 頻道id
+     * @param message 要取消置頂的文章
+     */
+    fun unPinPost(channelId: String, message: BulletinboardMessage?) {
+        KLog.i(TAG, "unPinPost:$message")
+        viewModelScope.launch {
+            postUseCase.unPinPost(channelId).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    KLog.i(TAG, "unPinPost success.")
+                    _updatePost.value = message
+                } else {
+                    it.printStackTrace()
+                    KLog.e(TAG, it)
+                }
+            })
+        }
     }
 
 }

@@ -82,6 +82,7 @@ fun PostScreen(
     val coroutineScope = rememberCoroutineScope()
     val postList by viewModel.post.collectAsState()
     val context = LocalContext.current
+    val pinPost by viewModel.pinPost.collectAsState()
 
     var showPostDeleteTip by remember {
         mutableStateOf(
@@ -98,6 +99,7 @@ fun PostScreen(
         navController = navController,
         listState = listState,
         channel = channel,
+        pinPost = pinPost,
         onPostClick = {
             //OnClick Method
             navController.navigate(
@@ -116,6 +118,7 @@ fun PostScreen(
                         is PostInteract.Delete -> {
                             showPostDeleteTip = Pair(true, post)
                         }
+
                         is PostInteract.Edit -> {
                             KLog.i(TAG, "PostInteract.Edit click.")
                             navController.navigate(
@@ -125,6 +128,7 @@ fun PostScreen(
                                 )
                             )
                         }
+
                         is PostInteract.Report -> TODO()
                     }
                 }
@@ -193,7 +197,8 @@ fun PostScreen(
 @Composable
 private fun PostScreenView(
     modifier: Modifier = Modifier,
-    postList: List<BulletinboardMessage>,
+    pinPost: BulletinboardMessage?,
+    postList: List<PostViewModel.Post>,
     navController: DestinationsNavigator,
     channel: Channel,
     onPostClick: () -> Unit,
@@ -212,23 +217,49 @@ private fun PostScreenView(
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
+                pinPost?.let { pinPost ->
+                    item {
+                        BasePostContentScreen(
+                            post = pinPost,
+                            bottomContent = {
+                                CommentCount(
+                                    post = pinPost,
+                                    navController = navController,
+                                    channel = channel,
+                                    isPinPost = true
+                                )
+                            },
+                            onMoreClick = {
+                                onMoreClick.invoke(pinPost)
+                            },
+                            onEmojiClick = {
+                                onEmojiClick.invoke(pinPost, it)
+                            }
+                        )
+                    }
+                }
+
                 items(items = postList) { post ->
-                    BasePostContentScreen(
-                        post = post,
-                        bottomContent = {
-                            CommentCount(
-                                post = post,
-                                navController = navController,
-                                channel = channel
+                    if (!post.isPin) {
+                        post.message.let { postMessage ->
+                            BasePostContentScreen(
+                                post = postMessage,
+                                bottomContent = {
+                                    CommentCount(
+                                        post = postMessage,
+                                        navController = navController,
+                                        channel = channel
+                                    )
+                                },
+                                onMoreClick = {
+                                    onMoreClick.invoke(postMessage)
+                                },
+                                onEmojiClick = {
+                                    onEmojiClick.invoke(postMessage, it)
+                                }
                             )
-                        },
-                        onMoreClick = {
-                            onMoreClick.invoke(post)
-                        },
-                        onEmojiClick = {
-                            onEmojiClick.invoke(post, it)
                         }
-                    )
+                    }
                 }
             }
         }
@@ -256,7 +287,8 @@ private fun PostScreenView(
 fun CommentCount(
     navController: DestinationsNavigator? = null,
     post: BulletinboardMessage? = null,
-    channel: Channel? = null
+    channel: Channel? = null,
+    isPinPost: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -267,7 +299,8 @@ fun CommentCount(
                         navController.navigate(
                             PostInfoScreenDestination(
                                 post = post,
-                                channel = channel
+                                channel = channel,
+                                isPinPost = isPinPost
                             )
                         )
                     }
@@ -278,6 +311,22 @@ fun CommentCount(
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (isPinPost) {
+            Text(
+                text = "置頂貼文",
+                fontSize = 14.sp,
+                color = LocalColor.current.text.default_100
+            )
+
+            Box(
+                modifier = Modifier
+                    .padding(start = 5.dp, end = 5.dp)
+                    .size(3.8.dp)
+                    .clip(CircleShape)
+                    .background(LocalColor.current.text.default_100)
+            )
+        }
+
         Text(
             text = post?.displayPostTime().orEmpty(),
             fontSize = 14.sp,
@@ -326,7 +375,10 @@ private fun EmptyPostContent(modifier: Modifier = Modifier) {
 fun PostScreenPreview() {
     FanciTheme {
         PostScreenView(
-            postList = PostViewModel.mockListMessage,
+            postList = PostViewModel.mockListMessage.map {
+                PostViewModel.Post(message = it)
+            },
+            pinPost = null,
             navController = EmptyDestinationsNavigator,
             channel = Channel(),
             onPostClick = {},

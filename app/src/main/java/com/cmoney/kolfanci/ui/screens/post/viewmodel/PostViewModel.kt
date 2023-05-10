@@ -30,8 +30,21 @@ class PostViewModel(
 ) : ViewModel() {
     private val TAG = PostViewModel::class.java.simpleName
 
-    private val _post = MutableStateFlow<List<BulletinboardMessage>>(emptyList())
+    /**
+     * 顯示貼文model
+     */
+    data class Post(
+        val message: BulletinboardMessage,
+        val isPin: Boolean = false
+    )
+
+    //貼文清單
+    private val _post = MutableStateFlow<List<Post>>(emptyList())
     val post = _post.asStateFlow()
+
+    //置頂貼文
+    private val _pinPost = MutableStateFlow<BulletinboardMessage?>(null)
+    val pinPost = _pinPost.asStateFlow()
 
     var haveNextPage: Boolean = false
     var nextWeight: Long? = null    //貼文分頁 索引
@@ -50,13 +63,64 @@ class PostViewModel(
                 nextWeight = it.nextWeight
 
                 val postList = _post.value.toMutableList()
-                postList.addAll(it.items?.filter { post ->
-                    post.isDeleted != true
+                postList.addAll(it.items?.map { post ->
+                    Post(
+                        message = post,
+                        isPin = false
+                    )
+                }?.filter { post ->
+                    post.message.isDeleted != true
                 }.orEmpty())
 
                 _post.value = postList
+
+                fetchPinPost()
             }, {
                 KLog.e(TAG, it)
+                fetchPinPost()
+            })
+        }
+    }
+
+    /**
+     * 拿取 置頂貼文, 並過濾掉原本清單同樣id 的貼文
+     */
+    private fun fetchPinPost() {
+        KLog.i(TAG, "fetchPinPost")
+        viewModelScope.launch {
+            postUseCase.getPinMessage(
+                channelId
+            ).fold({
+                //有置頂文
+                if (it.isAnnounced == true) {
+                    KLog.i(TAG, "has pin post.")
+                    it.message?.let {
+                        val pinPost = it.toBulletinboardMessage()
+                        //fix exists post
+                        _post.value = _post.value.map { post ->
+                            if (post.message.id == pinPost.id) {
+                                post.copy(
+                                    isPin = true
+                                )
+                            } else {
+                                post
+                            }
+                        }
+
+                        _pinPost.value = pinPost
+                    }
+                }
+                //沒有置頂文
+                else {
+                    KLog.i(TAG, "no pin post.")
+                    _post.value = _post.value.map {
+                        it.copy(isPin = false)
+                    }
+                    _pinPost.value = null
+                }
+            }, {
+                KLog.e(TAG, it)
+                it.printStackTrace()
             })
         }
     }
@@ -64,7 +128,7 @@ class PostViewModel(
     fun onPostSuccess(bulletinboardMessage: BulletinboardMessage) {
         KLog.i(TAG, "onPostSuccess:$bulletinboardMessage")
         val postList = _post.value.toMutableList()
-        postList.add(0, bulletinboardMessage)
+        postList.add(0, Post(message = bulletinboardMessage))
         _post.value = postList
     }
 
@@ -106,8 +170,8 @@ class PostViewModel(
 
             //UI show
             _post.value = _post.value.map {
-                if (it.id == postMessage.id) {
-                    postMessage
+                if (it.message.id == postMessage.id) {
+                    Post(message = postMessage)
                 } else {
                     it
                 }
@@ -131,27 +195,32 @@ class PostViewModel(
             chatRoomUseCase.getSingleMessage(
                 messageId = bulletinboardMessage.id.orEmpty()
             ).fold({ result ->
-                _post.value = _post.value.map {
-                    if (it.id == result.id) {
-                        result.toBulletinboardMessage()
+                val updatePost = result.toBulletinboardMessage()
+                val editList = _post.value.toMutableList()
+
+                _post.value = editList.map {
+                    if (it.message.id == result.id) {
+                        Post(message = updatePost)
                     } else {
                         it
                     }
                 }.filter {
-                    it.isDeleted != true
+                    it.message.isDeleted != true
                 }
 
+                fetchPinPost()
             }, { err ->
                 KLog.e(TAG, err)
                 err.printStackTrace()
                 //local update
                 _post.value = _post.value.map {
-                    if (it.id == bulletinboardMessage.id) {
-                        bulletinboardMessage
+                    if (it.message.id == bulletinboardMessage.id) {
+                        Post(message = bulletinboardMessage)
                     } else {
                         it
                     }
                 }
+                fetchPinPost()
             })
         }
     }
@@ -166,7 +235,7 @@ class PostViewModel(
                 }, {
                     if (it is EmptyBodyException) {
                         _post.value = _post.value.filter {
-                            it.id != post.id
+                            it.message.id != post.id
                         }
                     } else {
                         it.printStackTrace()
@@ -179,7 +248,7 @@ class PostViewModel(
                 }, {
                     if (it is EmptyBodyException) {
                         _post.value = _post.value.filter {
-                            it.id != post.id
+                            it.message.id != post.id
                         }
                     } else {
                         it.printStackTrace()
