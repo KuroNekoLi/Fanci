@@ -178,7 +178,7 @@ class PostViewModel(
             val newEmoji = clickEmoji.clickCount(emojiCount, orgEmoji)
 
             //回填資料
-            val postMessage = postMessage.copy(
+            val newPostMessage = postMessage.copy(
                 emojiCount = newEmoji,
                 messageReaction = if (emojiCount == -1) null else {
                     IUserMessageReaction(
@@ -189,8 +189,8 @@ class PostViewModel(
 
             //UI show
             _post.value = _post.value.map {
-                if (it.message.id == postMessage.id) {
-                    BulletinboardMessageWrapper(message = postMessage)
+                if (it.message.id == newPostMessage.id) {
+                    BulletinboardMessageWrapper(message = newPostMessage)
                 } else {
                     it
                 }

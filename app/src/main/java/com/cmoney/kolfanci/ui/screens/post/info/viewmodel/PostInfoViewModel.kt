@@ -149,7 +149,7 @@ class PostInfoViewModel(
                 //search cache
                 val replyCache = cacheReplyData[commentId]
 
-                if (replyCache == null || replyCache.replyList.isNullOrEmpty()) {
+                if (replyCache == null || replyCache.replyList.isEmpty()) {
                     fetchCommentReply(channelId, commentId)
                 } else {
                     _replyMap.value[commentId] = replyCache
@@ -290,10 +290,10 @@ class PostInfoViewModel(
                     //如果是回覆, 將回覆資料寫回
                     if (isReply) {
                         val replyData = _replyMap.value[message.id.orEmpty()]
-                        replyData?.let { replyData ->
-                            val replyList = replyData.replyList.toMutableList()
+                        replyData?.let { replyNotNullData ->
+                            val replyList = replyNotNullData.replyList.toMutableList()
                             replyList.add(it)
-                            _replyMap.value[message.id.orEmpty()] = replyData.copy(
+                            _replyMap.value[message.id.orEmpty()] = replyNotNullData.copy(
                                 replyList = replyList
                             )
 
@@ -643,7 +643,7 @@ class PostInfoViewModel(
      */
     fun onDeleteCommentOrReply(comment: Any?, reply: Any?, isComment: Boolean) {
         KLog.i(TAG, "onDeleteCommentOrReply:$isComment,  $comment")
-        comment?.let { comment ->
+        comment?.let {
             if (comment is BulletinboardMessage) {
                 viewModelScope.launch {
                     val deleteId = if (isComment) {
@@ -710,11 +710,11 @@ class PostInfoViewModel(
         reply?.let {
             if (reply is BulletinboardMessage) {
                 val replyData = _replyMap.value[comment.id]
-                replyData?.let { replyData ->
-                    val filterReplyList = replyData.replyList.filter {
+                replyData?.let { replyNotNullData ->
+                    val filterReplyList = replyNotNullData.replyList.filter {
                         it.id != reply.id
                     }
-                    _replyMap.value[comment.id.orEmpty()] = replyData.copy(
+                    _replyMap.value[comment.id.orEmpty()] = replyNotNullData.copy(
                         replyList = filterReplyList
                     )
 
