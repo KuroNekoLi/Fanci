@@ -48,6 +48,7 @@ import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.MessageAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
+import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.CenterTopAppBar
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
@@ -75,7 +76,7 @@ fun EditPostScreen(
             parametersOf(channelId)
         }
     ),
-    resultNavigator: ResultBackNavigator<BulletinboardMessage>
+    resultNavigator: ResultBackNavigator<PostViewModel.BulletinboardMessageWrapper>
 ) {
     var showImagePick by remember { mutableStateOf(false) }
 
@@ -162,7 +163,12 @@ fun EditPostScreen(
 
     //on post success
     onSuccess?.apply {
-        resultNavigator.navigateBack(this)
+        resultNavigator.navigateBack(
+            PostViewModel.BulletinboardMessageWrapper(
+                message = this,
+                isPin = editPost != null
+            )
+        )
     }
 
     SaveConfirmDialogScreen(

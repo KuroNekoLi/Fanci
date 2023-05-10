@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,12 +46,14 @@ import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
+import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -73,7 +76,7 @@ fun PostScreen(
             parametersOf(channel.id.orEmpty())
         }
     ),
-    resultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>,
+    resultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, BulletinboardMessage>
 ) {
     val TAG = "PostScreen"
@@ -89,6 +92,18 @@ fun PostScreen(
             Pair<Boolean, BulletinboardMessage?>(
                 false,
                 null
+            )
+        )
+    }
+
+    //置頂 提示
+    var showPinDialogTip by remember {
+        mutableStateOf(
+            //是否顯示dialog, data, isPin
+            Triple<Boolean, BulletinboardMessage?, Boolean>(
+                false,
+                null,
+                false
             )
         )
     }
@@ -114,7 +129,14 @@ fun PostScreen(
                 postMoreActionType = PostMoreActionType.Post,
                 onInteractClick = {
                     when (it) {
-                        is PostInteract.Announcement -> TODO()
+                        is PostInteract.Announcement -> {
+                            showPinDialogTip = Triple(
+                                true,
+                                post,
+                                viewModel.isPinPost(post)
+                            )
+                        }
+
                         is PostInteract.Delete -> {
                             showPostDeleteTip = Pair(true, post)
                         }
@@ -155,10 +177,16 @@ fun PostScreen(
             }
 
             is NavResult.Value -> {
-                viewModel.onPostSuccess(result.value)
-                coroutineScope.launch {
-                    listState.scrollToItem(index = 0)
+                val post = result.value
+                if (post.isPin) {
+                    viewModel.onUpdate(post.message)
+                } else {
+                    viewModel.onPostSuccess(post.message)
+                    coroutineScope.launch {
+                        listState.scrollToItem(index = 0)
+                    }
                 }
+
             }
         }
     }
@@ -177,28 +205,85 @@ fun PostScreen(
 
     //==================== 彈窗提示 ====================
     //是否刪貼文
-    DeleteConfirmDialogScreen(
-        date = showPostDeleteTip.second,
-        isShow = showPostDeleteTip.first,
-        title = "確定刪除貼文",
-        content = "貼文刪除後，內容將會完全消失。",
-        onCancel = {
-            showPostDeleteTip = showPostDeleteTip.copy(first = false)
-        },
-        onConfirm = {
-            showPostDeleteTip = showPostDeleteTip.copy(first = false)
-            showPostDeleteTip.second?.let {
-                viewModel.onDeletePostClick(it)
+    if (showPostDeleteTip.first) {
+        DeleteConfirmDialogScreen(
+            date = showPostDeleteTip.second,
+            isShow = showPostDeleteTip.first,
+            title = "確定刪除貼文",
+            content = "貼文刪除後，內容將會完全消失。",
+            onCancel = {
+                showPostDeleteTip = showPostDeleteTip.copy(first = false)
+            },
+            onConfirm = {
+                showPostDeleteTip = showPostDeleteTip.copy(first = false)
+                showPostDeleteTip.second?.let {
+                    viewModel.onDeletePostClick(it)
+                }
+            }
+        )
+    }
+
+    //置頂提示彈窗
+    if (showPinDialogTip.first) {
+        val isPinPost = showPinDialogTip.third
+        DialogScreen(
+            onDismiss = {
+                showPinDialogTip = Triple(false, null, false)
+            },
+            titleIconRes = R.drawable.pin,
+            iconFilter = LocalColor.current.component.other,
+            title = "置頂文章",
+            subTitle = if (isPinPost) {
+                ""
+            } else {
+                "置頂這篇文章，重要貼文不再被淹沒！"
+            }
+        ) {
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = if (isPinPost) {
+                    "取消置頂"
+                } else {
+                    "置頂文章"
+                },
+                borderColor = LocalColor.current.text.default_50,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                run {
+                    if (isPinPost) {
+                        viewModel.unPinPost(channel.id.orEmpty(), showPinDialogTip.second)
+                    } else {
+                        viewModel.pinPost(channel.id.orEmpty(), showPinDialogTip.second)
+                    }
+                    showPinDialogTip = Triple(false, null, false)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "取消",
+                borderColor = LocalColor.current.text.default_50,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                run {
+                    showPinDialogTip = Triple(false, null, false)
+                }
             }
         }
-    )
+    }
 }
 
 @Composable
 private fun PostScreenView(
     modifier: Modifier = Modifier,
     pinPost: BulletinboardMessage?,
-    postList: List<PostViewModel.Post>,
+    postList: List<PostViewModel.BulletinboardMessageWrapper>,
     navController: DestinationsNavigator,
     channel: Channel,
     onPostClick: () -> Unit,
@@ -239,27 +324,26 @@ private fun PostScreenView(
                     }
                 }
 
-                items(items = postList) { post ->
-                    if (!post.isPin) {
-                        post.message.let { postMessage ->
-                            BasePostContentScreen(
+                val filterPost = postList.filter { !it.isPin }
+
+                items(items = filterPost) { post ->
+                    val postMessage = post.message
+                    BasePostContentScreen(
+                        post = postMessage,
+                        bottomContent = {
+                            CommentCount(
                                 post = postMessage,
-                                bottomContent = {
-                                    CommentCount(
-                                        post = postMessage,
-                                        navController = navController,
-                                        channel = channel
-                                    )
-                                },
-                                onMoreClick = {
-                                    onMoreClick.invoke(postMessage)
-                                },
-                                onEmojiClick = {
-                                    onEmojiClick.invoke(postMessage, it)
-                                }
+                                navController = navController,
+                                channel = channel
                             )
+                        },
+                        onMoreClick = {
+                            onMoreClick.invoke(postMessage)
+                        },
+                        onEmojiClick = {
+                            onEmojiClick.invoke(postMessage, it)
                         }
-                    }
+                    )
                 }
             }
         }
@@ -376,7 +460,7 @@ fun PostScreenPreview() {
     FanciTheme {
         PostScreenView(
             postList = PostViewModel.mockListMessage.map {
-                PostViewModel.Post(message = it)
+                PostViewModel.BulletinboardMessageWrapper(message = it)
             },
             pinPost = null,
             navController = EmptyDestinationsNavigator,

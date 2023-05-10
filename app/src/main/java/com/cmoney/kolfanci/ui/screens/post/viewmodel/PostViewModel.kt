@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.post.viewmodel
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
@@ -21,6 +22,7 @@ import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import kotlin.random.Random
 
 class PostViewModel(
@@ -33,13 +35,14 @@ class PostViewModel(
     /**
      * 顯示貼文model
      */
-    data class Post(
+    @Parcelize
+    data class BulletinboardMessageWrapper(
         val message: BulletinboardMessage,
         val isPin: Boolean = false
-    )
+    ): Parcelable
 
     //貼文清單
-    private val _post = MutableStateFlow<List<Post>>(emptyList())
+    private val _post = MutableStateFlow<List<BulletinboardMessageWrapper>>(emptyList())
     val post = _post.asStateFlow()
 
     //置頂貼文
@@ -64,7 +67,7 @@ class PostViewModel(
 
                 val postList = _post.value.toMutableList()
                 postList.addAll(it.items?.map { post ->
-                    Post(
+                    BulletinboardMessageWrapper(
                         message = post,
                         isPin = false
                     )
@@ -103,7 +106,9 @@ class PostViewModel(
                                     isPin = true
                                 )
                             } else {
-                                post
+                                post.copy(
+                                    isPin = false
+                                )
                             }
                         }
 
@@ -125,10 +130,13 @@ class PostViewModel(
         }
     }
 
+    /**
+     * 發送貼文 成功
+     */
     fun onPostSuccess(bulletinboardMessage: BulletinboardMessage) {
         KLog.i(TAG, "onPostSuccess:$bulletinboardMessage")
         val postList = _post.value.toMutableList()
-        postList.add(0, Post(message = bulletinboardMessage))
+        postList.add(0, BulletinboardMessageWrapper(message = bulletinboardMessage))
         _post.value = postList
     }
 
@@ -171,7 +179,7 @@ class PostViewModel(
             //UI show
             _post.value = _post.value.map {
                 if (it.message.id == postMessage.id) {
-                    Post(message = postMessage)
+                    BulletinboardMessageWrapper(message = postMessage)
                 } else {
                     it
                 }
@@ -199,8 +207,8 @@ class PostViewModel(
                 val editList = _post.value.toMutableList()
 
                 _post.value = editList.map {
-                    if (it.message.id == result.id) {
-                        Post(message = updatePost)
+                    if (it.message.id == updatePost.id) {
+                        BulletinboardMessageWrapper(message = updatePost)
                     } else {
                         it
                     }
@@ -215,7 +223,7 @@ class PostViewModel(
                 //local update
                 _post.value = _post.value.map {
                     if (it.message.id == bulletinboardMessage.id) {
-                        Post(message = bulletinboardMessage)
+                        BulletinboardMessageWrapper(message = bulletinboardMessage)
                     } else {
                         it
                     }
@@ -257,6 +265,60 @@ class PostViewModel(
             }
 
         }
+    }
+
+    /**
+     * 置頂貼文
+     *
+     * @param channelId 頻道id
+     * @param message 要置頂的文章
+     */
+    fun pinPost(channelId: String, message: BulletinboardMessage?) {
+        KLog.i(TAG, "pinPost:$message")
+        viewModelScope.launch {
+            postUseCase.pinPost(
+                channelId = channelId,
+                messageId = message?.id.orEmpty()
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    KLog.i(TAG, "pinPost success.")
+                    fetchPinPost()
+                } else {
+                    it.printStackTrace()
+                    KLog.e(TAG, it)
+                }
+            })
+
+        }
+    }
+
+    /**
+     * 取消置頂貼文
+     * @param channelId 頻道id
+     * @param message 要取消置頂的文章
+     */
+    fun unPinPost(channelId: String, message: BulletinboardMessage?) {
+        KLog.i(TAG, "unPinPost:$message")
+        viewModelScope.launch {
+            postUseCase.unPinPost(channelId).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    KLog.i(TAG, "unPinPost success.")
+                    fetchPinPost()
+                } else {
+                    it.printStackTrace()
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
+
+    /**
+     * 檢查該貼文 是否為 pin
+     */
+    fun isPinPost(post: BulletinboardMessage): Boolean {
+        return _pinPost.value?.id == post.id
     }
 
     companion object {

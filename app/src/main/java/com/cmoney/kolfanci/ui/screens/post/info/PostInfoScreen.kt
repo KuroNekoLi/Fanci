@@ -95,7 +95,7 @@ fun PostInfoScreen(
         }
     ),
     resultNavigator: ResultBackNavigator<BulletinboardMessage>,
-    editResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>
+    editResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>
 ) {
     val context = LocalContext.current
 
@@ -345,7 +345,7 @@ fun PostInfoScreen(
             }
 
             is NavResult.Value -> {
-                viewModel.onUpdatePost(result.value)
+                viewModel.onUpdatePost(result.value.message)
             }
         }
     }

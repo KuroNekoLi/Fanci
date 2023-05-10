@@ -25,6 +25,7 @@ import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
+import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -48,7 +49,7 @@ fun ChannelScreen(
     channel: Channel,
     viewMode: ChannelViewModel = koinViewModel(),
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
-    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>,
+    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, BulletinboardMessage>
 ) {
 
@@ -77,7 +78,7 @@ private fun ChannelScreenView(
     navController: DestinationsNavigator,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     channelTabStatus: ChannelTabsStatus,
-    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, BulletinboardMessage>,
+    editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, BulletinboardMessage>
 ) {
     Scaffold(
