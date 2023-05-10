@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
@@ -51,9 +52,11 @@ import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
+import com.cmoney.kolfanci.ui.screens.post.dialog.ReportPostDialogScreenScreen
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -83,9 +86,10 @@ fun PostScreen(
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    val postList by viewModel.post.collectAsState()
     val context = LocalContext.current
+    val postList by viewModel.post.collectAsState()
     val pinPost by viewModel.pinPost.collectAsState()
+    val toastMessage by viewModel.toast.collectAsState()
 
     var showPostDeleteTip by remember {
         mutableStateOf(
@@ -104,6 +108,16 @@ fun PostScreen(
                 false,
                 null,
                 false
+            )
+        )
+    }
+
+    //檢舉提示 dialog
+    var showPostReportTip by remember {
+        mutableStateOf(
+            Pair<Boolean, BulletinboardMessage?>(
+                false,
+                null
             )
         )
     }
@@ -151,7 +165,10 @@ fun PostScreen(
                             )
                         }
 
-                        is PostInteract.Report -> TODO()
+                        is PostInteract.Report -> {
+                            KLog.i(TAG, "PostInteract.Report click.")
+                            showPostReportTip = Pair(true, post)
+                        }
                     }
                 }
             )
@@ -204,6 +221,30 @@ fun PostScreen(
     }
 
     //==================== 彈窗提示 ====================
+    //提示 Snackbar
+    toastMessage?.let {
+        FanciSnackBarScreen(
+            modifier = Modifier.padding(bottom = 70.dp),
+            message = it
+        ) {
+            viewModel.dismissSnackBar()
+        }
+    }
+
+    //檢舉貼文
+    if (showPostReportTip.first) {
+        ReportPostDialogScreenScreen(
+            user = showPostReportTip.second?.author ?: GroupMember(),
+            onDismiss = {
+                showPostReportTip = Pair(false, null)
+            },
+            onConfirm = { reportReason ->
+                viewModel.onReportPost(channel.id.orEmpty(), showPostReportTip.second, reportReason)
+                showPostReportTip = Pair(false, null)
+            }
+        )
+    }
+
     //是否刪貼文
     if (showPostDeleteTip.first) {
         DeleteConfirmDialogScreen(

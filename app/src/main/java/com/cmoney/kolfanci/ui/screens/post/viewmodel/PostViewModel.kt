@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.post.viewmodel
 
 import android.os.Parcelable
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
@@ -10,6 +11,8 @@ import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
@@ -17,6 +20,9 @@ import com.cmoney.kolfanci.extension.toBulletinboardMessage
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
+import com.cmoney.kolfanci.ui.theme.White_494D54
+import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.Utils
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +45,7 @@ class PostViewModel(
     data class BulletinboardMessageWrapper(
         val message: BulletinboardMessage,
         val isPin: Boolean = false
-    ): Parcelable
+    ) : Parcelable
 
     //貼文清單
     private val _post = MutableStateFlow<List<BulletinboardMessageWrapper>>(emptyList())
@@ -48,6 +54,10 @@ class PostViewModel(
     //置頂貼文
     private val _pinPost = MutableStateFlow<BulletinboardMessage?>(null)
     val pinPost = _pinPost.asStateFlow()
+
+    //Toast message
+    private val _toast = MutableStateFlow<CustomMessage?>(null)
+    val toast = _toast.asStateFlow()
 
     var haveNextPage: Boolean = false
     var nextWeight: Long? = null    //貼文分頁 索引
@@ -319,6 +329,40 @@ class PostViewModel(
      */
     fun isPinPost(post: BulletinboardMessage): Boolean {
         return _pinPost.value?.id == post.id
+    }
+
+    /**
+     * 檢舉貼文
+     */
+    fun onReportPost(channelId: String, message: BulletinboardMessage?, reason: ReportReason) {
+        KLog.i(TAG, "onReportPost:$reason")
+        viewModelScope.launch {
+            chatRoomUseCase.reportContent(
+                channelId = channelId,
+                contentId = message?.id.orEmpty(),
+                reason = reason
+            ).fold({
+                KLog.i(TAG, "onReportUser success:$it")
+                _toast.value = CustomMessage(
+                    textString = "檢舉成立！",
+                    textColor = Color.White,
+                    iconRes = R.drawable.report,
+                    iconColor = White_767A7F,
+                    backgroundColor = White_494D54
+                )
+            }, {
+                KLog.e(TAG, it)
+                it.printStackTrace()
+            })
+        }
+    }
+
+    /**
+     * 取消 snackBar
+     */
+    fun dismissSnackBar() {
+        KLog.i(TAG, "dismissSnackBar")
+        _toast.value = null
     }
 
     companion object {
