@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
@@ -807,7 +808,8 @@ class PostInfoViewModel(
             chatRoomUseCase.reportContent(
                 channelId = channelId,
                 contentId = message?.id.orEmpty(),
-                reason = reason
+                reason = reason,
+                tabType = ChannelTabType.bulletinboard
             ).fold({
                 KLog.i(TAG, "onReportUser success:$it")
                 _toast.value = CustomMessage(

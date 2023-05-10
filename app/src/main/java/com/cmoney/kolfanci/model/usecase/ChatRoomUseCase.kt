@@ -69,17 +69,20 @@ class ChatRoomUseCase(
      * @param channelId 頻道 id
      * @param contentId 哪一篇文章
      * @param reason 原因
+     * @param tabType 聊天室 or 貼文
      */
     suspend fun reportContent(
         channelId: String,
         contentId: String,
-        reason: ReportReason
+        reason: ReportReason,
+        tabType: ChannelTabType = ChannelTabType.chatRoom
     ) = kotlin.runCatching {
         userReport.apiV1UserReportChannelChannelIdPost(
             channelId = channelId,
             reportParm = ReportParm(
                 contentId = contentId,
-                reason = reason
+                reason = reason,
+                tabType = tabType
             )
         ).checkResponseBody()
     }

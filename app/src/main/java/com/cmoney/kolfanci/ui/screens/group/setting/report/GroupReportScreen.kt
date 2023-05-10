@@ -310,9 +310,30 @@ private fun ReportItem(
 
         Spacer(modifier = Modifier.height(13.dp))
 
-        //Chat room title
+        val reportTitle = when (reportInformation.tabType) {
+            ChannelTabType.bulletinboard -> {
+                val messageId = reportInformation.contentId.orEmpty()
+
+                when (messageId.count { it == '-' }) {  //區分 貼文,留言,回覆
+                    //留言
+                    1 -> {
+                        "於「%s」發布一則留言：".format(channel?.name.orEmpty())
+                    }
+                    //回覆
+                    2 -> {
+                        "於「%s」發布一則回覆：".format(channel?.name.orEmpty())
+                    }
+                    else -> {
+                        "於「%s」發布一則貼文：".format(channel?.name.orEmpty())
+                    }
+                }
+            }
+            else -> "於「%s」發布一則聊天聊天訊息：".format(channel?.name.orEmpty())
+        }
+
+        //title
         Text(
-            text = "於聊天室「%s」發布：".format(channel?.name.orEmpty()),
+            text = reportTitle,
             fontSize = 16.sp,
             color = LocalColor.current.text.default_100
         )
@@ -322,10 +343,7 @@ private fun ReportItem(
         //被檢舉內文
         Box(
             modifier = Modifier
-                .width(200.dp)
-                .clip(
-                    RoundedCornerShape(10.dp)
-                )
+                .fillMaxWidth()
                 .background(LocalColor.current.background)
                 .padding(15.dp)
         ) {

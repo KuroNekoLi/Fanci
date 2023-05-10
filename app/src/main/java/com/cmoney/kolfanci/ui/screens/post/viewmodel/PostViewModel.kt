@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
@@ -340,7 +341,8 @@ class PostViewModel(
             chatRoomUseCase.reportContent(
                 channelId = channelId,
                 contentId = message?.id.orEmpty(),
-                reason = reason
+                reason = reason,
+                tabType = ChannelTabType.bulletinboard
             ).fold({
                 KLog.i(TAG, "onReportUser success:$it")
                 _toast.value = CustomMessage(
