@@ -47,6 +47,7 @@ import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
@@ -382,28 +383,32 @@ private fun PostScreenView(
                             onMoreClick.invoke(postMessage)
                         },
                         onEmojiClick = {
-                            onEmojiClick.invoke(postMessage, it)
+                            if (Constant.isCanEmoji()) {
+                                onEmojiClick.invoke(postMessage, it)
+                            }
                         }
                     )
                 }
             }
         }
 
-        FloatingActionButton(
-            modifier = Modifier
-                .padding(30.dp)
-                .align(Alignment.BottomEnd),
-            onClick = {
-                onPostClick.invoke()
-            },
-            backgroundColor = LocalColor.current.primary,
-            shape = CircleShape,
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = "Add FAB",
-                tint = LocalColor.current.text.default_100,
-            )
+        if (Constant.canPostMessage()) {
+            FloatingActionButton(
+                modifier = Modifier
+                    .padding(30.dp)
+                    .align(Alignment.BottomEnd),
+                onClick = {
+                    onPostClick.invoke()
+                },
+                backgroundColor = LocalColor.current.primary,
+                shape = CircleShape,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "Add FAB",
+                    tint = LocalColor.current.text.default_100,
+                )
+            }
         }
     }
 }

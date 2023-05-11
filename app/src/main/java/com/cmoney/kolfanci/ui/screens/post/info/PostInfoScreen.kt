@@ -51,6 +51,7 @@ import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
@@ -187,12 +188,16 @@ fun PostInfoScreen(
     //貼文 callback listener
     val postInfoListener = object : PostInfoListener {
         override fun onEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
-            viewModel.onEmojiClick(comment, resourceId)
+            if (Constant.isCanEmoji()) {
+                viewModel.onEmojiClick(comment, resourceId)
+            }
         }
 
         override fun onCommentSend(text: String) {
-            viewModel.onCommentReplySend(text)
-            keyboard?.hide()
+            if (Constant.isCanReply()) {
+                viewModel.onCommentReplySend(text)
+                keyboard?.hide()
+            }
         }
 
         override fun onBackClick() {
@@ -208,7 +213,9 @@ fun PostInfoScreen(
         }
 
         override fun onCommentEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
-            viewModel.onCommentEmojiClick(comment, resourceId)
+            if (Constant.isCanEmoji()) {
+                viewModel.onCommentEmojiClick(comment, resourceId)
+            }
         }
 
         override fun onCommentReplyClose() {
@@ -256,7 +263,9 @@ fun PostInfoScreen(
     //底部留言 callback listener
     val commentBottomContentListener = object : CommentBottomContentListener {
         override fun onCommentReplyClick(comment: BulletinboardMessage) {
-            viewModel.onCommentReplyClick(comment)
+            if (Constant.isCanReply()) {
+                viewModel.onCommentReplyClick(comment)
+            }
         }
 
         override fun onExpandClick(comment: BulletinboardMessage) {
@@ -275,7 +284,9 @@ fun PostInfoScreen(
             reply: BulletinboardMessage,
             resourceId: Int
         ) {
-            viewModel.onReplyEmojiClick(comment, reply, resourceId)
+            if (Constant.isCanEmoji()) {
+                viewModel.onReplyEmojiClick(comment, reply, resourceId)
+            }
         }
 
         //留言 更多動做

@@ -107,17 +107,25 @@ fun PostMoreActionDialogScreen(
                     }
                     //他人
                     else {
-                        FeatureText(R.drawable.top, "置頂貼文") {
-                            onClose(coroutineScope, modalBottomSheetState)
-                            onInteractClick.invoke(PostInteract.Announcement(postMessage))
+                        if (Constant.isCanManage()) {
+                            FeatureText(R.drawable.top, "置頂貼文") {
+                                onClose(coroutineScope, modalBottomSheetState)
+                                onInteractClick.invoke(PostInteract.Announcement(postMessage))
+                            }
                         }
-                        FeatureText(R.drawable.report, getReportTitle()) {
-                            onClose(coroutineScope, modalBottomSheetState)
-                            onInteractClick.invoke(PostInteract.Report(postMessage))
+
+                        if (Constant.isCanReport()) {
+                            FeatureText(R.drawable.report, getReportTitle()) {
+                                onClose(coroutineScope, modalBottomSheetState)
+                                onInteractClick.invoke(PostInteract.Report(postMessage))
+                            }
                         }
-                        FeatureText(R.drawable.delete, getDeleteTitle()) {
-                            onClose(coroutineScope, modalBottomSheetState)
-                            onInteractClick.invoke(PostInteract.Delete(postMessage))
+
+                        if (Constant.isCanManage()) {
+                            FeatureText(R.drawable.delete, getDeleteTitle()) {
+                                onClose(coroutineScope, modalBottomSheetState)
+                                onInteractClick.invoke(PostInteract.Delete(postMessage))
+                            }
                         }
                     }
                 }
@@ -136,13 +144,18 @@ fun PostMoreActionDialogScreen(
                     }
                     //他人
                     else {
-                        FeatureText(R.drawable.report, getReportTitle()) {
-                            onClose(coroutineScope, modalBottomSheetState)
-                            onInteractClick.invoke(PostInteract.Report(postMessage))
+                        if (Constant.isCanReport()) {
+                            FeatureText(R.drawable.report, getReportTitle()) {
+                                onClose(coroutineScope, modalBottomSheetState)
+                                onInteractClick.invoke(PostInteract.Report(postMessage))
+                            }
                         }
-                        FeatureText(R.drawable.delete, getDeleteTitle()) {
-                            onClose(coroutineScope, modalBottomSheetState)
-                            onInteractClick.invoke(PostInteract.Delete(postMessage))
+
+                        if (Constant.isCanManage()) {
+                            FeatureText(R.drawable.delete, getDeleteTitle()) {
+                                onClose(coroutineScope, modalBottomSheetState)
+                                onInteractClick.invoke(PostInteract.Delete(postMessage))
+                            }
                         }
                     }
                 }

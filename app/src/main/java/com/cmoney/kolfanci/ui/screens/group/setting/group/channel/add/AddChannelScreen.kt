@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.channel.add
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -179,6 +183,7 @@ fun AddChannelScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.setChannelApproval(result.value)
             }
@@ -189,6 +194,7 @@ fun AddChannelScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.addChannelRole(result.value)
             }
@@ -199,6 +205,7 @@ fun AddChannelScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.setPermissionMemberSelected(result.value)
             }
@@ -299,6 +306,7 @@ fun AddChannelScreenView(
                             }
                         )
                     }
+
                     else -> {
                     }
                 }
@@ -430,7 +438,7 @@ private fun PermissionTabScreen(
     channelPermissionModel: List<ChannelAccessOptionModel>,
     onPermissionClick: (ChannelAccessOptionModel) -> Unit
 ) {
-    Column {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(10.dp))
 
         SettingItemScreen(
@@ -464,7 +472,10 @@ private fun PermissionTabScreen(
             Spacer(modifier = Modifier.height(25.dp))
             Text(
                 modifier = Modifier.padding(start = 16.dp),
-                text = "管理頻道成員（%d人）".format(uniqueUserCount), fontSize = 14.sp, color = Color_80FFFFFF)
+                text = "管理頻道成員（%d人）".format(uniqueUserCount),
+                fontSize = 14.sp,
+                color = Color_80FFFFFF
+            )
             Spacer(modifier = Modifier.height(15.dp))
             channelPermissionModel.forEach { it ->
                 ChannelPermissionItem(it) { channelPermissionModel ->
@@ -472,6 +483,29 @@ private fun PermissionTabScreen(
                     onPermissionClick.invoke(channelPermissionModel)
                 }
                 Spacer(modifier = Modifier.height(1.dp))
+            }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(LocalColor.current.background)
+            ) {
+                val colorMatrix = floatArrayOf(
+                    -1f, 0f, 0f, 0f, 255f,
+                    0f, -1f, 0f, 0f, 255f,
+                    0f, 0f, -1f, 0f, 255f,
+                    0f, 0f, 0f, 1f, 0f
+                )
+
+                Image(
+                    modifier = Modifier.fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.permission_table),
+                    contentScale = ContentScale.FillWidth,
+                    contentDescription = null,
+//                    colorFilter = ColorFilter.colorMatrix(ColorMatrix(colorMatrix))
+                )
             }
         }
 
