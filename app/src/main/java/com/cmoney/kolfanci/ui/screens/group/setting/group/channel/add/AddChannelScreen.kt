@@ -77,9 +77,11 @@ fun AddChannelScreen(
     }
 
     //Edit mode
-    channel?.let {
-        if (viewModel.channel == null) {
-            viewModel.initChannel(it)
+    LaunchedEffect(Unit) {
+        channel?.let {
+            if (viewModel.channel == null) {
+                viewModel.initChannel(it)
+            }
         }
     }
 
@@ -111,7 +113,6 @@ fun AddChannelScreen(
             } else {
                 viewModel.editChannel(
                     group = group,
-                    channel = channel,
                     name = it
                 )
             }

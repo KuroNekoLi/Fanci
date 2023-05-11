@@ -82,7 +82,7 @@ fun EditChannelScreen(
         group = group,
         selectedIndex = uiState.tabSelected,
         onConfirm = {
-            viewModel.editChannel(group, channel, it)
+            viewModel.editChannel(group, it)
         },
         onDelete = {
             KLog.i(TAG, "onDelete click")
