@@ -34,12 +34,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -47,6 +47,7 @@ import org.koin.androidx.compose.koinViewModel
  */
 @Composable
 fun MessageInput(
+    tabType: ChannelTabType = ChannelTabType.chatRoom,
     defaultText: String = "",
     onMessageSend: (text: String) -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
@@ -89,6 +90,20 @@ fun MessageInput(
             )
         }
 
+        /**
+         * 是否要顯示不能輸入的遮罩
+         */
+        fun isShowMask(): Boolean {
+            return when (tabType) {
+                ChannelTabType.chatRoom -> {
+                    !Constant.canPostMessage()
+                }
+                ChannelTabType.bulletinboard -> {
+                    !Constant.canPostMessage() && !Constant.isCanReply()
+                }
+            }
+        }
+        
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -115,25 +130,44 @@ fun MessageInput(
                 maxLines = 5,
                 textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                 placeholder = {
+                    val hintText = when (tabType) {
+                        ChannelTabType.chatRoom -> {
+                            if (Constant.canPostMessage()) {
+                                "輸入你想說的話..."
+                            } else {
+                                if(Constant.isBuffSilence()) {
+                                    Constant.getChannelSilenceDesc()
+                                }
+                                else {
+                                    "基本權限，無法與頻道成員互動"
+                                }
+                            }
+                        }
+                        ChannelTabType.bulletinboard -> {
+                            if (Constant.canPostMessage() || Constant.isCanReply()) {
+                                "輸入你想說的話..."
+                            } else {
+                                if(Constant.isBuffSilence()) {
+                                    Constant.getChannelSilenceDesc()
+                                }
+                                else {
+                                    "基本權限，無法與頻道成員互動"
+                                }
+                            }
+                        }
+                    }
+
                     Text(
-                        text = if (Constant.canPostMessage()) {
-                            "輸入你想說的話..."
-                        } else {
-                            if(Constant.isBuffSilence()) {
-                                Constant.getChannelSilenceDesc()
-                            }
-                            else {
-                                "基本權限，無法與頻道成員互動"
-                            }
-                        },
+                        text = hintText,
                         fontSize = 16.sp,
                         color = LocalColor.current.inputText.input_30
                     )
                 },
-                enabled = Constant.canPostMessage()
+                enabled = !isShowMask()
             )
 
-            if (!Constant.canPostMessage()) {
+            if (isShowMask()) {
+                //不能打字的遮罩
                 Box(modifier = Modifier
                     .fillMaxSize()
                     .clickable {
@@ -143,7 +177,7 @@ fun MessageInput(
             }
         }
 
-        if (isShowSend && Constant.canPostMessage()) {
+        if (isShowSend && !isShowMask()) {
             IconButton(
                 onClick = {
                     onMessageSend.invoke(textState)

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.kolfanci.R
@@ -680,6 +681,7 @@ private fun PostInfoScreenView(
                 //輸入匡
                 key(inputText) {
                     MessageInput(
+                        tabType = ChannelTabType.bulletinboard,
                         defaultText = inputText,
                         onMessageSend = {
                             postInfoListener.onCommentSend(it)
