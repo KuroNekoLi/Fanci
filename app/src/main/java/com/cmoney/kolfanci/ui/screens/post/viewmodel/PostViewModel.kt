@@ -21,6 +21,7 @@ import com.cmoney.kolfanci.extension.toBulletinboardMessage
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
+import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
@@ -365,6 +366,35 @@ class PostViewModel(
     fun dismissSnackBar() {
         KLog.i(TAG, "dismissSnackBar")
         _toast.value = null
+    }
+
+    /**
+     * PostInfo 頁面,操作完成後回來刷新通知
+     */
+    fun showPostInfoToast(action: PostInfoScreenResult.PostInfoAction) {
+        KLog.i(TAG, "showPostInfoToast")
+        when (action) {
+            PostInfoScreenResult.PostInfoAction.Default -> {}
+            PostInfoScreenResult.PostInfoAction.Delete -> {
+                _toast.value = CustomMessage(
+                    textString = "貼文已刪除！",
+                    textColor = Color.White,
+                    iconRes = R.drawable.delete,
+                    iconColor = White_767A7F,
+                    backgroundColor = White_494D54
+                )
+            }
+
+            PostInfoScreenResult.PostInfoAction.Pin -> {
+                _toast.value = CustomMessage(
+                    textString = "貼文已置頂！",
+                    textColor = Color.White,
+                    iconRes = R.drawable.pin,
+                    iconColor = White_767A7F,
+                    backgroundColor = White_494D54
+                )
+            }
+        }
     }
 
     companion object {

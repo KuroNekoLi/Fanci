@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.post.info
 
 import android.net.Uri
+import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -82,8 +83,22 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+@Parcelize
+data class PostInfoScreenResult(
+    val post: BulletinboardMessage,
+    val action: PostInfoAction = PostInfoAction.Default
+): Parcelable {
+    @Parcelize
+    sealed class PostInfoAction: Parcelable {
+        object Default: PostInfoAction()
+        object Pin: PostInfoAction()
+        object Delete: PostInfoAction()
+    }
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
@@ -99,7 +114,7 @@ fun PostInfoScreen(
             parametersOf(post, channel)
         }
     ),
-    resultNavigator: ResultBackNavigator<BulletinboardMessage>,
+    resultNavigator: ResultBackNavigator<PostInfoScreenResult>,
     editResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>
 ) {
     val TAG = "PostInfoScreen"
@@ -202,7 +217,11 @@ fun PostInfoScreen(
         }
 
         override fun onBackClick() {
-            resultNavigator.navigateBack(viewModel.post.value)
+            resultNavigator.navigateBack(
+                PostInfoScreenResult(
+                    post = viewModel.post.value,
+                )
+            )
         }
 
         override fun onAttachClick() {
@@ -523,7 +542,11 @@ fun PostInfoScreen(
     }
 
     BackHandler {
-        resultNavigator.navigateBack(viewModel.post.value)
+        resultNavigator.navigateBack(
+            PostInfoScreenResult(
+                post = viewModel.post.value
+            )
+        )
     }
 }
 

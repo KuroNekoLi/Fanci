@@ -24,6 +24,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
+import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
@@ -76,7 +77,7 @@ class PostInfoViewModel(
     val inputText = _inputText.asStateFlow()
 
     //更新貼文
-    private val _updatePost = MutableStateFlow<BulletinboardMessage?>(null)
+    private val _updatePost = MutableStateFlow<PostInfoScreenResult?>(null)
     val updatePost = _updatePost.asStateFlow()
 
     //Toast message
@@ -700,6 +701,14 @@ class PostInfoViewModel(
         _comment.value = _comment.value.filter {
             it.id != comment.id
         }
+
+        _toast.value = CustomMessage(
+            textString = "留言已刪除！",
+            textColor = Color.White,
+            iconRes = R.drawable.delete,
+            iconColor = White_767A7F,
+            backgroundColor = White_494D54
+        )
     }
 
     /**
@@ -716,6 +725,14 @@ class PostInfoViewModel(
                     }
                     _replyMap.value[comment.id.orEmpty()] = replyNotNullData.copy(
                         replyList = filterReplyList
+                    )
+
+                    _toast.value = CustomMessage(
+                        textString = "回覆已刪除！",
+                        textColor = Color.White,
+                        iconRes = R.drawable.delete,
+                        iconColor = White_767A7F,
+                        backgroundColor = White_494D54
                     )
 
                     //刷新上一層 留言裡面的回覆數量
@@ -754,7 +771,10 @@ class PostInfoViewModel(
                 chatRoomUseCase.takeBackMyMessage(post.id.orEmpty()).fold({
                 }, {
                     if (it is EmptyBodyException) {
-                        _updatePost.value = post
+                        _updatePost.value = PostInfoScreenResult(
+                            post = post,
+                            action = PostInfoScreenResult.PostInfoAction.Delete
+                        )
                     } else {
                         it.printStackTrace()
                     }
@@ -765,7 +785,10 @@ class PostInfoViewModel(
                 chatRoomUseCase.deleteOtherMessage(post.id.orEmpty()).fold({
                 }, {
                     if (it is EmptyBodyException) {
-                        _updatePost.value = post
+                        _updatePost.value = PostInfoScreenResult(
+                            post = post,
+                            action = PostInfoScreenResult.PostInfoAction.Delete
+                        )
                     } else {
                         it.printStackTrace()
                     }
@@ -797,7 +820,10 @@ class PostInfoViewModel(
             }, {
                 if (it is EmptyBodyException) {
                     KLog.i(TAG, "pinPost success.")
-                    _updatePost.value = message
+                    _updatePost.value = PostInfoScreenResult(
+                        post = message!!,
+                        action = PostInfoScreenResult.PostInfoAction.Pin
+                    )
                 } else {
                     it.printStackTrace()
                     KLog.e(TAG, it)
@@ -819,7 +845,10 @@ class PostInfoViewModel(
             }, {
                 if (it is EmptyBodyException) {
                     KLog.i(TAG, "unPinPost success.")
-                    _updatePost.value = message
+                    _updatePost.value = PostInfoScreenResult(
+                        post = message!!,
+                        action = PostInfoScreenResult.PostInfoAction.Default
+                    )
                 } else {
                     it.printStackTrace()
                     KLog.e(TAG, it)

@@ -25,6 +25,7 @@ import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
+import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -50,7 +51,7 @@ fun ChannelScreen(
     viewMode: ChannelViewModel = koinViewModel(),
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
-    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, BulletinboardMessage>
+    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
 ) {
 
     LaunchedEffect(Unit) {
@@ -79,7 +80,7 @@ private fun ChannelScreenView(
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     channelTabStatus: ChannelTabsStatus,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
-    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, BulletinboardMessage>
+    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
