@@ -6835,6 +6835,19 @@
         },
         "additionalProperties": false
       },
+      "IMedia": {
+        "type": "object",
+        "properties": {
+          "resourceLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/MediaType"
+          }
+        },
+        "additionalProperties": false
+      },
       "IUserMessageReaction": {
         "type": "object",
         "properties": {
@@ -7045,6 +7058,13 @@
           },
           "contentSnapshot": {
             "type": "string",
+            "nullable": true
+          },
+          "mediasSnapshot": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IMedia"
+            },
             "nullable": true
           },
           "processStatus": {
