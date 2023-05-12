@@ -13,6 +13,7 @@ import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
@@ -344,6 +345,7 @@ class PostInfoViewModel(
                 this@PostInfoViewModel.currentEditMessage = null
 
                 chatRoomUseCase.updateMessage(
+                    messageServiceType = MessageServiceType.bulletinboard,
                     messageId = currentEditMessage.id.orEmpty(),
                     text = text,
                     images = images
@@ -519,6 +521,7 @@ class PostInfoViewModel(
 
         //Call Emoji api
         chatRoomUseCase.clickEmoji(
+            messageServiceType = MessageServiceType.bulletinboard,
             messageId = postMessage.id.orEmpty(),
             emojiCount = emojiCount,
             clickEmoji = clickEmoji
@@ -660,7 +663,10 @@ class PostInfoViewModel(
                     //我發的
                     if (comment.isMyPost(Constant.MyInfo)) {
                         KLog.i(TAG, "delete my comment.")
-                        chatRoomUseCase.takeBackMyMessage(deleteId.orEmpty()).fold({
+                        chatRoomUseCase.takeBackMyMessage(
+                            messageServiceType = MessageServiceType.bulletinboard,
+                            deleteId.orEmpty()
+                        ).fold({
                         }, {
                             if (it is EmptyBodyException) {
                                 if (isComment) {
@@ -675,7 +681,10 @@ class PostInfoViewModel(
                     } else {
                         KLog.i(TAG, "delete other comment.")
                         //他人
-                        chatRoomUseCase.deleteOtherMessage(deleteId.orEmpty()).fold({
+                        chatRoomUseCase.deleteOtherMessage(
+                            messageServiceType = MessageServiceType.bulletinboard,
+                            deleteId.orEmpty()
+                        ).fold({
                         }, {
                             if (it is EmptyBodyException) {
                                 if (isComment) {
@@ -745,7 +754,10 @@ class PostInfoViewModel(
     /**
      * 刷新 留言數量
      */
-    private fun refreshCommentCount(comment: BulletinboardMessage, replyList: List<BulletinboardMessage>) {
+    private fun refreshCommentCount(
+        comment: BulletinboardMessage,
+        replyList: List<BulletinboardMessage>
+    ) {
         KLog.i(TAG, "refreshCommentCount")
         _comment.value = _comment.value.map {
             if (comment.id == it.id) {
@@ -768,7 +780,10 @@ class PostInfoViewModel(
             //我發的
             if (post.isMyPost(Constant.MyInfo)) {
                 KLog.i(TAG, "delete my comment.")
-                chatRoomUseCase.takeBackMyMessage(post.id.orEmpty()).fold({
+                chatRoomUseCase.takeBackMyMessage(
+                    messageServiceType = MessageServiceType.bulletinboard,
+                    post.id.orEmpty()
+                ).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         _updatePost.value = PostInfoScreenResult(
@@ -782,7 +797,10 @@ class PostInfoViewModel(
             } else {
                 KLog.i(TAG, "delete other comment.")
                 //他人
-                chatRoomUseCase.deleteOtherMessage(post.id.orEmpty()).fold({
+                chatRoomUseCase.deleteOtherMessage(
+                    messageServiceType = MessageServiceType.bulletinboard,
+                    post.id.orEmpty()
+                ).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         _updatePost.value = PostInfoScreenResult(

@@ -19,16 +19,19 @@ class ChatRoomUseCase(
     /**
      * 取得單一訊息
      */
-    suspend fun getSingleMessage(messageId: String) = kotlin.runCatching {
-        messageApi.apiV1MessageMessageIdGet(
-            messageId = messageId
-        ).checkResponseBody()
-    }
+    suspend fun getSingleMessage(messageId: String, messageServiceType: MessageServiceType) =
+        kotlin.runCatching {
+            messageApi.apiV2MessageMessageTypeMessageIdGet(
+                messageType = messageServiceType,
+                messageId = messageId
+            ).checkResponseBody()
+        }
 
     /**
      * 更新訊息
      */
     suspend fun updateMessage(
+        messageServiceType: MessageServiceType,
         messageId: String,
         text: String,
         images: List<String> = emptyList()
@@ -44,7 +47,8 @@ class ChatRoomUseCase(
                 )
             }
         )
-        messageApi.apiV1MessageMessageIdPut(
+        messageApi.apiV2MessageMessageTypeMessageIdPut(
+            messageType = messageServiceType,
             messageId = messageId,
             chatMessageParam = chatMessageParam
         ).checkResponseBody()
@@ -53,16 +57,24 @@ class ChatRoomUseCase(
     /**
      * 刪除他人訊息
      */
-    suspend fun deleteOtherMessage(messageId: String) = kotlin.runCatching {
-        messageApi.apiV1MessageRoleMessageIdDelete(messageId = messageId).checkResponseBody()
-    }
+    suspend fun deleteOtherMessage(messageServiceType: MessageServiceType, messageId: String) =
+        kotlin.runCatching {
+            messageApi.apiV2MessageRoleMessageTypeMessageIdDelete(
+                messageType = messageServiceType,
+                messageId = messageId
+            ).checkResponseBody()
+        }
 
     /**
      * 刪除自己發送的訊息
      */
-    suspend fun takeBackMyMessage(messageId: String) = kotlin.runCatching {
-        messageApi.apiV1MessageMeMessageIdDelete(messageId = messageId).checkResponseBody()
-    }
+    suspend fun takeBackMyMessage(messageServiceType: MessageServiceType, messageId: String) =
+        kotlin.runCatching {
+            messageApi.apiV2MessageMeMessageTypeMessageIdDelete(
+                messageType = messageServiceType,
+                messageId = messageId
+            ).checkResponseBody()
+        }
 
     /**
      * 檢舉內容
@@ -117,9 +129,13 @@ class ChatRoomUseCase(
      * @param messageId 針對的訊息Id
      * @param emoji 要發送的 Emoji
      */
-    suspend fun sendEmoji(messageId: String, emoji: Emojis) =
+    suspend fun sendEmoji(
+        messageServiceType: MessageServiceType,
+        messageId: String, emoji: Emojis
+    ) =
         kotlin.runCatching {
-            messageApi.apiV1MessageMessageIdEmojiPut(
+            messageApi.apiV2MessageMessageTypeMessageIdEmojiPut(
+                messageType = messageServiceType,
                 messageId = messageId,
                 emojiParam = EmojiParam(
                     emoji = emoji
@@ -131,27 +147,29 @@ class ChatRoomUseCase(
      * 收回 Emoji
      * @param messageId 訊息 id
      */
-    suspend fun deleteEmoji(messageId: String) = kotlin.runCatching {
-        messageApi.apiV1MessageMessageIdEmojiDelete(
-            messageId = messageId
-        ).checkResponseBody()
-    }
+    suspend fun deleteEmoji(messageServiceType: MessageServiceType, messageId: String) =
+        kotlin.runCatching {
+            messageApi.apiV2MessageMessageTypeMessageIdEmojiDelete(
+                messageType = messageServiceType,
+                messageId = messageId
+            ).checkResponseBody()
+        }
 
     /**
      * 點擊 emoji
      */
-    suspend fun clickEmoji(messageId: String, emojiCount: Int, clickEmoji: Emojis) =
+    suspend fun clickEmoji(messageServiceType: MessageServiceType, messageId: String, emojiCount: Int, clickEmoji: Emojis) =
         kotlin.runCatching {
             if (emojiCount == -1) {
                 //收回
-                deleteEmoji(messageId).fold({
+                deleteEmoji(messageServiceType, messageId).fold({
                     KLog.e(TAG, "delete emoji success.")
                 }, {
                     KLog.e(TAG, it)
                 })
             } else {
                 //增加
-                sendEmoji(messageId, clickEmoji).fold({
+                sendEmoji(messageServiceType, messageId, clickEmoji).fold({
                     KLog.i(TAG, "sendEmoji success.")
                 }, {
                     KLog.e(TAG, it)
@@ -208,10 +226,12 @@ class ChatRoomUseCase(
      * @param messageId 訊息 id
      */
     suspend fun recycleMessage(
+        messageServiceType: MessageServiceType,
         messageId: String
-    ) = kotlin.runCatching {
-        messageApi.apiV1MessageMeMessageIdDelete(messageId = messageId).checkResponseBody()
-    }
+    ) = takeBackMyMessage(
+        messageServiceType,
+        messageId
+    )
 
     companion object MockData {
         val mockListMessage: List<ChatMessage>

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.extension.EmptyBodyException
@@ -240,6 +241,7 @@ class EditPostViewModel(
         KLog.i(TAG, "onSendUpdatePost:$text")
         viewModelScope.launch {
             chatRoomUseCase.updateMessage(
+                messageServiceType = MessageServiceType.bulletinboard,
                 messageId = editPost.id.orEmpty(),
                 text = text,
                 images = images

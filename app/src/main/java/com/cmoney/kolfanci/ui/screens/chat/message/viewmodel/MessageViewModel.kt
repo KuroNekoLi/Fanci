@@ -586,6 +586,7 @@ class MessageViewModel(
                                     emojiCount
                                 )
                             )
+
                             Emojis.laugh -> orgEmoji?.copy(laugh = orgEmoji.laugh?.plus(emojiCount))
                             Emojis.money -> orgEmoji?.copy(money = orgEmoji.money?.plus(emojiCount))
                             Emojis.shock -> orgEmoji?.copy(shock = orgEmoji.shock?.plus(emojiCount))
@@ -614,14 +615,20 @@ class MessageViewModel(
             //Call Emoji api
             if (emojiCount == -1) {
                 //收回
-                chatRoomUseCase.deleteEmoji(chatMessage.id.orEmpty()).fold({
+                chatRoomUseCase.deleteEmoji(
+                    messageServiceType = MessageServiceType.chatroom,
+                    chatMessage.id.orEmpty()
+                ).fold({
                     KLog.e(TAG, "delete emoji success.")
                 }, {
                     KLog.e(TAG, it)
                 })
             } else {
                 //增加
-                chatRoomUseCase.sendEmoji(chatMessage.id.orEmpty(), clickEmoji).fold({
+                chatRoomUseCase.sendEmoji(
+                    messageServiceType = MessageServiceType.chatroom,
+                    chatMessage.id.orEmpty(), clickEmoji
+                ).fold({
                     KLog.i(TAG, "sendEmoji success.")
                 }, {
                     KLog.e(TAG, it)
@@ -643,25 +650,30 @@ class MessageViewModel(
                     copyMessage = messageInteract.message
                 )
             }
+
             is MessageInteract.Delete -> deleteMessage(messageInteract.message)
             is MessageInteract.HideUser -> {
                 uiState = uiState.copy(
                     hideUserMessage = messageInteract.message
                 )
             }
+
             is MessageInteract.Recycle -> {
                 recycleMessage(messageInteract.message)
             }
+
             is MessageInteract.Reply -> replyMessage(messageInteract.message)
             is MessageInteract.Report -> {
                 uiState = uiState.copy(
                     reportMessage = messageInteract.message
                 )
             }
+
             is MessageInteract.EmojiClick -> onEmojiClick(
                 messageInteract.message,
                 messageInteract.emojiResId
             )
+
             else -> {}
         }
     }
@@ -695,7 +707,10 @@ class MessageViewModel(
             if (chatMessageModel.author?.id == Constant.MyInfo?.id) {
                 //自己發的文章
                 KLog.i(TAG, "onDelete my post")
-                chatRoomUseCase.takeBackMyMessage(chatMessageModel.id.orEmpty()).fold({
+                chatRoomUseCase.takeBackMyMessage(
+                    messageServiceType = MessageServiceType.chatroom,
+                    chatMessageModel.id.orEmpty()
+                ).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         KLog.i(TAG, "onDelete my post success")
@@ -720,7 +735,10 @@ class MessageViewModel(
             } else {
                 //別人的文章
                 KLog.i(TAG, "onDelete other post")
-                chatRoomUseCase.deleteOtherMessage(chatMessageModel.id.orEmpty()).fold({
+                chatRoomUseCase.deleteOtherMessage(
+                    messageServiceType = MessageServiceType.chatroom,
+                    chatMessageModel.id.orEmpty()
+                ).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         KLog.i(TAG, "onDelete other post success")
@@ -753,6 +771,7 @@ class MessageViewModel(
         KLog.i(TAG, "recycleMessage:$message")
         viewModelScope.launch {
             chatRoomUseCase.recycleMessage(
+                messageServiceType = MessageServiceType.chatroom,
                 messageId = message.id.orEmpty()
             ).fold({
             }, {

@@ -77,8 +77,10 @@ def apiName = "fanci"
 def buildApiDir = "$buildDir/openApiGenerator/$apiName"
 def basePackage = "com.cmoney.fanciapi"
 def input = "$rootDir/swagger.json"
+def input_v2 = "$rootDir/swagger_v2.json"
 
 println(input)
+println(input_v2)
 
 openApiMeta {
     generatorName = apiName
@@ -94,6 +96,28 @@ openApiValidate {
 task buildKotlinClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
     generatorName = "kotlin"
     inputSpec = input
+    outputDir = buildApiDir
+    apiPackage = basePackage + "." + apiName + ".api"
+    modelPackage = basePackage + "." + apiName + ".model"
+    configOptions = [
+            dateLibrary: "java8",
+            parcelizeModels: "true"
+    ]
+    globalProperties = [
+            modelDocs: "false"
+    ]
+    additionalProperties = [
+            useCoroutines: "true"
+    ]
+    skipValidateSpec = false
+    packageName = "Fanci"
+    library = "jvm-retrofit2"
+    packageName = basePackage
+}
+
+task buildV2KotlinClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "kotlin"
+    inputSpec = input_v2
     outputDir = buildApiDir
     apiPackage = basePackage + "." + apiName + ".api"
     modelPackage = basePackage + "." + apiName + ".model"
@@ -130,6 +154,25 @@ task copy() {
     }
 }
 
+task copyV2() {
+    def packageToDir = basePackage.replace('.', '/')
+    def dirFrom = buildApiDir + "/src/main/kotlin/" + packageToDir + "/"
+    def dirInto = "${project.projectDir}/src/main/java/" + packageToDir + "/"
+
+//    doFirst {
+//        delete(file(dirInto))
+//    }
+
+    doLast {
+        copy {
+            from dirFrom
+            into dirInto
+        }
+    }
+}
+
 task buildApi() {
     dependsOn(buildKotlinClient, copy)
+
+    dependsOn(buildV2KotlinClient, copyV2)
 }

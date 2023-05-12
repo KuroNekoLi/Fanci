@@ -12,6 +12,7 @@ import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
@@ -199,6 +200,7 @@ class PostViewModel(
 
             //Call Emoji api
             chatRoomUseCase.clickEmoji(
+                messageServiceType = MessageServiceType.bulletinboard,
                 messageId = postMessage.id.orEmpty(),
                 emojiCount = emojiCount,
                 clickEmoji = clickEmoji
@@ -213,7 +215,8 @@ class PostViewModel(
         KLog.i(TAG, "onUpdate:$bulletinboardMessage")
         viewModelScope.launch {
             chatRoomUseCase.getSingleMessage(
-                messageId = bulletinboardMessage.id.orEmpty()
+                messageId = bulletinboardMessage.id.orEmpty(),
+                messageServiceType = MessageServiceType.bulletinboard
             ).fold({ result ->
                 val updatePost = result.toBulletinboardMessage()
                 val editList = _post.value.toMutableList()
@@ -251,7 +254,10 @@ class PostViewModel(
             //我發的
             if (post.isMyPost(Constant.MyInfo)) {
                 KLog.i(TAG, "delete my comment.")
-                chatRoomUseCase.takeBackMyMessage(post.id.orEmpty()).fold({
+                chatRoomUseCase.takeBackMyMessage(
+                    messageServiceType = MessageServiceType.bulletinboard,
+                    post.id.orEmpty()
+                ).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         _post.value = _post.value.filter {
@@ -264,7 +270,7 @@ class PostViewModel(
             } else {
                 KLog.i(TAG, "delete other comment.")
                 //他人
-                chatRoomUseCase.deleteOtherMessage(post.id.orEmpty()).fold({
+                chatRoomUseCase.deleteOtherMessage(messageServiceType = MessageServiceType.bulletinboard,post.id.orEmpty()).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         _post.value = _post.value.filter {
