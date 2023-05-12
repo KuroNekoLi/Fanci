@@ -3,7 +3,17 @@ package com.cmoney.kolfanci.ui.screens.group.setting.report
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -27,7 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.ReportInformation
+import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -323,11 +338,13 @@ private fun ReportItem(
                     2 -> {
                         "於「%s」發布一則回覆：".format(channel?.name.orEmpty())
                     }
+
                     else -> {
                         "於「%s」發布一則貼文：".format(channel?.name.orEmpty())
                     }
                 }
             }
+
             else -> "於「%s」發布一則聊天聊天訊息：".format(channel?.name.orEmpty())
         }
 
@@ -355,6 +372,17 @@ private fun ReportItem(
                     maxLines = 5,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                //如果有圖片附件,顯示
+                if (reportInformation.mediasSnapshot?.isNotEmpty() == true) {
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = "(圖片)",
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_100,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
