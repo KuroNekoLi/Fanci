@@ -239,7 +239,7 @@ fun BasePostContentScreen(
 }
 
 @Composable
-private fun EmojiFeedback(
+fun EmojiFeedback(
     modifier: Modifier = Modifier,
     onClick: (Int) -> Unit
 ) {

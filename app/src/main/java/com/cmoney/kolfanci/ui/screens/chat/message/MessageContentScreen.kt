@@ -8,6 +8,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.RichTooltipBox
+import androidx.compose.material3.RichTooltipState
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +32,7 @@ import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
 import com.cmoney.kolfanci.ui.screens.chat.*
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomUiState
+import com.cmoney.kolfanci.ui.screens.post.EmojiFeedback
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -47,8 +52,9 @@ sealed class MessageContentCallback {
 }
 
 /**
- * 聊天內容
+ * 聊天內容 item
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageContentScreen(
     chatMessageWrapper: ChatMessageWrapper,
@@ -63,6 +69,9 @@ fun MessageContentScreen(
     var backgroundColor by remember { mutableStateOf(defaultColor) }
     val longPressColor = LocalColor.current.component.other
     val messageModel = chatMessageWrapper.message
+    val scope = rememberCoroutineScope()
+    //Popup emoji selector
+    val tooltipStateRich = remember { RichTooltipState() }
 
     //長案訊息
     val onLongPress = {
@@ -264,6 +273,50 @@ fun MessageContentScreen(
                                     }
                                 }
                             }
+
+                            if (Utils.emojiMapping(this).sumOf {
+                                    it.second
+                                } > 0) {
+                                RichTooltipBox(
+                                    modifier = Modifier
+                                        .padding(20.dp, bottom = 25.dp)
+                                        .fillMaxWidth()
+                                        .height(60.dp),
+                                    action = {
+                                        EmojiFeedback(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .offset(y = (-15).dp)
+                                        ) {
+                                            onMessageContentCallback.invoke(
+                                                MessageContentCallback.EmojiClick(
+                                                    messageModel,
+                                                    it
+                                                )
+                                            )
+                                            scope.launch { tooltipStateRich.dismiss() }
+                                        }
+                                    },
+                                    text = { },
+                                    shape = RoundedCornerShape(69.dp),
+                                    tooltipState = tooltipStateRich,
+                                    colors = TooltipDefaults.richTooltipColors(
+                                        containerColor = LocalColor.current.env_80
+                                    )
+                                ) {
+                                    //Add Emoji
+                                    EmojiCountScreen(
+                                        modifier = Modifier
+                                            .height(30.dp),
+                                        emojiResource = R.drawable.empty_emoji,
+                                        emojiIconSize = 23.dp,
+                                        countText = ""
+                                    ) {
+                                        scope.launch { tooltipStateRich.show() }
+                                    }
+                                }
+                            }
+
                         }
                     }
 
@@ -282,132 +335,6 @@ fun MessageContentScreen(
                     }
                 }
             }
-
-//            //封鎖
-//            if (chatMessageWrapper.isBlocking || chatMessageWrapper.isBlocker) {
-//                MessageHideUserScreen(
-//                    chatMessageModel = messageModel,
-//                    isBlocking = chatMessageWrapper.isBlocking
-//                ) {
-//                    onMessageContentCallback.invoke(MessageContentCallback.MsgDismissHideClick(it))
-//                }
-//                //刪除
-//            } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
-//                MessageRemoveScreen()
-//            } else {
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    //大頭貼
-//                    messageModel.author?.let {
-//                        ChatUsrAvatarScreen(it)
-//                    }
-//
-//                    Spacer(modifier = Modifier.width(10.dp))
-//
-//                    //發文時間
-//                    ChatTimeText(
-//                        Utils.getDisplayTime(
-//                            messageModel.createUnixTime?.times(1000) ?: 0
-//                        )
-//                    )
-//                }
-//
-//                //收回
-//                if (messageModel.isDeleted == true) {
-//                    MessageRecycleScreen(modifier = contentPaddingModifier)
-//                } else {
-//                    //Reply
-//                    messageModel.replyMessage?.apply {
-//                        MessageReplayScreen(
-//                            reply = this,
-//                            modifier = contentPaddingModifier
-//                                .clip(RoundedCornerShape(9.dp))
-//                                .background(LocalColor.current.background)
-//                        )
-//                    }
-//
-//                    //內文
-//                    messageModel.content?.text?.apply {
-//                        if (this.isNotEmpty()) {
-//                            AutoLinkText(
-//                                modifier = contentPaddingModifier,
-//                                text = this,
-//                                fontSize = 17.sp,
-//                                color = LocalColor.current.text.default_100
-//                            ) {
-//                                onLongPress.invoke()
-//                            }
-//
-//                            //OG
-//                            Utils.extractLinks(this).forEach { url ->
-//                                MessageOGScreen(modifier = contentPaddingModifier, url = url)
-//                            }
-//                        }
-//                    }
-//
-//                    messageModel.content?.medias?.let {
-//                        MediaContent(contentPaddingModifier, it)
-//                    }
-//
-//                    //上傳圖片前預覽
-//                    if (chatMessageWrapper.uploadAttachPreview.isNotEmpty()) {
-//                        MessageImageScreen(
-//                            images = chatMessageWrapper.uploadAttachPreview.map {
-//                                if (it.uri == Uri.EMPTY) {
-//                                    it.serverUrl
-//                                } else {
-//                                    it.uri
-//                                }
-//                            },
-//                            modifier = contentPaddingModifier,
-//                            isShowLoading = chatMessageWrapper.uploadAttachPreview.map {
-//                                it.isUploadComplete
-//                            }.any {
-//                                !it
-//                            }
-//                        )
-//                    }
-//
-//                    //Emoji
-//                    messageModel.emojiCount?.apply {
-//                        FlowRow(
-//                            modifier = contentPaddingModifier.fillMaxWidth(),
-//                            crossAxisSpacing = 10.dp
-//                        ) {
-//                            Utils.emojiMapping(this).forEach { emoji ->
-//                                if (emoji.second != 0) {
-//                                    EmojiCountScreen(
-//                                        modifier = Modifier
-//                                            .padding(end = 10.dp),
-//                                        emojiResource = emoji.first,
-//                                        countText = emoji.second.toString()
-//                                    ) {
-//                                        onMessageContentCallback.invoke(
-//                                            MessageContentCallback.EmojiClick(
-//                                                messageModel,
-//                                                it
-//                                            )
-//                                        )
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                    //Re-Send
-//                    if (chatMessageWrapper.isPendingSendMessage) {
-//                        Box(modifier = contentPaddingModifier
-//                            .clickable {
-//                                onReSendClick.invoke(chatMessageWrapper)
-//                            }
-//                        ) {
-//                            Image(
-//                                painter = painterResource(id = R.drawable.resend),
-//                                contentDescription = ""
-//                            )
-//                        }
-//                    }
-//                }
-//            }
         }
     }
 }
