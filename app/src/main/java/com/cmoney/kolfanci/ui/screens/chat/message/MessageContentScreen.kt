@@ -316,7 +316,6 @@ fun MessageContentScreen(
                                     }
                                 }
                             }
-
                         }
                     }
 
