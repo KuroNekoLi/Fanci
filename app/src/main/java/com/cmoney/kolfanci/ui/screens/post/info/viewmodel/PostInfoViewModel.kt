@@ -97,9 +97,6 @@ class PostInfoViewModel(
     //紀錄目前展開狀態
     private val replyExpandState = hashMapOf<String, Boolean>()
 
-    //目前正在編輯的訊息
-    private var currentEditMessage: BulletinboardMessage? = null
-
     init {
         fetchComment(
             channelId = channel.id.orEmpty(),
@@ -272,140 +269,56 @@ class PostInfoViewModel(
             //是否為回覆
             val isReply = _commentReply.value != null
 
-            //是否為編輯
-            if (currentEditMessage != null) {
-                updateEditMessage(
-                    text, images, isReply
-                )
-            } else {
-                postUseCase.writeComment(
-                    channelId = channel.id.orEmpty(),
-                    messageId = message.id.orEmpty(),
-                    text = text,
-                    images = images
-                ).fold({
-                    dismissLoading()
-                    onCommentReplyClose()
+            postUseCase.writeComment(
+                channelId = channel.id.orEmpty(),
+                messageId = message.id.orEmpty(),
+                text = text,
+                images = images
+            ).fold({
+                dismissLoading()
+                onCommentReplyClose()
 
-                    KLog.i(TAG, "writeComment success.")
+                KLog.i(TAG, "writeComment success.")
 
-                    //如果是回覆, 將回覆資料寫回
-                    if (isReply) {
-                        val replyData = _replyMap.value[message.id.orEmpty()]
-                        replyData?.let { replyNotNullData ->
-                            val replyList = replyNotNullData.replyList.toMutableList()
-                            replyList.add(it)
-                            _replyMap.value[message.id.orEmpty()] = replyNotNullData.copy(
-                                replyList = replyList
-                            )
+                //如果是回覆, 將回覆資料寫回
+                if (isReply) {
+                    val replyData = _replyMap.value[message.id.orEmpty()]
+                    replyData?.let { replyNotNullData ->
+                        val replyList = replyNotNullData.replyList.toMutableList()
+                        replyList.add(it)
+                        _replyMap.value[message.id.orEmpty()] = replyNotNullData.copy(
+                            replyList = replyList
+                        )
 
-                            //刷新上一層 留言裡面的回覆數量
-                            refreshCommentCount(message, replyList)
+                        //刷新上一層 留言裡面的回覆數量
+                        refreshCommentCount(message, replyList)
 
-                        } ?: kotlin.run {
-                            //empty case
-                            _replyMap.value[message.id.orEmpty()] = ReplyData(
-                                replyList = listOf(it),
-                                haveMore = false
-                            )
+                    } ?: kotlin.run {
+                        //empty case
+                        _replyMap.value[message.id.orEmpty()] = ReplyData(
+                            replyList = listOf(it),
+                            haveMore = false
+                        )
 
-                            //設定 expand status
-                            setReplyExpand(message.id.orEmpty())
+                        //設定 expand status
+                        setReplyExpand(message.id.orEmpty())
 
-                            //刷新上一層 留言裡面的回覆數量
-                            refreshCommentCount(message, listOf(it))
-                        }
-                    } else {
-                        val comments = _comment.value.toMutableList()
-                        comments.add(it)
-                        _comment.value = comments
+                        //刷新上一層 留言裡面的回覆數量
+                        refreshCommentCount(message, listOf(it))
                     }
+                } else {
+                    val comments = _comment.value.toMutableList()
+                    comments.add(it)
+                    _comment.value = comments
+                }
 
-                }, {
-                    dismissLoading()
-                    onCommentReplyClose()
+            }, {
+                dismissLoading()
+                onCommentReplyClose()
 
-                    it.printStackTrace()
-                    KLog.e(TAG, it)
-                })
-            }
-        }
-    }
-
-    /**
-     * 編輯 更新資料
-     */
-    private fun updateEditMessage(text: String, images: List<String>, isReply: Boolean) {
-        KLog.i(TAG, "updateMessage")
-        viewModelScope.launch {
-            //看是 回覆 or 留言
-            val message = _commentReply.value ?: bulletinboardMessage
-
-            currentEditMessage?.let { currentEditMessage ->
-                this@PostInfoViewModel.currentEditMessage = null
-
-                chatRoomUseCase.updateMessage(
-                    messageServiceType = MessageServiceType.bulletinboard,
-                    messageId = currentEditMessage.id.orEmpty(),
-                    text = text,
-                    images = images
-                ).fold({
-                }, {
-                    if (it is EmptyBodyException) {
-                        //如果是回覆, 將回覆資料寫回
-                        if (isReply) {
-                            val replyData = _replyMap.value[message.id] ?: ReplyData(
-                                replyList = emptyList(),
-                                haveMore = false
-                            )
-                            val replyList = replyData.replyList.map {
-                                if (it.id == currentEditMessage.id) {
-                                    currentEditMessage.copy(
-                                        content = MediaIChatContent(
-                                            text = text,
-                                            medias = images.map { image ->
-                                                Media(
-                                                    resourceLink = image,
-                                                    type = MediaType.image
-                                                )
-                                            }
-                                        )
-                                    )
-                                } else {
-                                    it
-                                }
-                            }
-
-                            _replyMap.value[message.id.orEmpty()] = replyData.copy(
-                                replyList = replyList
-                            )
-                        } else {
-                            //更新留言
-                            _comment.value = _comment.value.map {
-                                if (it.id == currentEditMessage.id) {
-                                    currentEditMessage.copy(
-                                        content = MediaIChatContent(
-                                            text = text,
-                                            medias = images.map { image ->
-                                                Media(
-                                                    resourceLink = image,
-                                                    type = MediaType.image
-                                                )
-                                            }
-                                        )
-                                    )
-                                } else {
-                                    it
-                                }
-                            }
-                        }
-                    }
-                    dismissLoading()
-                    onCommentReplyClose()
-                    it.printStackTrace()
-                    KLog.e(TAG, it)
-                })
-            }
+                it.printStackTrace()
+                KLog.e(TAG, it)
+            })
         }
     }
 
@@ -546,32 +459,6 @@ class PostInfoViewModel(
         _commentReply.value = null
         _inputText.value = ""
     }
-
-    /**
-     * 點擊 編輯留言
-     */
-    fun onEditCommentClick(comment: BulletinboardMessage) {
-        KLog.i(TAG, "onEditCommentClick:$comment")
-        currentEditMessage = comment
-        _inputText.value = comment.content?.text.orEmpty()
-        _imageAttach.value = comment.content?.medias?.map {
-            Uri.parse(it.resourceLink)
-        }.orEmpty()
-    }
-
-    /**
-     * 點擊 編輯回覆
-     */
-    fun onEditReplyClick(comment: BulletinboardMessage, reply: BulletinboardMessage) {
-        KLog.i(TAG, "onEditReplyClick.")
-        currentEditMessage = reply
-        onCommentReplyClick(comment)
-        _inputText.value = reply.content?.text.orEmpty()
-        _imageAttach.value = reply.content?.medias?.map {
-            Uri.parse(it.resourceLink)
-        }.orEmpty()
-    }
-
 
     /**
      * 留言 讀取更多
@@ -908,5 +795,46 @@ class PostInfoViewModel(
     fun dismissSnackBar() {
         KLog.i(TAG, "dismissSnackBar")
         _toast.value = null
+    }
+
+    /**
+     * 留言編輯完後, 更新留言資料
+     */
+    fun onUpdateComment(editMessage: BulletinboardMessage) {
+        KLog.i(TAG, "onUpdateComment:$editMessage")
+        viewModelScope.launch {
+            _comment.value = _comment.value.map {
+                if (it.id == editMessage.id) {
+                    editMessage
+                } else {
+                    it
+                }
+            }
+
+        }
+    }
+
+    /**
+     * 回覆編輯完後, 更新回覆資料
+     */
+    fun onUpdateReply(editMessage: BulletinboardMessage, commentId: String) {
+        KLog.i(TAG, "onUpdateReply:$editMessage")
+        viewModelScope.launch {
+            val replyData = _replyMap.value[commentId] ?: ReplyData(
+                replyList = emptyList(),
+                haveMore = false
+            )
+
+            val replyList = replyData.replyList.map {
+                if (it.id == editMessage.id) {
+                    editMessage
+                } else {
+                    it
+                }
+            }
+            _replyMap.value[commentId] = replyData.copy(
+                replyList = replyList
+            )
+        }
     }
 }

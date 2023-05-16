@@ -57,6 +57,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
+import com.cmoney.kolfanci.ui.destinations.BaseEditMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.MessageAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
@@ -66,6 +67,7 @@ import com.cmoney.kolfanci.ui.screens.post.CommentCount
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import com.cmoney.kolfanci.ui.screens.post.dialog.ReportPostDialogScreenScreen
+import com.cmoney.kolfanci.ui.screens.post.edit.BaseEditMessageScreenResult
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
@@ -115,7 +117,8 @@ fun PostInfoScreen(
         }
     ),
     resultNavigator: ResultBackNavigator<PostInfoScreenResult>,
-    editResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>
+    editResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
+    editCommentReplyRecipient: ResultRecipient<BaseEditMessageScreenDestination, BaseEditMessageScreenResult>
 ) {
     val TAG = "PostInfoScreen"
     val context = LocalContext.current
@@ -322,8 +325,12 @@ fun PostInfoScreen(
                         }
 
                         is PostInteract.Edit -> {
-                            viewModel.onEditCommentClick(
-                                comment = comment,
+                            navController.navigate(
+                                BaseEditMessageScreenDestination(
+                                    channelId = channel.id.orEmpty(),
+                                    editMessage = comment,
+                                    isComment = true
+                                )
                             )
                         }
 
@@ -352,9 +359,13 @@ fun PostInfoScreen(
                         }
 
                         is PostInteract.Edit -> {
-                            viewModel.onEditReplyClick(
-                                comment = comment,
-                                reply = reply
+                            navController.navigate(
+                                BaseEditMessageScreenDestination(
+                                    channelId = channel.id.orEmpty(),
+                                    editMessage = reply,
+                                    isComment = false,
+                                    commentId = comment.id.orEmpty()
+                                )
                             )
                         }
 
@@ -403,6 +414,23 @@ fun PostInfoScreen(
 
             is NavResult.Value -> {
                 viewModel.onUpdatePost(result.value.message)
+            }
+        }
+    }
+
+    //編輯回覆 callback
+    editCommentReplyRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                if (result.value.isComment) {
+                    viewModel.onUpdateComment(result.value.editMessage)
+                }
+                else {
+                    viewModel.onUpdateReply(result.value.editMessage, result.value.commentId)
+                }
             }
         }
     }

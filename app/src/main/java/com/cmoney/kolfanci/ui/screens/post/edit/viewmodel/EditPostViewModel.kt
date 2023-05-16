@@ -265,4 +265,15 @@ class EditPostViewModel(
             })
         }
     }
+
+    /**
+     * 更新留言
+     */
+    fun onUpdateComment(bulletinboardMessage: BulletinboardMessage, text: String) {
+        KLog.i(TAG, "onUpdateComment:$bulletinboardMessage")
+        viewModelScope.launch {
+
+
+        }
+    }
 }
