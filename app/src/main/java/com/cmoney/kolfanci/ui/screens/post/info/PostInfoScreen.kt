@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
@@ -102,6 +104,9 @@ data class PostInfoScreenResult(
     }
 }
 
+/**
+ * 貼文 詳細資訊
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
 @Composable
@@ -660,6 +665,13 @@ private fun PostInfoScreenView(
                         Spacer(modifier = Modifier.height(1.dp))
                     }
 
+                    //沒有人留言
+                    item {
+                        if (comments.isEmpty()) {
+                            EmptyCommentView()
+                        }
+                    }
+
                     //留言內容
                     items(comments) { comment ->
                         //如果被刪除
@@ -758,6 +770,30 @@ private fun PostInfoScreenView(
 
     listState.OnBottomReached {
         postInfoListener.onCommentLoadMore()
+    }
+}
+
+/**
+ * 沒有人留言
+ */
+@Composable
+private fun EmptyCommentView() {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+            .height(350.dp)
+            .background(LocalColor.current.env_80),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        AsyncImage(
+            modifier = Modifier.size(105.dp),
+            model = R.drawable.empty_chat, contentDescription = "empty message"
+        )
+
+        Spacer(modifier = Modifier.height(43.dp))
+
+        Text(text = "目前還沒有人留言", fontSize = 16.sp, color = LocalColor.current.text.default_30)
     }
 }
 

@@ -34,6 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -493,13 +495,13 @@ private fun EmptyPostContent(modifier: Modifier = Modifier) {
     ) {
 
         AsyncImage(
-            modifier = Modifier.size(186.dp, 248.dp),
-            model = R.drawable.empty_message, contentDescription = "empty message"
+            modifier = Modifier.size(105.dp),
+            model = R.drawable.empty_chat, contentDescription = "empty message"
         )
 
         Spacer(modifier = Modifier.height(43.dp))
 
-        Text(text = "快成為第一個在貼文區發文的人！", fontSize = 16.sp, color = Color_80FFFFFF)
+        Text(text = "目前還沒有人發表貼文", fontSize = 16.sp, color = LocalColor.current.text.default_30)
     }
 }
 
