@@ -582,4 +582,12 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
             selectedRole = uiState.selectedRole
         )
     }
+
+    /**
+     * 點擊 邀請按鈕
+     */
+    fun onInviteClick() {
+        KLog.i(TAG, "onInviteClick")
+        //TODO dynamic link
+    }
 }
