@@ -17,4 +17,5 @@ val useCaseModule = module {
     factory { PermissionUseCase(get(), get()) }
     factory { OrderUseCase(get()) }
     factory { PostUseCase(get()) }
+    factory { DynamicLinkUseCase(get()) }
 }

@@ -12,6 +12,10 @@ import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UserUseCase
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.model.notification.NotificationHelper
+import com.cmoney.kolfanci.model.notification.Payload
+import com.cmoney.kolfanci.model.notification.TargetType
+import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,7 +29,9 @@ class MainViewModel(
     private val userUseCase: UserUseCase,
     private val themeUseCase: ThemeUseCase,
     private val settingsDataStore: SettingsDataStore,
-    private val permissionUseCase: PermissionUseCase
+    private val permissionUseCase: PermissionUseCase,
+    private val notificationHelper: NotificationHelper,
+    private val groupUseCase: GroupUseCase
 ) :
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
@@ -45,6 +51,9 @@ class MainViewModel(
 
     private val _currentGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
     val currentGroup = _currentGroup.asStateFlow()
+
+    private val _inviteGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
+    val inviteGroup = _inviteGroup.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -135,5 +144,43 @@ class MainViewModel(
     fun startFetchFollowData() {
         KLog.i(TAG, "startFetchFollowData")
         _fetchFollowData.value = true
+    }
+
+    /**
+     * 推播 or dynamic link 資料
+     */
+    fun setNotificationBundle(payLoad: Payload) {
+        KLog.i(TAG, "setNotificationBundle:$payLoad")
+        val targetType =
+            notificationHelper.convertPayloadToTargetType(payLoad) ?: TargetType.MainPage
+
+        KLog.i(TAG, "setNotificationBundle:${targetType}")
+
+        when (targetType) {
+            is TargetType.InviteGroup -> {
+                val groupId = targetType.groupId
+                fetchInviteGroup(groupId)
+            }
+
+            TargetType.MainPage -> {}
+        }
+    }
+
+    /**
+     * 抓取邀請連結社團的資訊
+     */
+    private fun fetchInviteGroup(groupId: String) {
+        KLog.i(TAG, "fetchInviteGroup:$groupId")
+        viewModelScope.launch {
+            groupUseCase.getGroupById(
+                groupId
+            ).fold({
+                KLog.i(TAG, "fetchInviteGroup success:$it")
+                _inviteGroup.value = it
+            }, {
+                it.printStackTrace()
+                KLog.e(TAG, it)
+            })
+        }
     }
 }

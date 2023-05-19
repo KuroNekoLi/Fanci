@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.extension
 
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -9,6 +11,19 @@ import android.os.Environment
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import java.io.File
+
+fun Context.copyToClipboard(text: String) {
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("", text)
+    clipboard.setPrimaryClip(clip)
+}
+
+fun Context.share(shareMsg: String) {
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.type = "text/分享給好友"
+    intent.putExtra(Intent.EXTRA_TEXT, shareMsg)
+    startActivity(Intent.createChooser(intent, "分享給好友"))
+}
 
 inline fun <reified T : Activity> Context.startActivity(block: Intent.() -> Unit = {}) {
     startActivity(Intent(this, T::class.java).apply(block))

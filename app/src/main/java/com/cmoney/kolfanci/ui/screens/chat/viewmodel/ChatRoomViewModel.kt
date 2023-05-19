@@ -17,6 +17,7 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
@@ -107,9 +108,7 @@ class ChatRoomViewModel(
      * 複製訊息
      */
     fun copyMessage(message: ChatMessage) {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("", message.content?.text)
-        clipboard.setPrimaryClip(clip)
+        context.copyToClipboard(message.content?.text.orEmpty())
 
         uiState = uiState.copy(
             snackBarMessage = CustomMessage(

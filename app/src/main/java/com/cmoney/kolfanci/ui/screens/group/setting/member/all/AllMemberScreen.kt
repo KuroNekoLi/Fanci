@@ -26,6 +26,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +47,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -74,6 +77,13 @@ fun AllMemberScreen(
     val uiState = viewModel.uiState
     if (uiState.groupMember == null && uiState.loading) {
         viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+    }
+
+    val shareText by viewModel.shareText.collectAsState()
+
+    if (shareText.isNotEmpty()) {
+        LocalContext.current.share(shareText)
+        viewModel.resetShareText()
     }
 
     //Edit callback
@@ -112,7 +122,7 @@ fun AllMemberScreen(
             )
         },
         onInviteClick = {
-            viewModel.onInviteClick()
+            viewModel.onInviteClick(group)
         }
     )
 }

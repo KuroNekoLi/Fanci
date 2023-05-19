@@ -12,6 +12,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +51,7 @@ fun EmptyFollowScreen(
     val uiState = viewModel.uiState
     val groupList = viewModel.groupList.observeAsState()
     val mainActivity = LocalDependencyContainer.current
+    val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
     EmptyFollowScreenView(
         modifier = modifier,
@@ -65,7 +68,7 @@ fun EmptyFollowScreen(
         isLoading = uiState.isLoading
     )
 
-    uiState.openGroupDialog?.let { group ->
+    openGroupDialog?.let { group ->
         GroupItemDialogScreen(
             groupModel = group,
             onDismiss = {

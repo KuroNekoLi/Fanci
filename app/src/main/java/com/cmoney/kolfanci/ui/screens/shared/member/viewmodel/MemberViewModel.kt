@@ -6,10 +6,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.AccessorParam
+import com.cmoney.fanciapi.fanci.model.AccessorTypes
+import com.cmoney.fanciapi.fanci.model.BanPeriodOption
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.usecase.BanUseCase
+import com.cmoney.kolfanci.model.usecase.DynamicLinkUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.google.gson.Gson
@@ -23,7 +29,9 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Timer
+import java.util.TimerTask
 import java.util.concurrent.TimeUnit
 
 data class UiState(
@@ -31,12 +39,14 @@ data class UiState(
     val kickMember: GroupMember? = null,     //踢除會員
     val banUiModel: BanUiModel? = null,      //禁言中 info
     val showAddSuccessTip: Boolean = false,  //show 新增成功 toast
-    val loading: Boolean = true,
-//    var selectedMember: List<GroupMember> = emptyList(), //選中的會員
+    val loading: Boolean = false,
     var selectedRole: List<FanciRole> = emptyList(), //選中的角色
     val tabIndex: Int = 0
 )
 
+/**
+ * 包裝會員,標註哪一個選中
+ */
 data class GroupMemberSelect(val groupMember: GroupMember, val isSelected: Boolean = false)
 
 /**
@@ -67,8 +77,12 @@ data class SelectedModel(
     }
 }
 
-class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUseCase: BanUseCase) :
-    ViewModel() {
+class MemberViewModel(
+    private val groupUseCase: GroupUseCase,
+    private val banUseCase: BanUseCase,
+    private val dynamicLinkUseCase: DynamicLinkUseCase
+) : ViewModel() {
+
     private val TAG = MemberViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(UiState())
@@ -89,6 +103,10 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
 
     //目前輸入的 keyword
     private var currentKeyword: String = ""
+
+    //分享文案
+    private val _shareText = MutableStateFlow("")
+    val shareText = _shareText.asStateFlow()
 
     private fun showLoading() {
         uiState = uiState.copy(
@@ -249,29 +267,11 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                         uiState = uiState.copy(
                             groupMember = orgGroupMemberList
                         )
-                    }
-                    else {
+                    } else {
                         uiState = uiState.copy(
                             groupMember = emptyList()
                         )
                     }
-                    //TODO just for test
-//                    else {
-//                        //test
-//                        uiState = uiState.copy(
-//                            groupMember = listOf(
-//                                GroupMemberSelect(
-//                                    groupMember = GroupMember(
-//                                        name = "Hello",
-//                                        thumbNail = "https://i.pinimg.com/564x/6f/4a/bd/6f4abd8a21e444296e3f0cc2f8801fdb.jpg",
-//                                        roleInfos = listOf(FanciRole(
-//                                            name = "哇哈哈權限",
-//                                        ))
-//                                    )
-//                                )
-//                            )
-//                        )
-//                    }
                     dismissLoading()
                 }, {
                     dismissLoading()
@@ -439,7 +439,7 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
                         )
                     }
 
-                    //Local Searching
+                    //Local Searching, server api not ready use.
 //                    //return all
 //                    uiState = if (keyword.isEmpty()) {
 //                        uiState.copy(
@@ -586,8 +586,21 @@ class MemberViewModel(private val groupUseCase: GroupUseCase, private val banUse
     /**
      * 點擊 邀請按鈕
      */
-    fun onInviteClick() {
-        KLog.i(TAG, "onInviteClick")
-        //TODO dynamic link
+    fun onInviteClick(group: Group) {
+        KLog.i(TAG, "onInviteClick:$group")
+        viewModelScope.launch {
+            showLoading()
+            dynamicLinkUseCase.createInviteGroupLink(
+                groupId = group.id.orEmpty()
+            )?.let { link ->
+                KLog.i(TAG, "created link:$link")
+                _shareText.value = "您已被邀請加入 「${group.name}」!\n請點選以下連結加入社群!\n$link"
+            }
+            dismissLoading()
+        }
+    }
+
+    fun resetShareText() {
+        _shareText.value = ""
     }
 }

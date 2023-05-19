@@ -27,6 +27,15 @@ class GroupUseCase(
 ) {
 
     /**
+     * 取得特定 group
+     */
+    suspend fun getGroupById(groupId: String) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdGet(
+            groupId = groupId
+        ).checkResponseBody()
+    }
+
+    /**
      * 刪除/解散 社團
      */
     suspend fun deleteGroup(groupId: String) = kotlin.runCatching {

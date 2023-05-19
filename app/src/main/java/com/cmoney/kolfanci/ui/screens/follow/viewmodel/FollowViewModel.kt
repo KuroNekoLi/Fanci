@@ -16,6 +16,8 @@ import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class FollowUiState(
@@ -26,8 +28,7 @@ data class FollowUiState(
     val showLoginDialog: Boolean = false,        //呈現登入彈窗
     val navigateToCreateGroup: Boolean = false,  //前往建立社團
     val navigateToApproveGroup: Group? = null,  //前往社團認證
-    val myGroupList: List<GroupItem> = emptyList(),  //我的社團
-    val openGroupDialog: Group? = null,  //點擊加入群組彈窗
+//    val myGroupList: List<GroupItem> = emptyList(),  //我的社團
     val isLoading: Boolean = false
 )
 
@@ -36,6 +37,13 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
 
     private val _groupList = MutableLiveData<List<Group>>()
     val groupList: LiveData<List<Group>> = _groupList
+
+    private val _myGroupList: MutableStateFlow<List<GroupItem>> = MutableStateFlow(emptyList())
+    val myGroupList = _myGroupList.asStateFlow()
+
+    //點擊加入群組彈窗
+    private val _openGroupDialog: MutableStateFlow<Group?> = MutableStateFlow(null)
+    val openGroupDialog = _openGroupDialog.asStateFlow()
 
     var uiState by mutableStateOf(FollowUiState())
         private set
@@ -67,7 +75,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 loading()
                 groupUseCase.groupToSelectGroupItem().fold({
                     if (it.isNotEmpty()) {
-                        var currentSelectedPos = uiState.myGroupList.indexOfFirst {groupItem ->
+                        var currentSelectedPos = _myGroupList.value.indexOfFirst {groupItem ->
                             groupItem.isSelected
                         }
 
@@ -76,19 +84,17 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                         }
 
                         //我的所有群組
-                        uiState = uiState.copy(
-                            myGroupList = it.mapIndexed { index, groupItem ->
-                                if (index == currentSelectedPos) {
-                                    groupItem.copy(
-                                        isSelected = true
-                                    )
-                                } else {
-                                    groupItem.copy(
-                                        isSelected = false
-                                    )
-                                }
+                        _myGroupList.value = it.mapIndexed { index, groupItem ->
+                            if (index == currentSelectedPos) {
+                                groupItem.copy(
+                                    isSelected = true
+                                )
+                            } else {
+                                groupItem.copy(
+                                    isSelected = false
+                                )
                             }
-                        )
+                        }
                     } else {
                         fetchAllGroupList()
                     }
@@ -133,17 +139,15 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      * 點擊 側邊 切換 群組
      */
     fun groupItemClick(groupItem: GroupItem) {
-        val currentGroupItemList = uiState.myGroupList
+        val currentGroupItemList = _myGroupList.value
 
-        uiState = uiState.copy(
-            myGroupList = currentGroupItemList.map {
-                if (it.groupModel == groupItem.groupModel) {
-                    it.copy(isSelected = true)
-                } else {
-                    it.copy(isSelected = false)
-                }
+        _myGroupList.value = currentGroupItemList.map {
+            if (it.groupModel == groupItem.groupModel) {
+                it.copy(isSelected = true)
+            } else {
+                it.copy(isSelected = false)
             }
-        )
+        }
     }
 
     /**
@@ -266,9 +270,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun openGroupItemDialog(group: Group) {
         KLog.i(TAG, "openGroupItemDialog:$group")
-        uiState = uiState.copy(
-            openGroupDialog = group
-        )
+        _openGroupDialog.value = group
     }
 
     /**
@@ -276,9 +278,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
      */
     fun closeGroupItemDialog() {
         KLog.i(TAG, "closeGroupItemDialog")
-        uiState = uiState.copy(
-            openGroupDialog = null
-        )
+        _openGroupDialog.value = null
     }
 
     /**

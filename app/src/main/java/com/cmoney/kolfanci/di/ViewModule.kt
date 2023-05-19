@@ -27,7 +27,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModule = module {
-    viewModel { MainViewModel(get(), get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { FollowViewModel(get()) }
     viewModel { ChatRoomViewModel(get(), get(), get(), get(), get()) }
     viewModel { MessageViewModel(androidApplication(), get(), get(), get()) }
@@ -39,7 +39,7 @@ val viewModule = module {
     }
 
     viewModel { RoleManageViewModel(get(), get()) }
-    viewModel { MemberViewModel(get(), get()) }
+    viewModel { MemberViewModel(get(), get(), get()) }
     viewModel { BanListViewModel(get()) }
     viewModel { GroupApplyViewModel(get()) }
     viewModel { params ->

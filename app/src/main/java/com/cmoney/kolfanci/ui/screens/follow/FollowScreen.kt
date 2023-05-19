@@ -81,8 +81,10 @@ fun FollowScreen(
 
     val group by globalViewModel.currentGroup.collectAsState()
 
-    if (group == null && uiState.myGroupList.isNotEmpty()) {
-        uiState.myGroupList.find {
+    val myGroupList by viewModel.myGroupList.collectAsState()
+
+    if (group == null && myGroupList.isNotEmpty()) {
+        myGroupList.find {
             it.isSelected
         }?.groupModel?.apply {
             globalViewModel.setCurrentGroup(this)
@@ -140,7 +142,7 @@ fun FollowScreen(
 
     FollowScreenView(
         navigator = navigator,
-        groupList = uiState.myGroupList,
+        groupList = myGroupList,
         group = group,
         imageOffset = uiState.imageOffset,
         spaceHeight = uiState.spaceHeight,

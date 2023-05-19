@@ -1,5 +1,7 @@
 package com.cmoney.kolfanci.ui.main
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -13,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
@@ -39,6 +42,18 @@ class MainActivity : BaseWebLoginActivity() {
 
     val globalViewModel by inject<MainViewModel>()
 
+    companion object {
+        const val FOREGROUND_NOTIFICATION_BUNDLE = "foreground_notification_bundle"
+
+        fun start(context: Context, payload: Payload) {
+            KLog.i("MainActivity", "start by Payload")
+            val starter = Intent(context, MainActivity::class.java)
+                .putExtra(FOREGROUND_NOTIFICATION_BUNDLE, payload)
+            starter.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            context.startActivity(starter)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -50,8 +65,7 @@ class MainActivity : BaseWebLoginActivity() {
                 isOpenTutorial?.let { isOpenTutorial ->
                     if (isOpenTutorial) {
                         FanciTheme(fanciColor = theme) {
-                            val mainState = rememberMainState()
-                            mainState.setStatusBarColor()
+                            setStatusBarColor()
 
                             Scaffold(
                                 modifier = Modifier
@@ -87,6 +101,19 @@ class MainActivity : BaseWebLoginActivity() {
         }
     }
 
+    @Composable
+    fun setStatusBarColor() {
+        val statusBarColor = MaterialTheme.colors.primary
+        val systemUiController = rememberSystemUiController()
+        SideEffect {
+            systemUiController.setStatusBarColor(
+                color = statusBarColor,
+                darkIcons = false
+            )
+        }
+    }
+
+
     override fun autoLoginFailCallback() {
         KLog.i(TAG, "autoLoginFailCallback")
         globalViewModel.startFetchFollowData()
@@ -119,8 +146,8 @@ fun MainScreen(
     val theme by globalViewModel.theme.collectAsState()
 
     FanciTheme(fanciColor = theme) {
-        val mainState = rememberMainState()
-        mainState.setStatusBarColor()
+//        val mainState = rememberMainState()
+//        mainState.setStatusBarColor()
 
         FollowScreen(
             modifier = Modifier,
