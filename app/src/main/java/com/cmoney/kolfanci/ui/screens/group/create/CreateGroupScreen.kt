@@ -66,8 +66,7 @@ fun CreateGroupScreen(
     val TAG = "CreateGroupScreen"
     val approvalUiState = groupOpennessViewModel.uiState
 
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
-
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
@@ -252,9 +251,8 @@ fun CreateGroupScreen(
 
     LaunchedEffect(Unit) {
         groupOpennessViewModel.saveComplete.collect { saveComplete ->
-            if (saveComplete) {
-                globalViewModel.setCurrentGroup(settingGroup)
-
+            if (saveComplete != null) {
+                globalGroupViewModel.setCurrentGroup(saveComplete)
                 navigator.popBackStack(
                     route = MainScreenDestination,
                     inclusive = false

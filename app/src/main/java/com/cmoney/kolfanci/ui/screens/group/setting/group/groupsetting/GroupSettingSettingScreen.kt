@@ -58,7 +58,7 @@ fun GroupSettingSettingScreen(
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>,
     group: Group,
 ) {
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
     val viewModel: GroupSettingViewModel = koinViewModel()
 
     setCallbackHandle(
@@ -72,7 +72,7 @@ fun GroupSettingSettingScreen(
     var groupParam = group
     viewModel.uiState.settingGroup?.let {
         groupParam = it
-        globalViewModel.setCurrentGroup(it)
+        globalGroupViewModel.setCurrentGroup(it)
     }
 
     GroupSettingSettingView(

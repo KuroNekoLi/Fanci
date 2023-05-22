@@ -51,7 +51,7 @@ fun GroupSettingThemeScreen(
 ) {
     val TAG = "GroupSettingThemeScreen"
 
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
 
     val state = viewModel.uiState
 
@@ -59,12 +59,12 @@ fun GroupSettingThemeScreen(
         mutableStateOf(null)
     }
 
-    val currentGroup by globalViewModel.currentGroup.collectAsState()
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
     var groupParam = currentGroup
 
     viewModel.uiState.settingGroup?.let {
         groupParam = it
-        globalViewModel.setCurrentGroup(it)
+        globalGroupViewModel.setCurrentGroup(it)
     }
 
     val isFromCreate = group.id.isNullOrBlank()

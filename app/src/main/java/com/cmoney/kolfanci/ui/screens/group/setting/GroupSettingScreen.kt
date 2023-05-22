@@ -63,7 +63,7 @@ fun GroupSettingScreen(
     applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>
 ) {
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
 
     val uiState = viewModel.uiState
 
@@ -88,7 +88,7 @@ fun GroupSettingScreen(
             is NavResult.Value -> {
                 val resultGroup = result.value
                 viewModel.settingGroup(resultGroup)
-                globalViewModel.setCurrentGroup(resultGroup)
+                globalGroupViewModel.setCurrentGroup(resultGroup)
             }
         }
     }

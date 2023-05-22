@@ -47,8 +47,8 @@ fun GroupSettingThemePreviewScreen(
     resultNavigator: ResultBackNavigator<String>
 ) {
     val TAG = "GroupSettingThemePreviewScreen"
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
-    val currentGroup by globalViewModel.currentGroup.collectAsState()
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
     var groupParam = currentGroup
 
     var showConfirmDialog: GroupTheme? by remember {
@@ -57,7 +57,7 @@ fun GroupSettingThemePreviewScreen(
 
     viewModel.uiState.settingGroup?.let {
         groupParam = it
-        globalViewModel.setCurrentGroup(it)
+        globalGroupViewModel.setCurrentGroup(it)
     }
 
     GroupSettingThemePreviewView(

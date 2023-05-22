@@ -5,22 +5,34 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
+import com.cmoney.kolfanci.ui.screens.follow.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.kolfanci.ui.theme.Black_242424
+import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.xlogin.base.BaseWebLoginActivity
@@ -42,6 +54,8 @@ class MainActivity : BaseWebLoginActivity() {
 
     val globalViewModel by inject<MainViewModel>()
 
+    val globalGroupViewModel by inject<GroupViewModel>()
+
     companion object {
         const val FOREGROUND_NOTIFICATION_BUNDLE = "foreground_notification_bundle"
 
@@ -60,7 +74,9 @@ class MainActivity : BaseWebLoginActivity() {
             CompositionLocalProvider(LocalDependencyContainer provides this) {
                 val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
 
-                val theme by globalViewModel.theme.collectAsState()
+                val theme by globalGroupViewModel.theme.collectAsState()
+
+                val isLoginLoading by globalViewModel.loginLoading.collectAsState()
 
                 isOpenTutorial?.let { isOpenTutorial ->
                     if (isOpenTutorial) {
@@ -76,10 +92,25 @@ class MainActivity : BaseWebLoginActivity() {
                                     modifier = Modifier
                                         .padding(padding)
                                 ) {
-                                    DestinationsNavHost(
-                                        navGraph = NavGraphs.root,
-                                        startRoute = MainScreenDestination
-                                    )
+                                    if (isLoginLoading) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(LocalColor.current.background),
+                                            horizontalArrangement = Arrangement.Center,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(size = 64.dp),
+                                                color = Blue_4F70E5
+                                            )
+                                        }
+                                    } else {
+                                        DestinationsNavHost(
+                                            navGraph = NavGraphs.root,
+                                            startRoute = MainScreenDestination
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -114,24 +145,28 @@ class MainActivity : BaseWebLoginActivity() {
     }
 
 
+    //==================== auto login callback ====================
     override fun autoLoginFailCallback() {
-        KLog.i(TAG, "autoLoginFailCallback")
-        globalViewModel.startFetchFollowData()
+        KLog.e(TAG, "autoLoginFailCallback")
+        globalViewModel.loginFail("autoLoginFailCallback")
+        globalGroupViewModel.fetchAllGroupList()
     }
 
     override fun loginCancel() {
         KLog.i(TAG, "loginCancel")
+        globalViewModel.loginFail("loginCancel")
     }
 
     override fun loginFailCallback(errorMessage: String) {
-        KLog.i(TAG, "loginFailCallback:$errorMessage")
+        KLog.e(TAG, "loginFailCallback:$errorMessage")
+        globalViewModel.loginFail(errorMessage)
+        globalGroupViewModel.fetchAllGroupList()
     }
 
     override fun loginSuccessCallback() {
         KLog.i(TAG, "loginSuccessCallback")
-        globalViewModel.registerUser()
         globalViewModel.loginSuccess()
-        globalViewModel.startFetchFollowData()
+        globalGroupViewModel.fetchMyGroup()
     }
 }
 
@@ -139,23 +174,34 @@ class MainActivity : BaseWebLoginActivity() {
 @Destination
 @Composable
 fun MainScreen(
-    navigator: DestinationsNavigator,
+    navigator: DestinationsNavigator
 ) {
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
-    val mainNavController = rememberNavController()
-    val theme by globalViewModel.theme.collectAsState()
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
+    val emptyGroupList by globalGroupViewModel.groupList.collectAsState()
+    val isLoading by globalGroupViewModel.loading.collectAsState()
 
-    FanciTheme(fanciColor = theme) {
-//        val mainState = rememberMainState()
-//        mainState.setStatusBarColor()
+    FollowScreen(
+        modifier = Modifier,
+        group = currentGroup,
+        emptyGroupList = emptyGroupList,
+        navigator = navigator,
+        myGroupList = myGroupList,
+        onGroupItemClick = {
+            globalGroupViewModel.setCurrentGroup(it)
+        },
+        onLoadMoreServerGroup = {
+            globalGroupViewModel.onLoadMore()
+        },
+        onRefreshMyGroupList = {
+            globalGroupViewModel.fetchMyGroup()
+        },
+        isLoading = isLoading
+    )
 
-        FollowScreen(
-            modifier = Modifier,
-            globalViewModel = globalViewModel,
-            navigator = navigator
-        )
 
-        //TODO 暫時移除 Tab, 之後有新功能才會加回來.
+    //TODO 暫時移除 Tab, 之後有新功能才會加回來.
 //        Scaffold(
 //            bottomBar = {
 //                BottomBarScreen(
@@ -174,7 +220,7 @@ fun MainScreen(
 //                navigator = navigator
 //            )
 //        }
-    }
+//    }
 }
 
 @Preview(showBackground = true)

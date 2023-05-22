@@ -490,13 +490,13 @@ class GroupUseCase(
     /**
      * 取得我加入的社團頻道清單
      */
-    suspend fun getMyJoinGroup() =
+    private suspend fun getMyJoinGroup() =
         kotlin.runCatching {
             groupApi.apiV1GroupMeGet(pageSize = 100).checkResponseBody()
         }
 
     /**
-     * 取得我加入的社團頻道清單, 包含目前所選擇的社團
+     * 取得我加入的社團頻道清單, 並設定第一個為目前選中的社團
      */
     suspend fun groupToSelectGroupItem() =
         kotlin.runCatching {
