@@ -132,4 +132,8 @@ class MainViewModel(
             })
         }
     }
+
+    fun openedInviteGroup() {
+        _inviteGroup.value = null
+    }
 }

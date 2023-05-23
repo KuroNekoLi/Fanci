@@ -37,6 +37,7 @@ import com.cmoney.kolfanci.ui.destinations.*
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -54,14 +55,16 @@ fun FollowScreen(
     modifier: Modifier,
     navigator: DestinationsNavigator,
     group: Group?,
-    emptyGroupList: List<Group>,
+    serverGroupList: List<Group>,
     viewModel: FollowViewModel = koinViewModel(),
     chatRoomViewModel: ChatRoomViewModel = koinViewModel(),
     myGroupList: List<GroupItem>,
     onGroupItemClick: (Group) -> Unit,
     onLoadMoreServerGroup: () -> Unit,
     onRefreshMyGroupList: () -> Unit,
-    isLoading: Boolean
+    isLoading: Boolean,
+    inviteGroup: Group?,
+    onDismissInvite: () -> Unit
 ) {
     val uiState = viewModel.uiState
     val chatRoomUiState = chatRoomViewModel.uiState
@@ -83,6 +86,23 @@ fun FollowScreen(
         onRefreshMyGroupList.invoke()
     }
 
+    //查看該社團info dialog
+    val openGroupDialog by viewModel.openGroupDialog.collectAsState()
+
+    openGroupDialog?.let { group ->
+        GroupItemDialogScreen(
+            groupModel = group,
+            onDismiss = {
+                viewModel.closeGroupItemDialog()
+                onDismissInvite.invoke()
+            },
+            onConfirm = {
+                viewModel.joinGroup(it)
+                onDismissInvite.invoke()
+            }
+        )
+    }
+
     //點擊channel權限檢查完
     chatRoomUiState.enterChannel?.let { channel ->
         if (Constant.canReadMessage()) {
@@ -96,6 +116,13 @@ fun FollowScreen(
             openDialog.value = true
         }
         chatRoomViewModel.resetChannel()
+    }
+
+    //邀請加入社團
+    LaunchedEffect(inviteGroup) {
+        inviteGroup?.let {
+            viewModel.openGroupItemDialog(it)
+        }
     }
 
     if (openDialog.value) {
@@ -125,7 +152,7 @@ fun FollowScreen(
         navigator = navigator,
         groupList = myGroupList,
         group = group,
-        emptyGroupList = emptyGroupList,
+        emptyGroupList = serverGroupList,
         imageOffset = uiState.imageOffset,
         spaceHeight = uiState.spaceHeight,
         scrollableState = scrollableState,

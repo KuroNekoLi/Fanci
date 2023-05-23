@@ -26,6 +26,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,9 +76,14 @@ fun AllMemberScreen(
     setMemberResult: ResultRecipient<MemberManageScreenDestination, MemberManageResult>
 ) {
     val uiState = viewModel.uiState
-    if (uiState.groupMember == null && uiState.loading) {
+
+    LaunchedEffect(Unit) {
         viewModel.fetchGroupMember(groupId = group.id.orEmpty())
     }
+
+//    if (uiState.groupMember == null && uiState.loading) {
+//        viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+//    }
 
     val shareText by viewModel.shareText.collectAsState()
 
@@ -211,10 +217,11 @@ fun AllMemberScreenView(
 
                 item {
                     if (groupMemberList.isEmpty() && textState.isEmpty()) {
-                        EmptyAllMemberView(onInviteClick)
-                    }
-                    else {
-                        SearchNoResultView()
+                        if (groupMemberList.isEmpty()) {
+                            EmptyAllMemberView(onInviteClick)
+                        } else {
+                            SearchNoResultView()
+                        }
                     }
                 }
 

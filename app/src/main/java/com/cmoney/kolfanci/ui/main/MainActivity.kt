@@ -17,14 +17,17 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
@@ -176,16 +179,26 @@ class MainActivity : BaseWebLoginActivity() {
 fun MainScreen(
     navigator: DestinationsNavigator
 ) {
+    val TAG = "MainScreen"
+    val globalViewModel = LocalDependencyContainer.current.globalViewModel
     val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
-    val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
-    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
-    val emptyGroupList by globalGroupViewModel.groupList.collectAsState()
+    val activity = LocalContext.current.findActivity()
     val isLoading by globalGroupViewModel.loading.collectAsState()
+
+    //我的社團清單
+    val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
+    //目前選中社團
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
+    //server 入門社團清單
+    val serverGroupList by globalGroupViewModel.groupList.collectAsState()
+    //邀請加入社團
+    val inviteGroup by globalViewModel.inviteGroup.collectAsState()
 
     FollowScreen(
         modifier = Modifier,
         group = currentGroup,
-        emptyGroupList = emptyGroupList,
+        serverGroupList = serverGroupList,
+        inviteGroup = inviteGroup,
         navigator = navigator,
         myGroupList = myGroupList,
         onGroupItemClick = {
@@ -197,8 +210,29 @@ fun MainScreen(
         onRefreshMyGroupList = {
             globalGroupViewModel.fetchMyGroup()
         },
-        isLoading = isLoading
+        isLoading = isLoading,
+        onDismissInvite = {
+            globalViewModel.openedInviteGroup()
+            activity.intent.replaceExtras(Bundle())
+        }
     )
+
+    /**
+     * 檢查 推播 or dynamic link
+     */
+    fun checkPayload(intent: Intent) {
+        val payLoad =
+            intent.getParcelableExtra<Payload>(MainActivity.FOREGROUND_NOTIFICATION_BUNDLE)
+        KLog.d(TAG, "payLoad = $payLoad")
+        if (payLoad != null) {
+            globalViewModel.setNotificationBundle(payLoad)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        KLog.i(TAG, "checkPayload")
+        checkPayload(activity.intent)
+    }
 
 
     //TODO 暫時移除 Tab, 之後有新功能才會加回來.

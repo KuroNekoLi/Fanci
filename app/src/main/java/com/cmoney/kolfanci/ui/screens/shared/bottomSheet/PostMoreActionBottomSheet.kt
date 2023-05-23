@@ -3,7 +3,6 @@ package com.cmoney.kolfanci.ui.screens.shared.bottomSheet
 import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
