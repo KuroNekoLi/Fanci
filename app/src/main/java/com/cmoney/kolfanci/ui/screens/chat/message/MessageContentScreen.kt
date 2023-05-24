@@ -26,6 +26,7 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.common.AutoLinkText
@@ -187,7 +188,19 @@ fun MessageContentScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         //大頭貼
                         messageModel.author?.let {
-                            ChatUsrAvatarScreen(it)
+                            val firstRoleColorName = it.roleInfos?.firstOrNull()?.color
+
+                            val roleColor = LocalColor.current.roleColor.colors.filter { color ->
+                                color.name == firstRoleColorName
+                            }.map { fanciColor ->
+                                fanciColor.hexColorCode?.toColor()
+                                    ?: LocalColor.current.text.default_100
+                            }.firstOrNull()
+
+                            ChatUsrAvatarScreen(
+                                user = it,
+                                nickNameColor = roleColor ?: LocalColor.current.text.default_100
+                            )
                         }
                         Spacer(modifier = Modifier.width(10.dp))
                         //發文時間
