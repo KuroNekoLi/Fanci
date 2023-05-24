@@ -25,18 +25,16 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
-sealed class MyCallback {
-    object ChangeAvatar : MyCallback()
-}
-
-
+/**
+ * 會員中心
+ */
 @Destination
 @Composable
 fun MyScreen(
-    modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
 ) {
     val TAG = "MyScreen"
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
