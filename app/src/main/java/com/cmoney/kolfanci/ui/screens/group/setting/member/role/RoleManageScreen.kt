@@ -139,7 +139,7 @@ fun RoleManageScreenView(
                     }
                 }
 
-                if (Constant.MyGroupPermission.rearrangeRoles == true) {
+                if (Constant.MyGroupPermission.rearrangeRoles == true && roleList.isNotEmpty()) {
                     Spacer(modifier = Modifier.width(23.dp))
 
                     BorderButton(
@@ -177,19 +177,6 @@ fun RoleManageScreenView(
                             .weight(1f)
                             .fillMaxWidth()
                     )
-//                    Box(
-//                        modifier = Modifier
-//                            .weight(1f)
-//                            .fillMaxWidth(),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        Text(
-//                            text = "尚未建立任何角色",
-//                            fontSize = 14.sp,
-//                            textAlign = TextAlign.Center,
-//                            color = LocalColor.current.component.other
-//                        )
-//                    }
                 } else {
                     Text(
                         modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 20.dp),

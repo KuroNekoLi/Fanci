@@ -54,7 +54,6 @@ fun EditChannelScreen(
     resultNavigator: ResultBackNavigator<Group>,
     setRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>
 ) {
-    val context = LocalContext.current
     val TAG = "EditChannelScreen"
     val showDialog = remember { mutableStateOf(false) }
 
