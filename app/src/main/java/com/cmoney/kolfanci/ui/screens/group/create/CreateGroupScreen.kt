@@ -47,6 +47,9 @@ import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/**
+ * 建立社團
+ */
 @Destination
 @Composable
 fun CreateGroupScreen(
@@ -434,7 +437,7 @@ private fun Step(
     isFirstStep: Boolean,
     title: String
 ) {
-    val color = if (isComplete) LocalColor.current.primary else LocalColor.current.env_40
+    val color = if (isComplete) LocalColor.current.primary else LocalColor.current.env_60
     val textColor =
         if (isComplete) LocalColor.current.text.default_100 else LocalColor.current.text.default_30
     var offset: Dp
