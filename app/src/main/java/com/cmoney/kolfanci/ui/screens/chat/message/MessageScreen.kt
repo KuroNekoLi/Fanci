@@ -11,6 +11,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,14 +66,17 @@ fun MessageScreen(
         }
     }
 
+    val blockingList by viewModel.blockingList.collectAsState()
+    val blockerList by viewModel.blockerList.collectAsState()
+
     if (uiState.message.isNotEmpty()) {
         MessageScreenView(
             modifier = modifier,
             message = uiState.message,
-            blockingList = viewModel.uiState.blockingList.map {
+            blockingList = blockingList.map {
                 it.id.orEmpty()
             },
-            blockerList = viewModel.uiState.blockerList.map {
+            blockerList = blockerList.map {
                 it.id.orEmpty()
             },
             listState = listState,

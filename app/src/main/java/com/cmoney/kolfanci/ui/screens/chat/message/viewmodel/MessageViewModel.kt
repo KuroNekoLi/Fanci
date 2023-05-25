@@ -13,12 +13,12 @@ import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
-import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
@@ -44,7 +44,13 @@ data class MessageUiState(
     val reportMessage: ChatMessage? = null,
     val deleteMessage: ChatMessage? = null,
     val showReSendDialog: ChatMessageWrapper? = null   //是否要show re-send dialog
-)
+){
+    data class ImageAttachState(
+        val uri: Uri,
+        val isUploadComplete: Boolean = false,
+        val serverUrl: String = ""
+    )
+}
 
 /**
  * 處理聊天室 相關訊息
@@ -305,7 +311,7 @@ class MessageViewModel(
                                             replyMessage = uiState.replyMessage
                                         ),
                                         uploadAttachPreview = uiState.imageAttach.map {
-                                            ChatRoomUiState.ImageAttachState(
+                                            MessageUiState.ImageAttachState(
                                                 uri = it,
                                                 isUploadComplete = true
                                             )
@@ -351,7 +357,7 @@ class MessageViewModel(
                             replyMessage = uiState.replyMessage
                         ),
                         uploadAttachPreview = uiState.imageAttach.map { uri ->
-                            ChatRoomUiState.ImageAttachState(
+                            MessageUiState.ImageAttachState(
                                 uri = uri
                             )
                         }
@@ -504,7 +510,7 @@ class MessageViewModel(
                                         replyMessage = uiState.replyMessage
                                     ),
                                     uploadAttachPreview = images.map {
-                                        ChatRoomUiState.ImageAttachState(
+                                        MessageUiState.ImageAttachState(
                                             uri = Uri.EMPTY,
                                             serverUrl = it
                                         )
@@ -960,6 +966,23 @@ class MessageViewModel(
                 iconRes = R.drawable.minus_people,
                 iconColor = White_767A7F,
                 textColor = Color.White
+            )
+        )
+    }
+
+    /**
+     * 複製訊息
+     */
+    fun copyMessage(message: ChatMessage) {
+        context.copyToClipboard(message.content?.text.orEmpty())
+
+        uiState = uiState.copy(
+            snackBarMessage = CustomMessage(
+                textString = "訊息複製成功！",
+                textColor = Color.White,
+                iconRes = R.drawable.copy,
+                iconColor = White_767A7F,
+                backgroundColor = White_494D54
             )
         )
     }

@@ -1,11 +1,8 @@
-package com.cmoney.kolfanci.ui.screens.follow.viewmodel
+package com.cmoney.kolfanci.model.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
@@ -23,6 +20,9 @@ sealed class ThemeSetting {
     object Coffee : ThemeSetting()
 }
 
+/**
+ * 社團相關設定
+ */
 class GroupViewModel(
     private val themeUseCase: ThemeUseCase,
     private val groupUseCase: GroupUseCase,
@@ -48,14 +48,6 @@ class GroupViewModel(
     //主題設定檔
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
-
-    //加入需要驗證社團
-    private val _approveGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
-    val approveGroup = _approveGroup.asStateFlow()
-
-    //提示登入
-    private val _showLoginDialog = MutableStateFlow(false)
-    val showLoginDialog = _showLoginDialog.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -240,33 +232,6 @@ class GroupViewModel(
                     KLog.e(TAG, it)
                 }
             )
-        }
-    }
-
-
-    /**
-     * 加入社團
-     */
-    fun joinGroup(group: Group) {
-        KLog.i(TAG, "joinGroup:$group")
-        if (XLoginHelper.isLogin) {
-            viewModelScope.launch {
-                if (group.isNeedApproval == true) {
-                    _approveGroup.value = group
-                } else {
-                    groupUseCase.joinGroup(group).fold({
-                        fetchMyGroup()
-                    }, {
-                        if (it is EmptyBodyException) {
-                            fetchMyGroup()
-                        } else {
-                            KLog.e(TAG, it)
-                        }
-                    })
-                }
-            }
-        } else {
-            _showLoginDialog.value = true
         }
     }
 }

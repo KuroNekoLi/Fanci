@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,8 +40,15 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * 聊天室
+ */
 @Composable
 fun ChatRoomScreen(
     channelId: String,
@@ -52,9 +62,10 @@ fun ChatRoomScreen(
 
     var openImagePickDialog by remember { mutableStateOf(false) }
 
-    val uiState = viewModel.uiState
+    //公告訊息
+    val announceMessage by viewModel.announceMessage.collectAsState()
 
-    KLog.i(TAG, "channelId:$channelId")
+    KLog.i(TAG, "open ChatRoomScreen channelId:$channelId")
 
     if (Constant.canReadMessage()) {
         messageViewModel.startPolling(channelId)
@@ -69,9 +80,13 @@ fun ChatRoomScreen(
     }
 
     //錯誤訊息提示
-    uiState.errorMessage?.let {
-        LocalContext.current.showToast(it)
-        viewModel.errorMessageDone()
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.errorMessage.collect {
+            if (it.isNotEmpty()) {
+                context.showToast(it)
+            }
+        }
     }
 
     //設定公告 callback
@@ -79,6 +94,7 @@ fun ChatRoomScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val announceMessage = result.value
                 viewModel.announceMessageToServer(
@@ -90,7 +106,7 @@ fun ChatRoomScreen(
     }
 
     messageViewModel.uiState.copyMessage?.let {
-        viewModel.copyMessage(it)
+        messageViewModel.copyMessage(it)
         messageViewModel.copyDone()
     }
 
@@ -98,7 +114,7 @@ fun ChatRoomScreen(
         channelId = channelId,
         channelTitle = channelTitle,
         navController = navController,
-        announceMessage = uiState.announceMessage,
+        announceMessage = announceMessage,
         onMsgDismissHide = {
             viewModel.onMsgDismissHide(it)
         },

@@ -6,7 +6,7 @@ import com.cmoney.kolfanci.ui.screens.channel.ChannelViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
-import com.cmoney.kolfanci.ui.screens.follow.viewmodel.GroupViewModel
+import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.search.apply.viewmodel.ApplyForGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
@@ -30,7 +30,7 @@ import org.koin.dsl.module
 val viewModule = module {
     viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { FollowViewModel(get()) }
-    viewModel { ChatRoomViewModel(get(), get(), get(), get(), get()) }
+    viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
     viewModel { MessageViewModel(androidApplication(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get()) }
     viewModel { GroupSettingViewModel(get(), get(), get()) }

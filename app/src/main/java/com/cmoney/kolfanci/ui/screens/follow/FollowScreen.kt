@@ -67,7 +67,6 @@ fun FollowScreen(
     onDismissInvite: () -> Unit
 ) {
     val uiState = viewModel.uiState
-    val chatRoomUiState = chatRoomViewModel.uiState
 
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -104,18 +103,19 @@ fun FollowScreen(
     }
 
     //點擊channel權限檢查完
-    chatRoomUiState.enterChannel?.let { channel ->
-        if (Constant.canReadMessage()) {
-            navigator.navigate(
-                ChannelScreenDestination(
-                    channel = channel
+    LaunchedEffect(Unit) {
+        chatRoomViewModel.updatePermissionDone.collect {
+            if (Constant.canReadMessage()) {
+                navigator.navigate(
+                    ChannelScreenDestination(
+                        channel = it
+                    )
                 )
-            )
-        } else {
-            //禁止進入該頻道,show dialog
-            openDialog.value = true
+            } else {
+                //禁止進入該頻道,show dialog
+                openDialog.value = true
+            }
         }
-        chatRoomViewModel.resetChannel()
     }
 
     //邀請加入社團

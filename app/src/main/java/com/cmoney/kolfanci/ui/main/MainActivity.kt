@@ -32,7 +32,7 @@ import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
-import com.cmoney.kolfanci.ui.screens.follow.viewmodel.GroupViewModel
+import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.kolfanci.ui.theme.Black_242424
 import com.cmoney.kolfanci.ui.theme.Blue_4F70E5

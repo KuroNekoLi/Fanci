@@ -136,7 +136,7 @@ private fun ChannelScreenView(
                                 coroutineScope.launch {
                                     pagerState.animateScrollToPage(index)
                                 }
-                            },
+                            }
                         )
                     }
                 }
@@ -147,6 +147,7 @@ private fun ChannelScreenView(
                 ) { page ->
                     when (page) {
                         0 -> {
+                            //聊天室 Tab
                             ChatRoomScreen(
                                 channelId = channel.id.orEmpty(),
                                 channelTitle = channel.name.orEmpty(),
@@ -155,6 +156,7 @@ private fun ChannelScreenView(
                             )
                         }
                         else -> {
+                            //貼文 Tab
                             PostScreen(
                                 channel = channel,
                                 navController = navController,
@@ -164,7 +166,6 @@ private fun ChannelScreenView(
                         }
                     }
                 }
-
             }
         }
         else {

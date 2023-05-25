@@ -32,7 +32,7 @@ import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
 import com.cmoney.kolfanci.ui.screens.chat.*
-import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomUiState
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageUiState
 import com.cmoney.kolfanci.ui.screens.post.EmojiFeedback
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
@@ -378,7 +378,7 @@ fun MessageContentScreenPreview() {
             chatMessageWrapper = ChatMessageWrapper(
                 message = ChatRoomUseCase.mockMessage,
                 uploadAttachPreview = listOf(
-                    ChatRoomUiState.ImageAttachState(
+                    MessageUiState.ImageAttachState(
                         uri = Uri.parse("")
                     )
                 ),
