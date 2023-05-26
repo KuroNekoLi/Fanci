@@ -45,7 +45,7 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.screens.chat.MessageAttachImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
@@ -269,7 +269,7 @@ private fun EditPostScreenView(
 
                 //Attach Image
                 if (attachImages.isNotEmpty()) {
-                    MessageAttachImageScreen(
+                    ChatRoomAttachImageScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(LocalColor.current.env_100),

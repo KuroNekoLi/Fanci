@@ -28,7 +28,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.cmoney.kolfanci.R
@@ -39,7 +38,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
  * 聊天室 附加圖片
  */
 @Composable
-fun MessageAttachImageScreen(
+fun ChatRoomAttachImageScreen(
     modifier: Modifier = Modifier,
     imageAttach: List<Uri>,
     onDelete: (Uri) -> Unit,
@@ -122,9 +121,9 @@ private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun MessageAttachImageScreenPreview() {
+fun ChatRoomAttachImageScreenPreview() {
     FanciTheme {
-        MessageAttachImageScreen(
+        ChatRoomAttachImageScreen(
             modifier = Modifier,
             imageAttach = listOf(Uri.EMPTY, Uri.EMPTY, Uri.EMPTY),
             onDelete = {},

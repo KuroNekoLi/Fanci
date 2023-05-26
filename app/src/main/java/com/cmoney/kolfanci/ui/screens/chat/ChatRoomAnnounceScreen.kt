@@ -24,7 +24,7 @@ import com.cmoney.kolfanci.R
  * 聊天室 公告 訊息
  */
 @Composable
-fun MessageAnnounceScreen(chatMessageModel: ChatMessage, modifier: Modifier = Modifier) {
+fun ChatRoomAnnounceScreen(chatMessageModel: ChatMessage, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -53,8 +53,8 @@ fun MessageAnnounceScreen(chatMessageModel: ChatMessage, modifier: Modifier = Mo
 
 @Preview(showBackground = true)
 @Composable
-fun MessageAnnounceScreenPreview() {
+fun ChatRoomAnnounceScreenPreview() {
     FanciTheme {
-        MessageAnnounceScreen(ChatRoomUseCase.mockMessage)
+        ChatRoomAnnounceScreen(ChatRoomUseCase.mockMessage)
     }
 }

@@ -3,9 +3,12 @@ package com.cmoney.kolfanci.ui.screens.chat
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,22 +30,15 @@ import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -52,7 +47,6 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ChatRoomScreen(
     channelId: String,
-    channelTitle: String,
     navController: DestinationsNavigator,
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
@@ -60,6 +54,7 @@ fun ChatRoomScreen(
 ) {
     val TAG = "ChatRoomScreen"
 
+    //打開圖片選擇
     var openImagePickDialog by remember { mutableStateOf(false) }
 
     //公告訊息
@@ -67,6 +62,7 @@ fun ChatRoomScreen(
 
     KLog.i(TAG, "open ChatRoomScreen channelId:$channelId")
 
+    //是否有讀的權限
     if (Constant.canReadMessage()) {
         messageViewModel.startPolling(channelId)
     }
@@ -74,6 +70,7 @@ fun ChatRoomScreen(
     //抓取 公告
     viewModel.fetchAnnounceMessage(channelId)
 
+    //離開頁面處理
     BackHandler {
         messageViewModel.stopPolling()
         navController.popBackStack()
@@ -105,6 +102,7 @@ fun ChatRoomScreen(
         }
     }
 
+    //todo
     messageViewModel.uiState.copyMessage?.let {
         messageViewModel.copyMessage(it)
         messageViewModel.copyDone()
@@ -112,8 +110,6 @@ fun ChatRoomScreen(
 
     ChatRoomScreenView(
         channelId = channelId,
-        channelTitle = channelTitle,
-        navController = navController,
         announceMessage = announceMessage,
         onMsgDismissHide = {
             viewModel.onMsgDismissHide(it)
@@ -135,14 +131,13 @@ fun ChatRoomScreen(
         showOnlyBasicPermissionTip = {
             messageViewModel.showPermissionTip()
         },
-        snackBarMessage = messageViewModel.uiState.snackBarMessage,
-        onSnackBarDismiss = {
-            messageViewModel.snackBarDismiss()
-        }
-    )
+        snackBarMessage = messageViewModel.uiState.snackBarMessage
+    ) {
+        messageViewModel.snackBarDismiss()
+    }
 
-    //Alert Dialog
-    //檢舉用戶
+    //==================== Alert Dialog ====================
+    //檢舉用戶 彈窗
     messageViewModel.uiState.reportMessage?.author?.apply {
         ReportUserDialogScreen(user = this,
             onConfirm = {
@@ -209,8 +204,6 @@ fun ChatRoomScreen(
 @Composable
 private fun ChatRoomScreenView(
     channelId: String,
-    channelTitle: String,
-    navController: DestinationsNavigator,
     announceMessage: ChatMessage?,
     onMsgDismissHide: (ChatMessage) -> Unit,
     replyMessage: ChatMessage?,
@@ -231,7 +224,7 @@ private fun ChatRoomScreenView(
     ) {
         //公告訊息 display
         announceMessage?.let {
-            MessageAnnounceScreen(
+            ChatRoomAnnounceScreen(
                 it,
                 modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
             )
@@ -257,7 +250,7 @@ private fun ChatRoomScreenView(
         }
 
         //附加圖片
-        MessageAttachImageScreen(
+        ChatRoomAttachImageScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colors.primary),
@@ -297,8 +290,6 @@ fun ChatRoomScreenPreview() {
     FanciTheme {
         ChatRoomScreenView(
             channelId = "",
-            channelTitle = "",
-            navController = EmptyDestinationsNavigator,
             announceMessage = ChatMessage(),
             onMsgDismissHide = {},
             replyMessage = ChatMessage(),
@@ -308,8 +299,7 @@ fun ChatRoomScreenPreview() {
             onMessageSend = {},
             onAttachClick = {},
             showOnlyBasicPermissionTip = {},
-            snackBarMessage = null,
-            onSnackBarDismiss = {}
-        )
+            snackBarMessage = null
+        ) {}
     }
 }

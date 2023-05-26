@@ -16,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
@@ -150,7 +149,6 @@ private fun ChannelScreenView(
                             //聊天室 Tab
                             ChatRoomScreen(
                                 channelId = channel.id.orEmpty(),
-                                channelTitle = channel.name.orEmpty(),
                                 navController = navController,
                                 resultRecipient = announcementResultRecipient
                             )
