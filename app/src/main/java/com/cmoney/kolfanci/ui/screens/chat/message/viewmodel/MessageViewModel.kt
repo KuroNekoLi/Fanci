@@ -8,7 +8,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.DeleteStatus
+import com.cmoney.fanciapi.fanci.model.Emojis
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
@@ -28,23 +35,25 @@ import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 data class MessageUiState(
-    val snackBarMessage: CustomMessage? = null,
     val message: List<ChatMessageWrapper> = emptyList(),    //訊息
     val imageAttach: List<Uri> = emptyList(),   //附加圖片
     val isSendComplete: Boolean = false,        //訊息是否發送完成
-    val replyMessage: ChatMessage? = null,      //回覆訊息用
     val routeAnnounceMessage: ChatMessage? = null,    //設定公告訊息,跳轉設定頁面
     val copyMessage: ChatMessage? = null,    //複製訊息
     val hideUserMessage: ChatMessage? = null,    //封鎖用戶
     val reportMessage: ChatMessage? = null,
     val deleteMessage: ChatMessage? = null,
     val showReSendDialog: ChatMessageWrapper? = null   //是否要show re-send dialog
-){
+) {
     data class ImageAttachState(
         val uri: Uri,
         val isUploadComplete: Boolean = false,
@@ -63,6 +72,14 @@ class MessageViewModel(
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
+
+    //通知訊息
+    private val _snackBarMessage = MutableSharedFlow<CustomMessage>()
+    val snackBarMessage = _snackBarMessage.asSharedFlow()
+
+    //要回覆的訊息
+    private val _replyMessage = MutableStateFlow<ChatMessage?>(null)
+    val replyMessage = _replyMessage.asStateFlow()
 
     var uiState by mutableStateOf(MessageUiState())
         private set
@@ -308,7 +325,7 @@ class MessageViewModel(
                                                 text = text
                                             ),
                                             createUnixTime = System.currentTimeMillis() / 1000,
-                                            replyMessage = uiState.replyMessage
+                                            replyMessage = _replyMessage.value
                                         ),
                                         uploadAttachPreview = uiState.imageAttach.map {
                                             MessageUiState.ImageAttachState(
@@ -354,7 +371,7 @@ class MessageViewModel(
                                 text = text
                             ),
                             createUnixTime = System.currentTimeMillis() / 1000,
-                            replyMessage = uiState.replyMessage
+                            replyMessage = _replyMessage.value
                         ),
                         uploadAttachPreview = uiState.imageAttach.map { uri ->
                             MessageUiState.ImageAttachState(
@@ -464,7 +481,7 @@ class MessageViewModel(
                 chatRoomChannelId = channelId,
                 text = text,
                 images = images,
-                replyMessageId = uiState.replyMessage?.id.orEmpty()
+                replyMessageId = _replyMessage.value?.id.orEmpty()
             ).fold({ chatMessage ->
                 //發送成功
                 KLog.i(TAG, "send success:$chatMessage")
@@ -477,8 +494,9 @@ class MessageViewModel(
                         }
                     },
                     isSendComplete = true,
-                    replyMessage = null
                 )
+
+                _replyMessage.value = null
 
                 //恢復聊天室內訊息,不會自動捲到最下面
                 delay(800)
@@ -507,7 +525,7 @@ class MessageViewModel(
                                             text = text
                                         ),
                                         createUnixTime = System.currentTimeMillis() / 1000,
-                                        replyMessage = uiState.replyMessage
+                                        replyMessage = _replyMessage.value
                                     ),
                                     uploadAttachPreview = images.map {
                                         MessageUiState.ImageAttachState(
@@ -725,7 +743,10 @@ class MessageViewModel(
                                 it.message != chatMessageModel
                             },
                             deleteMessage = null,
-                            snackBarMessage = CustomMessage(
+                        )
+
+                        snackBarMessage(
+                            CustomMessage(
                                 textString = "成功刪除訊息！",
                                 textColor = Color.White,
                                 iconRes = R.drawable.delete,
@@ -733,6 +754,7 @@ class MessageViewModel(
                                 backgroundColor = White_494D54
                             )
                         )
+
                     } else {
                         it.printStackTrace()
                         KLog.e(TAG, it)
@@ -753,7 +775,10 @@ class MessageViewModel(
                                 it.message != chatMessageModel
                             },
                             deleteMessage = null,
-                            snackBarMessage = CustomMessage(
+                        )
+
+                        snackBarMessage(
+                            CustomMessage(
                                 textString = "成功刪除訊息！",
                                 textColor = Color.White,
                                 iconRes = R.drawable.delete,
@@ -761,6 +786,7 @@ class MessageViewModel(
                                 backgroundColor = White_494D54
                             )
                         )
+
                     } else {
                         it.printStackTrace()
                         KLog.e(TAG, it)
@@ -809,9 +835,7 @@ class MessageViewModel(
      */
     private fun replyMessage(message: ChatMessage) {
         KLog.i(TAG, "replyMessage click:$message")
-        uiState = uiState.copy(
-            replyMessage = message
-        )
+        _replyMessage.value = message
     }
 
     /**
@@ -820,9 +844,7 @@ class MessageViewModel(
      */
     fun removeReply(reply: ChatMessage) {
         KLog.i(TAG, "removeReply:$reply")
-        uiState = uiState.copy(
-            replyMessage = null
-        )
+        _replyMessage.value = null
     }
 
     /**
@@ -880,8 +902,11 @@ class MessageViewModel(
             ).fold({
                 KLog.i(TAG, "onReportUser success:$it")
                 uiState = uiState.copy(
-                    reportMessage = null,
-                    snackBarMessage = CustomMessage(
+                    reportMessage = null
+                )
+
+                snackBarMessage(
+                    CustomMessage(
                         textString = "檢舉成立！",
                         textColor = Color.White,
                         iconRes = R.drawable.report,
@@ -901,15 +926,6 @@ class MessageViewModel(
     fun onReportUserDialogDismiss() {
         uiState = uiState.copy(
             reportMessage = null
-        )
-    }
-
-    /**
-     * 隱藏 SnackBar
-     */
-    fun snackBarDismiss() {
-        uiState = uiState.copy(
-            snackBarMessage = null
         )
     }
 
@@ -960,8 +976,8 @@ class MessageViewModel(
      */
     fun showPermissionTip() {
         KLog.i(TAG, "showBasicPermissionTip")
-        uiState = uiState.copy(
-            snackBarMessage = CustomMessage(
+        snackBarMessage(
+            CustomMessage(
                 textString = Constant.getChannelSilenceDesc(),
                 iconRes = R.drawable.minus_people,
                 iconColor = White_767A7F,
@@ -975,9 +991,8 @@ class MessageViewModel(
      */
     fun copyMessage(message: ChatMessage) {
         context.copyToClipboard(message.content?.text.orEmpty())
-
-        uiState = uiState.copy(
-            snackBarMessage = CustomMessage(
+        snackBarMessage(
+            CustomMessage(
                 textString = "訊息複製成功！",
                 textColor = Color.White,
                 iconRes = R.drawable.copy,
@@ -986,4 +1001,15 @@ class MessageViewModel(
             )
         )
     }
+
+    /**
+     * 發送 snackBar 訊息
+     */
+    private fun snackBarMessage(message: CustomMessage) {
+        KLog.i(TAG, "snackMessage:$message")
+        viewModelScope.launch {
+            _snackBarMessage.emit(message)
+        }
+    }
+
 }

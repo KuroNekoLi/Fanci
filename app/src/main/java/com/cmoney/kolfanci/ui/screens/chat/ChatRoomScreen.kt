@@ -60,6 +60,12 @@ fun ChatRoomScreen(
     //公告訊息
     val announceMessage by viewModel.announceMessage.collectAsState()
 
+    //通知訊息 tip
+    val snackBarMessage by messageViewModel.snackBarMessage.collectAsState(null)
+
+    //要回覆的訊息
+    val replyMessage by messageViewModel.replyMessage.collectAsState()
+
     KLog.i(TAG, "open ChatRoomScreen channelId:$channelId")
 
     //是否有讀的權限
@@ -71,9 +77,9 @@ fun ChatRoomScreen(
     viewModel.fetchAnnounceMessage(channelId)
 
     //離開頁面處理
-    BackHandler {
+    BackHandler(enabled = false) {
         messageViewModel.stopPolling()
-        navController.popBackStack()
+//        navController.popBackStack()
     }
 
     //錯誤訊息提示
@@ -102,7 +108,6 @@ fun ChatRoomScreen(
         }
     }
 
-    //todo
     messageViewModel.uiState.copyMessage?.let {
         messageViewModel.copyMessage(it)
         messageViewModel.copyDone()
@@ -114,7 +119,7 @@ fun ChatRoomScreen(
         onMsgDismissHide = {
             viewModel.onMsgDismissHide(it)
         },
-        replyMessage = messageViewModel.uiState.replyMessage,
+        replyMessage = replyMessage,
         onDeleteReply = {
             messageViewModel.removeReply(it)
         },
@@ -130,11 +135,18 @@ fun ChatRoomScreen(
         },
         showOnlyBasicPermissionTip = {
             messageViewModel.showPermissionTip()
-        },
-        snackBarMessage = messageViewModel.uiState.snackBarMessage
-    ) {
-        messageViewModel.snackBarDismiss()
+        }
+    )
+
+    //SnackBar 通知訊息
+    if (snackBarMessage != null) {
+        FanciSnackBarScreen(
+            modifier = Modifier.padding(bottom = 70.dp),
+            message = snackBarMessage
+        ) {
+        }
     }
+
 
     //==================== Alert Dialog ====================
     //檢舉用戶 彈窗
@@ -213,8 +225,6 @@ private fun ChatRoomScreenView(
     onMessageSend: (text: String) -> Unit,
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
-    snackBarMessage: CustomMessage?,
-    onSnackBarDismiss: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -274,14 +284,6 @@ private fun ChatRoomScreenView(
             showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
         )
     }
-
-    //SnackBar
-    FanciSnackBarScreen(
-        modifier = Modifier.padding(bottom = 70.dp),
-        message = snackBarMessage
-    ) {
-        onSnackBarDismiss.invoke()
-    }
 }
 
 @Preview(showBackground = true)
@@ -299,7 +301,6 @@ fun ChatRoomScreenPreview() {
             onMessageSend = {},
             onAttachClick = {},
             showOnlyBasicPermissionTip = {},
-            snackBarMessage = null
-        ) {}
+        )
     }
 }
