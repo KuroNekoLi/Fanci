@@ -31,7 +31,6 @@ import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -108,10 +107,15 @@ fun ChatRoomScreen(
         }
     }
 
-    messageViewModel.uiState.copyMessage?.let {
+    //複製訊息
+    val copyMessage by messageViewModel.copyMessage.collectAsState()
+    copyMessage?.let {
         messageViewModel.copyMessage(it)
         messageViewModel.copyDone()
     }
+
+    //附加圖片
+    val imageAttach by messageViewModel.imageAttach.collectAsState()
 
     ChatRoomScreenView(
         channelId = channelId,
@@ -123,7 +127,7 @@ fun ChatRoomScreen(
         onDeleteReply = {
             messageViewModel.removeReply(it)
         },
-        imageAttach = messageViewModel.uiState.imageAttach,
+        imageAttach = imageAttach,
         onDeleteAttach = {
             messageViewModel.removeAttach(it)
         },
@@ -150,13 +154,14 @@ fun ChatRoomScreen(
 
     //==================== Alert Dialog ====================
     //檢舉用戶 彈窗
-    messageViewModel.uiState.reportMessage?.author?.apply {
+    val reportMessage by messageViewModel.reportMessage.collectAsState()
+    reportMessage?.author?.apply {
         ReportUserDialogScreen(user = this,
             onConfirm = {
                 messageViewModel.onReportUser(
                     reason = it,
                     channelId = channelId,
-                    contentId = messageViewModel.uiState.reportMessage?.id.orEmpty()
+                    contentId = reportMessage?.id.orEmpty()
                 )
             }
         ) {
@@ -165,7 +170,8 @@ fun ChatRoomScreen(
     }
 
     //刪除訊息 彈窗
-    messageViewModel.uiState.deleteMessage?.apply {
+    val deleteMessage by messageViewModel.deleteMessage.collectAsState()
+    deleteMessage?.apply {
         DeleteMessageDialogScreen(chatMessageModel = this,
             onConfirm = {
                 messageViewModel.onDeleteMessageDialogDismiss()
@@ -176,7 +182,8 @@ fun ChatRoomScreen(
     }
 
     //封鎖用戶 彈窗
-    messageViewModel.uiState.hideUserMessage?.author?.apply {
+    val hideUserMessage by messageViewModel.hideUserMessage.collectAsState()
+    hideUserMessage?.author?.apply {
         HideUserDialogScreen(
             this,
             onConfirm = {
@@ -190,7 +197,8 @@ fun ChatRoomScreen(
 
     //Route
     //跳轉 公告 page
-    messageViewModel.uiState.routeAnnounceMessage?.apply {
+    val routeAnnounceMessage by messageViewModel.routeAnnounceMessage.collectAsState()
+    routeAnnounceMessage?.apply {
         navController.navigate(
             AnnouncementScreenDestination(
                 this

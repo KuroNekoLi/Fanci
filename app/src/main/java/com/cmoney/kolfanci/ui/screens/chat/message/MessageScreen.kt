@@ -58,8 +58,8 @@ fun MessageScreen(
 ) {
     val TAG = "MessageScreen"
 
-    val uiState = messageViewModel.uiState
-    val isScrollToBottom = uiState.isSendComplete
+    val isScrollToBottom by messageViewModel.isSendComplete.collectAsState()
+
     val onInteractClick = object : (MessageInteract) -> Unit {
         override fun invoke(messageInteract: MessageInteract) {
             messageViewModel.onInteractClick(messageInteract)
@@ -68,11 +68,13 @@ fun MessageScreen(
 
     val blockingList by viewModel.blockingList.collectAsState()
     val blockerList by viewModel.blockerList.collectAsState()
+    val showReSendDialog by messageViewModel.showReSendDialog.collectAsState()
+    val message by messageViewModel.message.collectAsState()
 
-    if (uiState.message.isNotEmpty()) {
+    if (message.isNotEmpty()) {
         MessageScreenView(
             modifier = modifier,
-            message = uiState.message,
+            message = message,
             blockingList = blockingList.map {
                 it.id.orEmpty()
             },
@@ -96,17 +98,17 @@ fun MessageScreen(
         EmptyMessageContent(modifier = modifier)
     }
 
-    if (uiState.showReSendDialog != null) {
+    showReSendDialog?.let {
         KLog.i(TAG, "showReSendDialog")
         MessageReSendDialogScreen(
             onDismiss = {
                 messageViewModel.onReSendDialogDismiss()
             },
             onReSend = {
-                messageViewModel.onResendMessage(channelId, uiState.showReSendDialog)
+                messageViewModel.onResendMessage(channelId, it)
             },
             onDelete = {
-                messageViewModel.onDeleteReSend(uiState.showReSendDialog)
+                messageViewModel.onDeleteReSend(it)
             }
         )
     }

@@ -20,6 +20,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +61,9 @@ fun MessageInput(
         mutableStateOf(false)
     }
 
-    isShowSend = viewModel.uiState.imageAttach.isNotEmpty() || textState.isNotEmpty()
+    val imageAttach by viewModel.imageAttach.collectAsState()
+
+    isShowSend = imageAttach.isNotEmpty() || textState.isNotEmpty()
 
     Row(
         modifier = Modifier
