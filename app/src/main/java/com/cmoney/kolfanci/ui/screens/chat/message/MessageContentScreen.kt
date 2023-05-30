@@ -171,7 +171,7 @@ fun MessageContentScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         //大頭貼
                         messageModel.author?.let {
-                            ChatUsrAvatarScreen(it)
+                            ChatUsrAvatarScreen(user = it)
                         }
                         Spacer(modifier = Modifier.width(10.dp))
                         //發文時間

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,13 +37,13 @@ fun GroupManageScreen(
     ) {
         Text(
             modifier = Modifier.padding(start = 25.dp, bottom = 9.dp),
-            text = "社團管理", fontSize = 14.sp, color = LocalColor.current.text.default_100
+            text = stringResource(id = R.string.group_manage), fontSize = 14.sp, color = LocalColor.current.text.default_100
         )
 
         if (Constant.MyGroupPermission.editGroup == true) {
             SettingItemScreen(
                 iconRes = R.drawable.info,
-                text = "社團設定",
+                text = stringResource(id = R.string.group_setting),
                 onItemClick = {
                     navController.navigate(
                         GroupSettingSettingScreenDestination(

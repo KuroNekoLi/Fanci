@@ -76,7 +76,7 @@ private fun GroupReportMessageScreenView(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 //大頭貼
                 reportInformation.reportee?.let {
-                    ChatUsrAvatarScreen(it)
+                    ChatUsrAvatarScreen(user = it)
                 }
             }
 

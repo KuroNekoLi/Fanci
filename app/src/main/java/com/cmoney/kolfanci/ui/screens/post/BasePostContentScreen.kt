@@ -96,7 +96,7 @@ fun BasePostContentScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             //大頭貼
             post.author?.let {
-                ChatUsrAvatarScreen(it)
+                ChatUsrAvatarScreen(user = it)
             }
 
             Spacer(modifier = Modifier.weight(1f))

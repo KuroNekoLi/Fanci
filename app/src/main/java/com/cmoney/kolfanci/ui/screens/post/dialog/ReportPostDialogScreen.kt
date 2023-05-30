@@ -105,7 +105,7 @@ fun ReportPostDialogScreenScreen(
                             .padding(start = 12.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        ChatUsrAvatarScreen(user)
+                        ChatUsrAvatarScreen(user = user)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
 

@@ -94,12 +94,13 @@ fun InteractDialogScreen(
                 }
             }
 
-            if (Constant.isCanBlock() && !message.isMyPostMessage(Constant.MyInfo)) {
-                FeatureText(R.drawable.hide, "封鎖此用戶") {
-                    onClose(coroutineScope, modalBottomSheetState)
-                    onInteractClick.invoke(MessageInteract.HideUser(message))
-                }
-            }
+            //暫時取消此功能
+//            if (Constant.isCanBlock() && !message.isMyPostMessage(Constant.MyInfo)) {
+//                FeatureText(R.drawable.hide, "封鎖此用戶") {
+//                    onClose(coroutineScope, modalBottomSheetState)
+//                    onInteractClick.invoke(MessageInteract.HideUser(message))
+//                }
+//            }
 
             if (Constant.isCanReport() && !message.isMyPostMessage(Constant.MyInfo)) {
                 FeatureText(R.drawable.report, "向管理員檢舉此用戶") {
