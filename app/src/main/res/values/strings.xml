@@ -32,8 +32,13 @@
     <string name="my_avatar_in_group">我在此社團的頭像</string>
     <string name="my_nickname_in_group">我在此社團的暱稱</string>
     <string name="save">儲存</string>
+    <string name="modify">修改</string>
 
     <string name="group_manage">社團管理</string>
     <string name="group_setting">社團設定</string>
+    <string name="group_name">社團名稱</string>
+    <string name="group_name_empty">社團名稱空白</string>
+    <string name="group_name_empty_desc">社團名稱不可以是空白的唷！</string>
+    <string name="group_name_placeholder">填寫專屬於社團的名稱吧!</string>
 
 </resources>

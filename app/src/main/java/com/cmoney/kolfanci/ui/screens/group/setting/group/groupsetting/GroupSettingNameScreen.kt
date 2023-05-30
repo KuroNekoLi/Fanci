@@ -1,33 +1,42 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.kolfanci.extension.showToast
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
+import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 
 @Destination
@@ -48,17 +57,16 @@ fun GroupSettingNameScreen(
 
     GroupSettingNameView(
         modifier = modifier,
-        navController = navController,
         group = group,
         onChangeName = { name ->
             resultNavigator.navigateBack(name)
         },
         onShowEmptyTip = {
             showEmptyTip = true
-        },
-        onBack = {
-            showSaveTip = true
-        })
+        }
+    ) {
+        showSaveTip = true
+    }
 
     if (showEmptyTip) {
         DialogScreen(
@@ -66,14 +74,14 @@ fun GroupSettingNameScreen(
                 showEmptyTip = false
             },
             titleIconRes = R.drawable.edit,
-            title = "社團名稱空白",
-            subTitle = "社團名稱不可以是空白的唷！",
+            title = stringResource(id = R.string.group_name_empty),
+            subTitle = stringResource(id = R.string.group_name_empty_desc),
             content = {
                 BlueButton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    text = "修改"
+                    text = stringResource(id = R.string.modify)
                 ) {
                     showEmptyTip = false
                 }
@@ -96,13 +104,11 @@ fun GroupSettingNameScreen(
 @Composable
 fun GroupSettingNameView(
     modifier: Modifier = Modifier,
-    navController: DestinationsNavigator,
     group: Group,
     onChangeName: (String) -> Unit,
     onShowEmptyTip: () -> Unit,
     onBack: () -> Unit
 ) {
-    val context = LocalContext.current
     var textState by remember { mutableStateOf(group.name.orEmpty()) }
     val maxLength = 20
 
@@ -110,11 +116,14 @@ fun GroupSettingNameView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
-                title = "社團名稱",
-                leadingEnable = true,
-                moreEnable = false,
-                moreClick = {
+            EditToolbarScreen(
+                title = stringResource(id = R.string.group_name),
+                saveClick = {
+                    if (textState.isEmpty()) {
+                        onShowEmptyTip.invoke()
+                    } else {
+                        onChangeName.invoke(textState)
+                    }
                 },
                 backClick = onBack
             )
@@ -135,7 +144,7 @@ fun GroupSettingNameView(
                     .padding(top = 20.dp, start = 25.dp, end = 25.dp)
             ) {
                 Text(
-                    text = "%d/20".format(textState.length),
+                    text = "%d/${maxLength}".format(textState.length),
                     fontSize = 14.sp,
                     color = LocalColor.current.text.default_50
                 )
@@ -163,7 +172,7 @@ fun GroupSettingNameView(
                     textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                     placeholder = {
                         Text(
-                            text = "填寫專屬於社團的名稱吧!",
+                            text = stringResource(R.string.group_name_placeholder),
                             fontSize = 16.sp,
                             color = LocalColor.current.text.default_30
                         )
@@ -171,36 +180,6 @@ fun GroupSettingNameView(
                 )
 
             }
-
-            //========== 儲存 ==========
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(135.dp)
-                    .background(LocalColor.current.env_100),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    modifier = Modifier
-                        .padding(25.dp)
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
-                    onClick = {
-                        if (textState.isEmpty()) {
-                            onShowEmptyTip.invoke()
-                        } else {
-                            onChangeName.invoke(textState)
-                        }
-                    }) {
-                    Text(
-                        text = "儲存",
-                        color = LocalColor.current.text.other,
-                        fontSize = 16.sp
-                    )
-                }
-            }
-
         }
     }
 }
@@ -214,10 +193,8 @@ fun GroupSettingNameScreenPreview() {
                 name = "韓勾ㄟ金針菇討論區",
                 description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
             ),
-            navController = EmptyDestinationsNavigator,
             onChangeName = {},
-            onShowEmptyTip = {},
-            onBack = {}
-        )
+            onShowEmptyTip = {}
+        ) {}
     }
 }
