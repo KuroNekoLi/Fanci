@@ -9,6 +9,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
 import java.io.File
 
@@ -85,4 +86,11 @@ fun Context.getCaptureUri(): Uri {
         "${this.packageName}.provider",
         file
     )
+}
+
+fun Context.openCustomTab(uri: Uri) {
+    val customTabsIntent = CustomTabsIntent.Builder()
+        .setShowTitle(true)
+        .build()
+    customTabsIntent.launchUrl(this, uri)
 }

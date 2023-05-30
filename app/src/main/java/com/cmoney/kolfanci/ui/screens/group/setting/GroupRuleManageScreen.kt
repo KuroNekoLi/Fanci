@@ -15,7 +15,7 @@ import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.destinations.BanListScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
-import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

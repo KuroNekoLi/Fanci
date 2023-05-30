@@ -14,4 +14,23 @@
     <string name="tab_my">我的</string>
     <string name="splash_title">你喜歡的，都在這裡！</string>
 
+    <string name="terms_of_service_url">https://www.cmoney.tw/member/tos.aspx</string>
+    <string name="privacy_policy_url">https://www.cmoney.tw/member/privacy.aspx</string>
+    <string name="copyright_policy_url">https://www.cmoney.tw/member/cr.aspx</string>
+    <string name="feedback_url">https://docs.google.com/forms/d/e/1FAIpQLScGpUz6ITCXbalRoMKZpBpLqHqH39_NngNCrASYIG6HhlXA8w/viewform</string>
+
+    <string name="about_us">關於我們</string>
+    <string name="policy">隱私權政策</string>
+    <string name="editor_policy">著作權條款</string>
+    <string name="service_guide_line">服務條款</string>
+    <string name="system_version">系統版本</string>
+    <string name="feedback">意見回饋</string>
+    <string name="account_info">帳號資料</string>
+    <string name="avatar_nickname">頭像與暱稱</string>
+    <string name="manage_account">帳號管理</string>
+    <string name="user_number">使用者編號</string>
+    <string name="my_avatar_in_group">我在此社團的頭像</string>
+    <string name="my_nickname_in_group">我在此社團的暱稱</string>
+    <string name="save">儲存</string>
+
 </resources>

@@ -79,14 +79,8 @@ fun MyScreen(
                 }
             )
 
-            //TODO 暫時不顯示
-//            //社團設定
-//            GroupSettingScreen(
-//                modifier = Modifier.padding(top = 25.dp)
-//            )
-//
-//            //關於我們
-//            AboutScreen(modifier = Modifier.padding(top = 25.dp))
+            //關於我們
+            AboutScreen(modifier = Modifier.padding(top = 25.dp))
         }
     }
 

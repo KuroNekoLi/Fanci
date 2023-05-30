@@ -36,7 +36,7 @@ import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme

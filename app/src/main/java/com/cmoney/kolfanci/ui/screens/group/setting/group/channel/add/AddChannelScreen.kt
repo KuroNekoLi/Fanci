@@ -31,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -53,7 +52,7 @@ import com.cmoney.kolfanci.ui.destinations.EditChannelOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MemberAndRoleManageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.SettingItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen

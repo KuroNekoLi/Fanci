@@ -212,6 +212,8 @@ fun FollowScreenView(
                 DrawerMenuScreen(
                     groupList = groupList,
                     onClick = {
+                        KLog.i(TAG, "onGroup item click.")
+
                         //Close Drawer
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
@@ -220,6 +222,8 @@ fun FollowScreenView(
                         onGroupItemClick.invoke(it)
                     },
                     onSearch = {
+                        KLog.i(TAG, "onSearch click.")
+
                         //Close Drawer
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
@@ -237,6 +241,7 @@ fun FollowScreenView(
                         )
                     },
                     onProfile = {
+                        KLog.i(TAG, "onProfile click.")
                         navigator.navigate(MyScreenDestination)
                     }
                 )
