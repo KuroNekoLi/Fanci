@@ -40,5 +40,7 @@
     <string name="group_name_empty">社團名稱空白</string>
     <string name="group_name_empty_desc">社團名稱不可以是空白的唷！</string>
     <string name="group_name_placeholder">填寫專屬於社團的名稱吧!</string>
+    <string name="group_description">社團簡介</string>
+    <string name="group_description_placeholder">填寫專屬於社團的簡介吧！</string>
 
 </resources>
