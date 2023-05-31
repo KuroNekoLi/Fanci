@@ -65,7 +65,7 @@ fun EditToolbarScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(id = R.string.save), fontSize = 17.sp, color = LocalColor.current.primary)
+                Text(text = stringResource(id = R.string.confirm), fontSize = 17.sp, color = LocalColor.current.primary)
             }
         }
     )

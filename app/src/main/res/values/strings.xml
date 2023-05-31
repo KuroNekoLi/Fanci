@@ -33,6 +33,7 @@
     <string name="my_nickname_in_group">我在此社團的暱稱</string>
     <string name="save">儲存</string>
     <string name="modify">修改</string>
+    <string name="confirm">確定</string>
 
     <string name="group_manage">社團管理</string>
     <string name="group_setting">社團設定</string>
@@ -42,5 +43,7 @@
     <string name="group_name_placeholder">填寫專屬於社團的名稱吧!</string>
     <string name="group_description">社團簡介</string>
     <string name="group_description_placeholder">填寫專屬於社團的簡介吧！</string>
+    <string name="group_avatar">社團圖示</string>
+    <string name="group_background">社團背景</string>
 
 </resources>
