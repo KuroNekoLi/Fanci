@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.shared.theme
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -31,7 +32,6 @@ fun ThemeSettingItemScreen(
     isSelected: Boolean,
     isShowArrow: Boolean = true,
     onItemClick: () -> Unit,
-    onConfirm: () -> Unit
 ) {
     Row(
         modifier = modifier
@@ -39,6 +39,7 @@ fun ThemeSettingItemScreen(
             .clickable {
                 onItemClick.invoke()
             }
+            .background(LocalColor.current.env_80)
             .padding(top = 20.dp, bottom = 20.dp, start = 35.dp, end = 35.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -66,23 +67,7 @@ fun ThemeSettingItemScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             if (isSelected) {
-                BorderButton(
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(35.dp),
-                    text = "套用中", borderColor = LocalColor.current.text.default_30
-                ) {
-                }
-            }
-            else {
-                BorderButton(
-                    modifier = Modifier
-                        .width(75.dp)
-                        .height(35.dp),
-                    text = "套用", borderColor = LocalColor.current.text.default_100
-                ) {
-                    onConfirm.invoke()
-                }
+                Text(text = "套用中", fontSize = 14.sp, color = LocalColor.current.text.default_30)
             }
         }
         if (isShowArrow) {
@@ -105,9 +90,8 @@ fun ThemeSettingItemScreenPreview() {
             env_80 = Color.Blue,
             env_60 = Color.Cyan,
             name = "Blue",
-            isSelected = false,
+            isSelected = true,
             onItemClick = {},
-            onConfirm = {}
         )
     }
 }

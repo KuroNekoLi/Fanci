@@ -34,6 +34,8 @@
     <string name="save">儲存</string>
     <string name="modify">修改</string>
     <string name="confirm">確定</string>
+    <string name="change_image">更換圖片</string>
+    <string name="apply">套用</string>
 
     <string name="group_manage">社團管理</string>
     <string name="group_setting">社團設定</string>
@@ -45,5 +47,8 @@
     <string name="group_description_placeholder">填寫專屬於社團的簡介吧！</string>
     <string name="group_avatar">社團圖示</string>
     <string name="group_background">社團背景</string>
+    <string name="group_board_place">面板覆蓋處</string>
+    <string name="theme_color">主題色彩</string>
+    <string name="theme_preview">主題預覽</string>
 
 </resources>

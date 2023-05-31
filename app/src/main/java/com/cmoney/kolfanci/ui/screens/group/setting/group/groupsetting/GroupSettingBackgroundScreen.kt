@@ -1,12 +1,25 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +40,6 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.Im
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.state.GroupSettingSettingState
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.state.rememberGroupSettingSettingState
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
@@ -62,6 +74,7 @@ fun GroupSettingBackgroundScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val fanciUrl = result.value
                 viewModel.onGroupCoverSelect(fanciUrl, group)
@@ -130,7 +143,7 @@ fun GroupSettingBackgroundView(
                                 url = null
                             )
                         )
-                    } ?: kotlin.run {
+                    } ?: run {
                         onImageChange.invoke(
                             ImageChangeData(
                                 uri = null,
@@ -184,7 +197,7 @@ fun GroupSettingBackgroundView(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "面板覆蓋處",
+                            text = stringResource(id = R.string.group_board_place),
                             fontSize = 30.sp,
                             color = LocalColor.current.text.default_30
                         )
@@ -201,7 +214,7 @@ fun GroupSettingBackgroundView(
             }
 
             TransparentButton(
-                text = "更換圖片"
+                text = stringResource(id = R.string.change_image)
             ) {
                 KLog.i(TAG, "button click.")
                 state.openCameraDialog()

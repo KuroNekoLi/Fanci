@@ -34,6 +34,7 @@ fun EditToolbarScreen(
     title: String,
     leadingIcon: ImageVector = Icons.Filled.Close,
     backgroundColor: Color = LocalColor.current.env_100,
+    confirmText: String = stringResource(id = R.string.confirm),
     saveClick: (() -> Unit)? = null,
     backClick: (() -> Unit)? = null,
 ) {
@@ -65,7 +66,7 @@ fun EditToolbarScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(id = R.string.confirm), fontSize = 17.sp, color = LocalColor.current.primary)
+                Text(text = confirmText, fontSize = 17.sp, color = LocalColor.current.primary)
             }
         }
     )
