@@ -36,6 +36,7 @@
     <string name="confirm">確定</string>
     <string name="change_image">更換圖片</string>
     <string name="apply">套用</string>
+    <string name="add">新增</string>
 
     <string name="group_manage">社團管理</string>
     <string name="group_setting">社團設定</string>
@@ -50,5 +51,25 @@
     <string name="group_board_place">面板覆蓋處</string>
     <string name="theme_color">主題色彩</string>
     <string name="theme_preview">主題預覽</string>
+
+    <string name="edit_channel">編輯頻道</string>
+    <string name="add_channel">新增頻道</string>
+    <string name="style">樣式</string>
+    <string name="permission">權限</string>
+    <string name="manager">管理員</string>
+
+    <string name="channel_name">頻道名稱</string>
+    <string name="input_channel_name">輸入頻道名稱</string>
+    <string name="delete_channel">刪除頻道</string>
+    <string name="channel_name_empty">頻道名稱空白</string>
+    <string name="channel_name_empty_desc">頻道名稱不可以是空白的唷！</string>
+
+    <string name="channel_openness">頻道公開度</string>
+    <string name="full_public">完全公開</string>
+    <string name="not_public">不公開</string>
+    <string name="channel_manage_count">管理頻道成員（%d人）</string>
+    <string name="edit_member">編輯成員</string>
+    <string name="channel_manager_description">選擇角色來建立頻道管理員：擁有該角色之成員，即可針對相對應的權限，進行頻道管理。</string>
+    <string name="add_role">新增角色</string>
 
 </resources>

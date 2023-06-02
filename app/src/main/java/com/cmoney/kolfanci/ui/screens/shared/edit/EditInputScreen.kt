@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
+package com.cmoney.kolfanci.ui.screens.shared.edit
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +27,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
@@ -39,12 +38,19 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 
+/**
+ * 單一輸入編輯畫面
+ */
 @Destination
 @Composable
-fun GroupSettingNameScreen(
+fun EditInputScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    group: Group,
+    defaultText: String,
+    toolbarTitle: String,
+    placeholderText: String,
+    emptyAlertTitle: String,
+    emptyAlertSubTitle: String,
     resultNavigator: ResultBackNavigator<String>
 ) {
     var showEmptyTip by remember {
@@ -55,18 +61,21 @@ fun GroupSettingNameScreen(
         mutableStateOf(false)
     }
 
-    GroupSettingNameView(
+    EditInputScreenView(
         modifier = modifier,
-        group = group,
+        defaultText = defaultText,
+        toolbarTitle = toolbarTitle,
+        placeholderText = placeholderText,
         onChangeName = { name ->
             resultNavigator.navigateBack(name)
         },
         onShowEmptyTip = {
             showEmptyTip = true
+        },
+        onBack = {
+            showSaveTip = true
         }
-    ) {
-        showSaveTip = true
-    }
+    )
 
     if (showEmptyTip) {
         DialogScreen(
@@ -74,8 +83,8 @@ fun GroupSettingNameScreen(
                 showEmptyTip = false
             },
             titleIconRes = R.drawable.edit,
-            title = stringResource(id = R.string.group_name_empty),
-            subTitle = stringResource(id = R.string.group_name_empty_desc),
+            title = emptyAlertTitle,
+            subTitle = emptyAlertSubTitle,
             content = {
                 BlueButton(
                     modifier = Modifier
@@ -102,14 +111,16 @@ fun GroupSettingNameScreen(
 }
 
 @Composable
-fun GroupSettingNameView(
+fun EditInputScreenView(
     modifier: Modifier = Modifier,
-    group: Group,
+    defaultText: String,
     onChangeName: (String) -> Unit,
     onShowEmptyTip: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    toolbarTitle: String,
+    placeholderText: String
 ) {
-    var textState by remember { mutableStateOf(group.name.orEmpty()) }
+    var textState by remember { mutableStateOf(defaultText) }
     val maxLength = 20
 
     Scaffold(
@@ -117,7 +128,7 @@ fun GroupSettingNameView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             EditToolbarScreen(
-                title = stringResource(id = R.string.group_name),
+                title = toolbarTitle,
                 saveClick = {
                     if (textState.isEmpty()) {
                         onShowEmptyTip.invoke()
@@ -172,7 +183,7 @@ fun GroupSettingNameView(
                     textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                     placeholder = {
                         Text(
-                            text = stringResource(R.string.group_name_placeholder),
+                            text = placeholderText,
                             fontSize = 16.sp,
                             color = LocalColor.current.text.default_30
                         )
@@ -188,13 +199,13 @@ fun GroupSettingNameView(
 @Composable
 fun GroupSettingNameScreenPreview() {
     FanciTheme {
-        GroupSettingNameView(
-            group = Group(
-                name = "韓勾ㄟ金針菇討論區",
-                description = "我愛金針菇\uD83D\uDC97這裡是一群超愛金針菇的人類！喜歡的人就趕快來參加吧吧啊！"
-            ),
+        EditInputScreenView(
+            defaultText = "韓勾ㄟ金針菇討論區",
             onChangeName = {},
-            onShowEmptyTip = {}
-        ) {}
+            onShowEmptyTip = {},
+            onBack = {},
+            toolbarTitle = stringResource(id = R.string.group_name),
+            placeholderText = stringResource(R.string.group_name_placeholder)
+        )
     }
 }
