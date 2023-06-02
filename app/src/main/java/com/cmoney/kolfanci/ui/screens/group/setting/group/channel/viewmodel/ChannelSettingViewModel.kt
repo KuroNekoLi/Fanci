@@ -21,6 +21,7 @@ data class UiState(
     val isLoading: Boolean = false,
     val group: Group? = null,
     var channelName: String = "",                    //頻道名稱
+    var categoryName: String = "",                   //分類名稱
     val channelRole: List<FanciRole>? = null,        //目前頻道顯示角色List, 管理員
     val groupRoleList: List<AddChannelRoleModel> = emptyList(),
     val confirmRoleList: String = "",
@@ -650,6 +651,13 @@ class ChannelSettingViewModel(
      */
     fun setChannelName(name: String) {
         uiState = uiState.copy(channelName = name)
+    }
+
+    /**
+     * 設定分類名稱
+     */
+    fun setCategoryName(name: String) {
+        uiState = uiState.copy(categoryName = name)
     }
 
     /**
