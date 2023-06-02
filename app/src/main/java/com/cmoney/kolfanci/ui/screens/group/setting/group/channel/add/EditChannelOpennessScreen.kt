@@ -3,20 +3,31 @@ package com.cmoney.kolfanci.ui.screens.group.setting.group.channel.add
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -49,12 +60,14 @@ fun EditChannelOpennessScreen(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
-                title = "頻道公開度",
-                leadingEnable = true,
-                moreEnable = false,
+            EditToolbarScreen(
+                title = stringResource(id = R.string.channel_openness),
                 backClick = {
                     navigator.popBackStack()
+                },
+                saveClick = {
+                    KLog.i(TAG, "saveClick click.")
+                    resultNavigator.navigateBack(result = isNeedApproval)
                 }
             )
         }
@@ -83,7 +96,7 @@ fun EditChannelOpennessScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "完全公開",
+                            text = stringResource(id = R.string.full_public),
                             fontSize = 17.sp,
                             color = if (!isNeedApproval) {
                                 LocalColor.current.primary
@@ -94,7 +107,11 @@ fun EditChannelOpennessScreen(
 
                         Spacer(modifier = Modifier.height(3.dp))
 
-                        Text(text = "任何人都能看到頻道，任何人都能進入。", fontSize = 14.sp, color = Color_80FFFFFF)
+                        Text(
+                            text = stringResource(id = R.string.full_public_desc),
+                            fontSize = 14.sp,
+                            color = Color_80FFFFFF
+                        )
                     }
 
                     if (!isNeedApproval) {
@@ -122,7 +139,7 @@ fun EditChannelOpennessScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "不公開",
+                            text = stringResource(id = R.string.not_public),
                             fontSize = 17.sp,
                             color = if (isNeedApproval) {
                                 LocalColor.current.primary
@@ -134,7 +151,7 @@ fun EditChannelOpennessScreen(
                         Spacer(modifier = Modifier.height(3.dp))
 
                         Text(
-                            text = "任何人都能看到頻道，只有指定成員才能進入。",
+                            text = stringResource(id = R.string.not_public_desc),
                             fontSize = 14.sp,
                             color = Color_80FFFFFF
                         )
@@ -148,22 +165,6 @@ fun EditChannelOpennessScreen(
 
                         Spacer(modifier = Modifier.width(25.dp))
                     }
-                }
-            }
-
-            //========== 儲存 ==========
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(135.dp)
-                    .background(LocalColor.current.env_100),
-                contentAlignment = Alignment.Center
-            ) {
-                BlueButton(
-                    text = "儲存變更"
-                ) {
-                    KLog.i(TAG, "onSave click:$isNeedApproval")
-                    resultNavigator.navigateBack(result = isNeedApproval)
                 }
             }
         }

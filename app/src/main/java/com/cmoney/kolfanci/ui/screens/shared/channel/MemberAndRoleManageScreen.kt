@@ -1,11 +1,13 @@
 package com.cmoney.kolfanci.ui.screens.shared.channel
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
@@ -74,6 +77,7 @@ fun MemberAndRoleManageScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val member = result.value
                 viewModel.addSelectedMember(member)
@@ -86,6 +90,7 @@ fun MemberAndRoleManageScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.addSelectedRole(result.value)
             }
@@ -113,11 +118,16 @@ fun MemberAndRoleManageScreen(
         onRoleRemoveClick = {
             viewModel.removeSelectedRole(it)
         },
-        onSaveClick = {
+        onBackClick = {
             val selectedModel = viewModel.fetchSelected()
             selectedCallback.navigateBack(result = selectedModel)
         }
     )
+
+    BackHandler {
+        val selectedModel = viewModel.fetchSelected()
+        selectedCallback.navigateBack(result = selectedModel)
+    }
 }
 
 @Composable
@@ -132,7 +142,7 @@ private fun MemberAndRoleManageScreenView(
     onTabClick: (Int) -> Unit,
     onRemoveClick: (GroupMember) -> Unit,
     onRoleRemoveClick: (FanciRole) -> Unit,
-    onSaveClick: () -> Unit
+    onBackClick: () -> Unit
 ) {
     val list = listOf("成員", "角色")
 
@@ -144,9 +154,7 @@ private fun MemberAndRoleManageScreenView(
                 title = topBarTitle,
                 leadingEnable = true,
                 moreEnable = false,
-                backClick = {
-                    navigator.popBackStack()
-                }
+                backClick = onBackClick
             )
         }
     ) { padding ->
@@ -192,22 +200,8 @@ private fun MemberAndRoleManageScreenView(
                             onRemoveClick = onRoleRemoveClick
                         )
                     }
-                    else -> {}
-                }
-            }
 
-            //========== 儲存 ==========
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(135.dp)
-                    .background(LocalColor.current.env_100),
-                contentAlignment = Alignment.Center
-            ) {
-                BlueButton(
-                    text = "儲存變更"
-                ) {
-                    onSaveClick.invoke()
+                    else -> {}
                 }
             }
         }
@@ -225,20 +219,27 @@ private fun AddMemberListScreen(
     title: String,
     onRemoveClick: (GroupMember) -> Unit
 ) {
+    val TAG = "AddMemberListScreen"
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         item {
-            Box(modifier = Modifier.background(LocalColor.current.background)) {
+            Column(
+                modifier = Modifier
+                    .background(LocalColor.current.background)
+                    .padding(top = 12.dp, bottom = 8.dp, start = 24.dp, end = 24.dp)
+            ) {
                 BorderButton(
                     modifier = Modifier
-                        .padding(top = 8.dp, bottom = 8.dp, start = 24.dp, end = 24.dp)
                         .fillMaxWidth()
                         .height(40.dp),
                     text = "新增成員",
                     textColor = Color.White,
                     borderColor = Color_80FFFFFF
                 ) {
+                    KLog.i(TAG, "BorderButton click.")
+
                     navigator.navigate(
                         AddMemberScreenDestination(
                             group = group,
@@ -247,6 +248,15 @@ private fun AddMemberListScreen(
                         )
                     )
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "下列成員可以獲得「%s」並且在頻道中執行對應的權限資格。".format(title),
+                    fontSize = 14.sp,
+                    color = LocalColor.current.text.default_50
+                )
+
             }
         }
 
@@ -272,20 +282,27 @@ private fun AddRoleListScreen(
     title: String,
     onRemoveClick: (FanciRole) -> Unit
 ) {
+    val TAG = "AddRoleListScreen"
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         item {
-            Box(modifier = Modifier.background(LocalColor.current.background)) {
+
+            Column(
+                modifier = Modifier
+                    .background(LocalColor.current.background)
+                    .padding(top = 12.dp, bottom = 8.dp, start = 24.dp, end = 24.dp)
+            ) {
                 BorderButton(
                     modifier = Modifier
-                        .padding(top = 8.dp, bottom = 8.dp, start = 24.dp, end = 24.dp)
                         .fillMaxWidth()
                         .height(40.dp),
                     text = "新增角色",
                     textColor = Color.White,
                     borderColor = Color_80FFFFFF
                 ) {
+                    KLog.i(TAG, "BorderButton click.")
+
                     navigator.navigate(
                         ShareAddRoleScreenDestination(
                             group = group,
@@ -296,6 +313,15 @@ private fun AddRoleListScreen(
                         )
                     )
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "獲得下列角色的成員，可以獲得「%s」並且在頻道中執行對應的權限資格。".format(title),
+                    fontSize = 14.sp,
+                    color = LocalColor.current.text.default_50
+                )
+
             }
         }
 
@@ -323,7 +349,7 @@ fun MemberAndRoleManageScreenPreview() {
             navigator = EmptyDestinationsNavigator,
             group = Group(),
             topBarTitle = "基本權限",
-            selectedIndex = 1,
+            selectedIndex = 0,
             selectedMember = emptyList(),
             selectedRole = listOf(
                 FanciRole(
@@ -335,7 +361,7 @@ fun MemberAndRoleManageScreenPreview() {
             onTabClick = {},
             onRemoveClick = {},
             onRoleRemoveClick = {},
-            onSaveClick = {}
+            onBackClick = {}
         )
     }
 }

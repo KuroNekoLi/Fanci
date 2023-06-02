@@ -89,6 +89,7 @@ fun AddChannelScreen(
     permissionMemberResult: ResultRecipient<MemberAndRoleManageScreenDestination, SelectedModel>,
     setChannelNameResult: ResultRecipient<EditInputScreenDestination, String>
 ) {
+    val TAG = "AddChannelScreen"
     val uiState = viewModel.uiState
     val showDeleteDialog = remember { mutableStateOf(false) }
     var showSaveTip by remember {
@@ -171,7 +172,9 @@ fun AddChannelScreen(
         viewModel.fetchChannelPermissionList()
     }
 
+    //點擊的權限
     uiState.clickPermissionMemberModel?.let {
+        KLog.i(TAG, "clickPermissionMemberModel:$it")
         navigator.navigate(
             MemberAndRoleManageScreenDestination(
                 group = group,
@@ -476,6 +479,7 @@ private fun PermissionTabScreen(
     channelPermissionModel: List<ChannelAccessOptionModel>,
     onPermissionClick: (ChannelAccessOptionModel) -> Unit
 ) {
+    val TAG = "PermissionTabScreen"
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -483,6 +487,8 @@ private fun PermissionTabScreen(
             iconRes = R.drawable.lock,
             text = stringResource(id = R.string.channel_openness),
             onItemClick = {
+                KLog.i(TAG, "onItemClick.")
+
                 navigator.navigate(
                     EditChannelOpennessScreenDestination(
                         isNeedApproval = isNeedApproval

@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,7 @@ import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.Color_99FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -208,12 +210,12 @@ private fun AddMemberScreenPreview(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
+            EditToolbarScreen(
                 title = title,
-                leadingEnable = true,
-                moreEnable = false,
-                backClick = {
-                    onBack.invoke()
+                backClick = onBack,
+                saveClick = {
+                    KLog.i(TAG, "saveClick click.")
+                    onAddClick.invoke()
                 }
             )
         }
@@ -301,13 +303,6 @@ private fun AddMemberScreenPreview(
                         onMemberClick.invoke(it)
                     }
                 }
-            }
-
-            BottomButtonScreen(
-                text = btnTitle
-            ) {
-                KLog.i(TAG, "on save click.")
-                onAddClick.invoke()
             }
         }
 
