@@ -308,7 +308,6 @@ private fun AddRoleListScreen(
                             group = group,
                             title = "新增「%s」角色".format(title),
                             subTitle = "直接指定角色，讓一批成員進入私密頻道。",
-                            buttonText = "新增",
                             existsRole = roles.toTypedArray()
                         )
                     )

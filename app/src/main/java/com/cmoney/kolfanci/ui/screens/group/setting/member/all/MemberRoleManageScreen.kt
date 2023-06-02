@@ -185,7 +185,6 @@ private fun MemberRoleManageScreenView(
                         navController.navigate(
                             ShareAddRoleScreenDestination(
                                 group = group,
-                                buttonText = "新增角色給「%s」".format(groupMember.name.orEmpty()),
                                 existsRole = roleList.toTypedArray()
                             )
                         )

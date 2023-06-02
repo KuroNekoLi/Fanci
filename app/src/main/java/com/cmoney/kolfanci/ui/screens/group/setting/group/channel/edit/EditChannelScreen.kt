@@ -284,7 +284,6 @@ private fun ManageView(
             navigator.navigate(
                 ShareAddRoleScreenDestination(
                     group = group,
-                    buttonText = "新增角色成為頻道管理員",
                     existsRole = fanciRole.orEmpty().toTypedArray()
                 )
             )

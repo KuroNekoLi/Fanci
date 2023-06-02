@@ -652,7 +652,6 @@ private fun ManagerTabScreen(
             navigator.navigate(
                 ShareAddRoleScreenDestination(
                     group = group,
-                    buttonText = "新增",
                     existsRole = fanciRole.orEmpty().toTypedArray()
                 )
             )
