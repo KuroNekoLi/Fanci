@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.member.all
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,7 +22,6 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.gson.Gson
@@ -31,6 +31,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -90,9 +91,6 @@ fun MemberRoleManageScreen(
                     gson.toJson(roleList.value)
                 )
             }
-        },
-        onBack = {
-            showSaveTip = true
         }
     )
 
@@ -106,6 +104,20 @@ fun MemberRoleManageScreen(
             navController.popBackStack()
         }
     )
+
+    BackHandler {
+        viewModel.assignMemberRole(
+            groupId = group.id.orEmpty(),
+            userId = groupMember.id.orEmpty(),
+            oldFanciRole = groupMember.roleInfos.orEmpty(),
+            newFanciRole = roleList.value
+        ) {
+            val gson = Gson()
+            resultNavigator.navigateBack(
+                gson.toJson(roleList.value)
+            )
+        }
+    }
 }
 
 @Composable
@@ -116,9 +128,9 @@ private fun MemberRoleManageScreenView(
     roleList: List<FanciRole>,
     group: Group,
     onRemove: (FanciRole) -> Unit,
-    onSave: () -> Unit,
-    onBack: () -> Unit
+    onSave: () -> Unit
 ) {
+    val TAG = "MemberRoleManageScreenView"
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -128,7 +140,8 @@ private fun MemberRoleManageScreenView(
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
-                    navController.popBackStack()
+                    KLog.i(TAG, "saveClick click.")
+                    onSave.invoke()
                 }
             )
         }
@@ -191,12 +204,6 @@ private fun MemberRoleManageScreenView(
                     }
                 )
             }
-
-            BottomButtonScreen(
-                text = "儲存"
-            ) {
-                onSave.invoke()
-            }
         }
     }
 }
@@ -208,7 +215,6 @@ fun MemberRoleManageScreenPreview() {
     FanciTheme {
         MemberRoleManageScreenView(
             navController = EmptyDestinationsNavigator,
-            group = Group(),
             groupMember = GroupMember(
                 name = "Hello",
                 roleInfos = listOf(
@@ -221,9 +227,8 @@ fun MemberRoleManageScreenPreview() {
                 )
             ),
             roleList = listOf(),
-            onRemove = {},
-            onSave = {},
-            onBack = {}
-        )
+            group = Group(),
+            onRemove = {}
+        ) {}
     }
 }
