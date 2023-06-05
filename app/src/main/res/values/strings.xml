@@ -80,4 +80,8 @@
     <string name="category_name_empty">分類名稱空白</string>
     <string name="category_name_empty_desc">分類名稱不可以是空白的唷！</string>
 
+    <string name="input_role_name">輸入角色名稱</string>
+    <string name="role_name_empty">角色名稱空白</string>
+    <string name="role_name_empty_desc">角色名稱不可以是空白的唷！</string>
+
 </resources>

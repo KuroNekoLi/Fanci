@@ -1,8 +1,21 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.openness
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -11,10 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -62,7 +73,7 @@ fun CreateApplyQuestionScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 text = "修改",
-            ){
+            ) {
                 run {
                     showEmptyTipDialog = false
                 }
@@ -81,17 +92,20 @@ private fun CreateApplyQuestionScreenView(
 ) {
     var textState by remember { mutableStateOf(question) }
     val maxLength = 50
+    val TAG = "CreateApplyQuestionScreenView"
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
+            EditToolbarScreen(
                 title = "新增審核題目",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
+                },
+                saveClick = {
+                    KLog.i(TAG, "saveClick click.")
+                    onAdd.invoke(textState)
                 }
             )
         }
@@ -134,12 +148,6 @@ private fun CreateApplyQuestionScreenView(
                     )
                 }
             )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            BottomButtonScreen(text = "新增") {
-                onAdd.invoke(textState)
-            }
         }
     }
 }

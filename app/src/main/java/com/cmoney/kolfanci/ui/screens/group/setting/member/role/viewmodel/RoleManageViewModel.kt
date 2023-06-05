@@ -175,6 +175,16 @@ class RoleManageViewModel(
     }
 
     /**
+     *  設定角色 名稱
+     */
+    fun setRoleName(name: String) {
+        KLog.i(TAG, "setRoleName: $name")
+        uiState = uiState.copy(
+            roleName = name
+        )
+    }
+
+    /**
      * 確定 新增角色 or 編輯角色
      */
     fun onConfirmAddRole(group: Group) {
