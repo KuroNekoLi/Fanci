@@ -53,6 +53,7 @@ import com.cmoney.kolfanci.ui.destinations.MemberAndRoleManageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
+import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
@@ -113,11 +114,7 @@ fun AddChannelScreen(
     AddChannelScreenView(
         modifier,
         navigator,
-        topBarTitle = (if ((channel != null)) {
-            stringResource(id = R.string.edit_channel)
-        } else {
-            stringResource(id = R.string.add_channel)
-        }),
+        channel = channel,
         selectedIndex = uiState.tabSelected,
         channelName = uiState.channelName,
         isNeedApproval = uiState.isNeedApproval,
@@ -145,9 +142,6 @@ fun AddChannelScreen(
         },
         onPermissionClick = { channelPermissionModel ->
             viewModel.onPermissionClick(channelPermissionModel)
-        },
-        onChannelNameInput = {
-            viewModel.setChannelName(it)
         },
         onDeleteClick = {
             showDeleteDialog.value = true
@@ -252,7 +246,6 @@ fun AddChannelScreen(
 fun AddChannelScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    topBarTitle: String,
     selectedIndex: Int,
     channelName: String,
     isNeedApproval: Boolean,
@@ -266,9 +259,9 @@ fun AddChannelScreenView(
     onTabClick: (Int) -> Unit,
     onRemoveRole: (FanciRole) -> Unit,
     onPermissionClick: (ChannelAccessOptionModel) -> Unit,
-    onChannelNameInput: (String) -> Unit,
     onDeleteClick: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    channel: Channel?
 ) {
     val TAG = "AddChannelScreenView"
     val list = listOf(
@@ -281,14 +274,26 @@ fun AddChannelScreenView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            EditToolbarScreen(
-                title = topBarTitle,
-                backClick = onBack,
-                saveClick = {
-                    KLog.i(TAG, "saveClick click.")
-                    onConfirm.invoke(channelName)
-                }
-            )
+            if (channel != null) {
+                TopBarScreen(
+                    title = stringResource(id = R.string.edit_channel),
+                    moreEnable = false,
+                    backClick = {
+                        KLog.i(TAG, "saveClick click.")
+                        onConfirm.invoke(channelName)
+                    }
+                )
+            }
+            else {
+                EditToolbarScreen(
+                    title = stringResource(id = R.string.add_channel),
+                    backClick = onBack,
+                    saveClick = {
+                        KLog.i(TAG, "saveClick click.")
+                        onConfirm.invoke(channelName)
+                    }
+                )
+            }
         }
     ) { padding ->
 
@@ -715,7 +720,6 @@ fun AddChannelScreenPreview() {
             navigator = EmptyDestinationsNavigator,
             selectedIndex = 0,
             channelName = "",
-            topBarTitle = "新增頻道",
             isNeedApproval = true,
             fanciRole = emptyList(),
             group = Group(),
@@ -745,9 +749,9 @@ fun AddChannelScreenPreview() {
             onTabClick = {},
             onRemoveRole = {},
             onPermissionClick = {},
-            onChannelNameInput = {},
             onDeleteClick = {},
-            onBack = {}
+            onBack = {},
+            channel = null
         )
     }
 }
