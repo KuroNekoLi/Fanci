@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.channel.edit
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,10 +18,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -36,9 +35,8 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
+import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -66,10 +64,6 @@ fun EditCategoryScreen(
 ) {
     val TAG = "EditCategoryScreen"
     val showDialog = remember { mutableStateOf(false) }
-    var showSaveTip by remember {
-        mutableStateOf(false)
-    }
-
     val textState = viewModel.uiState.categoryName
 
     LaunchedEffect(Unit) {
@@ -88,15 +82,15 @@ fun EditCategoryScreen(
         textState = textState,
         onConfirm = {
             viewModel.editCategory(group, category, it)
-        },
-        onDelete = {
-            KLog.i(TAG, "onDelete click")
-            showDialog.value = true
-        },
-        onBack = {
-            showSaveTip = true
         }
-    )
+    ) {
+        KLog.i(TAG, "onDelete click")
+        showDialog.value = true
+    }
+
+    BackHandler {
+        viewModel.editCategory(group, category, textState)
+    }
 
     if (showDialog.value) {
         DeleteAlertDialogScreen(
@@ -111,18 +105,6 @@ fun EditCategoryScreen(
             }
         )
     }
-
-    //離開再次 確認
-    SaveConfirmDialogScreen(
-        isShow = showSaveTip,
-        onContinue = {
-            showSaveTip = false
-        },
-        onGiveUp = {
-            showSaveTip = false
-            navigator.popBackStack()
-        }
-    )
 
     editInputResult.onNavResult { result ->
         when (result) {
@@ -143,8 +125,7 @@ fun EditCategoryScreenView(
     navigator: DestinationsNavigator,
     textState: String,
     onConfirm: (String) -> Unit,
-    onDelete: () -> Unit,
-    onBack: () -> Unit
+    onDelete: () -> Unit
 ) {
     val TAG = "EditCategoryScreenView"
 
@@ -152,10 +133,10 @@ fun EditCategoryScreenView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            EditToolbarScreen(
+            TopBarScreen(
                 title = "編輯分類",
-                backClick = onBack,
-                saveClick = {
+                moreEnable = false,
+                backClick = {
                     KLog.i(TAG, "saveClick click.")
                     onConfirm.invoke(textState)
                 }
@@ -225,12 +206,7 @@ fun EditCategoryScreenView(
             }
 
             if (Constant.isCanDeleteCategory()) {
-                Spacer(modifier = Modifier.height(35.dp))
-
-                Text(
-                    modifier = Modifier.padding(start = 24.dp, bottom = 10.dp),
-                    text = "刪除分類", fontSize = 14.sp, color = LocalColor.current.text.default_100
-                )
+                Spacer(modifier = Modifier.weight(1f))
 
                 Box(
                     modifier = Modifier
@@ -247,8 +223,9 @@ fun EditCategoryScreenView(
                         fontSize = 17.sp,
                         color = LocalColor.current.specialColor.red
                     )
-
                 }
+
+                Spacer(modifier = Modifier.height(25.dp))
             }
         }
 
@@ -363,9 +340,7 @@ fun EditCategoryScreenViewPreview() {
         EditCategoryScreenView(
             navigator = EmptyDestinationsNavigator,
             textState = "嘿嘿分類",
-            onConfirm = {},
-            onDelete = {},
-            onBack = {}
-        )
+            onConfirm = {}
+        ) {}
     }
 }
