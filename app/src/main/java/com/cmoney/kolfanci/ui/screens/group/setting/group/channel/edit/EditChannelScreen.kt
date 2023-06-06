@@ -54,7 +54,6 @@ fun EditChannelScreen(
     resultNavigator: ResultBackNavigator<Group>,
     setRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>
 ) {
-    val context = LocalContext.current
     val TAG = "EditChannelScreen"
     val showDialog = remember { mutableStateOf(false) }
 
@@ -82,7 +81,7 @@ fun EditChannelScreen(
         group = group,
         selectedIndex = uiState.tabSelected,
         onConfirm = {
-            viewModel.editChannel(group, channel, it)
+            viewModel.editChannel(group, it)
         },
         onDelete = {
             KLog.i(TAG, "onDelete click")
@@ -285,7 +284,6 @@ private fun ManageView(
             navigator.navigate(
                 ShareAddRoleScreenDestination(
                     group = group,
-                    buttonText = "新增角色成為頻道管理員",
                     existsRole = fanciRole.orEmpty().toTypedArray()
                 )
             )

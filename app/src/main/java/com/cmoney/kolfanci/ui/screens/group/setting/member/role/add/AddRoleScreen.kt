@@ -1,12 +1,29 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.member.role.add
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +37,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
+import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
@@ -28,7 +46,7 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -37,6 +55,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -48,7 +67,8 @@ fun AddRoleScreen(
     fanciRole: FanciRole? = null,
     viewModel: RoleManageViewModel = koinViewModel(),
     memberResult: ResultRecipient<AddMemberScreenDestination, String>,
-    resultNavigator: ResultBackNavigator<FanciRoleCallback>
+    resultNavigator: ResultBackNavigator<FanciRoleCallback>,
+    editRoleNameResult: ResultRecipient<EditInputScreenDestination, String>
 ) {
     val mainActivity = LocalDependencyContainer.current
     val uiState = viewModel.uiState
@@ -64,9 +84,23 @@ fun AddRoleScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val member = result.value
                 viewModel.addMember(member)
+            }
+        }
+    }
+
+    //Edit Role name Callback
+    editRoleNameResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                val roleName = result.value
+                viewModel.setRoleName(roleName)
             }
         }
     }
@@ -124,7 +158,9 @@ fun AddRoleScreen(
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
-                        text = "角色刪除後，具有該角色的成員將會自動移除角色相關權限。", fontSize = 17.sp, color = Color.White
+                        text = "角色刪除後，具有該角色的成員將會自動移除角色相關權限。",
+                        fontSize = 17.sp,
+                        color = Color.White
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -236,27 +272,38 @@ private fun AddRoleScreenView(
     isLoading: Boolean
 ) {
     val tabList = listOf("樣式", "權限", "成員")
+    val TAG = "AddRoleScreenView"
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
-                title = (if ((fanciRole != null)) {
-                    "編輯角色"
-                } else {
-                    "新增角色"
-                }),
-                leadingEnable = true,
-                moreEnable = false,
-                backClick = onBack
-            )
+            if (fanciRole != null) {
+                TopBarScreen(
+                    title = "編輯角色",
+                    leadingEnable = true,
+                    moreEnable = false,
+                    backClick = {
+                        KLog.i(TAG, "backClick click.")
+                        onConfirm.invoke()
+                    }
+                )
+            } else {
+                EditToolbarScreen(
+                    title = "新增角色",
+                    backClick = onBack,
+                    saveClick = {
+                        KLog.i(TAG, "saveClick click.")
+                        onConfirm.invoke()
+                    }
+                )
+            }
         }
     ) { padding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .background(LocalColor.current.env_80)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
@@ -308,6 +355,7 @@ private fun AddRoleScreenView(
                     0 -> {
                         StyleScreen(
                             mainActivity = mainActivity,
+                            navigator = navigator,
                             roleName = roleName,
                             roleColor = roleColor,
                             onChange = onRoleStyleChange,
@@ -338,12 +386,12 @@ private fun AddRoleScreenView(
                 }
             }
 
-            //========== 儲存 ==========
-            BottomButtonScreen(
-                text = "儲存"
-            ) {
-                onConfirm.invoke()
-            }
+//            //========== 儲存 ==========
+//            BottomButtonScreen(
+//                text = "儲存"
+//            ) {
+//                onConfirm.invoke()
+//            }
         }
 
         if (isLoading) {

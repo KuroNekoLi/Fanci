@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.my
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,197 +8,86 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.openCustomTab
+import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
+
 @Composable
 fun AboutScreen(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     Column(modifier = modifier) {
         Text(
             modifier = Modifier
                 .padding(
                     start = 25.dp,
                 ),
-            text = "關於我們", fontSize = 14.sp, color = LocalColor.current.text.default_100
+            text = stringResource(id = R.string.about_us),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
         )
         Spacer(modifier = Modifier.height(10.dp))
         Column(modifier = Modifier.background(LocalColor.current.background)) {
-            Row(
-                modifier = Modifier
-                    .padding(
-                        top = 10.dp,
-                        bottom = 10.dp,
-                        start = 25.dp,
-                        end = 20.dp
-                    )
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(id = R.drawable.system),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
-                )
-                Spacer(modifier = Modifier.width(17.dp))
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "系統版本", fontSize = 17.sp, color = LocalColor.current.text.default_100
-                )
-                Text(
-                    text = "1.0.0", fontSize = 14.sp, color = LocalColor.current.text.default_80
-                )
-            }
 
-            Row(
-                modifier = Modifier
-                    .padding(
-                        top = 10.dp,
-                        bottom = 10.dp,
-                        start = 25.dp,
-                        end = 10.dp
-                    )
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(id = R.drawable.service),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
-                )
-                Spacer(modifier = Modifier.width(17.dp))
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "客服中心", fontSize = 17.sp, color = LocalColor.current.text.default_100
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.next),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
-                )
-            }
+            //服務條款
+            SettingItemScreen(
+                modifier = Modifier.padding(bottom = 1.dp),
+                text = stringResource(id = R.string.service_guide_line),
+                onItemClick = {
+                    context.openCustomTab(Uri.parse(context.getString(R.string.terms_of_service_url)))
+                }
+            )
 
-            Row(
-                modifier = Modifier
-                    .padding(
-                        top = 10.dp,
-                        bottom = 10.dp,
-                        start = 25.dp,
-                        end = 10.dp
-                    )
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(id = R.drawable.rating),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
-                )
-                Spacer(modifier = Modifier.width(17.dp))
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "幫我們評分", fontSize = 17.sp, color = LocalColor.current.text.default_100
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.next),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
-                )
-            }
+            //隱私權政策
+            SettingItemScreen(
+                modifier = Modifier.padding(bottom = 1.dp),
+                text = stringResource(id = R.string.policy),
+                onItemClick = {
+                    context.openCustomTab(Uri.parse(context.getString(R.string.privacy_policy_url)))
+                }
+            )
 
-            Row(
-                modifier = Modifier
-                    .padding(
-                        top = 10.dp,
-                        bottom = 10.dp,
-                        start = 25.dp,
-                        end = 10.dp
-                    )
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(id = R.drawable.hide_user),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
-                )
-                Spacer(modifier = Modifier.width(17.dp))
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "隱私權政策", fontSize = 17.sp, color = LocalColor.current.text.default_100
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.next),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
-                )
-            }
+            //著作權條款
+            SettingItemScreen(
+                modifier = Modifier.padding(bottom = 1.dp),
+                text = stringResource(id = R.string.editor_policy),
+                onItemClick = {
+                    context.openCustomTab(Uri.parse(context.getString(R.string.copyright_policy_url)))
+                }
+            )
 
-            Row(
-                modifier = Modifier
-                    .padding(
-                        top = 10.dp,
-                        bottom = 10.dp,
-                        start = 25.dp,
-                        end = 10.dp
-                    )
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(id = R.drawable.copyright),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
-                )
-                Spacer(modifier = Modifier.width(17.dp))
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "著作權政策", fontSize = 17.sp, color = LocalColor.current.text.default_100
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.next),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
-                )
-            }
+            //意見回饋
+            SettingItemScreen(
+                modifier = Modifier.padding(bottom = 1.dp),
+                text = stringResource(id = R.string.feedback),
+                onItemClick = {
+                    context.openCustomTab(Uri.parse(context.getString(R.string.feedback_url)))
+                }
+            )
 
-            Row(
-                modifier = Modifier
-                    .padding(
-                        top = 10.dp,
-                        bottom = 10.dp,
-                        start = 25.dp,
-                        end = 10.dp
+            //系統版本
+            SettingItemScreen(
+                modifier = Modifier.padding(bottom = 1.dp),
+                text = stringResource(id = R.string.system_version),
+                withRightArrow = false,
+                otherContent = {
+                    Text(
+                        text = BuildConfig.VERSION_NAME,
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_100
                     )
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(id = R.drawable.guideline),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
-                )
-                Spacer(modifier = Modifier.width(17.dp))
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "服務條款", fontSize = 17.sp, color = LocalColor.current.text.default_100
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.next),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
-                )
-            }
+                }
+            )
         }
     }
 }

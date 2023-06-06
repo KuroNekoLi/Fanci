@@ -52,7 +52,7 @@ fun DiscoverGroupScreen(
     resultRecipient: ResultRecipient<ApplyForGroupScreenDestination, Boolean>
 ) {
     val uiState = viewModel.uiState
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
 
     DiscoverGroupScreenView(
         modifier = modifier,
@@ -105,7 +105,7 @@ fun DiscoverGroupScreen(
             onConfirm = {
                 if (isJoined) {
                     //global change group
-                    globalViewModel.setCurrentGroup(it)
+                    globalGroupViewModel.setCurrentGroup(it)
                     navController.popBackStack()
                 } else {
                     //不公開
@@ -126,7 +126,7 @@ fun DiscoverGroupScreen(
     }
 
     if (uiState.joinSuccess != null) {
-        globalViewModel.setCurrentGroup(uiState.joinSuccess)
+        globalGroupViewModel.setCurrentGroup(uiState.joinSuccess)
         navController.popBackStack(MainScreenDestination, inclusive = false)
 //        navController.popBackStack()
     }

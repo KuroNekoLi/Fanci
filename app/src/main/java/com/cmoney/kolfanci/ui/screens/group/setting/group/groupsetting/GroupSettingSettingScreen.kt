@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,13 +53,13 @@ import org.koin.androidx.compose.koinViewModel
 fun GroupSettingSettingScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    setNameResult: ResultRecipient<GroupSettingNameScreenDestination, String>,
+    setNameResult: ResultRecipient<EditInputScreenDestination, String>,
     setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
     setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>,
     group: Group,
 ) {
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
     val viewModel: GroupSettingViewModel = koinViewModel()
 
     setCallbackHandle(
@@ -72,7 +73,7 @@ fun GroupSettingSettingScreen(
     var groupParam = group
     viewModel.uiState.settingGroup?.let {
         groupParam = it
-        globalViewModel.setCurrentGroup(it)
+        globalGroupViewModel.setCurrentGroup(it)
     }
 
     GroupSettingSettingView(
@@ -184,7 +185,7 @@ fun GroupSettingSettingScreen(
  */
 @Composable
 private fun setCallbackHandle(
-    setNameResult: ResultRecipient<GroupSettingNameScreenDestination, String>,
+    setNameResult: ResultRecipient<EditInputScreenDestination, String>,
     setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
     group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
@@ -265,6 +266,7 @@ fun GroupSettingSettingView(
             )
         }
     ) { innerPadding ->
+        val context = LocalContext.current
         Column(
             modifier = Modifier
                 .background(LocalColor.current.env_80)
@@ -278,7 +280,15 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "name click")
-                        navController.navigate(GroupSettingNameScreenDestination(group = group))
+                        navController.navigate(
+                            EditInputScreenDestination(
+                                defaultText = group.name.orEmpty(),
+                                toolbarTitle = context.getString(R.string.group_name),
+                                placeholderText = context.getString(R.string.group_name_placeholder),
+                                emptyAlertTitle = context.getString(R.string.group_name_empty),
+                                emptyAlertSubTitle = context.getString(R.string.group_name_empty_desc)
+                            )
+                        )
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),

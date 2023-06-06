@@ -2,7 +2,13 @@ package com.cmoney.kolfanci.ui.screens.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -15,12 +21,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.ChannelText
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.kolfanci.R
+
 @Composable
 fun ChannelBarScreen(
     channel: Channel,
@@ -60,6 +68,15 @@ fun ChannelBarScreen(
                 Text(
                     text = "編輯", fontSize = 14.sp, color = LocalColor.current.primary
                 )
+            } else {
+                //私密頻道
+                if (channel.privacy == ChannelPrivacy.private) {
+                    Icon(
+                        painterResource(id = R.drawable.lock),
+                        contentDescription = null,
+                        tint = LocalColor.current.component.other
+                    )
+                }
             }
         }
     }

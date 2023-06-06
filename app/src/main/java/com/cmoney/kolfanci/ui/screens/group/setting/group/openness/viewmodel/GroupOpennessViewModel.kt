@@ -29,7 +29,7 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
     var uiState by mutableStateOf(UiState())
         private set
 
-    private val _saveComplete = MutableSharedFlow<Boolean>()
+    private val _saveComplete = MutableSharedFlow<Group?>()
     val saveComplete = _saveComplete.asSharedFlow()
 
     init {
@@ -153,16 +153,16 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
                             groupId = groupId,
                             question = questionList
                         ).fold({
-                            _saveComplete.emit(true)
+                            _saveComplete.emit(group)
                         }, {
                             KLog.e(TAG, it)
                         })
                     } else {
-                        _saveComplete.emit(true)
+                        _saveComplete.emit(group)
                     }
                 } else {
                     KLog.e(TAG, it)
-                    _saveComplete.emit(false)
+                    _saveComplete.emit(null)
                 }
             })
         }

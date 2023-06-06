@@ -210,7 +210,7 @@ fun GroupOpennessScreen(
     //設定完成
     LaunchedEffect(Unit) {
         viewModel.saveComplete.collect { saveComplete ->
-            if (saveComplete) {
+            if (saveComplete != null) {
                 resultBackNavigator.navigateBack(
                     group.copy(
                         isNeedApproval = uiState.isNeedApproval

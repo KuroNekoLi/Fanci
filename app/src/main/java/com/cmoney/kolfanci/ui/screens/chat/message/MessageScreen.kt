@@ -11,9 +11,12 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,22 +58,27 @@ fun MessageScreen(
 ) {
     val TAG = "MessageScreen"
 
-    val uiState = messageViewModel.uiState
-    val isScrollToBottom = uiState.isSendComplete
+    val isScrollToBottom by messageViewModel.isSendComplete.collectAsState()
+
     val onInteractClick = object : (MessageInteract) -> Unit {
         override fun invoke(messageInteract: MessageInteract) {
             messageViewModel.onInteractClick(messageInteract)
         }
     }
 
-    if (uiState.message.isNotEmpty()) {
+    val blockingList by viewModel.blockingList.collectAsState()
+    val blockerList by viewModel.blockerList.collectAsState()
+    val showReSendDialog by messageViewModel.showReSendDialog.collectAsState()
+    val message by messageViewModel.message.collectAsState()
+
+    if (message.isNotEmpty()) {
         MessageScreenView(
             modifier = modifier,
-            message = uiState.message,
-            blockingList = viewModel.uiState.blockingList.map {
+            message = message,
+            blockingList = blockingList.map {
                 it.id.orEmpty()
             },
-            blockerList = viewModel.uiState.blockerList.map {
+            blockerList = blockerList.map {
                 it.id.orEmpty()
             },
             listState = listState,
@@ -90,17 +98,17 @@ fun MessageScreen(
         EmptyMessageContent(modifier = modifier)
     }
 
-    if (uiState.showReSendDialog != null) {
+    showReSendDialog?.let {
         KLog.i(TAG, "showReSendDialog")
         MessageReSendDialogScreen(
             onDismiss = {
                 messageViewModel.onReSendDialogDismiss()
             },
             onReSend = {
-                messageViewModel.onResendMessage(channelId, uiState.showReSendDialog)
+                messageViewModel.onResendMessage(channelId, it)
             },
             onDelete = {
-                messageViewModel.onDeleteReSend(uiState.showReSendDialog)
+                messageViewModel.onDeleteReSend(it)
             }
         )
     }
@@ -207,13 +215,13 @@ private fun EmptyMessageContent(modifier: Modifier = Modifier) {
     ) {
 
         AsyncImage(
-            modifier = Modifier.size(186.dp, 248.dp),
-            model = R.drawable.empty_message, contentDescription = "empty message"
+            modifier = Modifier.size(105.dp),
+            model = R.drawable.empty_chat, contentDescription = "empty message"
         )
 
         Spacer(modifier = Modifier.height(43.dp))
 
-        Text(text = "快成為第一個在聊天室發言的人！", fontSize = 16.sp, color = Color_80FFFFFF)
+        Text(text = "目前還沒有人發言", fontSize = 16.sp, color = LocalColor.current.text.default_30)
     }
 }
 

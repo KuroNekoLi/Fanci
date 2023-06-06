@@ -14,4 +14,74 @@
     <string name="tab_my">我的</string>
     <string name="splash_title">你喜歡的，都在這裡！</string>
 
+    <string name="terms_of_service_url">https://www.cmoney.tw/member/tos.aspx</string>
+    <string name="privacy_policy_url">https://www.cmoney.tw/member/privacy.aspx</string>
+    <string name="copyright_policy_url">https://www.cmoney.tw/member/cr.aspx</string>
+    <string name="feedback_url">https://docs.google.com/forms/d/e/1FAIpQLScGpUz6ITCXbalRoMKZpBpLqHqH39_NngNCrASYIG6HhlXA8w/viewform</string>
+
+    <string name="about_us">關於我們</string>
+    <string name="policy">隱私權政策</string>
+    <string name="editor_policy">著作權條款</string>
+    <string name="service_guide_line">服務條款</string>
+    <string name="system_version">系統版本</string>
+    <string name="feedback">意見回饋</string>
+    <string name="account_info">帳號資料</string>
+    <string name="avatar_nickname">頭像與暱稱</string>
+    <string name="manage_account">帳號管理</string>
+    <string name="user_number">使用者編號</string>
+    <string name="my_avatar_in_group">我在此社團的頭像</string>
+    <string name="my_nickname_in_group">我在此社團的暱稱</string>
+    <string name="save">儲存</string>
+    <string name="modify">修改</string>
+    <string name="confirm">確定</string>
+    <string name="change_image">更換圖片</string>
+    <string name="apply">套用</string>
+    <string name="add">新增</string>
+
+    <string name="group_manage">社團管理</string>
+    <string name="group_setting">社團設定</string>
+    <string name="group_name">社團名稱</string>
+    <string name="group_name_empty">社團名稱空白</string>
+    <string name="group_name_empty_desc">社團名稱不可以是空白的唷！</string>
+    <string name="group_name_placeholder">填寫專屬於社團的名稱吧!</string>
+    <string name="group_description">社團簡介</string>
+    <string name="group_description_placeholder">填寫專屬於社團的簡介吧！</string>
+    <string name="group_avatar">社團圖示</string>
+    <string name="group_background">社團背景</string>
+    <string name="group_board_place">面板覆蓋處</string>
+    <string name="theme_color">主題色彩</string>
+    <string name="theme_preview">主題預覽</string>
+
+    <string name="edit_channel">編輯頻道</string>
+    <string name="add_channel">新增頻道</string>
+    <string name="style">樣式</string>
+    <string name="permission">權限</string>
+    <string name="manager">管理員</string>
+
+    <string name="channel_name">頻道名稱</string>
+    <string name="input_channel_name">輸入頻道名稱</string>
+    <string name="delete_channel">刪除頻道</string>
+    <string name="channel_name_empty">頻道名稱空白</string>
+    <string name="channel_name_empty_desc">頻道名稱不可以是空白的唷！</string>
+
+    <string name="channel_openness">頻道公開度</string>
+    <string name="full_public">完全公開</string>
+    <string name="full_public_desc">任何人都能看到頻道，任何人都能進入。</string>
+    <string name="not_public">不公開</string>
+    <string name="not_public_desc">任何人都能看到頻道，只有指定成員才能進入。</string>
+    <string name="channel_manage_count">管理頻道成員（%d人）</string>
+    <string name="edit_member">編輯成員</string>
+    <string name="channel_manager_description">選擇角色來建立頻道管理員：擁有該角色之成員，即可針對相對應的權限，進行頻道管理。</string>
+    <string name="add_role">新增角色</string>
+
+    <string name="add_category">新增分類</string>
+    <string name="category_name">分類名稱</string>
+    <string name="input_category_name">輸入分類名稱</string>
+    <string name="category_name_empty">分類名稱空白</string>
+    <string name="category_name_empty_desc">分類名稱不可以是空白的唷！</string>
+
+    <string name="input_role_name">輸入角色名稱</string>
+    <string name="role_name_empty">角色名稱空白</string>
+    <string name="role_name_empty_desc">角色名稱不可以是空白的唷！</string>
+
 </resources>

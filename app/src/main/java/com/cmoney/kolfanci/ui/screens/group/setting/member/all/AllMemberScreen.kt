@@ -4,28 +4,54 @@ import FlowRow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.destinations.MemberManageScreenDestination
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -50,8 +76,20 @@ fun AllMemberScreen(
     setMemberResult: ResultRecipient<MemberManageScreenDestination, MemberManageResult>
 ) {
     val uiState = viewModel.uiState
-    if (uiState.groupMember == null && uiState.loading) {
+
+    LaunchedEffect(Unit) {
         viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+    }
+
+//    if (uiState.groupMember == null && uiState.loading) {
+//        viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+//    }
+
+    val shareText by viewModel.shareText.collectAsState()
+
+    if (shareText.isNotEmpty()) {
+        LocalContext.current.share(shareText)
+        viewModel.resetShareText()
     }
 
     //Edit callback
@@ -59,12 +97,14 @@ fun AllMemberScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val memberResult = result.value
                 when (memberResult.type) {
                     MemberManageResult.Type.Update -> {
                         viewModel.editGroupMember(memberResult.groupMember)
                     }
+
                     MemberManageResult.Type.Delete -> {
                         viewModel.removeMember(memberResult.groupMember)
                     }
@@ -86,6 +126,9 @@ fun AllMemberScreen(
                 groupId = group.id.orEmpty(),
                 keyword = it
             )
+        },
+        onInviteClick = {
+            viewModel.onInviteClick(group)
         }
     )
 }
@@ -97,7 +140,8 @@ fun AllMemberScreenView(
     group: Group,
     groupMemberList: List<GroupMember>,
     isLoading: Boolean,
-    onSearch: (String) -> Unit
+    onSearch: (String) -> Unit,
+    onInviteClick: () -> Unit
 ) {
     val TAG = "AllMemberScreenView"
     var textState by remember { mutableStateOf("") }
@@ -170,14 +214,27 @@ fun AllMemberScreenView(
             )
 
             LazyColumn(modifier = Modifier.padding(innerPadding)) {
+
+                item {
+                    if (groupMemberList.isEmpty() && textState.isEmpty()) {
+                        if (groupMemberList.isEmpty()) {
+                            EmptyAllMemberView(onInviteClick)
+                        } else {
+                            SearchNoResultView()
+                        }
+                    }
+                }
+
                 items(groupMemberList) { groupMember ->
                     MemberItem(groupMember = groupMember) {
                         KLog.i(TAG, "member click:$it")
                         if (Constant.isCanEnterMemberManager()) {
-                            navController.navigate(MemberManageScreenDestination(
-                                group = group,
-                                groupMember =  groupMember
-                            ))
+                            navController.navigate(
+                                MemberManageScreenDestination(
+                                    group = group,
+                                    groupMember = groupMember
+                                )
+                            )
                         }
                     }
                     Spacer(modifier = Modifier.height(1.dp))
@@ -199,6 +256,66 @@ fun AllMemberScreenView(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyAllMemberView(
+    onInviteClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(350.dp)
+            .background(LocalColor.current.env_80),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        AsyncImage(
+            modifier = Modifier.size(105.dp),
+            model = R.drawable.empty_folwer, contentDescription = "empty message"
+        )
+
+        Spacer(modifier = Modifier.height(43.dp))
+
+        Text(
+            text = "目前沒有其他社團成員\n複製邀請連結，邀請好多好多人加入吧！",
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            color = LocalColor.current.text.default_30
+        )
+
+        BlueButton(text = "邀請") {
+            onInviteClick.invoke()
+        }
+    }
+}
+
+@Composable
+fun SearchNoResultView() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(350.dp)
+            .background(LocalColor.current.env_80),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        AsyncImage(
+            modifier = Modifier.size(105.dp),
+            model = R.drawable.empty_search, contentDescription = "empty message"
+        )
+
+        Spacer(modifier = Modifier.height(43.dp))
+
+        Text(
+            text = "暫無搜尋結果",
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            color = LocalColor.current.text.default_30
+        )
     }
 }
 
@@ -339,7 +456,8 @@ fun AllMemberScreenPreview() {
                 )
             ),
             group = Group(),
-            onSearch = {}
+            onSearch = {},
+            onInviteClick = {}
         )
     }
 }

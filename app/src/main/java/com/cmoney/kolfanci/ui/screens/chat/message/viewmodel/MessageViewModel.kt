@@ -8,17 +8,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.DeleteStatus
+import com.cmoney.fanciapi.fanci.model.Emojis
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
+import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
-import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
@@ -28,22 +35,18 @@ import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-data class MessageUiState(
-    val snackBarMessage: CustomMessage? = null,
-    val message: List<ChatMessageWrapper> = emptyList(),    //訊息
-    val imageAttach: List<Uri> = emptyList(),   //附加圖片
-    val isSendComplete: Boolean = false,        //訊息是否發送完成
-    val replyMessage: ChatMessage? = null,      //回覆訊息用
-    val routeAnnounceMessage: ChatMessage? = null,    //設定公告訊息,跳轉設定頁面
-    val copyMessage: ChatMessage? = null,    //複製訊息
-    val hideUserMessage: ChatMessage? = null,    //封鎖用戶
-    val reportMessage: ChatMessage? = null,
-    val deleteMessage: ChatMessage? = null,
-    val showReSendDialog: ChatMessageWrapper? = null   //是否要show re-send dialog
+data class ImageAttachState(
+    val uri: Uri,
+    val isUploadComplete: Boolean = false,
+    val serverUrl: String = ""
 )
 
 /**
@@ -58,8 +61,49 @@ class MessageViewModel(
 
     private val TAG = MessageViewModel::class.java.simpleName
 
-    var uiState by mutableStateOf(MessageUiState())
-        private set
+    //通知訊息
+    private val _snackBarMessage = MutableSharedFlow<CustomMessage>()
+    val snackBarMessage = _snackBarMessage.asSharedFlow()
+
+    //要回覆的訊息
+    private val _replyMessage = MutableStateFlow<ChatMessage?>(null)
+    val replyMessage = _replyMessage.asStateFlow()
+
+    //是否要show re-send dialog
+    private val _showReSendDialog = MutableStateFlow<ChatMessageWrapper?>(null)
+    val showReSendDialog = _showReSendDialog.asStateFlow()
+
+    //刪除訊息
+    private val _deleteMessage = MutableStateFlow<ChatMessage?>(null)
+    val deleteMessage = _deleteMessage.asStateFlow()
+
+    //檢舉訊息
+    private val _reportMessage = MutableStateFlow<ChatMessage?>(null)
+    val reportMessage = _reportMessage.asStateFlow()
+
+    //封鎖用戶的訊息
+    private val _hideUserMessage = MutableStateFlow<ChatMessage?>(null)
+    val hideUserMessage = _hideUserMessage.asStateFlow()
+
+    //複製訊息
+    private val _copyMessage = MutableStateFlow<ChatMessage?>(null)
+    val copyMessage = _copyMessage.asStateFlow()
+
+    //設定公告訊息,跳轉設定頁面
+    private val _routeAnnounceMessage = MutableStateFlow<ChatMessage?>(null)
+    val routeAnnounceMessage = _routeAnnounceMessage.asStateFlow()
+
+    //訊息是否發送完成
+    private val _isSendComplete = MutableStateFlow<Boolean>(false)
+    val isSendComplete = _isSendComplete.asStateFlow()
+
+    //附加圖片
+    private val _imageAttach = MutableStateFlow<List<Uri>>(emptyList())
+    val imageAttach = _imageAttach.asStateFlow()
+
+    //聊天訊息
+    private val _message = MutableStateFlow<List<ChatMessageWrapper>>(emptyList())
+    val message = _message.asStateFlow()
 
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
 
@@ -177,11 +221,11 @@ class MessageViewModel(
         isLatest: Boolean = false
     ) {
         //combine old message
-        val oldMessage = uiState.message.filter {
+        val oldMessage = _message.value.filter {
             !it.isPendingSendMessage
         }.toMutableList()
 
-        val pendingSendMessage = uiState.message.filter {
+        val pendingSendMessage = _message.value.filter {
             it.isPendingSendMessage
         }
 
@@ -203,9 +247,7 @@ class MessageViewModel(
             }
         }
 
-        uiState = uiState.copy(
-            message = distinctMessage
-        )
+        _message.value = distinctMessage
     }
 
     /**
@@ -216,8 +258,8 @@ class MessageViewModel(
         KLog.i(TAG, "onLoadMore.")
         viewModelScope.launch {
             //訊息不為空,才抓取分頁,因為預設會有Polling訊息, 超過才需讀取分頁
-            if (uiState.message.isNotEmpty()) {
-                val lastMessage = uiState.message.last()
+            if (_message.value.isNotEmpty()) {
+                val lastMessage = _message.value.last()
 
                 val serialNumber = lastMessage.message.serialNumber
                 chatRoomUseCase.fetchMoreMessage(
@@ -243,11 +285,9 @@ class MessageViewModel(
      */
     fun attachImage(uri: Uri) {
         KLog.i(TAG, "attachImage:$uri")
-        val imageList = uiState.imageAttach.toMutableList()
+        val imageList = _imageAttach.value.toMutableList()
         imageList.add(uri)
-        uiState = uiState.copy(
-            imageAttach = imageList
-        )
+        _imageAttach.value = imageList
     }
 
     /**
@@ -256,13 +296,10 @@ class MessageViewModel(
      */
     fun removeAttach(uri: Uri) {
         KLog.i(TAG, "removeAttach:$uri")
-        val imageList = uiState.imageAttach.toMutableList()
-
-        uiState = uiState.copy(
-            imageAttach = imageList.filter {
-                it != uri
-            }
-        )
+        val imageList = _imageAttach.value.toMutableList()
+        _imageAttach.value = imageList.filter {
+            it != uri
+        }
     }
 
     /**
@@ -276,8 +313,8 @@ class MessageViewModel(
             generatePreviewBeforeSend(text)
 
             //附加圖片, 獲取圖片 Url
-            if (uiState.imageAttach.isNotEmpty()) {
-                uploadImages(uiState.imageAttach, object : ImageUploadCallback {
+            if (_imageAttach.value.isNotEmpty()) {
+                uploadImages(_imageAttach.value, object : ImageUploadCallback {
                     override fun complete(images: List<String>) {
                         KLog.i(TAG, "all image upload complete:" + images.size)
                         send(channelId, text, images)
@@ -287,38 +324,35 @@ class MessageViewModel(
                         KLog.e(TAG, "onFailure:$e")
 
                         //Create pending message
-                        uiState = uiState.copy(
-                            message = uiState.message.toMutableList().apply {
-                                add(
-                                    0,
-                                    ChatMessageWrapper(
-                                        message = ChatMessage(
-                                            id = System.currentTimeMillis().toString(),
-                                            author = GroupMember(
-                                                name = XLoginHelper.nickName,
-                                                thumbNail = XLoginHelper.headImagePath
-                                            ),
-                                            content = MediaIChatContent(
-                                                text = text
-                                            ),
-                                            createUnixTime = System.currentTimeMillis() / 1000,
-                                            replyMessage = uiState.replyMessage
+                        _message.value = _message.value.toMutableList().apply {
+                            add(
+                                0,
+                                ChatMessageWrapper(
+                                    message = ChatMessage(
+                                        id = System.currentTimeMillis().toString(),
+                                        author = GroupMember(
+                                            name = XLoginHelper.nickName,
+                                            thumbNail = XLoginHelper.headImagePath
                                         ),
-                                        uploadAttachPreview = uiState.imageAttach.map {
-                                            ChatRoomUiState.ImageAttachState(
-                                                uri = it,
-                                                isUploadComplete = true
-                                            )
-                                        },
-                                        isPendingSendMessage = true
-                                    )
+                                        content = MediaIChatContent(
+                                            text = text
+                                        ),
+                                        createUnixTime = System.currentTimeMillis() / 1000,
+                                        replyMessage = _replyMessage.value
+                                    ),
+                                    uploadAttachPreview = _imageAttach.value.map {
+                                        ImageAttachState(
+                                            uri = it,
+                                            isUploadComplete = true
+                                        )
+                                    },
+                                    isPendingSendMessage = true
                                 )
-                            }
-                        )
-
+                            )
+                        }
                     }
                 })
-                uiState = uiState.copy(imageAttach = emptyList())
+                _imageAttach.value = emptyList()
             }
             //Only text
             else {
@@ -333,32 +367,32 @@ class MessageViewModel(
      */
     private fun generatePreviewBeforeSend(text: String) {
         // TODO: TBD
-        return
-        uiState = uiState.copy(
-            message = uiState.message.toMutableList().apply {
-                add(0,
-                    ChatMessageWrapper(
-                        message = ChatMessage(
-                            id = preSendChatId,
-                            author = GroupMember(
-                                name = XLoginHelper.nickName,
-                                thumbNail = XLoginHelper.headImagePath
-                            ),
-                            content = MediaIChatContent(
-                                text = text
-                            ),
-                            createUnixTime = System.currentTimeMillis() / 1000,
-                            replyMessage = uiState.replyMessage
-                        ),
-                        uploadAttachPreview = uiState.imageAttach.map { uri ->
-                            ChatRoomUiState.ImageAttachState(
-                                uri = uri
-                            )
-                        }
-                    )
-                )
-            }
-        )
+//        return
+//        uiState = uiState.copy(
+//            message = uiState.message.toMutableList().apply {
+//                add(0,
+//                    ChatMessageWrapper(
+//                        message = ChatMessage(
+//                            id = preSendChatId,
+//                            author = GroupMember(
+//                                name = XLoginHelper.nickName,
+//                                thumbNail = XLoginHelper.headImagePath
+//                            ),
+//                            content = MediaIChatContent(
+//                                text = text
+//                            ),
+//                            createUnixTime = System.currentTimeMillis() / 1000,
+//                            replyMessage = _replyMessage.value
+//                        ),
+//                        uploadAttachPreview = uiState.imageAttach.map { uri ->
+//                            MessageUiState.ImageAttachState(
+//                                uri = uri
+//                            )
+//                        }
+//                    )
+//                )
+//            }
+//        )
     }
 
     /**
@@ -369,9 +403,7 @@ class MessageViewModel(
     private suspend fun uploadImages(uriLis: List<Uri>, imageUploadCallback: ImageUploadCallback) {
         KLog.i(TAG, "uploadImages:" + uriLis.size)
 
-        uiState = uiState.copy(
-            imageAttach = emptyList()
-        )
+        _imageAttach.value = emptyList()
 
         val uploadImage = UploadImage(
             context,
@@ -385,9 +417,7 @@ class MessageViewModel(
         withContext(Dispatchers.IO) {
             uploadImage.upload().catch { e ->
                 KLog.e(TAG, e)
-                uiState = uiState.copy(
-                    imageAttach = uriLis
-                )
+                _imageAttach.value = uriLis
 
                 imageUploadCallback.onFailure(e)
 
@@ -458,25 +488,25 @@ class MessageViewModel(
                 chatRoomChannelId = channelId,
                 text = text,
                 images = images,
-                replyMessageId = uiState.replyMessage?.id.orEmpty()
+                replyMessageId = _replyMessage.value?.id.orEmpty()
             ).fold({ chatMessage ->
                 //發送成功
                 KLog.i(TAG, "send success:$chatMessage")
-                uiState = uiState.copy(
-                    message = uiState.message.map {
-                        if (it.message.id == preSendChatId) {
-                            ChatMessageWrapper(message = chatMessage)
-                        } else {
-                            it
-                        }
-                    },
-                    isSendComplete = true,
-                    replyMessage = null
-                )
+                _message.value = _message.value.map {
+                    if (it.message.id == preSendChatId) {
+                        ChatMessageWrapper(message = chatMessage)
+                    } else {
+                        it
+                    }
+                }
+
+                _isSendComplete.value = true
+
+                _replyMessage.value = null
 
                 //恢復聊天室內訊息,不會自動捲到最下面
                 delay(800)
-                uiState = uiState.copy(isSendComplete = false)
+                _isSendComplete.value = false
 
             }, {
                 KLog.e(TAG, it)
@@ -486,34 +516,32 @@ class MessageViewModel(
                     checkChannelPermission(channelId)
                 } else {
                     //將發送失敗訊息 標註為Pending
-                    uiState = uiState.copy(
-                        message = uiState.message.toMutableList().apply {
-                            add(
-                                0,
-                                ChatMessageWrapper(
-                                    message = ChatMessage(
-                                        id = System.currentTimeMillis().toString(),
-                                        author = GroupMember(
-                                            name = XLoginHelper.nickName,
-                                            thumbNail = XLoginHelper.headImagePath
-                                        ),
-                                        content = MediaIChatContent(
-                                            text = text
-                                        ),
-                                        createUnixTime = System.currentTimeMillis() / 1000,
-                                        replyMessage = uiState.replyMessage
+                    _message.value = _message.value.toMutableList().apply {
+                        add(
+                            0,
+                            ChatMessageWrapper(
+                                message = ChatMessage(
+                                    id = System.currentTimeMillis().toString(),
+                                    author = GroupMember(
+                                        name = XLoginHelper.nickName,
+                                        thumbNail = XLoginHelper.headImagePath
                                     ),
-                                    uploadAttachPreview = images.map {
-                                        ChatRoomUiState.ImageAttachState(
-                                            uri = Uri.EMPTY,
-                                            serverUrl = it
-                                        )
-                                    },
-                                    isPendingSendMessage = true
-                                )
+                                    content = MediaIChatContent(
+                                        text = text
+                                    ),
+                                    createUnixTime = System.currentTimeMillis() / 1000,
+                                    replyMessage = _replyMessage.value
+                                ),
+                                uploadAttachPreview = images.map {
+                                    ImageAttachState(
+                                        uri = Uri.EMPTY,
+                                        serverUrl = it
+                                    )
+                                },
+                                isPendingSendMessage = true
                             )
-                        }
-                    )
+                        )
+                    }
                 }
 
 
@@ -575,53 +603,58 @@ class MessageViewModel(
             }
 
             //先將 Emoji append to ui.
-            uiState = uiState.copy(
-                message = uiState.message.map { chatMessageWrapper ->
-                    if (chatMessageWrapper.message.id == chatMessage.id) {
-                        val orgEmoji = chatMessageWrapper.message.emojiCount
-                        val newEmoji = when (clickEmoji) {
-                            Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(emojiCount))
-                            Emojis.dislike -> orgEmoji?.copy(
-                                dislike = orgEmoji.dislike?.plus(
-                                    emojiCount
-                                )
-                            )
-                            Emojis.laugh -> orgEmoji?.copy(laugh = orgEmoji.laugh?.plus(emojiCount))
-                            Emojis.money -> orgEmoji?.copy(money = orgEmoji.money?.plus(emojiCount))
-                            Emojis.shock -> orgEmoji?.copy(shock = orgEmoji.shock?.plus(emojiCount))
-                            Emojis.cry -> orgEmoji?.copy(cry = orgEmoji.cry?.plus(emojiCount))
-                            Emojis.think -> orgEmoji?.copy(think = orgEmoji.think?.plus(emojiCount))
-                            Emojis.angry -> orgEmoji?.copy(angry = orgEmoji.angry?.plus(emojiCount))
-                        }
-
-                        //回填資料
-                        chatMessageWrapper.copy(
-                            message = chatMessageWrapper.message.copy(
-                                emojiCount = newEmoji,
-                                messageReaction = if (emojiCount == -1) null else {
-                                    IUserMessageReaction(
-                                        emoji = clickEmoji.value
-                                    )
-                                }
+            _message.value = _message.value.map { chatMessageWrapper ->
+                if (chatMessageWrapper.message.id == chatMessage.id) {
+                    val orgEmoji = chatMessageWrapper.message.emojiCount
+                    val newEmoji = when (clickEmoji) {
+                        Emojis.like -> orgEmoji?.copy(like = orgEmoji.like?.plus(emojiCount))
+                        Emojis.dislike -> orgEmoji?.copy(
+                            dislike = orgEmoji.dislike?.plus(
+                                emojiCount
                             )
                         )
-                    } else {
-                        chatMessageWrapper
+
+                        Emojis.laugh -> orgEmoji?.copy(laugh = orgEmoji.laugh?.plus(emojiCount))
+                        Emojis.money -> orgEmoji?.copy(money = orgEmoji.money?.plus(emojiCount))
+                        Emojis.shock -> orgEmoji?.copy(shock = orgEmoji.shock?.plus(emojiCount))
+                        Emojis.cry -> orgEmoji?.copy(cry = orgEmoji.cry?.plus(emojiCount))
+                        Emojis.think -> orgEmoji?.copy(think = orgEmoji.think?.plus(emojiCount))
+                        Emojis.angry -> orgEmoji?.copy(angry = orgEmoji.angry?.plus(emojiCount))
                     }
+
+                    //回填資料
+                    chatMessageWrapper.copy(
+                        message = chatMessageWrapper.message.copy(
+                            emojiCount = newEmoji,
+                            messageReaction = if (emojiCount == -1) null else {
+                                IUserMessageReaction(
+                                    emoji = clickEmoji.value
+                                )
+                            }
+                        )
+                    )
+                } else {
+                    chatMessageWrapper
                 }
-            )
+            }
 
             //Call Emoji api
             if (emojiCount == -1) {
                 //收回
-                chatRoomUseCase.deleteEmoji(chatMessage.id.orEmpty()).fold({
+                chatRoomUseCase.deleteEmoji(
+                    messageServiceType = MessageServiceType.chatroom,
+                    chatMessage.id.orEmpty()
+                ).fold({
                     KLog.e(TAG, "delete emoji success.")
                 }, {
                     KLog.e(TAG, it)
                 })
             } else {
                 //增加
-                chatRoomUseCase.sendEmoji(chatMessage.id.orEmpty(), clickEmoji).fold({
+                chatRoomUseCase.sendEmoji(
+                    messageServiceType = MessageServiceType.chatroom,
+                    chatMessage.id.orEmpty(), clickEmoji
+                ).fold({
                     KLog.i(TAG, "sendEmoji success.")
                 }, {
                     KLog.e(TAG, it)
@@ -639,29 +672,28 @@ class MessageViewModel(
         when (messageInteract) {
             is MessageInteract.Announcement -> announceMessage(messageInteract.message)
             is MessageInteract.Copy -> {
-                uiState = uiState.copy(
-                    copyMessage = messageInteract.message
-                )
+                _copyMessage.value = messageInteract.message
             }
+
             is MessageInteract.Delete -> deleteMessage(messageInteract.message)
             is MessageInteract.HideUser -> {
-                uiState = uiState.copy(
-                    hideUserMessage = messageInteract.message
-                )
+                _hideUserMessage.value = messageInteract.message
             }
+
             is MessageInteract.Recycle -> {
                 recycleMessage(messageInteract.message)
             }
+
             is MessageInteract.Reply -> replyMessage(messageInteract.message)
             is MessageInteract.Report -> {
-                uiState = uiState.copy(
-                    reportMessage = messageInteract.message
-                )
+                _reportMessage.value = messageInteract.message
             }
+
             is MessageInteract.EmojiClick -> onEmojiClick(
                 messageInteract.message,
                 messageInteract.emojiResId
             )
+
             else -> {}
         }
     }
@@ -671,18 +703,14 @@ class MessageViewModel(
      */
     private fun deleteMessage(message: ChatMessage) {
         KLog.i(TAG, "deleteMessage:$message")
-        uiState = uiState.copy(
-            deleteMessage = message
-        )
+        _deleteMessage.value = message
     }
 
     /**
      * 關閉 刪除訊息 彈窗
      */
     fun onDeleteMessageDialogDismiss() {
-        uiState = uiState.copy(
-            deleteMessage = null
-        )
+        _deleteMessage.value = null
     }
 
     /**
@@ -695,16 +723,21 @@ class MessageViewModel(
             if (chatMessageModel.author?.id == Constant.MyInfo?.id) {
                 //自己發的文章
                 KLog.i(TAG, "onDelete my post")
-                chatRoomUseCase.takeBackMyMessage(chatMessageModel.id.orEmpty()).fold({
+                chatRoomUseCase.takeBackMyMessage(
+                    messageServiceType = MessageServiceType.chatroom,
+                    chatMessageModel.id.orEmpty()
+                ).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         KLog.i(TAG, "onDelete my post success")
-                        uiState = uiState.copy(
-                            message = uiState.message.filter {
-                                it.message != chatMessageModel
-                            },
-                            deleteMessage = null,
-                            snackBarMessage = CustomMessage(
+                        _message.value = _message.value.filter {
+                            it.message != chatMessageModel
+                        }
+
+                        _deleteMessage.value = null
+
+                        snackBarMessage(
+                            CustomMessage(
                                 textString = "成功刪除訊息！",
                                 textColor = Color.White,
                                 iconRes = R.drawable.delete,
@@ -712,6 +745,7 @@ class MessageViewModel(
                                 backgroundColor = White_494D54
                             )
                         )
+
                     } else {
                         it.printStackTrace()
                         KLog.e(TAG, it)
@@ -720,16 +754,21 @@ class MessageViewModel(
             } else {
                 //別人的文章
                 KLog.i(TAG, "onDelete other post")
-                chatRoomUseCase.deleteOtherMessage(chatMessageModel.id.orEmpty()).fold({
+                chatRoomUseCase.deleteOtherMessage(
+                    messageServiceType = MessageServiceType.chatroom,
+                    chatMessageModel.id.orEmpty()
+                ).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         KLog.i(TAG, "onDelete other post success")
-                        uiState = uiState.copy(
-                            message = uiState.message.filter {
-                                it.message != chatMessageModel
-                            },
-                            deleteMessage = null,
-                            snackBarMessage = CustomMessage(
+                        _message.value = _message.value.filter {
+                            it.message != chatMessageModel
+                        }
+
+                        _deleteMessage.value = null
+
+                        snackBarMessage(
+                            CustomMessage(
                                 textString = "成功刪除訊息！",
                                 textColor = Color.White,
                                 iconRes = R.drawable.delete,
@@ -737,6 +776,7 @@ class MessageViewModel(
                                 backgroundColor = White_494D54
                             )
                         )
+
                     } else {
                         it.printStackTrace()
                         KLog.e(TAG, it)
@@ -753,24 +793,23 @@ class MessageViewModel(
         KLog.i(TAG, "recycleMessage:$message")
         viewModelScope.launch {
             chatRoomUseCase.recycleMessage(
+                messageServiceType = MessageServiceType.chatroom,
                 messageId = message.id.orEmpty()
             ).fold({
             }, {
                 KLog.e(TAG, it)
                 if (it is EmptyBodyException) {
-                    uiState = uiState.copy(
-                        message = uiState.message.map { chatMessageWrapper ->
-                            if (chatMessageWrapper.message.id == message.id) {
-                                chatMessageWrapper.copy(
-                                    message = chatMessageWrapper.message.copy(
-                                        isDeleted = true
-                                    )
+                    _message.value = _message.value.map { chatMessageWrapper ->
+                        if (chatMessageWrapper.message.id == message.id) {
+                            chatMessageWrapper.copy(
+                                message = chatMessageWrapper.message.copy(
+                                    isDeleted = true
                                 )
-                            } else {
-                                chatMessageWrapper
-                            }
+                            )
+                        } else {
+                            chatMessageWrapper
                         }
-                    )
+                    }
                 } else {
                     it.printStackTrace()
                 }
@@ -784,9 +823,7 @@ class MessageViewModel(
      */
     private fun replyMessage(message: ChatMessage) {
         KLog.i(TAG, "replyMessage click:$message")
-        uiState = uiState.copy(
-            replyMessage = message
-        )
+        _replyMessage.value = message
     }
 
     /**
@@ -795,9 +832,7 @@ class MessageViewModel(
      */
     fun removeReply(reply: ChatMessage) {
         KLog.i(TAG, "removeReply:$reply")
-        uiState = uiState.copy(
-            replyMessage = null
-        )
+        _replyMessage.value = null
     }
 
     /**
@@ -809,36 +844,28 @@ class MessageViewModel(
         val noEmojiMessage = messageModel.copy(
             emojiCount = null
         )
-        uiState = uiState.copy(
-            routeAnnounceMessage = noEmojiMessage
-        )
+        _routeAnnounceMessage.value = noEmojiMessage
     }
 
     /**
      * 設置公告 跳轉完畢
      */
     fun announceRouteDone() {
-        uiState = uiState.copy(
-            routeAnnounceMessage = null
-        )
+        _routeAnnounceMessage.value = null
     }
 
     /**
      * 執行完複製
      */
     fun copyDone() {
-        uiState = uiState.copy(
-            copyMessage = null
-        )
+        _copyMessage.value = null
     }
 
     /**
      * 關閉 隱藏用戶彈窗
      */
     fun onHideUserDialogDismiss() {
-        uiState = uiState.copy(
-            hideUserMessage = null
-        )
+        _hideUserMessage.value = null
     }
 
 
@@ -854,9 +881,10 @@ class MessageViewModel(
                 reason = reason
             ).fold({
                 KLog.i(TAG, "onReportUser success:$it")
-                uiState = uiState.copy(
-                    reportMessage = null,
-                    snackBarMessage = CustomMessage(
+                _reportMessage.value = null
+
+                snackBarMessage(
+                    CustomMessage(
                         textString = "檢舉成立！",
                         textColor = Color.White,
                         iconRes = R.drawable.report,
@@ -874,18 +902,7 @@ class MessageViewModel(
      * 關閉 檢舉用戶 彈窗
      */
     fun onReportUserDialogDismiss() {
-        uiState = uiState.copy(
-            reportMessage = null
-        )
-    }
-
-    /**
-     * 隱藏 SnackBar
-     */
-    fun snackBarDismiss() {
-        uiState = uiState.copy(
-            snackBarMessage = null
-        )
+        _reportMessage.value = null
     }
 
     /**
@@ -893,18 +910,14 @@ class MessageViewModel(
      */
     fun onReSendClick(it: ChatMessageWrapper) {
         KLog.i(TAG, "onReSendClick:$it")
-        uiState = uiState.copy(
-            showReSendDialog = it
-        )
+        _showReSendDialog.value = it
     }
 
     /**
      * 關閉 重新發送 Dialog
      */
     fun onReSendDialogDismiss() {
-        uiState = uiState.copy(
-            showReSendDialog = null
-        )
+        _showReSendDialog.value = null
     }
 
     /**
@@ -912,12 +925,10 @@ class MessageViewModel(
      */
     fun onDeleteReSend(message: ChatMessageWrapper) {
         KLog.i(TAG, "onDeleteReSend:$message")
-        uiState = uiState.copy(
-            message = uiState.message.filter {
-                !it.isPendingSendMessage && it != message
-            },
-            showReSendDialog = null
-        )
+        _message.value = _message.value.filter {
+            !it.isPendingSendMessage && it != message
+        }
+        _showReSendDialog.value = null
     }
 
     /**
@@ -935,8 +946,8 @@ class MessageViewModel(
      */
     fun showPermissionTip() {
         KLog.i(TAG, "showBasicPermissionTip")
-        uiState = uiState.copy(
-            snackBarMessage = CustomMessage(
+        snackBarMessage(
+            CustomMessage(
                 textString = Constant.getChannelSilenceDesc(),
                 iconRes = R.drawable.minus_people,
                 iconColor = White_767A7F,
@@ -944,4 +955,31 @@ class MessageViewModel(
             )
         )
     }
+
+    /**
+     * 複製訊息
+     */
+    fun copyMessage(message: ChatMessage) {
+        context.copyToClipboard(message.content?.text.orEmpty())
+        snackBarMessage(
+            CustomMessage(
+                textString = "訊息複製成功！",
+                textColor = Color.White,
+                iconRes = R.drawable.copy,
+                iconColor = White_767A7F,
+                backgroundColor = White_494D54
+            )
+        )
+    }
+
+    /**
+     * 發送 snackBar 訊息
+     */
+    private fun snackBarMessage(message: CustomMessage) {
+        KLog.i(TAG, "snackMessage:$message")
+        viewModelScope.launch {
+            _snackBarMessage.emit(message)
+        }
+    }
+
 }

@@ -31,7 +31,6 @@ import kotlinx.parcelize.Parcelize
  * @param description 
  * @param startDateTime 
  * @param endDateTime 
- * @param dutationTime 
  */
 @Parcelize
 
@@ -54,10 +53,7 @@ data class BuffStatus (
     val startDateTime: kotlin.Long? = null,
 
     @Json(name = "endDateTime")
-    val endDateTime: kotlin.Long? = null,
-
-    @Json(name = "dutationTime")
-    val dutationTime: kotlin.Long? = null
+    val endDateTime: kotlin.Long? = null
 
 ) : Parcelable
 

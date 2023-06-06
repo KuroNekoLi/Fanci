@@ -47,6 +47,9 @@ import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/**
+ * 建立社團
+ */
 @Destination
 @Composable
 fun CreateGroupScreen(
@@ -66,8 +69,7 @@ fun CreateGroupScreen(
     val TAG = "CreateGroupScreen"
     val approvalUiState = groupOpennessViewModel.uiState
 
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
-
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
@@ -252,11 +254,8 @@ fun CreateGroupScreen(
 
     LaunchedEffect(Unit) {
         groupOpennessViewModel.saveComplete.collect { saveComplete ->
-            if (saveComplete) {
-                globalViewModel.setCurrentGroup(settingGroup)
-
-                globalViewModel.startFetchFollowData()
-
+            if (saveComplete != null) {
+                globalGroupViewModel.setCurrentGroup(saveComplete)
                 navigator.popBackStack(
                     route = MainScreenDestination,
                     inclusive = false
@@ -438,7 +437,7 @@ private fun Step(
     isFirstStep: Boolean,
     title: String
 ) {
-    val color = if (isComplete) LocalColor.current.primary else LocalColor.current.env_40
+    val color = if (isComplete) LocalColor.current.primary else LocalColor.current.env_60
     val textColor =
         if (isComplete) LocalColor.current.text.default_100 else LocalColor.current.text.default_30
     var offset: Dp
