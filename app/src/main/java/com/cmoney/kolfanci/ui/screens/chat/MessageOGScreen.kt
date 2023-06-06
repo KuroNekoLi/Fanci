@@ -19,6 +19,7 @@ import coil.compose.AsyncImage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.openUrl
 import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
+import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.kedia.ogparser.OpenGraphCacheProvider
 import com.kedia.ogparser.OpenGraphCallback
@@ -110,7 +111,9 @@ fun MessageOGScreen(
 @Preview(showBackground = true)
 @Composable
 fun MessageArticleScreenPreview() {
-    MessageOGScreen(
-        url = "https://www.youtube.com/watch?v=d8pBKXyEt_0"
-    )
+    FanciTheme {
+        MessageOGScreen(
+            url = "https://www.youtube.com/watch?v=d8pBKXyEt_0"
+        )
+    }
 }

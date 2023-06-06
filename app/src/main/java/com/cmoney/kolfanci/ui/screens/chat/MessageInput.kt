@@ -34,6 +34,7 @@ import org.koin.androidx.compose.koinViewModel
 fun MessageInput(
     onMessageSend: (text: String) -> Unit,
     onAttach: (Uri) -> Unit,
+    showOnlyBasicPermissionTip: () -> Unit,
     viewModel: MessageViewModel = koinViewModel()
 ) {
     val openDialog = remember { mutableStateOf(false) }
@@ -59,7 +60,9 @@ fun MessageInput(
                 .clip(CircleShape)
                 .background(LocalColor.current.background)
                 .clickable {
-                    openDialog.value = true
+                    if (Constant.canPostMessage()) {
+                        openDialog.value = true
+                    }
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -71,36 +74,61 @@ fun MessageInput(
             )
         }
 
-        TextField(
+        Box(
             modifier = Modifier
                 .weight(1f)
-                .padding(10.dp),
-            value = textState,
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = LocalColor.current.inputText.input_100,
-                backgroundColor = LocalColor.current.inputFrame,
-                cursorColor = LocalColor.current.primary,
-                disabledLabelColor = LocalColor.current.text.default_30,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            onValueChange = {
-                textState = it
-                isShowSend = it.isNotEmpty()
-            },
-            shape = RoundedCornerShape(40.dp),
-            maxLines = 5,
-            textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-            placeholder = {
-                Text(
-                    text = "輸入你想說的話...",
-                    fontSize = 16.sp,
-                    color = LocalColor.current.inputText.input_30
+                .padding(10.dp)
+        ) {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                value = textState,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = LocalColor.current.inputText.input_100,
+                    backgroundColor = LocalColor.current.inputFrame,
+                    cursorColor = LocalColor.current.primary,
+                    disabledLabelColor = LocalColor.current.text.default_30,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                onValueChange = {
+                    textState = it
+                    isShowSend = it.isNotEmpty()
+                },
+                shape = RoundedCornerShape(40.dp),
+                maxLines = 5,
+                textStyle = TextStyle.Default.copy(fontSize = 16.sp),
+                placeholder = {
+                    Text(
+                        text = if (Constant.canPostMessage()) {
+                            "輸入你想說的話..."
+                        } else {
+                            if(Constant.isBuffSilence()) {
+                                Constant.getChannelSilenceDesc()
+                            }
+                            else {
+                                "基本權限，無法與頻道成員互動"
+                            }
+                        },
+                        fontSize = 16.sp,
+                        color = LocalColor.current.inputText.input_30
+                    )
+                },
+                enabled = Constant.canPostMessage()
+            )
+
+            if (!Constant.canPostMessage()) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        showOnlyBasicPermissionTip.invoke()
+                    }
                 )
             }
-        )
+        }
 
-        if (isShowSend && Constant.MyChannelPermission.canPost == true) {
+        if (isShowSend && Constant.canPostMessage()) {
             IconButton(
                 onClick = {
                     onMessageSend.invoke(textState)
@@ -135,6 +163,7 @@ fun MessageInput(
 fun MessageInputPreview() {
     FanciTheme {
         MessageInput(
+            {},
             {},
             {}
         )

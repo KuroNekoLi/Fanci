@@ -11,13 +11,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.kolfanci.MainStateHolder
-import com.cmoney.kolfanci.MainViewModel
+import com.cmoney.kolfanci.ui.main.MainViewModel
 import com.cmoney.kolfanci.databinding.MyFragmentLayoutBinding
+import com.cmoney.kolfanci.ui.main.MainStateHolder
 import com.cmoney.kolfanci.ui.screens.TabItem
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
-import com.cmoney.kolfanci.ui.screens.my.MyCallback
-import com.cmoney.kolfanci.ui.screens.my.MyScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.UserInfoSettingScreen
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
@@ -116,6 +114,7 @@ fun MainNavHost(
                 TabItem.Follow -> {
                     composable(TabItem.Follow.route) {
                         FollowScreen(
+                            modifier = Modifier,
                             globalViewModel = globalViewModel,
                             navigator = navigator
                         )
@@ -142,15 +141,15 @@ fun MainNavHost(
                     }
                 }
                 TabItem.My -> {
-                    composable(TabItem.My.route) {
-                        MyScreen {
-                            when (it) {
-                                MyCallback.ChangeAvatar -> {
-                                    route.invoke(MainStateHolder.Route.UserInfo())
-                                }
-                            }
-                        }
-                    }
+//                    composable(TabItem.My.route) {
+//                        MyScreen {
+//                            when (it) {
+//                                MyCallback.ChangeAvatar -> {
+//                                    route.invoke(MainStateHolder.Route.UserInfo())
+//                                }
+//                            }
+//                        }
+//                    }
                 }
             }
         }

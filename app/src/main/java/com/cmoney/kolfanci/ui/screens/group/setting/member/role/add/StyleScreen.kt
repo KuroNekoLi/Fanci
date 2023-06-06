@@ -17,14 +17,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.kolfanci.MainActivity
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.showColorPickerDialogBottomSheet
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.socks.library.KLog
-import com.cmoney.kolfanci.R
+
 /**
  * 樣式 View
  */
@@ -93,7 +94,8 @@ fun StyleScreen(
                     fontSize = 16.sp,
                     color = LocalColor.current.text.default_30
                 )
-            }
+            },
+            enabled = Constant.isCanEditRole()
         )
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -135,7 +137,7 @@ fun StyleScreen(
             )
         }
 
-        if (showDelete && Constant.MyGroupPermission.deleteRole == true) {
+        if (showDelete && Constant.isCanDeleteRole()) {
             Spacer(modifier = Modifier.height(40.dp))
 
             Text(

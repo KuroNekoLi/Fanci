@@ -22,12 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.LocalDependencyContainer
-import com.cmoney.kolfanci.MainActivity
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.*
 import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.*
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -448,7 +449,11 @@ fun GroupSettingSettingView(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i(TAG, "theme click")
-                        navController.navigate(GroupSettingThemeScreenDestination())
+                        navController.navigate(
+                            GroupSettingThemeScreenDestination(
+                                group = group
+                            )
+                        )
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),
@@ -478,17 +483,19 @@ fun GroupSettingSettingView(
             Spacer(modifier = Modifier.weight(1f))
 
             //========== 解散社團 ==========
-            Box(
-                modifier = Modifier
-                    .height(50.dp)
-                    .fillMaxWidth()
-                    .background(LocalColor.current.background)
-                    .clickable {
-                        onDelectClick.invoke()
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "解散社團", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+            if (group.creatorId == Constant.MyInfo?.id) {
+                Box(
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth()
+                        .background(LocalColor.current.background)
+                        .clickable {
+                            onDelectClick.invoke()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "解散社團", fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+                }
             }
         }
     }

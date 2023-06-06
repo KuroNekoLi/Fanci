@@ -11,17 +11,18 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.kolfanci.LocalDependencyContainer
-import com.cmoney.kolfanci.destinations.GroupSettingThemePreviewScreenDestination
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.ui.destinations.GroupSettingThemePreviewScreenDestination
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -43,19 +44,33 @@ import org.koin.androidx.compose.koinViewModel
 fun GroupSettingThemeScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    isFromCreate: Boolean = false,
+    group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<String>,
     themeResult: ResultRecipient<GroupSettingThemePreviewScreenDestination, String>
 ) {
     val TAG = "GroupSettingThemeScreen"
+
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
+
     val state = viewModel.uiState
 
-    var groupParam = globalViewModel.uiState.currentGroup
+    var showConfirmDialog: GroupTheme? by remember {
+        mutableStateOf(null)
+    }
+
+    val currentGroup by globalViewModel.currentGroup.collectAsState()
+    var groupParam = currentGroup
+
     viewModel.uiState.settingGroup?.let {
         groupParam = it
         globalViewModel.setCurrentGroup(it)
+    }
+
+    val isFromCreate = group.id.isNullOrBlank()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchAllTheme(groupParam)
     }
 
     themeResult.onNavResult { result ->
@@ -79,20 +94,29 @@ fun GroupSettingThemeScreen(
         isFromCreate = isFromCreate,
         onThemeConfirmClick = {
             KLog.i(TAG, "on theme click.")
-            if (isFromCreate) {
-                val gson = Gson()
-                resultNavigator.navigateBack(gson.toJson(it))
-            }
-            else {
-                groupParam?.let {groupParam ->
-                    viewModel.changeTheme(groupParam, it)
-                }
-            }
+            showConfirmDialog = it
         }
     )
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchAllTheme(groupParam, isFromCreate)
+    showConfirmDialog?.let {
+        //如果是建立 直接確定並返回
+        if (isFromCreate) {
+            val gson = Gson()
+            resultNavigator.navigateBack(gson.toJson(it))
+        } else {
+            ChangeThemeDialogScreen(
+                groupTheme = it,
+                onDismiss = {
+                    showConfirmDialog = null
+                },
+                onConfirm = {
+                    showConfirmDialog = null
+                    groupParam?.let { groupParam ->
+                        viewModel.changeTheme(groupParam, it)
+                    }
+                }
+            )
+        }
     }
 }
 

@@ -21,7 +21,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 頻道的權限列表
  *
  * @param canRead 
  * @param canPost 

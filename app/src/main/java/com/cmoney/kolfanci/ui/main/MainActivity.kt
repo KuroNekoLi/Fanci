@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci
+package com.cmoney.kolfanci.ui.main
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -9,21 +9,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.key
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.cmoney.kolfanci.destinations.MainScreenDestination
-import com.cmoney.kolfanci.ui.MainNavHost
-import com.cmoney.kolfanci.ui.screens.BottomBarScreen
+import com.cmoney.kolfanci.ui.NavGraphs
+import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
+import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
 import com.cmoney.kolfanci.ui.screens.tutorial.TutorialScreen
+import com.cmoney.kolfanci.ui.theme.Black_242424
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.xlogin.base.BaseWebLoginActivity
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -45,12 +43,13 @@ class MainActivity : BaseWebLoginActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CompositionLocalProvider(LocalDependencyContainer provides this) {
-                val state = globalViewModel.uiState
-                val isOpenTutorial = globalViewModel.isOpenTutorial.observeAsState()
+                val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
 
-                isOpenTutorial.value?.let { isOpenTutorial ->
+                val theme by globalViewModel.theme.collectAsState()
+
+                isOpenTutorial?.let { isOpenTutorial ->
                     if (isOpenTutorial) {
-                        FanciTheme(fanciColor = state.theme) {
+                        FanciTheme(fanciColor = theme) {
                             val mainState = rememberMainState()
                             mainState.setStatusBarColor()
 
@@ -71,6 +70,10 @@ class MainActivity : BaseWebLoginActivity() {
                             }
                         }
                     } else {
+                        rememberSystemUiController().setStatusBarColor(
+                            color = Black_242424,
+                            darkIcons = false
+                        )
                         MaterialTheme {
                             TutorialScreen(
                                 modifier = Modifier.fillMaxWidth()
@@ -86,6 +89,7 @@ class MainActivity : BaseWebLoginActivity() {
 
     override fun autoLoginFailCallback() {
         KLog.i(TAG, "autoLoginFailCallback")
+        globalViewModel.startFetchFollowData()
     }
 
     override fun loginCancel() {
@@ -100,6 +104,7 @@ class MainActivity : BaseWebLoginActivity() {
         KLog.i(TAG, "loginSuccessCallback")
         globalViewModel.registerUser()
         globalViewModel.loginSuccess()
+        globalViewModel.startFetchFollowData()
     }
 }
 
@@ -111,28 +116,37 @@ fun MainScreen(
 ) {
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
     val mainNavController = rememberNavController()
-    val state = globalViewModel.uiState
+    val theme by globalViewModel.theme.collectAsState()
 
-    FanciTheme(fanciColor = state.theme) {
+    FanciTheme(fanciColor = theme) {
         val mainState = rememberMainState()
+        mainState.setStatusBarColor()
 
-        Scaffold(
-            bottomBar = {
-                BottomBarScreen(
-                    mainNavController
-                )
-            }
-        ) { innerPadding ->
-            mainState.setStatusBarColor()
-            MainNavHost(
-                modifier = Modifier.padding(innerPadding),
-                navController = mainNavController,
-                route = {
-                },
-                globalViewModel = globalViewModel,
-                navigator = navigator
-            )
-        }
+        FollowScreen(
+            modifier = Modifier,
+            globalViewModel = globalViewModel,
+            navigator = navigator
+        )
+
+        //TODO 暫時移除 Tab, 之後有新功能才會加回來.
+//        Scaffold(
+//            bottomBar = {
+//                BottomBarScreen(
+//                    mainNavController
+//                )
+//            }
+//        ) { innerPadding ->
+//            mainState.setStatusBarColor()
+//
+//            MainNavHost(
+//                modifier = Modifier.padding(innerPadding),
+//                navController = mainNavController,
+//                route = {
+//                },
+//                globalViewModel = globalViewModel,
+//                navigator = navigator
+//            )
+//        }
     }
 }
 

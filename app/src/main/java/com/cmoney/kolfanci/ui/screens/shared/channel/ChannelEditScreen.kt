@@ -30,7 +30,7 @@ fun ChannelEditScreen(
     category: Category,
     channelList: List<Channel>,
     onCategoryEdit: (Category) -> Unit,
-    onChanelEdit: (Channel) -> Unit,
+    onChanelEdit: (Category, Channel) -> Unit,
     onAddChannel: (Category) -> Unit
 ) {
     Column(
@@ -52,7 +52,7 @@ fun ChannelEditScreen(
                 }
             )
 
-            if (category.isDefault != true && Constant.isEditCategoryPermission()) {
+            if (category.isDefault != true && Constant.isEnterEditCategoryPermission()) {
                 Box(
                     modifier =
                     Modifier
@@ -77,8 +77,8 @@ fun ChannelEditScreen(
                 horizontalPadding = 0.dp,
                 isEditMode = true,
                 onClick = {
-                    if (Constant.isChannelEditPermission()) {
-                        onChanelEdit.invoke(it)
+                    if (Constant.isEnterChannelEditPermission()) {
+                        onChanelEdit.invoke(category, it)
                     }
                 }
             )
@@ -142,7 +142,7 @@ fun ChannelEditScreenPreview() {
                 )
             ),
             onCategoryEdit = {},
-            onChanelEdit = {},
+            onChanelEdit = {_,_ ->},
             onAddChannel = {}
         )
     }

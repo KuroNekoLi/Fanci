@@ -1,6 +1,9 @@
 package com.cmoney.kolfanci.ui.screens.my
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -13,11 +16,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.kolfanci.R
+
+/**
+ * 個人資訊 - 大頭貼/名稱
+ */
 @Composable
-fun MyInfoScreen(modifier: Modifier = Modifier) {
+fun MyInfoScreen(
+    modifier: Modifier = Modifier,
+    avatarUrl: String = "https://picsum.photos/300/300",
+    name: String
+) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -26,17 +37,13 @@ fun MyInfoScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(60.dp)
                 .clip(CircleShape),
-            model = "https://picsum.photos/300/300",
+            model = avatarUrl,
             placeholder = painterResource(id = R.drawable.placeholder),
             contentScale = ContentScale.Crop,
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(20.dp))
-        Column {
-            Text(text = "Emily Chen", fontSize = 17.sp, color = LocalColor.current.text.default_100)
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(text = "此頭像與暱稱為基本設定，你在不同社團的頭像與暱稱，皆可以自由更換。", fontSize = 12.sp, color = LocalColor.current.text.default_100)
-        }
+        Text(text = name, fontSize = 17.sp, color = LocalColor.current.text.default_100)
     }
 }
 
@@ -44,6 +51,8 @@ fun MyInfoScreen(modifier: Modifier = Modifier) {
 @Composable
 fun MyInfoScreenPreview() {
     FanciTheme {
-        MyInfoScreen()
+        MyInfoScreen(
+            name = "Test Name"
+        )
     }
 }

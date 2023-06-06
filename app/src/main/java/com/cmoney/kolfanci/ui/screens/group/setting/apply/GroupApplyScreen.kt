@@ -33,6 +33,7 @@ import com.cmoney.kolfanci.ui.screens.shared.CenterTopAppBar
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -132,7 +133,8 @@ private fun GroupApplyScreenView(
                     onSelectAllClick.invoke()
                 }
             )
-        }
+        },
+        backgroundColor = LocalColor.current.env_80
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             LazyColumn(
@@ -254,32 +256,9 @@ private fun ApplyQuestionItem(
                 color = LocalColor.current.text.default_50
             )
 
-            Box(
-                modifier = Modifier,
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(17.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (groupRequirementApplySelected.isSelected) {
-                                LocalColor.current.primary
-                            } else {
-                                Color.Transparent
-                            }
-                        )
-                )
-
-                Canvas(modifier = Modifier.size(57.dp)) {
-                    drawCircle(
-                        color = Color.White,
-                        radius = 30f,
-                        style = Stroke(width = 2.dp.toPx())
-                    )
-                }
-            }
-
+            CircleCheckedScreen(
+                isChecked = groupRequirementApplySelected.isSelected
+            )
         }
 
         groupRequirementApply.answers?.forEach { answer ->

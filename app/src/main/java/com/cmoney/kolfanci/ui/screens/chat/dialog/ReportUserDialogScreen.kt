@@ -19,11 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
-import com.cmoney.kolfanci.ui.theme.*
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
+import com.cmoney.kolfanci.ui.theme.*
 
 /**
  * 隱藏用戶 彈窗
@@ -136,38 +137,31 @@ fun ReportUserDialogScreen(
                             Spacer(modifier = Modifier.height(20.dp))
                         }
                     } else {
-                        Button(
+
+                        BorderButton(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
-                            border = BorderStroke(1.dp, LocalColor.current.text.default_100),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = LocalColor.current.env_80
-                            ),
-                            onClick = {
-                                dialogHeight.value = IntrinsicSize.Max
-                                showReason.value = true
-                            }) {
-                            Text(text = "確定檢舉", fontSize = 16.sp, color = Color_CB4A4A)
+                            text = "確定檢舉",
+                            textColor = LocalColor.current.specialColor.red,
+                            borderColor = LocalColor.current.text.default_50
+                        ) {
+                            dialogHeight.value = IntrinsicSize.Max
+                            showReason.value = true
+                            Unit
                         }
                         Spacer(modifier = Modifier.height(20.dp))
-                        Button(
+
+                        BorderButton(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
-                            border = BorderStroke(1.dp, LocalColor.current.text.default_100),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = LocalColor.current.env_80
-                            ),
-                            onClick = {
-                                openDialog.value = false
-                                onDismiss.invoke()
-                            }) {
-                            Text(
-                                text = "取消",
-                                fontSize = 16.sp,
-                                color = LocalColor.current.text.default_100
-                            )
+                            text = "取消",
+                            textColor = LocalColor.current.text.default_100,
+                            borderColor = LocalColor.current.text.default_50
+                        ) {
+                            openDialog.value = false
+                            onDismiss.invoke()
                         }
                     }
                 }

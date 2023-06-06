@@ -79,10 +79,11 @@ fun AddCategoryScreenView(
                 }
             )
         }
-    ) {
+    ) {padding ->
 
         Column(
             modifier = Modifier
+                .padding(padding)
                 .fillMaxSize()
                 .background(LocalColor.current.env_80)
         ) {

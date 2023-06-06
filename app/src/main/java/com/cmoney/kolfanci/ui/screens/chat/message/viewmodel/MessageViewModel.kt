@@ -17,6 +17,7 @@ import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
+import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomUiState
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
@@ -51,7 +52,8 @@ data class MessageUiState(
 class MessageViewModel(
     val context: Application,
     private val chatRoomUseCase: ChatRoomUseCase,
-    private val chatRoomPollUseCase: ChatRoomPollUseCase
+    private val chatRoomPollUseCase: ChatRoomPollUseCase,
+    private val permissionUseCase: PermissionUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
@@ -86,11 +88,76 @@ class MessageViewModel(
                     val newMessage = it.items?.map { chatMessage ->
                         ChatMessageWrapper(message = chatMessage)
                     }.orEmpty().reversed()
-                    processMessageCombine(newMessage, true)
+
+                    //檢查插入時間 bar
+                    val timeBarMessage = insertTimeBar(newMessage)
+
+                    processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
+                        defineMessageType(chatMessageWrapper)
+                    }, true)
                 }
             }
         }
     }
+
+    /**
+     *  檢查內容,是否有跨日期,並在跨日中間插入 time bar,
+     *  或是 內容不滿分頁大小(訊息太少), 也插入
+     */
+    private fun insertTimeBar(newMessage: List<ChatMessageWrapper>): List<ChatMessageWrapper> {
+        if (newMessage.isEmpty()) {
+            return newMessage
+        }
+
+        //依照日期 分群
+        val groupList = newMessage.groupBy {
+            val createTime = it.message.createUnixTime?.times(1000) ?: 0L
+            Utils.getTimeGroupByKey(createTime)
+        }
+
+        //大於2群, 找出跨日交界並插入time bar
+        return if (groupList.size > 1) {
+            val groupMessage = groupList.map {
+                val newList = it.value.toMutableList()
+                newList.add(generateTimeBar(it.value.first()))
+                newList
+            }.flatten().toMutableList()
+            groupMessage
+        } else {
+            val newList = newMessage.toMutableList()
+            val timeBarMessage = generateTimeBar(newMessage.first())
+            newList.add(timeBarMessage)
+            return newList
+        }
+    }
+
+    private fun generateTimeBar(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
+        return chatMessageWrapper.copy(
+            message = chatMessageWrapper.message.copy(
+                id = chatMessageWrapper.message.createUnixTime.toString()
+            ),
+            messageType = ChatMessageWrapper.MessageType.TimeBar
+        )
+    }
+
+    private fun defineMessageType(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
+        val messageType = if (chatMessageWrapper.isBlocking) {
+            ChatMessageWrapper.MessageType.Blocking
+        } else if (chatMessageWrapper.isBlocker) {
+            ChatMessageWrapper.MessageType.Blocker
+        } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
+            ChatMessageWrapper.MessageType.Delete
+        } else if (chatMessageWrapper.message.isDeleted == true) {
+            ChatMessageWrapper.MessageType.RecycleMessage
+        } else {
+            chatMessageWrapper.messageType
+        }
+
+        return chatMessageWrapper.copy(
+            messageType = messageType
+        )
+    }
+
 
     /**
      * 停止 Polling 聊天室 訊息
@@ -109,9 +176,6 @@ class MessageViewModel(
         newChatMessage: List<ChatMessageWrapper>,
         isLatest: Boolean = false
     ) {
-
-        //TODO pending message sort
-
         //combine old message
         val oldMessage = uiState.message.filter {
             !it.isPendingSendMessage
@@ -130,7 +194,13 @@ class MessageViewModel(
         oldMessage.addAll(0, pendingSendMessage)
 
         val distinctMessage = oldMessage.distinctBy { combineMessage ->
-            combineMessage.message.id
+
+            if (combineMessage.messageType == ChatMessageWrapper.MessageType.TimeBar) {
+                val createTime = combineMessage.message.createUnixTime?.times(1000) ?: 0L
+                Utils.getTimeGroupByKey(createTime)
+            } else {
+                combineMessage.message.id
+            }
         }
 
         uiState = uiState.copy(
@@ -411,35 +481,40 @@ class MessageViewModel(
             }, {
                 KLog.e(TAG, it)
 
-                //將發送失敗訊息 標註為Pending
-                uiState = uiState.copy(
-                    message = uiState.message.toMutableList().apply {
-                        add(
-                            0,
-                            ChatMessageWrapper(
-                                message = ChatMessage(
-                                    id = System.currentTimeMillis().toString(),
-                                    author = GroupMember(
-                                        name = XLoginHelper.nickName,
-                                        thumbNail = XLoginHelper.headImagePath
+                if (it.message?.contains("403") == true) {
+                    //檢查身上狀態
+                    checkChannelPermission(channelId)
+                } else {
+                    //將發送失敗訊息 標註為Pending
+                    uiState = uiState.copy(
+                        message = uiState.message.toMutableList().apply {
+                            add(
+                                0,
+                                ChatMessageWrapper(
+                                    message = ChatMessage(
+                                        id = System.currentTimeMillis().toString(),
+                                        author = GroupMember(
+                                            name = XLoginHelper.nickName,
+                                            thumbNail = XLoginHelper.headImagePath
+                                        ),
+                                        content = MediaIChatContent(
+                                            text = text
+                                        ),
+                                        createUnixTime = System.currentTimeMillis() / 1000,
+                                        replyMessage = uiState.replyMessage
                                     ),
-                                    content = MediaIChatContent(
-                                        text = text
-                                    ),
-                                    createUnixTime = System.currentTimeMillis() / 1000,
-                                    replyMessage = uiState.replyMessage
-                                ),
-                                uploadAttachPreview = images.map {
-                                    ChatRoomUiState.ImageAttachState(
-                                        uri = Uri.EMPTY,
-                                        serverUrl = it
-                                    )
-                                },
-                                isPendingSendMessage = true
+                                    uploadAttachPreview = images.map {
+                                        ChatRoomUiState.ImageAttachState(
+                                            uri = Uri.EMPTY,
+                                            serverUrl = it
+                                        )
+                                    },
+                                    isPendingSendMessage = true
+                                )
                             )
-                        )
-                    }
-                )
+                        }
+                    )
+                }
 
 
 //                //將發送失敗訊息放至Pending清單中
@@ -458,6 +533,20 @@ class MessageViewModel(
 //                        pendingSendMessage = pendingMessage
 //                    )
 //                )
+            })
+        }
+    }
+
+    /**
+     * 檢查 目前在此 channel permission 狀態, 並show tip
+     */
+    private fun checkChannelPermission(channelId: String) {
+        KLog.i(TAG, "checkChannelPermission:$channelId")
+        viewModelScope.launch {
+            permissionUseCase.updateChannelPermissionAndBuff(channelId = channelId).fold({
+                showPermissionTip()
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -839,5 +928,20 @@ class MessageViewModel(
         onDeleteReSend(message)
         messageSend(channelId = channelId, text = message.message.content?.text.orEmpty())
         onReSendDialogDismiss()
+    }
+
+    /**
+     * show 無法與頻道成員互動 tip
+     */
+    fun showPermissionTip() {
+        KLog.i(TAG, "showBasicPermissionTip")
+        uiState = uiState.copy(
+            snackBarMessage = CustomMessage(
+                textString = Constant.getChannelSilenceDesc(),
+                iconRes = R.drawable.minus_people,
+                iconColor = White_767A7F,
+                textColor = Color.White
+            )
+        )
     }
 }

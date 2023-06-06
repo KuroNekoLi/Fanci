@@ -24,7 +24,6 @@ import kotlinx.parcelize.Parcelize
  * 
  *
  * @param editGroup 
- * @param createOrEditApplyQuestions 
  * @param rearrangeChannelCategory 
  * @param setGroupPublicity 
  * @param createOrEditCategory 
@@ -47,9 +46,6 @@ data class GroupPermission (
 
     @Json(name = "editGroup")
     val editGroup: kotlin.Boolean? = null,
-
-    @Json(name = "createOrEditApplyQuestions")
-    val createOrEditApplyQuestions: kotlin.Boolean? = null,
 
     @Json(name = "rearrangeChannelCategory")
     val rearrangeChannelCategory: kotlin.Boolean? = null,

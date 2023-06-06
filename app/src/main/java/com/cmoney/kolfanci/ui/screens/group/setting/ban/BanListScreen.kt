@@ -11,6 +11,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,21 +23,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DisBanItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogDefaultContentScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DisBanDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.User
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
-import com.cmoney.kolfanci.R
 
 @Destination
 @Composable
@@ -68,27 +70,22 @@ fun BanListScreen(
 
     //解除禁言 彈窗
     if (showDisBanDialog.value.first) {
-        AlertDialogScreen(
+        val name = showDisBanDialog.value.second?.user?.name.orEmpty()
+
+        DisBanDialogScreen(
+            name = name,
             onDismiss = {
                 showDisBanDialog.value = Pair(false, null)
             },
-            title = showDisBanDialog.value.second?.user?.name + " 禁言中",
-        ) {
-            DisBanItemScreen(
-                onConfirm = {
-                    showDisBanDialog.value.second?.let {
-                        viewModel.liftBanUser(
-                            groupId = group.id.orEmpty(),
-                            userId = it.user?.id.orEmpty()
-                        )
-                    }
-                    showDisBanDialog.value = Pair(false, null)
-                },
-                onDismiss = {
-                    showDisBanDialog.value = Pair(false, null)
+            onConfirm = {
+                showDisBanDialog.value.second?.let {
+                    viewModel.liftBanUser(
+                        groupId = group.id.orEmpty(),
+                        userId = it.user?.id.orEmpty()
+                    )
                 }
-            )
-        }
+            }
+        )
     }
 }
 

@@ -21,6 +21,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.kolfanci.R
+
 /**
  * 社團角色 Item
  * @param index 排名第幾
@@ -58,7 +59,7 @@ fun RoleItemScreen(
                 ),
                 text = "NO.%d".format(index),
                 fontSize = 14.sp,
-                color = LocalColor.current.component.other
+                color = LocalColor.current.text.default_100
             )
         }
 
@@ -98,7 +99,12 @@ fun RoleItemScreen(
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = fanciRole.name.orEmpty(), fontSize = 16.sp, color = Color.White)
+            Text(
+                text = fanciRole.name.orEmpty(),
+                fontSize = 16.sp,
+                color = LocalColor.current.text.default_100
+            )
+
             Text(
                 text = "%d 位成員".format(fanciRole.userCount ?: 0),
                 fontSize = 12.sp,
@@ -109,15 +115,16 @@ fun RoleItemScreen(
         if (!isSortMode) {
             Text(
                 modifier = Modifier.padding(end = 24.dp),
-                text = editText, fontSize = 14.sp, color = LocalColor.current.primary
+                text = editText, fontSize = 14.sp,
+                color = LocalColor.current.primary
             )
-        }
-        else {
+        } else {
             Image(
                 modifier = Modifier.padding(end = 24.dp),
                 painter = painterResource(id = R.drawable.menu),
-                colorFilter = ColorFilter.tint(color = Blue_4F70E5),
-                contentDescription = null)
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary),
+                contentDescription = null
+            )
         }
     }
 }

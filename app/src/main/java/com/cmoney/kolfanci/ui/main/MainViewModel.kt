@@ -1,10 +1,8 @@
-package com.cmoney.kolfanci
+package com.cmoney.kolfanci.ui.main
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.model.Constant
@@ -13,63 +11,15 @@ import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UserUseCase
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
-import com.cmoney.kolfanci.ui.theme.FanciColor
-import com.cmoney.fanciapi.fanci.model.Category
-import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 sealed class ThemeSetting {
     object Default : ThemeSetting()
     object Coffee : ThemeSetting()
 }
-
-data class UiState(
-    val currentGroup: Group? = null, //目前選擇中的社團
-//    val theme: FanciColor = CoffeeThemeColor,
-    val theme: FanciColor = DefaultThemeColor,
-    val isLoginSuccess: Boolean = false,
-    val isFetchFollowData: Boolean = false,
-    val testCategory: List<Category> = listOf(
-        Category(
-            id = "1",
-            name = "Title1",
-            channels = listOf(
-                Channel(
-                    id = "1",
-                    name = "Channel1"
-                ),
-                Channel(
-                    id = "2",
-                    name = "Channel2"
-                ),
-                Channel(
-                    id = "3",
-                    name = "Channel3"
-                )
-            )
-        ),
-        Category(
-            id = "2",
-            name = "Title2",
-            channels = listOf(
-                Channel(
-                    id = "4",
-                    name = "Channel4"
-                ),
-                Channel(
-                    id = "5",
-                    name = "Channel5"
-                ),
-                Channel(
-                    id = "6",
-                    name = "Channel6"
-                )
-            )
-        )
-    )
-)
 
 class MainViewModel(
     private val userUseCase: UserUseCase,
@@ -80,17 +30,25 @@ class MainViewModel(
     ViewModel() {
     private val TAG = MainViewModel::class.java.simpleName
 
-    private val _isOpenTutorial = MutableLiveData<Boolean>()
-    val isOpenTutorial: LiveData<Boolean> = _isOpenTutorial
+    private val _fetchFollowData = MutableStateFlow(false)
+    val fetchFollowData: StateFlow<Boolean>
+        get() = _fetchFollowData
 
-    var uiState by mutableStateOf(UiState())
-        private set
+    private val _isOpenTutorial: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    val isOpenTutorial = _isOpenTutorial.asStateFlow()
+
+    private val _theme = MutableStateFlow(DefaultThemeColor)
+    val theme = _theme.asStateFlow()
+
+    private val _isLoginSuccess = MutableStateFlow(false)
+    val isLoginSuccess = _isLoginSuccess.asStateFlow()
+
+    private val _currentGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
+    val currentGroup = _currentGroup.asStateFlow()
 
     init {
         viewModelScope.launch {
-            settingsDataStore.isTutorial.collect {
-                _isOpenTutorial.value = it
-            }
+            _isOpenTutorial.value = settingsDataStore.isTutorial.first()
         }
     }
 
@@ -114,18 +72,14 @@ class MainViewModel(
      */
     fun setCurrentGroup(group: Group) {
         KLog.i(TAG, "setCurrentGroup")
-        if (group != uiState.currentGroup && group.id != null) {
+        if (group != _currentGroup.value && group.id != null) {
             KLog.i(TAG, "setCurrentGroup diff:$group")
             fetchGroupPermission(group)
-            uiState = uiState.copy(
-                currentGroup = group
-            )
+            _currentGroup.value = group
             viewModelScope.launch {
                 group.colorSchemeGroupKey?.apply {
                     themeUseCase.fetchThemeConfig(this).fold({
-                        uiState = uiState.copy(
-                            theme = it.theme
-                        )
+                        _theme.value = it.theme
                     }, {
                         KLog.e(TAG, it)
                     })
@@ -168,25 +122,18 @@ class MainViewModel(
      */
     fun loginSuccess() {
         KLog.i(TAG, "loginSuccess")
-        uiState = uiState.copy(
-            isLoginSuccess = true,
-            isFetchFollowData = true
-        )
+        _isLoginSuccess.value = true
     }
 
     /**
      * 執行完抓取社團資料
      */
     fun fetchFollowDataDone() {
-        uiState = uiState.copy(
-            isFetchFollowData = false
-        )
+        _fetchFollowData.value = false
     }
 
-    fun sortCallback(categoryList: List<Category>) {
-        uiState = uiState.copy(
-            testCategory = categoryList
-        )
+    fun startFetchFollowData() {
+        KLog.i(TAG, "startFetchFollowData")
+        _fetchFollowData.value = true
     }
-
 }

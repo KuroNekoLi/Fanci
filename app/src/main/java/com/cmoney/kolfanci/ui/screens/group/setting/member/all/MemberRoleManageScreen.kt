@@ -6,30 +6,31 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.kolfanci.destinations.ShareAddRoleScreenDestination
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.*
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -45,6 +46,10 @@ fun MemberRoleManageScreen(
 ) {
     val roleList = remember {
         mutableStateOf(groupMember.roleInfos.orEmpty())
+    }
+
+    var showSaveTip by remember {
+        mutableStateOf(false)
     }
 
     //Add role callback
@@ -79,12 +84,26 @@ fun MemberRoleManageScreen(
                 userId = groupMember.id.orEmpty(),
                 oldFanciRole = groupMember.roleInfos.orEmpty(),
                 newFanciRole = roleList.value
-            )
-            val gson = Gson()
+            ) {
+                val gson = Gson()
+                resultNavigator.navigateBack(
+                    gson.toJson(roleList.value)
+                )
+            }
+        },
+        onBack = {
+            showSaveTip = true
+        }
+    )
 
-            resultNavigator.navigateBack(
-                gson.toJson(roleList.value)
-            )
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navController.popBackStack()
         }
     )
 }
@@ -97,7 +116,8 @@ private fun MemberRoleManageScreenView(
     roleList: List<FanciRole>,
     group: Group,
     onRemove: (FanciRole) -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    onBack: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -112,7 +132,7 @@ private fun MemberRoleManageScreenView(
                 }
             )
         }
-    ) {padding ->
+    ) { padding ->
         Column(
             modifier = Modifier.padding(padding)
         ) {
@@ -203,7 +223,8 @@ fun MemberRoleManageScreenPreview() {
             ),
             roleList = listOf(),
             onRemove = {},
-            onSave = {}
+            onSave = {},
+            onBack = {}
         )
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,24 +20,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.MemberRoleManageScreenDestination
-import com.cmoney.kolfanci.extension.fromJsonTypeToken
-import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.common.CircleImage
-import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
-import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DisBanItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.KickOutItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
-import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.fromJsonTypeToken
+import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.common.CircleImage
+import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
+import com.cmoney.kolfanci.ui.destinations.MemberRoleManageScreenDestination
+import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
+import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.BanDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DisBanDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.KickOutDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
+import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -80,6 +82,10 @@ fun MemberManageScreen(
     val member = remember {
         mutableStateOf(groupMember)
     }
+
+    //再次確認禁言 彈窗
+    val showBanDoubleConfirmDialog: MutableState<BanPeriodOption?> =
+        remember { mutableStateOf(null) }
 
     //Add role callback
     setRoleResult.onNavResult { result ->
@@ -145,76 +151,57 @@ fun MemberManageScreen(
         )
     }
 
+    //==================== Dialog ====================
     //禁言 彈窗
     if (showBanDialog.value) {
-        AlertDialogScreen(
+        BanDialogScreen(
+            name = groupMember.name.orEmpty(),
             onDismiss = {
                 showBanDialog.value = false
             },
-            title = "禁言 " + groupMember.name,
-        ) {
-            BanDayItemScreen(
-                name = groupMember.name.orEmpty(),
-                onClick = {
-                    showBanDialog.value = false
-                    viewModel.banUser(
-                        groupId = group.id.orEmpty(),
-                        userId = groupMember.id.orEmpty(),
-                        banPeriodOption = it
-                    )
-                },
-                onDismiss = {
-                    showBanDialog.value = false
-                }
-            )
-        }
+            onConfirm = {
+                showBanDialog.value = false
+                viewModel.banUser(
+                    groupId = group.id.orEmpty(),
+                    userId = groupMember.id.orEmpty(),
+                    banPeriodOption = it
+                )
+            }
+        )
     }
 
     //解除禁言 彈窗
     if (showDisBanDialog.value) {
-        AlertDialogScreen(
+        DisBanDialogScreen(
+            name = groupMember.name.orEmpty(),
             onDismiss = {
                 showDisBanDialog.value = false
             },
-            title = groupMember.name + " 禁言中",
-        ) {
-            DisBanItemScreen(
-                onConfirm = {
-                    viewModel.liftBanUser(
-                        groupId = group.id.orEmpty(),
-                        userId = groupMember.id.orEmpty()
-                    )
-                    showDisBanDialog.value = false
-                },
-                onDismiss = {
-                    showDisBanDialog.value = false
-                }
-            )
-        }
+            onConfirm = {
+                showDisBanDialog.value = false
+                viewModel.liftBanUser(
+                    groupId = group.id.orEmpty(),
+                    userId = groupMember.id.orEmpty()
+                )
+            }
+        )
     }
 
     //踢出社團 彈窗
     if (showKickOutDialog.value) {
-        AlertDialogScreen(
+        KickOutDialogScreen(
+            name = groupMember.name.orEmpty(),
             onDismiss = {
                 showKickOutDialog.value = false
             },
-            title = "將 " + groupMember.name + " 踢出社團",
-        ) {
-            KickOutItemScreen(
-                name = groupMember.name.orEmpty(),
-                onConfirm = {
-                    viewModel.kickOutMember(
-                        groupId = group.id.orEmpty(),
-                        groupMember
-                    )
-                    showKickOutDialog.value = false
-                },
-                onDismiss = {
-                    showKickOutDialog.value = false
-                }
-            )
-        }
+            onConfirm = {
+                showKickOutDialog.value = false
+                viewModel.kickOutMember(
+                    groupId = group.id.orEmpty(),
+                    groupMember
+                )
+            }
+        )
     }
 }
 
@@ -243,7 +230,7 @@ private fun MemberManageScreenView(
                 }
             )
         }
-    ) {padding ->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -326,62 +313,65 @@ private fun MemberManageScreenView(
             }
 
             //編輯角色 按鈕
-            BorderButton(
-                modifier = Modifier
-                    .padding(
-                        top = 20.dp,
-                        start = 24.dp,
-                        end = 24.dp
-                    )
-                    .fillMaxWidth()
-                    .height(45.dp),
-                text = "編輯角色",
-                borderColor = LocalColor.current.text.default_50,
-                textColor = LocalColor.current.text.default_100,
-                onClick = {
-                    navController.navigate(
-                        MemberRoleManageScreenDestination(
-                            group = group,
-                            groupMember = groupMember
+            if (Constant.isCanEditRole()) {
+                BorderButton(
+                    modifier = Modifier
+                        .padding(
+                            top = 20.dp,
+                            start = 24.dp,
+                            end = 24.dp
                         )
-                    )
-                }
-            )
-
-            //權限管理
-            Text(
-                modifier = Modifier.padding(top = 40.dp, start = 24.dp, bottom = 10.dp),
-                text = "權限管理", fontSize = 14.sp, color = LocalColor.current.text.default_80
-            )
-
-            //禁言
-            if (banInfo == null) {
-                BanItem(
-                    banTitle = "禁言「%s」".format(groupMember.name),
-                    desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
-                ) {
-                    onBanClick.invoke()
-                }
-            }
-            else {
-                BanInfo(
-                    banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
-                    banStartDay = banInfo.startDay,
-                    banDuration = banInfo.duration,
+                        .fillMaxWidth()
+                        .height(45.dp),
+                    text = "編輯角色",
+                    borderColor = LocalColor.current.text.default_50,
+                    textColor = LocalColor.current.text.default_100,
                     onClick = {
-                        onDisBanClick.invoke()
+                        navController.navigate(
+                            MemberRoleManageScreenDestination(
+                                group = group,
+                                groupMember = groupMember
+                            )
+                        )
                     }
                 )
             }
 
-            Spacer(modifier = Modifier.height(1.dp))
+            //權限管理
+            if (Constant.isCanBanKickMember()) {
+                Text(
+                    modifier = Modifier.padding(top = 40.dp, start = 24.dp, bottom = 10.dp),
+                    text = "權限管理", fontSize = 14.sp, color = LocalColor.current.text.default_80
+                )
 
-            //踢出社團
-            BanItem(
-                banTitle = "將「%s」踢出社團".format(groupMember.name),
-                desc = "讓 %s 離開社團".format(groupMember.name)
-            ) {
-                onKickClick.invoke()
+                //禁言
+                if (banInfo == null) {
+                    BanItem(
+                        banTitle = "禁言「%s」".format(groupMember.name),
+                        desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
+                    ) {
+                        onBanClick.invoke()
+                    }
+                } else {
+                    BanInfo(
+                        banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
+                        banStartDay = banInfo.startDay,
+                        banDuration = banInfo.duration,
+                        onClick = {
+                            onDisBanClick.invoke()
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(1.dp))
+
+                //踢出社團
+                BanItem(
+                    banTitle = "將「%s」踢出社團".format(groupMember.name),
+                    desc = "讓 %s 離開社團".format(groupMember.name)
+                ) {
+                    onKickClick.invoke()
+                }
             }
         }
 
@@ -409,10 +399,12 @@ private fun BanItem(banTitle: String, desc: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun BanInfo(banTitle: String,
-                    banStartDay: String,
-                    banDuration: String,
-                    onClick: () -> Unit) {
+private fun BanInfo(
+    banTitle: String,
+    banStartDay: String,
+    banDuration: String,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -426,9 +418,17 @@ private fun BanInfo(banTitle: String,
         Column(modifier = Modifier.weight(1f)) {
             Text(text = banTitle, fontSize = 16.sp, color = LocalColor.current.text.default_100)
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = "被禁言日：%s".format(banStartDay), fontSize = 12.sp, color = LocalColor.current.text.default_80)
+            Text(
+                text = "被禁言日：%s".format(banStartDay),
+                fontSize = 12.sp,
+                color = LocalColor.current.text.default_80
+            )
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = "禁言時長：%s".format(banDuration), fontSize = 12.sp, color = LocalColor.current.text.default_80)
+            Text(
+                text = "禁言時長：%s".format(banDuration),
+                fontSize = 12.sp,
+                color = LocalColor.current.text.default_80
+            )
             Spacer(modifier = Modifier.height(10.dp))
         }
 

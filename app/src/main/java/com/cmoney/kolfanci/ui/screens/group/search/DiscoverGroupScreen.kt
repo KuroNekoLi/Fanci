@@ -23,12 +23,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.LocalDependencyContainer
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.ApplyForGroupScreenDestination
-import com.cmoney.kolfanci.destinations.CreateGroupScreenDestination
-import com.cmoney.kolfanci.destinations.MainScreenDestination
 import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
+import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen

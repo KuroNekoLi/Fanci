@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci
+package com.cmoney.kolfanci.ui.main
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable

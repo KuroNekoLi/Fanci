@@ -6,24 +6,35 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabService" />
+        </intent>
+    </queries>
+
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Fanci"
-        android:name=".MyApplication"
-        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.SplashActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Fanci">
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,23 +56,21 @@
                 android:resource="@xml/fileprovider" />
         </provider>
 
-        <activity android:name="com.cmoney.member.application.view.CMoneyLoginActivity"
+        <activity
+            android:name="com.cmoney.member.application.view.CMoneyLoginActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:host="auth" android:scheme="@string/app_client_id" />
+
+                <data
+                    android:host="auth"
+                    android:scheme="@string/app_client_id" />
             </intent-filter>
         </activity>
-
     </application>
-
-    <queries>
-        <intent>
-            <action android:name="android.support.customtabs.action.CustomTabService" />
-        </intent>
-    </queries>
 
 </manifest>

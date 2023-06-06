@@ -6,7 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,18 +18,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.FanciDefaultCoverScreenDestination
 import com.cmoney.kolfanci.ui.common.TransparentButton
+import com.cmoney.kolfanci.ui.destinations.FanciDefaultCoverScreenDestination
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.state.GroupSettingSettingState
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.state.rememberGroupSettingSettingState
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -51,6 +52,10 @@ fun GroupSettingBackgroundScreen(
 ) {
     val state = viewModel.uiState
 
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
+
     fanciCoverResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -67,9 +72,24 @@ fun GroupSettingBackgroundScreen(
         navController,
         isLoading = viewModel.uiState.isLoading,
         group = state.settingGroup ?: group,
-    ) {
-        resultNavigator.navigateBack(it)
-    }
+        onImageChange = {
+            resultNavigator.navigateBack(it)
+        },
+        onBack = {
+            showSaveTip = true
+        }
+    )
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navController.popBackStack()
+        }
+    )
 
 //    LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
 //        if (viewModel.uiState.isGroupSettingPop) {
@@ -86,7 +106,8 @@ fun GroupSettingBackgroundView(
     group: Group,
     state: GroupSettingSettingState = rememberGroupSettingSettingState(),
     isLoading: Boolean,
-    onImageChange: (ImageChangeData) -> Unit
+    onImageChange: (ImageChangeData) -> Unit,
+    onBack: () -> Unit
 ) {
     val TAG = "GroupSettingAvatarView"
     val configuration = LocalConfiguration.current
@@ -102,9 +123,7 @@ fun GroupSettingBackgroundView(
                 moreEnable = false,
                 moreClick = {
                 },
-                backClick = {
-                    navController.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { innerPadding ->
@@ -238,7 +257,9 @@ fun GroupSettingBackgroundPreview() {
         GroupSettingBackgroundView(
             navController = EmptyDestinationsNavigator,
             group = Group(),
-            isLoading = true
-        ) {}
+            isLoading = true,
+            onImageChange = {},
+            onBack = {}
+        )
     }
 }

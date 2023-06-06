@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.follow
 
-import android.content.Intent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableState
@@ -30,16 +29,20 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.MainActivity
-import com.cmoney.kolfanci.MainViewModel
+import com.cmoney.kolfanci.ui.main.MainViewModel
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.ChatRoomScreenDestination
-import com.cmoney.kolfanci.destinations.DiscoverGroupScreenDestination
-import com.cmoney.kolfanci.destinations.GroupSettingScreenDestination
-import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.ChatRoomScreenDestination
+import com.cmoney.kolfanci.ui.destinations.DiscoverGroupScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
+import com.cmoney.kolfanci.ui.destinations.MyScreenDestination
+import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -53,12 +56,18 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun FollowScreen(
+    modifier: Modifier,
     globalViewModel: MainViewModel,
     navigator: DestinationsNavigator,
     viewModel: FollowViewModel = koinViewModel(),
-    mainViewModel: MainViewModel = koinViewModel()
+    chatRoomViewModel: ChatRoomViewModel = koinViewModel(),
+    firstInitData: MutableState<Boolean> = remember {
+        mutableStateOf(true)
+    }
 ) {
     val uiState = viewModel.uiState
+    val chatRoomUiState = chatRoomViewModel.uiState
+
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val scrollableState = rememberScrollableState {
@@ -66,32 +75,63 @@ fun FollowScreen(
         it
     }
 
-    /**
-     * 抓取資料時機點,
-     * 登入成功後觸發一次
-     * 還未登入
-     */
-    fun triggerFetchGroup(): Boolean {
-        return (globalViewModel.uiState.isFetchFollowData) || (!XLoginHelper.isLogin && uiState.firstFetchData)
+    val fetchDataState = globalViewModel.fetchFollowData.collectAsState()
+
+    if (fetchDataState.value) {
+        viewModel.fetchMyGroup()
+        globalViewModel.fetchFollowDataDone()
     }
 
-//    LaunchedEffect(Unit) {
-//        viewModel.fetchMyGroup()
-//    }
+    val group by globalViewModel.currentGroup.collectAsState()
 
-    if (triggerFetchGroup()) {
-        viewModel.fetchMyGroup()
-        if (XLoginHelper.isLogin) {
-            globalViewModel.fetchFollowDataDone()
+    if (group == null && uiState.myGroupList.isNotEmpty()) {
+        uiState.myGroupList.find {
+            it.isSelected
+        }?.groupModel?.apply {
+            globalViewModel.setCurrentGroup(this)
+            firstInitData.value = false
         }
     }
 
-    val group = uiState.myGroupList.find {
-        it.isSelected
-    }?.groupModel
+    //禁止進入頻道彈窗
+    val openDialog = remember { mutableStateOf(false) }
 
-    group?.let {
-        mainViewModel.setCurrentGroup(it)
+    //點擊channel權限檢查完
+    chatRoomUiState.enterChannel?.let { channel ->
+        if (Constant.canReadMessage()) {
+            navigator.navigate(
+                ChatRoomScreenDestination(
+                    channelId = channel.id.orEmpty(),
+                    channelTitle = channel.name.orEmpty()
+                )
+            )
+        } else {
+            //禁止進入該頻道,show dialog
+            openDialog.value = true
+        }
+        chatRoomViewModel.resetChannel()
+    }
+
+    if (openDialog.value) {
+        DialogScreen(
+            onDismiss = { openDialog.value = false },
+            titleIconRes = R.drawable.minus_people,
+            title = "不具有此頻道的權限",
+            subTitle = "這是個上了鎖的頻道，你目前沒有權限能夠進入喔！"
+        ) {
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "返回",
+                borderColor = LocalColor.current.text.default_50,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                run {
+                    openDialog.value = false
+                }
+            }
+        }
     }
 
     FollowScreenView(
@@ -110,7 +150,10 @@ fun FollowScreen(
         lazyColumnAtTop = {
             viewModel.lazyColumnAtTop()
         },
-        isLoading = uiState.isLoading
+        isLoading = uiState.isLoading,
+        onChannelClick = {
+            chatRoomViewModel.fetchChannelPermission(it)
+        }
     )
 }
 
@@ -129,7 +172,8 @@ fun FollowScreenView(
     lazyColumnScrollEnabled: Boolean,
     onGroupItemClick: (GroupItem) -> Unit,
     lazyColumnAtTop: () -> Unit,
-    isLoading: Boolean
+    isLoading: Boolean,
+    onChannelClick: (Channel) -> Unit
 ) {
     val TAG = "FollowScreenView"
 
@@ -137,8 +181,6 @@ fun FollowScreenView(
 
     val scaffoldState: ScaffoldState =
         rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
-
-    val context = LocalContext.current
 
     val lazyListState = rememberLazyListState()
 
@@ -176,12 +218,8 @@ fun FollowScreenView(
                             )
                         )
                     },
-                    onLogout = {
-                        XLoginHelper.logOut(context)
-                        val intent = Intent(context, MainActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        context.findActivity().finish()
-                        context.startActivity(intent)
+                    onProfile = {
+                        navigator.navigate(MyScreenDestination)
                     }
                 )
             }
@@ -325,12 +363,7 @@ fun FollowScreenView(
                                     items(group.categories.orEmpty()) { category ->
                                         CategoryScreen(category = category) { channel ->
                                             KLog.i(TAG, "Category click:$channel")
-                                            navigator.navigate(
-                                                ChatRoomScreenDestination(
-                                                    channelId = channel.id.orEmpty(),
-                                                    channelTitle = channel.name.orEmpty()
-                                                )
-                                            )
+                                            onChannelClick.invoke(channel)
                                         }
                                     }
                                 }
@@ -419,7 +452,8 @@ fun FollowScreenPreview() {
             lazyColumnScrollEnabled = true,
             onGroupItemClick = {},
             lazyColumnAtTop = {},
-            isLoading = true
+            isLoading = true,
+            onChannelClick = {}
         )
     }
 }

@@ -1,13 +1,15 @@
 package com.cmoney.kolfanci.ui.screens.group.search.apply
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -23,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.IGroupRequirementQuestion
@@ -33,6 +34,7 @@ import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.search.apply.viewmodel.ApplyForGroupViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -87,18 +89,61 @@ fun ApplyForGroupScreen(
         resultBackNavigator.navigateBack(result = true)
     }
 
-    if (uiState.warning.isNotEmpty()) {
-        TipDialog(
-            title = uiState.warning,
-            isBackClick = uiState.isFromBackCheck,
+    //未完成 Dialog
+    if (uiState.notComplete) {
+        DialogScreen(
+            title = "尚有題目未完成",
+            subTitle = "題目未完成前，無法送出邀請。",
+            titleIconRes = R.drawable.edit,
             onDismiss = {
                 viewModel.dismissWarning()
-            },
-            onForceClose = {
-                navigator.popBackStack()
+            }) {
+            BlueButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "繼續"
+            ) {
+                viewModel.dismissWarning()
             }
-        )
+        }
     }
+
+    //未送出 Dialog
+    if (uiState.notSend) {
+        DialogScreen(
+            title = "答案未送出",
+            subTitle = "你的答案沒有送出喔！",
+            titleIconRes = R.drawable.edit,
+            onDismiss = {
+                viewModel.dismissWarning()
+            }) {
+            Column {
+                BlueButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = "繼續作答"
+                ) {
+                    viewModel.dismissWarning()
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = "取消並返回",
+                    borderColor = LocalColor.current.text.default_100
+                ) {
+                    navigator.popBackStack()
+                    Unit
+                }
+            }
+        }
+    }
+
 
     if (uiState.isPopupBack) {
         navigator.popBackStack()
@@ -248,70 +293,70 @@ private fun ApplyForGroupScreenView(
     }
 }
 
-@Composable
-private fun TipDialog(
-    title: String,
-    isBackClick: Boolean,
-    onDismiss: () -> Unit,
-    onForceClose: () -> Unit
-) {
-    Dialog(onDismissRequest = { onDismiss.invoke() }) {
-        Surface(
-            modifier = Modifier,
-            shape = RoundedCornerShape(16.dp),
-            color = LocalColor.current.env_80
-        ) {
-            Box(
-                modifier = Modifier.padding(20.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(id = android.R.drawable.ic_menu_edit),
-                            contentDescription = null
-                        )
-
-                        Spacer(modifier = Modifier.width(9.dp))
-
-                        Text(
-                            text = title,
-                            fontSize = 19.sp,
-                            color = LocalColor.current.text.default_100
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    BlueButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        text = "繼續作答",
-                        onClick = {
-                            onDismiss.invoke()
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    if (isBackClick) {
-                        BorderButton(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                            text = "取消作答",
-                            borderColor = LocalColor.current.text.default_50,
-                            textColor = LocalColor.current.text.default_100
-                        ) {
-                            onForceClose.invoke()
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//private fun TipDialog(
+//    title: String,
+//    isBackClick: Boolean,
+//    onDismiss: () -> Unit,
+//    onForceClose: () -> Unit
+//) {
+//    Dialog(onDismissRequest = { onDismiss.invoke() }) {
+//        Surface(
+//            modifier = Modifier,
+//            shape = RoundedCornerShape(16.dp),
+//            color = LocalColor.current.env_80
+//        ) {
+//            Box(
+//                modifier = Modifier.padding(20.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Column {
+//                    Row(verticalAlignment = Alignment.CenterVertically) {
+//                        Image(
+//                            painter = painterResource(id = android.R.drawable.ic_menu_edit),
+//                            contentDescription = null
+//                        )
+//
+//                        Spacer(modifier = Modifier.width(9.dp))
+//
+//                        Text(
+//                            text = title,
+//                            fontSize = 19.sp,
+//                            color = LocalColor.current.text.default_100
+//                        )
+//                    }
+//
+//                    Spacer(modifier = Modifier.height(20.dp))
+//
+//                    BlueButton(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(50.dp),
+//                        text = "繼續作答",
+//                        onClick = {
+//                            onDismiss.invoke()
+//                        }
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(20.dp))
+//
+//                    if (isBackClick) {
+//                        BorderButton(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .height(50.dp),
+//                            text = "取消作答",
+//                            borderColor = LocalColor.current.text.default_50,
+//                            textColor = LocalColor.current.text.default_100
+//                        ) {
+//                            onForceClose.invoke()
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 @Preview(showBackground = true)

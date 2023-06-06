@@ -2,14 +2,13 @@ package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar
 
 import android.net.Uri
 import android.os.Parcelable
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,14 +18,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.destinations.FanciDefaultAvatarScreenDestination
 import com.cmoney.kolfanci.ui.common.TransparentButton
+import com.cmoney.kolfanci.ui.destinations.FanciDefaultAvatarScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -60,6 +59,10 @@ fun GroupSettingAvatarScreen(
 
     val uiState = groupSettingAvatarViewModel.uiState
 
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
+
     fanciAvatarResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -67,6 +70,7 @@ fun GroupSettingAvatarScreen(
             is NavResult.Value -> {
                 val fanciUrl = result.value
                 viewModel.onGroupAvatarSelect(fanciUrl, group)
+                groupSettingAvatarViewModel.resetCameraUri()
             }
         }
     }
@@ -84,6 +88,9 @@ fun GroupSettingAvatarScreen(
         },
         openCameraDialog = {
             groupSettingAvatarViewModel.openCameraDialog()
+        },
+        onBack = {
+            showSaveTip = true
         }
     )
 
@@ -101,6 +108,17 @@ fun GroupSettingAvatarScreen(
             }
         )
     }
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navController.popBackStack()
+        }
+    )
 }
 
 @Composable
@@ -111,7 +129,8 @@ fun GroupSettingAvatarView(
     isLoading: Boolean,
     onImageChange: (ImageChangeData) -> Unit,
     avatarImage: Uri?,
-    openCameraDialog: () -> Unit
+    openCameraDialog: () -> Unit,
+    onBack: () -> Unit
 ) {
     val TAG = "GroupSettingAvatarView"
     Scaffold(
@@ -124,9 +143,7 @@ fun GroupSettingAvatarView(
                 moreEnable = false,
                 moreClick = {
                 },
-                backClick = {
-                    navController.popBackStack()
-                }
+                backClick = onBack
             )
         }
     ) { innerPadding ->
@@ -229,7 +246,8 @@ fun GroupSettingAvatarScreenPreview() {
             isLoading = true,
             onImageChange = {},
             avatarImage = null,
-            openCameraDialog = {}
+            openCameraDialog = {},
+            onBack = {}
         )
     }
 }

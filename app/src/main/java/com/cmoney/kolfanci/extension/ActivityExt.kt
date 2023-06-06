@@ -3,16 +3,13 @@ package com.cmoney.kolfanci.extension
 import android.app.Activity
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.kolfanci.MainActivity
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.BottomSheetWrapper
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.ColorPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.InteractBottomSheet
@@ -31,7 +28,7 @@ fun Activity.showInteractDialogBottomSheet(
         viewGroup.addView(
             ComposeView(viewGroup.context).apply {
                 setContent {
-                    val theme = globalViewModel.uiState.theme
+                    val theme by globalViewModel.theme.collectAsState()
                     FanciTheme(fanciColor = theme) {
                         InteractBottomSheet(viewGroup, this, message, onInteractClick)
                     }
@@ -54,7 +51,7 @@ fun Activity.showColorPickerDialogBottomSheet(
         viewGroup.addView(
             ComposeView(viewGroup.context).apply {
                 setContent {
-                    val theme = globalViewModel.uiState.theme
+                    val theme by globalViewModel.theme.collectAsState()
                     FanciTheme(fanciColor = theme) {
                         ColorPickerBottomSheet(viewGroup, this, selectedColor, onColorPicker)
                     }

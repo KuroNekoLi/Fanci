@@ -14,7 +14,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.lang.reflect.Type
 
 data class UiState(
@@ -24,7 +27,7 @@ data class UiState(
     val tabSelected: Int = 0,
     val memberList: List<GroupMember> = emptyList(), //assign 成員
     val addRoleComplete: Boolean = false,   //新增角色 完成
-    val addRoleError: String = "",          //新增角色 錯誤
+    val addRoleError: Pair<String, String>? = null,          //新增角色 錯誤
     val roleName: String = "",              //角色名稱
     val roleColor: Color = Color(),         //角色顏色
     val fanciRoleCallback: FanciRoleCallback? = null, // 新增 or 刪除 角色
@@ -46,17 +49,24 @@ class RoleManageViewModel(
     var uiState by mutableStateOf(UiState())
         private set
 
+    private val _loading = MutableStateFlow(false)
+    val loading = _loading.asStateFlow()
+
     private var isEdited = false    //是否已經初始化編輯資料
     private var editFanciRole: FanciRole? = null  //要編輯的角色
     private var editMemberList: List<GroupMember> = emptyList() //編輯模式下原本的成員清單
 
     private fun showLoading() {
+        _loading.value = true
+
         uiState = uiState.copy(
             loading = true
         )
     }
 
     private fun dismissLoading() {
+        _loading.value = false
+
         uiState = uiState.copy(
             loading = false
         )
@@ -170,11 +180,13 @@ class RoleManageViewModel(
     fun onConfirmAddRole(group: Group) {
         KLog.i(TAG, "onConfirmAddRole")
         viewModelScope.launch {
+            showLoading()
             val name = uiState.roleName
             if (name.isEmpty()) {
                 uiState = uiState.copy(
-                    addRoleError = "請輸入名稱"
+                    addRoleError = Pair("角色名稱空白", "角色名稱不可以是空白的唷！")
                 )
+                dismissLoading()
                 return@launch
             }
             val permissionIds = uiState.permissionSelected.toList().filter {
@@ -201,15 +213,22 @@ class RoleManageViewModel(
                     colorCode = uiState.roleColor
                 ).fold({
                 }, {
+                    dismissLoading()
                     KLog.e(TAG, it)
                     if (it is EmptyBodyException) {
                         assignMemberRole(group.id.orEmpty(), editFanciRole!!)
-
                     } else {
-                        // TODO: 判斷server error type
-                        uiState = uiState.copy(
-                            addRoleError = "已有相同名稱的角色"
-                        )
+                        //Conflict error
+                        if (it is HttpException) {
+                            if ((it as HttpException).code() == 409) {
+                                uiState = uiState.copy(
+                                    addRoleError = Pair(
+                                        "角色名稱重複", "名稱「%s」與現有角色重複\n".format(name) +
+                                                "請修改後再次儲存！"
+                                    )
+                                )
+                            }
+                        }
                     }
                 })
             }
@@ -222,9 +241,20 @@ class RoleManageViewModel(
                     colorCode = uiState.roleColor
                 ).fold({
                     KLog.i(TAG, it)
+                    dismissLoading()
                     assignMemberRole(group.id.orEmpty(), it)
                 }, {
                     KLog.e(TAG, it)
+                    dismissLoading()
+                    //Conflict error
+                    if ((it as HttpException).code() == 409) {
+                        uiState = uiState.copy(
+                            addRoleError = Pair(
+                                "角色名稱重複", "名稱「%s」與現有角色重複\n".format(name) +
+                                        "請修改後再次儲存！"
+                            )
+                        )
+                    }
                 })
             }
         }
@@ -255,7 +285,7 @@ class RoleManageViewModel(
                             fanciRoleCallback = FanciRoleCallback(
                                 fanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
                             ),
-                            addRoleError = "",
+                            addRoleError = null,
                             addRoleComplete = true
                         )
                     }, {
@@ -280,11 +310,19 @@ class RoleManageViewModel(
                                 fanciRoleCallback = FanciRoleCallback(
                                     fanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
                                 ),
-                                addRoleError = "",
+                                addRoleError = null,
                                 addRoleComplete = true
                             )
                         }
                     })
+                } else {
+                    uiState = uiState.copy(
+                        fanciRoleCallback = FanciRoleCallback(
+                            fanciRole = fanciRole
+                        ),
+                        addRoleError = null,
+                        addRoleComplete = true
+                    )
                 }
             } else {
                 //將原本清單的人員都移除
@@ -306,7 +344,7 @@ class RoleManageViewModel(
                     fanciRoleCallback = FanciRoleCallback(
                         fanciRole = fanciRole
                     ),
-                    addRoleError = "",
+                    addRoleError = null,
                     addRoleComplete = true
                 )
             }
@@ -318,7 +356,7 @@ class RoleManageViewModel(
      */
     fun errorShowDone() {
         uiState = uiState.copy(
-            addRoleError = ""
+            addRoleError = null,
         )
     }
 

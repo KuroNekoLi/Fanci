@@ -2,10 +2,8 @@ package com.cmoney.kolfanci.ui.screens.shared.dialog
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.FileProvider
 import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -28,15 +25,16 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.socks.library.KLog
-import java.io.File
 
 /**
  * 群組設定選擇圖片 彈窗
+ * @param isShowFanciPic 是否呈現Fanci 預設圖庫
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GroupPhotoPickDialogScreen(
     modifier: Modifier = Modifier,
+    isShowFanciPic: Boolean = true,
     onDismiss: () -> Unit,
     onAttach: (Uri) -> Unit,
     onFanciClick: () -> Unit
@@ -130,7 +128,11 @@ fun GroupPhotoPickDialogScreen(
 
                 GrayButton(
                     text = "打開相機",
-                    shape = RoundedCornerShape(0.dp)
+                    shape = if (isShowFanciPic) {
+                        RoundedCornerShape(0.dp)
+                    } else {
+                        RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                    }
                 ) {
                     if (cameraPermissionState.status.isGranted) {
                         startCameraPicker()
@@ -139,12 +141,15 @@ fun GroupPhotoPickDialogScreen(
                     }
                 }
 
-                GrayButton(
-                    text = "從Fanci圖庫中選取圖片",
-                    shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
-                ) {
-                    onFanciClick.invoke()
+                if (isShowFanciPic) {
+                    GrayButton(
+                        text = "從Fanci圖庫中選取圖片",
+                        shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                    ) {
+                        onFanciClick.invoke()
+                    }
                 }
+
 
                 Spacer(modifier = Modifier.height(20.dp))
 

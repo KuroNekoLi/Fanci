@@ -15,19 +15,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.cmoney.kolfanci.LocalDependencyContainer
-import com.cmoney.kolfanci.destinations.*
+import com.cmoney.fanciapi.fanci.model.Category
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
+import com.cmoney.kolfanci.ui.destinations.*
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.channel.ChannelEditScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Category
-import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -48,7 +48,6 @@ fun ChannelSettingScreen(
     viewModel: ChannelSettingViewModel = koinViewModel(),
     setChannelResult: ResultRecipient<AddChannelScreenDestination, Group>,
     setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>,
-    setEditChannelResult: ResultRecipient<EditChannelScreenDestination, Group>,
     setEditCategoryResult: ResultRecipient<EditCategoryScreenDestination, Group>,
     sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>,
     sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
@@ -85,16 +84,6 @@ fun ChannelSettingScreen(
     }
 
     setEditCategoryResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-
-    setEditChannelResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
@@ -237,12 +226,13 @@ fun ChannelSettingScreenView(
                             )
                         )
                     },
-                    onChanelEdit = {
-                        KLog.i(TAG, "onChanelEdit:$it")
+                    onChanelEdit = { category, channel ->
+                        KLog.i(TAG, "onChanelEdit:$channel")
                         navigator.navigate(
-                            EditChannelScreenDestination(
+                            AddChannelScreenDestination(
                                 group = group,
-                                channel = it
+                                category = category,
+                                channel = channel
                             )
                         )
                     },

@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.di
 
-import com.cmoney.kolfanci.MainViewModel
+import com.cmoney.kolfanci.ui.main.MainViewModel
+import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
@@ -16,6 +17,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleMa
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -23,11 +25,15 @@ import org.koin.dsl.module
 val viewModule = module {
     viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { FollowViewModel(get()) }
-    viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
-    viewModel { MessageViewModel(get(), get(), get()) }
+    viewModel { ChatRoomViewModel(get(), get(), get(), get(), get()) }
+    viewModel { MessageViewModel(androidApplication(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get()) }
     viewModel { GroupSettingViewModel(get(), get(), get()) }
-    viewModel { ChannelSettingViewModel(get(), get(), get()) }
+
+    viewModel {
+        ChannelSettingViewModel(get(), get())
+    }
+
     viewModel { RoleManageViewModel(get(), get()) }
     viewModel { MemberViewModel(get(), get()) }
     viewModel { BanListViewModel(get()) }
@@ -52,5 +58,11 @@ val viewModule = module {
     }
     viewModel {
         GroupSettingAvatarViewModel()
+    }
+    viewModel {
+        RoleViewModel(get(), get(), get())
+    }
+    viewModel {
+        UserViewModel(androidApplication())
     }
 }

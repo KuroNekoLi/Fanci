@@ -11,9 +11,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.kolfanci.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
@@ -49,13 +49,8 @@ fun ChatRoomScreen(
 
     KLog.i(TAG, "channelId:$channelId")
 
-    //抓取在頻道的權限
-    viewModel.fetchChannelPermission(channelId)
-
-    if (uiState.startPolling && Constant.MyChannelPermission.canRead == true) {
+    if (Constant.canReadMessage()) {
         messageViewModel.startPolling(channelId)
-    } else {
-        KLog.i(TAG, "channelId:$channelId can't read.")
     }
 
     //抓取 公告
@@ -113,6 +108,9 @@ fun ChatRoomScreen(
         },
         onAttach = {
             messageViewModel.attachImage(it)
+        },
+        showOnlyBasicPermissionTip = {
+            messageViewModel.showPermissionTip()
         },
         snackBarMessage = messageViewModel.uiState.snackBarMessage,
         onSnackBarDismiss = {
@@ -185,6 +183,7 @@ private fun ChatRoomScreenView(
     onDeleteAttach: (Uri) -> Unit,
     onMessageSend: (text: String) -> Unit,
     onAttach: (Uri) -> Unit,
+    showOnlyBasicPermissionTip: () -> Unit,
     snackBarMessage: CustomMessage?,
     onSnackBarDismiss: () -> Unit
 ) {
@@ -246,7 +245,8 @@ private fun ChatRoomScreenView(
                 },
                 onAttach = {
                     onAttach.invoke(it)
-                }
+                },
+                showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
             )
         }
 
@@ -277,6 +277,7 @@ fun ChatRoomScreenPreview() {
             onDeleteAttach = {},
             onMessageSend = {},
             onAttach = {},
+            showOnlyBasicPermissionTip = {},
             snackBarMessage = null,
             onSnackBarDismiss = {}
         )

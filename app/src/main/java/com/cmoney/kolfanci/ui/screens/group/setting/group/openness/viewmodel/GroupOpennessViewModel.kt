@@ -9,6 +9,8 @@ import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 data class UiState(
@@ -16,7 +18,7 @@ data class UiState(
     val isNeedApproval: Boolean = true,
     val isEditMode: Boolean = false,
     val orgQuestion: String = "",
-    val saveComplete: Boolean = false,
+//    val saveComplete: Boolean = false,
     val isFirstFetchQuestion: Boolean = true
 
 )
@@ -26,6 +28,9 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
 
     var uiState by mutableStateOf(UiState())
         private set
+
+    private val _saveComplete = MutableSharedFlow<Boolean>()
+    val saveComplete = _saveComplete.asSharedFlow()
 
     init {
         uiState = uiState.copy(
@@ -127,7 +132,7 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
      * @param group 社團
      */
     fun onSave(group: Group) {
-        KLog.i(TAG, "onSave:$uiState")
+        KLog.i(TAG, "onSave:$group")
         val groupId = group.id.orEmpty()
         viewModelScope.launch {
             //公開 or 不公開
@@ -148,15 +153,16 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
                             groupId = groupId,
                             question = questionList
                         ).fold({
-                            uiState = uiState.copy(saveComplete = true)
+                            _saveComplete.emit(true)
                         }, {
                             KLog.e(TAG, it)
                         })
                     } else {
-                        uiState = uiState.copy(saveComplete = true)
+                        _saveComplete.emit(true)
                     }
                 } else {
                     KLog.e(TAG, it)
+                    _saveComplete.emit(false)
                 }
             })
         }

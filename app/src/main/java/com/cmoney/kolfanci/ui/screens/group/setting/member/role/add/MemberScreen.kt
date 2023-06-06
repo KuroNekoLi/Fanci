@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.cmoney.kolfanci.destinations.AddMemberScreenDestination
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -28,6 +27,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
+
 @Composable
 fun MemberScreen(
     modifier: Modifier = Modifier,
@@ -39,7 +40,7 @@ fun MemberScreen(
     val TAG = "MemberScreen"
 
     Column(modifier = modifier.fillMaxSize()) {
-        if (Constant.MyGroupPermission.assignRole == true) {
+        if (Constant.isCanEditRole()) {
             BorderButton(
                 modifier = Modifier
                     .background(LocalColor.current.env_80)
@@ -50,7 +51,8 @@ fun MemberScreen(
             ) {
                 navigator.navigate(
                     AddMemberScreenDestination(
-                        group = group
+                        group = group,
+                        excludeMember = memberList.toTypedArray()
                     )
                 )
             }

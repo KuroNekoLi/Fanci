@@ -5,14 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,18 +21,19 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.LocalDependencyContainer
-import com.cmoney.kolfanci.destinations.*
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.ui.destinations.*
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
-import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.TipDialog
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.gson.Gson
@@ -43,6 +43,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -63,7 +64,6 @@ fun CreateGroupScreen(
     setThemeResult: ResultRecipient<GroupSettingThemeScreenDestination, String>
 ) {
     val TAG = "CreateGroupScreen"
-    val uiState = viewModel.uiState
     val approvalUiState = groupOpennessViewModel.uiState
 
     val globalViewModel = LocalDependencyContainer.current.globalViewModel
@@ -71,12 +71,23 @@ fun CreateGroupScreen(
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
+
+    val currentStep by viewModel.currentStep.collectAsState()
+    val settingGroup by viewModel.group.collectAsState()
+    val fanciColor by viewModel.fanciColor.collectAsState()
+    val isShowLoading by viewModel.loading.collectAsState()
 
     CreateGroupScreenView(
         navController = navigator,
         modifier = modifier,
-        uiState = uiState,
+        settingGroup = settingGroup,
+        fanciColor = fanciColor,
+        currentStep = currentStep,
         approvalUiState = approvalUiState,
+        isShowLoading = isShowLoading,
         question = approvalUiState.groupQuestionList.orEmpty(),
         onGroupName = {
             KLog.i(TAG, "onGroupName:$it")
@@ -96,11 +107,10 @@ fun CreateGroupScreen(
             showEditDialog.value = Pair(true, it)
         },
         onNextStep = {
-            if (uiState.currentStep == viewModel.finalStep) {
-                viewModel.createGroup {
-                    groupOpennessViewModel.onSave(it)
-                }
-
+            if (currentStep == viewModel.finalStep) {
+                viewModel.createGroup(
+                    isNeedApproval = groupOpennessViewModel.uiState.isNeedApproval
+                )
             } else {
                 viewModel.nextStep()
             }
@@ -108,7 +118,27 @@ fun CreateGroupScreen(
         onPreStep = {
             viewModel.preStep()
         }
+    ) {
+        showSaveTip = true
+    }
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navigator.popBackStack()
+        }
     )
+
+    //建立社團完成
+    LaunchedEffect(Unit) {
+        viewModel.createComplete.collect {
+            groupOpennessViewModel.onSave(it)
+        }
+    }
 
     //不公開 提示
     if (showDialog.value) {
@@ -150,9 +180,13 @@ fun CreateGroupScreen(
     }
 
     //錯誤提示
-    if (uiState.warningText.isNotEmpty()) {
-        LocalContext.current.showToast(uiState.warningText)
-        viewModel.resetWarning()
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.warningText.collect { warningText ->
+            if (warningText.isNotEmpty()) {
+                context.showToast(warningText)
+            }
+        }
     }
 
     //新增 題目 callback
@@ -215,32 +249,43 @@ fun CreateGroupScreen(
     /**
      * 建立完成, 回到首頁並顯示所建立群組
      */
-    if (approvalUiState.saveComplete) {
-        uiState.createdGroup?.let {
-            globalViewModel.setCurrentGroup(it)
-            navigator.popBackStack(
-                route = MainScreenDestination,
-                inclusive = false
-            )
-        } ?: run {
-            navigator.popBackStack()
+
+    LaunchedEffect(Unit) {
+        groupOpennessViewModel.saveComplete.collect { saveComplete ->
+            if (saveComplete) {
+                globalViewModel.setCurrentGroup(settingGroup)
+
+                globalViewModel.startFetchFollowData()
+
+                navigator.popBackStack(
+                    route = MainScreenDestination,
+                    inclusive = false
+                )
+            } else {
+                viewModel.dismissLoading()
+            }
         }
     }
+
 }
 
 @Composable
 private fun CreateGroupScreenView(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
-    uiState: UiState,
+    settingGroup: Group,
+    fanciColor: FanciColor?,
+    currentStep: Int,
     approvalUiState: com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.UiState,
     question: List<String>,
+    isShowLoading: Boolean,
     onGroupName: (String) -> Unit,
     onSwitchApprove: (Boolean) -> Unit,
     onAddQuestion: () -> Unit,
     onEditClick: (String) -> Unit,
     onNextStep: () -> Unit,
-    onPreStep: () -> Unit
+    onPreStep: () -> Unit,
+    onBack: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -254,93 +299,102 @@ private fun CreateGroupScreenView(
                 moreClick = {
                 },
                 backClick = {
-                    navController.popBackStack()
+                    onBack.invoke()
                 }
             )
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
+                .padding(padding)
                 .fillMaxSize()
                 .background(LocalColor.current.env_80)
         ) {
-            Text(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 25.dp),
-                text = "馬上就能擁有你自己的社團囉！",
-                fontSize = 17.sp,
-                color = LocalColor.current.text.default_80,
-                textAlign = TextAlign.Center
-            )
+                    .fillMaxSize()
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 25.dp),
+                    text = "馬上就能擁有你自己的社團囉！",
+                    fontSize = 17.sp,
+                    color = LocalColor.current.text.default_80,
+                    textAlign = TextAlign.Center
+                )
 
-            StepProgressBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 30.dp),
-                numberOfSteps = 3,
-                currentStep = uiState.currentStep,
-                titleList = listOf("名稱", "權限", "佈置")
-            )
+                StepProgressBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 30.dp),
+                    numberOfSteps = 3,
+                    currentStep = currentStep,
+                    titleList = listOf("名稱", "權限", "佈置")
+                )
 
-            when (uiState.currentStep) {
-                //step 1.
-                1 -> {
-                    Step1Screen(
-                        uiState.groupName
-                    ) {
-                        onGroupName.invoke(it)
+                when (currentStep) {
+                    //step 1.
+                    1 -> {
+                        Step1Screen(
+                            settingGroup.name.orEmpty()
+                        ) {
+                            onGroupName.invoke(it)
+                        }
+                    }
+                    //step 2.
+                    2 -> {
+                        Step2Screen(
+                            question = question,
+                            isNeedApproval = approvalUiState.isNeedApproval,
+                            onSwitchApprove = onSwitchApprove,
+                            onAddQuestion = onAddQuestion,
+                            onEditClick = onEditClick,
+                            onNext = onNextStep,
+                            onPre = onPreStep
+                        )
+                    }
+                    //step 3.
+                    3 -> {
+                        Step3Screen(
+                            groupIcon = settingGroup.thumbnailImageUrl.orEmpty(),
+                            groupBackground = settingGroup.coverImageUrl.orEmpty(),
+                            fanciColor = fanciColor,
+                            onChangeIcon = {
+                                navController.navigate(
+                                    GroupSettingAvatarScreenDestination(
+                                        group = settingGroup
+                                    )
+                                )
+                            },
+                            onChangeBackground = {
+                                navController.navigate(
+                                    GroupSettingBackgroundScreenDestination(
+                                        group = settingGroup
+                                    )
+                                )
+                            },
+                            onThemeChange = {
+                                navController.navigate(
+                                    GroupSettingThemeScreenDestination(
+                                        group = settingGroup
+                                    )
+                                )
+                            },
+                            onPre = onPreStep,
+                            onNext = onNextStep
+                        )
                     }
                 }
-                //step 2.
-                2 -> {
-                    Step2Screen(
-                        question = question,
-                        isNeedApproval = approvalUiState.isNeedApproval,
-                        onSwitchApprove = onSwitchApprove,
-                        onAddQuestion = onAddQuestion,
-                        onEditClick = onEditClick,
-                        onNext = onNextStep,
-                        onPre = onPreStep
-                    )
-                }
-                //step 3.
-                3 -> {
-                    Step3Screen(
-                        groupIcon = uiState.groupIcon,
-                        groupBackground = uiState.groupBackground,
-                        themeColor = uiState.groupTheme,
-                        onChangeIcon = {
-                            navController.navigate(
-                                GroupSettingAvatarScreenDestination(
-                                    group = Group(
-                                        thumbnailImageUrl = uiState.groupIcon,
-                                        coverImageUrl = uiState.groupBackground
-                                    )
-                                )
-                            )
-                        },
-                        onChangeBackground = {
-                            navController.navigate(
-                                GroupSettingBackgroundScreenDestination(
-                                    group = Group(
-                                        thumbnailImageUrl = uiState.groupIcon,
-                                        coverImageUrl = uiState.groupBackground
-                                    )
-                                )
-                            )
-                        },
-                        onThemeChange = {
-                            navController.navigate(
-                                GroupSettingThemeScreenDestination(
-                                    isFromCreate = true
-                                )
-                            )
-                        },
-                        onPre = onPreStep,
-                        onNext = onNextStep
-                    )
-                }
+            }
+
+            if (isShowLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(45.dp)
+                        .align(Alignment.Center),
+                    color = LocalColor.current.primary
+                )
             }
         }
     }
@@ -448,17 +502,18 @@ fun CreateGroupScreenPreview() {
     FanciTheme {
         CreateGroupScreenView(
             navController = EmptyDestinationsNavigator,
-            uiState = UiState(
-                currentStep = 1
-            ),
+            settingGroup = Group(),
+            fanciColor = null,
+            currentStep = 1,
             approvalUiState = com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.UiState(),
+            question = emptyList(),
+            isShowLoading = false,
             onGroupName = {},
             onSwitchApprove = {},
             onAddQuestion = {},
-            question = emptyList(),
             onEditClick = {},
             onNextStep = {},
             onPreStep = {}
-        )
+        ) {}
     }
 }

@@ -28,7 +28,6 @@ fun RolePermissionScreen(
             text = "社團編輯", fontSize = 14.sp, color = LocalColor.current.text.default_100
         )
 
-        //todo
         Row(
             modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
         ) {

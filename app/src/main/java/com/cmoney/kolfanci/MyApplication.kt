@@ -53,7 +53,7 @@ class MyApplication : XLoginApplication() {
             clientId = getString(R.string.app_client_id)
             platform = Platform.Android
             appVersion = BuildConfig.VERSION_NAME
-            domainUrl = getString(R.string.cm_server_url)
+            domainUrl = BuildConfig.CM_SERVER_URL
         }
 
         // 根據需求設定是否紀錄API
@@ -72,7 +72,7 @@ class MyApplication : XLoginApplication() {
         ) { backend2Setting ->
             backend2Setting.appId = resources.getInteger(R.integer.app_id)
             backend2Setting.clientId = getString(R.string.app_client_id)
-            backend2Setting.domainUrl = getString(R.string.cm_server_url)
+            backend2Setting.domainUrl = BuildConfig.CM_SERVER_URL
             backend2Setting.platform = com.cmoney.backend2.base.model.setting.Platform.Android
         }
 

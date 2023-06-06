@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="shapeAppearanceCircle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="shapeAppearance9DpCorner">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">9dp</item>
+    </style>
+
+    <style name="shapeAppearance24DpCorner">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24dp</item>
+    </style>
+
+    <style name="tabLayout_style" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+</resources>

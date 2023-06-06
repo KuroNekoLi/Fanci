@@ -17,7 +17,7 @@ android {
         minSdk 24
         targetSdk 33
         versionCode 1
-        versionName "1.0.0.2"
+        versionName "1.0.2.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -38,14 +38,16 @@ android {
             minifyEnabled false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            resValue 'string', 'cm_server_url', '"https://www.cmoney.tw/"'
+            buildConfigField "String", "CM_SERVER_URL", '"https://www.cmoney.tw/"'
+            buildConfigField "String", "FANCI_SERVER_URL", '"https://fanci.cmoney.tw/"'
         }
 
         debug {
             debuggable true
             applicationIdSuffix = '.debug'
             versionNameSuffix '-debug'
-            resValue 'string', 'cm_server_url', '"https://outpost.cmoney.tw/"'
+            buildConfigField "String", "CM_SERVER_URL", '"https://outpost.cmoney.tw/"'
+            buildConfigField "String", "FANCI_SERVER_URL", '"http://34.80.212.140/fanci/"'
         }
     }
 
@@ -108,7 +110,6 @@ dependencies {
     implementation "com.google.accompanist:accompanist-pager:0.27.0"
     implementation "com.google.accompanist:accompanist-pager-indicators:0.27.0"
 
-
     //==================== Coil ====================
     implementation("io.coil-kt:coil-compose:2.2.2")
 
@@ -118,10 +119,12 @@ dependencies {
     //=============== CMoney ===============
     implementation 'com.cmoney.analytics:analytics-user:5.1.0'
     implementation project(path: ':fancyapi')
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     releaseImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
     debugImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
 
-    implementation('com.cmoney.xlab:login:1.2.5')
+    implementation('com.cmoney.xlab:login:1.2.7')
     implementation('com.cmoney.xlab:imagelibrary:1.0.6')
     implementation('com.cmoney.xlab:ratingview:1.1.8') { // 導入模組
         exclude group: 'androidx.constraintlayout', module: 'constraintlayout'
@@ -159,6 +162,23 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-perf-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
+
+    //=============== hyperion ===============
+    def hyperion_version = "0.9.37"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-core:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-attr:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-build-config:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-crash:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-disk:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-geiger-counter:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-measurement:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-phoenix:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-recorder:$hyperion_version"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-shared-preferences:$hyperion_version"
+
+    //=============== image viewer ===============
+    implementation 'com.github.stfalcon-studio:StfalconImageViewer:v1.0.1'
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
