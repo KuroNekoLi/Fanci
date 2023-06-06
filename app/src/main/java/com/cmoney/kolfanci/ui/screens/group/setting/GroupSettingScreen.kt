@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,14 +32,16 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.model.Constant.isShowApproval
 import com.cmoney.kolfanci.model.Constant.isShowGroupManage
+import com.cmoney.kolfanci.model.Constant.isShowVipManager
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
+import com.cmoney.kolfanci.ui.destinations.VipManagerScreenDestination
 import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
+import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -46,6 +49,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -167,6 +171,8 @@ fun GroupSettingScreenView(
     onInviteClick: () -> Unit,
     loading: Boolean
 ) {
+    val TAG = "GroupSettingScreenView"
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -226,6 +232,20 @@ fun GroupSettingScreenView(
 
             Spacer(modifier = Modifier.height(28.dp))
 
+            //VIP 方案管理
+            if (isShowVipManager()) {
+                VipPlanManager {
+                    KLog.i(TAG, "VipPlanManager click.")
+                    navController.navigate(
+                        VipManagerScreenDestination(
+                            group = group
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
             //秩序管理
             if (isShowApproval()) {
                 GroupRuleManageScreen(
@@ -235,6 +255,29 @@ fun GroupSettingScreenView(
                 )
             }
         }
+    }
+}
+
+/**
+ * Vip 方案管理
+ */
+@Composable
+private fun VipPlanManager(
+    onVipManagerClick: () -> Unit
+) {
+    Column {
+        Text(
+            modifier = Modifier.padding(start = 25.dp, bottom = 9.dp),
+            text = stringResource(id = R.string.vip_manager),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
+        )
+
+        SettingItemScreen(
+            iconRes = R.drawable.vip_crown,
+            text = stringResource(id = R.string.vip_manager),
+            onItemClick = onVipManagerClick
+        )
     }
 }
 

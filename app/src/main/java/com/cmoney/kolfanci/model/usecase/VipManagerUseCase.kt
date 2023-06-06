@@ -1,0 +1,36 @@
+package com.cmoney.kolfanci.model.usecase
+
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
+
+class VipManagerUseCase {
+
+    companion object {
+        fun getVipPlanMockData() = listOf(
+            VipPlanModel(
+                name = "高級學員",
+                memberCount = 10
+            ),
+            VipPlanModel(
+                name = "進階學員",
+                memberCount = 5
+            ),
+            VipPlanModel(
+                name = "初階學員",
+                memberCount = 0
+            )
+        )
+    }
+
+    /**
+     * 取得 vip 方案清單
+     *
+     * @param group 社團
+     */
+    fun getVipPlan(group: Group) = kotlin.runCatching {
+//            emptyList<VipPlanModel>()
+        //TODO wait server api
+        getVipPlanMockData()
+    }
+
+}

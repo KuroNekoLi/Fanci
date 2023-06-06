@@ -53,6 +53,12 @@ object Constant {
     var MyChannelBuff: UserBuffInformation = UserBuffInformation()
 
 
+    //TODO 等server 新增
+    /**
+     * 是否可以管理 vip 方案
+     */
+    fun isShowVipManager(): Boolean = true
+
     /**
      * 是否可以管理 加入申請
      */

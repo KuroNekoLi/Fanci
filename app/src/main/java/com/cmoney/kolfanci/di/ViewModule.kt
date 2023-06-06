@@ -18,6 +18,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.Gro
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
@@ -89,5 +90,11 @@ val viewModule = module {
     }
     viewModel {
         GroupViewModel(get(), get(), get())
+    }
+    viewModel { params ->
+        VipManagerViewModel(
+            group = params.get(),
+            vipManagerUseCase = get()
+        )
     }
 }
