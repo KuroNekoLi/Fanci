@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.model.usecase
 
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 
 class VipManagerUseCase {
@@ -20,6 +21,16 @@ class VipManagerUseCase {
                 memberCount = 0
             )
         )
+
+        fun getVipPlanInfoMockData() = VipPlanInfoModel(
+            name = "高級學員",
+            memberCount = 10,
+            planSourceDescList = listOf(
+                "・30元訂閱促銷方案",
+                "・99元月訂閱方案"
+            ),
+            members = emptyList()
+        )
     }
 
     /**
@@ -31,6 +42,16 @@ class VipManagerUseCase {
 //            emptyList<VipPlanModel>()
         //TODO wait server api
         getVipPlanMockData()
+    }
+
+
+    /**
+     * 取得該 vip 方案 詳細資訊
+     *
+     * @param vipPlanModel 選擇的方案
+     */
+    fun getVipPlanInfo(vipPlanModel: VipPlanModel) = kotlin.runCatching {
+        getVipPlanInfoMockData()
     }
 
 }

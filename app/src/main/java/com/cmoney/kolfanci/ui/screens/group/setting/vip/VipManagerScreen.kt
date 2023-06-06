@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
+import com.cmoney.kolfanci.ui.destinations.VipPlanInfoMainScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -56,12 +57,23 @@ fun VipManagerScreen(
         }
     )
 ) {
+    val TAG = "VipManagerScreen"
+
     val vipPlanList by viewModel.vipPlanList.collectAsState()
 
     VipManagerScreenView(
         modifier = modifier,
         navController = navController,
-        vipPlanList = vipPlanList
+        vipPlanList = vipPlanList,
+        onPlanClick = { vipPlan ->
+            KLog.i(TAG, "onPlanClick:$vipPlan")
+            navController.navigate(
+                VipPlanInfoMainScreenDestination(
+                    group = group,
+                    vipPlanModel = vipPlan
+                )
+            )
+        }
     )
 
     LaunchedEffect(Unit) {
@@ -73,7 +85,8 @@ fun VipManagerScreen(
 fun VipManagerScreenView(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    vipPlanList: List<VipPlanModel>
+    vipPlanList: List<VipPlanModel>,
+    onPlanClick: (VipPlanModel) -> Unit
 ) {
     val TAG = "VipManagerScreenView"
 
@@ -118,11 +131,7 @@ fun VipManagerScreenView(
                     items(vipPlanList) { plan ->
                         VipPlanScreen(
                             vipPlanModel = plan,
-                            onPlanClick = {
-                                KLog.i(TAG, "onPlanClick:$plan")
-                                //TODO navigate plan info page
-                                
-                            }
+                            onPlanClick = onPlanClick
                         )
                     }
                 }
@@ -163,7 +172,8 @@ fun VipManagerScreenPreview() {
     FanciTheme {
         VipManagerScreenView(
             navController = EmptyDestinationsNavigator,
-            vipPlanList = VipManagerUseCase.getVipPlanMockData()
+            vipPlanList = VipManagerUseCase.getVipPlanMockData(),
+            onPlanClick = {}
         )
     }
 }

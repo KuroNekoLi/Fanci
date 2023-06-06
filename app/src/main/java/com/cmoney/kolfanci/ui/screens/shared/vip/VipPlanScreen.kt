@@ -40,7 +40,7 @@ fun VipPlanScreen(
             .fillMaxWidth()
             .background(LocalColor.current.background)
             .clickable {
-
+                onPlanClick.invoke(vipPlanModel)
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
