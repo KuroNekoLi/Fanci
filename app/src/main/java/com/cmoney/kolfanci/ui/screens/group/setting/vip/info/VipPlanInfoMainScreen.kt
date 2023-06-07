@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
@@ -29,6 +30,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -167,7 +169,9 @@ private fun VipPlanInfoMainScreenView(
 
                 //成員
                 VipManagerViewModel.VipManageTabKind.MEMBER -> {
-                    TODO()
+                    VipMemberPage(
+                        members = vipPlanInfo.members
+                    )
                 }
             }
         }
@@ -189,7 +193,6 @@ private fun VipInfoPage(
     Column {
         Text(
             modifier = Modifier.padding(
-                top = 20.dp,
                 bottom = 20.dp,
                 start = 24.dp,
                 end = 24.dp
@@ -238,6 +241,52 @@ private fun VipInfoPage(
     }
 }
 
+/**
+ * 成員頁面
+ *
+ * @param members 會員清單
+ */
+@Composable
+private fun VipMemberPage(
+    members: List<GroupMember>
+) {
+    Column {
+        Text(
+            modifier = Modifier.padding(
+                bottom = 20.dp,
+                start = 24.dp,
+                end = 24.dp
+            ),
+            text = stringResource(id = R.string.vip_member_description),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_50
+        )
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            items(members) { member ->
+                MemberItemScreen(
+                    groupMember = member,
+                    isShowRemove = false,
+                )
+            }
+
+        }
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun VipMemberPagePreview() {
+    FanciTheme {
+        VipMemberPage(
+            members = VipManagerUseCase.getVipPlanInfoMockData().members
+        )
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -245,7 +294,7 @@ fun VipPlanInfoScreenPreview() {
     FanciTheme {
         VipPlanInfoMainScreenView(
             navController = EmptyDestinationsNavigator,
-            selectedTab = VipManagerViewModel.VipManageTabKind.INFO,
+            selectedTab = VipManagerViewModel.VipManageTabKind.MEMBER,
             vipPlanInfo = VipManagerUseCase.getVipPlanInfoMockData(),
             onTabSelected = {
             }

@@ -53,7 +53,11 @@ data class GroupMember (
 
     /* 角色資訊(全部) */
     @Json(name = "roleInfos")
-    val roleInfos: kotlin.collections.List<FanciRole>? = null
+    val roleInfos: kotlin.collections.List<FanciRole>? = null,
+
+    /* 是否為vip 用戶 */
+    @Json(name = "isVip")
+    val isVip: kotlin.Boolean = false
 
 ) : Parcelable
 
