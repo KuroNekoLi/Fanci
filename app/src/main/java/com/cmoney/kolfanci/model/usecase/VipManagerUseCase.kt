@@ -3,65 +3,14 @@ package com.cmoney.kolfanci.model.usecase
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionOptionModel
+import kotlin.random.Random
 
 class VipManagerUseCase {
-
-    companion object {
-        fun getVipPlanMockData() = listOf(
-            VipPlanModel(
-                name = "高級學員",
-                memberCount = 10
-            ),
-            VipPlanModel(
-                name = "進階學員",
-                memberCount = 5
-            ),
-            VipPlanModel(
-                name = "初階學員",
-                memberCount = 0
-            )
-        )
-
-        fun getVipPlanInfoMockData() = VipPlanInfoModel(
-            name = "高級學員",
-            memberCount = 10,
-            planSourceDescList = listOf(
-                "・30元訂閱促銷方案",
-                "・99元月訂閱方案"
-            ),
-            members = emptyList()
-        )
-
-        fun getVipPlanPermissionOptionsMockData(): List<VipPlanPermissionOptionModel> {
-            return listOf(
-                VipPlanPermissionOptionModel(
-                    name = "無權限",
-                    description = "不可進入此頻道",
-                    authType = "none"
-                ),
-                VipPlanPermissionOptionModel(
-                    name = "基本權限",
-                    description = "可以進入此頻道，並且瀏覽",
-                    authType = "basic"
-                ),
-                VipPlanPermissionOptionModel(
-                    name = "中階權限",
-                    description = "可以進入此頻道，並在貼文留言",
-                    authType = "middle"
-                ),
-                VipPlanPermissionOptionModel(
-                    name = "進階權限",
-                    description = "可以進入此頻道，可以聊天、發文與留言",
-                    authType = "advanced"
-                )
-            )
-        }
-    }
-
     /**
      * 取得 vip 方案清單
      *
@@ -75,12 +24,18 @@ class VipManagerUseCase {
 
 
     /**
-     * 取得該 vip 方案 詳細資訊
+     * 取得該 vip 方案 詳細資訊, 過濾掉非vip 的成員
      *
      * @param vipPlanModel 選擇的方案
      */
     fun getVipPlanInfo(vipPlanModel: VipPlanModel) = kotlin.runCatching {
-        getVipPlanInfoMockData()
+        val mockData = getVipPlanInfoMockData()
+        val filterPlanModel = mockData.copy(
+            members = mockData.members.filter {
+                it.isVip
+            }
+        )
+        filterPlanModel
     }
 
     /**
@@ -124,4 +79,140 @@ class VipManagerUseCase {
         }
     }
 
+    companion object {
+        fun getVipPlanMockData() = listOf(
+            VipPlanModel(
+                name = "高級學員",
+                memberCount = 10
+            ),
+            VipPlanModel(
+                name = "進階學員",
+                memberCount = 5
+            ),
+            VipPlanModel(
+                name = "初階學員",
+                memberCount = 0
+            )
+        )
+
+        fun getVipPlanInfoMockData() = VipPlanInfoModel(
+            name = "高級學員",
+            memberCount = 10,
+            planSourceDescList = listOf(
+                "・30元訂閱促銷方案",
+                "・99元月訂閱方案"
+            ),
+            members = listOf(
+                GroupMember(
+                    name = "王力宏",
+                    thumbNail = "https://picsum.photos/${
+                        Random.nextInt(
+                            100,
+                            300
+                        )
+                    }/${Random.nextInt(100, 300)}",
+                    serialNumber = Random.nextLong(
+                        1000,
+                        3000
+                    ),
+                    isVip = true
+                ),
+                GroupMember(
+                    name = "王力宏1",
+                    thumbNail = "https://picsum.photos/${
+                        Random.nextInt(
+                            100,
+                            300
+                        )
+                    }/${Random.nextInt(100, 300)}",
+                    serialNumber = Random.nextLong(
+                        1000,
+                        3000
+                    ),
+                    isVip = true
+                ),
+                GroupMember(
+                    name = "王力宏2",
+                    thumbNail = "https://picsum.photos/${
+                        Random.nextInt(
+                            100,
+                            300
+                        )
+                    }/${Random.nextInt(100, 300)}",
+                    serialNumber = Random.nextLong(
+                        1000,
+                        3000
+                    ),
+                    isVip = false
+                ),
+                GroupMember(
+                    name = "Kevin",
+                    thumbNail = "https://picsum.photos/${
+                        Random.nextInt(
+                            100,
+                            300
+                        )
+                    }/${Random.nextInt(100, 300)}",
+                    serialNumber = Random.nextLong(
+                        1000,
+                        3000
+                    ),
+                    isVip = true
+                ),
+                GroupMember(
+                    name = "Kevin1",
+                    thumbNail = "https://picsum.photos/${
+                        Random.nextInt(
+                            100,
+                            300
+                        )
+                    }/${Random.nextInt(100, 300)}",
+                    serialNumber = Random.nextLong(
+                        1000,
+                        3000
+                    ),
+                    isVip = true
+                ),
+                GroupMember(
+                    name = "Kevin2",
+                    thumbNail = "https://picsum.photos/${
+                        Random.nextInt(
+                            100,
+                            300
+                        )
+                    }/${Random.nextInt(100, 300)}",
+                    serialNumber = Random.nextLong(
+                        1000,
+                        3000
+                    ),
+                    isVip = true
+                )
+            )
+        )
+
+        fun getVipPlanPermissionOptionsMockData(): List<VipPlanPermissionOptionModel> {
+            return listOf(
+                VipPlanPermissionOptionModel(
+                    name = "無權限",
+                    description = "不可進入此頻道",
+                    authType = "none"
+                ),
+                VipPlanPermissionOptionModel(
+                    name = "基本權限",
+                    description = "可以進入此頻道，並且瀏覽",
+                    authType = "basic"
+                ),
+                VipPlanPermissionOptionModel(
+                    name = "中階權限",
+                    description = "可以進入此頻道，並在貼文留言",
+                    authType = "middle"
+                ),
+                VipPlanPermissionOptionModel(
+                    name = "進階權限",
+                    description = "可以進入此頻道，可以聊天、發文與留言",
+                    authType = "advanced"
+                )
+            )
+        }
+    }
 }

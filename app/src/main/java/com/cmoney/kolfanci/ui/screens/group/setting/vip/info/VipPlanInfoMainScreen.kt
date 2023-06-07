@@ -1,11 +1,13 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.vip.info
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
@@ -14,13 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
@@ -32,6 +37,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionO
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -206,7 +212,9 @@ private fun VipPlanInfoMainScreenView(
 
                 //成員
                 VipManagerViewModel.VipManageTabKind.MEMBER -> {
-                    TODO()
+                    VipMemberPage(
+                        members = vipPlanInfo.members
+                    )
                 }
             }
         }
@@ -228,7 +236,6 @@ private fun VipInfoPage(
     Column {
         Text(
             modifier = Modifier.padding(
-                top = 20.dp,
                 bottom = 20.dp,
                 start = 24.dp,
                 end = 24.dp
@@ -277,6 +284,73 @@ private fun VipInfoPage(
     }
 }
 
+/**
+ * 成員頁面
+ *
+ * @param members 會員清單
+ */
+@Composable
+private fun VipMemberPage(
+    members: List<GroupMember>
+) {
+    Column {
+        Text(
+            modifier = Modifier.padding(
+                bottom = 20.dp,
+                start = 24.dp,
+                end = 24.dp
+            ),
+            text = stringResource(id = R.string.vip_member_description),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_50
+        )
+
+        if (members.isEmpty()) {
+            //Empty Screen
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    modifier = Modifier.size(105.dp),
+                    painter = painterResource(id = R.drawable.flower_box), contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = stringResource(id = R.string.vip_member_empty_description),
+                    fontSize = 16.sp,
+                    color = LocalColor.current.text.default_30
+                )
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                items(members) { member ->
+                    MemberItemScreen(
+                        groupMember = member,
+                        isShowRemove = false,
+                    )
+                }
+            }
+        }
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun VipMemberPagePreview() {
+    FanciTheme {
+        VipMemberPage(
+            members = VipManagerUseCase.getVipPlanInfoMockData().members
+        )
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -284,7 +358,7 @@ fun VipPlanInfoScreenPreview() {
     FanciTheme {
         VipPlanInfoMainScreenView(
             navController = EmptyDestinationsNavigator,
-            selectedTab = VipManagerViewModel.VipManageTabKind.INFO,
+            selectedTab = VipManagerViewModel.VipManageTabKind.MEMBER,
             vipPlanInfo = VipManagerUseCase.getVipPlanInfoMockData(),
             vipPlanPermissionModels = listOf(
                 VipPlanPermissionModel(
