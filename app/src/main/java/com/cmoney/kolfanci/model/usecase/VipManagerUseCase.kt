@@ -213,5 +213,6 @@ class VipManagerUseCase {
                     authType = "advanced"
                 )
             )
+        }
     }
 }
