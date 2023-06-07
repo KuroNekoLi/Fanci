@@ -92,6 +92,7 @@
     <string name="information">資訊</string>
     <string name="member">成員</string>
     <string name="vip_manage_info_description">可以在此編輯 VIP 名稱。若要編輯方案內容，請聯絡官方客服人員協助編輯。</string>
+    <string name="vip_manage_channel_permission_description">購買此 VIP 方案的成員，分別可以在下列頻道執行對應權限的行為。</string>
 
     <string name="vip_name">VIP 名稱</string>
     <string name="input_vip_name">輸入VIP 名稱</string>

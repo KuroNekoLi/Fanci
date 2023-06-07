@@ -26,6 +26,7 @@ import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -63,6 +64,8 @@ fun VipPlanInfoMainScreen(
 
     //vip 方案資訊
     val vipPlanInfo by viewModel.planInfo.collectAsState()
+    // vip 權限資訊
+    val vipPlanPermissionModels by viewModel.permissionModels.collectAsState()
 
     vipPlanInfo?.let {
         VipPlanInfoMainScreenView(
@@ -70,6 +73,7 @@ fun VipPlanInfoMainScreen(
             navController = navController,
             selectedTab = selectedTabPosition,
             vipPlanInfo = it,
+            vipPlanPermissionModels = vipPlanPermissionModels.orEmpty(),
             onTabSelected = { position ->
                 viewModel.onManageVipTabClick(position)
             }
@@ -79,6 +83,9 @@ fun VipPlanInfoMainScreen(
     LaunchedEffect(Unit) {
         if (vipPlanInfo == null) {
             viewModel.fetchVipPlanInfo(vipPlanModel)
+        }
+        if (vipPlanPermissionModels == null) {
+            viewModel.fetchPermissions(vipPlanModel = vipPlanModel)
         }
     }
 
@@ -102,7 +109,8 @@ private fun VipPlanInfoMainScreenView(
     navController: DestinationsNavigator,
     selectedTab: VipManagerViewModel.VipManageTabKind,
     onTabSelected: (Int) -> Unit,
-    vipPlanInfo: VipPlanInfoModel
+    vipPlanInfo: VipPlanInfoModel,
+    vipPlanPermissionModels: List<VipPlanPermissionModel>
 ) {
     val TAG = "VipManagerScreenView"
     val context = LocalContext.current
@@ -162,7 +170,12 @@ private fun VipPlanInfoMainScreenView(
 
                 //權限
                 VipManagerViewModel.VipManageTabKind.PERMISSION -> {
-                    TODO()
+                    VipPlanInfoPermissionPage(
+                        permissionModels = vipPlanPermissionModels,
+                        onEditPermission = { index ->
+                            // TODO 跳轉編輯權限頁
+                        }
+                    )
                 }
 
                 //成員
@@ -247,6 +260,20 @@ fun VipPlanInfoScreenPreview() {
             navController = EmptyDestinationsNavigator,
             selectedTab = VipManagerViewModel.VipManageTabKind.INFO,
             vipPlanInfo = VipManagerUseCase.getVipPlanInfoMockData(),
+            vipPlanPermissionModels = listOf(
+                VipPlanPermissionModel(
+                    name = "歡迎新朋友",
+                    canEdit = false,
+                    permissionTitle = "公開頻道",
+                    authType = "basic"
+                ),
+                VipPlanPermissionModel(
+                    name = "健身肌肉男",
+                    canEdit = true,
+                    permissionTitle = "進階權限",
+                    authType = "basic"
+                )
+            ),
             onTabSelected = {
             }
         )

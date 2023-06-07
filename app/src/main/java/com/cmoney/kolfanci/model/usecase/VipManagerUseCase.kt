@@ -1,8 +1,11 @@
 package com.cmoney.kolfanci.model.usecase
 
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
 
 class VipManagerUseCase {
 
@@ -52,6 +55,34 @@ class VipManagerUseCase {
      */
     fun getVipPlanInfo(vipPlanModel: VipPlanModel) = kotlin.runCatching {
         getVipPlanInfoMockData()
+    }
+
+    /**
+     * 取得某社團下該 vip 方案的詳細資訊
+     *
+     * @param group 指定社團
+     * @param vipPlanModel 選擇的方案
+     * @return 社團所有頻道此方案下的權限設定
+     */
+    fun getPermissions(group: Group, vipPlanModel: VipPlanModel): Result<List<VipPlanPermissionModel>> {
+        return kotlin.runCatching {
+            group.categories?.fold(mutableListOf<Channel>()) { acc, category ->
+                acc.addAll(category.channels.orEmpty())
+                acc
+            }?.map { channel ->
+                // TODO 取得每個頻道目前方案下設定的權限
+                VipPlanPermissionModel(
+                    name = channel.name.orEmpty(),
+                    canEdit = when (channel.privacy) {
+                        ChannelPrivacy.public -> false
+                        ChannelPrivacy.private -> true
+                        null -> false
+                    },
+                    permissionTitle = "假資料",
+                    authType = "basic"
+                )
+            }.orEmpty()
+        }
     }
 
 }
