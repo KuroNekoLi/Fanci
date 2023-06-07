@@ -57,7 +57,7 @@ data class GroupMember (
 
     /* 是否為vip 用戶 */
     @Json(name = "isVip")
-    val isVip: kotlin.Boolean = false
+    val isVip: kotlin.Boolean = true
 
 ) : Parcelable
 
