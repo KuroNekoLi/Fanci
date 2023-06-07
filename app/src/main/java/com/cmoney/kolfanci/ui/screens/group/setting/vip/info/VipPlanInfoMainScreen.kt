@@ -1,11 +1,13 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.vip.info
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
@@ -14,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -262,16 +266,37 @@ private fun VipMemberPage(
             color = LocalColor.current.text.default_50
         )
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            items(members) { member ->
-                MemberItemScreen(
-                    groupMember = member,
-                    isShowRemove = false,
+        if (members.isEmpty()) {
+            //Empty Screen
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    modifier = Modifier.size(105.dp),
+                    painter = painterResource(id = R.drawable.flower_box), contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = stringResource(id = R.string.vip_member_empty_description),
+                    fontSize = 16.sp,
+                    color = LocalColor.current.text.default_30
                 )
             }
-
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                items(members) { member ->
+                    MemberItemScreen(
+                        groupMember = member,
+                        isShowRemove = false,
+                    )
+                }
+            }
         }
     }
 
