@@ -99,4 +99,6 @@
     <string name="subscription_plan">訂閱方案</string>
     <string name="vip_name_empty">VIP 名稱空白</string>
     <string name="vip_name_empty_desc">VIP 名稱不可以是空白的唷！</string>
+
+    <string name="choose_channel">選擇頻道</string>
 </resources>

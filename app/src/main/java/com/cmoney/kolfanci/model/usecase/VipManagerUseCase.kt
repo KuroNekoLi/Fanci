@@ -6,6 +6,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionOptionModel
 
 class VipManagerUseCase {
 
@@ -34,6 +35,31 @@ class VipManagerUseCase {
             ),
             members = emptyList()
         )
+
+        fun getVipPlanPermissionOptionsMockData(): List<VipPlanPermissionOptionModel> {
+            return listOf(
+                VipPlanPermissionOptionModel(
+                    name = "無權限",
+                    description = "不可進入此頻道",
+                    authType = "none"
+                ),
+                VipPlanPermissionOptionModel(
+                    name = "基本權限",
+                    description = "可以進入此頻道，並且瀏覽",
+                    authType = "basic"
+                ),
+                VipPlanPermissionOptionModel(
+                    name = "中階權限",
+                    description = "可以進入此頻道，並在貼文留言",
+                    authType = "middle"
+                ),
+                VipPlanPermissionOptionModel(
+                    name = "進階權限",
+                    description = "可以進入此頻道，可以聊天、發文與留言",
+                    authType = "advanced"
+                )
+            )
+        }
     }
 
     /**
@@ -69,19 +95,32 @@ class VipManagerUseCase {
             group.categories?.fold(mutableListOf<Channel>()) { acc, category ->
                 acc.addAll(category.channels.orEmpty())
                 acc
-            }?.map { channel ->
+            }?.mapNotNull { channel ->
                 // TODO 取得每個頻道目前方案下設定的權限
                 VipPlanPermissionModel(
-                    name = channel.name.orEmpty(),
+                    id = channel.id ?: return@mapNotNull null,
+                    name = channel.name ?: return@mapNotNull null,
                     canEdit = when (channel.privacy) {
                         ChannelPrivacy.public -> false
                         ChannelPrivacy.private -> true
                         null -> false
                     },
-                    permissionTitle = "假資料",
+                    permissionTitle = "基本權限",
                     authType = "basic"
                 )
             }.orEmpty()
+        }
+    }
+
+    /**
+     * 取得選擇的VIP方案下可選的權限選項
+     *
+     * @param vipPlanModel 選擇的方案
+     * @return 選項
+     */
+    fun getPermissionOptions(vipPlanModel: VipPlanModel): Result<List<VipPlanPermissionOptionModel>> {
+        return kotlin.runCatching {
+            getVipPlanPermissionOptionsMockData()
         }
     }
 

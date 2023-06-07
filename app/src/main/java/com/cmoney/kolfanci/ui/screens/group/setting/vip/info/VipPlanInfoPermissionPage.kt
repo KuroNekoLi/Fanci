@@ -128,12 +128,14 @@ fun VipPlanInfoPermissionPagePreview() {
             VipPlanInfoPermissionPage(
                 permissionModels = listOf(
                     VipPlanPermissionModel(
+                        id = "101",
                         name = "歡迎新朋友",
                         canEdit = false,
                         permissionTitle = "公開頻道",
                         authType = "basic"
                     ),
                     VipPlanPermissionModel(
+                        id = "102",
                         name = "健身肌肉男",
                         canEdit = true,
                         permissionTitle = "進階權限",
@@ -154,6 +156,7 @@ fun ChannelPermissionBarItemPreview() {
         Column {
             ChannelPermissionBarItem(
                 permissionModel = VipPlanPermissionModel(
+                    id = "101",
                     name = "歡迎新朋友",
                     canEdit = false,
                     permissionTitle = "公開頻道",
@@ -165,6 +168,7 @@ fun ChannelPermissionBarItemPreview() {
             Spacer(modifier = Modifier.height(20.dp))
             ChannelPermissionBarItem(
                 permissionModel = VipPlanPermissionModel(
+                    id = "102",
                     name = "健身肌肉男",
                     canEdit = true,
                     permissionTitle = "進階權限",
