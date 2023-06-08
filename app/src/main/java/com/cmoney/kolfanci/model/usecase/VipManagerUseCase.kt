@@ -11,6 +11,16 @@ import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionO
 import kotlin.random.Random
 
 class VipManagerUseCase {
+
+    /**
+     * 取得所有VIP方案
+     */
+    fun getVipPlan(): Result<List<VipPlanModel>> {
+        return kotlin.runCatching {
+            getVipPlanMockData()
+        }
+    }
+
     /**
      * 取得 vip 方案清單
      *

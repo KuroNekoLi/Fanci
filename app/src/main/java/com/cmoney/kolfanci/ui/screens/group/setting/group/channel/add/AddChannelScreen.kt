@@ -3,7 +3,6 @@ package com.cmoney.kolfanci.ui.screens.group.setting.group.channel.add
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.AuthBulliten
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
@@ -182,7 +181,7 @@ fun AddChannelScreen(
     //DeleteDialog
     if (showDeleteDialog.value) {
         channel?.let {
-            showDeleteAlert(
+            ShowDeleteAlert(
                 channelName = channel.name.orEmpty(),
                 onConfirm = {
                     showDeleteDialog.value = false
@@ -567,61 +566,36 @@ private fun ChannelPermissionItem(
                 onClick.invoke(channelAccessOptionModel)
             }
             .fillMaxWidth()
-            .padding(top = 20.dp, bottom = 20.dp, start = 10.dp, end = 10.dp),
+            .height(67.dp)
+            .padding(horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
-            modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.weight(1f)
         ) {
-            AsyncImage(
-                modifier = Modifier.size(35.dp),
-                model = channelAccessOptionModel.icon,
-                placeholder = painterResource(id = R.drawable.placeholder),
-                contentDescription = null
-            )
-
-            Spacer(modifier = Modifier.height(7.dp))
-
             Text(
                 text = channelAccessOptionModel.title.orEmpty(),
-                fontSize = 14.sp,
-                color = Color.White
+                fontSize = 17.sp,
+                color = LocalColor.current.text.default_100
             )
-        }
-
-        Column(
-            modifier = Modifier.weight(2f),
-            verticalArrangement = Arrangement.Center
-        ) {
-            for (item in channelAccessOptionModel.bullitens.orEmpty()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        modifier = Modifier.size(14.dp),
-                        model = item.icon,
-                        placeholder = painterResource(id = R.drawable.placeholder),
-                        contentDescription = null
-                    )
-
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    Text(text = item.title.orEmpty(), fontSize = 14.sp, color = Color_80FFFFFF)
-                }
+            val subTitle = remember(channelAccessOptionModel.bullitens) {
+                channelAccessOptionModel.bullitens?.filter { bulliten ->
+                    bulliten.title != null
+                }?.joinToString("，") { bulliten ->
+                    bulliten.title.orEmpty()
+                }.orEmpty()
             }
-        }
-
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center
-        ) {
             Text(
-                text = stringResource(id = R.string.edit_member),
+                text = subTitle,
                 fontSize = 14.sp,
-                color = LocalColor.current.primary
+                color = LocalColor.current.text.default_50
             )
         }
+        Icon(
+            painter = painterResource(id = R.drawable.next),
+            contentDescription = "manage",
+            tint = LocalColor.current.text.default_100
+        )
     }
 }
 
@@ -684,7 +658,7 @@ private fun ManagerTabScreen(
 }
 
 @Composable
-private fun showDeleteAlert(
+private fun ShowDeleteAlert(
     channelName: String,
     onConfirm: () -> Unit, onCancel: () -> Unit
 ) {
@@ -752,6 +726,29 @@ fun AddChannelScreenPreview() {
             onDeleteClick = {},
             onBack = {},
             channel = null
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ChannelPermissionItemPreview() {
+    FanciTheme {
+        ChannelPermissionItem(
+            channelAccessOptionModel = ChannelAccessOptionModel(
+                authType = "",
+                title = "基本權限",
+                icon = null,
+                bullitens = listOf(
+                    AuthBulliten(
+                        title = "可以進入此頻道",
+                        icon = null,
+                        isEnabled = true
+                    )
+                )
+            ),
+            onClick = {
+            }
         )
     }
 }
