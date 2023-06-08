@@ -78,12 +78,10 @@ fun AllMemberScreen(
     val uiState = viewModel.uiState
 
     LaunchedEffect(Unit) {
-        viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+        if (uiState.groupMember.isNullOrEmpty()) {
+            viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+        }
     }
-
-//    if (uiState.groupMember == null && uiState.loading) {
-//        viewModel.fetchGroupMember(groupId = group.id.orEmpty())
-//    }
 
     val shareText by viewModel.shareText.collectAsState()
 

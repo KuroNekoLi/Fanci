@@ -30,7 +30,7 @@ import com.cmoney.kolfanci.ui.destinations.VipPlanInfoMainScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanScreen
+import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -129,8 +129,10 @@ fun VipManagerScreenView(
                     verticalArrangement = Arrangement.spacedBy(1.dp)
                 ) {
                     items(vipPlanList) { plan ->
-                        VipPlanScreen(
+                        VipPlanItemScreen(
                             vipPlanModel = plan,
+                            subTitle = "%d 位成員".format(plan.memberCount),
+                            endText = "管理",
                             onPlanClick = onPlanClick
                         )
                     }

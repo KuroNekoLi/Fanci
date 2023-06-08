@@ -2,13 +2,28 @@ package com.cmoney.kolfanci.ui.screens.group.setting.member.all
 
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,17 +42,20 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
 import com.cmoney.kolfanci.ui.destinations.MemberRoleManageScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.BanDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DisBanDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.KickOutDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
+import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.gson.Gson
@@ -49,6 +67,7 @@ import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Parcelize
 data class MemberManageResult(
@@ -69,6 +88,9 @@ fun MemberManageScreen(
     group: Group,
     groupMember: GroupMember,
     viewModel: MemberViewModel = koinViewModel(),
+    vipManagerViewModel: VipManagerViewModel = koinViewModel {
+        parametersOf(group)
+    },
     setRoleResult: ResultRecipient<MemberRoleManageScreenDestination, String>,
     resultNavigator: ResultBackNavigator<MemberManageResult>
 ) {
@@ -84,6 +106,8 @@ fun MemberManageScreen(
         mutableStateOf(groupMember)
     }
 
+    val purchasesPlan by vipManagerViewModel.alreadyPurchasePlan.collectAsState()
+
     //再次確認禁言 彈窗
     val showBanDoubleConfirmDialog: MutableState<BanPeriodOption?> =
         remember { mutableStateOf(null) }
@@ -93,6 +117,7 @@ fun MemberManageScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val roleListStr = result.value
                 val gson = Gson()
@@ -104,10 +129,14 @@ fun MemberManageScreen(
         }
     }
 
-    viewModel.fetchUserBanInfo(
-        groupId = group.id.orEmpty(),
-        userId = groupMember.id.orEmpty()
-    )
+    LaunchedEffect(Unit) {
+        viewModel.fetchUserBanInfo(
+            groupId = group.id.orEmpty(),
+            userId = groupMember.id.orEmpty()
+        )
+
+        vipManagerViewModel.fetchAlreadyPurchasePlan(groupMember)
+    }
 
     MemberManageScreenView(
         modifier = modifier,
@@ -115,6 +144,7 @@ fun MemberManageScreen(
         group = group,
         groupMember = member.value,
         banInfo = uiState.banUiModel,
+        purchasesPlan = purchasesPlan,
         onBack = {
             resultNavigator.navigateBack(
                 MemberManageResult(
@@ -216,7 +246,8 @@ private fun MemberManageScreenView(
     onBack: () -> Unit,
     onBanClick: () -> Unit,
     onKickClick: () -> Unit,
-    onDisBanClick: () -> Unit
+    onDisBanClick: () -> Unit,
+    purchasesPlan: List<VipPlanModel>
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -232,25 +263,50 @@ private fun MemberManageScreenView(
             )
         }
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
 
-            MemberItemScreen(groupMember = groupMember, isShowRemove = false)
+            //會員資訊
+            item {
+                MemberItemScreen(groupMember = groupMember, isShowRemove = false)
+            }
+
+            //購買的VIP方案
+            item {
+                if (purchasesPlan.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier.padding(top = 20.dp, start = 24.dp, bottom = 10.dp),
+                        text = "購買的 VIP 方案",
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_80
+                    )
+                }
+            }
+
+            items(purchasesPlan) { plan ->
+                VipPlanItemScreen(
+                    vipPlanModel = plan,
+                    subTitle = plan.description
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+            }
 
             //身份組
-            Text(
-                modifier = Modifier.padding(top = 20.dp, start = 24.dp, bottom = 10.dp),
-                text = "身份組", fontSize = 14.sp, color = LocalColor.current.text.default_80
-            )
+            item {
+                Text(
+                    modifier = Modifier.padding(top = 20.dp, start = 24.dp, bottom = 10.dp),
+                    text = "具備的角色", fontSize = 14.sp, color = LocalColor.current.text.default_80
+                )
+            }
 
             //身份清單
             groupMember.roleInfos?.let {
-                repeat(it.size) { index ->
-                    val roleInfo = it[index]
+                items(it) { roleInfo ->
                     val roleColor = if (roleInfo.color?.isNotEmpty() == true) {
                         HexStringMapRoleColor(roleInfo.color.orEmpty())
                     } else {
@@ -282,63 +338,75 @@ private fun MemberManageScreenView(
 
             //編輯角色 按鈕
             if (Constant.isCanEditRole()) {
-                BorderButton(
-                    modifier = Modifier
-                        .padding(
-                            top = 20.dp,
-                            start = 24.dp,
-                            end = 24.dp
-                        )
-                        .fillMaxWidth()
-                        .height(45.dp),
-                    text = "編輯角色",
-                    borderColor = LocalColor.current.text.default_50,
-                    textColor = LocalColor.current.text.default_100,
-                    onClick = {
-                        navController.navigate(
-                            MemberRoleManageScreenDestination(
-                                group = group,
-                                groupMember = groupMember
+                item {
+                    BorderButton(
+                        modifier = Modifier
+                            .padding(
+                                top = 20.dp,
+                                start = 24.dp,
+                                end = 24.dp
                             )
-                        )
-                    }
-                )
+                            .fillMaxWidth()
+                            .height(45.dp),
+                        text = "編輯角色",
+                        borderColor = LocalColor.current.text.default_50,
+                        textColor = LocalColor.current.text.default_100,
+                        onClick = {
+                            navController.navigate(
+                                MemberRoleManageScreenDestination(
+                                    group = group,
+                                    groupMember = groupMember
+                                )
+                            )
+                        }
+                    )
+                }
             }
 
             //權限管理
             if (Constant.isCanBanKickMember()) {
-                Text(
-                    modifier = Modifier.padding(top = 40.dp, start = 24.dp, bottom = 10.dp),
-                    text = "權限管理", fontSize = 14.sp, color = LocalColor.current.text.default_80
-                )
-
-                //禁言
-                if (banInfo == null) {
-                    BanItem(
-                        banTitle = "禁言「%s」".format(groupMember.name),
-                        desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
-                    ) {
-                        onBanClick.invoke()
-                    }
-                } else {
-                    BanInfo(
-                        banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
-                        banStartDay = banInfo.startDay,
-                        banDuration = banInfo.duration,
-                        onClick = {
-                            onDisBanClick.invoke()
-                        }
+                item {
+                    Text(
+                        modifier = Modifier.padding(top = 40.dp, start = 24.dp, bottom = 10.dp),
+                        text = "權限管理",
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_80
                     )
                 }
 
-                Spacer(modifier = Modifier.height(1.dp))
+                //禁言
+                item {
+                    if (banInfo == null) {
+                        BanItem(
+                            banTitle = "禁言「%s」".format(groupMember.name),
+                            desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
+                        ) {
+                            onBanClick.invoke()
+                        }
+                    } else {
+                        BanInfo(
+                            banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
+                            banStartDay = banInfo.startDay,
+                            banDuration = banInfo.duration,
+                            onClick = {
+                                onDisBanClick.invoke()
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
 
                 //踢出社團
-                BanItem(
-                    banTitle = "將「%s」踢出社團".format(groupMember.name),
-                    desc = "讓 %s 離開社團".format(groupMember.name)
-                ) {
-                    onKickClick.invoke()
+                item {
+                    BanItem(
+                        banTitle = "將「%s」踢出社團".format(groupMember.name),
+                        desc = "讓 %s 離開社團".format(groupMember.name)
+                    ) {
+                        onKickClick.invoke()
+                    }
                 }
             }
         }
@@ -423,15 +491,16 @@ fun MemberManageScreenPreview() {
                     )
                 )
             ),
-            onBack = {},
-            onBanClick = {},
-            onKickClick = {},
-            onDisBanClick = {},
             banInfo = BanUiModel(
                 user = null,
                 startDay = "2020/10/22",
                 duration = "3日"
-            )
+            ),
+            onBack = {},
+            onBanClick = {},
+            onKickClick = {},
+            onDisBanClick = {},
+            purchasesPlan = VipManagerUseCase.getVipPlanMockData()
         )
     }
 }
