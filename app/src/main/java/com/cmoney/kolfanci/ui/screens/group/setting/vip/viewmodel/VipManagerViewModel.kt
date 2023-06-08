@@ -6,6 +6,8 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionOptionModel
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +39,18 @@ class VipManagerViewModel(
     //管理Vip 方案, 方案詳細資訊
     private val _planInfo = MutableStateFlow<VipPlanInfoModel?>(null)
     val planInfo = _planInfo.asStateFlow()
+
+    /**
+     * 各頻道的權限狀態
+     */
+    private val _permissionModels = MutableStateFlow<List<VipPlanPermissionModel>?>(null)
+    val permissionModels = _permissionModels.asStateFlow()
+
+    /**
+     * 可以選擇的權限選項
+     */
+    private val _permissionOptionModels = MutableStateFlow<List<VipPlanPermissionOptionModel>?>(null)
+    val permissionOptionModels = _permissionOptionModels.asStateFlow()
 
     /**
      *  取得該社團目前有的 Vip 方案清單
@@ -85,4 +99,50 @@ class VipManagerViewModel(
         //TODO call api change name
     }
 
+    /**
+     * 取得VIP管理的權限資料
+     */
+    fun fetchPermissions(vipPlanModel: VipPlanModel) {
+        viewModelScope.launch {
+            vipManagerUseCase.getPermissions(group = group, vipPlanModel = vipPlanModel)
+                .onSuccess { data ->
+                    _permissionModels.value = data
+                }
+                .onFailure { error ->
+                    KLog.i(TAG, error)
+                }
+        }
+    }
+
+    /**
+     * 設定此頻道在此方案下權限
+     */
+    fun setPermission(permissionModel: VipPlanPermissionModel) {
+        viewModelScope.launch {
+            // TODO call api change permission
+            _permissionModels.value = _permissionModels.value.orEmpty()
+                .map { oldPermission ->
+                    if (oldPermission.id == permissionModel.id) {
+                        permissionModel
+                    } else {
+                        oldPermission
+                    }
+                }
+        }
+    }
+
+    /**
+     * 取得頻道設定的權限選擇
+     */
+    fun fetchPermissionOptions(vipPlanModel: VipPlanModel) {
+        viewModelScope.launch {
+            vipManagerUseCase.getPermissionOptions(vipPlanModel = vipPlanModel)
+                .onSuccess { data ->
+                    _permissionOptionModels.value = data
+                }
+                .onFailure { error ->
+                    KLog.i(TAG, error)
+                }
+        }
+    }
 }
