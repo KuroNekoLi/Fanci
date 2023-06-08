@@ -18,6 +18,7 @@ import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.cmoney.kolfanci.model.usecase.DynamicLinkUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
@@ -40,7 +41,8 @@ data class UiState(
     val banUiModel: BanUiModel? = null,      //禁言中 info
     val showAddSuccessTip: Boolean = false,  //show 新增成功 toast
     val loading: Boolean = false,
-    var selectedRole: List<FanciRole> = emptyList(), //選中的角色
+    val selectedRole: List<FanciRole> = emptyList(), //選中的角色
+    val selectedVipPlanModels: List<VipPlanModel> = emptyList(), // 選中的VIP方案
     val tabIndex: Int = 0
 )
 
@@ -55,7 +57,8 @@ data class GroupMemberSelect(val groupMember: GroupMember, val isSelected: Boole
 @Parcelize
 data class SelectedModel(
     val selectedMember: List<GroupMember> = emptyList(),
-    val selectedRole: List<FanciRole> = emptyList()
+    val selectedRole: List<FanciRole> = emptyList(),
+    val selectedVipPlans: List<VipPlanModel> = emptyList()
 ) : Parcelable {
 
     fun toAccessorList(): List<AccessorParam> {
@@ -72,6 +75,8 @@ data class SelectedModel(
                 it.id.orEmpty()
             }
         )
+
+        // TODO vip plan 加入私密頻道的機制
 
         return listOf(memberAccessor, roleAccessor)
     }
@@ -513,12 +518,6 @@ class MemberViewModel(
         }
     }
 
-    fun addSelectedMember(selectedMember: List<GroupMember>) {
-        if (selectedMember.isNotEmpty()) {
-            _selectedMember.value = selectedMember
-        }
-    }
-
     /**
      * 增加 角色
      */
@@ -533,9 +532,17 @@ class MemberViewModel(
         )
     }
 
-    fun addSelectedRole(selectedRole: List<FanciRole>) {
-        if (selectedRole.isNotEmpty()) {
-            uiState.selectedRole = selectedRole
+    fun initialUiStateFromModel(selectedModel: SelectedModel) {
+        uiState = uiState.copy(
+            selectedRole = selectedModel.selectedRole.ifEmpty {
+                uiState.selectedRole
+            },
+            selectedVipPlanModels = selectedModel.selectedVipPlans.ifEmpty {
+                uiState.selectedVipPlanModels
+            }
+        )
+        if (selectedModel.selectedMember.isNotEmpty()) {
+            _selectedMember.value = selectedModel.selectedMember
         }
     }
 
@@ -602,5 +609,19 @@ class MemberViewModel(
 
     fun resetShareText() {
         _shareText.value = ""
+    }
+
+    fun removeSelectedVipPlan(model: VipPlanModel) {
+        uiState = uiState.copy(
+            selectedVipPlanModels = uiState.selectedVipPlanModels.filterNot { vipPlanModel ->
+                vipPlanModel.name == model.name
+            }
+        )
+    }
+
+    fun addSelectedVipPlanModel(model: VipPlanModel) {
+        uiState = uiState.copy(
+            selectedVipPlanModels = uiState.selectedVipPlanModels.plus(model)
+        )
     }
 }

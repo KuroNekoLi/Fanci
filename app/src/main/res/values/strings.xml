@@ -84,6 +84,7 @@
     <string name="role_name_empty">角色名稱空白</string>
     <string name="role_name_empty_desc">角色名稱不可以是空白的唷！</string>
 
+    <string name="vip_plan">VIP方案</string>
     <string name="vip_manager">VIP 方案管理</string>
     <string name="vip_plan_empty_description">目前還沒有建立 VIP 方案\n聯絡官方客服人員協助建立</string>
     <string name="vip_plan_description">購買下列 VIP 方案的成員，可以獲得 VIP 所設定的對應權限，進入某頻道進行互動。</string>
@@ -104,5 +105,11 @@
 
     <string name="vip_member_description">下列為購買此 VIP 方案的成員，他們可以執行此 VIP的權限行為。</string>
     <string name="vip_member_empty_description">目前沒有任何人購買此方案</string>
+
+    <string name="add_plan">新增方案</string>
+    <string name="remove">移除</string>
+    <string name="add_blank_plan">新增「%1$s」方案</string>
+    <string name="n_member">%1$d 位成員</string>
+    <string name="vip_plan_in_x_channel_permission_description">購買下列VIP方案的成員，可以獲得「%1$s」並且在頻道中執行對應的權限資格。</string>
 
 </resources>

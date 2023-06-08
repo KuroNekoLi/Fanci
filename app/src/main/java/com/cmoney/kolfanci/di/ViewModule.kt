@@ -24,6 +24,7 @@ import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
+import com.cmoney.kolfanci.ui.screens.shared.vip.viewmodel.VipPlanViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -94,6 +95,11 @@ val viewModule = module {
     viewModel { params ->
         VipManagerViewModel(
             group = params.get(),
+            vipManagerUseCase = get()
+        )
+    }
+    viewModel {
+        VipPlanViewModel(
             vipManagerUseCase = get()
         )
     }
