@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit
 data class UiState(
     val groupMember: List<GroupMemberSelect>? = null,  //社團會員
     val kickMember: GroupMember? = null,     //踢除會員
-    val banUiModel: BanUiModel? = null,      //禁言中 info
     val showAddSuccessTip: Boolean = false,  //show 新增成功 toast
     val loading: Boolean = false,
     var selectedRole: List<FanciRole> = emptyList(), //選中的角色
@@ -88,6 +87,10 @@ class MemberViewModel(
     var uiState by mutableStateOf(UiState())
         private set
 
+    //禁言中 info
+    private val _banUiModel = MutableStateFlow<BanUiModel?>(null)
+    val banUiModel = _banUiModel.asStateFlow()
+
     //選中的會員
     private val _selectedMember = MutableStateFlow(emptyList<GroupMember>())
     val selectedMember = _selectedMember.asStateFlow()
@@ -107,6 +110,10 @@ class MemberViewModel(
     //分享文案
     private val _shareText = MutableStateFlow("")
     val shareText = _shareText.asStateFlow()
+
+    //管理人員
+    private val _managerMember = MutableStateFlow<GroupMember?>(null)
+    val managerMember = _managerMember.asStateFlow()
 
     private fun showLoading() {
         uiState = uiState.copy(
@@ -130,9 +137,7 @@ class MemberViewModel(
                 groupId = groupId,
                 userIds = listOf(userId)
             ).fold({
-                uiState = uiState.copy(
-                    banUiModel = null
-                )
+                _banUiModel.value = null
             }, {
                 KLog.e(TAG, it)
             })
@@ -192,12 +197,10 @@ class MemberViewModel(
                     "%d日".format(duration)
                 }
 
-                uiState = uiState.copy(
-                    banUiModel = BanUiModel(
-                        user = userBanInformation.user,
-                        startDay = startDay,
-                        duration = durationStr
-                    )
+                _banUiModel.value = BanUiModel(
+                    user = userBanInformation.user,
+                    startDay = startDay,
+                    duration = durationStr
                 )
             }, {
                 KLog.e(TAG, it)
@@ -602,5 +605,72 @@ class MemberViewModel(
 
     fun resetShareText() {
         _shareText.value = ""
+    }
+
+    /**
+     * 設置要編輯的會員info
+     */
+    fun setManageGroupMember(groupMember: GroupMember) {
+        KLog.i(TAG, "setManageGroupMember:$groupMember")
+        _managerMember.value = groupMember
+    }
+
+    /**
+     * 增加角色 - 編輯人員角色
+     */
+    fun onAddRole(
+        groupId: String,
+        userId: String,
+        addRole: List<FanciRole>
+    ) {
+        KLog.i(TAG, "onAddRole")
+
+        viewModelScope.launch {
+            if (addRole.isNotEmpty()) {
+                groupUseCase.addRoleToMember(
+                    groupId = groupId,
+                    userId = userId,
+                    roleIds = addRole.map { it.id.orEmpty() }
+                ).getOrNull()
+            }
+
+            _managerMember.value?.let { member ->
+                val newMemberList = member.roleInfos?.toMutableList()
+                newMemberList?.addAll(addRole)
+
+                _managerMember.value = member.copy(
+                    roleInfos = newMemberList?.distinctBy {
+                        it.id
+                    }
+                )
+            }
+        }
+    }
+
+    /**
+     * 移除 - 編輯人員角色
+     */
+    fun onRemoveRole(
+        groupId: String,
+        userId: String,
+        fanciRole: FanciRole
+    ) {
+        KLog.i(TAG, "onRemoveRole:$fanciRole")
+
+        viewModelScope.launch {
+            groupUseCase.removeRoleFromUser(
+                groupId = groupId,
+                userId = userId,
+                roleIds = listOf(fanciRole.id.orEmpty())
+            ).getOrNull()
+
+            _managerMember.value?.let { member ->
+                _managerMember.value = member.copy(
+                    roleInfos = member.roleInfos?.filter { role ->
+                        role != fanciRole
+                    }
+                )
+            }
+        }
     }
 }
