@@ -354,11 +354,22 @@ private fun MemberItem(
                     color = LocalColor.current.text.default_100
                 )
 
+                //是否為vip
+                if (groupMember.isVip) {
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Image(
+                        modifier = Modifier.size(11.dp),
+                        painter = painterResource(id = R.drawable.vip_diamond),
+                        contentDescription = null
+                    )
+                }
+
                 Spacer(modifier = Modifier.width(5.dp))
 
                 //代號
                 Text(
-                    text = groupMember.serialNumber.toString(),
+                    text = "#%d".format(groupMember.serialNumber),
                     fontSize = 12.sp,
                     color = LocalColor.current.text.default_50
                 )

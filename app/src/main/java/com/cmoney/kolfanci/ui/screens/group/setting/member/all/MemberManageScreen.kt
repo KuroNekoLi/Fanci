@@ -36,6 +36,7 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.BanDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DisBanDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.KickOutDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -238,40 +239,7 @@ private fun MemberManageScreenView(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            //大頭貼, 名稱
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .background(LocalColor.current.background)
-                    .padding(start = 30.dp, end = 24.dp, top = 9.dp, bottom = 9.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircleImage(
-                    modifier = Modifier
-                        .size(34.dp),
-                    imageUrl = groupMember.thumbNail.orEmpty()
-                )
-
-                Spacer(modifier = Modifier.width(15.dp))
-
-                Column {
-                    //名字
-                    Text(
-                        text = groupMember.name.orEmpty(),
-                        fontSize = 16.sp,
-                        color = LocalColor.current.text.default_100
-                    )
-
-                    Spacer(modifier = Modifier.height(2.dp))
-
-                    //代號
-                    Text(
-                        text = groupMember.serialNumber.toString(),
-                        fontSize = 12.sp,
-                        color = LocalColor.current.text.default_50
-                    )
-                }
-            }
+            MemberItemScreen(groupMember = groupMember, isShowRemove = false)
 
             //身份組
             Text(

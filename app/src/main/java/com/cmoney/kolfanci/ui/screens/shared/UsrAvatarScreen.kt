@@ -1,8 +1,11 @@
 package com.cmoney.kolfanci.ui.screens.shared
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +49,17 @@ fun ChatUsrAvatarScreen(
             fontSize = 14.sp,
             color = nickNameColor
         )
+
+        //是否為vip
+        if (user.isVip) {
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Image(
+                modifier = Modifier.size(11.dp),
+                painter = painterResource(id = R.drawable.vip_diamond),
+                contentDescription = null
+            )
+        }
     }
 }
 

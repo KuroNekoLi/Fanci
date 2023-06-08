@@ -321,6 +321,7 @@ private fun MemberItem(
     val groupMember = groupMemberSelect.groupMember
     Row(
         modifier = Modifier
+            .fillMaxWidth()
             .background(LocalColor.current.background)
             .clickable {
                 onMemberClick.invoke(groupMemberSelect)
@@ -328,30 +329,9 @@ private fun MemberItem(
             .padding(start = 30.dp, top = 8.dp, bottom = 8.dp, end = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(34.dp)
-                .clip(CircleShape),
-            model = groupMember.thumbNail.orEmpty(),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            placeholder = painterResource(id = R.drawable.placeholder)
-        )
-
-        Spacer(modifier = Modifier.width(15.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = groupMember.name.orEmpty(),
-                fontSize = 16.sp,
-                color = LocalColor.current.text.default_100
-            )
-            Text(
-                text = groupMember.serialNumber.toString(),
-                fontSize = 12.sp,
-                color = LocalColor.current.text.default_50
-            )
-        }
+        MemberInfoItemScreen(
+            modifier = Modifier.weight(1f),
+            groupMember = groupMember)
 
         CircleCheckedScreen(
             isChecked = groupMemberSelect.isSelected

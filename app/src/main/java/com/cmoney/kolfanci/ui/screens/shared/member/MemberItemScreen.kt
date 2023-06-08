@@ -51,6 +51,28 @@ fun MemberItemScreen(
             .padding(start = 30.dp, end = 24.dp, top = 12.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        MemberInfoItemScreen(
+            modifier = Modifier.weight(1f),
+            groupMember
+        )
+
+        if (isShowRemove) {
+            Text(text = "移除", fontSize = 14.sp, color = LocalColor.current.primary)
+        }
+    }
+}
+
+/**
+ * 大頭貼, 名字, vip icon, 代號顯示
+ */
+@Composable
+fun MemberInfoItemScreen(
+    modifier: Modifier = Modifier,
+    groupMember: GroupMember
+) {
+    Row(
+        modifier = modifier
+    ) {
         CircleImage(
             modifier = Modifier
                 .size(34.dp),
@@ -60,7 +82,6 @@ fun MemberItemScreen(
         Spacer(modifier = Modifier.width(15.dp))
 
         Column(
-            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -92,14 +113,11 @@ fun MemberItemScreen(
                 color = LocalColor.current.text.default_50
             )
         }
-
-        if (isShowRemove) {
-            Text(text = "移除", fontSize = 14.sp, color = LocalColor.current.primary)
-        }
     }
+
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun MemberItemScreenPreview() {
     FanciTheme {

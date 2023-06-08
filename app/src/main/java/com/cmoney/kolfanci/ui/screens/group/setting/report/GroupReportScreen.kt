@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.report
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,7 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.destinations.GroupReportMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReporterScreenDestination
@@ -53,6 +55,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReport
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.BanDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.KickOutDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.HorizontalMemberItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
@@ -281,34 +284,9 @@ private fun ReportItem(
             .padding(top = 20.dp, bottom = 20.dp, start = 24.dp, end = 24.dp)
     ) {
         //被檢舉人info
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AsyncImage(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape),
-                model = reportUser?.thumbNail,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                placeholder = painterResource(id = R.drawable.placeholder)
-            )
-
-            Spacer(modifier = Modifier.width(15.dp))
-
-            Text(
-                text = reportUser?.name.orEmpty(),
-                fontSize = 16.sp,
-                color = LocalColor.current.text.default_100
-            )
-
-            Spacer(modifier = Modifier.width(5.dp))
-
-            Text(
-                modifier = Modifier.weight(1f),
-                text = reportUser?.serialNumber.toString(),
-                fontSize = 12.sp,
-                color = LocalColor.current.text.default_50
+        reportUser?.let {
+            HorizontalMemberItemScreen(
+                groupMember = it
             )
         }
 
