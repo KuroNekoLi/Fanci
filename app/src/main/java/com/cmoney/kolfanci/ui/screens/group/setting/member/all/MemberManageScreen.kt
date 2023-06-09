@@ -2,25 +2,35 @@ package com.cmoney.kolfanci.ui.screens.group.setting.member.all
 
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
@@ -28,7 +38,6 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
 import com.cmoney.kolfanci.ui.destinations.MemberRoleManageScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
@@ -83,10 +92,6 @@ fun MemberManageScreen(
     val member = remember {
         mutableStateOf(groupMember)
     }
-
-    //再次確認禁言 彈窗
-    val showBanDoubleConfirmDialog: MutableState<BanPeriodOption?> =
-        remember { mutableStateOf(null) }
 
     //Add role callback
     setRoleResult.onNavResult { result ->
@@ -157,6 +162,7 @@ fun MemberManageScreen(
     if (showBanDialog.value) {
         BanDialogScreen(
             name = groupMember.name.orEmpty(),
+            isVip = groupMember.isVip,
             onDismiss = {
                 showBanDialog.value = false
             },
@@ -192,6 +198,7 @@ fun MemberManageScreen(
     if (showKickOutDialog.value) {
         KickOutDialogScreen(
             name = groupMember.name.orEmpty(),
+            isVip = groupMember.isVip,
             onDismiss = {
                 showKickOutDialog.value = false
             },
@@ -273,7 +280,11 @@ private fun MemberManageScreenView(
 
                         Spacer(modifier = Modifier.width(16.dp))
 
-                        Text(text = roleInfo.name.orEmpty(), fontSize = 16.sp, color = Color.White)
+                        Text(
+                            text = roleInfo.name.orEmpty(),
+                            fontSize = 16.sp,
+                            color = LocalColor.current.text.default_100
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(1.dp))
@@ -387,13 +398,13 @@ private fun BanInfo(
             Text(text = banTitle, fontSize = 16.sp, color = LocalColor.current.text.default_100)
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "被禁言日：%s".format(banStartDay),
+                text = stringResource(R.string.ban_start_at, banStartDay),
                 fontSize = 12.sp,
                 color = LocalColor.current.text.default_80
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "禁言時長：%s".format(banDuration),
+                text = stringResource(R.string.ban_duration, banDuration),
                 fontSize = 12.sp,
                 color = LocalColor.current.text.default_80
             )
