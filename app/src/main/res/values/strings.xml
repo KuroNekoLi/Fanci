@@ -56,6 +56,7 @@
     <string name="add_channel">新增頻道</string>
     <string name="style">樣式</string>
     <string name="permission">權限</string>
+    <string name="manage">管理</string>
     <string name="manager">管理員</string>
 
     <string name="channel_name">頻道名稱</string>
@@ -105,9 +106,22 @@
 
     <string name="vip_member_description">下列為購買此 VIP 方案的成員，他們可以執行此 VIP的權限行為。</string>
     <string name="vip_member_empty_description">目前沒有任何人購買此方案</string>
+    <string name="already_purchases_plan">購買的 VIP 方案</string>
+    <string name="exists_role">具備的角色</string>
+    <string name="remove">移除</string>
+    <string name="rule_manage">秩序管理</string>
+    <string name="silence_who">禁言「%s」</string>
+    <string name="silence_who_desc">讓 %s 無法繼續在社團中發表言論</string>
+    <string name="silence_ing">「%s」正在禁言中</string>
+    <string name="remove_group_who">將「%s」踢出社團</string>
+    <string name="remove_group_who_desc">讓 %s 離開社團</string>
+
+    <string name="back">返回</string>
+    <string name="forward_to_official_web">前往官方網站</string>
+    <string name="forward_to_official_web_title">前往官方網站，管理 VIP 方案</string>
+    <string name="forward_to_official_web_subtitle">你目前無法在App內管理方案，請前往官方網站進行方案管理。</string>
 
     <string name="add_plan">新增方案</string>
-    <string name="remove">移除</string>
     <string name="add_blank_plan">新增「%1$s」方案</string>
     <string name="n_member">%1$d 位成員</string>
     <string name="vip_plan_in_x_channel_permission_description">購買下列VIP方案的成員，可以獲得「%1$s」並且在頻道中執行對應的權限資格。</string>

@@ -42,7 +42,7 @@ import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanScreen
+import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanItemScreen
 import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -417,9 +417,10 @@ private fun AddVipPlanScreen(
 
         //Role block
         items(vipPlanModels) { plan ->
-            VipPlanScreen(
+            VipPlanItemScreen(
                 vipPlanModel = plan,
                 endText = stringResource(id = R.string.remove),
+                subTitle = stringResource(id = R.string.n_member).format(plan.memberCount),
                 onPlanClick = {
                     onVipPlanRemoveClick(plan)
                 }

@@ -2,13 +2,27 @@ package com.cmoney.kolfanci.ui.screens.group.setting.member.all
 
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -17,27 +31,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
-import com.cmoney.kolfanci.ui.destinations.MemberRoleManageScreenDestination
+import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.BanDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DisBanDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.KickOutDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
+import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.gson.Gson
@@ -47,8 +64,10 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Parcelize
 data class MemberManageResult(
@@ -69,9 +88,14 @@ fun MemberManageScreen(
     group: Group,
     groupMember: GroupMember,
     viewModel: MemberViewModel = koinViewModel(),
-    setRoleResult: ResultRecipient<MemberRoleManageScreenDestination, String>,
+    vipManagerViewModel: VipManagerViewModel = koinViewModel {
+        parametersOf(group)
+    },
+    setRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
     resultNavigator: ResultBackNavigator<MemberManageResult>
 ) {
+    val TAG = "MemberManageScreen"
+
     val uiState = viewModel.uiState
 
     val showBanDialog = remember { mutableStateOf(false) }
@@ -80,76 +104,100 @@ fun MemberManageScreen(
 
     val showKickOutDialog = remember { mutableStateOf(false) }
 
-    val member = remember {
-        mutableStateOf(groupMember)
-    }
+    //目前會員
+    val member by viewModel.managerMember.collectAsState()
 
-    //再次確認禁言 彈窗
-    val showBanDoubleConfirmDialog: MutableState<BanPeriodOption?> =
-        remember { mutableStateOf(null) }
+    //目前購買方案
+    val purchasesPlan by vipManagerViewModel.alreadyPurchasePlan.collectAsState()
+
+    //禁言資訊
+    val banInfo by viewModel.banUiModel.collectAsState()
 
     //Add role callback
     setRoleResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val roleListStr = result.value
                 val gson = Gson()
                 val resultRoleList = gson.fromJsonTypeToken<List<FanciRole>>(roleListStr)
-                member.value = member.value.copy(
-                    roleInfos = resultRoleList
+                viewModel.onAddRole(
+                    groupId = group.id.orEmpty(),
+                    userId = groupMember.id.orEmpty(),
+                    addRole = resultRoleList
                 )
             }
         }
     }
 
-    viewModel.fetchUserBanInfo(
-        groupId = group.id.orEmpty(),
-        userId = groupMember.id.orEmpty()
-    )
+    LaunchedEffect(Unit) {
+        viewModel.fetchUserBanInfo(
+            groupId = group.id.orEmpty(),
+            userId = groupMember.id.orEmpty()
+        )
 
-    MemberManageScreenView(
-        modifier = modifier,
-        navController = navController,
-        group = group,
-        groupMember = member.value,
-        banInfo = uiState.banUiModel,
-        onBack = {
+        vipManagerViewModel.fetchAlreadyPurchasePlan(groupMember)
+
+        if (member == null) {
+            viewModel.setManageGroupMember(groupMember)
+        }
+
+    }
+
+    member?.apply {
+        MemberManageScreenView(
+            modifier = modifier,
+            navController = navController,
+            group = group,
+            groupMember = this,
+            banInfo = banInfo,
+            purchasesPlan = purchasesPlan,
+            onBack = {
+                resultNavigator.navigateBack(
+                    MemberManageResult(
+                        this,
+                        MemberManageResult.Type.Update
+                    )
+                )
+            },
+            onBanClick = {
+                showBanDialog.value = true
+            },
+            onKickClick = {
+                showKickOutDialog.value = true
+            },
+            onDisBanClick = {
+                showDisBanDialog.value = true
+            },
+            onRemoveRole = { role ->
+                KLog.i(TAG, "onRemoveRole:$role")
+                viewModel.onRemoveRole(
+                    groupId = group.id.orEmpty(),
+                    userId = groupMember.id.orEmpty(),
+                    fanciRole = role
+                )
+            }
+        )
+
+        BackHandler {
             resultNavigator.navigateBack(
                 MemberManageResult(
-                    member.value,
+                    this,
                     MemberManageResult.Type.Update
                 )
             )
-        },
-        onBanClick = {
-            showBanDialog.value = true
-        },
-        onKickClick = {
-            showKickOutDialog.value = true
-        },
-        onDisBanClick = {
-            showDisBanDialog.value = true
         }
-    )
 
-    BackHandler {
-        resultNavigator.navigateBack(
-            MemberManageResult(
-                member.value,
-                MemberManageResult.Type.Update
+        if (uiState.kickMember != null) {
+            resultNavigator.navigateBack(
+                MemberManageResult(
+                    this,
+                    MemberManageResult.Type.Delete
+                )
             )
-        )
-    }
-
-    if (uiState.kickMember != null) {
-        resultNavigator.navigateBack(
-            MemberManageResult(
-                member.value,
-                MemberManageResult.Type.Delete
-            )
-        )
+        }
     }
 
     //==================== Dialog ====================
@@ -216,8 +264,12 @@ private fun MemberManageScreenView(
     onBack: () -> Unit,
     onBanClick: () -> Unit,
     onKickClick: () -> Unit,
-    onDisBanClick: () -> Unit
+    onDisBanClick: () -> Unit,
+    purchasesPlan: List<VipPlanModel>,
+    onRemoveRole: (FanciRole) -> Unit
 ) {
+    val TAG = "MemberManageScreenView"
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -232,25 +284,55 @@ private fun MemberManageScreenView(
             )
         }
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
 
-            MemberItemScreen(groupMember = groupMember, isShowRemove = false)
+            //會員資訊
+            item {
+                MemberItemScreen(groupMember = groupMember, isShowRemove = false)
+            }
+
+            //購買的VIP方案
+            item {
+                if (purchasesPlan.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier.padding(top = 20.dp, start = 24.dp, bottom = 10.dp),
+                        text = stringResource(id = R.string.already_purchases_plan),
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_80
+                    )
+                }
+            }
+
+            items(purchasesPlan) { plan ->
+                VipPlanItemScreen(
+                    modifier = Modifier.fillMaxWidth(),
+                    vipPlanModel = plan,
+                    subTitle = plan.description
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+            }
 
             //身份組
-            Text(
-                modifier = Modifier.padding(top = 20.dp, start = 24.dp, bottom = 10.dp),
-                text = "身份組", fontSize = 14.sp, color = LocalColor.current.text.default_80
-            )
+            item {
+                if (groupMember.roleInfos?.isNotEmpty() == true) {
+                    Text(
+                        modifier = Modifier.padding(top = 20.dp, start = 24.dp, bottom = 10.dp),
+                        text = stringResource(id = R.string.exists_role),
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_80
+                    )
+                }
+            }
 
             //身份清單
             groupMember.roleInfos?.let {
-                repeat(it.size) { index ->
-                    val roleInfo = it[index]
+                items(it) { roleInfo ->
                     val roleColor = if (roleInfo.color?.isNotEmpty() == true) {
                         HexStringMapRoleColor(roleInfo.color.orEmpty())
                     } else {
@@ -260,6 +342,9 @@ private fun MemberManageScreenView(
                         modifier = modifier
                             .fillMaxWidth()
                             .background(LocalColor.current.background)
+                            .clickable(enabled = Constant.isCanEditRole()) {
+                                onRemoveRole.invoke(roleInfo)
+                            }
                             .padding(start = 25.dp, end = 25.dp, top = 14.dp, bottom = 14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -274,71 +359,98 @@ private fun MemberManageScreenView(
                         Spacer(modifier = Modifier.width(16.dp))
 
                         Text(text = roleInfo.name.orEmpty(), fontSize = 16.sp, color = Color.White)
+
+                        if (Constant.isCanEditRole()) {
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            Text(
+                                text = stringResource(id = R.string.remove),
+                                fontSize = 14.sp,
+                                color = LocalColor.current.primary
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(1.dp))
                 }
             }
 
-            //編輯角色 按鈕
+            //新增角色 按鈕
             if (Constant.isCanEditRole()) {
-                BorderButton(
-                    modifier = Modifier
-                        .padding(
-                            top = 20.dp,
-                            start = 24.dp,
-                            end = 24.dp
-                        )
-                        .fillMaxWidth()
-                        .height(45.dp),
-                    text = "編輯角色",
-                    borderColor = LocalColor.current.text.default_50,
-                    textColor = LocalColor.current.text.default_100,
-                    onClick = {
-                        navController.navigate(
-                            MemberRoleManageScreenDestination(
-                                group = group,
-                                groupMember = groupMember
+                item {
+                    BorderButton(
+                        modifier = Modifier
+                            .padding(
+                                top = 20.dp,
+                                start = 24.dp,
+                                end = 24.dp
                             )
-                        )
-                    }
-                )
+                            .fillMaxWidth()
+                            .height(45.dp),
+                        text = stringResource(id = R.string.add_role),
+                        borderColor = LocalColor.current.text.default_50,
+                        textColor = LocalColor.current.text.default_100,
+                        onClick = {
+                            KLog.i(TAG, "onAddRole click.")
+                            groupMember.roleInfos?.let {
+                                navController.navigate(
+                                    ShareAddRoleScreenDestination(
+                                        group = group,
+                                        existsRole = it.toTypedArray()
+                                    )
+                                )
+                            }
+                        }
+                    )
+                }
             }
 
             //權限管理
             if (Constant.isCanBanKickMember()) {
-                Text(
-                    modifier = Modifier.padding(top = 40.dp, start = 24.dp, bottom = 10.dp),
-                    text = "權限管理", fontSize = 14.sp, color = LocalColor.current.text.default_80
-                )
-
-                //禁言
-                if (banInfo == null) {
-                    BanItem(
-                        banTitle = "禁言「%s」".format(groupMember.name),
-                        desc = "讓 %s 無法繼續在社團中發表言論".format(groupMember.name)
-                    ) {
-                        onBanClick.invoke()
-                    }
-                } else {
-                    BanInfo(
-                        banTitle = "「%s」正在禁言中".format(banInfo.user?.name.orEmpty()),
-                        banStartDay = banInfo.startDay,
-                        banDuration = banInfo.duration,
-                        onClick = {
-                            onDisBanClick.invoke()
-                        }
+                item {
+                    Text(
+                        modifier = Modifier.padding(top = 40.dp, start = 24.dp, bottom = 10.dp),
+                        text = stringResource(id = R.string.rule_manage),
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_80
                     )
                 }
 
-                Spacer(modifier = Modifier.height(1.dp))
+                //禁言
+                item {
+                    if (banInfo == null) {
+                        BanItem(
+                            banTitle = stringResource(id = R.string.silence_who).format(groupMember.name),
+                            desc = stringResource(id = R.string.silence_who_desc).format(groupMember.name)
+                        ) {
+                            onBanClick.invoke()
+                        }
+                    } else {
+                        BanInfo(
+                            banTitle = stringResource(id = R.string.silence_ing).format(banInfo.user?.name.orEmpty()),
+                            banStartDay = banInfo.startDay,
+                            banDuration = banInfo.duration,
+                            onClick = {
+                                onDisBanClick.invoke()
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
 
                 //踢出社團
-                BanItem(
-                    banTitle = "將「%s」踢出社團".format(groupMember.name),
-                    desc = "讓 %s 離開社團".format(groupMember.name)
-                ) {
-                    onKickClick.invoke()
+                item {
+                    BanItem(
+                        banTitle = stringResource(id = R.string.remove_group_who).format(groupMember.name),
+                        desc = stringResource(id = R.string.remove_group_who_desc).format(
+                            groupMember.name
+                        )
+                    ) {
+                        onKickClick.invoke()
+                    }
                 }
             }
         }
@@ -423,15 +535,17 @@ fun MemberManageScreenPreview() {
                     )
                 )
             ),
-            onBack = {},
-            onBanClick = {},
-            onKickClick = {},
-            onDisBanClick = {},
             banInfo = BanUiModel(
                 user = null,
                 startDay = "2020/10/22",
                 duration = "3日"
-            )
+            ),
+            onBack = {},
+            onBanClick = {},
+            onKickClick = {},
+            onDisBanClick = {},
+            purchasesPlan = VipManagerUseCase.getVipPlanMockData(),
+            onRemoveRole = {}
         )
     }
 }

@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
@@ -49,8 +50,15 @@ class VipManagerViewModel(
     /**
      * 可以選擇的權限選項
      */
-    private val _permissionOptionModels = MutableStateFlow<List<VipPlanPermissionOptionModel>?>(null)
+    private val _permissionOptionModels =
+        MutableStateFlow<List<VipPlanPermissionOptionModel>?>(null)
     val permissionOptionModels = _permissionOptionModels.asStateFlow()
+
+    /**
+     * 已經購買的方案清單
+     */
+    private val _alreadyPurchasePlan = MutableStateFlow<List<VipPlanModel>>(emptyList())
+    val alreadyPurchasePlan = _alreadyPurchasePlan.asStateFlow()
 
     /**
      *  取得該社團目前有的 Vip 方案清單
@@ -141,8 +149,21 @@ class VipManagerViewModel(
                     _permissionOptionModels.value = data
                 }
                 .onFailure { error ->
-                    KLog.i(TAG, error)
+                    KLog.e(TAG, error)
                 }
+        }
+    }
+
+    /**
+     * 取得該會員已購買的清單
+     */
+    fun fetchAlreadyPurchasePlan(groupMember: GroupMember) {
+        viewModelScope.launch {
+            vipManagerUseCase.getAlreadyPurchasePlan(groupMember = groupMember).fold({
+                _alreadyPurchasePlan.value = it
+            }, {
+                KLog.e(TAG, it)
+            })
         }
     }
 }

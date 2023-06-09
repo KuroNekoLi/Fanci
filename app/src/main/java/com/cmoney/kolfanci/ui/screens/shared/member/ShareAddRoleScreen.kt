@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -240,7 +241,7 @@ private fun RoleItemScreen(
         Column(modifier = Modifier.weight(1f)) {
             Text(text = fanciRole.name.orEmpty(), fontSize = 16.sp, color = Color.White)
             Text(
-                text = "%d 位成員".format(fanciRole.userCount ?: 0),
+                text = stringResource(id = R.string.n_member).format(fanciRole.userCount ?: 0),
                 fontSize = 12.sp,
                 color = LocalColor.current.component.other
             )
