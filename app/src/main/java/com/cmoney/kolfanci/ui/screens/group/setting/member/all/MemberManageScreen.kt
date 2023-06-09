@@ -27,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -205,6 +204,7 @@ fun MemberManageScreen(
     if (showBanDialog.value) {
         BanDialogScreen(
             name = groupMember.name.orEmpty(),
+            isVip = groupMember.isVip,
             onDismiss = {
                 showBanDialog.value = false
             },
@@ -240,6 +240,7 @@ fun MemberManageScreen(
     if (showKickOutDialog.value) {
         KickOutDialogScreen(
             name = groupMember.name.orEmpty(),
+            isVip = groupMember.isVip,
             onDismiss = {
                 showKickOutDialog.value = false
             },
@@ -358,7 +359,11 @@ private fun MemberManageScreenView(
 
                         Spacer(modifier = Modifier.width(16.dp))
 
-                        Text(text = roleInfo.name.orEmpty(), fontSize = 16.sp, color = Color.White)
+                        Text(
+                            text = roleInfo.name.orEmpty(),
+                            fontSize = 16.sp,
+                            color = LocalColor.current.text.default_100
+                        )
 
                         if (Constant.isCanEditRole()) {
                             Spacer(modifier = Modifier.weight(1f))
@@ -499,13 +504,13 @@ private fun BanInfo(
             Text(text = banTitle, fontSize = 16.sp, color = LocalColor.current.text.default_100)
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "被禁言日：%s".format(banStartDay),
+                text = stringResource(R.string.ban_start_at, banStartDay),
                 fontSize = 12.sp,
                 color = LocalColor.current.text.default_80
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "禁言時長：%s".format(banDuration),
+                text = stringResource(R.string.ban_duration, banDuration),
                 fontSize = 12.sp,
                 color = LocalColor.current.text.default_80
             )

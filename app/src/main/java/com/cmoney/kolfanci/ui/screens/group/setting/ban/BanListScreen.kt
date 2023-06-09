@@ -11,7 +11,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,8 +29,6 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogDefaultContentScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DisBanDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -102,7 +100,7 @@ private fun BanListScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "禁言列表",
+                title = stringResource(id = R.string.ban_list),
                 leadingEnable = true,
                 moreEnable = false,
                 backClick = {
@@ -191,7 +189,7 @@ private fun BanUserItem(banUiModel: BanUiModel, onClick: () -> Unit) {
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
-            text = "被禁言日：%s".format(banUiModel.startDay),
+            text = stringResource(R.string.ban_start_at, banUiModel.startDay),
             fontSize = 16.sp,
             color = LocalColor.current.text.default_100
         )
@@ -199,7 +197,7 @@ private fun BanUserItem(banUiModel: BanUiModel, onClick: () -> Unit) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "禁言時長：%s".format(banUiModel.duration),
+            text = stringResource(R.string.ban_duration, banUiModel.duration),
             fontSize = 16.sp,
             color = LocalColor.current.text.default_100
         )

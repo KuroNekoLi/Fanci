@@ -102,10 +102,10 @@ fun DialogScreenPreview() {
         ) {
             BanDayItemScreen(
                 name = "Hello",
-                onClick = {}
-            ) {
-
-            }
+                isVip = false,
+                onClick = {},
+                onDismiss = {}
+            )
         }
     }
 }

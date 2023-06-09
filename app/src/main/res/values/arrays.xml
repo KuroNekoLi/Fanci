@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="ban_day_options">
+        <item>@string/one_day</item>
+        <item>@string/three_day</item>
+        <item>@string/seven_day</item>
+        <item>@string/thirty_day</item>
+        <item>@string/forever</item>
+    </string-array>
+</resources>

@@ -1,15 +1,24 @@
 package com.cmoney.kolfanci.ui.screens.shared.dialog
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.cmoney.fanciapi.fanci.model.BanPeriodOption
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toDisplayDay
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DialogDefaultContentScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
 @Composable
 fun BanDialogScreen(
     name: String,
+    isVip: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (BanPeriodOption) -> Unit
 ) {
@@ -26,10 +35,11 @@ fun BanDialogScreen(
             onDismiss = {
                 onDismiss.invoke()
             },
-            title = "禁言 $name",
+            title = stringResource(id = R.string.ban_x),
         ) {
             BanDayItemScreen(
                 name = name,
+                isVip = isVip,
                 onClick = {
                     showFirstDialog = false
                     showBanDoubleConfirmDialog.value = it
@@ -47,12 +57,12 @@ fun BanDialogScreen(
                 showBanDoubleConfirmDialog.value = null
                 onDismiss.invoke()
             },
-            title = "確定禁言 %s %s".format(name, it.toDisplayDay())
+            title = stringResource(R.string.confirm_ban_x_y_days, name, it.toDisplayDay())
         ) {
             DialogDefaultContentScreen(
-                content = "一旦被禁言，將會無法對頻道做出任何社群行為：留言、按讚等等。",
-                confirmTitle = "確定禁言",
-                cancelTitle = "取消",
+                content = stringResource(id = R.string.confirm_ban_x_content),
+                confirmTitle = stringResource(id = R.string.confirm_ban),
+                cancelTitle = stringResource(id = R.string.cancel),
                 onConfirm = {
                     showBanDoubleConfirmDialog.value = null
                     onConfirm.invoke(it)
@@ -72,6 +82,20 @@ fun BanDialogScreenPreview() {
     FanciTheme {
         BanDialogScreen(
             name = "Hello",
+            isVip = false,
+            onConfirm = {},
+            onDismiss = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun VipBanDialogScreenPreview() {
+    FanciTheme {
+        BanDialogScreen(
+            name = "Hello",
+            isVip = true,
             onConfirm = {},
             onDismiss = {}
         )
