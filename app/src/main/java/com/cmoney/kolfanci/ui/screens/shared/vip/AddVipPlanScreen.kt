@@ -255,9 +255,11 @@ fun VipPlanModelItemPreview() {
         Column {
             VipPlanModelItem(
                 vipPlanModel = VipPlanModel(
+                    id = "0",
                     name = "基本權限",
                     memberCount = 10,
-                    planIcon = R.drawable.vip_diamond
+                    planIcon = R.drawable.vip_diamond,
+                    description = ""
                 ),
                 isChecked = true,
                 onItemClick = {
@@ -270,9 +272,11 @@ fun VipPlanModelItemPreview() {
             )
             VipPlanModelItem(
                 vipPlanModel = VipPlanModel(
+                    id = "1",
                     name = "進階權限",
                     memberCount = 5,
-                    planIcon = R.drawable.vip_diamond
+                    planIcon = R.drawable.vip_diamond,
+                    description = ""
                 ),
                 isChecked = false,
                 onItemClick = {

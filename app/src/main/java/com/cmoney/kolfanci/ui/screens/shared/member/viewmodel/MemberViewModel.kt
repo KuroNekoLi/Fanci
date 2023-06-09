@@ -614,7 +614,6 @@ class MemberViewModel(
         _shareText.value = ""
     }
 
-<<<<<<< app/src/main/java/com/cmoney/kolfanci/ui/screens/shared/member/viewmodel/MemberViewModel.kt
     /**
      * 設置要編輯的會員info
      */

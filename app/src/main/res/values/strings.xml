@@ -121,7 +121,6 @@
     <string name="forward_to_official_web_subtitle">你目前無法在App內管理方案，請前往官方網站進行方案管理。</string>
 
     <string name="add_plan">新增方案</string>
-    <string name="remove">移除</string>
     <string name="add_blank_plan">新增「%1$s」方案</string>
     <string name="n_member">%1$d 位成員</string>
     <string name="vip_plan_in_x_channel_permission_description">購買下列VIP方案的成員，可以獲得「%1$s」並且在頻道中執行對應的權限資格。</string>
