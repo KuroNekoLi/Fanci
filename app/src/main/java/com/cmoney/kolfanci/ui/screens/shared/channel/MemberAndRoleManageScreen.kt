@@ -420,7 +420,7 @@ private fun AddVipPlanScreen(
             VipPlanItemScreen(
                 vipPlanModel = plan,
                 endText = stringResource(id = R.string.remove),
-                subTitle = "%d 位成員".format(plan.memberCount),
+                subTitle = stringResource(id = R.string.n_member).format(plan.memberCount),
                 onPlanClick = {
                     onVipPlanRemoveClick(plan)
                 }

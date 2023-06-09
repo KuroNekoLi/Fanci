@@ -133,8 +133,8 @@ fun VipManagerScreenView(
                         VipPlanItemScreen(
                             modifier = Modifier.fillMaxWidth(),
                             vipPlanModel = plan,
-                            subTitle = "%d 位成員".format(plan.memberCount),
-                            endText = "管理",
+                            subTitle = stringResource(id = R.string.n_member).format(plan.memberCount),
+                            endText = stringResource(id = R.string.manage),
                             onPlanClick = onPlanClick
                         )
                     }
