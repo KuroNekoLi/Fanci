@@ -55,6 +55,7 @@ class ChannelUseCase(
         accessorList: List<AccessorParam>
     ) =
         kotlin.runCatching {
+            // TODO vip plan 加入私密頻道的機制
             channelApi.apiV1ChannelChannelIdWhiteListAuthTypePut(
                 channelId = channelId,
                 authType = authType,
