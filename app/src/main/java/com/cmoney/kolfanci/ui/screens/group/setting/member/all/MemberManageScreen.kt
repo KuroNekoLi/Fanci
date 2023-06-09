@@ -311,6 +311,7 @@ private fun MemberManageScreenView(
 
             items(purchasesPlan) { plan ->
                 VipPlanItemScreen(
+                    modifier = Modifier.fillMaxWidth(),
                     vipPlanModel = plan,
                     subTitle = plan.description
                 )

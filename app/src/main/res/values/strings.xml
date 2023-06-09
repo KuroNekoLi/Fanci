@@ -114,4 +114,9 @@
     <string name="remove_group_who">將「%s」踢出社團</string>
     <string name="remove_group_who_desc">讓 %s 離開社團</string>
 
+    <string name="back">返回</string>
+    <string name="forward_to_official_web">前往官方網站</string>
+    <string name="forward_to_official_web_title">前往官方網站，管理 VIP 方案</string>
+    <string name="forward_to_official_web_subtitle">你目前無法在App內管理方案，請前往官方網站進行方案管理。</string>
+
 </resources>

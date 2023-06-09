@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,7 +38,6 @@ fun VipPlanItemScreen(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
             .background(LocalColor.current.background)
             .clickable(enabled = onPlanClick != null) {
                 onPlanClick?.invoke(vipPlanModel)
@@ -52,7 +52,7 @@ fun VipPlanItemScreen(
             contentDescription = null
         )
 
-        Column(modifier = Modifier.weight(1f)) {
+        Column {
             Text(
                 text = vipPlanModel.name,
                 fontSize = 16.sp,
@@ -60,7 +60,6 @@ fun VipPlanItemScreen(
             )
 
             Text(
-//                text = "%d 位成員".format(vipPlanModel.memberCount),
                 text = subTitle,
                 fontSize = 12.sp,
                 color = LocalColor.current.component.other
@@ -68,6 +67,8 @@ fun VipPlanItemScreen(
         }
 
         endText?.let {
+            Spacer(modifier = Modifier.weight(1f))
+
             Text(
                 modifier = Modifier.padding(end = 24.dp),
                 text = endText,
