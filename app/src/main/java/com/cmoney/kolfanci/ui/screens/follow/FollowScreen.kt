@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -88,9 +89,9 @@ fun FollowScreen(
     //查看該社團info dialog
     val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
-    openGroupDialog?.let { group ->
+    openGroupDialog?.let { targetGroup ->
         GroupItemDialogScreen(
-            groupModel = group,
+            groupModel = targetGroup,
             onDismiss = {
                 viewModel.closeGroupItemDialog()
                 onDismissInvite.invoke()
@@ -209,42 +210,63 @@ fun FollowScreenView(
         scaffoldState = scaffoldState,
         drawerContent = if (XLoginHelper.isLogin) {
             {
-                DrawerMenuScreen(
-                    groupList = groupList,
-                    onClick = {
-                        KLog.i(TAG, "onGroup item click.")
+                Row(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    DrawerMenuScreen(
+                        modifier = Modifier.fillMaxHeight(),
+                        groupList = groupList,
+                        onClick = {
+                            KLog.i(TAG, "onGroup item click.")
 
-                        //Close Drawer
-                        coroutineScope.launch {
-                            scaffoldState.drawerState.close()
-                        }
+                            //Close Drawer
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
 
-                        onGroupItemClick.invoke(it)
-                    },
-                    onSearch = {
-                        KLog.i(TAG, "onSearch click.")
+                            onGroupItemClick.invoke(it)
+                        },
+                        onSearch = {
+                            KLog.i(TAG, "onSearch click.")
 
-                        //Close Drawer
-                        coroutineScope.launch {
-                            scaffoldState.drawerState.close()
-                        }
+                            //Close Drawer
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
 
-                        val arrayGroupItems = arrayListOf<Group>()
-                        arrayGroupItems.addAll(groupList.map {
-                            it.groupModel
-                        })
+                            val arrayGroupItems = arrayListOf<Group>()
+                            arrayGroupItems.addAll(groupList.map {
+                                it.groupModel
+                            })
 
-                        navigator.navigate(
-                            DiscoverGroupScreenDestination(
-                                groupItems = arrayGroupItems
+                            navigator.navigate(
+                                DiscoverGroupScreenDestination(
+                                    groupItems = arrayGroupItems
+                                )
                             )
-                        )
-                    },
-                    onProfile = {
-                        KLog.i(TAG, "onProfile click.")
-                        navigator.navigate(MyScreenDestination)
-                    }
-                )
+                        },
+                        onProfile = {
+                            KLog.i(TAG, "onProfile click.")
+                            navigator.navigate(MyScreenDestination)
+                        }
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .clickable(
+                                interactionSource = remember {
+                                    MutableInteractionSource()
+                                },
+                                indication = null,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        scaffoldState.drawerState.close()
+                                    }
+                                }
+                            )
+                    )
+                }
             }
         } else {
             null
@@ -315,7 +337,7 @@ fun FollowScreenView(
                                 Image(
                                     painter = painterResource(id = R.drawable.menu),
                                     contentDescription = null,
-                                    colorFilter = ColorFilter.tint(color = LocalColor.current.env_100)
+                                    colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
                                 )
                             }
                         }
