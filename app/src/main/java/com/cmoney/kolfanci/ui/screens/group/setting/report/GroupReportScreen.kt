@@ -1,7 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.report
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,11 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -26,10 +23,8 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.Group
@@ -47,7 +41,6 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.destinations.GroupReportMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReporterScreenDestination
@@ -123,9 +116,11 @@ fun GroupReportScreen(
     //禁言 dialog
     if (uiState.showSilenceDialog != null) {
         val name = uiState.showSilenceDialog.reportee?.name.orEmpty()
+        val isVip = uiState.showSilenceDialog.reportee?.isVip ?: false
 
         BanDialogScreen(
             name = name,
+            isVip = isVip,
             onDismiss = {
                 viewModel.dismissSilenceDialog()
             },
@@ -141,9 +136,11 @@ fun GroupReportScreen(
     //踢出 dialog
     if (uiState.kickDialog != null) {
         val name = uiState.kickDialog.reportee?.name.orEmpty()
+        val isVip = uiState.kickDialog.reportee?.isVip ?: false
 
         KickOutDialogScreen(
             name = name,
+            isVip = isVip,
             onDismiss = {
                 viewModel.dismissKickDialog()
             },
@@ -185,14 +182,14 @@ private fun ReportDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 GrayButton(
-                    text = "禁言",
+                    text = stringResource(id = R.string.ban),
                     shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
                 ) {
                     onSilence.invoke(reportInformation)
                 }
 
                 GrayButton(
-                    text = "踢出社團",
+                    text = stringResource(id = R.string.kick_out_from_group),
                     shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
                 ) {
                     onKick.invoke(reportInformation)
@@ -201,7 +198,7 @@ private fun ReportDialog(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 GrayButton(
-                    text = "返回"
+                    text = stringResource(id = R.string.back)
                 ) {
                     onDismiss()
                 }
@@ -415,7 +412,7 @@ private fun ReportItem(
                     .height(40.dp),
                 borderColor = LocalColor.current.text.default_50,
                 textColor = LocalColor.current.text.default_100,
-                text = "不懲處"
+                text = stringResource(id = R.string.not_punish)
             ) {
                 onIgnore.invoke(reportInformation)
             }
@@ -426,7 +423,7 @@ private fun ReportItem(
                 modifier = Modifier
                     .weight(1f)
                     .height(40.dp),
-                text = "懲處"
+                text = stringResource(id = R.string.punish)
             ) {
                 onReportClick.invoke(reportInformation)
             }
