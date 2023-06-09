@@ -93,7 +93,9 @@ class ChannelSettingViewModel(
                     listPermissionSelected[channelWhiteList.authType.orEmpty()] = SelectedModel(
                         selectedMember = channelWhiteList.users?.map { it.toGroupMember() }
                             .orEmpty(),
-                        selectedRole = channelWhiteList.roles.orEmpty()
+                        selectedRole = channelWhiteList.roles.orEmpty(),
+                        // TODO 需要此頻道已設定的VIP方案
+                        selectedVipPlans = emptyList()
                     )
                 }
                 fetchPrivateChannelUserCount()
@@ -222,8 +224,7 @@ class ChannelSettingViewModel(
      * 將新的 channel append 至 原本 group 做顯示
      */
     private fun addChannelToGroup(channel: Channel, group: Group) {
-        val channelCategory = channel.category
-        channelCategory?.let { channelCategory ->
+        channel.category?.let { channelCategory ->
             val newCategory = group.categories?.map { category ->
                 if (category.id == channelCategory.id) {
                     val newChannel = category.channels.orEmpty().toMutableList()
