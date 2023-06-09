@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,7 +31,7 @@ import com.cmoney.kolfanci.ui.destinations.VipPlanInfoMainScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanScreen
+import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -129,8 +130,11 @@ fun VipManagerScreenView(
                     verticalArrangement = Arrangement.spacedBy(1.dp)
                 ) {
                     items(vipPlanList) { plan ->
-                        VipPlanScreen(
+                        VipPlanItemScreen(
+                            modifier = Modifier.fillMaxWidth(),
                             vipPlanModel = plan,
+                            subTitle = stringResource(id = R.string.n_member).format(plan.memberCount),
+                            endText = stringResource(id = R.string.manage),
                             onPlanClick = onPlanClick
                         )
                     }

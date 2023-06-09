@@ -11,6 +11,16 @@ import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionO
 import kotlin.random.Random
 
 class VipManagerUseCase {
+
+    /**
+     * 取得所有VIP方案
+     */
+    fun getVipPlan(): Result<List<VipPlanModel>> {
+        return kotlin.runCatching {
+            getVipPlanMockData()
+        }
+    }
+
     /**
      * 取得 vip 方案清單
      *
@@ -79,19 +89,36 @@ class VipManagerUseCase {
         }
     }
 
+    /**
+     * 取得該會員已購買的vip方案清單
+     *
+     * @param groupMember 要查的會員
+     * @return vip 方案清單
+     */
+    fun getAlreadyPurchasePlan(groupMember: GroupMember) = kotlin.runCatching {
+        getVipPlanMockData()
+    }
+
+
     companion object {
         fun getVipPlanMockData() = listOf(
             VipPlanModel(
+                id = "1",
                 name = "高級學員",
-                memberCount = 10
+                memberCount = 10,
+                description = "99元月訂閱方案"
             ),
             VipPlanModel(
+                id = "2",
                 name = "進階學員",
-                memberCount = 5
+                memberCount = 5,
+                description = "120元月訂閱方案"
             ),
             VipPlanModel(
+                id = "3",
                 name = "初階學員",
-                memberCount = 0
+                memberCount = 0,
+                description = "30 元月訂閱方案"
             )
         )
 
