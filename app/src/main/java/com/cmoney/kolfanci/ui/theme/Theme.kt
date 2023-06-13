@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.cmoney.kolfanci.R
 
@@ -150,7 +151,7 @@ private val DarkImages = Images(lockupLogo = R.drawable.emoji_like)
 @Composable
 fun FanciTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    fanciColor: FanciColor = DefaultThemeColor,
+    fanciColor: FanciColor = LocalColor.current,
     content: @Composable () -> Unit
 ) {
     val image = LightImages
@@ -164,9 +165,14 @@ private fun MainTheme(
     content: @Composable () -> Unit,
     image: Images
 ) {
+    val rememberColor = remember {
+        // Explicitly creating a new object here so we don't mutate the initial [fanciColor]
+        // provided, and overwrite the values set in it.
+        fanciColor.copy()
+    }.apply { updateColorFrom(other = fanciColor) }
     CompositionLocalProvider(
         LocalImages provides image,
-        LocalColor provides fanciColor
+        LocalColor provides rememberColor
     ) {
         MaterialTheme(
             colors = MaterialTheme.colors.copy(

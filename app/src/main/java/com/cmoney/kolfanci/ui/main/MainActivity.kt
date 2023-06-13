@@ -29,10 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.model.notification.Payload
+import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
-import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.kolfanci.ui.theme.Black_242424
 import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
@@ -81,10 +81,10 @@ class MainActivity : BaseWebLoginActivity() {
 
                 val isLoginLoading by globalViewModel.loginLoading.collectAsState()
 
-                isOpenTutorial?.let { isOpenTutorial ->
-                    if (isOpenTutorial) {
+                isOpenTutorial?.let { isCurrentOpenTutorial ->
+                    if (isCurrentOpenTutorial) {
                         FanciTheme(fanciColor = theme) {
-                            setStatusBarColor()
+                            StatusBarColorEffect()
 
                             Scaffold(
                                 modifier = Modifier
@@ -136,7 +136,7 @@ class MainActivity : BaseWebLoginActivity() {
     }
 
     @Composable
-    fun setStatusBarColor() {
+    fun StatusBarColorEffect() {
         val statusBarColor = MaterialTheme.colors.primary
         val systemUiController = rememberSystemUiController()
         SideEffect {
