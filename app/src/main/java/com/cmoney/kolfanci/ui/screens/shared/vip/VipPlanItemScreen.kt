@@ -88,7 +88,7 @@ fun VipPlanItemScreen(
     paddingValues: PaddingValues = PaddingValues(start = 28.dp),
     rowHeight: Dp = 60.dp,
     subTitle: String = vipPlanModel.description,
-    endContent: @Composable () -> Unit = {},
+    endContent: @Composable (() -> Unit)? = null,
     onPlanClick: ((VipPlanModel) -> Unit)? = null
 ) {
     Row(
@@ -123,7 +123,7 @@ fun VipPlanItemScreen(
                 color = LocalColor.current.component.other
             )
         }
-        endContent()
+        endContent?.invoke()
     }
 }
 

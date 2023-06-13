@@ -315,7 +315,7 @@ private fun MemberManageScreenView(
                     modifier = Modifier.fillMaxWidth(),
                     vipPlanModel = plan,
                     subTitle = plan.description,
-                    endContent = {}
+                    endContent = null
                 )
                 Spacer(modifier = Modifier.height(1.dp))
             }
