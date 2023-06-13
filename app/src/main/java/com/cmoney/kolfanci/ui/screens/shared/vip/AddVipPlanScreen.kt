@@ -2,19 +2,15 @@ package com.cmoney.kolfanci.ui.screens.shared.vip
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
@@ -121,12 +117,18 @@ private fun AddVipPlanScreenView(
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    itemsIndexed(vipPlanModels) { index, vipPlan ->
-                        VipPlanModelItem(
-                            vipPlanModel = vipPlan,
-                            isChecked = index == selectedIndex,
-                            onItemClick = {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
+                    itemsIndexed(vipPlanModels) { index, vipPlanModel ->
+                        VipPlanItemScreen(
+                            modifier = modifier.fillMaxWidth(),
+                            vipPlanModel = vipPlanModel,
+                            endContent = {
+                                CircleCheckedScreen(isChecked = index == selectedIndex)
+                            },
+                            onPlanClick = {
                                 selectedIndex = index
                             }
                         )
@@ -173,49 +175,6 @@ private fun EmptyVipPlanScreenView() {
     }
 }
 
-@Composable
-private fun VipPlanModelItem(
-    modifier: Modifier = Modifier,
-    vipPlanModel: VipPlanModel,
-    isChecked: Boolean,
-    onItemClick: () -> Unit
-) {
-    Row(
-        modifier = modifier
-            .background(LocalColor.current.background)
-            .clickable {
-                onItemClick()
-            }
-            .fillMaxWidth()
-            .height(60.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.width(28.dp))
-        Image(
-            modifier = Modifier.size(28.dp),
-            painter = painterResource(id = vipPlanModel.planIcon),
-            contentDescription = "vip plan icon"
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = vipPlanModel.name,
-                fontSize = 16.sp,
-                color = LocalColor.current.text.default_100
-            )
-            val memberCount = stringResource(id = R.string.n_member, vipPlanModel.memberCount)
-            Text(
-                text = memberCount,
-                fontSize = 12.sp,
-                color = LocalColor.current.text.default_50
-            )
-        }
-        CircleCheckedScreen(isChecked = isChecked)
-    }
-}
-
 @Preview
 @Composable
 fun AddVipPlanScreenViewPreview() {
@@ -245,43 +204,5 @@ fun LoadingScreenViewPreview() {
 fun EmptyVipPlanScreenViewPreview() {
     FanciTheme {
         EmptyVipPlanScreenView()
-    }
-}
-
-@Preview
-@Composable
-fun VipPlanModelItemPreview() {
-    FanciTheme {
-        Column {
-            VipPlanModelItem(
-                vipPlanModel = VipPlanModel(
-                    id = "0",
-                    name = "基本權限",
-                    memberCount = 10,
-                    planIcon = R.drawable.vip_diamond,
-                    description = ""
-                ),
-                isChecked = true,
-                onItemClick = {
-                }
-            )
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(8.dp)
-                .background(LocalColor.current.env_80)
-            )
-            VipPlanModelItem(
-                vipPlanModel = VipPlanModel(
-                    id = "1",
-                    name = "進階權限",
-                    memberCount = 5,
-                    planIcon = R.drawable.vip_diamond,
-                    description = ""
-                ),
-                isChecked = false,
-                onItemClick = {
-                }
-            )
-        }
     }
 }

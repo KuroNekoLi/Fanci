@@ -418,6 +418,7 @@ private fun AddVipPlanScreen(
         //Role block
         items(vipPlanModels) { plan ->
             VipPlanItemScreen(
+                modifier = Modifier.fillMaxWidth(),
                 vipPlanModel = plan,
                 endText = stringResource(id = R.string.remove),
                 subTitle = stringResource(id = R.string.n_member).format(plan.memberCount),

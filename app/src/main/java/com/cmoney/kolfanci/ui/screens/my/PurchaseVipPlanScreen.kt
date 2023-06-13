@@ -1,18 +1,14 @@
 package com.cmoney.kolfanci.ui.screens.my
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -46,24 +42,20 @@ fun PurchaseVipPlanScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         vipPlanList.forEach { plan ->
-            Box {
-                VipPlanItemScreen(
-                    modifier = Modifier.fillMaxWidth(),
-                    vipPlanModel = plan,
-                    subTitle = plan.description,
-                    onPlanClick = onPlanClick
-                )
-
-                Image(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 10.dp),
-                    painter = painterResource(id = R.drawable.next),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
-                )
-            }
-
+            VipPlanItemScreen(
+                modifier = Modifier.fillMaxWidth(),
+                paddingValues = PaddingValues(start = 28.dp, end = 10.dp),
+                vipPlanModel = plan,
+                subTitle = plan.description,
+                endContent = {
+                    Image(
+                        painter = painterResource(id = R.drawable.next),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
+                    )
+                },
+                onPlanClick = onPlanClick
+            )
             Spacer(modifier = Modifier.height(1.dp))
         }
     }
