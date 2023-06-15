@@ -140,11 +140,8 @@ fun CoffeeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val image = LightImages
-    MainTheme(darkTheme, CoffeeThemeColor, content, image)
+    MainTheme(darkTheme, CoffeeThemeColor, content)
 }
-
-private val LightImages = Images(lockupLogo = R.drawable.fanci)
 
 private val DarkImages = Images(lockupLogo = R.drawable.emoji_like)
 
@@ -154,8 +151,7 @@ fun FanciTheme(
     fanciColor: FanciColor = LocalColor.current,
     content: @Composable () -> Unit
 ) {
-    val image = LightImages
-    MainTheme(darkTheme, fanciColor, content, image)
+    MainTheme(darkTheme, fanciColor, content)
 }
 
 @Composable
@@ -163,7 +159,7 @@ private fun MainTheme(
     darkTheme: Boolean,
     fanciColor: FanciColor,
     content: @Composable () -> Unit,
-    image: Images
+    image: Images = LocalImages.current
 ) {
     val rememberColor = remember {
         // Explicitly creating a new object here so we don't mutate the initial [fanciColor]

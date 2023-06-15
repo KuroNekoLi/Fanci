@@ -8,13 +8,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.graphics.Color
+import com.cmoney.kolfanci.R
 import com.google.errorprone.annotations.Immutable
+
+private val LightImages = Images(lockupLogo = R.drawable.fanci)
 
 @Immutable
 data class Images(@DrawableRes val lockupLogo: Int)
 
 internal val LocalImages = staticCompositionLocalOf<Images> {
-    error("No LocalImages specified")
+    LightImages
 }
 
 /**
@@ -62,15 +65,15 @@ class FanciColor(
         internal set
     var inputFrame by mutableStateOf(inputFrame, structuralEqualityPolicy())
         internal set
-    var component: FanciComponentColor by mutableStateOf(component, structuralEqualityPolicy())
+    var component by mutableStateOf(component, structuralEqualityPolicy())
         internal set
-    var text: FanciTextColor by mutableStateOf(text, structuralEqualityPolicy())
+    var text by mutableStateOf(text, structuralEqualityPolicy())
         internal set
-    var inputText: FanciInputText by mutableStateOf(inputText, structuralEqualityPolicy())
+    var inputText by mutableStateOf(inputText, structuralEqualityPolicy())
         internal set
-    var specialColor: SpecialColor by mutableStateOf(specialColor, structuralEqualityPolicy())
+    var specialColor by mutableStateOf(specialColor, structuralEqualityPolicy())
         internal set
-    var roleColor: RoleColor by mutableStateOf(roleColor, structuralEqualityPolicy())
+    var roleColor by mutableStateOf(roleColor, structuralEqualityPolicy())
         internal set
 
     fun copy(
@@ -398,11 +401,48 @@ internal fun FanciColor.updateColorFrom(other: FanciColor) {
     env_80 = other.env_80
     env_100 = other.env_100
     inputFrame = other.inputFrame
-    component = other.component
-    text = other.text
-    inputText = other.inputText
-    specialColor = other.specialColor
-    roleColor = other.roleColor
+    component.updateColorFrom(other.component)
+    text.updateColorFrom(other.text)
+    inputText.updateColorFrom(other.inputText)
+    specialColor.updateColorFrom(other.specialColor)
+    roleColor.updateColorFrom(other.roleColor)
+}
+
+private fun FanciComponentColor.updateColorFrom(other: FanciComponentColor) {
+    tabUnSelect = other.tabSelected
+    tabSelected = other.tabUnSelect
+    this.other = other.other
+}
+
+private fun FanciTextColor.updateColorFrom(other: FanciTextColor) {
+    default_30 = other.default_30
+    default_50 = other.default_50
+    default_80 = other.default_80
+    default_100 = other.default_100
+    this.other = other.other
+}
+
+private fun FanciInputText.updateColorFrom(other: FanciInputText) {
+    input_30 = other.input_30
+    input_50 = other.input_50
+    input_80 = other.input_80
+    input_100 = other.input_100
+}
+
+private fun SpecialColor.updateColorFrom(other: SpecialColor) {
+    blue = other.blue
+    blueGreen = other.blueGreen
+    green = other.green
+    hintRed = other.hintRed
+    orange = other.orange
+    pink = other.pink
+    purple = other.purple
+    red = other.red
+    yellow = other.yellow
+}
+
+private fun RoleColor.updateColorFrom(other: RoleColor) {
+    colors = other.colors
 }
 
 internal val LocalColor = staticCompositionLocalOf<FanciColor> {
