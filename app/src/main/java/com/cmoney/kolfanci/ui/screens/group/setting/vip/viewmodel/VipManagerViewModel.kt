@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.extension.toVipPlanModel
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
@@ -61,12 +62,19 @@ class VipManagerViewModel(
     val alreadyPurchasePlan = _alreadyPurchasePlan.asStateFlow()
 
     /**
+     * 目前選中的方案
+     */
+    private var selectedVipPlanModel: VipPlanModel? = null
+
+    /**
      *  取得該社團目前有的 Vip 方案清單
      */
     fun fetchVipPlan() {
         viewModelScope.launch {
             vipManagerUseCase.getVipPlan(group).fold({
-                _vipPlanList.value = it
+                _vipPlanList.value = it.map { role ->
+                    role.toVipPlanModel()
+                }
             }, {
                 KLog.e(TAG, it)
             })
@@ -165,5 +173,13 @@ class VipManagerViewModel(
                 KLog.e(TAG, it)
             })
         }
+    }
+
+    /**
+     * 設定目前選擇的 plan
+     */
+    fun setCurrentVipPlanModel(vipPlanModel: VipPlanModel) {
+        KLog.i(TAG, "setCurrentVipPlanModel:$vipPlanModel")
+        this.selectedVipPlanModel = vipPlanModel
     }
 }
