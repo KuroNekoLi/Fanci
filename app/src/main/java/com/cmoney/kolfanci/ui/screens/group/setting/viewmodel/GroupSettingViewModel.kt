@@ -15,7 +15,9 @@ import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -42,6 +44,9 @@ class GroupSettingViewModel(
 
     var uiState by mutableStateOf(GroupSettingUiState())
         private set
+
+    private val _confirmNewThemeEvent = MutableSharedFlow<String>()
+    val confirmNewThemeEvent = _confirmNewThemeEvent.asSharedFlow()
 
     //檢舉清單
     private val _reportList = MutableStateFlow<List<ReportInformation>>(emptyList())
@@ -294,14 +299,16 @@ class GroupSettingViewModel(
         viewModelScope.launch {
             group?.let { group ->
                 if (group.id != null) {
-                    themeUseCase.changeGroupTheme(group, groupTheme).fold({
-
-                    }, {
-                        KLog.e(TAG, it)
-                        if (it is EmptyBodyException) {
-                            setSelectedTheme(group, groupTheme)
+                    themeUseCase.changeGroupTheme(group, groupTheme)
+                        .onSuccess {
                         }
-                    })
+                        .onFailure {
+                            KLog.e(TAG, it)
+                            if (it is EmptyBodyException) {
+                                setSelectedTheme(group, groupTheme)
+                                _confirmNewThemeEvent.emit(groupTheme.id)
+                            }
+                        }
                 }
             }
         }
