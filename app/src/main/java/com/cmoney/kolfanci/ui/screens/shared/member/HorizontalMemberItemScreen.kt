@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -43,7 +44,7 @@ fun HorizontalMemberItemScreen(
         )
 
         //是否為vip
-        if (groupMember.isVip) {
+        if (groupMember.isVip()) {
             Spacer(modifier = Modifier.width(6.dp))
 
             Image(

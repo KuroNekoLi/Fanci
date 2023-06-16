@@ -91,8 +91,7 @@ class ChannelSettingViewModel(
             ).fold({
                 it.map { channelWhiteList ->
                     listPermissionSelected[channelWhiteList.authType.orEmpty()] = SelectedModel(
-                        selectedMember = channelWhiteList.users?.map { it.toGroupMember() }
-                            .orEmpty(),
+                        selectedMember = channelWhiteList.users.orEmpty(),
                         selectedRole = channelWhiteList.roles.orEmpty(),
                         // TODO 需要此頻道已設定的VIP方案
                         selectedVipPlans = emptyList()

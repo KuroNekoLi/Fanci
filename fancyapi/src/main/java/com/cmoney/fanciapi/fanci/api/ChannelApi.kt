@@ -25,6 +25,7 @@ interface ChannelApi {
      *
      * @return [kotlin.collections.List<ChannelAccessOptionModel>]
      */
+    @Deprecated("This api was deprecated")
     @GET("api/v1/Channel/AccessType")
     suspend fun apiV1ChannelAccessTypeGet(): Response<kotlin.collections.List<ChannelAccessOptionModel>>
 
@@ -92,7 +93,7 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdRoleDelete(@Path("channelId") channelId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**
-     * 取得角色清單
+     * 取得角色清單 (不包含VIP)
      * 
      * Responses:
      *  - 200: 成功
@@ -124,6 +125,21 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdRolePut(@Path("channelId") channelId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**
+     * 取得VIP角色清單
+     * 
+     * Responses:
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 404: 找不到該頻道
+     *  - 403: 沒有權限
+     *
+     * @param channelId 頻道Id
+     * @return [kotlin.collections.List<FanciRole>]
+     */
+    @GET("api/v1/Channel/{channelId}/VipRole")
+    suspend fun apiV1ChannelChannelIdVipRoleGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
+
+    /**
      * 取得私密頻道白名單
      * 
      * Responses:
@@ -137,7 +153,7 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdWhiteListAuthTypeGet(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: kotlin.String): Response<ChannelWhiteList>
 
     /**
-     * 設定私密頻道白名單 (Role/Users) __________🔒 編輯頻道
+     * 設定私密頻道白名單 (Role/VipRole/Users) __________🔒 編輯頻道
      * 
      * Responses:
      *  - 204: No Content

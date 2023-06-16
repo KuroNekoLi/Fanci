@@ -39,6 +39,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
+import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -204,7 +205,7 @@ fun MemberManageScreen(
     if (showBanDialog.value) {
         BanDialogScreen(
             name = groupMember.name.orEmpty(),
-            isVip = groupMember.isVip,
+            isVip = groupMember.isVip(),
             onDismiss = {
                 showBanDialog.value = false
             },
@@ -240,7 +241,7 @@ fun MemberManageScreen(
     if (showKickOutDialog.value) {
         KickOutDialogScreen(
             name = groupMember.name.orEmpty(),
-            isVip = groupMember.isVip,
+            isVip = groupMember.isVip(),
             onDismiss = {
                 showKickOutDialog.value = false
             },
