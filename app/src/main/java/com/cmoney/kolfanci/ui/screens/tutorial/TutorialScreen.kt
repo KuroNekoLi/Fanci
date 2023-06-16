@@ -18,10 +18,15 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun TutorialScreen(modifier: Modifier = Modifier, onStart: () -> Unit) {
+    rememberSystemUiController().setStatusBarColor(
+        color = Black_242424,
+        darkIcons = false
+    )
     Scaffold(
         modifier = modifier
             .fillMaxSize(),

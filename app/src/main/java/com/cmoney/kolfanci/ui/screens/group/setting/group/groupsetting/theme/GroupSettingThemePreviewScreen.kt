@@ -46,6 +46,9 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -104,7 +107,17 @@ fun GroupSettingThemePreviewScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchThemeInfo(themeId)
+        launch {
+            viewModel.fetchThemeInfo(themeId)
+        }
+        launch {
+            viewModel.confirmNewThemeEvent
+                .onEach { groupThemeId ->
+                    println("confirm")
+                    resultNavigator.navigateBack(groupThemeId)
+                }
+                .collect()
+        }
     }
 }
 
