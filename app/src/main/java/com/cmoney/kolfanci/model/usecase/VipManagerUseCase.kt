@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.model.usecase
 
 import com.cmoney.fanciapi.fanci.api.GroupApi
+import com.cmoney.fanciapi.fanci.api.RoleUserApi
 import com.cmoney.fanciapi.fanci.api.VipApi
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
@@ -18,7 +19,8 @@ import kotlin.random.Random
 
 class VipManagerUseCase(
     private val groupApi: GroupApi,
-    private val vipApi: VipApi
+    private val vipApi: VipApi,
+    private val roleUserApi: RoleUserApi
 ) {
 
     /**
@@ -135,6 +137,20 @@ class VipManagerUseCase(
                 )
             )
         }
+
+
+    /**
+     * 取得該vip 方案下的成員清單
+     *
+     * @param groupId 社團 id
+     * @param roleId 角色 id (vip 方案 id)
+     */
+    suspend fun getVipPlanMember(groupId: String, roleId: String) = kotlin.runCatching {
+        roleUserApi.apiV1RoleUserGroupGroupIdRoleRoleIdGet(
+            groupId = groupId,
+            roleId = roleId
+        ).checkResponseBody()
+    }
 
 
     companion object {
