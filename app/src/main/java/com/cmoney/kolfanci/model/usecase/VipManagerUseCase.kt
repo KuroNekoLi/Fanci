@@ -39,6 +39,14 @@ class VipManagerUseCase(
 //        getVipPlanMockData()
     }
 
+    /**
+     * 取得該vip 的銷售方案
+     *
+     * @param roleId 角色 id (vip相當於角色)
+     */
+    suspend fun getVipSales(roleId: String) = kotlin.runCatching {
+        vipApi.apiV1VipVipSalesRoleIdGet(roleId = roleId).checkResponseBody()
+    }
 
     /**
      * 取得該 vip 方案 詳細資訊, 過濾掉非vip 的成員
