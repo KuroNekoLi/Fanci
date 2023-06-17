@@ -39,6 +39,7 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
@@ -116,7 +117,7 @@ fun GroupReportScreen(
     //禁言 dialog
     if (uiState.showSilenceDialog != null) {
         val name = uiState.showSilenceDialog.reportee?.name.orEmpty()
-        val isVip = uiState.showSilenceDialog.reportee?.isVip ?: false
+        val isVip = uiState.showSilenceDialog.reportee?.isVip() ?: false
 
         BanDialogScreen(
             name = name,
@@ -136,7 +137,7 @@ fun GroupReportScreen(
     //踢出 dialog
     if (uiState.kickDialog != null) {
         val name = uiState.kickDialog.reportee?.name.orEmpty()
-        val isVip = uiState.kickDialog.reportee?.isVip ?: false
+        val isVip = uiState.kickDialog.reportee?.isVip() ?: false
 
         KickOutDialogScreen(
             name = name,

@@ -48,6 +48,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
@@ -353,7 +354,7 @@ private fun MemberItem(
                 )
 
                 //是否為vip
-                if (groupMember.isVip) {
+                if (groupMember.isVip()) {
                     Spacer(modifier = Modifier.width(6.dp))
 
                     Image(

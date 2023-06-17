@@ -62,11 +62,7 @@ data class User (
 
     /* 使用者更新時間 */
     @Json(name = "updateUnixTime")
-    val updateUnixTime: kotlin.Long? = null,
-
-    /* 是否為vip 用戶 */
-    @Json(name = "isVip")
-    val isVip: kotlin.Boolean = true
+    val updateUnixTime: kotlin.Long? = null
 
 ) : Parcelable
 

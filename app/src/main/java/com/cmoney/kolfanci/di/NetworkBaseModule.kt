@@ -117,6 +117,9 @@ val networkBaseModule = module {
         get<ApiClient>().createService(BulletinBoardApi::class.java)
     }
 
+    single {
+        get<ApiClient>().createService(VipApi::class.java)
+    }
 }
 
 private fun getDomain(): String {

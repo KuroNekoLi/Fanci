@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.extension.toVipPlanModel
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
@@ -66,7 +67,9 @@ class VipManagerViewModel(
     fun fetchVipPlan() {
         viewModelScope.launch {
             vipManagerUseCase.getVipPlan(group).fold({
-                _vipPlanList.value = it
+                _vipPlanList.value = it.map { role ->
+                    role.toVipPlanModel()
+                }
             }, {
                 KLog.e(TAG, it)
             })

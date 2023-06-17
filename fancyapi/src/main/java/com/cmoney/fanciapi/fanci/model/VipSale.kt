@@ -15,8 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.FanciRole
-import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.VipRole
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -25,27 +24,23 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param authType 
- * @param roles 
+ * @param vipSaleId 
+ * @param vipSaleName 
  * @param vipRoles 
- * @param users 
  */
 @Parcelize
 
 
-data class ChannelWhiteList (
+data class VipSale (
 
-    @Json(name = "authType")
-    val authType: kotlin.String? = null,
+    @Json(name = "vipSaleId")
+    val vipSaleId: kotlin.Long? = null,
 
-    @Json(name = "roles")
-    val roles: kotlin.collections.List<FanciRole>? = null,
+    @Json(name = "vipSaleName")
+    val vipSaleName: kotlin.String? = null,
 
     @Json(name = "vipRoles")
-    val vipRoles: kotlin.collections.List<FanciRole>? = null,
-
-    @Json(name = "users")
-    val users: kotlin.collections.List<GroupMember>? = null
+    val vipRoles: kotlin.collections.List<VipRole>? = null
 
 ) : Parcelable
 

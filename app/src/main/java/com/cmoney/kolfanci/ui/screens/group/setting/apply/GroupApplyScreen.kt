@@ -237,7 +237,8 @@ private fun ApplyQuestionItem(
                     id = this.id,
                     name = this.name,
                     serialNumber = this.serialNumber,
-                    isVip = this.isVip
+                        //TODO 跟 server 溝通中, 要增加欄位才有辦法轉換
+//                    isVip = this.isVip
                 ))
             }
 

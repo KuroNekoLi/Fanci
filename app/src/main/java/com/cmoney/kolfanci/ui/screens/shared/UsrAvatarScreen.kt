@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.ui.theme.Color_B3FB9304
 
 /**
@@ -51,7 +52,7 @@ fun ChatUsrAvatarScreen(
         )
 
         //是否為vip
-        if (user.isVip) {
+        if (user.isVip()) {
             Spacer(modifier = Modifier.width(6.dp))
 
             Image(

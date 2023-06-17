@@ -1,16 +1,24 @@
 package com.cmoney.kolfanci.model.usecase
 
+import com.cmoney.fanciapi.fanci.api.GroupApi
+import com.cmoney.fanciapi.fanci.api.VipApi
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
+import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionOptionModel
 import kotlin.random.Random
 
-class VipManagerUseCase {
+class VipManagerUseCase(
+    private val groupApi: GroupApi,
+    private val vipApi: VipApi
+) {
 
     /**
      * 取得所有VIP方案
@@ -26,10 +34,9 @@ class VipManagerUseCase {
      *
      * @param group 社團
      */
-    fun getVipPlan(group: Group) = kotlin.runCatching {
-//            emptyList<VipPlanModel>()
-        //TODO wait server api
-        getVipPlanMockData()
+    suspend fun getVipPlan(group: Group) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdVipRoleGet(groupId = group.id.orEmpty()).checkResponseBody()
+//        getVipPlanMockData()
     }
 
 
@@ -38,11 +45,11 @@ class VipManagerUseCase {
      *
      * @param vipPlanModel 選擇的方案
      */
-    fun getVipPlanInfo(vipPlanModel: VipPlanModel) = kotlin.runCatching {
+    suspend fun getVipPlanInfo(vipPlanModel: VipPlanModel) = kotlin.runCatching {
         val mockData = getVipPlanInfoMockData()
         val filterPlanModel = mockData.copy(
             members = mockData.members.filter {
-                it.isVip
+                it.isVip()
             }
         )
         filterPlanModel
@@ -142,7 +149,12 @@ class VipManagerUseCase {
                         1000,
                         3000
                     ),
-                    isVip = true
+                    roleInfos = listOf(
+                        FanciRole(
+                            name = "高級學員",
+                            userCount = 10
+                        )
+                    )
                 ),
                 GroupMember(
                     name = "王力宏1",
@@ -156,7 +168,12 @@ class VipManagerUseCase {
                         1000,
                         3000
                     ),
-                    isVip = true
+                    roleInfos = listOf(
+                        FanciRole(
+                            name = "高級學員",
+                            userCount = 10
+                        )
+                    )
                 ),
                 GroupMember(
                     name = "王力宏2",
@@ -170,7 +187,12 @@ class VipManagerUseCase {
                         1000,
                         3000
                     ),
-                    isVip = false
+                    roleInfos = listOf(
+                        FanciRole(
+                            name = "高級學員",
+                            userCount = 10
+                        )
+                    )
                 ),
                 GroupMember(
                     name = "Kevin",
@@ -184,7 +206,12 @@ class VipManagerUseCase {
                         1000,
                         3000
                     ),
-                    isVip = true
+                    roleInfos = listOf(
+                        FanciRole(
+                            name = "高級學員",
+                            userCount = 10
+                        )
+                    )
                 ),
                 GroupMember(
                     name = "Kevin1",
@@ -198,7 +225,12 @@ class VipManagerUseCase {
                         1000,
                         3000
                     ),
-                    isVip = true
+                    roleInfos = listOf(
+                        FanciRole(
+                            name = "高級學員",
+                            userCount = 10
+                        )
+                    )
                 ),
                 GroupMember(
                     name = "Kevin2",
@@ -212,7 +244,12 @@ class VipManagerUseCase {
                         1000,
                         3000
                     ),
-                    isVip = true
+                    roleInfos = listOf(
+                        FanciRole(
+                            name = "高級學員",
+                            userCount = 10
+                        )
+                    )
                 )
             )
         )
