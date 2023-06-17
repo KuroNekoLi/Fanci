@@ -6,7 +6,6 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.extension.toVipPlanModel
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
-import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionOptionModel
@@ -33,6 +32,12 @@ class VipManagerViewModel(
     private val _planSourceList = MutableStateFlow<List<String>>(emptyList())
     val planSourceList = _planSourceList.asStateFlow()
 
+    /**
+     * vip 方案下的成員
+     */
+    private val _vipMembers = MutableStateFlow<List<GroupMember>>(emptyList())
+    val vipMembers = _vipMembers.asStateFlow()
+
     //Vip 方案清單
     private val _vipPlanList = MutableStateFlow<List<VipPlanModel>>(emptyList())
     val vipPlanList = _vipPlanList.asStateFlow()
@@ -49,10 +54,6 @@ class VipManagerViewModel(
     //管理Vip 方案, 目前選的 tab position
     private val _manageTabPosition = MutableStateFlow(VipManageTabKind.INFO)
     val manageTabPosition = _manageTabPosition.asStateFlow()
-
-    //管理Vip 方案, 方案詳細資訊
-    private val _planInfo = MutableStateFlow<VipPlanInfoModel?>(null)
-    val planInfo = _planInfo.asStateFlow()
 
     /**
      * 各頻道的權限狀態
@@ -109,22 +110,10 @@ class VipManagerViewModel(
             }
             //成員 tab
             else -> {
-
+                _vipPlanModel.value?.let {
+                    fetchVipMembers(it.id)
+                }
             }
-        }
-    }
-
-    /**
-     * 抓取該 vip 方案, 更詳細資訊
-     */
-    fun fetchVipPlanInfo(vipPlanModel: VipPlanModel) {
-        KLog.i(TAG, "fetchVipPlanInfo:$vipPlanModel")
-        viewModelScope.launch {
-            vipManagerUseCase.getVipPlanInfo(vipPlanModel).fold({
-                _planInfo.value = it
-            }, {
-                KLog.e(TAG, it)
-            })
         }
     }
 
@@ -225,6 +214,8 @@ class VipManagerViewModel(
 
     /**
      * 取得 該vip 的銷售方案
+     *
+     * @param roleId vip 方案id
      */
     private fun fetchVipSales(roleId: String) {
         KLog.i(TAG, "fetchVipSales:$roleId")
@@ -236,6 +227,25 @@ class VipManagerViewModel(
             }, {
                 KLog.e(TAG, it)
             })
+        }
+    }
+
+    /**
+     * 取得該方案下的成員
+     *
+     * @param roleId vip 方案id
+     */
+    private fun fetchVipMembers(roleId: String) {
+        KLog.i(TAG, "fetchVipMembers:$roleId")
+        viewModelScope.launch {
+            vipManagerUseCase.getVipPlanMember(
+                groupId = group.id.orEmpty(),
+                roleId = roleId
+            ).onSuccess {
+                _vipMembers.value = it
+            }.onFailure {
+                KLog.e(TAG, it)
+            }
         }
     }
 }
