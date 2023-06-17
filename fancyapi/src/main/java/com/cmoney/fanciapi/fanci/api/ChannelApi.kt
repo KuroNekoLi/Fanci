@@ -8,6 +8,7 @@ import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
+import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
 import com.cmoney.fanciapi.fanci.model.ChannelWhiteList
 import com.cmoney.fanciapi.fanci.model.EditChannelParam
 import com.cmoney.fanciapi.fanci.model.FanciRole
@@ -192,4 +193,14 @@ interface ChannelApi {
     @POST("api/v1/Channel/WhiteList/Users/Count")
     suspend fun apiV1ChannelWhiteListUsersCountPost(@Body getWhiteListCountParam: GetWhiteListCountParam? = null): Response<WhiteListCount>
 
+    /**
+     * 取得私密頻道權限設定文案  提供權限類型，以及權限描述的文案
+     *
+     * Responses:
+     *  - 200: Success
+     *
+     * @return [kotlin.collections.List<ChannelAccessOptionV2>]
+     */
+    @GET("api/v2/Channel/AccessType")
+    suspend fun apiV2ChannelAccessTypeGet(): Response<kotlin.collections.List<ChannelAccessOptionV2>>
 }
