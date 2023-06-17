@@ -21,6 +21,18 @@ class VipManagerViewModel(
 ) : ViewModel() {
     private val TAG = VipManagerViewModel::class.java.simpleName
 
+    /**
+     * 目前vip plan
+     */
+    private val _vipPlanModel = MutableStateFlow<VipPlanModel?>(null)
+    val vipPlanModel = _vipPlanModel.asStateFlow()
+
+    /**
+     * vip 銷售方案
+     */
+    private val _planSourceList = MutableStateFlow<List<String>>(emptyList())
+    val planSourceList = _planSourceList.asStateFlow()
+
     //Vip 方案清單
     private val _vipPlanList = MutableStateFlow<List<VipPlanModel>>(emptyList())
     val vipPlanList = _vipPlanList.asStateFlow()
@@ -82,6 +94,24 @@ class VipManagerViewModel(
     fun onManageVipTabClick(tabPosition: Int) {
         KLog.i(TAG, "onManageVipTabClick:$tabPosition")
         _manageTabPosition.value = VipManageTabKind.values()[tabPosition]
+        //TODO call api
+        when (tabPosition) {
+            //資訊 tab
+            0 -> {
+                _vipPlanModel.value?.let {
+                    fetchVipSales(it.id)
+                }
+
+            }
+            //權限 tab
+            1 -> {
+
+            }
+            //成員 tab
+            else -> {
+
+            }
+        }
     }
 
     /**
@@ -103,11 +133,23 @@ class VipManagerViewModel(
      */
     fun setVipName(vipName: String) {
         KLog.i(TAG, "setVipName:$vipName")
-
-        _planInfo.value = _planInfo.value?.copy(
+        _vipPlanModel.value = _vipPlanModel.value?.copy(
             name = vipName
         )
-        //TODO call api change name
+
+        _vipPlanModel.value?.let { planModel ->
+            viewModelScope.launch {
+                vipManagerUseCase.changeVipRoleName(
+                    groupId = group.id.orEmpty(),
+                    roleId = planModel.id,
+                    name = vipName
+                ).onSuccess {
+                    KLog.i(TAG, "setVipName onSuccess")
+                }.onFailure {
+                    KLog.e(TAG, it)
+                }
+            }
+        }
     }
 
     /**
@@ -164,6 +206,33 @@ class VipManagerViewModel(
         viewModelScope.launch {
             vipManagerUseCase.getAlreadyPurchasePlan(groupMember = groupMember).fold({
                 _alreadyPurchasePlan.value = it
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 初始化,選擇的方案
+     * 設定目前選擇的 vip 名稱
+     * 取得 資訊tab 訂閱方案
+     */
+    fun initVipPlanModel(vipPlanModel: VipPlanModel) {
+        KLog.i(TAG, "initVipPlanModel:$vipPlanModel")
+        _vipPlanModel.value = vipPlanModel
+        fetchVipSales(roleId = vipPlanModel.id)
+    }
+
+    /**
+     * 取得 該vip 的銷售方案
+     */
+    private fun fetchVipSales(roleId: String) {
+        KLog.i(TAG, "fetchVipSales:$roleId")
+        viewModelScope.launch {
+            vipManagerUseCase.getVipSales(roleId = roleId).fold({
+                _planSourceList.value = it.map { sale ->
+                    sale.vipSaleName.orEmpty()
+                }
             }, {
                 KLog.e(TAG, it)
             })
