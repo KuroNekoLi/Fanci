@@ -28,6 +28,7 @@ import kotlinx.parcelize.Parcelize
  *
  * @param id Id
  * @param user 
+ * @param hasVipRole 是否為社團VIP  TODO:查理財寶VIP
  * @param answers 回答
  * @param status 
  * @param updateUnixTime 更新時間
@@ -45,6 +46,10 @@ data class GroupRequirementApply (
 
     @Json(name = "user")
     val user: User? = null,
+
+    /* 是否為社團VIP  TODO:查理財寶VIP */
+    @Json(name = "hasVipRole")
+    val hasVipRole: kotlin.Boolean? = null,
 
     /* 回答 */
     @Json(name = "answers")
