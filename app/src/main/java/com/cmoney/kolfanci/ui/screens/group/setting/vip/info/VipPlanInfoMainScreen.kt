@@ -95,7 +95,6 @@ fun VipPlanInfoMainScreen(
     LaunchedEffect(Unit) {
         if (vipPlanInfo == null) {
             viewModel.fetchVipPlanInfo(vipPlanModel)
-            viewModel.setCurrentVipPlanModel(vipPlanModel)
         }
         if (vipPlanPermissionModels == null) {
             viewModel.fetchPermissions(vipPlanModel = vipPlanModel)

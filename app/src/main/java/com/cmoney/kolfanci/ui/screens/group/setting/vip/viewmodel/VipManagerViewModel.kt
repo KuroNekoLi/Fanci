@@ -62,11 +62,6 @@ class VipManagerViewModel(
     val alreadyPurchasePlan = _alreadyPurchasePlan.asStateFlow()
 
     /**
-     * 目前選中的方案
-     */
-    private var selectedVipPlanModel: VipPlanModel? = null
-
-    /**
      *  取得該社團目前有的 Vip 方案清單
      */
     fun fetchVipPlan() {
@@ -173,13 +168,5 @@ class VipManagerViewModel(
                 KLog.e(TAG, it)
             })
         }
-    }
-
-    /**
-     * 設定目前選擇的 plan
-     */
-    fun setCurrentVipPlanModel(vipPlanModel: VipPlanModel) {
-        KLog.i(TAG, "setCurrentVipPlanModel:$vipPlanModel")
-        this.selectedVipPlanModel = vipPlanModel
     }
 }
