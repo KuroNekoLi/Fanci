@@ -4880,7 +4880,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               },
@@ -4888,7 +4888,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               },
@@ -4896,7 +4896,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               }
@@ -5091,7 +5091,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               },
@@ -5099,7 +5099,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               },
@@ -5107,7 +5107,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               }
@@ -5245,7 +5245,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/VipRole"
+                    "$ref": "#/components/schemas/PurchasedRole"
                   }
                 }
               },
@@ -5253,7 +5253,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/VipRole"
+                    "$ref": "#/components/schemas/PurchasedRole"
                   }
                 }
               },
@@ -5261,7 +5261,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/VipRole"
+                    "$ref": "#/components/schemas/PurchasedRole"
                   }
                 }
               }
@@ -5390,7 +5390,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               },
@@ -5398,7 +5398,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               },
@@ -5406,7 +5406,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/GroupMember"
                   }
                 }
               }
@@ -5664,26 +5664,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VipRole"
-                  }
+                  "$ref": "#/components/schemas/UserConsumeInfo"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VipRole"
-                  }
+                  "$ref": "#/components/schemas/UserConsumeInfo"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VipRole"
-                  }
+                  "$ref": "#/components/schemas/UserConsumeInfo"
                 }
               }
             }
@@ -7474,6 +7465,10 @@
           "user": {
             "$ref": "#/components/schemas/User"
           },
+          "hasVipRole": {
+            "type": "boolean",
+            "description": "是否為社團VIP\r\nTODO:查理財寶VIP"
+          },
           "answers": {
             "type": "array",
             "items": {
@@ -8210,6 +8205,27 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/BuffStatus"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserConsumeInfo": {
+        "type": "object",
+        "properties": {
+          "cmoneyMemberId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "purchasedSales": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchasedSale"
             },
             "nullable": true
           }

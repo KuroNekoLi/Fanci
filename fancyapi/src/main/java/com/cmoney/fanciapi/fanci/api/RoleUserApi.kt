@@ -7,11 +7,12 @@ import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.GroupMemberRoleInfos
+import com.cmoney.fanciapi.fanci.model.PurchasedRole
 import com.cmoney.fanciapi.fanci.model.RoleIdsParam
-import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.fanciapi.fanci.model.UserConsumeInfo
 import com.cmoney.fanciapi.fanci.model.UseridsParam
-import com.cmoney.fanciapi.fanci.model.VipRole
 
 interface RoleUserApi {
     /**
@@ -26,10 +27,10 @@ interface RoleUserApi {
      *
      * @param groupId 
      * @param channelId 
-     * @return [kotlin.collections.List<User>]
+     * @return [kotlin.collections.List<GroupMember>]
      */
     @GET("api/v1/RoleUser/Channel/{channelId}/VipRole")
-    suspend fun apiV1RoleUserChannelChannelIdVipRoleGet(@Path("groupId") groupId: kotlin.String, @Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<User>>
+    suspend fun apiV1RoleUserChannelChannelIdVipRoleGet(@Path("groupId") groupId: kotlin.String, @Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<GroupMember>>
 
     /**
      * 判斷用戶是否擁有社團的Vip角色 __________🔒 已註冊的fanci使用者
@@ -129,10 +130,10 @@ interface RoleUserApi {
      *
      * @param groupId 
      * @param roleId 
-     * @return [kotlin.collections.List<User>]
+     * @return [kotlin.collections.List<GroupMember>]
      */
     @GET("api/v1/RoleUser/Group/{groupId}/Role/{roleId}")
-    suspend fun apiV1RoleUserGroupGroupIdRoleRoleIdGet(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<kotlin.collections.List<User>>
+    suspend fun apiV1RoleUserGroupGroupIdRoleRoleIdGet(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<kotlin.collections.List<GroupMember>>
 
     /**
      * 指派使用者角色身分 __________🔒 指派身分
@@ -181,10 +182,10 @@ interface RoleUserApi {
      *
      * @param groupId 
      * @param userId 
-     * @return [kotlin.collections.List<VipRole>]
+     * @return [kotlin.collections.List<PurchasedRole>]
      */
     @GET("api/v1/RoleUser/Group/{groupId}/{userId}/VipRole")
-    suspend fun apiV1RoleUserGroupGroupIdUserIdVipRoleGet(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String): Response<kotlin.collections.List<VipRole>>
+    suspend fun apiV1RoleUserGroupGroupIdUserIdVipRoleGet(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String): Response<kotlin.collections.List<PurchasedRole>>
 
     /**
      * 取得社團中具有Vip角色身分的用戶清單 (任一種VIP) __________🔒 已註冊的fanci使用者
@@ -197,10 +198,10 @@ interface RoleUserApi {
      *  - 409: 找不到指派的角色
      *
      * @param groupId 
-     * @return [kotlin.collections.List<User>]
+     * @return [kotlin.collections.List<GroupMember>]
      */
     @GET("api/v1/RoleUser/Group/{groupId}/VipRole")
-    suspend fun apiV1RoleUserGroupGroupIdVipRoleGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<User>>
+    suspend fun apiV1RoleUserGroupGroupIdVipRoleGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<GroupMember>>
 
     /**
      * 取得我的個人Vip資訊 __________🔒 已註冊的fanci使用者
@@ -211,9 +212,9 @@ interface RoleUserApi {
      *  - 403: 沒有權限
      *  - 404: 找不到使用者
      *
-     * @return [kotlin.collections.List<VipRole>]
+     * @return [UserConsumeInfo]
      */
     @GET("api/v1/RoleUser/VipRole/me")
-    suspend fun apiV1RoleUserVipRoleMeGet(): Response<kotlin.collections.List<VipRole>>
+    suspend fun apiV1RoleUserVipRoleMeGet(): Response<UserConsumeInfo>
 
 }
