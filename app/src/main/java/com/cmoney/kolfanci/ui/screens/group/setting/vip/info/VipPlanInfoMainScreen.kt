@@ -30,7 +30,6 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.VipPlanInfoEditChannelPermissionScreenDestination
-import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionOptionModel
@@ -72,9 +71,6 @@ fun VipPlanInfoMainScreen(
     //目前選擇的 tab
     val selectedTabPosition by viewModel.manageTabPosition.collectAsState()
 
-    //vip 方案資訊
-    val vipPlanInfo by viewModel.planInfo.collectAsState()
-
     //vip 權限資訊
     val vipPlanPermissionModels by viewModel.permissionModels.collectAsState()
 
@@ -86,32 +82,30 @@ fun VipPlanInfoMainScreen(
     //vip 方案資訊
     val planSourceList by viewModel.planSourceList.collectAsState()
 
+    //vip 成員
+    val vipMembers by viewModel.vipMembers.collectAsState()
+
     LaunchedEffect(Unit) {
         if (planModel == null) {
             viewModel.initVipPlanModel(vipPlanModel)
         }
     }
 
-    vipPlanInfo?.let {
-        VipPlanInfoMainScreenView(
-            modifier = modifier,
-            navController = navController,
-            vipName = planModel?.name.orEmpty(),
-            planSourceList = planSourceList,
-            selectedTab = selectedTabPosition,
-            vipPlanInfo = it,
-            vipPlanPermissionModels = vipPlanPermissionModels.orEmpty(),
-            vipPlanPermissionOptionModels = vipPlanPermissionOptionModels.orEmpty(),
-            onTabSelected = { position ->
-                viewModel.onManageVipTabClick(position)
-            }
-        )
-    }
+    VipPlanInfoMainScreenView(
+        modifier = modifier,
+        navController = navController,
+        vipName = planModel?.name.orEmpty(),
+        selectedTab = selectedTabPosition,
+        onTabSelected = { position ->
+            viewModel.onManageVipTabClick(position)
+        },
+        vipPlanPermissionModels = vipPlanPermissionModels.orEmpty(),
+        vipPlanPermissionOptionModels = vipPlanPermissionOptionModels.orEmpty(),
+        planSourceList = planSourceList,
+        vipMembers = vipMembers
+    )
 
     LaunchedEffect(Unit) {
-        if (vipPlanInfo == null) {
-            viewModel.fetchVipPlanInfo(vipPlanModel)
-        }
         if (vipPlanPermissionModels == null) {
             viewModel.fetchPermissions(vipPlanModel = vipPlanModel)
         }
@@ -151,10 +145,10 @@ private fun VipPlanInfoMainScreenView(
     vipName: String,
     selectedTab: VipManagerViewModel.VipManageTabKind,
     onTabSelected: (Int) -> Unit,
-    vipPlanInfo: VipPlanInfoModel,
     vipPlanPermissionModels: List<VipPlanPermissionModel>,
     vipPlanPermissionOptionModels: List<VipPlanPermissionOptionModel>,
-    planSourceList: List<String>
+    planSourceList: List<String>,
+    vipMembers: List<GroupMember>
 ) {
     val TAG = "VipManagerScreenView"
     val context = LocalContext.current
@@ -231,7 +225,7 @@ private fun VipPlanInfoMainScreenView(
                 //成員
                 VipManagerViewModel.VipManageTabKind.MEMBER -> {
                     VipMemberPage(
-                        members = vipPlanInfo.members
+                        members = vipMembers
                     )
                 }
             }
@@ -380,7 +374,6 @@ fun VipPlanInfoScreenPreview() {
             selectedTab = VipManagerViewModel.VipManageTabKind.MEMBER,
             onTabSelected = {
             },
-            vipPlanInfo = VipManagerUseCase.getVipPlanInfoMockData(),
             vipPlanPermissionModels = listOf(
                 VipPlanPermissionModel(
                     id = "101",
@@ -398,7 +391,8 @@ fun VipPlanInfoScreenPreview() {
                 )
             ),
             vipPlanPermissionOptionModels = VipManagerUseCase.getVipPlanPermissionOptionsMockData(),
-            planSourceList = emptyList()
+            planSourceList = emptyList(),
+            vipMembers = emptyList()
         )
     }
 }
