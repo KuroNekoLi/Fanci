@@ -18,5 +18,5 @@ val useCaseModule = module {
     factory { OrderUseCase(get()) }
     factory { PostUseCase(get()) }
     factory { DynamicLinkUseCase(get()) }
-    factory { VipManagerUseCase(get(), get()) }
+    factory { VipManagerUseCase(get(), get(), get()) }
 }
