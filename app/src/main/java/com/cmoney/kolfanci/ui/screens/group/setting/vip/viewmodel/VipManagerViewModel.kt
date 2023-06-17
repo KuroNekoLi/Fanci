@@ -136,8 +136,20 @@ class VipManagerViewModel(
         _vipPlanModel.value = _vipPlanModel.value?.copy(
             name = vipName
         )
-        //TODO call api change name
-//        vipManagerUseCase.changeVipName()
+
+        _vipPlanModel.value?.let { planModel ->
+            viewModelScope.launch {
+                vipManagerUseCase.changeVipRoleName(
+                    groupId = group.id.orEmpty(),
+                    roleId = planModel.id,
+                    name = vipName
+                ).onSuccess {
+                    KLog.i(TAG, "setVipName onSuccess")
+                }.onFailure {
+                    KLog.e(TAG, it)
+                }
+            }
+        }
     }
 
     /**

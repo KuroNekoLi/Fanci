@@ -7,6 +7,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.RoleParam
 import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanInfoModel
@@ -70,7 +71,10 @@ class VipManagerUseCase(
      * @param vipPlanModel 選擇的方案
      * @return 社團所有頻道此方案下的權限設定
      */
-    fun getPermissions(group: Group, vipPlanModel: VipPlanModel): Result<List<VipPlanPermissionModel>> {
+    fun getPermissions(
+        group: Group,
+        vipPlanModel: VipPlanModel
+    ): Result<List<VipPlanPermissionModel>> {
         return kotlin.runCatching {
             group.categories?.fold(mutableListOf<Channel>()) { acc, category ->
                 acc.addAll(category.channels.orEmpty())
@@ -113,6 +117,24 @@ class VipManagerUseCase(
     fun getAlreadyPurchasePlan(groupMember: GroupMember) = kotlin.runCatching {
         getVipPlanMockData()
     }
+
+    /**
+     * 更換 vip 名稱
+     *
+     * @param groupId 社團 id
+     * @param roleId 角色 id (vip 方案 id)
+     * @param name 要更改的名稱
+     */
+    suspend fun changeVipRoleName(groupId: String, roleId: String, name: String) =
+        kotlin.runCatching {
+            groupApi.apiV1GroupGroupIdRoleRoleIdPut(
+                groupId = groupId,
+                roleId = roleId,
+                roleParam = RoleParam(
+                    name = name
+                )
+            )
+        }
 
 
     companion object {
