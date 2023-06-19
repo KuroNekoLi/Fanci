@@ -16,6 +16,16 @@
           "Channel"
         ],
         "summary": "取得私密頻道權限設定文案\r\n提供權限類型，以及權限描述的文案",
+        "parameters": [
+          {
+            "name": "IsWithNoPermission",
+            "in": "query",
+            "description": "是否包含無權限文案",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",

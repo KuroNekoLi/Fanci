@@ -199,8 +199,9 @@ interface ChannelApi {
      * Responses:
      *  - 200: Success
      *
+     * @param isWithNoPermission 是否包含無權限文案 (optional)
      * @return [kotlin.collections.List<ChannelAccessOptionV2>]
      */
     @GET("api/v2/Channel/AccessType")
-    suspend fun apiV2ChannelAccessTypeGet(): Response<kotlin.collections.List<ChannelAccessOptionV2>>
+    suspend fun apiV2ChannelAccessTypeGet(@Query("IsWithNoPermission") isWithNoPermission: kotlin.Boolean? = null): Response<kotlin.collections.List<ChannelAccessOptionV2>>
 }
