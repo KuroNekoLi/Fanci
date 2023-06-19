@@ -213,7 +213,7 @@ class VipManagerViewModel(
     }
 
     /**
-     * 取得 該vip 的銷售方案
+     * 取得 該vip 的銷售方案, 會加工 方案名稱前面多個 ・
      *
      * @param roleId vip 方案id
      */
@@ -222,7 +222,7 @@ class VipManagerViewModel(
         viewModelScope.launch {
             vipManagerUseCase.getVipSales(roleId = roleId).fold({
                 _planSourceList.value = it.map { sale ->
-                    sale.vipSaleName.orEmpty()
+                    "・%s".format(sale.vipSaleName.orEmpty())
                 }
             }, {
                 KLog.e(TAG, it)
