@@ -31,6 +31,8 @@ import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewMod
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DisBanDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberInfoItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -154,36 +156,15 @@ private fun BanUserItem(banUiModel: BanUiModel, onClick: () -> Unit) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape),
-                model = user?.thumbNail,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                placeholder = painterResource(id = R.drawable.placeholder)
-            )
-
-            Spacer(modifier = Modifier.width(15.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = user?.name.orEmpty(),
-                    fontSize = 16.sp,
-                    color = LocalColor.current.text.default_100
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = user?.serialNumber.toString(),
-                    fontSize = 12.sp,
-                    color = LocalColor.current.text.default_50
+            user?.apply {
+                MemberInfoItemScreen(
+                    modifier = Modifier.weight(1f),
+                    groupMember = this
                 )
             }
 
             Text(
-                text = "調整", fontSize = 14.sp, color = LocalColor.current.primary
+                text = stringResource(id = R.string.adjust), fontSize = 14.sp, color = LocalColor.current.primary
             )
         }
 
