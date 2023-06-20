@@ -6828,9 +6828,6 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
-          "replyMessage": {
-            "$ref": "#/components/schemas/ChatMessage"
-          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
@@ -6872,6 +6869,9 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "replyMessage": {
+            "$ref": "#/components/schemas/ChatMessage"
           }
         },
         "additionalProperties": false
@@ -8174,7 +8174,7 @@
         "type": "object",
         "properties": {
           "user": {
-            "$ref": "#/components/schemas/User"
+            "$ref": "#/components/schemas/GroupMember"
           },
           "startDateTime": {
             "type": "integer",

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
@@ -212,7 +213,7 @@ fun BanListScreenPreview() {
             navigator = EmptyDestinationsNavigator,
             banUserList = listOf(
                 BanUiModel(
-                    user = User(
+                    user = GroupMember(
                         name = "Hi",
                         serialNumber = 123456
                     ),
@@ -220,7 +221,7 @@ fun BanListScreenPreview() {
                     duration = "3日"
                 ),
                 BanUiModel(
-                    user = User(
+                    user = GroupMember(
                         name = "Hi2",
                         serialNumber = 123456
                     ),
