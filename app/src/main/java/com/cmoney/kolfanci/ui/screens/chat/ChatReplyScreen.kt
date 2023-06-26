@@ -16,13 +16,14 @@ import com.cmoney.kolfanci.ui.common.ReplyChatTitleText
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.kolfanci.R
 
 /**
  * 回覆 某人 訊息
  */
 @Composable
-fun ChatReplyScreen(reply: ChatMessage, onDelete: (ChatMessage) -> Unit) {
+fun ChatReplyScreen(reply: IReplyMessage, onDelete: (IReplyMessage) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -63,7 +64,7 @@ fun ChatReplyScreen(reply: ChatMessage, onDelete: (ChatMessage) -> Unit) {
 fun ChatReplyScreenPreview() {
     FanciTheme {
         ChatReplyScreen(
-            ChatRoomUseCase.mockMessage
+            IReplyMessage()
         ) {
 
         }

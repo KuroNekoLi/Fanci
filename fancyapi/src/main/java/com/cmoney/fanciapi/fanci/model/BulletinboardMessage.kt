@@ -18,6 +18,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
@@ -30,6 +31,7 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
+ * @param replyMessage 
  * @param messageFromType 
  * @param author 
  * @param content 
@@ -49,6 +51,9 @@ import kotlinx.parcelize.Parcelize
 
 
 data class BulletinboardMessage (
+
+    @Json(name = "replyMessage")
+    val replyMessage: IReplyMessage? = null,
 
     @Json(name = "messageFromType")
     val messageFromType: MessageServiceType? = null,

@@ -10,6 +10,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.PutAuthTypeRequest
 import com.cmoney.fanciapi.fanci.model.RoleParam
 import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.extension.isVip
@@ -134,12 +135,13 @@ class VipManagerUseCase(
         vipRoleId: String,
         authType: ChannelAuthType
     ) = kotlin.runCatching {
-        //TODO: api 還在調整, put 用法有問題
-        channelApi.apiV1ChannelChannelIdWhiteListPut(
+        channelApi.apiV1ChannelChannelIdWhiteListAccessorTypeAccessorIdPut(
             channelId = channelId,
             accessorType = AccessorTypes.vipRole,
             accessorId = vipRoleId,
-            authType = authType
+            putAuthTypeRequest = PutAuthTypeRequest(
+                authType = authType
+            )
         ).checkResponseBody()
     }
 

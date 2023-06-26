@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
@@ -226,8 +227,8 @@ private fun ChatRoomScreenView(
     channelId: String,
     announceMessage: ChatMessage?,
     onMsgDismissHide: (ChatMessage) -> Unit,
-    replyMessage: ChatMessage?,
-    onDeleteReply: (ChatMessage) -> Unit,
+    replyMessage: IReplyMessage?,
+    onDeleteReply: (IReplyMessage) -> Unit,
     imageAttach: List<Uri>,
     onDeleteAttach: (Uri) -> Unit,
     onMessageSend: (text: String) -> Unit,
@@ -302,7 +303,7 @@ fun ChatRoomScreenPreview() {
             channelId = "",
             announceMessage = ChatMessage(),
             onMsgDismissHide = {},
-            replyMessage = ChatMessage(),
+            replyMessage = IReplyMessage(),
             onDeleteReply = {},
             imageAttach = emptyList(),
             onDeleteAttach = {},

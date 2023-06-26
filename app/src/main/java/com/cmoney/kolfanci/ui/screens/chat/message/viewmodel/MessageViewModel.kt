@@ -12,6 +12,7 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
@@ -66,7 +67,7 @@ class MessageViewModel(
     val snackBarMessage = _snackBarMessage.asSharedFlow()
 
     //要回覆的訊息
-    private val _replyMessage = MutableStateFlow<ChatMessage?>(null)
+    private val _replyMessage = MutableStateFlow<IReplyMessage?>(null)
     val replyMessage = _replyMessage.asStateFlow()
 
     //是否要show re-send dialog
@@ -684,7 +685,14 @@ class MessageViewModel(
                 recycleMessage(messageInteract.message)
             }
 
-            is MessageInteract.Reply -> replyMessage(messageInteract.message)
+            is MessageInteract.Reply -> replyMessage(
+                IReplyMessage(
+                    id = messageInteract.message.id,
+                    author = messageInteract.message.author,
+                    content = messageInteract.message.content,
+                    isDeleted = messageInteract.message.isDeleted
+                )
+            )
             is MessageInteract.Report -> {
                 _reportMessage.value = messageInteract.message
             }
@@ -821,7 +829,7 @@ class MessageViewModel(
      * 點擊 回覆訊息
      * @param message
      */
-    private fun replyMessage(message: ChatMessage) {
+    private fun replyMessage(message: IReplyMessage) {
         KLog.i(TAG, "replyMessage click:$message")
         _replyMessage.value = message
     }
@@ -830,7 +838,7 @@ class MessageViewModel(
      * 取消 回覆訊息
      * @param reply
      */
-    fun removeReply(reply: ChatMessage) {
+    fun removeReply(reply: IReplyMessage) {
         KLog.i(TAG, "removeReply:$reply")
         _replyMessage.value = null
     }

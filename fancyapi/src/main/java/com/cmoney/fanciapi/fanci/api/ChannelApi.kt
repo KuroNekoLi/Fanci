@@ -15,6 +15,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelWhiteList
 import com.cmoney.fanciapi.fanci.model.EditChannelParam
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GetWhiteListCountParam
+import com.cmoney.fanciapi.fanci.model.PutAuthTypeRequest
 import com.cmoney.fanciapi.fanci.model.PutWhiteListRequest
 import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 import com.cmoney.fanciapi.fanci.model.WhiteListCount
@@ -145,6 +146,23 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdVipRoleGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
 
     /**
+     * 編輯指定使用者/角色 於頻道中的權限AuthType   使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 編輯頻道
+     * 
+     * Responses:
+     *  - 204: No Content
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param channelId 頻道ID
+     * @param accessorType 異動的成員類型 使用者/角色/VIP角色
+     * @param accessorId 異動頻道成員ID
+     * @param putAuthTypeRequest 指定加入成員的權限類型) (optional)
+     * @return [Unit]
+     */
+    @PUT("api/v1/Channel/{channelId}/WhiteList/{accessorType}/{accessorId}")
+    suspend fun apiV1ChannelChannelIdWhiteListAccessorTypeAccessorIdPut(@Path("channelId") channelId: kotlin.String, @Path("accessorType") accessorType: AccessorTypes, @Path("accessorId") accessorId: kotlin.String, @Body putAuthTypeRequest: PutAuthTypeRequest? = null): Response<Unit>
+
+    /**
      * 取得私密頻道白名單
      * 
      * Responses:
@@ -188,23 +206,6 @@ interface ChannelApi {
      */
     @GET("api/v1/Channel/{channelId}/WhiteList")
     suspend fun apiV1ChannelChannelIdWhiteListGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<ChannelWhiteList>>
-
-    /**
-     * 編輯指定使用者/角色 於頻道中的權限AuthType   使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 編輯頻道
-     * 
-     * Responses:
-     *  - 204: No Content
-     *  - 401: Unauthorized
-     *  - 403: Forbidden
-     *
-     * @param channelId 頻道ID
-     * @param accessorType 異動的成員類型 使用者/角色/VIP角色)
-     * @param accessorId 異動頻道成員ID
-     * @param authType 指定加入成員的權限類型)
-     * @return [Unit]
-     */
-    @PUT("api/v1/Channel/{channelId}/WhiteList")
-    suspend fun apiV1ChannelChannelIdWhiteListPut(@Path("channelId") channelId: kotlin.String, @Path("accessorType") accessorType: AccessorTypes, @Path("accessorId") accessorId: kotlin.String, @Path("authType") authType: ChannelAuthType): Response<Unit>
 
     /**
      * 取得私密頻道白名單覆蓋人數

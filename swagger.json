@@ -1810,69 +1810,6 @@
             ]
           }
         ]
-      },
-      "put": {
-        "tags": [
-          "Channel"
-        ],
-        "summary": "編輯指定使用者/角色 於頻道中的權限AuthType \r\n使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 編輯頻道",
-        "parameters": [
-          {
-            "name": "channelId",
-            "in": "path",
-            "description": "頻道ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "accessorType",
-            "in": "path",
-            "description": "異動的成員類型 使用者/角色/VIP角色)",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/AccessorTypes"
-            }
-          },
-          {
-            "name": "accessorId",
-            "in": "path",
-            "description": "異動頻道成員ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authType",
-            "in": "path",
-            "description": "指定加入成員的權限類型)",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ChannelAuthType"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
-              "user"
-            ]
-          }
-        ]
       }
     },
     "/api/v1/Channel/{channelId}/WhiteList/{authType}": {
@@ -1977,6 +1914,82 @@
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/PutWhiteListRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Channel/{channelId}/WhiteList/{accessorType}/{accessorId}": {
+      "put": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "編輯指定使用者/角色 於頻道中的權限AuthType \r\n使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 編輯頻道",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accessorType",
+            "in": "path",
+            "description": "異動的成員類型 使用者/角色/VIP角色",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AccessorTypes"
+            }
+          },
+          {
+            "name": "accessorId",
+            "in": "path",
+            "description": "異動頻道成員ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "指定加入成員的權限類型)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutAuthTypeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutAuthTypeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutAuthTypeRequest"
               }
             }
           }
@@ -6562,6 +6575,9 @@
       "BulletinboardMessage": {
         "type": "object",
         "properties": {
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
           "messageFromType": {
             "$ref": "#/components/schemas/MessageServiceType"
           },
@@ -6964,9 +6980,6 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
-          "replyMessage": {
-            "$ref": "#/components/schemas/ChatMessage"
-          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
@@ -6996,9 +7009,6 @@
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
           },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
-          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -7011,6 +7021,12 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false
@@ -7782,6 +7798,26 @@
         },
         "additionalProperties": false
       },
+      "IReplyMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "author": {
+            "$ref": "#/components/schemas/GroupMember"
+          },
+          "content": {
+            "$ref": "#/components/schemas/MediaIChatContent"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "是否刪除"
+          }
+        },
+        "additionalProperties": false
+      },
       "IUserMessageReaction": {
         "type": "object",
         "properties": {
@@ -8017,6 +8053,15 @@
               "$ref": "#/components/schemas/PurchasedRole"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PutAuthTypeRequest": {
+        "type": "object",
+        "properties": {
+          "authType": {
+            "$ref": "#/components/schemas/ChannelAuthType"
           }
         },
         "additionalProperties": false
