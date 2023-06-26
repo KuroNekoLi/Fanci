@@ -20,6 +20,7 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.MessageType
 
 import com.squareup.moshi.Json
@@ -39,6 +40,7 @@ import kotlinx.parcelize.Parcelize
  * @param updateUnixTime 
  * @param serialNumber 
  * @param messageType 
+ * @param messageFromType 
  * @param messageReaction 
  * @param deleteStatus 
  * @param deleteFrom 
@@ -79,6 +81,9 @@ data class ChatMessage (
 
     @Json(name = "messageType")
     val messageType: MessageType? = null,
+
+    @Json(name = "messageFromType")
+    val messageFromType: MessageServiceType? = null,
 
     @Json(name = "messageReaction")
     val messageReaction: IUserMessageReaction? = null,

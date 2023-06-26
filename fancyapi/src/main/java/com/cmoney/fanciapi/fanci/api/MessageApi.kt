@@ -10,6 +10,8 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessageParam
 import com.cmoney.fanciapi.fanci.model.EmojiParam
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.fanciapi.fanci.model.OrderType
+import com.cmoney.fanciapi.fanci.model.SearchMessageParam
 import com.cmoney.fanciapi.fanci.model.User
 
 interface MessageApi {
@@ -132,5 +134,22 @@ interface MessageApi {
      */
     @DELETE("api/v2/Message/role/{messageType}/{messageId}")
     suspend fun apiV2MessageRoleMessageTypeMessageIdDelete(@Path("messageType") messageType: MessageServiceType, @Path("messageId") messageId: kotlin.String): Response<Unit>
+
+    /**
+     * 搜尋功能  代入自訂條件搜尋訊息 全部條件取\&quot;交集\&quot; 不需要的條件請移除   有範圍小的條件可以不用代範圍大的條件 (如 有Channel可以不用Group)  TODO:貼文回覆先不要 等前端確定 (聊天回復不影響) __________🔒 已註冊的fanci使用者
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param order  (optional)
+     * @param offset 從第幾筆搜尋結果開始取 (optional, default to 0)
+     * @param fetch 共取幾筆搜尋結果 (optional, default to 10)
+     * @param searchMessageParam  (optional)
+     * @return [kotlin.collections.List<ChatMessage>]
+     */
+    @POST("api/v2/Message/Search")
+    suspend fun apiV2MessageSearchPost(@Query("order") order: OrderType? = null, @Query("offset") offset: kotlin.Int? = 0, @Query("fetch") fetch: kotlin.Int? = 10, @Body searchMessageParam: SearchMessageParam? = null): Response<kotlin.collections.List<ChatMessage>>
 
 }
