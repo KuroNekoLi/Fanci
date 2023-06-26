@@ -19,6 +19,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleMa
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
+import com.cmoney.kolfanci.ui.screens.my.MyScreenViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
@@ -102,5 +103,8 @@ val viewModule = module {
         VipPlanViewModel(
             vipManagerUseCase = get()
         )
+    }
+    viewModel {
+        MyScreenViewModel(get())
     }
 }

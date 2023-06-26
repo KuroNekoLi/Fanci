@@ -193,8 +193,22 @@ class VipManagerViewModel(
      */
     fun fetchAlreadyPurchasePlan(groupMember: GroupMember) {
         viewModelScope.launch {
-            vipManagerUseCase.getAlreadyPurchasePlan(groupMember = groupMember).fold({
-                _alreadyPurchasePlan.value = it
+            vipManagerUseCase.getAlreadyPurchasePlan(
+                groupId = group.id.orEmpty(),
+                groupMember = groupMember
+            ).fold({
+                //TODO:  驗證
+                _alreadyPurchasePlan.value = it.map { purchaseRole ->
+                    val plans = purchaseRole.vipSalePlans.orEmpty()
+                    plans.map { plan ->
+                        VipPlanModel(
+                            id = plan.vipSaleId.toString(),
+                            name = purchaseRole.roleName.orEmpty(),
+                            memberCount = 0,
+                            description = plan.vipSaleName.orEmpty()
+                        )
+                    }
+                }.flatten()
             }, {
                 KLog.e(TAG, it)
             })

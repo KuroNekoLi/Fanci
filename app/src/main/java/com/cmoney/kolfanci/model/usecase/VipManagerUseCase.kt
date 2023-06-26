@@ -24,6 +24,13 @@ class VipManagerUseCase(
 ) {
 
     /**
+     * 取得用戶所購買的所有方案
+     */
+    suspend fun getUserAllVipPlan(userId: String) = kotlin.runCatching {
+        vipApi.apiV1VipPurchasedSaleUserIdGet(userId).checkResponseBody()
+    }
+
+    /**
      * 取得所有VIP方案
      */
     fun getVipPlan(): Result<List<VipPlanModel>> {
@@ -39,7 +46,6 @@ class VipManagerUseCase(
      */
     suspend fun getVipPlan(group: Group) = kotlin.runCatching {
         groupApi.apiV1GroupGroupIdVipRoleGet(groupId = group.id.orEmpty()).checkResponseBody()
-//        getVipPlanMockData()
     }
 
     /**
@@ -113,11 +119,15 @@ class VipManagerUseCase(
     /**
      * 取得該會員已購買的vip方案清單
      *
+     * @param groupId 所在的社團
      * @param groupMember 要查的會員
      * @return vip 方案清單
      */
-    fun getAlreadyPurchasePlan(groupMember: GroupMember) = kotlin.runCatching {
-        getVipPlanMockData()
+    suspend fun getAlreadyPurchasePlan(groupId: String, groupMember: GroupMember) = kotlin.runCatching {
+        roleUserApi.apiV1RoleUserGroupGroupIdUserIdVipRoleGet(
+            groupId = groupId,
+            userId = groupMember.id.orEmpty()
+        ).checkResponseBody()
     }
 
     /**

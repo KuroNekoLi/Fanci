@@ -11,6 +11,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +29,7 @@ import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AccountManageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.AvatarNicknameChangeScreenDestination
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -36,6 +39,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 會員中心
@@ -44,12 +48,15 @@ import com.socks.library.KLog
 @Composable
 fun MyScreen(
     navController: DestinationsNavigator,
+    viewModel: MyScreenViewModel = koinViewModel()
 ) {
     val TAG = "MyScreen"
 
     var isShowPurchasePlanTip by remember {
         mutableStateOf(false)
     }
+
+    val vipPlan by viewModel.userVipPlan.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -82,16 +89,17 @@ fun MyScreen(
                 name = XLoginHelper.nickName
             )
 
-            //TODO 用戶購買方案 api
             //購買的vip方案
-            PurchaseVipPlanScreen(
-                modifier = Modifier.padding(top = 15.dp),
-                vipPlanList = VipManagerUseCase.getVipPlanMockData(),
-                onPlanClick = {
-                    KLog.i(TAG, "onPlanClick:$it")
-                    isShowPurchasePlanTip = true
-                }
-            )
+            if (vipPlan.isNotEmpty()) {
+                PurchaseVipPlanScreen(
+                    modifier = Modifier.padding(top = 15.dp),
+                    vipPlanList = vipPlan,
+                    onPlanClick = {
+                        KLog.i(TAG, "onPlanClick:$it")
+                        isShowPurchasePlanTip = true
+                    }
+                )
+            }
 
             //帳號資料
             AccountInfoScreen(
@@ -148,7 +156,10 @@ fun MyScreen(
                 }
             )
         }
+    }
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getUserVipPlan()
     }
 }
 
