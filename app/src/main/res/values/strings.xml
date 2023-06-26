@@ -38,6 +38,9 @@
     <string name="apply">套用</string>
     <string name="add">新增</string>
 
+    <string name="about_group">關於社團</string>
+    <string name="invite_group_member">邀請社團成員</string>
+    <string name="leave_group">退出社團</string>
     <string name="group_manage">社團管理</string>
     <string name="group_setting">社團設定</string>
     <string name="group_name">社團名稱</string>
@@ -151,4 +154,6 @@
     <string name="ban">禁言</string>
     <string name="kick_out_from_group">踢出社團</string>
     <string name="adjust">調整</string>
+    <string name="leave_group_remind">退出社團後，需要重新加入喔！</string>
+    <string name="leaving_group">退出社團中</string>
 </resources>
