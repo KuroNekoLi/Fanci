@@ -47,7 +47,7 @@ data class RoleChannelAuthType (
 
     /* 該角色頻道權限 */
     @Json(name = "authType")
-    val authType: kotlin.String? = null
+    val authType: ChannelAuthType? = null
 
 ) : Parcelable
 

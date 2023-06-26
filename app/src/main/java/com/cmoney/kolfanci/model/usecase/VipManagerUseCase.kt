@@ -1,8 +1,12 @@
 package com.cmoney.kolfanci.model.usecase
 
+import com.cmoney.fanciapi.fanci.api.ChannelApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.RoleUserApi
 import com.cmoney.fanciapi.fanci.api.VipApi
+import com.cmoney.fanciapi.fanci.model.AccessorTypes
+import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
@@ -18,7 +22,8 @@ import kotlin.random.Random
 class VipManagerUseCase(
     private val groupApi: GroupApi,
     private val vipApi: VipApi,
-    private val roleUserApi: RoleUserApi
+    private val roleUserApi: RoleUserApi,
+    private val channelApi: ChannelApi
 ) {
 
     /**
@@ -91,7 +96,7 @@ class VipManagerUseCase(
                 name = roleChannelAuthType.channelName.orEmpty(),
                 canEdit = roleChannelAuthType.isPublic != true,
                 permissionTitle = roleChannelAuthType.channelName.orEmpty(),
-                authType = roleChannelAuthType.authType.orEmpty()
+                authType = roleChannelAuthType.authType ?: ChannelAuthType.noPermission
             )
         }
     }
@@ -102,10 +107,40 @@ class VipManagerUseCase(
      * @param vipPlanModel 選擇的方案
      * @return 選項
      */
-    fun getPermissionOptions(vipPlanModel: VipPlanModel): Result<List<VipPlanPermissionOptionModel>> {
+    suspend fun getPermissionOptions(vipPlanModel: VipPlanModel): Result<List<VipPlanPermissionOptionModel>> {
         return kotlin.runCatching {
-            getVipPlanPermissionOptionsMockData()
+            channelApi.apiV2ChannelAccessTypeGet(
+                isWithNoPermission = true
+            ).checkResponseBody().map { channelAccessOptionV2 ->
+                VipPlanPermissionOptionModel(
+                    name = channelAccessOptionV2.title.orEmpty(),
+                    description = channelAccessOptionV2.allowedAction.orEmpty(),
+                    authType = channelAccessOptionV2.authType ?: ChannelAuthType.noPermission
+                )
+            }
         }
+    }
+
+
+    /**
+     * 設定 vip角色 在此頻道 的權限
+     *
+     * @param channelId 頻道id
+     * @param vipRoleId 要設定的vip角色id
+     * @param authType 權限
+     */
+    suspend fun setChannelVipRolePermission(
+        channelId: String,
+        vipRoleId: String,
+        authType: ChannelAuthType
+    ) = kotlin.runCatching {
+        //TODO: api 還在調整, put 用法有問題
+        channelApi.apiV1ChannelChannelIdWhiteListPut(
+            channelId = channelId,
+            accessorType = AccessorTypes.vipRole,
+            accessorId = vipRoleId,
+            authType = authType
+        ).checkResponseBody()
     }
 
     /**
@@ -308,22 +343,22 @@ class VipManagerUseCase(
                 VipPlanPermissionOptionModel(
                     name = "無權限",
                     description = "不可進入此頻道",
-                    authType = "none"
+                    authType = ChannelAuthType.noPermission
                 ),
                 VipPlanPermissionOptionModel(
                     name = "基本權限",
                     description = "可以進入此頻道，並且瀏覽",
-                    authType = "basic"
+                    authType = ChannelAuthType.basic
                 ),
                 VipPlanPermissionOptionModel(
                     name = "中階權限",
                     description = "可以進入此頻道，並在貼文留言",
-                    authType = "middle"
+                    authType = ChannelAuthType.inter
                 ),
                 VipPlanPermissionOptionModel(
                     name = "進階權限",
                     description = "可以進入此頻道，可以聊天、發文與留言",
-                    authType = "advanced"
+                    authType = ChannelAuthType.advance
                 )
             )
         }

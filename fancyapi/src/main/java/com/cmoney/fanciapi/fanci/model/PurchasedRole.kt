@@ -50,10 +50,10 @@ data class PurchasedRole (
     val isSubscribed: kotlin.Boolean? = null,
 
     @Json(name = "currentDeadline")
-    val currentDeadline: java.time.OffsetDateTime? = null,
+    val currentDeadline: String? = null,
 
     @Json(name = "paymentDate")
-    val paymentDate: java.time.OffsetDateTime? = null,
+    val paymentDate: String? = null,
 
     @Json(name = "nextPaymentAlert")
     val nextPaymentAlert: kotlin.String? = null

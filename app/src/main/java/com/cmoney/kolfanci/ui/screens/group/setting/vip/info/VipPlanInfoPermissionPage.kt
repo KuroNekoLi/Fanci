@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.ChannelText
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
@@ -132,14 +133,14 @@ fun VipPlanInfoPermissionPagePreview() {
                         name = "歡迎新朋友",
                         canEdit = false,
                         permissionTitle = "公開頻道",
-                        authType = "basic"
+                        authType = ChannelAuthType.basic
                     ),
                     VipPlanPermissionModel(
                         id = "102",
                         name = "健身肌肉男",
                         canEdit = true,
                         permissionTitle = "進階權限",
-                        authType = "basic"
+                        authType = ChannelAuthType.basic
                     )
                 ),
                 onEditPermission = { _ ->
@@ -160,7 +161,7 @@ fun ChannelPermissionBarItemPreview() {
                     name = "歡迎新朋友",
                     canEdit = false,
                     permissionTitle = "公開頻道",
-                    authType = "basic"
+                    authType = ChannelAuthType.basic
                 ),
                 onClick = {
                 }
@@ -172,7 +173,7 @@ fun ChannelPermissionBarItemPreview() {
                     name = "健身肌肉男",
                     canEdit = true,
                     permissionTitle = "進階權限",
-                    authType = "advanced"
+                    authType = ChannelAuthType.advance
                 ),
                 onClick = {
                 }

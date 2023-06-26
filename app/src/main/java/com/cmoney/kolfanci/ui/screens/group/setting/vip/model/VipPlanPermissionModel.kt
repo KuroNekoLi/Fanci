@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.vip.model
 
 import android.os.Parcelable
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -18,5 +19,5 @@ data class VipPlanPermissionModel(
     val name: String,
     val canEdit: Boolean,
     val permissionTitle: String,
-    val authType: String
+    val authType: ChannelAuthType
 ): Parcelable

@@ -6,9 +6,11 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
+import com.cmoney.fanciapi.fanci.model.AccessorTypes
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.ChannelWhiteList
 import com.cmoney.fanciapi.fanci.model.EditChannelParam
 import com.cmoney.fanciapi.fanci.model.FanciRole
@@ -23,6 +25,8 @@ interface ChannelApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @return [kotlin.collections.List<ChannelAccessOptionModel>]
      */
@@ -46,7 +50,7 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdDelete(@Path("channelId") channelId: kotlin.String): Response<Unit>
 
     /**
-     * 取得特定頻道 __________🔒 已註冊的fanci使用者
+     * 取得特定頻道
      * 
      * Responses:
      *  - 200: 成功
@@ -99,8 +103,8 @@ interface ChannelApi {
      * Responses:
      *  - 200: 成功
      *  - 401: 未驗證
-     *  - 404: 找不到該頻道
      *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
      * @param channelId 頻道Id
      * @return [kotlin.collections.List<FanciRole>]
@@ -131,8 +135,8 @@ interface ChannelApi {
      * Responses:
      *  - 200: 成功
      *  - 401: 未驗證
-     *  - 404: 找不到該頻道
      *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
      * @param channelId 頻道Id
      * @return [kotlin.collections.List<FanciRole>]
@@ -145,13 +149,15 @@ interface ChannelApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param channelId 
      * @param authType 
      * @return [ChannelWhiteList]
      */
     @GET("api/v1/Channel/{channelId}/WhiteList/{authType}")
-    suspend fun apiV1ChannelChannelIdWhiteListAuthTypeGet(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: kotlin.String): Response<ChannelWhiteList>
+    suspend fun apiV1ChannelChannelIdWhiteListAuthTypeGet(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: ChannelAuthType): Response<ChannelWhiteList>
 
     /**
      * 設定私密頻道白名單 (Role/VipRole/Users) __________🔒 編輯頻道
@@ -174,6 +180,8 @@ interface ChannelApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param channelId 
      * @return [kotlin.collections.List<ChannelWhiteList>]
@@ -182,10 +190,29 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdWhiteListGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<ChannelWhiteList>>
 
     /**
+     * 編輯指定使用者/角色 於頻道中的權限AuthType   使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 編輯頻道
+     * 
+     * Responses:
+     *  - 204: No Content
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param channelId 頻道ID
+     * @param accessorType 異動的成員類型 使用者/角色/VIP角色)
+     * @param accessorId 異動頻道成員ID
+     * @param authType 指定加入成員的權限類型)
+     * @return [Unit]
+     */
+    @PUT("api/v1/Channel/{channelId}/WhiteList")
+    suspend fun apiV1ChannelChannelIdWhiteListPut(@Path("channelId") channelId: kotlin.String, @Path("accessorType") accessorType: AccessorTypes, @Path("accessorId") accessorId: kotlin.String, @Path("authType") authType: ChannelAuthType): Response<Unit>
+
+    /**
      * 取得私密頻道白名單覆蓋人數
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param getWhiteListCountParam  (optional)
      * @return [WhiteListCount]

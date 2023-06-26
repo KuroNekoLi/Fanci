@@ -95,7 +95,6 @@ class VipManagerViewModel(
     fun onManageVipTabClick(tabPosition: Int) {
         KLog.i(TAG, "onManageVipTabClick:$tabPosition")
         _manageTabPosition.value = VipManageTabKind.values()[tabPosition]
-        //TODO call api
         when (tabPosition) {
             //資訊 tab
             0 -> {
@@ -106,7 +105,6 @@ class VipManagerViewModel(
             }
             //權限 tab
             1 -> {
-
             }
             //成員 tab
             else -> {
@@ -145,6 +143,7 @@ class VipManagerViewModel(
      * 取得VIP管理的權限資料
      */
     fun fetchPermissions(vipPlanModel: VipPlanModel) {
+        KLog.i(TAG, "fetchPermissions.")
         viewModelScope.launch {
             vipManagerUseCase.getPermissions(group = group, vipPlanModel = vipPlanModel)
                 .onSuccess { data ->
@@ -160,8 +159,19 @@ class VipManagerViewModel(
      * 設定此頻道在此方案下權限
      */
     fun setPermission(permissionModel: VipPlanPermissionModel) {
+        KLog.i(TAG, "setPermission:$permissionModel")
+
         viewModelScope.launch {
-            // TODO call api change permission
+            vipManagerUseCase.setChannelVipRolePermission(
+                channelId = permissionModel.id,
+                vipRoleId = _vipPlanModel.value?.id.orEmpty(),
+                authType = permissionModel.authType
+            ).onSuccess {
+                KLog.i(TAG, "setPermission success.")
+            }.onFailure {
+                KLog.e(TAG, it)
+            }
+
             _permissionModels.value = _permissionModels.value.orEmpty()
                 .map { oldPermission ->
                     if (oldPermission.id == permissionModel.id) {
@@ -197,7 +207,6 @@ class VipManagerViewModel(
                 groupId = group.id.orEmpty(),
                 groupMember = groupMember
             ).fold({
-                //TODO:  驗證
                 _alreadyPurchasePlan.value = it.map { purchaseRole ->
                     val plans = purchaseRole.vipSalePlans.orEmpty()
                     plans.map { plan ->
