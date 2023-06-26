@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 class GroupUseCase(
     val context: Context,
@@ -368,7 +369,6 @@ class GroupUseCase(
                     UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
 
                 val uploadResult = uploadImage.upload().first()
-                val uri = uploadResult.first
                 imageUrl = uploadResult.second
                 emit(imageUrl)
             } else if (uri is String) {
@@ -402,7 +402,6 @@ class GroupUseCase(
                     UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
 
                 val uploadResult = uploadImage.upload().first()
-                val uri = uploadResult.first
                 imageUrl = uploadResult.second
                 emit(imageUrl)
             } else if (uri is String) {
@@ -504,4 +503,17 @@ class GroupUseCase(
                 GroupItem(group, index == 0)
             }.orEmpty()
         }
+
+    /**
+     * 退出社團
+     *
+     * @param id 欲退出的社團編號
+     * @return Result.success 表示退出成功，Result.failure 表示退出失敗
+     */
+    suspend fun leaveGroup(id: String): Result<Unit> = withContext(Dispatchers.IO) {
+        kotlin.runCatching {
+            groupMemberApi.apiV1GroupMemberGroupGroupIdMeDelete(groupId = id)
+                .checkResponseBody()
+        }
+    }
 }

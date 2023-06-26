@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.model.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
@@ -122,7 +123,7 @@ class GroupViewModel(
             ).fold({
                 haveNextPage = it.haveNextPage == true
                 nextWeight = it.nextWeight
-                val orgGroupList = _groupList.value.orEmpty().toMutableList()
+                val orgGroupList = _groupList.value.toMutableList()
                 orgGroupList.addAll(it.items.orEmpty())
                 _groupList.value = orgGroupList.distinctBy { group ->
                     group.id
@@ -162,11 +163,44 @@ class GroupViewModel(
         KLog.i(TAG, "setCurrentGroup")
         if (group != _currentGroup.value && group.id != null) {
             KLog.i(TAG, "setCurrentGroup diff:$group")
-            fetchGroupPermission(group)
             setAppTheme(group)
+            fetchGroupPermission(group)
             _currentGroup.value = group
-
             setupMenuSelectedStatus(group)
+        }
+    }
+
+    fun leaveGroup(id: String) {
+        viewModelScope.launch {
+            loading()
+            val result = groupUseCase.leaveGroup(id = id)
+            result.onSuccess {
+                // TODO 目前不會成功，因為回傳 204 會被轉為 EmptyBodyException
+            }
+                .onFailure { t ->
+                    if (t is EmptyBodyException) {
+                        val myGroup = _myGroupList.value
+                        val newGroups = myGroup.filterNot { groupItem ->
+                            groupItem.groupModel.id == id
+                        }.mapIndexed { index, groupItem ->
+                            if (index == 0) {
+                                groupItem.copy(isSelected = true)
+                            } else {
+                                groupItem
+                            }
+                        }
+                        if (newGroups.isNotEmpty()) {
+                            val selectGroup = newGroups.first()
+                            _myGroupList.value = newGroups
+                            setCurrentGroup(group = selectGroup.groupModel)
+                        } else {
+                            fetchAllGroupList()
+                        }
+                    } else {
+                        KLog.e(TAG, t)
+                    }
+                }
+            dismissLoading()
         }
     }
 
