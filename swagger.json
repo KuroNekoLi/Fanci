@@ -1228,7 +1228,7 @@
         "tags": [
           "Channel"
         ],
-        "summary": "取得特定頻道 __________🔒 已註冊的fanci使用者",
+        "summary": "取得特定頻道",
         "parameters": [
           {
             "name": "channelId",
@@ -1332,8 +1332,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
+              "user"
             ]
           }
         ]
@@ -1371,8 +1371,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_刪除頻道_0_channelId_channelGroupId"
+              "PERMISSION_刪除頻道_0_channelId_channelGroupId",
+              "user"
             ]
           }
         ]
@@ -1428,13 +1428,20 @@
           "401": {
             "description": "未驗證"
           },
-          "404": {
-            "description": "找不到該頻道"
-          },
           "403": {
             "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -1492,7 +1499,8 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_指派頻道管理員_0_channelId_channelGroupId"
+              "PERMISSION_指派頻道管理員_0_channelId_channelGroupId",
+              "user"
             ]
           }
         ]
@@ -1553,7 +1561,8 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_指派頻道管理員_0_channelId_channelGroupId"
+              "PERMISSION_指派頻道管理員_0_channelId_channelGroupId",
+              "user"
             ]
           }
         ]
@@ -1609,13 +1618,20 @@
           "401": {
             "description": "未驗證"
           },
-          "404": {
-            "description": "找不到該頻道"
-          },
           "403": {
             "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Channel/AccessType": {
@@ -1653,9 +1669,22 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
-        "deprecated": true
+        "deprecated": true,
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Channel/WhiteList/Users/Count": {
@@ -1703,8 +1732,21 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Channel/{channelId}/WhiteList": {
@@ -1753,8 +1795,84 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "編輯指定使用者/角色 於頻道中的權限AuthType \r\n使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 編輯頻道",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accessorType",
+            "in": "path",
+            "description": "異動的成員類型 使用者/角色/VIP角色)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AccessorTypes"
+            }
+          },
+          {
+            "name": "accessorId",
+            "in": "path",
+            "description": "異動頻道成員ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authType",
+            "in": "path",
+            "description": "指定加入成員的權限類型)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChannelAuthType"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Channel/{channelId}/WhiteList/{authType}": {
@@ -1778,7 +1896,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/ChannelAuthType"
             }
           }
         ],
@@ -1802,8 +1920,21 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -1864,7 +1995,8 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
+              "user"
             ]
           }
         ]
@@ -2083,7 +2215,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取得聊天室訊息列表 __________🔒 可看",
+        "summary": "取得聊天室訊息列表",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -2146,21 +2278,13 @@
           "401": {
             "description": "未驗證"
           },
-          "403": {
-            "description": "沒有權限"
-          },
           "404": {
             "description": "找不到該頻道"
+          },
+          "403": {
+            "description": "沒有權限"
           }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_chatRoomChannelId_none"
-            ]
-          }
-        ]
+        }
       }
     },
     "/api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage": {
@@ -6438,6 +6562,9 @@
       "BulletinboardMessage": {
         "type": "object",
         "properties": {
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
+          },
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
@@ -6691,6 +6818,15 @@
         },
         "additionalProperties": false
       },
+      "ChannelAuthType": {
+        "enum": [
+          "basic",
+          "inter",
+          "advance",
+          "NoPermission"
+        ],
+        "type": "string"
+      },
       "ChannelPaging": {
         "type": "object",
         "properties": {
@@ -6828,6 +6964,9 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
+          "replyMessage": {
+            "$ref": "#/components/schemas/ChatMessage"
+          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
@@ -6857,6 +6996,9 @@
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
           },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
+          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -6869,9 +7011,6 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
-          },
-          "replyMessage": {
-            "$ref": "#/components/schemas/ChatMessage"
           }
         },
         "additionalProperties": false
@@ -7708,6 +7847,13 @@
         },
         "additionalProperties": false,
         "description": "訊息id 參數"
+      },
+      "MessageServiceType": {
+        "enum": [
+          "Chatroom",
+          "Bulletinboard"
+        ],
+        "type": "string"
       },
       "MessageType": {
         "enum": [

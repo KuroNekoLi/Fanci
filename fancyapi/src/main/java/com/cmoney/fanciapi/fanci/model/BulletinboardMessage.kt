@@ -20,6 +20,7 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.MessageType
 
 import com.squareup.moshi.Json
@@ -29,6 +30,7 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
+ * @param messageFromType 
  * @param author 
  * @param content 
  * @param emojiCount 
@@ -47,6 +49,9 @@ import kotlinx.parcelize.Parcelize
 
 
 data class BulletinboardMessage (
+
+    @Json(name = "messageFromType")
+    val messageFromType: MessageServiceType? = null,
 
     @Json(name = "author")
     val author: GroupMember? = null,
