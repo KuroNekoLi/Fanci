@@ -9,6 +9,7 @@ import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.toGroupMember
+import com.cmoney.kolfanci.extension.toVipPlanModel
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.sort.MoveItem
@@ -93,8 +94,9 @@ class ChannelSettingViewModel(
                     listPermissionSelected[channelWhiteList.authType.orEmpty()] = SelectedModel(
                         selectedMember = channelWhiteList.users.orEmpty(),
                         selectedRole = channelWhiteList.roles.orEmpty(),
-                        // TODO 需要此頻道已設定的VIP方案
-                        selectedVipPlans = emptyList()
+                        selectedVipPlans = channelWhiteList.vipRoles.orEmpty().map { fanciRole ->
+                            fanciRole.toVipPlanModel()
+                        }
                     )
                 }
                 fetchPrivateChannelUserCount()
@@ -585,7 +587,7 @@ class ChannelSettingViewModel(
             channel = this.copy(
                 privacy = if (isNeedApproval) {
                     ChannelPrivacy.private
-                }  else {
+                } else {
                     ChannelPrivacy.public
                 }
             )

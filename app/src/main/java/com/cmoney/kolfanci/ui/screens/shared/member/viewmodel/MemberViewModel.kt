@@ -65,19 +65,24 @@ data class SelectedModel(
             type = AccessorTypes.users,
             ids = selectedMember.map {
                 it.id.orEmpty()
-            }
+            }.filter { it.isNotEmpty() }
         )
 
         val roleAccessor = AccessorParam(
             type = AccessorTypes.role,
             ids = selectedRole.map {
                 it.id.orEmpty()
-            }
+            }.filter { it.isNotEmpty() }
         )
 
-        // TODO vip plan 加入私密頻道的機制
+        val vipAccessor = AccessorParam(
+            type = AccessorTypes.vipRole,
+            ids = selectedVipPlans.map {
+                it.id
+            }.filter { it.isNotEmpty() }
+        )
 
-        return listOf(memberAccessor, roleAccessor)
+        return listOf(memberAccessor, roleAccessor, vipAccessor)
     }
 }
 
@@ -536,6 +541,7 @@ class MemberViewModel(
     }
 
     fun initialUiStateFromModel(selectedModel: SelectedModel) {
+        KLog.i(TAG, "initialUiStateFromModel")
         uiState = uiState.copy(
             selectedRole = selectedModel.selectedRole.ifEmpty {
                 uiState.selectedRole
@@ -589,7 +595,8 @@ class MemberViewModel(
     fun fetchSelected(): SelectedModel {
         return SelectedModel(
             selectedMember = _selectedMember.value,
-            selectedRole = uiState.selectedRole
+            selectedRole = uiState.selectedRole,
+            selectedVipPlans = uiState.selectedVipPlanModels
         )
     }
 
@@ -690,6 +697,7 @@ class MemberViewModel(
     }
 
     fun addSelectedVipPlanModel(model: VipPlanModel) {
+        KLog.i(TAG, "addSelectedVipPlanModel:$model")
         uiState = uiState.copy(
             selectedVipPlanModels = uiState.selectedVipPlanModels.plus(model)
         )

@@ -76,7 +76,9 @@ fun MemberAndRoleManageScreen(
 
     //init default data
     LaunchedEffect(Unit) {
-        viewModel.initialUiStateFromModel(selectedModel = selectedModel)
+        if (uiState.selectedVipPlanModels.isEmpty() && uiState.selectedRole.isEmpty()) {
+            viewModel.initialUiStateFromModel(selectedModel = selectedModel)
+        }
     }
 
     //Add Member Callback
@@ -109,6 +111,7 @@ fun MemberAndRoleManageScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.addSelectedVipPlanModel(model = result.value)
             }
@@ -234,6 +237,7 @@ private fun MemberAndRoleManageScreenView(
                             onVipPlanRemoveClick = onVipPlanRemoveClick
                         )
                     }
+
                     else -> {}
                 }
             }
@@ -348,7 +352,9 @@ private fun AddRoleListScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = "獲得下列角色的成員，可以獲得「%s」並且在頻道中執行對應的權限資格。".format(title),
+                    text = "獲得下列角色的成員，可以獲得「%s」並且在頻道中執行對應的權限資格。".format(
+                        title
+                    ),
                     fontSize = 14.sp,
                     color = LocalColor.current.text.default_50
                 )
@@ -408,7 +414,10 @@ private fun AddVipPlanScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = stringResource(R.string.vip_plan_in_x_channel_permission_description, title),
+                    text = stringResource(
+                        R.string.vip_plan_in_x_channel_permission_description,
+                        title
+                    ),
                     fontSize = 14.sp,
                     color = LocalColor.current.text.default_50
                 )
