@@ -1,8 +1,15 @@
 package com.cmoney.kolfanci.ui.screens.channel
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -13,12 +20,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.Color
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
@@ -89,6 +104,23 @@ private fun ChannelScreenView(
         topBar = {
             TopBarScreen(
                 title = channel.name.orEmpty(),
+                trailingContent = {
+                    Box(
+                        modifier = Modifier
+                            .size(35.dp)
+                            .offset(x = (-15).dp)
+                            .clickable {
+                                //TODO: forward to search page
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            modifier = Modifier.size(25.dp),
+                            painter = painterResource(id = R.drawable.message_search),
+                            contentDescription = null
+                        )
+                    }
+                },
                 backClick = {
                     navController.popBackStack()
                 }
@@ -155,6 +187,7 @@ private fun ChannelScreenView(
                                 resultRecipient = announcementResultRecipient
                             )
                         }
+
                         else -> {
                             //貼文 Tab
                             PostScreen(
@@ -167,8 +200,7 @@ private fun ChannelScreenView(
                     }
                 }
             }
-        }
-        else {
+        } else {
 //            Text(text = "No Tab Display")
         }
     }
