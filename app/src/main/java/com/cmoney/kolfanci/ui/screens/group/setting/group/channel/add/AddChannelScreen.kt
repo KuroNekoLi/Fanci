@@ -276,7 +276,6 @@ fun AddChannelScreenView(
             if (channel != null) {
                 TopBarScreen(
                     title = stringResource(id = R.string.edit_channel),
-                    moreEnable = false,
                     backClick = {
                         KLog.i(TAG, "saveClick click.")
                         onConfirm.invoke(channelName)

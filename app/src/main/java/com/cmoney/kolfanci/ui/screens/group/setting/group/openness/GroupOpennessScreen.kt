@@ -250,8 +250,6 @@ fun GroupOpennessScreenView(
         topBar = {
             TopBarScreen(
                 title = "社團公開度",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = onBack
             )
         }

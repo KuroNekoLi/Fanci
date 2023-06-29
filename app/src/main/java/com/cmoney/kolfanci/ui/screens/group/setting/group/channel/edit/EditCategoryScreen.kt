@@ -135,7 +135,6 @@ fun EditCategoryScreenView(
         topBar = {
             TopBarScreen(
                 title = "編輯分類",
-                moreEnable = false,
                 backClick = {
                     KLog.i(TAG, "saveClick click.")
                     onConfirm.invoke(textState)

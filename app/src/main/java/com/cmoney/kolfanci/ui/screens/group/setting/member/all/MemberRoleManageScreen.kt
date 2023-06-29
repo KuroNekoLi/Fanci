@@ -139,8 +139,6 @@ private fun MemberRoleManageScreenView(
         topBar = {
             TopBarScreen(
                 title = "%s的角色管理".format(groupMember.name),
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     KLog.i(TAG, "saveClick click.")
                     onSave.invoke()

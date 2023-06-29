@@ -605,7 +605,6 @@ private fun PostInfoScreenView(
         topBar = {
             TopBarScreen(
                 title = "貼文",
-                moreEnable = false,
                 backClick = {
                     postInfoListener.onBackClick()
                 }

@@ -170,12 +170,6 @@ private fun ApplyForGroupScreenView(
         topBar = {
             TopBarScreen(
                 title = "加入申請",
-                leadingEnable = true,
-                leadingIcon = Icons.Filled.ArrowBack,
-                trailingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     onBackClick.invoke()
                 }

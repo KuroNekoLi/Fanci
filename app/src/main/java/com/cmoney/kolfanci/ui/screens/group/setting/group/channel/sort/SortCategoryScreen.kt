@@ -83,8 +83,6 @@ private fun SortCategoryScreenView(
         topBar = {
             TopBarScreen(
                 title = "分類排序",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

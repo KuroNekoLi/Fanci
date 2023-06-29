@@ -56,8 +56,6 @@ private fun GroupReportMessageScreenView(
         topBar = {
             TopBarScreen(
                 title = "遭檢舉資訊",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

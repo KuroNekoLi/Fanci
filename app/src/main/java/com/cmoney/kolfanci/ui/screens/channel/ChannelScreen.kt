@@ -41,6 +41,9 @@ import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * 頻道主頁面
+ */
 @Destination
 @Composable
 fun ChannelScreen(
@@ -86,7 +89,6 @@ private fun ChannelScreenView(
         topBar = {
             TopBarScreen(
                 title = channel.name.orEmpty(),
-                moreEnable = false,
                 backClick = {
                     navController.popBackStack()
                 }

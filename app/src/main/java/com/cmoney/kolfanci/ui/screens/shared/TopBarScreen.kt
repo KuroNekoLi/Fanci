@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.ui.screens.shared
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -30,11 +31,13 @@ fun TopBarScreen(
     title: String,
     leadingEnable: Boolean = true,
     leadingIcon: ImageVector = Icons.Filled.ArrowBack,
-    trailingEnable: Boolean = true,
-    moreEnable: Boolean,
+//    trailingEnable: Boolean = true,
+//    moreEnable: Boolean,
+    trailingContent: @Composable (RowScope.() -> Unit)? = null,
+//    trailingContent: @Composable () -> Unit = { CircleDot() },
     backgroundColor: Color = LocalColor.current.env_100,
-    moreClick: (() -> Unit)?= null,
-    backClick:  (() -> Unit)?= null,
+//    moreClick: (() -> Unit)? = null,
+    backClick: (() -> Unit)? = null,
 ) {
     val TAG = "TopBarScreen"
     CenterTopAppBar(
@@ -53,34 +56,35 @@ fun TopBarScreen(
         title = { Text(title, fontSize = 17.sp, color = Color.White) },
         backgroundColor = backgroundColor,
         contentColor = Color.White,
-        trailing = {
-            if (trailingEnable) {
-                Box(
-                    modifier = Modifier
-                        .size(35.dp)
-                        .offset(x = (-15).dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (moreEnable) {
-                                LocalColor.current.background
-                            } else {
-                                Color.Transparent
-                            }
-                        )
-                        .clickable {
-                            if (moreEnable) {
-                                KLog.i(TAG, "more click")
-                                moreClick?.invoke()
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (moreEnable) {
-                        CircleDot()
-                    }
-                }
-            }
-        }
+        trailing = trailingContent
+//        trailing = {
+//            if (trailingEnable) {
+//                Box(
+//                    modifier = Modifier
+//                        .size(35.dp)
+//                        .offset(x = (-15).dp)
+//                        .clip(CircleShape)
+//                        .background(
+//                            if (moreEnable) {
+//                                LocalColor.current.background
+//                            } else {
+//                                Color.Transparent
+//                            }
+//                        )
+//                        .clickable(enabled = moreEnable) {
+//                            if (moreEnable) {
+//                                KLog.i(TAG, "more click")
+//                                moreClick?.invoke()
+//                            }
+//                        },
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    if (moreEnable) {
+//                        trailingContent
+//                    }
+//                }
+//            }
+//        }
     )
 }
 
@@ -89,8 +93,7 @@ fun TopBarScreen(
 fun ChatRoomTopBarScreenPreview() {
     FanciTheme {
         TopBarScreen(
-            title = "Test",
-            moreEnable = true
+            title = "Test"
         ) {
 
         }

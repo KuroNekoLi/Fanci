@@ -291,12 +291,6 @@ private fun CreateGroupScreenView(
         topBar = {
             TopBarScreen(
                 title = "建立社團",
-                leadingEnable = true,
-                leadingIcon = Icons.Filled.ArrowBack,
-                trailingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     onBack.invoke()
                 }

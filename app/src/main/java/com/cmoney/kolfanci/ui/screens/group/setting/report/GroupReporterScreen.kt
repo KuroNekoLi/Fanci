@@ -57,8 +57,6 @@ private fun GroupReporterScreenView(
         topBar = {
             TopBarScreen(
                 title = "檢舉人列表",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

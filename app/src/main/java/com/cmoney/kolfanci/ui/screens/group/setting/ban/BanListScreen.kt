@@ -104,8 +104,6 @@ private fun BanListScreenView(
         topBar = {
             TopBarScreen(
                 title = stringResource(id = R.string.ban_list),
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

@@ -136,8 +136,6 @@ fun EditChannelScreenView(
         topBar = {
             TopBarScreen(
                 title = "編輯頻道:" + channel.name.orEmpty(),
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

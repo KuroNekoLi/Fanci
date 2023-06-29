@@ -38,9 +38,6 @@ fun AnnouncementScreen(
         topBar = {
             TopBarScreen(
                 title = "設定公告訊息",
-                trailingEnable = false,
-                moreEnable = false,
-                moreClick = {},
                 backClick = {
                     navigator.popBackStack()
                 }

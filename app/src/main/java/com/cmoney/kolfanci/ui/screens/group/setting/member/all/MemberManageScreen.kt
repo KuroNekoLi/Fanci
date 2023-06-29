@@ -278,8 +278,6 @@ private fun MemberManageScreenView(
         topBar = {
             TopBarScreen(
                 title = "管理 " + groupMember.name,
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     onBack.invoke()
                 }

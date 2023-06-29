@@ -157,12 +157,7 @@ private fun DiscoverGroupScreenView(
         topBar = {
             TopBarScreen(
                 title = "探索社團",
-                leadingEnable = true,
                 leadingIcon = Icons.Filled.Home,
-                trailingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     navController.popBackStack()
                 }
