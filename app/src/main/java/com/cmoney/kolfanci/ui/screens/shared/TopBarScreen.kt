@@ -31,12 +31,8 @@ fun TopBarScreen(
     title: String,
     leadingEnable: Boolean = true,
     leadingIcon: ImageVector = Icons.Filled.ArrowBack,
-//    trailingEnable: Boolean = true,
-//    moreEnable: Boolean,
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
-//    trailingContent: @Composable () -> Unit = { CircleDot() },
     backgroundColor: Color = LocalColor.current.env_100,
-//    moreClick: (() -> Unit)? = null,
     backClick: (() -> Unit)? = null,
 ) {
     val TAG = "TopBarScreen"
