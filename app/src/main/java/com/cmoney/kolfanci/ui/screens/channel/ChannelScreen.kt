@@ -37,6 +37,7 @@ import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
+import com.cmoney.kolfanci.ui.destinations.SearchMainScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
@@ -110,7 +111,11 @@ private fun ChannelScreenView(
                             .size(35.dp)
                             .offset(x = (-15).dp)
                             .clickable {
-                                //TODO: forward to search page
+                                navController.navigate(
+                                    SearchMainScreenDestination(
+                                        channel = channel
+                                    )
+                                )
                             },
                         contentAlignment = Alignment.Center
                     ) {
