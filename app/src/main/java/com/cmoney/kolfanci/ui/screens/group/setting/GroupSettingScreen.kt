@@ -30,6 +30,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.share
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
 import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.model.Constant.isShowVipManager
@@ -227,6 +228,7 @@ fun GroupSettingScreenView(
                 item {
                     GroupAboutScreen(
                         modifier = Modifier.fillMaxWidth(),
+                        isCreator = group.creatorId == Constant.MyInfo?.id,
                         onInviteClick = onInviteClick,
                         onLeaveGroup = onLeaveGroup
                     )
