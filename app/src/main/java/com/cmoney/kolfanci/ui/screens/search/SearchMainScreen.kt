@@ -23,6 +23,7 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +42,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.screens.search.viewmodel.SearchViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -52,18 +56,28 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
 fun SearchMainScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    channel: Channel
+    group: Group,
+    channel: Channel,
+    viewModel: SearchViewModel = koinViewModel()
 ) {
+
+    val searchResult by viewModel.searchResult.collectAsState()
+
     SearchMainScreenView(
         modifier = modifier,
+        searchResult = searchResult,
         onClose = {
             navController.popBackStack()
+        },
+        onSearch = {
+            viewModel.doSearch(it)
         }
     )
 }
@@ -72,7 +86,9 @@ fun SearchMainScreen(
 @Composable
 private fun SearchMainScreenView(
     modifier: Modifier = Modifier,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onSearch: (String) -> Unit,
+    searchResult: List<ChatMessage>
 ) {
     val pages = mutableListOf(
         stringResource(id = R.string.all),
@@ -91,9 +107,8 @@ private fun SearchMainScreenView(
         topBar = {
             SearchToolBar(
                 onClose = onClose,
-                onSearch = {
-                    //TODO
-                })
+                onSearch = onSearch
+            )
         }
     ) { innerPadding ->
         Column(
@@ -257,7 +272,9 @@ fun SearchToolBarPreview() {
 fun SearchMainScreenPreview() {
     FanciTheme {
         SearchMainScreenView(
-            onClose = {}
+            onClose = {},
+            onSearch = {},
+            searchResult = emptyList()
         )
     }
 }

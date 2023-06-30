@@ -28,6 +28,7 @@ import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.ChatMessageWrapper
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
@@ -376,7 +377,7 @@ fun MessageContentScreenPreview() {
     FanciTheme {
         MessageContentScreen(
             chatMessageWrapper = ChatMessageWrapper(
-                message = ChatRoomUseCase.mockMessage,
+                message = MockData.mockMessage,
                 uploadAttachPreview = listOf(
                     ImageAttachState(
                         uri = Uri.parse("")
