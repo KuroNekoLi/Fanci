@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.model.mock
 
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.Media
@@ -15,21 +16,29 @@ object MockData {
     /**
      * 會員 假資料
      */
-    private val mockGroupMember: GroupMember = if (BuildConfig.DEBUG) {
-        GroupMember(
-            name = RandomStringUtils.randomAlphabetic(10),
-            thumbNail = "https://picsum.photos/${
-                Random.nextInt(
-                    100,
-                    300
+    val mockGroupMember: GroupMember
+        get() {
+            return if (BuildConfig.DEBUG) {
+                GroupMember(
+                    name = RandomStringUtils.randomAlphabetic(10),
+                    thumbNail = "https://picsum.photos/${
+                        Random.nextInt(
+                            100,
+                            300
+                        )
+                    }/${Random.nextInt(100, 300)}",
+                    isGroupVip = Random.nextBoolean(),
+                    roleInfos = listOf(
+                        FanciRole(
+                            name = "Role",
+                            color = ""
+                        )
+                    )
                 )
-            }/${Random.nextInt(100, 300)}",
-            isGroupVip = Random.nextBoolean()
-        )
-    } else {
-        GroupMember()
-    }
-
+            } else {
+                GroupMember()
+            }
+        }
 
     val mockListMessage: List<ChatMessage>
         get() {

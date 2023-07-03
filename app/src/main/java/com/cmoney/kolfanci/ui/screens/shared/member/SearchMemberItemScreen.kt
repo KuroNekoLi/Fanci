@@ -19,56 +19,45 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isVip
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
- * 會員 item ui
+ *  搜尋結果 user item
  *
  * @param groupMember 會員 model
- * @param isShowRemove 是否要移除功能
  */
 @Composable
-fun MemberItemScreen(
+fun SearchMemberItemScreen(
     modifier: Modifier = Modifier,
     groupMember: GroupMember,
-    isShowRemove: Boolean = true,
-    onMemberClick: ((GroupMember) -> Unit)? = null
+    subTitle: String
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(LocalColor.current.background)
-            .clickable(
-                enabled = (onMemberClick != null)
-            ) {
-                onMemberClick?.invoke(groupMember)
-            }
             .padding(start = 30.dp, end = 24.dp, top = 12.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        MemberInfoItemScreen(
+        SearchMemberInfoItemScreen(
             modifier = Modifier.weight(1f),
-            groupMember
+            subTitle = subTitle,
+            groupMember = groupMember
         )
 
-        if (isShowRemove) {
-            Text(text = "移除", fontSize = 14.sp, color = LocalColor.current.primary)
-        }
+        Text(text = "查看", fontSize = 14.sp, color = LocalColor.current.primary)
     }
 }
 
-/**
- * 大頭貼, 名字, vip icon, 代號顯示
- */
 @Composable
-fun MemberInfoItemScreen(
+fun SearchMemberInfoItemScreen(
     modifier: Modifier = Modifier,
+    subTitle: String,
     groupMember: GroupMember
 ) {
     Row(
@@ -107,9 +96,8 @@ fun MemberInfoItemScreen(
 
             Spacer(modifier = Modifier.width(5.dp))
 
-            //代號
             Text(
-                text = "#%d".format(groupMember.serialNumber),
+                text = subTitle,
                 fontSize = 12.sp,
                 color = LocalColor.current.text.default_50
             )
@@ -119,21 +107,11 @@ fun MemberInfoItemScreen(
 
 @Preview
 @Composable
-fun MemberItemScreenPreview() {
+fun SearchMemberItemScreenPreview() {
     FanciTheme {
-        MemberItemScreen(
-            groupMember = GroupMember(
-                thumbNail = "",
-                name = "王力宏",
-                serialNumber = 123456,
-                roleInfos = listOf(
-                    FanciRole(
-                        name = "Role",
-                        color = ""
-                    )
-                )
-            ),
-            onMemberClick = {}
+        SearchMemberItemScreen(
+            groupMember = MockData.mockGroupMember,
+            subTitle = "聊天・2023.01.13"
         )
     }
 }

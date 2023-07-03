@@ -45,6 +45,7 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
 import com.cmoney.kolfanci.ui.screens.search.viewmodel.SearchViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -88,7 +89,7 @@ private fun SearchMainScreenView(
     modifier: Modifier = Modifier,
     onClose: () -> Unit,
     onSearch: (String) -> Unit,
-    searchResult: List<ChatMessage>
+    searchResult: List<SearchChatMessage>
 ) {
     val pages = mutableListOf(
         stringResource(id = R.string.all),
@@ -151,8 +152,13 @@ private fun SearchMainScreenView(
                     //TODO: 判斷資料有無
                     //全部
                     0 -> {
-                        SearchEmptyScreen(modifier = modifier.fillMaxSize())
-//                        SearchAllScreen()
+                        if (searchResult.isEmpty()) {
+                            SearchEmptyScreen(modifier = modifier.fillMaxSize())
+                        } else {
+                            SearchAllScreen(searchResult = searchResult, onSearchItemClick = {
+                                //TODO: navigate to detail page
+                            })
+                        }
                     }
                     //聊天
                     1 -> {

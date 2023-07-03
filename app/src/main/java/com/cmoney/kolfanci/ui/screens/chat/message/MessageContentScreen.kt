@@ -29,7 +29,6 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.mock.MockData
-import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
 import com.cmoney.kolfanci.ui.screens.chat.*
