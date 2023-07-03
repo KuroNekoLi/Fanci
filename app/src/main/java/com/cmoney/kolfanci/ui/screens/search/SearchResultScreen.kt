@@ -26,7 +26,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.socks.library.KLog
 
 @Composable
-fun SearchAllScreen(
+fun SearchResultScreen(
     modifier: Modifier = Modifier,
     searchResult: List<SearchChatMessage>,
     onSearchItemClick: (SearchChatMessage) -> Unit
@@ -91,9 +91,9 @@ fun SearchResultItemPreview() {
 
 @Preview
 @Composable
-fun SearchAllScreenPreview() {
+fun SearchResultScreenPreview() {
     FanciTheme {
-        SearchAllScreen(
+        SearchResultScreen(
             searchResult = listOf(
                 SearchChatMessage(
                     searchKeyword = "水",

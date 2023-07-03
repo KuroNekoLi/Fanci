@@ -42,7 +42,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
@@ -69,11 +68,15 @@ fun SearchMainScreen(
     viewModel: SearchViewModel = koinViewModel()
 ) {
 
-    val searchResult by viewModel.searchResult.collectAsState()
-
+    val searchAllResult by viewModel.searchResult.collectAsState()
+    val searchChatResult by viewModel.searchChatResult.collectAsState()
+    val searchPostResult by viewModel.searchPostResult.collectAsState()
+    
     SearchMainScreenView(
         modifier = modifier,
-        searchResult = searchResult,
+        searchAllResult = searchAllResult,
+        searchChatResult = searchChatResult,
+        searchPostResult = searchPostResult,
         onClose = {
             navController.popBackStack()
         },
@@ -89,7 +92,9 @@ private fun SearchMainScreenView(
     modifier: Modifier = Modifier,
     onClose: () -> Unit,
     onSearch: (String) -> Unit,
-    searchResult: List<SearchChatMessage>
+    searchAllResult: List<SearchChatMessage>,
+    searchChatResult: List<SearchChatMessage>,
+    searchPostResult: List<SearchChatMessage>
 ) {
     val pages = mutableListOf(
         stringResource(id = R.string.all),
@@ -149,26 +154,35 @@ private fun SearchMainScreenView(
                 state = pagerState,
             ) { page ->
                 when (page) {
-                    //TODO: 判斷資料有無
                     //全部
                     0 -> {
-                        if (searchResult.isEmpty()) {
+                        if (searchAllResult.isEmpty()) {
                             SearchEmptyScreen(modifier = modifier.fillMaxSize())
                         } else {
-                            SearchAllScreen(searchResult = searchResult, onSearchItemClick = {
+                            SearchResultScreen(searchResult = searchAllResult, onSearchItemClick = {
                                 //TODO: navigate to detail page
                             })
                         }
                     }
                     //聊天
                     1 -> {
-                        SearchEmptyScreen(modifier = modifier.fillMaxSize())
-//                        SearchChatScreen()
+                        if (searchAllResult.isEmpty()) {
+                            SearchEmptyScreen(modifier = modifier.fillMaxSize())
+                        } else {
+                            SearchResultScreen(searchResult = searchChatResult, onSearchItemClick = {
+                                //TODO: navigate to detail page
+                            })
+                        }
                     }
                     //貼文
                     else -> {
-                        SearchEmptyScreen(modifier = modifier.fillMaxSize())
-//                        SearchPostScreen()
+                        if (searchAllResult.isEmpty()) {
+                            SearchEmptyScreen(modifier = modifier.fillMaxSize())
+                        } else {
+                            SearchResultScreen(searchResult = searchPostResult, onSearchItemClick = {
+                                //TODO: navigate to detail page
+                            })
+                        }
                     }
                 }
             }
@@ -280,7 +294,9 @@ fun SearchMainScreenPreview() {
         SearchMainScreenView(
             onClose = {},
             onSearch = {},
-            searchResult = emptyList()
+            searchAllResult = emptyList(),
+            searchChatResult = emptyList(),
+            searchPostResult = emptyList()
         )
     }
 }
