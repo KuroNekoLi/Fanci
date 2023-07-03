@@ -47,6 +47,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
+import com.cmoney.kolfanci.ui.screens.search.model.SearchType
 import com.cmoney.kolfanci.ui.screens.search.viewmodel.SearchViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -74,6 +75,7 @@ fun SearchMainScreen(
     val searchChatResult by viewModel.searchChatResult.collectAsState()
     val searchPostResult by viewModel.searchPostResult.collectAsState()
 
+    //前往 貼文 info page
     LaunchedEffect(Unit) {
         viewModel.bulletinboardMessage.collect { clickPostItem ->
             navController.navigate(
@@ -82,6 +84,14 @@ fun SearchMainScreen(
                     channel = channel
                 )
             )
+        }
+    }
+
+    //前往 聊天 info page
+    LaunchedEffect(Unit) {
+        viewModel.chatInfoMessage.collect { chatMessageList ->
+            KLog.i("TAG", "chatMessageList:$chatMessageList")
+            // TODO: navigate to chat list page
         }
     }
 
@@ -98,6 +108,9 @@ fun SearchMainScreen(
         },
         onPostItemClick = {
             viewModel.onPostItemClick(it)
+        },
+        onChatItemClick = {
+            viewModel.onChatItemClick(channel, it)
         }
     )
 }
@@ -111,7 +124,8 @@ private fun SearchMainScreenView(
     searchAllResult: List<SearchChatMessage>,
     searchChatResult: List<SearchChatMessage>,
     searchPostResult: List<SearchChatMessage>,
-    onPostItemClick: (SearchChatMessage) -> Unit
+    onPostItemClick: (SearchChatMessage) -> Unit,
+    onChatItemClick: (SearchChatMessage) -> Unit
 ) {
     val pages = mutableListOf(
         stringResource(id = R.string.all),
@@ -177,7 +191,10 @@ private fun SearchMainScreenView(
                             SearchEmptyScreen(modifier = modifier.fillMaxSize())
                         } else {
                             SearchResultScreen(searchResult = searchAllResult, onSearchItemClick = {
-                                //TODO: navigate to detail page
+                                when (it.searchType) {
+                                    SearchType.Chat -> onChatItemClick.invoke(it)
+                                    SearchType.Post -> onPostItemClick.invoke(it)
+                                }
                             })
                         }
                     }
@@ -189,7 +206,7 @@ private fun SearchMainScreenView(
                             SearchResultScreen(
                                 searchResult = searchChatResult,
                                 onSearchItemClick = {
-                                    //TODO: navigate to detail page
+                                    onChatItemClick.invoke(it)
                                 })
                         }
                     }
@@ -318,7 +335,8 @@ fun SearchMainScreenPreview() {
             searchAllResult = emptyList(),
             searchChatResult = emptyList(),
             searchPostResult = emptyList(),
-            onPostItemClick = {}
+            onPostItemClick = {},
+            onChatItemClick = {}
         )
     }
 }

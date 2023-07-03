@@ -3,6 +3,8 @@ package com.cmoney.kolfanci.ui.screens.search.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
 import com.cmoney.kolfanci.model.usecase.SearchUseCase
 import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
@@ -10,7 +12,6 @@ import com.cmoney.kolfanci.ui.screens.search.model.SearchType
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -33,6 +34,10 @@ class SearchViewModel(private val searchUseCase: SearchUseCase) : ViewModel() {
     //Open Post info page
     private val _bulletinboardMessage = MutableSharedFlow<BulletinboardMessage>()
     val bulletinboardMessage = _bulletinboardMessage.asSharedFlow()
+
+    //聊天 info page
+    private val _chatInfoMessage = MutableSharedFlow<List<ChatMessage>>()
+    val chatInfoMessage = _chatInfoMessage.asSharedFlow()
 
     /**
      * 進行 搜尋
@@ -72,6 +77,20 @@ class SearchViewModel(private val searchUseCase: SearchUseCase) : ViewModel() {
                 }, {
                     KLog.e(TAG, it)
                 })
+        }
+    }
+
+    /**
+     * 點擊聊天 item
+     */
+    fun onChatItemClick(channel: Channel, searchChatMessage: SearchChatMessage) {
+        KLog.i(TAG, "onChatItemClick:$searchChatMessage")
+        viewModelScope.launch {
+            val chatList = searchUseCase.getChatMessagePreload(
+                channelId = channel.id.orEmpty(),
+                message = searchChatMessage.message
+            )
+            _chatInfoMessage.emit(chatList)
         }
     }
 
