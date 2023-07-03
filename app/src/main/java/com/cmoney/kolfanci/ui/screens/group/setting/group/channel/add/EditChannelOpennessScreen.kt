@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
-import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -110,7 +109,7 @@ fun EditChannelOpennessScreen(
                         Text(
                             text = stringResource(id = R.string.full_public_desc),
                             fontSize = 14.sp,
-                            color = Color_80FFFFFF
+                            color = LocalColor.current.text.default_50
                         )
                     }
 
@@ -153,7 +152,7 @@ fun EditChannelOpennessScreen(
                         Text(
                             text = stringResource(id = R.string.not_public_desc),
                             fontSize = 14.sp,
-                            color = Color_80FFFFFF
+                            color = LocalColor.current.text.default_50
                         )
                     }
 

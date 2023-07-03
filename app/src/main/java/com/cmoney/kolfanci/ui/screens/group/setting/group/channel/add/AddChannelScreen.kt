@@ -59,7 +59,6 @@ import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
-import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -522,7 +521,7 @@ private fun PermissionTabScreen(
                 modifier = Modifier.padding(start = 16.dp),
                 text = stringResource(id = R.string.channel_manage_count).format(uniqueUserCount),
                 fontSize = 14.sp,
-                color = Color_80FFFFFF
+                color = LocalColor.current.text.default_50
             )
             Spacer(modifier = Modifier.height(15.dp))
             channelPermissionModel.forEach { it ->

@@ -22,7 +22,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isVip
-import com.cmoney.kolfanci.ui.theme.Color_B3FB9304
+import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
  * 用戶大頭貼+名稱
@@ -31,7 +31,7 @@ import com.cmoney.kolfanci.ui.theme.Color_B3FB9304
 fun ChatUsrAvatarScreen(
     modifier: Modifier = Modifier,
     user: GroupMember,
-    nickNameColor: Color = Color_B3FB9304
+    nickNameColor: Color = LocalColor.current.specialColor.pink
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         AsyncImage(

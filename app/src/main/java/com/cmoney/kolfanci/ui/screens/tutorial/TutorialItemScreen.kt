@@ -1,6 +1,11 @@
 package com.cmoney.kolfanci.ui.screens.tutorial
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -17,8 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.theme.LocalColor
 
 @Composable
 fun TutorialItemScreen(
@@ -121,7 +126,7 @@ fun BlueButton(
 ) {
     Button(
         modifier = modifier,
-        colors = ButtonDefaults.buttonColors(backgroundColor = Blue_4F70E5),
+        colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
         onClick = {
             onClick.invoke()
         }) {

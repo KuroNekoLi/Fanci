@@ -41,7 +41,6 @@ import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
-import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.Color_99FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -163,7 +162,9 @@ fun ShareAddRoleScreenView(
                     if (subTitle.isNotEmpty()) {
                         Text(
                             modifier = Modifier.padding(20.dp),
-                            text = subTitle, fontSize = 14.sp, color = Color_80FFFFFF
+                            text = subTitle,
+                            fontSize = 14.sp,
+                            color = LocalColor.current.text.default_50
                         )
                     }
 
