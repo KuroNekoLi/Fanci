@@ -2,10 +2,19 @@ package com.cmoney.kolfanci.ui.screens.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -18,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.openUrl
-import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.kedia.ogparser.OpenGraphCacheProvider
@@ -38,7 +46,7 @@ fun MessageOGScreen(
         mutableStateOf(false)
     }
 
-    var openGraphResult by remember {
+    var ogResult by remember {
         mutableStateOf(OpenGraphResult())
     }
 
@@ -51,9 +59,9 @@ fun MessageOGScreen(
                 isShowContent = false
             }
 
-            override fun onPostResponse(result: OpenGraphResult) {
+            override fun onPostResponse(openGraphResult: OpenGraphResult) {
                 isShowContent = true
-                openGraphResult = result
+                ogResult = openGraphResult
             }
         },
         showNullOnEmpty = true,
@@ -76,7 +84,7 @@ fun MessageOGScreen(
                     .padding(10.dp)
             ) {
                 AsyncImage(
-                    model = openGraphResult.image,
+                    model = ogResult.image,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(130.dp)
@@ -87,16 +95,16 @@ fun MessageOGScreen(
                 )
                 Text(
                     modifier = Modifier.padding(top = 5.dp),
-                    text = openGraphResult.title.orEmpty(),
+                    text = ogResult.title.orEmpty(),
                     fontSize = 14.sp,
-                    color = Blue_4F70E5,
+                    color = LocalColor.current.primary,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
 
                 Text(
                     modifier = Modifier.padding(top = 5.6.dp),
-                    text = openGraphResult.description.orEmpty(),
+                    text = ogResult.description.orEmpty(),
                     fontSize = 12.sp,
                     color = LocalColor.current.text.default_100,
                     maxLines = 2,

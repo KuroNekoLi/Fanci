@@ -43,7 +43,6 @@ import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanItemScreen
-import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -273,7 +272,7 @@ private fun AddMemberListScreen(
                         .height(40.dp),
                     text = "新增成員",
                     textColor = Color.White,
-                    borderColor = Color_80FFFFFF
+                    borderColor = LocalColor.current.component.other
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
@@ -335,7 +334,7 @@ private fun AddRoleListScreen(
                         .height(40.dp),
                     text = "新增角色",
                     textColor = Color.White,
-                    borderColor = Color_80FFFFFF
+                    borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 

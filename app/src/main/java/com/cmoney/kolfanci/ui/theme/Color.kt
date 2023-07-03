@@ -2,11 +2,6 @@ package com.cmoney.kolfanci.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
-val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
-
 val Black_14171C = Color(0xFF14171C)
 val Black_1B2129 = Color(0xFF1B2129)
 val Black_191E24 = Color(0xFF191E24)
@@ -19,8 +14,6 @@ val Black_242424 = Color(0xFF242424)
 
 val Black_1AFFFFFF = Color(0x1AFFFFFF)
 
-val Blue_4F70E5 = Color(0xFF4F70E5)
-
 val White_494D54 = Color(0Xff494D54)
 val White_BBBCBF = Color(0xFFBBBCBF)
 val White_767A7F = Color(0xFF767A7F)
@@ -29,10 +22,6 @@ val White_262C34 = Color(0xFF262C34)
 val White_C7C7C7 = Color(0xFFC7C7C7)
 
 val Color_99FFFFFF = Color(0x99FFFFFF)
-
-val Color_B3FB9304 = Color(0xB3FB9304)
-
-val Color_CB4A4A = Color(0xFFCB4A4A)
 
 //=========== Fanci ===========
 val Color_4F70E5 = Color(0xFF4F70E5)

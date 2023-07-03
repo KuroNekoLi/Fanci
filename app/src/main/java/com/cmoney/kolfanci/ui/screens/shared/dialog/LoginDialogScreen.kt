@@ -1,7 +1,16 @@
 package com.cmoney.kolfanci.ui.screens.shared.dialog
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -21,8 +30,6 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
-import com.cmoney.kolfanci.ui.theme.Color_2B313C
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -42,7 +49,7 @@ fun LoginDialogScreen(
         R.drawable.login_top
     }
 
-    val notificationTitle = group?.name?.orEmpty() ?: "網紅動態一手掌握"
+    val notificationTitle = group?.name ?: "網紅動態一手掌握"
 
     Dialog(onDismissRequest = {
         onDismiss.invoke()
@@ -50,7 +57,7 @@ fun LoginDialogScreen(
         Surface(
             modifier = modifier.height(520.dp),
             shape = RoundedCornerShape(16.dp),
-            color = Color_2B313C
+            color = LocalColor.current.env_80
         ) {
             Box {
                 Column {
@@ -142,7 +149,7 @@ fun LoginDialogScreen(
                             .padding(start = 25.dp, end = 25.dp)
                             .fillMaxWidth()
                             .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue_4F70E5),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                         onClick = {
                             onLogin.invoke()
                         }) {
@@ -171,7 +178,7 @@ fun LoginDialogScreen(
                             .padding(start = 25.dp, end = 25.dp)
                             .fillMaxWidth()
                             .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue_4F70E5),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                         onClick = {
                             onLogin.invoke()
                         }) {
