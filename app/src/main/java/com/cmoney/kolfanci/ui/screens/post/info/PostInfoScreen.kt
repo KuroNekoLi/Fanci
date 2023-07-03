@@ -903,7 +903,7 @@ private fun CommentBottomContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun CommentBottomContentPreview() {
     FanciTheme {
@@ -986,7 +986,7 @@ fun CommentReplayScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun CommentReplayScreenPreview() {
     FanciTheme {
@@ -1000,7 +1000,7 @@ fun CommentReplayScreenPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun PostInfoScreenPreview() {
     FanciTheme {

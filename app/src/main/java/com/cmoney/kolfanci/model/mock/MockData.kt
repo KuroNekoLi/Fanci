@@ -97,7 +97,8 @@ object MockData {
                                 type = MediaType.image
                             )
                         }
-                    )
+                    ),
+                    createUnixTime = System.currentTimeMillis().times(1000)
                 )
             } else {
                 ChatMessage()

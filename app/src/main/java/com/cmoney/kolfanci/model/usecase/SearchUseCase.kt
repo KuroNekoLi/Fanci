@@ -6,14 +6,19 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
 import com.cmoney.kolfanci.ui.screens.search.model.SearchType
 import com.cmoney.kolfanci.utils.Utils
 import kotlin.random.Random
 
-class SearchUseCase {
+class SearchUseCase(
+    private val messageApi: MessageApi
+) {
 
     /**
      * 搜尋
@@ -57,8 +62,8 @@ class SearchUseCase {
             SearchType.Post -> "貼文"
         }
 
-        val createTime = message.createUnixTime?.times(1000) ?: 0
-        val displayTime = Utils.getDisplayTime(createTime)
+        val createTime = message.createUnixTime?.div(1000) ?: 0
+        val displayTime = Utils.getSearchDisplayTime(createTime)
 
         return "%s・%s".format(typeString, displayTime)
     }
@@ -96,18 +101,17 @@ class SearchUseCase {
         }
     }
 
-//    @Deprecated("需求更改, 不需要 顯示了")
-//    /**
-//     * 取得 原文+連結,圖片 轉為文字訊息
-//     */
-//    private fun translateLinkMessageToText(message: ChatMessage): String {
-//        val linkTextList = message.content?.medias?.joinToString(separator = "\n") {
-//            when (it.type) {
-//                MediaType.image -> "(圖片)"
-//                MediaType.video -> "(影片)"
-//                else -> "(圖片)"
-//            }
-//        } ?: ""
-//    }
+    /**
+     * 取得單一貼文訊息
+     */
+    suspend fun getSinglePostMessage(messageId: String) = kotlin.runCatching {
+        //TODO
+//        messageApi.apiV2MessageMessageTypeMessageIdGet(
+//            messageType = MessageServiceType.bulletinboard,
+//            messageId = messageId
+//        ).checkResponseBody()
+
+        MockData.mockMessage
+    }
 
 }

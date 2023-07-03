@@ -23,6 +23,7 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
 import com.cmoney.kolfanci.ui.screens.search.viewmodel.SearchViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -71,7 +73,18 @@ fun SearchMainScreen(
     val searchAllResult by viewModel.searchResult.collectAsState()
     val searchChatResult by viewModel.searchChatResult.collectAsState()
     val searchPostResult by viewModel.searchPostResult.collectAsState()
-    
+
+    LaunchedEffect(Unit) {
+        viewModel.bulletinboardMessage.collect { clickPostItem ->
+            navController.navigate(
+                PostInfoScreenDestination(
+                    post = clickPostItem,
+                    channel = channel
+                )
+            )
+        }
+    }
+
     SearchMainScreenView(
         modifier = modifier,
         searchAllResult = searchAllResult,
@@ -82,6 +95,9 @@ fun SearchMainScreen(
         },
         onSearch = {
             viewModel.doSearch(it)
+        },
+        onPostItemClick = {
+            viewModel.onPostItemClick(it)
         }
     )
 }
@@ -94,7 +110,8 @@ private fun SearchMainScreenView(
     onSearch: (String) -> Unit,
     searchAllResult: List<SearchChatMessage>,
     searchChatResult: List<SearchChatMessage>,
-    searchPostResult: List<SearchChatMessage>
+    searchPostResult: List<SearchChatMessage>,
+    onPostItemClick: (SearchChatMessage) -> Unit
 ) {
     val pages = mutableListOf(
         stringResource(id = R.string.all),
@@ -169,9 +186,11 @@ private fun SearchMainScreenView(
                         if (searchAllResult.isEmpty()) {
                             SearchEmptyScreen(modifier = modifier.fillMaxSize())
                         } else {
-                            SearchResultScreen(searchResult = searchChatResult, onSearchItemClick = {
-                                //TODO: navigate to detail page
-                            })
+                            SearchResultScreen(
+                                searchResult = searchChatResult,
+                                onSearchItemClick = {
+                                    //TODO: navigate to detail page
+                                })
                         }
                     }
                     //貼文
@@ -179,9 +198,11 @@ private fun SearchMainScreenView(
                         if (searchAllResult.isEmpty()) {
                             SearchEmptyScreen(modifier = modifier.fillMaxSize())
                         } else {
-                            SearchResultScreen(searchResult = searchPostResult, onSearchItemClick = {
-                                //TODO: navigate to detail page
-                            })
+                            SearchResultScreen(
+                                searchResult = searchPostResult,
+                                onSearchItemClick = {
+                                    onPostItemClick.invoke(it)
+                                })
                         }
                     }
                 }
@@ -296,7 +317,8 @@ fun SearchMainScreenPreview() {
             onSearch = {},
             searchAllResult = emptyList(),
             searchChatResult = emptyList(),
-            searchPostResult = emptyList()
+            searchPostResult = emptyList(),
+            onPostItemClick = {}
         )
     }
 }
