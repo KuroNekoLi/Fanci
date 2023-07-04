@@ -6,9 +6,11 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
+import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.usecase.SearchUseCase
 import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
 import com.cmoney.kolfanci.ui.screens.search.model.SearchType
+import com.cmoney.kolfanci.utils.MessageUtils
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +38,7 @@ class SearchViewModel(private val searchUseCase: SearchUseCase) : ViewModel() {
     val bulletinboardMessage = _bulletinboardMessage.asSharedFlow()
 
     //聊天 info page
-    private val _chatInfoMessage = MutableSharedFlow<List<ChatMessage>>()
+    private val _chatInfoMessage = MutableStateFlow<List<ChatMessageWrapper>?>(null)
     val chatInfoMessage = _chatInfoMessage.asSharedFlow()
 
     /**
@@ -83,14 +85,22 @@ class SearchViewModel(private val searchUseCase: SearchUseCase) : ViewModel() {
     /**
      * 點擊聊天 item
      */
-    fun onChatItemClick(channel: Channel, searchChatMessage: SearchChatMessage) {
+    fun onChatItemClick(channel: Channel, searchChatMessage: ChatMessage) {
         KLog.i(TAG, "onChatItemClick:$searchChatMessage")
         viewModelScope.launch {
             val chatList = searchUseCase.getChatMessagePreload(
                 channelId = channel.id.orEmpty(),
-                message = searchChatMessage.message
-            )
-            _chatInfoMessage.emit(chatList)
+                message = searchChatMessage
+            ).map { chatMessage ->
+                ChatMessageWrapper(message = chatMessage)
+            }.reversed()
+
+            //檢查插入時間 bar
+            val timeBarMessage = MessageUtils.insertTimeBar(chatList)
+
+            _chatInfoMessage.value = timeBarMessage.map {
+                MessageUtils.defineMessageType(it)
+            }
         }
     }
 

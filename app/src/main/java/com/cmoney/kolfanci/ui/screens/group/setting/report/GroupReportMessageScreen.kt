@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
-import com.cmoney.kolfanci.ui.screens.chat.MessageImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme

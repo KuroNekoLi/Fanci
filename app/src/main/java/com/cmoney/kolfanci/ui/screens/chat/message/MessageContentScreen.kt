@@ -353,9 +353,12 @@ fun MessageContentScreen(
 
 /**
  * 多媒體 型態
+ *
+ * @param medias 圖片清單
+ * @param isClickable 是否可以點擊圖片,放大瀏覽
  */
 @Composable
-private fun MediaContent(modifier: Modifier, medias: List<Media>) {
+fun MediaContent(modifier: Modifier, medias: List<Media>, isClickable: Boolean = true) {
     val imageList = medias.filter {
         it.type == MediaType.image
     }
@@ -365,7 +368,8 @@ private fun MediaContent(modifier: Modifier, medias: List<Media>) {
             images = imageList.map {
                 it.resourceLink.orEmpty()
             },
-            modifier = modifier
+            modifier = modifier,
+            isClickable = isClickable
         )
     }
 }

@@ -31,6 +31,7 @@ import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
+import com.cmoney.kolfanci.utils.MessageUtils
 import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -135,73 +136,73 @@ class MessageViewModel(
                     }.orEmpty().reversed()
 
                     //檢查插入時間 bar
-                    val timeBarMessage = insertTimeBar(newMessage)
+                    val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
 
                     processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
-                        defineMessageType(chatMessageWrapper)
+                        MessageUtils.defineMessageType(chatMessageWrapper)
                     }, true)
                 }
             }
         }
     }
 
-    /**
-     *  檢查內容,是否有跨日期,並在跨日中間插入 time bar,
-     *  或是 內容不滿分頁大小(訊息太少), 也插入
-     */
-    private fun insertTimeBar(newMessage: List<ChatMessageWrapper>): List<ChatMessageWrapper> {
-        if (newMessage.isEmpty()) {
-            return newMessage
-        }
+//    /**
+//     *  檢查內容,是否有跨日期,並在跨日中間插入 time bar,
+//     *  或是 內容不滿分頁大小(訊息太少), 也插入
+//     */
+//    private fun insertTimeBar(newMessage: List<ChatMessageWrapper>): List<ChatMessageWrapper> {
+//        if (newMessage.isEmpty()) {
+//            return newMessage
+//        }
+//
+//        //依照日期 分群
+//        val groupList = newMessage.groupBy {
+//            val createTime = it.message.createUnixTime?.times(1000) ?: 0L
+//            Utils.getTimeGroupByKey(createTime)
+//        }
+//
+//        //大於2群, 找出跨日交界並插入time bar
+//        return if (groupList.size > 1) {
+//            val groupMessage = groupList.map {
+//                val newList = it.value.toMutableList()
+//                newList.add(generateTimeBar(it.value.first()))
+//                newList
+//            }.flatten().toMutableList()
+//            groupMessage
+//        } else {
+//            val newList = newMessage.toMutableList()
+//            val timeBarMessage = generateTimeBar(newMessage.first())
+//            newList.add(timeBarMessage)
+//            return newList
+//        }
+//    }
 
-        //依照日期 分群
-        val groupList = newMessage.groupBy {
-            val createTime = it.message.createUnixTime?.times(1000) ?: 0L
-            Utils.getTimeGroupByKey(createTime)
-        }
+//    private fun generateTimeBar(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
+//        return chatMessageWrapper.copy(
+//            message = chatMessageWrapper.message.copy(
+//                id = chatMessageWrapper.message.createUnixTime.toString()
+//            ),
+//            messageType = ChatMessageWrapper.MessageType.TimeBar
+//        )
+//    }
 
-        //大於2群, 找出跨日交界並插入time bar
-        return if (groupList.size > 1) {
-            val groupMessage = groupList.map {
-                val newList = it.value.toMutableList()
-                newList.add(generateTimeBar(it.value.first()))
-                newList
-            }.flatten().toMutableList()
-            groupMessage
-        } else {
-            val newList = newMessage.toMutableList()
-            val timeBarMessage = generateTimeBar(newMessage.first())
-            newList.add(timeBarMessage)
-            return newList
-        }
-    }
-
-    private fun generateTimeBar(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
-        return chatMessageWrapper.copy(
-            message = chatMessageWrapper.message.copy(
-                id = chatMessageWrapper.message.createUnixTime.toString()
-            ),
-            messageType = ChatMessageWrapper.MessageType.TimeBar
-        )
-    }
-
-    private fun defineMessageType(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
-        val messageType = if (chatMessageWrapper.isBlocking) {
-            ChatMessageWrapper.MessageType.Blocking
-        } else if (chatMessageWrapper.isBlocker) {
-            ChatMessageWrapper.MessageType.Blocker
-        } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
-            ChatMessageWrapper.MessageType.Delete
-        } else if (chatMessageWrapper.message.isDeleted == true) {
-            ChatMessageWrapper.MessageType.RecycleMessage
-        } else {
-            chatMessageWrapper.messageType
-        }
-
-        return chatMessageWrapper.copy(
-            messageType = messageType
-        )
-    }
+//    private fun defineMessageType(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
+//        val messageType = if (chatMessageWrapper.isBlocking) {
+//            ChatMessageWrapper.MessageType.Blocking
+//        } else if (chatMessageWrapper.isBlocker) {
+//            ChatMessageWrapper.MessageType.Blocker
+//        } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
+//            ChatMessageWrapper.MessageType.Delete
+//        } else if (chatMessageWrapper.message.isDeleted == true) {
+//            ChatMessageWrapper.MessageType.RecycleMessage
+//        } else {
+//            chatMessageWrapper.messageType
+//        }
+//
+//        return chatMessageWrapper.copy(
+//            messageType = messageType
+//        )
+//    }
 
 
     /**

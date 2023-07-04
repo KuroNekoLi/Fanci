@@ -46,6 +46,7 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
+import com.cmoney.kolfanci.ui.destinations.SearchChatInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
 import com.cmoney.kolfanci.ui.screens.search.model.SearchType
 import com.cmoney.kolfanci.ui.screens.search.viewmodel.SearchViewModel
@@ -70,7 +71,7 @@ fun SearchMainScreen(
     channel: Channel,
     viewModel: SearchViewModel = koinViewModel()
 ) {
-
+    val TAG = "SearchMainScreen"
     val searchAllResult by viewModel.searchResult.collectAsState()
     val searchChatResult by viewModel.searchChatResult.collectAsState()
     val searchPostResult by viewModel.searchPostResult.collectAsState()
@@ -84,14 +85,6 @@ fun SearchMainScreen(
                     channel = channel
                 )
             )
-        }
-    }
-
-    //前往 聊天 info page
-    LaunchedEffect(Unit) {
-        viewModel.chatInfoMessage.collect { chatMessageList ->
-            KLog.i("TAG", "chatMessageList:$chatMessageList")
-            // TODO: navigate to chat list page
         }
     }
 
@@ -110,7 +103,12 @@ fun SearchMainScreen(
             viewModel.onPostItemClick(it)
         },
         onChatItemClick = {
-            viewModel.onChatItemClick(channel, it)
+            KLog.i(TAG, "onChatItemClick:$it")
+            navController.navigate(SearchChatInfoScreenDestination(
+                group = group,
+                channel = channel,
+                message = it.message
+            ))
         }
     )
 }
