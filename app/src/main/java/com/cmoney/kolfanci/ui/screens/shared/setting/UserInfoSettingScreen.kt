@@ -3,10 +3,23 @@ package com.cmoney.kolfanci.ui.screens.shared.setting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +38,11 @@ import coil.compose.AsyncImage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.camera.ChooseImagePickDialog
-import com.cmoney.kolfanci.ui.theme.*
+import com.cmoney.kolfanci.ui.theme.Black_202327
+import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.kolfanci.ui.theme.White_494D54
+import com.cmoney.kolfanci.ui.theme.White_BBBCBF
 
 /**
  * 社團 個人資料 設定
@@ -122,7 +139,7 @@ fun UserInfoSettingScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Blue_4F70E5),
+                colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                 onClick = {
                 }) {
                 Text(text = "儲存", color = Color.White, fontSize = 16.sp)

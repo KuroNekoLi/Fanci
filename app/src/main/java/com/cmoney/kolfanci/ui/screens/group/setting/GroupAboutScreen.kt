@@ -27,10 +27,13 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
  * 關於社團
+ *
+ * @param isCreator 是否為社團建立者，true 不能退出社團
  */
 @Composable
 fun GroupAboutScreen(
     modifier: Modifier = Modifier,
+    isCreator: Boolean,
     onInviteClick: () -> Unit,
     onLeaveGroup: () -> Unit
 ) {
@@ -55,13 +58,15 @@ fun GroupAboutScreen(
                     onInviteClick.invoke()
                 }
             )
-            SettingItemScreen(
-                iconRes = R.drawable.logout,
-                text = stringResource(id = R.string.leave_group),
-                onItemClick = {
-                    showLeaveGroupDialog = true
-                }
-            )
+            if (!isCreator) {
+                SettingItemScreen(
+                    iconRes = R.drawable.logout,
+                    text = stringResource(id = R.string.leave_group),
+                    onItemClick = {
+                        showLeaveGroupDialog = true
+                    }
+                )
+            }
         }
         if (showLeaveGroupDialog) {
             AlertDialogScreen(
@@ -114,6 +119,7 @@ private fun GroupAboutScreenPreview() {
     FanciTheme {
         GroupAboutScreen(
             modifier = Modifier.fillMaxWidth(),
+            isCreator = false,
             onInviteClick = {},
             onLeaveGroup = {}
         )
