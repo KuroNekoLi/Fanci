@@ -38,6 +38,7 @@ import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
+import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.message.MediaContent
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageReplayScreen
@@ -54,6 +55,7 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -73,7 +75,7 @@ fun SearchChatInfoScreen(
     message: ChatMessage,
     searchViewModel: SearchViewModel = koinViewModel()
 ) {
-
+    val TAG = "SearchChatInfoScreen"
     val chatMessageInfo by searchViewModel.chatInfoMessage.collectAsState(null)
 
     val scrollToPosition by searchViewModel.scrollToPosition.collectAsState()
@@ -93,7 +95,16 @@ fun SearchChatInfoScreen(
             navController = navController,
             channelTitle = channel.name.orEmpty(),
             message = it,
-            scrollToPosition = scrollToPosition
+            scrollToPosition = scrollToPosition,
+            onForwardChatClick = {
+                KLog.i(TAG, "onForwardChatClick:$message")
+                navController.navigate(
+                    ChannelScreenDestination(
+                        channel = channel,
+                        jumpChatMessage = message
+                    )
+                )
+            }
         )
     }
 }
@@ -104,7 +115,8 @@ private fun SearchChatInfoViewScreen(
     navController: DestinationsNavigator,
     channelTitle: String,
     message: List<ChatMessageWrapper>,
-    scrollToPosition: Int
+    scrollToPosition: Int,
+    onForwardChatClick: () -> Unit
 ) {
     val listState: LazyListState = rememberLazyListState()
 
@@ -147,7 +159,7 @@ private fun SearchChatInfoViewScreen(
                     .fillMaxWidth()
                     .background(LocalColor.current.env_100)
                     .clickable {
-
+                        onForwardChatClick.invoke()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -182,7 +194,8 @@ fun SearchChatInfoScreenPreview() {
                     isPendingSendMessage = true
                 )
             ),
-            scrollToPosition = 0
+            scrollToPosition = 0,
+            onForwardChatClick = {}
         )
     }
 }

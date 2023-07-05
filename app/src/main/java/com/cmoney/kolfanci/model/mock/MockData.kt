@@ -98,7 +98,7 @@ object MockData {
                             )
                         }
                     ),
-                    createUnixTime = System.currentTimeMillis().times(1000),
+                    createUnixTime = System.currentTimeMillis().div(1000),
                     serialNumber = Random.nextLong(1, 65536)
                 )
             } else {

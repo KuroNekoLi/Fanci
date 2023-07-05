@@ -55,6 +55,9 @@ import org.koin.androidx.compose.koinViewModel
 
 /**
  * 頻道主頁面
+ *
+ * @param channel 點擊頻道
+ * @param jumpChatMessage 打開直接前往的聊天訊息
  */
 @Destination
 @Composable
@@ -63,6 +66,7 @@ fun ChannelScreen(
     navController: DestinationsNavigator,
     channel: Channel,
     viewMode: ChannelViewModel = koinViewModel(),
+    jumpChatMessage: ChatMessage? = null,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
@@ -80,6 +84,7 @@ fun ChannelScreen(
         group = group,
         channel = channel,
         navController = navController,
+        jumpChatMessage = jumpChatMessage,
         channelTabStatus = channelTabStatus,
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
@@ -93,6 +98,7 @@ private fun ChannelScreenView(
     modifier: Modifier = Modifier,
     group: Group?,
     channel: Channel,
+    jumpChatMessage: ChatMessage? = null,
     navController: DestinationsNavigator,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     channelTabStatus: ChannelTabsStatus,
@@ -191,7 +197,8 @@ private fun ChannelScreenView(
                             ChatRoomScreen(
                                 channelId = channel.id.orEmpty(),
                                 navController = navController,
-                                resultRecipient = announcementResultRecipient
+                                resultRecipient = announcementResultRecipient,
+                                jumpChatMessage = jumpChatMessage
                             )
                         }
 

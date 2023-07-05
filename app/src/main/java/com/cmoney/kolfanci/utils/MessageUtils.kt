@@ -16,7 +16,7 @@ class MessageUtils {
 
             //依照日期 分群
             val groupList = newMessage.groupBy {
-                val createTime = it.message.createUnixTime?.div(1000) ?: 0L
+                val createTime = it.message.createUnixTime?.times(1000) ?: 0L
                 Utils.getTimeGroupByKey(createTime)
             }
 
@@ -24,14 +24,14 @@ class MessageUtils {
             return if (groupList.size > 1) {
                 val groupMessage = groupList.map {
                     val newList = it.value.toMutableList()
-                    newList.add(generateTimeBar(it.value.first()))
+                    newList.add(0, generateTimeBar(it.value.first()))
                     newList
                 }.flatten().toMutableList()
                 groupMessage
             } else {
                 val newList = newMessage.toMutableList()
                 val timeBarMessage = generateTimeBar(newMessage.first())
-                newList.add(timeBarMessage)
+                newList.add(0, timeBarMessage)
                 return newList
             }
         }
