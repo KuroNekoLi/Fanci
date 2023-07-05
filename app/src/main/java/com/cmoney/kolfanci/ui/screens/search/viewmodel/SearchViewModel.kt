@@ -41,6 +41,10 @@ class SearchViewModel(private val searchUseCase: SearchUseCase) : ViewModel() {
     private val _chatInfoMessage = MutableStateFlow<List<ChatMessageWrapper>?>(null)
     val chatInfoMessage = _chatInfoMessage.asSharedFlow()
 
+    //滑動到指定聊天訊息
+    private val _scrollToPosition = MutableStateFlow(0)
+    val scrollToPosition = _scrollToPosition.asStateFlow()
+
     /**
      * 進行 搜尋
      * @param keyword 關鍵字
@@ -101,6 +105,14 @@ class SearchViewModel(private val searchUseCase: SearchUseCase) : ViewModel() {
             _chatInfoMessage.value = timeBarMessage.map {
                 MessageUtils.defineMessageType(it)
             }
+
+            //check scroll position
+            _chatInfoMessage.value?.indexOfFirst {
+                it.message.serialNumber == searchChatMessage.serialNumber
+            }?.let { scrollPosition ->
+                _scrollToPosition.value = scrollPosition
+            }
+
         }
     }
 

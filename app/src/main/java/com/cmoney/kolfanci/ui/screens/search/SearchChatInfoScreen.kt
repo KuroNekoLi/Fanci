@@ -76,6 +76,8 @@ fun SearchChatInfoScreen(
 
     val chatMessageInfo by searchViewModel.chatInfoMessage.collectAsState(null)
 
+    val scrollToPosition by searchViewModel.scrollToPosition.collectAsState()
+
     LaunchedEffect(key1 = Unit) {
         if (chatMessageInfo == null) {
             searchViewModel.onChatItemClick(
@@ -90,7 +92,8 @@ fun SearchChatInfoScreen(
             modifier = modifier,
             navController = navController,
             channelTitle = channel.name.orEmpty(),
-            message = it
+            message = it,
+            scrollToPosition = scrollToPosition
         )
     }
 }
@@ -100,9 +103,14 @@ private fun SearchChatInfoViewScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     channelTitle: String,
-    message: List<ChatMessageWrapper>
+    message: List<ChatMessageWrapper>,
+    scrollToPosition: Int
 ) {
     val listState: LazyListState = rememberLazyListState()
+
+    LaunchedEffect(key1 = Unit) {
+        listState.scrollToItem(index = scrollToPosition)
+    }
 
     Scaffold(
         modifier = modifier
@@ -173,7 +181,8 @@ fun SearchChatInfoScreenPreview() {
                     ),
                     isPendingSendMessage = true
                 )
-            )
+            ),
+            scrollToPosition = 0
         )
     }
 }
