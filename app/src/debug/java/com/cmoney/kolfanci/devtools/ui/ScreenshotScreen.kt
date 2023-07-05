@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.kolfanci.devtools.model.takeScreenshot
+import com.cmoney.kolfanci.devtools.ui.data.ScreenshotTarget
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.channel.ChannelScreenPreview
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreenPreview
@@ -20,9 +21,14 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import kotlinx.coroutines.delay
 import org.koin.core.context.GlobalContext
 
+/**
+ * 螢幕截圖畫面(會依據設定的目標依序切換並截圖儲存)
+ *
+ * @param targets 目標集合
+ */
 @Composable
 fun ScreenshotScreen(
-    contents: List<@Composable () -> Unit> = DefaultTestContents
+    targets: List<ScreenshotTarget> = DefaultTestTargets
 ) {
     val themeUseCase = remember {
         GlobalContext.get().get<ThemeUseCase>()
@@ -37,19 +43,20 @@ fun ScreenshotScreen(
     var themeIndex by remember {
         mutableStateOf(-1)
     }
+    val target = targets[index]
     FanciTheme(
         fanciColor = theme
     ) {
-        contents[index]()
+        target.content()
     }
-    LaunchedEffect(key1 = index) {
+    LaunchedEffect(key1 = index, key2 = targets) {
         // wait for content create
         delay(500L)
-        takeScreenshot(context = context)
+        takeScreenshot(context = context, relativePath = target.relativePath, name = target.name)
         // wait for bitmap create
         delay(100L)
         val targetIndex = index.plus(1)
-        if (targetIndex <= contents.lastIndex) {
+        if (targetIndex <= targets.lastIndex) {
             // 切換內容
             index = targetIndex
         } else {
@@ -71,21 +78,33 @@ fun ScreenshotScreen(
     }
 }
 
-private val DefaultTestContents: List<@Composable () -> Unit> by lazy {
+private val DefaultTestTargets: List<ScreenshotTarget> by lazy {
     listOf(
-        {
+        ScreenshotTarget(
+            relativePath = "follow",
+            name = "FollowScreen"
+        ) {
             FollowScreenPreview()
         },
-        {
+        ScreenshotTarget(
+            name = "ChannelScreen"
+        ) {
             ChannelScreenPreview()
         },
-        {
+        ScreenshotTarget(
+            relativePath = "group/setting",
+            name = "GroupSettingScreen"
+        ) {
             GroupSettingScreenPreview()
         },
-        {
+        ScreenshotTarget(
+            name = "MyScreen"
+        ) {
             MyScreenPreview()
         },
-        {
+        ScreenshotTarget(
+            name = "DiscoverGroupScreen"
+        ) {
             DiscoverGroupScreenPreview()
         }
     )

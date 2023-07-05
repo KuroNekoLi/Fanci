@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
@@ -38,7 +39,6 @@ import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.ui.destinations.VipManagerScreenDestination
-import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
@@ -70,7 +70,7 @@ fun GroupSettingScreen(
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>,
     leaveResultBackNavigator: ResultBackNavigator<String>
 ) {
-    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val globalGroupViewModel = globalGroupViewModel()
 
     val uiState = viewModel.uiState
 

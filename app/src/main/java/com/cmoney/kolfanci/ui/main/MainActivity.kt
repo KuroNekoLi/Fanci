@@ -12,11 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
@@ -30,18 +28,12 @@ import com.cmoney.xlogin.base.BaseWebLoginActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.socks.library.KLog
-import org.koin.android.ext.android.inject
-
-val LocalDependencyContainer = staticCompositionLocalOf<MainActivity> {
-    error("No dependency container provided!")
-}
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseWebLoginActivity() {
     private val TAG = MainActivity::class.java.simpleName
-
-    val globalViewModel by inject<MainViewModel>()
-
-    val globalGroupViewModel by inject<GroupViewModel>()
+    private val globalViewModel by viewModel<MainViewModel>()
+    private val globalGroupViewModel by viewModel<GroupViewModel>()
 
     companion object {
         const val FOREGROUND_NOTIFICATION_BUNDLE = "foreground_notification_bundle"
@@ -58,18 +50,16 @@ class MainActivity : BaseWebLoginActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            CompositionLocalProvider(LocalDependencyContainer provides this) {
-                val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
-                isOpenTutorial?.let { isCurrentOpenTutorial ->
-                    FanciTheme(fanciColor = DefaultThemeColor) {
-                        if (isCurrentOpenTutorial) {
-                            MainScreen()
-                        } else {
-                            TutorialScreen(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                globalViewModel.tutorialOnOpen()
-                            }
+            val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
+            isOpenTutorial?.let { isCurrentOpenTutorial ->
+                FanciTheme(fanciColor = DefaultThemeColor) {
+                    if (isCurrentOpenTutorial) {
+                        MainScreen()
+                    } else {
+                        TutorialScreen(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            globalViewModel.tutorialOnOpen()
                         }
                     }
                 }

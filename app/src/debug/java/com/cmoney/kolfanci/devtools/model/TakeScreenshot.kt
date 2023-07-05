@@ -12,47 +12,43 @@ import android.view.PixelCopy
 import androidx.core.os.HandlerCompat
 import com.cmoney.tools_android.util.notifyGalleryAddPic
 import com.cmoney.tools_android.util.storeImageAboveQ
-import com.cmoney.tools_android.util.storeImageBelowQ
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
+private const val ROOT_FOLDER_NAME = "test_screenshot"
+
 /**
  * 螢幕截圖
  *
  * @param context android context
+ * @param relativePath 儲存的相對路徑 "分類/子分類..."
+ * @param name 儲存的原始檔案名稱(會加上時間戳記: xxx-millisTime.jpg)
  */
-fun CoroutineScope.takeScreenshot(context: Context) {
+fun CoroutineScope.takeScreenshot(context: Context, relativePath: String, name: String) {
     val activity = context as? Activity ?: return
-    val picturesFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-    if (!picturesFolder.exists()) {
-        picturesFolder.mkdir()
-    }
-    val testFolder = File(picturesFolder, "test_screenshot")
-    if (!testFolder.exists()) {
-        testFolder.mkdir()
-    }
-    val fileName = "screenshot-${System.currentTimeMillis()}.jpg"
+    val fileName = "$name-${System.currentTimeMillis()}.jpg"
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             takeScreenshotAboveO(activity = activity) { bitmap ->
                 launch(Dispatchers.IO) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         context.contentResolver.storeImageAboveQ(
-                            folderName = testFolder.name,
+                            folderName = if (relativePath.isNotEmpty()) {
+                                "$ROOT_FOLDER_NAME/$relativePath"
+                            } else {
+                                ROOT_FOLDER_NAME
+                            },
                             fileName = fileName,
                             outputBitmap = bitmap
                         )
                     } else {
                         context.storeImageBelowQ(
-                            folderName = testFolder.name,
+                            relativePath = relativePath,
                             fileName = fileName,
-                            outputBitmap = bitmap,
-                            format = Bitmap.CompressFormat.JPEG
-                        ).onSuccess { absolutePath ->
-                            context.notifyGalleryAddPic(absolutePath)
-                        }
+                            bitmap = bitmap
+                        )
                     }
                 }
             }
@@ -60,18 +56,41 @@ fun CoroutineScope.takeScreenshot(context: Context) {
             val bitmap = takeScreenshotBelowO(activity)
             launch(Dispatchers.IO) {
                 context.storeImageBelowQ(
-                    folderName = testFolder.name,
+                    relativePath = relativePath,
                     fileName = fileName,
-                    outputBitmap = bitmap,
-                    format = Bitmap.CompressFormat.JPEG
-                ).onSuccess { absolutePath ->
-                    context.notifyGalleryAddPic(absolutePath)
-                }
+                    bitmap = bitmap
+                )
             }
         }
     } catch (e: Exception) {
         // TODO screenshot flow failed
-        println("e: $e")
+    }
+}
+
+private fun Context.storeImageBelowQ(
+    relativePath: String,
+    fileName: String,
+    bitmap: Bitmap
+) {
+    val picturesFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+    picturesFolder.mkdir()
+    val testFolder = File(picturesFolder, ROOT_FOLDER_NAME)
+    testFolder.mkdir()
+    val saveFolder = if (relativePath.isNotEmpty()) {
+        File(testFolder, relativePath).apply {
+            mkdirs()
+        }
+    } else {
+        testFolder
+    }
+    val saveFile = File(saveFolder, fileName)
+    val isSuccess = saveFile.outputStream().use { outputStream ->
+        val saveSuccess = bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        outputStream.flush()
+        saveSuccess
+    }
+    if (isSuccess) {
+        notifyGalleryAddPic(saveFile.absolutePath)
     }
 }
 
