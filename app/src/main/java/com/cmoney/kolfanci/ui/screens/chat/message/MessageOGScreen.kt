@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.chat
+package com.cmoney.kolfanci.ui.screens.chat.message
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

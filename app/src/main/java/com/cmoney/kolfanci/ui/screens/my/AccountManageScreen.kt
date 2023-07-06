@@ -49,9 +49,6 @@ fun AccountManageScreen(
         topBar = {
             TopBarScreen(
                 title = "帳號管理",
-                leadingEnable = true,
-                trailingEnable = false,
-                moreEnable = false,
                 backClick = {
                     navController.popBackStack()
                 }

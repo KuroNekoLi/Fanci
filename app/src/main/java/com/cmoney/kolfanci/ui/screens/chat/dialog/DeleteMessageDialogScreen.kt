@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -137,7 +137,7 @@ fun DeleteMessageDialogScreen(
 fun DeleteMessageDialogScreenPreview() {
     FanciTheme {
         DeleteMessageDialogScreen(
-            ChatRoomUseCase.mockMessage,
+            MockData.mockMessage,
             onConfirm = {},
             onDismiss = {}
         )

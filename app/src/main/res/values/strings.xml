@@ -156,4 +156,10 @@
     <string name="adjust">調整</string>
     <string name="leave_group_remind">退出社團後，需要重新加入喔！</string>
     <string name="leaving_group">退出社團中</string>
+    <string name="all">全部</string>
+    <string name="chat">聊天</string>
+    <string name="post">貼文</string>
+    <string name="search_result_empty">找不到相關內容\n試試看比較簡短的關鍵字呢</string>
+    <string name="jump_to_chatroom">跳至訊息，進行更多互動</string>
+    <string name="search_keyword_hint">輸入關鍵字</string>
 </resources>

@@ -43,10 +43,14 @@ import org.koin.androidx.compose.koinViewModel
 
 /**
  * 聊天室
+ *
+ * @param channelId 目前頻道id
+ * @param jumpChatMessage 指定前往的message
  */
 @Composable
 fun ChatRoomScreen(
     channelId: String,
+    jumpChatMessage: ChatMessage? = null,
     navController: DestinationsNavigator,
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
@@ -70,7 +74,12 @@ fun ChatRoomScreen(
 
     //是否有讀的權限
     if (Constant.canReadMessage()) {
-        messageViewModel.startPolling(channelId)
+        if (jumpChatMessage != null) {
+            messageViewModel.forwardToMessage(channelId, jumpChatMessage)
+        }
+        else {
+            messageViewModel.startPolling(channelId)
+        }
     }
 
     //抓取 公告

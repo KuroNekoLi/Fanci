@@ -179,8 +179,6 @@ private fun MemberAndRoleManageScreenView(
         topBar = {
             TopBarScreen(
                 title = topBarTitle,
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = onBackClick
             )
         }

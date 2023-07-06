@@ -16,6 +16,7 @@ import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.kolfanci.model.mock.MockData
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -38,9 +39,6 @@ fun AnnouncementScreen(
         topBar = {
             TopBarScreen(
                 title = "設定公告訊息",
-                trailingEnable = false,
-                moreEnable = false,
-                moreClick = {},
                 backClick = {
                     navigator.popBackStack()
                 }
@@ -110,7 +108,7 @@ fun AnnouncementScreenPreview() {
     FanciTheme {
         AnnouncementScreen(
             EmptyDestinationsNavigator,
-            ChatRoomUseCase.mockMessage,
+            MockData.mockMessage,
             resultBackNavigator = EmptyResultBackNavigator())
     }
 }

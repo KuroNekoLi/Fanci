@@ -96,8 +96,6 @@ fun VipManagerScreenView(
         topBar = {
             TopBarScreen(
                 title = stringResource(id = R.string.vip_manager),
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navController.popBackStack()
                 }

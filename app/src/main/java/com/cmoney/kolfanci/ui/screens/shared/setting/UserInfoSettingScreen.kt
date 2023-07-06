@@ -60,9 +60,6 @@ fun UserInfoSettingScreen(
         topBar = {
             TopBarScreen(
                 title = "社團個人資料",
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     state.navController.popBackStack()
                 }

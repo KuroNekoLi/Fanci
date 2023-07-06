@@ -20,6 +20,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isMyPostMessage
 import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -186,7 +187,7 @@ fun InteractDialogScreenPreview() {
                     it != ModalBottomSheetValue.HalfExpanded
                 }
             ),
-            message = ChatRoomUseCase.mockMessage
+            message = MockData.mockMessage
         ) {
 
         }

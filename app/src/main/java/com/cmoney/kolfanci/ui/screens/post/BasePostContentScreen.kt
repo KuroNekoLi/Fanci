@@ -41,7 +41,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
-import com.cmoney.kolfanci.ui.screens.chat.MessageImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen

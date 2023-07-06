@@ -172,8 +172,6 @@ fun ChannelSettingScreenView(
         topBar = {
             TopBarScreen(
                 title = "頻道管理",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

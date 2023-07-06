@@ -171,6 +171,7 @@ private fun MessageScreenView(
                                         )
                                     )
                                 }
+
                                 is MessageContentCallback.LongClick -> {
                                     KLog.i(TAG, "LongClick.")
                                     //非禁言才顯示 互動彈窗
@@ -182,6 +183,7 @@ private fun MessageScreenView(
                                         )
                                     }
                                 }
+
                                 is MessageContentCallback.MsgDismissHideClick -> {
                                     onMsgDismissHide.invoke(chatMessageWrapper.message)
                                 }
@@ -224,7 +226,11 @@ private fun EmptyMessageContent(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(43.dp))
 
-        Text(text = "目前還沒有人發言", fontSize = 16.sp, color = LocalColor.current.text.default_30)
+        Text(
+            text = "目前還沒有人發言",
+            fontSize = 16.sp,
+            color = LocalColor.current.text.default_30
+        )
     }
 }
 

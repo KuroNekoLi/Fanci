@@ -152,8 +152,6 @@ fun AllMemberScreenView(
         topBar = {
             TopBarScreen(
                 title = "所有成員",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navController.popBackStack()
                 }

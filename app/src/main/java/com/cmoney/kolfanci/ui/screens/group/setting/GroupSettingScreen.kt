@@ -191,8 +191,6 @@ fun GroupSettingScreenView(
         topBar = {
             TopBarScreen(
                 title = "設定",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     onBackClick.invoke()
                 }

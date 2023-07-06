@@ -2,14 +2,11 @@ package com.cmoney.kolfanci.ui.screens.chat.message.viewmodel
 
 import android.app.Application
 import android.net.Uri
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
@@ -31,6 +28,7 @@ import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
+import com.cmoney.kolfanci.utils.MessageUtils
 import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -123,84 +121,32 @@ class MessageViewModel(
      * 開始 Polling 聊天室 訊息
      * @param channelId 聊天室id
      */
-    fun startPolling(channelId: String?) {
+    fun startPolling(channelId: String?, fromIndex: Long? = null) {
         KLog.i(TAG, "startPolling:$channelId")
         viewModelScope.launch {
             if (channelId?.isNotEmpty() == true) {
                 stopPolling()
-                chatRoomPollUseCase.poll(pollingInterval, channelId).collect {
+                chatRoomPollUseCase.poll(pollingInterval, channelId, fromIndex).collect {
 //                    KLog.i(TAG, it)
+                    if (it.items?.isEmpty() == true) {
+                        return@collect
+                    }
+
                     val newMessage = it.items?.map { chatMessage ->
                         ChatMessageWrapper(message = chatMessage)
-                    }.orEmpty().reversed()
+                    }.orEmpty()
+
+//                    KLog.i(TAG, newMessage.map { it.message.content?.text })
 
                     //檢查插入時間 bar
-                    val timeBarMessage = insertTimeBar(newMessage)
+                    val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
 
                     processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
-                        defineMessageType(chatMessageWrapper)
-                    }, true)
+                        MessageUtils.defineMessageType(chatMessageWrapper)
+                    })
                 }
             }
         }
-    }
-
-    /**
-     *  檢查內容,是否有跨日期,並在跨日中間插入 time bar,
-     *  或是 內容不滿分頁大小(訊息太少), 也插入
-     */
-    private fun insertTimeBar(newMessage: List<ChatMessageWrapper>): List<ChatMessageWrapper> {
-        if (newMessage.isEmpty()) {
-            return newMessage
-        }
-
-        //依照日期 分群
-        val groupList = newMessage.groupBy {
-            val createTime = it.message.createUnixTime?.times(1000) ?: 0L
-            Utils.getTimeGroupByKey(createTime)
-        }
-
-        //大於2群, 找出跨日交界並插入time bar
-        return if (groupList.size > 1) {
-            val groupMessage = groupList.map {
-                val newList = it.value.toMutableList()
-                newList.add(generateTimeBar(it.value.first()))
-                newList
-            }.flatten().toMutableList()
-            groupMessage
-        } else {
-            val newList = newMessage.toMutableList()
-            val timeBarMessage = generateTimeBar(newMessage.first())
-            newList.add(timeBarMessage)
-            return newList
-        }
-    }
-
-    private fun generateTimeBar(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
-        return chatMessageWrapper.copy(
-            message = chatMessageWrapper.message.copy(
-                id = chatMessageWrapper.message.createUnixTime.toString()
-            ),
-            messageType = ChatMessageWrapper.MessageType.TimeBar
-        )
-    }
-
-    private fun defineMessageType(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
-        val messageType = if (chatMessageWrapper.isBlocking) {
-            ChatMessageWrapper.MessageType.Blocking
-        } else if (chatMessageWrapper.isBlocker) {
-            ChatMessageWrapper.MessageType.Blocker
-        } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
-            ChatMessageWrapper.MessageType.Delete
-        } else if (chatMessageWrapper.message.isDeleted == true) {
-            ChatMessageWrapper.MessageType.RecycleMessage
-        } else {
-            chatMessageWrapper.messageType
-        }
-
-        return chatMessageWrapper.copy(
-            messageType = messageType
-        )
     }
 
 
@@ -215,40 +161,33 @@ class MessageViewModel(
     /**
      *  將新的訊息 跟舊的合併
      *  @param newChatMessage 新訊息
-     *  @param isLatest 是否為新訊息,要加在頭
      */
     private fun processMessageCombine(
-        newChatMessage: List<ChatMessageWrapper>,
-        isLatest: Boolean = false
+        newChatMessage: List<ChatMessageWrapper>
     ) {
-        //combine old message
+        //combine old message, 因為原本 output 的資料會 reversed, 所以再 reversed 一次矯正
         val oldMessage = _message.value.filter {
             !it.isPendingSendMessage
-        }.toMutableList()
+        }.reversed().toMutableList()
 
         val pendingSendMessage = _message.value.filter {
             it.isPendingSendMessage
         }
 
-        if (isLatest) {
-            oldMessage.addAll(0, newChatMessage)
-        } else {
-            oldMessage.addAll(newChatMessage)
-        }
+        oldMessage.addAll(0, newChatMessage)
 
         oldMessage.addAll(0, pendingSendMessage)
 
         val distinctMessage = oldMessage.distinctBy { combineMessage ->
-
             if (combineMessage.messageType == ChatMessageWrapper.MessageType.TimeBar) {
                 val createTime = combineMessage.message.createUnixTime?.times(1000) ?: 0L
                 Utils.getTimeGroupByKey(createTime)
             } else {
                 combineMessage.message.id
             }
-        }
+        }.sortedBy { it.message.createUnixTime }
 
-        _message.value = distinctMessage
+        _message.value = distinctMessage.reversed()
     }
 
     /**
@@ -270,8 +209,14 @@ class MessageViewModel(
                     it.items?.also { message ->
                         val newMessage = message.map {
                             ChatMessageWrapper(message = it)
-                        }.reversed()
-                        processMessageCombine(newMessage)
+                        }
+
+                        //檢查插入時間 bar
+                        val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
+
+                        processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
+                            MessageUtils.defineMessageType(chatMessageWrapper)
+                        })
                     }
                 }, {
                     KLog.e(TAG, it)
@@ -693,6 +638,7 @@ class MessageViewModel(
                     isDeleted = messageInteract.message.isDeleted
                 )
             )
+
             is MessageInteract.Report -> {
                 _reportMessage.value = messageInteract.message
             }
@@ -987,6 +933,29 @@ class MessageViewModel(
         KLog.i(TAG, "snackMessage:$message")
         viewModelScope.launch {
             _snackBarMessage.emit(message)
+        }
+    }
+
+    /**
+     * 前往指定訊息, 並從該訊息index 開始往下 polling
+     *
+     * @param channelId 頻道id
+     * @param jumpChatMessage 指定跳往的訊息
+     */
+    fun forwardToMessage(channelId: String, jumpChatMessage: ChatMessage) {
+        KLog.i(TAG, "forwardToMessage:$jumpChatMessage")
+        viewModelScope.launch {
+            val newMessage = listOf(ChatMessageWrapper(message = jumpChatMessage))
+
+            //檢查插入時間 bar
+            val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
+
+            processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
+                MessageUtils.defineMessageType(chatMessageWrapper)
+            })
+
+            //開始指定位置開始 polling
+            startPolling(channelId, jumpChatMessage.serialNumber)
         }
     }
 

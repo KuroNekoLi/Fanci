@@ -276,8 +276,6 @@ private fun AddRoleScreenView(
             if (fanciRole != null) {
                 TopBarScreen(
                     title = "編輯角色",
-                    leadingEnable = true,
-                    moreEnable = false,
                     backClick = {
                         KLog.i(TAG, "backClick click.")
                         onConfirm.invoke()

@@ -104,8 +104,6 @@ private fun SortChannelScreenView(
         topBar = {
             TopBarScreen(
                 title = "頻道排序",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

@@ -63,12 +63,7 @@ fun MyScreen(
         topBar = {
             TopBarScreen(
                 title = "會員中心",
-                leadingEnable = true,
-                trailingEnable = false,
-                moreEnable = false,
                 leadingIcon = ImageVector.vectorResource(id = R.drawable.house),
-                moreClick = {
-                },
                 backClick = {
                     navController.popBackStack()
                 }

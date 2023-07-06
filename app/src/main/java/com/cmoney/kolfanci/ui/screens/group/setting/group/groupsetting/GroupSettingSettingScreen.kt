@@ -273,10 +273,6 @@ fun GroupSettingSettingView(
         topBar = {
             TopBarScreen(
                 title = "社團設定",
-                leadingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     navController.popBackStack()
                 }

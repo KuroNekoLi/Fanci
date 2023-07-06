@@ -223,8 +223,6 @@ private fun GroupReportScreenView(
         topBar = {
             TopBarScreen(
                 title = "檢舉審核",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     onBack.invoke()
                 }

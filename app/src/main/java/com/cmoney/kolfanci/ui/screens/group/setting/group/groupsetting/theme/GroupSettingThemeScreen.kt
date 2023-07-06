@@ -143,10 +143,6 @@ private fun GroupSettingThemeView(
         topBar = {
             TopBarScreen(
                 title = stringResource(id = R.string.theme_color),
-                leadingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     navController.popBackStack()
                 }

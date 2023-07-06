@@ -165,8 +165,6 @@ private fun VipPlanInfoMainScreenView(
         topBar = {
             TopBarScreen(
                 title = stringResource(id = R.string.manager_vip_plan),
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navController.popBackStack()
                 }
