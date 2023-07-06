@@ -324,7 +324,7 @@ fun PostInfoScreen(
                 postMoreActionType = PostMoreActionType.Comment,
                 onInteractClick = {
                     when (it) {
-                        is PostInteract.Announcement -> TODO()
+                        is PostInteract.Announcement -> {}
                         is PostInteract.Delete -> {
                             showCommentDeleteTip = Pair(true, comment)
                         }
@@ -358,7 +358,7 @@ fun PostInfoScreen(
                 postMoreActionType = PostMoreActionType.Reply,
                 onInteractClick = {
                     when (it) {
-                        is PostInteract.Announcement -> TODO()
+                        is PostInteract.Announcement -> {}
                         is PostInteract.Delete -> {
                             showReplyDeleteTip = Triple(true, comment, reply)
                         }
@@ -622,6 +622,7 @@ private fun PostInfoScreenView(
                     //貼文
                     item {
                         BasePostContentScreen(
+                            backgroundColor = LocalColor.current.env_80,
                             post = post,
                             defaultDisplayLine = Int.MAX_VALUE,
                             bottomContent = {
@@ -649,7 +650,7 @@ private fun PostInfoScreenView(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(45.dp)
-                                .background(LocalColor.current.background)
+                                .background(LocalColor.current.env_80)
                                 .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
                         ) {
                             Text(
