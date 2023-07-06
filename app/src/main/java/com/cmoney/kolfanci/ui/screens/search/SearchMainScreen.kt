@@ -138,7 +138,7 @@ private fun SearchMainScreenView(
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
-        backgroundColor = LocalColor.current.env_100,
+        backgroundColor = LocalColor.current.env_80,
         topBar = {
             SearchToolBar(
                 onClose = onClose,
@@ -237,7 +237,9 @@ private fun SearchToolBar(
     var textState by remember { mutableStateOf("") }
     val keyboard = LocalSoftwareKeyboardController.current
     Row(
-        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 15.dp, bottom = 15.dp),
+        modifier = Modifier
+            .background(LocalColor.current.env_100)
+            .padding(start = 24.dp, end = 24.dp, top = 15.dp, bottom = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         //Search Field
@@ -281,7 +283,7 @@ private fun SearchToolBar(
                     Box(modifier = Modifier.weight(1f)) {
                         if (textState.isEmpty()) {
                             Text(
-                                text = "輸入關鍵字",
+                                text = stringResource(R.string.search_keyword_hint),
                                 fontSize = 16.sp,
                                 color = LocalColor.current.text.default_30
                             )

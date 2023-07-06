@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.mock.MockData
@@ -120,7 +122,7 @@ private fun SearchChatInfoViewScreen(
 ) {
     val listState: LazyListState = rememberLazyListState()
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = scrollToPosition) {
         listState.scrollToItem(index = scrollToPosition)
     }
 
@@ -164,7 +166,7 @@ private fun SearchChatInfoViewScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "跳至訊息，進行更多互動",
+                    text = stringResource(id = R.string.jump_to_chatroom),
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     color = LocalColor.current.primary
@@ -312,10 +314,10 @@ private fun SearchChatMessageContent(
                 }
             }
 
-            ChatMessageWrapper.MessageType.Blocker -> TODO()
-            ChatMessageWrapper.MessageType.Blocking -> TODO()
-            ChatMessageWrapper.MessageType.Delete -> TODO()
-            ChatMessageWrapper.MessageType.RecycleMessage -> TODO()
+            ChatMessageWrapper.MessageType.Blocker -> {}
+            ChatMessageWrapper.MessageType.Blocking -> {}
+            ChatMessageWrapper.MessageType.Delete -> {}
+            ChatMessageWrapper.MessageType.RecycleMessage -> {}
         }
     }
 }
