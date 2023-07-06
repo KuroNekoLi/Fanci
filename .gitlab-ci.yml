@@ -23,6 +23,7 @@ before_script:
   - export PATH=$PATH:~/Library/Android/sdk/platform-tools/
   - chmod +x ./gradlew
   - chmod +x ./auto_bot.sh
+  - echo $CI_DEFAULT_BRANCH
   - echo $CI_COMMIT_BRANCH
   - echo $CI_COMMIT_TAG
 
