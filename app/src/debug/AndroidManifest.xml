@@ -1,9 +1,11 @@
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
+    <application
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".devtools.ui.ScreenshotActivity"
             android:icon="@mipmap/ic_launcher"
