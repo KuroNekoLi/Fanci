@@ -336,7 +336,7 @@ private fun MemberItem(
 
 @Preview(showBackground = true)
 @Composable
-fun AddMemberScreen() {
+fun AddMemberScreenPreview() {
     FanciTheme {
         AddMemberScreenPreview(
             modifier = Modifier,

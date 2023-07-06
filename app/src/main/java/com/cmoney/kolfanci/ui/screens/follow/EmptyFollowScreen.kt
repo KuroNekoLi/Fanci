@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,7 +37,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
-import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
@@ -56,7 +57,6 @@ fun EmptyFollowScreen(
     isLoading: Boolean
 ) {
     val uiState = viewModel.uiState
-    val mainActivity = LocalDependencyContainer.current
     val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
     EmptyFollowScreenView(
@@ -87,13 +87,14 @@ fun EmptyFollowScreen(
     }
 
     if (uiState.showLoginDialog) {
+        val context = LocalContext.current
         LoginDialogScreen(
             onDismiss = {
                 viewModel.dismissLoginDialog()
             },
             onLogin = {
                 viewModel.dismissLoginDialog()
-                mainActivity.startLogin()
+                (context as? MainActivity)?.startLogin()
             }
         )
     }

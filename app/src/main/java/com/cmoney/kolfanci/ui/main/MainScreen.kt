@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -9,8 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
@@ -24,6 +27,7 @@ import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Main screen
@@ -40,8 +44,10 @@ fun MainScreen(
 ) {
     val TAG = "MainScreen"
     val context = LocalContext.current
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
-    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val globalViewModel = koinViewModel<MainViewModel>(
+        owner = LocalContext.current as? ComponentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
+    )
+    val globalGroupViewModel = globalGroupViewModel()
     val activity = LocalContext.current.findActivity()
     val isLoading by globalGroupViewModel.loading.collectAsState()
 
