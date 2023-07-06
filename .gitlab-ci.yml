@@ -32,8 +32,10 @@ stages:
 publish_play_internal:
   stage: publish
   script: echo $CI_COMMIT_BRANCH
-  rules:
-    - if: $CI_COMMIT_BRANCH == 'master' && $CI_COMMIT_TAG != null
+  only:
+    - tags
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == 'master' && $CI_COMMIT_TAG != null
   tags:
     - mac_studio
 
