@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
-private const val ROOT_FOLDER_NAME = "test_screenshot"
+private const val ROOT_FOLDER_NAME = "fanci_verify_screenshots"
 
 /**
  * 螢幕截圖
