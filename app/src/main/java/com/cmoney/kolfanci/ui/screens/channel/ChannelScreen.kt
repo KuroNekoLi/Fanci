@@ -29,11 +29,11 @@ import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.SearchMainScreenDestination
-import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
@@ -71,7 +71,7 @@ fun ChannelScreen(
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
 ) {
-    val group by LocalDependencyContainer.current.globalGroupViewModel.currentGroup.collectAsState()
+    val group by globalGroupViewModel().currentGroup.collectAsState()
 
     LaunchedEffect(Unit) {
         viewMode.fetchChannelTabStatus(channel.id.orEmpty())
