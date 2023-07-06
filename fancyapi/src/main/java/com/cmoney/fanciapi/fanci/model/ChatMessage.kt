@@ -35,7 +35,6 @@ import kotlinx.parcelize.Parcelize
  * @param emojiCount 
  * @param id 
  * @param isDeleted 是否刪除
- * @param myProperty 
  * @param createUnixTime 
  * @param updateUnixTime 
  * @param serialNumber 
@@ -43,6 +42,7 @@ import kotlinx.parcelize.Parcelize
  * @param messageReaction 
  * @param deleteStatus 
  * @param deleteFrom 
+ * @param commentCount 
  */
 @Parcelize
 
@@ -68,9 +68,6 @@ data class ChatMessage (
     @Json(name = "isDeleted")
     val isDeleted: kotlin.Boolean? = null,
 
-    @Json(name = "myProperty")
-    val myProperty: kotlin.Int? = null,
-
     @Json(name = "createUnixTime")
     val createUnixTime: kotlin.Long? = null,
 
@@ -90,7 +87,10 @@ data class ChatMessage (
     val deleteStatus: DeleteStatus? = null,
 
     @Json(name = "deleteFrom")
-    val deleteFrom: GroupMember? = null
+    val deleteFrom: GroupMember? = null,
+
+    @Json(name = "commentCount")
+    val commentCount: kotlin.Int? = null
 
 ) : Parcelable
 

@@ -2,19 +2,33 @@ package com.cmoney.kolfanci.ui.screens.group.setting
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.model.Constant.isShowApproval
 import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
@@ -22,7 +36,9 @@ import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
+import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -32,6 +48,9 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * 社團-設定頁面
+ */
 @Destination
 @Composable
 fun GroupSettingScreen(
@@ -39,13 +58,23 @@ fun GroupSettingScreen(
     navController: DestinationsNavigator,
     initGroup: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
+    memberViewModel: MemberViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>,
     applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>
 ) {
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
 
     val uiState = viewModel.uiState
+
+    val loading = memberViewModel.uiState.loading
+
+    //邀請加入社團連結
+    val shareText by memberViewModel.shareText.collectAsState()
+    if (shareText.isNotEmpty()) {
+        LocalContext.current.share(shareText)
+        memberViewModel.resetShareText()
+    }
 
     //檢舉審核 清單
     val reportList by viewModel.reportList.collectAsState()
@@ -55,10 +84,11 @@ fun GroupSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val resultGroup = result.value
                 viewModel.settingGroup(resultGroup)
-                globalViewModel.setCurrentGroup(resultGroup)
+                globalGroupViewModel.setCurrentGroup(resultGroup)
             }
         }
     }
@@ -68,6 +98,7 @@ fun GroupSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val refreshReport = result.value
                 if (refreshReport) {
@@ -81,6 +112,7 @@ fun GroupSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val isNeedRefresh = result.value
                 if (isNeedRefresh) {
@@ -95,16 +127,22 @@ fun GroupSettingScreen(
         navController.popBackStack()
     }
 
+    val group = uiState.settingGroup ?: initGroup
+
     GroupSettingScreenView(
         modifier = modifier,
         navController = navController,
-        group = uiState.settingGroup ?: initGroup,
+        group = group,
         unApplyCount = uiState.unApplyCount ?: 0,
         reportList = reportList,
         onBackClick = {
 //            globalViewModel.setCurrentGroup(group)
             navController.popBackStack()
-        }
+        },
+        onInviteClick = {
+            memberViewModel.onInviteClick(group)
+        },
+        loading = loading
     )
 
     //抓取加入申請 數量
@@ -125,7 +163,9 @@ fun GroupSettingScreenView(
     group: Group,
     onBackClick: () -> Unit,
     unApplyCount: Long,
-    reportList: List<ReportInformation>?
+    reportList: List<ReportInformation>?,
+    onInviteClick: () -> Unit,
+    loading: Boolean
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -148,6 +188,23 @@ fun GroupSettingScreenView(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
+            if (loading) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(size = 32.dp),
+                        color = LocalColor.current.primary
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            //邀請成員
+            InviteMemberScreen(onInviteClick)
+
             Spacer(modifier = Modifier.height(28.dp))
 
             //社團管理
@@ -181,6 +238,29 @@ fun GroupSettingScreenView(
     }
 }
 
+/**
+ * 邀請成員
+ */
+@Composable
+private fun InviteMemberScreen(
+    onInviteClick: () -> Unit
+) {
+    Column {
+        Text(
+            modifier = Modifier.padding(start = 25.dp, bottom = 9.dp),
+            text = "邀請成員", fontSize = 14.sp, color = LocalColor.current.text.default_100
+        )
+
+        SettingItemScreen(
+            iconRes = R.drawable.invite_member,
+            text = "邀請社團成員",
+            onItemClick = {
+                onInviteClick.invoke()
+            }
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GroupSettingScreenPreview() {
@@ -190,7 +270,9 @@ fun GroupSettingScreenPreview() {
             group = Group(),
             onBackClick = {},
             unApplyCount = 20,
-            reportList = emptyList()
+            reportList = emptyList(),
+            onInviteClick = {},
+            loading = false
         )
     }
 }

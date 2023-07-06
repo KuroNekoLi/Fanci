@@ -10,10 +10,12 @@ val useCaseModule = module {
     factory { UserUseCase(get()) }
     factory { ChatRoomPollUseCase(get()) }
     factory { ThemeUseCase(get(), get()) }
-    factory { ChannelUseCase(get(), get(), get(), get()) }
+    factory { ChannelUseCase(get(), get(), get(), get(), get()) }
     factory { BanUseCase(get()) }
     factory { GroupApplyUseCase(get()) }
     factory { RelationUseCase(get()) }
     factory { PermissionUseCase(get(), get()) }
     factory { OrderUseCase(get()) }
+    factory { PostUseCase(get()) }
+    factory { DynamicLinkUseCase(get()) }
 }

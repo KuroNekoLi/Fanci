@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ReportReason
 
 import com.squareup.moshi.Json
@@ -24,6 +25,7 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
+ * @param tabType 
  * @param contentId 
  * @param reason 
  */
@@ -31,6 +33,9 @@ import kotlinx.parcelize.Parcelize
 
 
 data class ReportParm (
+
+    @Json(name = "tabType")
+    val tabType: ChannelTabType? = null,
 
     @Json(name = "contentId")
     val contentId: kotlin.String? = null,

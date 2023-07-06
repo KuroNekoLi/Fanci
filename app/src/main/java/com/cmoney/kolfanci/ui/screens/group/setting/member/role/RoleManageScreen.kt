@@ -16,8 +16,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddRoleScreenDestination
@@ -56,6 +58,7 @@ fun RoleManageScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val fanciRoleCallback = result.value
                 if (fanciRoleCallback.isAdd) {
@@ -67,10 +70,11 @@ fun RoleManageScreen(
         }
     }
 
-    sortRoleResult.onNavResult {result ->
+    sortRoleResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val sortedRole = result.value
                 viewModel.setSortResult(sortedRole.roleList)
@@ -135,7 +139,7 @@ fun RoleManageScreenView(
                     }
                 }
 
-                if (Constant.MyGroupPermission.rearrangeRoles == true) {
+                if (Constant.MyGroupPermission.rearrangeRoles == true && roleList.isNotEmpty()) {
                     Spacer(modifier = Modifier.width(23.dp))
 
                     BorderButton(
@@ -166,22 +170,13 @@ fun RoleManageScreenView(
                         color = LocalColor.current.primary
                     )
                 }
-            }
-            else {
+            } else {
                 if (roleList.isEmpty()) {
-                    Box(
+                    EmptyRoleView(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "尚未建立任何角色",
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center,
-                            color = LocalColor.current.component.other
-                        )
-                    }
+                            .fillMaxWidth()
+                    )
                 } else {
                     Text(
                         modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 20.dp),
@@ -227,6 +222,33 @@ fun RoleManageScreenView(
 //                }
 //            }
         }
+    }
+}
+
+@Composable
+private fun EmptyRoleView(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .background(LocalColor.current.env_80),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        AsyncImage(
+            modifier = Modifier.size(105.dp),
+            model = R.drawable.empty_folwer, contentDescription = "empty message"
+        )
+
+        Spacer(modifier = Modifier.height(43.dp))
+
+        Text(
+            text = "目前沒有建立任何角色\n建立角色可以區分粉絲，讓管理更有效率！",
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            color = LocalColor.current.text.default_30
+        )
     }
 }
 

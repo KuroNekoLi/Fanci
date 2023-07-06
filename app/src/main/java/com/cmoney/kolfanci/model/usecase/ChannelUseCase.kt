@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.model.usecase
 import com.cmoney.fanciapi.fanci.api.BuffInformationApi
 import com.cmoney.fanciapi.fanci.api.CategoryApi
 import com.cmoney.fanciapi.fanci.api.ChannelApi
+import com.cmoney.fanciapi.fanci.api.ChannelTabApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.checkResponseBody
@@ -11,7 +12,8 @@ class ChannelUseCase(
     private val categoryApi: CategoryApi,
     private val groupApi: GroupApi,
     private val channelApi: ChannelApi,
-    private val buffInformationApi: BuffInformationApi
+    private val buffInformationApi: BuffInformationApi,
+    private val channelTabApi: ChannelTabApi
 ) {
 
     /**
@@ -171,11 +173,18 @@ class ChannelUseCase(
             categoryApi.apiV1CategoryCategoryIdChannelPost(
                 categoryId = categoryId,
                 channelParam = ChannelParam(
-                    channelType = ChannelType.chatRoom,
+                    channelType = ChannelTabType.chatRoom,
                     name = name,
                     privacy = privacy
                 )
             ).checkResponseBody()
         }
+
+    /**
+     * 查看 該 channel tab 狀態
+     */
+    suspend fun fetchChannelTabStatus(channelId: String) = kotlin.runCatching {
+        channelTabApi.apiV1ChannelTabChannelIdTabGet(channelId = channelId).checkResponseBody()
+    }
 
 }

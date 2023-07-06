@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -31,17 +30,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.ui.main.MainViewModel
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.destinations.ChatRoomScreenDestination
-import com.cmoney.kolfanci.ui.destinations.DiscoverGroupScreenDestination
-import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
-import com.cmoney.kolfanci.ui.destinations.MyScreenDestination
+import com.cmoney.kolfanci.ui.destinations.*
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -57,16 +53,20 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun FollowScreen(
     modifier: Modifier,
-    globalViewModel: MainViewModel,
     navigator: DestinationsNavigator,
+    group: Group?,
+    serverGroupList: List<Group>,
     viewModel: FollowViewModel = koinViewModel(),
     chatRoomViewModel: ChatRoomViewModel = koinViewModel(),
-    firstInitData: MutableState<Boolean> = remember {
-        mutableStateOf(true)
-    }
+    myGroupList: List<GroupItem>,
+    onGroupItemClick: (Group) -> Unit,
+    onLoadMoreServerGroup: () -> Unit,
+    onRefreshMyGroupList: () -> Unit,
+    isLoading: Boolean,
+    inviteGroup: Group?,
+    onDismissInvite: () -> Unit
 ) {
     val uiState = viewModel.uiState
-    val chatRoomUiState = chatRoomViewModel.uiState
 
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -75,41 +75,54 @@ fun FollowScreen(
         it
     }
 
-    val fetchDataState = globalViewModel.fetchFollowData.collectAsState()
-
-    if (fetchDataState.value) {
-        viewModel.fetchMyGroup()
-        globalViewModel.fetchFollowDataDone()
-    }
-
-    val group by globalViewModel.currentGroup.collectAsState()
-
-    if (group == null && uiState.myGroupList.isNotEmpty()) {
-        uiState.myGroupList.find {
-            it.isSelected
-        }?.groupModel?.apply {
-            globalViewModel.setCurrentGroup(this)
-            firstInitData.value = false
-        }
-    }
-
     //禁止進入頻道彈窗
     val openDialog = remember { mutableStateOf(false) }
 
+    //刷新我的社團清單
+    val isRefreshMyGroupList by viewModel.refreshMyGroup.collectAsState()
+
+    if (isRefreshMyGroupList) {
+        onRefreshMyGroupList.invoke()
+    }
+
+    //查看該社團info dialog
+    val openGroupDialog by viewModel.openGroupDialog.collectAsState()
+
+    openGroupDialog?.let { group ->
+        GroupItemDialogScreen(
+            groupModel = group,
+            onDismiss = {
+                viewModel.closeGroupItemDialog()
+                onDismissInvite.invoke()
+            },
+            onConfirm = {
+                viewModel.joinGroup(it)
+                onDismissInvite.invoke()
+            }
+        )
+    }
+
     //點擊channel權限檢查完
-    chatRoomUiState.enterChannel?.let { channel ->
-        if (Constant.canReadMessage()) {
-            navigator.navigate(
-                ChatRoomScreenDestination(
-                    channelId = channel.id.orEmpty(),
-                    channelTitle = channel.name.orEmpty()
+    LaunchedEffect(Unit) {
+        chatRoomViewModel.updatePermissionDone.collect {
+            if (Constant.canReadMessage()) {
+                navigator.navigate(
+                    ChannelScreenDestination(
+                        channel = it
+                    )
                 )
-            )
-        } else {
-            //禁止進入該頻道,show dialog
-            openDialog.value = true
+            } else {
+                //禁止進入該頻道,show dialog
+                openDialog.value = true
+            }
         }
-        chatRoomViewModel.resetChannel()
+    }
+
+    //邀請加入社團
+    LaunchedEffect(inviteGroup) {
+        inviteGroup?.let {
+            viewModel.openGroupItemDialog(it)
+        }
     }
 
     if (openDialog.value) {
@@ -135,25 +148,27 @@ fun FollowScreen(
     }
 
     FollowScreenView(
+        modifier = modifier,
         navigator = navigator,
-        groupList = uiState.myGroupList,
+        groupList = myGroupList,
         group = group,
+        emptyGroupList = serverGroupList,
         imageOffset = uiState.imageOffset,
         spaceHeight = uiState.spaceHeight,
         scrollableState = scrollableState,
         visibleAvatar = uiState.visibleAvatar,
         lazyColumnScrollEnabled = uiState.lazyColumnScrollEnabled,
         onGroupItemClick = {
-            globalViewModel.setCurrentGroup(it.groupModel)
-            viewModel.groupItemClick(it)
+            onGroupItemClick.invoke(it.groupModel)
         },
         lazyColumnAtTop = {
             viewModel.lazyColumnAtTop()
         },
-        isLoading = uiState.isLoading,
+        isLoading = isLoading,
         onChannelClick = {
             chatRoomViewModel.fetchChannelPermission(it)
-        }
+        },
+        onLoadMoreServerGroup = onLoadMoreServerGroup
     )
 }
 
@@ -173,7 +188,10 @@ fun FollowScreenView(
     onGroupItemClick: (GroupItem) -> Unit,
     lazyColumnAtTop: () -> Unit,
     isLoading: Boolean,
-    onChannelClick: (Channel) -> Unit
+    onChannelClick: (Channel) -> Unit,
+    onLoadMoreServerGroup: () -> Unit,
+    emptyGroupList: List<Group>,
+    modifier: Modifier
 ) {
     val TAG = "FollowScreenView"
 
@@ -185,7 +203,7 @@ fun FollowScreenView(
     val lazyListState = rememberLazyListState()
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize(),
         backgroundColor = LocalColor.current.env_60,
         scaffoldState = scaffoldState,
@@ -194,6 +212,8 @@ fun FollowScreenView(
                 DrawerMenuScreen(
                     groupList = groupList,
                     onClick = {
+                        KLog.i(TAG, "onGroup item click.")
+
                         //Close Drawer
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
@@ -202,6 +222,8 @@ fun FollowScreenView(
                         onGroupItemClick.invoke(it)
                     },
                     onSearch = {
+                        KLog.i(TAG, "onSearch click.")
+
                         //Close Drawer
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
@@ -219,6 +241,7 @@ fun FollowScreenView(
                         )
                     },
                     onProfile = {
+                        KLog.i(TAG, "onProfile click.")
                         navigator.navigate(MyScreenDestination)
                     }
                 )
@@ -238,7 +261,15 @@ fun FollowScreenView(
                 LoadingView()
             } else {
                 //是否已經加入群組
-                if (group != null) {
+                if (group == null) {
+                    //Empty follow group
+                    EmptyFollowScreen(
+                        navigator = navigator,
+                        onLoadMore = onLoadMoreServerGroup,
+                        groupList = emptyGroupList,
+                        isLoading = isLoading
+                    )
+                } else {
                     Box(
                         modifier = Modifier
                             .padding(innerPadding)
@@ -370,16 +401,14 @@ fun FollowScreenView(
                             }
                         }
                     }
-                } else {
-                    //Empty follow group
-                    EmptyFollowScreen(
-                        navigator = navigator
-                    )
                 }
             }
         } else {
             EmptyFollowScreen(
-                navigator = navigator
+                navigator = navigator,
+                onLoadMore = onLoadMoreServerGroup,
+                groupList = emptyGroupList,
+                isLoading = isLoading
             )
         }
     }
@@ -453,7 +482,10 @@ fun FollowScreenPreview() {
             onGroupItemClick = {},
             lazyColumnAtTop = {},
             isLoading = true,
-            onChannelClick = {}
+            onChannelClick = {},
+            onLoadMoreServerGroup = {},
+            emptyGroupList = emptyList(),
+            modifier = Modifier
         )
     }
 }

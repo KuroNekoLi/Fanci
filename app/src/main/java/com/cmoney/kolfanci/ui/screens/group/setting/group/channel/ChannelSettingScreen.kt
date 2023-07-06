@@ -52,14 +52,14 @@ fun ChannelSettingScreen(
     sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>,
     sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
 ) {
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
     var groupParam = group
 
     val uiState = viewModel.uiState
 
     uiState.group?.let {
         groupParam = it
-        globalViewModel.setCurrentGroup(it)
+        globalGroupViewModel.setCurrentGroup(it)
     }
 
     //========== Result callback Start ==========

@@ -139,5 +139,27 @@ class Utils {
             val sdf = SimpleDateFormat("yyyy/MM/dd (E)")
             return sdf.format(publishTime)
         }
+
+        fun timesMillisToDate(timestamp: Long): String {
+            val calendar = Calendar.getInstance(Locale.TAIWAN).clone() as Calendar
+            val timePassed = System.currentTimeMillis() - timestamp
+            return when {
+                timePassed / (1000 * 60 * 60 * 24) >= 2 -> {
+                    SimpleDateFormat("yyyy-MM-dd", Locale.TAIWAN).format(Date(timestamp))
+                }
+                timePassed / (1000 * 60 * 60 * 24) >= 1 -> {
+                    "昨天"
+                }
+                timePassed / (1000 * 60 * 60) > 0 -> {
+                    StringBuilder().append(timePassed / (1000 * 60 * 60)).append("小時前").toString()
+                }
+                timePassed / (1000 * 60) > 0 -> {
+                    StringBuilder().append(timePassed / (1000 * 60)).append("分鐘前").toString()
+                }
+                else -> {
+                    "剛剛"
+                }
+            }
+        }
     }
 }

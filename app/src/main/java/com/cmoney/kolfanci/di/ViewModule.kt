@@ -1,10 +1,12 @@
 package com.cmoney.kolfanci.di
 
-import com.cmoney.kolfanci.ui.main.MainViewModel
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
+import com.cmoney.kolfanci.ui.main.MainViewModel
+import com.cmoney.kolfanci.ui.screens.channel.ChannelViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.search.apply.viewmodel.ApplyForGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
@@ -16,6 +18,9 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.Gro
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
+import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
+import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
+import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
 import org.koin.android.ext.koin.androidApplication
@@ -25,7 +30,7 @@ import org.koin.dsl.module
 val viewModule = module {
     viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { FollowViewModel(get()) }
-    viewModel { ChatRoomViewModel(get(), get(), get(), get(), get()) }
+    viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
     viewModel { MessageViewModel(androidApplication(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get()) }
     viewModel { GroupSettingViewModel(get(), get(), get()) }
@@ -35,7 +40,7 @@ val viewModule = module {
     }
 
     viewModel { RoleManageViewModel(get(), get()) }
-    viewModel { MemberViewModel(get(), get()) }
+    viewModel { MemberViewModel(get(), get(), get()) }
     viewModel { BanListViewModel(get()) }
     viewModel { GroupApplyViewModel(get()) }
     viewModel { params ->
@@ -64,5 +69,25 @@ val viewModule = module {
     }
     viewModel {
         UserViewModel(androidApplication())
+    }
+    viewModel { params ->
+        PostViewModel(get(), params.get(), get())
+    }
+    viewModel { params ->
+        EditPostViewModel(
+            androidApplication(),
+            get(),
+            get(),
+            params.get()
+        )
+    }
+    viewModel {
+        ChannelViewModel(get())
+    }
+    viewModel { params ->
+        PostInfoViewModel(androidApplication(), get(), get(), params.get(), params.get())
+    }
+    viewModel {
+        GroupViewModel(get(), get(), get())
     }
 }

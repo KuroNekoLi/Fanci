@@ -1,17 +1,32 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -19,9 +34,9 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeSettingItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -34,7 +49,7 @@ import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * 主題預覽
+ * 主題預覽, 社團背景
  */
 @Destination
 @Composable
@@ -47,8 +62,8 @@ fun GroupSettingThemePreviewScreen(
     resultNavigator: ResultBackNavigator<String>
 ) {
     val TAG = "GroupSettingThemePreviewScreen"
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
-    val currentGroup by globalViewModel.currentGroup.collectAsState()
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
     var groupParam = currentGroup
 
     var showConfirmDialog: GroupTheme? by remember {
@@ -57,7 +72,7 @@ fun GroupSettingThemePreviewScreen(
 
     viewModel.uiState.settingGroup?.let {
         groupParam = it
-        globalViewModel.setCurrentGroup(it)
+        globalGroupViewModel.setCurrentGroup(it)
     }
 
     GroupSettingThemePreviewView(
@@ -104,14 +119,16 @@ private fun GroupSettingThemePreviewView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
-                title = "主題預覽",
-                leadingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
+            EditToolbarScreen(
+                title = stringResource(id = R.string.theme_preview),
+                confirmText = stringResource(id = R.string.apply),
                 backClick = {
                     navController.popBackStack()
+                },
+                saveClick = {
+                    groupTheme?.let {
+                        onThemeConfirmClick.invoke(groupTheme)
+                    }
                 }
             )
         }
@@ -135,9 +152,6 @@ private fun GroupSettingThemePreviewView(
                         isSelected = groupTheme.isSelected,
                         isShowArrow = false,
                         onItemClick = {
-                        },
-                        onConfirm = {
-                            onThemeConfirmClick.invoke(groupTheme)
                         }
                     )
                 }
@@ -146,7 +160,7 @@ private fun GroupSettingThemePreviewView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .background(LocalColor.current.background),
+                        .background(LocalColor.current.env_40),
                     contentPadding = PaddingValues(29.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {

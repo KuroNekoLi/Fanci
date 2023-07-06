@@ -14,9 +14,11 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemePreviewScreenDestination
 import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
@@ -51,7 +53,7 @@ fun GroupSettingThemeScreen(
 ) {
     val TAG = "GroupSettingThemeScreen"
 
-    val globalViewModel = LocalDependencyContainer.current.globalViewModel
+    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
 
     val state = viewModel.uiState
 
@@ -59,12 +61,12 @@ fun GroupSettingThemeScreen(
         mutableStateOf(null)
     }
 
-    val currentGroup by globalViewModel.currentGroup.collectAsState()
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
     var groupParam = currentGroup
 
     viewModel.uiState.settingGroup?.let {
         groupParam = it
-        globalViewModel.setCurrentGroup(it)
+        globalGroupViewModel.setCurrentGroup(it)
     }
 
     val isFromCreate = group.id.isNullOrBlank()
@@ -134,7 +136,7 @@ private fun GroupSettingThemeView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "主題色彩",
+                title = stringResource(id = R.string.theme_color),
                 leadingEnable = true,
                 moreEnable = false,
                 moreClick = {
@@ -161,7 +163,7 @@ private fun GroupSettingThemeView(
                         env_80 = it.theme.env_80,
                         env_60 = it.theme.env_60,
                         name = it.name,
-                        isSelected = it.isSelected,
+                        isSelected = (!isFromCreate && it.isSelected),
                         onItemClick = {
                             navController.navigate(
                                 GroupSettingThemePreviewScreenDestination(
@@ -169,9 +171,6 @@ private fun GroupSettingThemeView(
                                     isFromCreate = isFromCreate
                                 )
                             )
-                        },
-                        onConfirm = {
-                            onThemeConfirmClick.invoke(it)
                         }
                     )
                 }

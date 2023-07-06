@@ -17,7 +17,7 @@ package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
-import com.cmoney.fanciapi.fanci.model.ChannelType
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -51,7 +51,7 @@ data class Channel (
     val creatorId: kotlin.String? = null,
 
     @Json(name = "channelType")
-    val channelType: ChannelType? = null,
+    val channelType: ChannelTabType? = null,
 
     /* 頻道命名 */
     @Json(name = "name")

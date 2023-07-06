@@ -31,6 +31,8 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun SaveConfirmDialogScreen(
     modifier: Modifier = Modifier,
     isShow: Boolean = false,
+    title: String = "此次變更尚未儲存",
+    content: String = "你所設定的內容，尚未儲存喔！",
     onContinue: () -> Unit,
     onGiveUp: () -> Unit
 ) {
@@ -69,7 +71,7 @@ fun SaveConfirmDialogScreen(
                             Spacer(modifier = Modifier.width(8.dp))
 
                             Text(
-                                text = "此次變更尚未儲存！",
+                                text = title,
                                 fontSize = 19.sp,
                                 color = LocalColor.current.specialColor.red
                             )
@@ -78,7 +80,7 @@ fun SaveConfirmDialogScreen(
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Text(
-                            text = "你所設定的內容，尚未儲存喔！",
+                            text = content,
                             fontSize = 17.sp,
                             color = LocalColor.current.text.default_100
                         )

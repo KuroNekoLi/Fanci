@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isMyPostMessage
+import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
@@ -35,16 +36,6 @@ fun InteractDialogScreen(
     message: ChatMessage,
     onInteractClick: (MessageInteract) -> Unit
 ) {
-    val emojiLit = listOf(
-        R.drawable.emoji_money,
-        R.drawable.emoji_shock,
-        R.drawable.emoji_laugh,
-        R.drawable.emoji_angry,
-        R.drawable.emoji_think,
-        R.drawable.emoji_cry,
-        R.drawable.emoji_like,
-    )
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,7 +56,7 @@ fun InteractDialogScreen(
                         .horizontalScroll(rememberScrollState()),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    emojiLit.forEach {
+                    Constant.emojiLit.forEach {
                         EmojiIcon(it) { resId ->
                             onClose(coroutineScope, modalBottomSheetState)
                             onInteractClick.invoke(MessageInteract.EmojiClick(message, resId))
@@ -103,12 +94,13 @@ fun InteractDialogScreen(
                 }
             }
 
-            if (Constant.isCanBlock() && !message.isMyPostMessage(Constant.MyInfo)) {
-                FeatureText(R.drawable.hide, "封鎖此用戶") {
-                    onClose(coroutineScope, modalBottomSheetState)
-                    onInteractClick.invoke(MessageInteract.HideUser(message))
-                }
-            }
+            //暫時取消此功能
+//            if (Constant.isCanBlock() && !message.isMyPostMessage(Constant.MyInfo)) {
+//                FeatureText(R.drawable.hide, "封鎖此用戶") {
+//                    onClose(coroutineScope, modalBottomSheetState)
+//                    onInteractClick.invoke(MessageInteract.HideUser(message))
+//                }
+//            }
 
             if (Constant.isCanReport() && !message.isMyPostMessage(Constant.MyInfo)) {
                 FeatureText(R.drawable.report, "向管理員檢舉此用戶") {

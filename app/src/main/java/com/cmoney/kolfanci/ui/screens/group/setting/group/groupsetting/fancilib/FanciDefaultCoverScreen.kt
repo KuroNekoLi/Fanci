@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -82,8 +83,10 @@ fun FanciDefaultCoverView(
                 }
             )
         }
-    ) {
-        Column {
+    ) { padding ->
+        Column(
+            modifier = Modifier.padding(padding)
+        ) {
             LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                 items(imageUrl.size) { index ->
                     AsyncImage(

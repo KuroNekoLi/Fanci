@@ -21,6 +21,7 @@ data class UiState(
     val isLoading: Boolean = false,
     val group: Group? = null,
     var channelName: String = "",                    //頻道名稱
+    var categoryName: String = "",                   //分類名稱
     val channelRole: List<FanciRole>? = null,        //目前頻道顯示角色List, 管理員
     val groupRoleList: List<AddChannelRoleModel> = emptyList(),
     val confirmRoleList: String = "",
@@ -253,20 +254,21 @@ class ChannelSettingViewModel(
     /**
      * 編輯 頻道
      * @param group 社團 model
-     * @param channel 該社團底下的頻道
      * @param name 要更改的頻道名稱
      */
-    fun editChannel(group: Group, channel: Channel, name: String) {
+    fun editChannel(group: Group, name: String) {
         KLog.i(TAG, "editChannel")
         viewModelScope.launch {
-            //私密頻道處理
-            if (uiState.isNeedApproval) {
-                setPrivateChannelWhiteList(channelId = channel.id.orEmpty())
+            channel?.let { channel ->
+                //私密頻道處理
+                if (uiState.isNeedApproval) {
+                    setPrivateChannelWhiteList(channelId = channel.id.orEmpty())
+                }
+
+                editChannelRole(channel)
+
+                editChannelName(group, channel, name)
             }
-
-            editChannelRole(channel)
-
-            editChannelName(group, channel, name)
         }
     }
 
@@ -289,7 +291,7 @@ class ChannelSettingViewModel(
                     val newCategory = group.categories?.map { category ->
                         val newChannel = category.channels?.map { groupChannel ->
                             if (channel.id == groupChannel.id) {
-                                groupChannel.copy(
+                                channel.copy(
                                     name = name
                                 )
                             } else {
@@ -576,8 +578,18 @@ class ChannelSettingViewModel(
     fun setChannelApproval(isNeedApproval: Boolean) {
         KLog.i(TAG, "setChannelApproval:$isNeedApproval")
         uiState = uiState.copy(
-            isNeedApproval = isNeedApproval
+            isNeedApproval = isNeedApproval,
         )
+
+        channel?.apply {
+            channel = this.copy(
+                privacy = if (isNeedApproval) {
+                    ChannelPrivacy.private
+                }  else {
+                    ChannelPrivacy.public
+                }
+            )
+        }
     }
 
     /**
@@ -639,6 +651,13 @@ class ChannelSettingViewModel(
      */
     fun setChannelName(name: String) {
         uiState = uiState.copy(channelName = name)
+    }
+
+    /**
+     * 設定分類名稱
+     */
+    fun setCategoryName(name: String) {
+        uiState = uiState.copy(categoryName = name)
     }
 
     /**

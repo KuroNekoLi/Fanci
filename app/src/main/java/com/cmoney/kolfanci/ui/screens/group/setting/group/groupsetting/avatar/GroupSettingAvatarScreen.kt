@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,6 +27,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewMo
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -137,11 +139,25 @@ fun GroupSettingAvatarView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
-                title = "社團圖示",
-                leadingEnable = true,
-                moreEnable = false,
-                moreClick = {
+            EditToolbarScreen(
+                title = stringResource(id = R.string.group_avatar),
+                saveClick = {
+                    KLog.i(TAG, "on image save click.")
+                    avatarImage?.let {
+                        onImageChange.invoke(
+                            ImageChangeData(
+                                uri = it,
+                                url = null
+                            )
+                        )
+                    } ?: kotlin.run {
+                        onImageChange.invoke(
+                            ImageChangeData(
+                                uri = null,
+                                url = group.thumbnailImageUrl.orEmpty()
+                            )
+                        )
+                    }
                 },
                 backClick = onBack
             )
@@ -192,45 +208,6 @@ fun GroupSettingAvatarView(
             }
 
             Spacer(modifier = Modifier.height(50.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(135.dp)
-                    .background(LocalColor.current.env_100),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    modifier = Modifier
-                        .padding(25.dp)
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
-                    onClick = {
-                        KLog.i(TAG, "on image save click.")
-                        avatarImage?.let {
-                            onImageChange.invoke(
-                                ImageChangeData(
-                                    uri = it,
-                                    url = null
-                                )
-                            )
-                        } ?: kotlin.run {
-                            onImageChange.invoke(
-                                ImageChangeData(
-                                    uri = null,
-                                    url = group.thumbnailImageUrl.orEmpty()
-                                )
-                            )
-                        }
-                    }) {
-                    Text(
-                        text = "儲存",
-                        color = LocalColor.current.text.other,
-                        fontSize = 16.sp
-                    )
-                }
-            }
         }
     }
 }
