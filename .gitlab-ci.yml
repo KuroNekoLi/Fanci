@@ -24,7 +24,8 @@ before_script:
   - chmod +x ./gradlew
   - chmod +x ./auto_bot.sh
   - echo $CI_COMMIT_BRANCH
-
+  - echo $CI_COMMIT_TAG
+  -
 stages:
   - publish
   - review
@@ -32,7 +33,7 @@ stages:
 
 publish_play_internal:
   stage: publish
-  script: echo $CI_COMMIT_BRANCH
+  script: echo "publish_play_internal"
   only:
     - tags
 #  rules:
