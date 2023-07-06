@@ -36,8 +36,6 @@ publish_play_internal:
   script: echo "publish_play_internal"
   only:
     - tags
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == 'master' && $CI_COMMIT_TAG != null
   tags:
     - mac_studio
 
