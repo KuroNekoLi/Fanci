@@ -3,13 +3,27 @@ package com.cmoney.kolfanci.ui.screens.group.search
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Tab
+import androidx.compose.material.TabPosition
+import androidx.compose.material.TabRow
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
@@ -25,10 +39,10 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
-import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
@@ -52,7 +66,7 @@ fun DiscoverGroupScreen(
     resultRecipient: ResultRecipient<ApplyForGroupScreenDestination, Boolean>
 ) {
     val uiState = viewModel.uiState
-    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val globalGroupViewModel = globalGroupViewModel()
 
     DiscoverGroupScreenView(
         modifier = modifier,
@@ -157,12 +171,7 @@ private fun DiscoverGroupScreenView(
         topBar = {
             TopBarScreen(
                 title = "探索社團",
-                leadingEnable = true,
                 leadingIcon = Icons.Filled.Home,
-                trailingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     navController.popBackStack()
                 }

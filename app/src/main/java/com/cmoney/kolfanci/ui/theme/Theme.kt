@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.cmoney.kolfanci.R
 
@@ -139,22 +140,18 @@ fun CoffeeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val image = LightImages
-    MainTheme(darkTheme, CoffeeThemeColor, content, image)
+    MainTheme(darkTheme, CoffeeThemeColor, content)
 }
-
-private val LightImages = Images(lockupLogo = R.drawable.fanci)
 
 private val DarkImages = Images(lockupLogo = R.drawable.emoji_like)
 
 @Composable
 fun FanciTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    fanciColor: FanciColor = DefaultThemeColor,
+    fanciColor: FanciColor = LocalColor.current,
     content: @Composable () -> Unit
 ) {
-    val image = LightImages
-    MainTheme(darkTheme, fanciColor, content, image)
+    MainTheme(darkTheme, fanciColor, content)
 }
 
 @Composable
@@ -162,11 +159,16 @@ private fun MainTheme(
     darkTheme: Boolean,
     fanciColor: FanciColor,
     content: @Composable () -> Unit,
-    image: Images
+    image: Images = LocalImages.current
 ) {
+    val rememberColor = remember {
+        // Explicitly creating a new object here so we don't mutate the initial [fanciColor]
+        // provided, and overwrite the values set in it.
+        fanciColor.copy()
+    }.apply { updateColorFrom(other = fanciColor) }
     CompositionLocalProvider(
         LocalImages provides image,
-        LocalColor provides fanciColor
+        LocalColor provides rememberColor
     ) {
         MaterialTheme(
             colors = MaterialTheme.colors.copy(

@@ -48,6 +48,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
@@ -78,12 +79,10 @@ fun AllMemberScreen(
     val uiState = viewModel.uiState
 
     LaunchedEffect(Unit) {
-        viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+        if (uiState.groupMember.isNullOrEmpty()) {
+            viewModel.fetchGroupMember(groupId = group.id.orEmpty())
+        }
     }
-
-//    if (uiState.groupMember == null && uiState.loading) {
-//        viewModel.fetchGroupMember(groupId = group.id.orEmpty())
-//    }
 
     val shareText by viewModel.shareText.collectAsState()
 
@@ -153,8 +152,6 @@ fun AllMemberScreenView(
         topBar = {
             TopBarScreen(
                 title = "所有成員",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navController.popBackStack()
                 }
@@ -354,11 +351,22 @@ private fun MemberItem(
                     color = LocalColor.current.text.default_100
                 )
 
+                //是否為vip
+                if (groupMember.isVip()) {
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Image(
+                        modifier = Modifier.size(11.dp),
+                        painter = painterResource(id = R.drawable.vip_diamond),
+                        contentDescription = null
+                    )
+                }
+
                 Spacer(modifier = Modifier.width(5.dp))
 
                 //代號
                 Text(
-                    text = groupMember.serialNumber.toString(),
+                    text = "#%d".format(groupMember.serialNumber),
                     fontSize = 12.sp,
                     color = LocalColor.current.text.default_50
                 )

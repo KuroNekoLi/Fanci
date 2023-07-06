@@ -90,8 +90,6 @@ private fun RoleSortScreenView(
         topBar = {
             TopBarScreen(
                 title = "重新排列",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

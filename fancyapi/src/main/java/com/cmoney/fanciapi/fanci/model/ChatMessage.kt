@@ -18,8 +18,10 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.MessageType
 
 import com.squareup.moshi.Json
@@ -30,7 +32,6 @@ import kotlinx.parcelize.Parcelize
  * 
  *
  * @param author 
- * @param replyMessage 
  * @param content 
  * @param emojiCount 
  * @param id 
@@ -43,6 +44,8 @@ import kotlinx.parcelize.Parcelize
  * @param deleteStatus 
  * @param deleteFrom 
  * @param commentCount 
+ * @param replyMessage 
+ * @param messageFromType 
  */
 @Parcelize
 
@@ -51,9 +54,6 @@ data class ChatMessage (
 
     @Json(name = "author")
     val author: GroupMember? = null,
-
-    @Json(name = "replyMessage")
-    val replyMessage: ChatMessage? = null,
 
     @Json(name = "content")
     val content: MediaIChatContent? = null,
@@ -90,7 +90,13 @@ data class ChatMessage (
     val deleteFrom: GroupMember? = null,
 
     @Json(name = "commentCount")
-    val commentCount: kotlin.Int? = null
+    val commentCount: kotlin.Int? = null,
+
+    @Json(name = "replyMessage")
+    val replyMessage: IReplyMessage? = null,
+
+    @Json(name = "messageFromType")
+    val messageFromType: MessageServiceType? = null
 
 ) : Parcelable
 

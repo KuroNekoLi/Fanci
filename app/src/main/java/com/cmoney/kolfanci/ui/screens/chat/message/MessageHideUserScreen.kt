@@ -22,6 +22,8 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.mock.MockData
+
 @Composable
 fun MessageHideUserScreen(
     modifier: Modifier = Modifier,
@@ -77,7 +79,7 @@ fun MessageHideUserScreen(
 fun MessageHideUserScreenPreview() {
     FanciTheme {
         MessageHideUserScreen(
-            chatMessageModel = ChatRoomUseCase.mockMessage,
+            chatMessageModel = MockData.mockMessage,
             isBlocking = true
         ) {}
     }

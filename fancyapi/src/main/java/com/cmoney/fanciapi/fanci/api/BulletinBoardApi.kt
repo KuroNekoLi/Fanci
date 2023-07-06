@@ -40,9 +40,9 @@ interface BulletinBoardApi {
      *  - 401: Unauthorized
      *  - 403: Forbidden
      *
-     * @param channelId 
-     * @param messageId 
-     * @param bulletingBoardMessageParam  (optional)
+     * @param channelId 頻道
+     * @param messageId 訊息
+     * @param bulletingBoardMessageParam BulletingBoardMessageParam (optional)
      * @return [BulletinboardMessage]
      */
     @POST("api/v1/BulletinBoard/{channelId}/Message/{messageId}/Comment")
@@ -56,10 +56,10 @@ interface BulletinBoardApi {
      *  - 401: Unauthorized
      *  - 403: Forbidden
      *
-     * @param channelId 
-     * @param messageId 
-     * @param take  (optional, default to 20)
-     * @param order  (optional)
+     * @param channelId 頻道ID
+     * @param messageId 貼文ID
+     * @param take 取得筆數 (optional, default to 20)
+     * @param order 排序方式 (optional)
      * @param fromSerialNumber  (optional)
      * @return [BulletinboardMessagePaging]
      */

@@ -12,16 +12,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.ui.theme.Black_1AFFFFFF
 import com.cmoney.kolfanci.ui.theme.Black_242424
-import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
 import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun TutorialScreen(modifier: Modifier = Modifier, onStart: () -> Unit) {
+    rememberSystemUiController().setStatusBarColor(
+        color = Black_242424,
+        darkIcons = false
+    )
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
@@ -59,7 +64,7 @@ fun TutorialScreen(modifier: Modifier = Modifier, onStart: () -> Unit) {
                     pagerState = pagerState,
                     modifier = Modifier
                         .padding(5.dp),
-                    activeColor = Blue_4F70E5,
+                    activeColor = LocalColor.current.primary,
                     inactiveColor = Black_1AFFFFFF
                 )
             }

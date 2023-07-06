@@ -1,7 +1,5 @@
-package com.cmoney.kolfanci.ui.screens.chat
+package com.cmoney.kolfanci.ui.screens.chat.message
 
-import android.media.Image
-import android.widget.ImageView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,13 +21,13 @@ import com.bumptech.glide.Glide
 import com.socks.library.KLog
 import com.cmoney.kolfanci.R
 import com.stfalcon.imageviewer.StfalconImageViewer
-import com.stfalcon.imageviewer.loader.ImageLoader
 
 @Composable
 fun MessageImageScreen(
     images: List<Any>,
     modifier: Modifier = Modifier,
-    isShowLoading: Boolean = false
+    isShowLoading: Boolean = false,
+    isClickable: Boolean = true
 ) {
     val TAG = "MessageImageScreen"
     val context = LocalContext.current
@@ -38,7 +36,7 @@ fun MessageImageScreen(
             .size(205.dp)
             .aspectRatio(1f)
             .clip(RoundedCornerShape(10.dp))
-            .clickable {
+            .clickable(enabled = isClickable) {
                 KLog.i(TAG, "image click.")
 
                 StfalconImageViewer

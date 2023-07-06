@@ -34,7 +34,7 @@ interface BanApi {
      *  - 401: Unauthorized
      *  - 403: Forbidden
      *
-     * @param groupId 
+     * @param groupId 社團ID
      * @return [kotlin.collections.List<UserBanInformation>]
      */
     @GET("api/v1/Ban/Group/{groupId}")

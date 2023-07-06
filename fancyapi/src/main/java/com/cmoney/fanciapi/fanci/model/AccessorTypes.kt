@@ -21,13 +21,16 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * Values: role,users
+ * Values: role,vipRole,users
  */
 
 enum class AccessorTypes(val value: kotlin.String) {
 
     @Json(name = "Role")
     role("Role"),
+
+    @Json(name = "VipRole")
+    vipRole("VipRole"),
 
     @Json(name = "Users")
     users("Users");

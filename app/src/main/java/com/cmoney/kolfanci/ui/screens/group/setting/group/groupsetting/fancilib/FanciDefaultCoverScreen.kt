@@ -74,10 +74,6 @@ fun FanciDefaultCoverView(
         topBar = {
             TopBarScreen(
                 title = "Fanci圖庫",
-                leadingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     navController.popBackStack()
                 }

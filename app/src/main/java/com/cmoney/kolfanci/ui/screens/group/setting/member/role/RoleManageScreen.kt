@@ -111,8 +111,6 @@ fun RoleManageScreenView(
         topBar = {
             TopBarScreen(
                 title = "角色管理",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

@@ -20,6 +20,8 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.mock.MockData
+
 /**
  * 聊天室 公告 訊息
  */
@@ -55,6 +57,6 @@ fun ChatRoomAnnounceScreen(chatMessageModel: ChatMessage, modifier: Modifier = M
 @Composable
 fun ChatRoomAnnounceScreenPreview() {
     FanciTheme {
-        ChatRoomAnnounceScreen(ChatRoomUseCase.mockMessage)
+        ChatRoomAnnounceScreen(MockData.mockMessage)
     }
 }

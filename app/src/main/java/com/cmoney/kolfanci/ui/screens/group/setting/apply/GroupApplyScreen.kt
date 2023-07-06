@@ -34,6 +34,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.HorizontalMemberItemScreen
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -229,32 +230,17 @@ private fun ApplyQuestionItem(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape),
-                model = user?.thumbNail,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                placeholder = painterResource(id = R.drawable.placeholder)
-            )
-
-            Spacer(modifier = Modifier.width(15.dp))
-
-            Text(
-                text = user?.name.orEmpty(),
-                fontSize = 16.sp,
-                color = LocalColor.current.text.default_100
-            )
-
-            Spacer(modifier = Modifier.width(5.dp))
-
-            Text(
-                modifier = Modifier.weight(1f),
-                text = user?.serialNumber.toString(),
-                fontSize = 12.sp,
-                color = LocalColor.current.text.default_50
-            )
+            user?.apply {
+                HorizontalMemberItemScreen(
+                    modifier = Modifier.weight(1f),
+                    groupMember = GroupMember(
+                    id = this.id,
+                    name = this.name,
+                    serialNumber = this.serialNumber,
+                        //TODO 跟 server 溝通中, 要增加欄位才有辦法轉換
+//                    isVip = this.isVip
+                ))
+            }
 
             CircleCheckedScreen(
                 isChecked = groupRequirementApplySelected.isSelected
@@ -351,7 +337,7 @@ private fun BottomButton(
 }
 
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun GroupApplyScreenPreview() {
     FanciTheme {

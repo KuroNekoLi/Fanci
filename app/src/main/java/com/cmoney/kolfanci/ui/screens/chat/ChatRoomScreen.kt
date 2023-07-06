@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
@@ -42,10 +43,14 @@ import org.koin.androidx.compose.koinViewModel
 
 /**
  * 聊天室
+ *
+ * @param channelId 目前頻道id
+ * @param jumpChatMessage 指定前往的message
  */
 @Composable
 fun ChatRoomScreen(
     channelId: String,
+    jumpChatMessage: ChatMessage? = null,
     navController: DestinationsNavigator,
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
@@ -69,7 +74,12 @@ fun ChatRoomScreen(
 
     //是否有讀的權限
     if (Constant.canReadMessage()) {
-        messageViewModel.startPolling(channelId)
+        if (jumpChatMessage != null) {
+            messageViewModel.forwardToMessage(channelId, jumpChatMessage)
+        }
+        else {
+            messageViewModel.startPolling(channelId)
+        }
     }
 
     //抓取 公告
@@ -226,8 +236,8 @@ private fun ChatRoomScreenView(
     channelId: String,
     announceMessage: ChatMessage?,
     onMsgDismissHide: (ChatMessage) -> Unit,
-    replyMessage: ChatMessage?,
-    onDeleteReply: (ChatMessage) -> Unit,
+    replyMessage: IReplyMessage?,
+    onDeleteReply: (IReplyMessage) -> Unit,
     imageAttach: List<Uri>,
     onDeleteAttach: (Uri) -> Unit,
     onMessageSend: (text: String) -> Unit,
@@ -302,7 +312,7 @@ fun ChatRoomScreenPreview() {
             channelId = "",
             announceMessage = ChatMessage(),
             onMsgDismissHide = {},
-            replyMessage = ChatMessage(),
+            replyMessage = IReplyMessage(),
             onDeleteReply = {},
             imageAttach = emptyList(),
             onDeleteAttach = {},

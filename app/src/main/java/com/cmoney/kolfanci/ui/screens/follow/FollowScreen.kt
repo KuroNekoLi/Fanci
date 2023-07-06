@@ -4,7 +4,9 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -46,9 +48,10 @@ import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-
 
 @Composable
 fun FollowScreen(
@@ -70,9 +73,29 @@ fun FollowScreen(
 
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
-    val scrollableState = rememberScrollableState {
-        viewModel.scrollOffset(it, density, configuration)
-        it
+    val coroutineScope = rememberCoroutineScope()
+    val lazyListState = rememberLazyListState()
+    val scrollableState = rememberScrollableState { delta ->
+        // 若目前應該捲動頻道列表
+        if (uiState.lazyColumnScrollEnabled) {
+            // delta > 0 表示向下滑
+            // 若向下滑時頻道列表已不能向下滑動則透過 viewModel 重新設定目前UI的狀態
+            // 其餘狀態則用於捲動頻道列表
+            if (delta > 0 && !lazyListState.canScrollBackward) {
+                viewModel.scrollOffset(delta, density, configuration)
+                delta
+            } else {
+                coroutineScope.launch {
+                    // lazyListState 要向下捲動參數為正數，向上捲動參數為負數，與 delta 正負剛好相反
+                    lazyListState.scrollBy(-delta)
+                }
+                // 回傳 0f 表示不允許 scrollableState 滑動
+                0f
+            }
+        } else {
+            viewModel.scrollOffset(delta, density, configuration)
+            delta
+        }
     }
 
     //禁止進入頻道彈窗
@@ -88,9 +111,9 @@ fun FollowScreen(
     //查看該社團info dialog
     val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
-    openGroupDialog?.let { group ->
+    openGroupDialog?.let { targetGroup ->
         GroupItemDialogScreen(
-            groupModel = group,
+            groupModel = targetGroup,
             onDismiss = {
                 viewModel.closeGroupItemDialog()
                 onDismissInvite.invoke()
@@ -156,8 +179,8 @@ fun FollowScreen(
         imageOffset = uiState.imageOffset,
         spaceHeight = uiState.spaceHeight,
         scrollableState = scrollableState,
+        lazyListState = lazyListState,
         visibleAvatar = uiState.visibleAvatar,
-        lazyColumnScrollEnabled = uiState.lazyColumnScrollEnabled,
         onGroupItemClick = {
             onGroupItemClick.invoke(it.groupModel)
         },
@@ -172,8 +195,6 @@ fun FollowScreen(
     )
 }
 
-fun LazyListState.isScrolledToTop() = firstVisibleItemScrollOffset == 0
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FollowScreenView(
@@ -183,8 +204,8 @@ fun FollowScreenView(
     imageOffset: Int,
     spaceHeight: Int,
     scrollableState: ScrollableState,
+    lazyListState: LazyListState,
     visibleAvatar: Boolean,
-    lazyColumnScrollEnabled: Boolean,
     onGroupItemClick: (GroupItem) -> Unit,
     lazyColumnAtTop: () -> Unit,
     isLoading: Boolean,
@@ -196,11 +217,8 @@ fun FollowScreenView(
     val TAG = "FollowScreenView"
 
     val coroutineScope = rememberCoroutineScope()
-
     val scaffoldState: ScaffoldState =
         rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
-
-    val lazyListState = rememberLazyListState()
 
     Scaffold(
         modifier = modifier
@@ -209,42 +227,63 @@ fun FollowScreenView(
         scaffoldState = scaffoldState,
         drawerContent = if (XLoginHelper.isLogin) {
             {
-                DrawerMenuScreen(
-                    groupList = groupList,
-                    onClick = {
-                        KLog.i(TAG, "onGroup item click.")
+                Row(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    DrawerMenuScreen(
+                        modifier = Modifier.fillMaxHeight(),
+                        groupList = groupList,
+                        onClick = {
+                            KLog.i(TAG, "onGroup item click.")
 
-                        //Close Drawer
-                        coroutineScope.launch {
-                            scaffoldState.drawerState.close()
-                        }
+                            //Close Drawer
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
 
-                        onGroupItemClick.invoke(it)
-                    },
-                    onSearch = {
-                        KLog.i(TAG, "onSearch click.")
+                            onGroupItemClick.invoke(it)
+                        },
+                        onSearch = {
+                            KLog.i(TAG, "onSearch click.")
 
-                        //Close Drawer
-                        coroutineScope.launch {
-                            scaffoldState.drawerState.close()
-                        }
+                            //Close Drawer
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
 
-                        val arrayGroupItems = arrayListOf<Group>()
-                        arrayGroupItems.addAll(groupList.map {
-                            it.groupModel
-                        })
+                            val arrayGroupItems = arrayListOf<Group>()
+                            arrayGroupItems.addAll(groupList.map {
+                                it.groupModel
+                            })
 
-                        navigator.navigate(
-                            DiscoverGroupScreenDestination(
-                                groupItems = arrayGroupItems
+                            navigator.navigate(
+                                DiscoverGroupScreenDestination(
+                                    groupItems = arrayGroupItems
+                                )
                             )
-                        )
-                    },
-                    onProfile = {
-                        KLog.i(TAG, "onProfile click.")
-                        navigator.navigate(MyScreenDestination)
-                    }
-                )
+                        },
+                        onProfile = {
+                            KLog.i(TAG, "onProfile click.")
+                            navigator.navigate(MyScreenDestination)
+                        }
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .clickable(
+                                interactionSource = remember {
+                                    MutableInteractionSource()
+                                },
+                                indication = null,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        scaffoldState.drawerState.close()
+                                    }
+                                }
+                            )
+                    )
+                }
             }
         } else {
             null
@@ -267,14 +306,15 @@ fun FollowScreenView(
                         navigator = navigator,
                         onLoadMore = onLoadMoreServerGroup,
                         groupList = emptyGroupList,
-                        isLoading = isLoading
+                        isLoading = false
                     )
                 } else {
-                    Box(
+                    BoxWithConstraints(
                         modifier = Modifier
-                            .padding(innerPadding)
                             .fillMaxSize()
+                            .padding(innerPadding)
                     ) {
+                        val cardHeight = maxHeight
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -315,7 +355,7 @@ fun FollowScreenView(
                                 Image(
                                     painter = painterResource(id = R.drawable.menu),
                                     contentDescription = null,
-                                    colorFilter = ColorFilter.tint(color = LocalColor.current.env_100)
+                                    colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
                                 )
                             }
                         }
@@ -343,7 +383,7 @@ fun FollowScreenView(
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(850.dp)
+                                    .height(cardHeight)
                                     .padding(
                                         top = 0.dp,
                                         start = 16.dp,
@@ -355,19 +395,21 @@ fun FollowScreenView(
                                 backgroundColor = LocalColor.current.env_80
                             ) {
                                 // observer when reached end of list
-                                val endOfListReached by remember {
-                                    derivedStateOf {
-                                        lazyListState.isScrolledToTop()
+                                LaunchedEffect(key1 = Unit) {
+                                    snapshotFlow {
+                                        lazyListState.canScrollBackward
                                     }
-                                }
-
-                                LaunchedEffect(endOfListReached) {
-                                    lazyColumnAtTop.invoke()
+                                        .onEach { canScrollBackward ->
+                                            if (!canScrollBackward) {
+                                                lazyColumnAtTop.invoke()
+                                            }
+                                        }
+                                        .collect()
                                 }
 
                                 LazyColumn(
                                     state = lazyListState,
-                                    userScrollEnabled = lazyColumnScrollEnabled,
+                                    userScrollEnabled = false,
                                     verticalArrangement = Arrangement.spacedBy(15.dp),
                                     modifier = Modifier.padding(
                                         start = 20.dp,
@@ -477,8 +519,8 @@ fun FollowScreenPreview() {
             scrollableState = rememberScrollableState {
                 it
             },
+            lazyListState = rememberLazyListState(),
             visibleAvatar = false,
-            lazyColumnScrollEnabled = true,
             onGroupItemClick = {},
             lazyColumnAtTop = {},
             isLoading = true,

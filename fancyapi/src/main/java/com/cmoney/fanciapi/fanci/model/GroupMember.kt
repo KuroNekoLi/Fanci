@@ -29,6 +29,7 @@ import kotlinx.parcelize.Parcelize
  * @param thumbNail 頭像
  * @param serialNumber 會員識別號
  * @param roleInfos 角色資訊(全部)
+ * @param isGroupVip 判斷該成員是否有群組任一種VIP
  */
 @Parcelize
 
@@ -53,7 +54,11 @@ data class GroupMember (
 
     /* 角色資訊(全部) */
     @Json(name = "roleInfos")
-    val roleInfos: kotlin.collections.List<FanciRole>? = null
+    val roleInfos: kotlin.collections.List<FanciRole>? = null,
+
+    /* 判斷該成員是否有群組任一種VIP */
+    @Json(name = "isGroupVip")
+    val isGroupVip: kotlin.Boolean? = null
 
 ) : Parcelable
 

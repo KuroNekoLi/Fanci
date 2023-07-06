@@ -1,0 +1,25 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <application
+        android:icon="@mipmap/ic_launcher">
+        <activity
+            android:name=".devtools.ui.ScreenshotActivity"
+            android:icon="@mipmap/ic_launcher"
+            android:exported="true"
+            android:label="@string/screen_shot_application"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Fanci">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+    </application>
+
+</manifest>

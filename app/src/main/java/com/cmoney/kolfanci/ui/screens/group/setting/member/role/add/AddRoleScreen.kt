@@ -38,8 +38,6 @@ import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
-import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
-import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.FanciRoleCallback
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -70,7 +68,6 @@ fun AddRoleScreen(
     resultNavigator: ResultBackNavigator<FanciRoleCallback>,
     editRoleNameResult: ResultRecipient<EditInputScreenDestination, String>
 ) {
-    val mainActivity = LocalDependencyContainer.current
     val uiState = viewModel.uiState
     var showDeleteConfirmDialog by remember {
         mutableStateOf(false)
@@ -113,7 +110,6 @@ fun AddRoleScreen(
         uiState.tabSelected,
         group,
         fanciRole = fanciRole,
-        mainActivity,
         uiState.permissionList.orEmpty(),
         uiState.permissionSelected,
         uiState.memberList,
@@ -256,7 +252,6 @@ private fun AddRoleScreenView(
     selectedIndex: Int,
     group: Group,
     fanciRole: FanciRole? = null,
-    mainActivity: MainActivity,
     permissionList: List<PermissionCategory>,
     permissionSelected: Map<String, Boolean>,
     memberList: List<GroupMember>,
@@ -281,8 +276,6 @@ private fun AddRoleScreenView(
             if (fanciRole != null) {
                 TopBarScreen(
                     title = "編輯角色",
-                    leadingEnable = true,
-                    moreEnable = false,
                     backClick = {
                         KLog.i(TAG, "backClick click.")
                         onConfirm.invoke()
@@ -354,7 +347,6 @@ private fun AddRoleScreenView(
                     //樣式
                     0 -> {
                         StyleScreen(
-                            mainActivity = mainActivity,
                             navigator = navigator,
                             roleName = roleName,
                             roleColor = roleColor,
@@ -416,7 +408,6 @@ fun AddRoleScreenPreview() {
             navigator = EmptyDestinationsNavigator,
             selectedIndex = 0,
             group = Group(),
-            mainActivity = MainActivity(),
             permissionList = listOf(
                 PermissionCategory(
                     displayCategoryName = "社團編輯",

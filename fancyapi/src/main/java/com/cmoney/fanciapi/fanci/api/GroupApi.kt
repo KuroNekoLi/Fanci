@@ -14,6 +14,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupPaging
 import com.cmoney.fanciapi.fanci.model.GroupParam
 import com.cmoney.fanciapi.fanci.model.OrderType
+import com.cmoney.fanciapi.fanci.model.RoleChannelAuthType
 import com.cmoney.fanciapi.fanci.model.RoleParam
 import com.cmoney.fanciapi.fanci.model.UpdateIsNeedApprovalParam
 
@@ -109,7 +110,7 @@ interface GroupApi {
     suspend fun apiV1GroupGroupIdPut(@Path("groupId") groupId: kotlin.String, @Body editGroupParam: EditGroupParam? = null): Response<Unit>
 
     /**
-     * 取得角色列表
+     * 取得角色列表 (不包含VIP)
      * 
      * Responses:
      *  - 200: 成功
@@ -120,6 +121,20 @@ interface GroupApi {
      */
     @GET("api/v1/Group/{groupId}/Role")
     suspend fun apiV1GroupGroupIdRoleGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
+
+    /**
+     * 取得特定角色在Group中所有頻道權限
+     * 
+     * Responses:
+     *  - 200: 成功
+     *  - 404: 找不到該社團
+     *
+     * @param groupId 社團Id
+     * @param roleId 
+     * @return [kotlin.collections.List<RoleChannelAuthType>]
+     */
+    @GET("api/v1/Group/{groupId}/{roleId}/ChannelAuthType")
+    suspend fun apiV1GroupGroupIdRoleIdChannelAuthTypeGet(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String): Response<kotlin.collections.List<RoleChannelAuthType>>
 
     /**
      * 新增角色(管理員) __________🔒 新增角色
@@ -172,6 +187,19 @@ interface GroupApi {
      */
     @PUT("api/v1/Group/{groupId}/Role/{roleId}")
     suspend fun apiV1GroupGroupIdRoleRoleIdPut(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String, @Body roleParam: RoleParam? = null): Response<Unit>
+
+    /**
+     * 取得Vip角色列表
+     * 
+     * Responses:
+     *  - 200: 成功
+     *  - 404: 找不到該社團
+     *
+     * @param groupId 社團Id
+     * @return [kotlin.collections.List<FanciRole>]
+     */
+    @GET("api/v1/Group/{groupId}/VipRole")
+    suspend fun apiV1GroupGroupIdVipRoleGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
 
     /**
      * 取得我加入的社團清單 __________🔒 已註冊的fanci使用者

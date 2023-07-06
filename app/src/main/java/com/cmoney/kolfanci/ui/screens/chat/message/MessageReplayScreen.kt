@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.chat
+package com.cmoney.kolfanci.ui.screens.chat.message
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,10 +14,11 @@ import com.cmoney.kolfanci.ui.theme.Black_181C23
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 
 @Composable
-fun MessageReplayScreen(reply: ChatMessage, modifier: Modifier = Modifier) {
+fun MessageReplayScreen(reply: IReplyMessage, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
     ) {
@@ -41,7 +42,7 @@ fun MessageReplayScreen(reply: ChatMessage, modifier: Modifier = Modifier) {
 fun MessageReplayScreenPreview() {
     FanciTheme {
         MessageReplayScreen(
-            ChatMessage(
+            IReplyMessage(
                 author = GroupMember(name = "阿修羅"),
                 content = MediaIChatContent(
                     text = "內容內容內容內容1234"

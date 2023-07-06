@@ -18,11 +18,15 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.Gro
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
+import com.cmoney.kolfanci.ui.screens.my.MyScreenViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
+import com.cmoney.kolfanci.ui.screens.search.viewmodel.SearchViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
+import com.cmoney.kolfanci.ui.screens.shared.vip.viewmodel.VipPlanViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -89,5 +93,22 @@ val viewModule = module {
     }
     viewModel {
         GroupViewModel(get(), get(), get())
+    }
+    viewModel { params ->
+        VipManagerViewModel(
+            group = params.get(),
+            vipManagerUseCase = get()
+        )
+    }
+    viewModel {
+        VipPlanViewModel(
+            vipManagerUseCase = get()
+        )
+    }
+    viewModel {
+        MyScreenViewModel(get())
+    }
+    viewModel {
+        SearchViewModel(get())
     }
 }

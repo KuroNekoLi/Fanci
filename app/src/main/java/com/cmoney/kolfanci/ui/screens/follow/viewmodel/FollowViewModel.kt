@@ -5,15 +5,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.px
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
-import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,7 +73,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
 
 
     /**
-     * 滑動位移量, 來調整 top space
+     * 滑動位移量, 來調整 top space，並判斷目前是否要開始捲動頻道列表
      *
      * @param offset 位移量
      */
@@ -102,17 +99,13 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             visibleAvatar = isVisibleAvatar,
             lazyColumnScrollEnabled = isVisibleAvatar
         )
-
     }
 
     /**
      * 滑動到最上方 觸發
      */
     fun lazyColumnAtTop() {
-        uiState = uiState.copy(
-            lazyColumnScrollEnabled = false,
-            visibleAvatar = false
-        )
+        uiState = uiState.copy(visibleAvatar = false)
     }
 
     /**

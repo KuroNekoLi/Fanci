@@ -62,13 +62,6 @@ class ChatRoomViewModel(
                 e.printStackTrace()
                 KLog.e(TAG, e)
             }
-
-            val y = _blockingList.map { userList ->
-                userList.map {
-                    it.id
-                }
-            }
-
         }
     }
 

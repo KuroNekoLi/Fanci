@@ -1,23 +1,29 @@
 package com.cmoney.kolfanci.ui.screens.shared.dialog
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
-import com.cmoney.kolfanci.ui.theme.Color_2B313C
-import com.cmoney.kolfanci.ui.theme.Color_CA4848
-import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
+import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
+
 @Composable
 fun AlertDialogScreen(
     modifier: Modifier = Modifier,
@@ -31,7 +37,7 @@ fun AlertDialogScreen(
         Surface(
             modifier = modifier,
             shape = RoundedCornerShape(16.dp),
-            color = Color_2B313C
+            color = LocalColor.current.env_80
         ) {
             Box(
                 modifier = Modifier.padding(20.dp),
@@ -46,7 +52,11 @@ fun AlertDialogScreen(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        Text(text = title, fontSize = 19.sp, color = Color_CA4848)
+                        Text(
+                            text = title,
+                            fontSize = 19.sp,
+                            color = LocalColor.current.specialColor.hintRed
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -69,10 +79,10 @@ fun AlertDialogScreenPreview() {
         ){
             BanDayItemScreen(
                 name = "Hello",
-                onClick = {}
-            ) {
-
-            }
+                isVip = false,
+                onClick = {},
+                onDismiss = {}
+            )
         }
     }
 }

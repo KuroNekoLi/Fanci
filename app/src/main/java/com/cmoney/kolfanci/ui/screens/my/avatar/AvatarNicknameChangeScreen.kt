@@ -128,9 +128,6 @@ private fun AvatarNicknameChangeScreenView(
         topBar = {
             TopBarScreen(
                 title = stringResource(id = R.string.avatar_nickname),
-                leadingEnable = true,
-                trailingEnable = false,
-                moreEnable = false,
                 backClick = {
                     navController.popBackStack()
                 }

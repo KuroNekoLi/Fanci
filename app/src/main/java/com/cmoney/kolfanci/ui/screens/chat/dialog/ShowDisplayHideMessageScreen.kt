@@ -25,6 +25,8 @@ import com.cmoney.kolfanci.ui.theme.White_262C34
 import com.cmoney.kolfanci.ui.theme.White_BBBCBF
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.mock.MockData
+
 @Composable
 fun ShowDisplayHideMessageScreen(
     chatMessageModel: ChatMessage,
@@ -93,7 +95,7 @@ fun ShowDisplayHideMessageScreen(
 @Composable
 fun ShowDisplayHideMessageScreenPreview() {
     ShowDisplayHideMessageScreen(
-        chatMessageModel = ChatRoomUseCase.mockMessage,
+        chatMessageModel = MockData.mockMessage,
         {},
         {}
     )

@@ -1,7 +1,14 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.channel
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -18,11 +25,15 @@ import androidx.compose.ui.window.Dialog
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
-import com.cmoney.kolfanci.ui.destinations.*
-import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
+import com.cmoney.kolfanci.ui.destinations.AddCategoryScreenDestination
+import com.cmoney.kolfanci.ui.destinations.AddChannelScreenDestination
+import com.cmoney.kolfanci.ui.destinations.EditCategoryScreenDestination
+import com.cmoney.kolfanci.ui.destinations.SortCategoryScreenDestination
+import com.cmoney.kolfanci.ui.destinations.SortChannelScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.channel.ChannelEditScreen
@@ -52,7 +63,7 @@ fun ChannelSettingScreen(
     sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>,
     sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
 ) {
-    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val globalGroupViewModel = globalGroupViewModel()
     var groupParam = group
 
     val uiState = viewModel.uiState
@@ -161,8 +172,6 @@ fun ChannelSettingScreenView(
         topBar = {
             TopBarScreen(
                 title = "頻道管理",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }

@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
-import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -52,7 +51,7 @@ fun EditChannelOpennessScreen(
 ) {
     val TAG = "EditChannelOpennessScreen"
 
-    var isNeedApproval by remember {
+    var isNeedApprovalCurrent by remember {
         mutableStateOf(isNeedApproval)
     }
 
@@ -67,7 +66,7 @@ fun EditChannelOpennessScreen(
                 },
                 saveClick = {
                     KLog.i(TAG, "saveClick click.")
-                    resultNavigator.navigateBack(result = isNeedApproval)
+                    resultNavigator.navigateBack(result = isNeedApprovalCurrent)
                 }
             )
         }
@@ -86,7 +85,7 @@ fun EditChannelOpennessScreen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                         .clickable {
-                            isNeedApproval = false
+                            isNeedApprovalCurrent = false
                         }
                         .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -98,7 +97,7 @@ fun EditChannelOpennessScreen(
                         Text(
                             text = stringResource(id = R.string.full_public),
                             fontSize = 17.sp,
-                            color = if (!isNeedApproval) {
+                            color = if (!isNeedApprovalCurrent) {
                                 LocalColor.current.primary
                             } else {
                                 LocalColor.current.text.default_100
@@ -110,11 +109,11 @@ fun EditChannelOpennessScreen(
                         Text(
                             text = stringResource(id = R.string.full_public_desc),
                             fontSize = 14.sp,
-                            color = Color_80FFFFFF
+                            color = LocalColor.current.text.default_50
                         )
                     }
 
-                    if (!isNeedApproval) {
+                    if (!isNeedApprovalCurrent) {
                         Image(
                             painter = painterResource(id = R.drawable.checked),
                             contentDescription = null
@@ -129,7 +128,7 @@ fun EditChannelOpennessScreen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                         .clickable {
-                            isNeedApproval = true
+                            isNeedApprovalCurrent = true
                         }
                         .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -141,7 +140,7 @@ fun EditChannelOpennessScreen(
                         Text(
                             text = stringResource(id = R.string.not_public),
                             fontSize = 17.sp,
-                            color = if (isNeedApproval) {
+                            color = if (isNeedApprovalCurrent) {
                                 LocalColor.current.primary
                             } else {
                                 LocalColor.current.text.default_100
@@ -153,11 +152,11 @@ fun EditChannelOpennessScreen(
                         Text(
                             text = stringResource(id = R.string.not_public_desc),
                             fontSize = 14.sp,
-                            color = Color_80FFFFFF
+                            color = LocalColor.current.text.default_50
                         )
                     }
 
-                    if (isNeedApproval) {
+                    if (isNeedApprovalCurrent) {
                         Image(
                             painter = painterResource(id = R.drawable.checked),
                             contentDescription = null

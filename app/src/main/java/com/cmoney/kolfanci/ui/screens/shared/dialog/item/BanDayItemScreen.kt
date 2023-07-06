@@ -1,126 +1,136 @@
 package com.cmoney.kolfanci.ui.screens.shared.dialog.item
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.BanPeriodOption
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.screens.shared.vip.getVipDiamondInlineContent
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 
 @Composable
-fun BanDayItemScreen(modifier: Modifier = Modifier,
-                     name: String,
-                     onClick: (BanPeriodOption) -> Unit,
-                     onDismiss: () -> Unit) {
-
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
+fun BanDayItemScreen(
+    modifier: Modifier = Modifier,
+    name: String,
+    isVip: Boolean,
+    onClick: (BanPeriodOption) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val options = stringArrayResource(id = R.array.ban_day_options)
+    val context = LocalContext.current
+    val innerClickFunc = rememberUpdatedState { option: String ->
+        when (option) {
+            context.getString(R.string.one_day) -> {
+                onClick.invoke(BanPeriodOption.oneDay)
+            }
+            context.getString(R.string.three_day) -> {
+                onClick.invoke(BanPeriodOption.threeDay)
+            }
+            context.getString(R.string.seven_day) -> {
+                onClick.invoke(BanPeriodOption.oneWeek)
+            }
+            context.getString(R.string.thirty_day) -> {
+                onClick.invoke(BanPeriodOption.oneMonth)
+            }
+            context.getString(R.string.forever) -> {
+                onClick.invoke(BanPeriodOption.forever)
+            }
+        }
+    }
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Text(
-            text = "你確定要將 %s 禁言嗎？\n日後可以從禁言列表中取消懲處".format(name), fontSize = 17.sp, color = Color.White
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        BorderButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            text = "1日",
-            borderColor = LocalColor.current.component.other,
-            textColor = Color.White
-        ) {
-            onClick.invoke(BanPeriodOption.oneDay)
+        item {
+            if (isVip) {
+                val vipId = "vip"
+                val banContent = buildAnnotatedString {
+                    append(stringResource(id = R.string.ban_vip_x_content, name))
+                    append(' ')
+                    appendInlineContent(vipId)
+                }
+                Text(
+                    text = banContent,
+                    inlineContent = mapOf(
+                        vipId to getVipDiamondInlineContent()
+                    ),
+                    fontSize = 17.sp,
+                    color = LocalColor.current.text.default_100
+                )
+            } else {
+                val banContent =  stringResource(id = R.string.ban_x_content, name)
+                Text(
+                    text = banContent,
+                    fontSize = 17.sp,
+                    color = LocalColor.current.text.default_100
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        BorderButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            text = "3日",
-            borderColor = LocalColor.current.component.other,
-            textColor = Color.White
-        ) {
-            onClick.invoke(BanPeriodOption.threeDay)
+        items(options) { option ->
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = option,
+                borderColor = LocalColor.current.component.other,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                innerClickFunc.value.invoke(option)
+            }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        BorderButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            text = "7日",
-            borderColor = LocalColor.current.component.other,
-            textColor = Color.White
-        ) {
-            onClick.invoke(BanPeriodOption.oneWeek)
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        BorderButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            text = "30日",
-            borderColor = LocalColor.current.component.other,
-            textColor = Color.White
-        ) {
-            onClick.invoke(BanPeriodOption.oneMonth)
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        BorderButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            text = "永久",
-            borderColor = LocalColor.current.component.other,
-            textColor = Color.White
-        ) {
-            onClick.invoke(BanPeriodOption.forever)
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        BorderButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            text = "取消",
-            borderColor = LocalColor.current.component.other,
-            textColor = Color.White
-        ) {
-            onDismiss.invoke()
+        item {
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "取消",
+                borderColor = LocalColor.current.component.other,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                onDismiss.invoke()
+            }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun BanDayItemScreenPreview() {
     FanciTheme {
         BanDayItemScreen(
             name = "王力宏 ",
-            onClick = {}
-        ) {
+            isVip = false,
+            onClick = {},
+            onDismiss = {}
+        )
+    }
+}
 
-        }
+@Preview
+@Composable
+fun VipBanDayItemScreenPreview() {
+    FanciTheme {
+        BanDayItemScreen(
+            name = "王力宏 ",
+            isVip = true,
+            onClick = {},
+            onDismiss = {}
+        )
     }
 }

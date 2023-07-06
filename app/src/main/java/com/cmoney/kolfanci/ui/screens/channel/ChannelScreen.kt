@@ -1,8 +1,13 @@
 package com.cmoney.kolfanci.ui.screens.channel
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -13,15 +18,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
+import com.cmoney.kolfanci.ui.destinations.SearchMainScreenDestination
+import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
@@ -41,6 +53,12 @@ import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * 頻道主頁面
+ *
+ * @param channel 點擊頻道
+ * @param jumpChatMessage 打開直接前往的聊天訊息
+ */
 @Destination
 @Composable
 fun ChannelScreen(
@@ -48,10 +66,12 @@ fun ChannelScreen(
     navController: DestinationsNavigator,
     channel: Channel,
     viewMode: ChannelViewModel = koinViewModel(),
+    jumpChatMessage: ChatMessage? = null,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
 ) {
+    val group by LocalDependencyContainer.current.globalGroupViewModel.currentGroup.collectAsState()
 
     LaunchedEffect(Unit) {
         viewMode.fetchChannelTabStatus(channel.id.orEmpty())
@@ -61,8 +81,10 @@ fun ChannelScreen(
 
     ChannelScreenView(
         modifier = modifier,
+        group = group,
         channel = channel,
         navController = navController,
+        jumpChatMessage = jumpChatMessage,
         channelTabStatus = channelTabStatus,
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
@@ -74,7 +96,9 @@ fun ChannelScreen(
 @Composable
 private fun ChannelScreenView(
     modifier: Modifier = Modifier,
+    group: Group?,
     channel: Channel,
+    jumpChatMessage: ChatMessage? = null,
     navController: DestinationsNavigator,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     channelTabStatus: ChannelTabsStatus,
@@ -86,7 +110,30 @@ private fun ChannelScreenView(
         topBar = {
             TopBarScreen(
                 title = channel.name.orEmpty(),
-                moreEnable = false,
+                trailingContent = {
+                    Box(
+                        modifier = Modifier
+                            .size(35.dp)
+                            .offset(x = (-15).dp)
+                            .clickable {
+                                group?.run {
+                                    navController.navigate(
+                                        SearchMainScreenDestination(
+                                            group = this,
+                                            channel = channel
+                                        )
+                                    )
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            modifier = Modifier.size(25.dp),
+                            painter = painterResource(id = R.drawable.message_search),
+                            contentDescription = null
+                        )
+                    }
+                },
                 backClick = {
                     navController.popBackStack()
                 }
@@ -150,9 +197,11 @@ private fun ChannelScreenView(
                             ChatRoomScreen(
                                 channelId = channel.id.orEmpty(),
                                 navController = navController,
-                                resultRecipient = announcementResultRecipient
+                                resultRecipient = announcementResultRecipient,
+                                jumpChatMessage = jumpChatMessage
                             )
                         }
+
                         else -> {
                             //貼文 Tab
                             PostScreen(
@@ -165,8 +214,7 @@ private fun ChannelScreenView(
                     }
                 }
             }
-        }
-        else {
+        } else {
 //            Text(text = "No Tab Display")
         }
     }
@@ -184,7 +232,8 @@ fun ChannelScreenPreview() {
             announcementResultRecipient = EmptyResultRecipient(),
             channelTabStatus = ChannelTabsStatus(),
             editPostResultRecipient = EmptyResultRecipient(),
-            postInfoResultRecipient = EmptyResultRecipient()
+            postInfoResultRecipient = EmptyResultRecipient(),
+            group = Group()
         )
     }
 }
