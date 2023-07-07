@@ -14,7 +14,9 @@ sealed class Page(val eventName: String) {
     /**
      * 會員頁
      */
-    object MemberPage: Page("MemberPage")
+    object MemberPage: Page("MemberPage") {
+
+    }
 
     object AvatarAndNickname: Page("avatar_and_nickname")
 
@@ -33,4 +35,8 @@ sealed class Page(val eventName: String) {
     object TermsOfService: Page("TermsOfService")
 
     object PrivacyPolicy: Page("PrivacyPolicy")
+
+    object CopyrightPolicy: Page("CopyrightPolicy")
+
+    object Feedback: Page("Feedback")
 }

@@ -130,7 +130,7 @@ dependencies {
     implementation 'com.cmoney.firebase-ext:firebase-ext:5.5.0'
     implementation 'com.cmoney.userbehavior:userbehavior-application:5.11.0'
 
-    implementation('com.cmoney.xlab:login:1.2.7')
+    implementation('com.cmoney.xlab:login:1.3.0')
     implementation('com.cmoney.xlab:imagelibrary:1.0.6')
     implementation('com.cmoney.xlab:ratingview:1.1.8') { // 導入模組
         exclude group: 'androidx.constraintlayout', module: 'constraintlayout'
