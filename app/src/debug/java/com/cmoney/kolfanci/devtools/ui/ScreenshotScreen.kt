@@ -11,7 +11,6 @@ import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.kolfanci.devtools.model.takeScreenshot
 import com.cmoney.kolfanci.devtools.ui.data.ScreenshotTarget
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
-import com.cmoney.kolfanci.ui.screens.channel.ChannelScreenPreview
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.GroupSettingScreenPreview
@@ -81,28 +80,25 @@ fun ScreenshotScreen(
 private val DefaultTestTargets: List<ScreenshotTarget> by lazy {
     listOf(
         ScreenshotTarget(
-            relativePath = "follow",
+            relativePath = "main",
             name = "FollowScreen"
         ) {
             FollowScreenPreview()
         },
         ScreenshotTarget(
-            name = "ChannelScreen"
-        ) {
-            ChannelScreenPreview()
-        },
-        ScreenshotTarget(
-            relativePath = "group/setting",
+            relativePath = "setting",
             name = "GroupSettingScreen"
         ) {
             GroupSettingScreenPreview()
         },
         ScreenshotTarget(
+            relativePath = "my",
             name = "MyScreen"
         ) {
             MyScreenPreview()
         },
         ScreenshotTarget(
+            relativePath = "discover",
             name = "DiscoverGroupScreen"
         ) {
             DiscoverGroupScreenPreview()
