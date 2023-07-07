@@ -89,12 +89,17 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.material:material:1.8.0'
-
     implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.1'
     implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation "androidx.work:work-runtime-ktx:2.8.1"
+    implementation("androidx.room:room-runtime:2.5.2")
+    implementation("androidx.room:room-ktx:2.5.2")
+    ksp("androidx.room:room-compiler:2.5.2")
 
     //==================== Compose ====================
     implementation "androidx.compose.ui:ui:$compose_ui_version"
@@ -119,12 +124,11 @@ dependencies {
     implementation 'com.github.zhaokaiqiang.klog:library:1.6.0'
 
     //=============== CMoney ===============
-    implementation 'com.cmoney.analytics:analytics-user:5.1.0'
     implementation project(path: ':fancyapi')
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    releaseImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
-    debugImplementation 'com.cmoney.notifylibrary:notifylibrary-android:5.0.0'
+    implementation 'com.cmoney.analytics:analytics-user:5.2.0'
+    implementation 'com.cmoney.backend2:backend2:5.53.3'
+    implementation 'com.cmoney.firebase-ext:firebase-ext:5.5.0'
+    implementation 'com.cmoney.userbehavior:userbehavior-application:5.11.0'
 
     implementation('com.cmoney.xlab:login:1.2.7')
     implementation('com.cmoney.xlab:imagelibrary:1.0.6')
@@ -132,12 +136,9 @@ dependencies {
         exclude group: 'androidx.constraintlayout', module: 'constraintlayout'
         // 忽略constraintlayout版本，使模組版本不要影響到app
     }
-    implementation 'com.cmoney.remoteconfig:remoteconfig-android:5.0.0'
 
     //=============== Flurry ===============
     implementation 'com.flurry.android:analytics:13.3.0'
-
-    implementation "androidx.work:work-runtime-ktx:2.8.1"
 
     //=============== SnackBar ===============
     implementation 'com.radusalagean:info-bar-compose:1.0.0'
@@ -146,7 +147,8 @@ dependencies {
     implementation 'com.github.Priyansh-Kedia:OpenGraphParser:2.5.5'
 
     //=============== Koin ===============
-    implementation "io.insert-koin:koin-androidx-compose:3.2.1"
+    implementation "io.insert-koin:koin-android:3.3.3"
+    implementation "io.insert-koin:koin-androidx-compose:3.3.0"
 
     //=============== Chucker Log ===============
     debugImplementation "com.github.chuckerteam.chucker:library:3.5.2"
