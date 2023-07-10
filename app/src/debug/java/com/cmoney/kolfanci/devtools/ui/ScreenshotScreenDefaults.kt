@@ -2,7 +2,8 @@ package com.cmoney.kolfanci.devtools.ui
 
 import com.cmoney.kolfanci.devtools.ui.data.ScreenshotTarget
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreenPreview
-import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupPopularScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupLatestScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.GroupSettingScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.AccountManageScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.MyScreenPreview
@@ -45,9 +46,15 @@ object ScreenshotScreenDefaults {
         listOf(
             ScreenshotTarget(
                 relativePath = "discover",
-                name = "DiscoverGroupScreen"
+                name = "DiscoverGroupPopularScreen"
             ) {
-                DiscoverGroupScreenPreview()
+                DiscoverGroupPopularScreenPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "discover",
+                name = "DiscoverGroupLatestScreen"
+            ) {
+                DiscoverGroupLatestScreenPreview()
             }
         )
     }
