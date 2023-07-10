@@ -11,10 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import com.cmoney.application_user_behavior.AnalyticsAgent
+import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
@@ -109,6 +112,13 @@ fun MainScreen(
                 val groupId = navResult.value
                 globalGroupViewModel.leaveGroup(id = groupId)
             }
+        }
+    }
+
+    LaunchedEffect(key1 = currentGroup) {
+        if (currentGroup != null) {
+            AnalyticsAgent.getInstance()
+                .logPageViewed(Page.Home.eventName)
         }
     }
 
