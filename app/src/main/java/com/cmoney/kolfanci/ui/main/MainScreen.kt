@@ -45,7 +45,7 @@ fun MainScreen(
     val TAG = "MainScreen"
     val context = LocalContext.current
     val globalViewModel = koinViewModel<MainViewModel>(
-        owner = LocalContext.current as? ComponentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
+        viewModelStoreOwner = LocalContext.current as? ComponentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
     )
     val globalGroupViewModel = globalGroupViewModel()
     val activity = LocalContext.current.findActivity()

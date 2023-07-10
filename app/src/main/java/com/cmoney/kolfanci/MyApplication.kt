@@ -1,24 +1,35 @@
 package com.cmoney.kolfanci
 
+import android.app.Application
 import android.util.Log
-import com.cmoney.backend2.base.di.BACKEND2_SETTING
+import com.cmoney.application_user_behavior.AnalyticsAgent
+import com.cmoney.application_user_behavior.di.analyticsModule
+import com.cmoney.backend2.base.model.manager.GlobalBackend2Manager
 import com.cmoney.backend2.base.model.setting.Platform
-import com.cmoney.backend2.base.model.setting.Setting
+import com.cmoney.backend2.di.backendServicesModule
+import com.cmoney.crypto.di.CryptoHelper
 import com.cmoney.data_logdatarecorder.recorder.LogDataRecorder
 import com.cmoney.kolfanci.di.appModule
 import com.cmoney.kolfanci.di.networkBaseModule
 import com.cmoney.kolfanci.di.useCaseModule
 import com.cmoney.kolfanci.di.viewModule
+import com.cmoney.loginlibrary.di.loginModule
+import com.cmoney.loginlibrary.di.loginServiceModule
+import com.cmoney.loginlibrary.di.loginSharedPreferencesModule
+import com.cmoney.loginlibrary.di.memberProfileCacheModule
+import com.cmoney.loginlibrary.di.visitBindRepositoryModule
+import com.cmoney.loginlibrary.di.visitBindViewModelModule
 import com.cmoney.member.application.di.CMoneyMemberServiceLocator
-import com.cmoney.xlogin.XLoginApplication
 import com.flurry.android.FlurryAgent
 import com.flurry.android.FlurryPerformance
 import com.google.firebase.FirebaseApp
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
+import org.koin.core.context.startKoin
 
-class MyApplication : XLoginApplication() {
+class MyApplication : Application() {
     companion object {
         lateinit var instance: MyApplication
             private set
@@ -27,6 +38,33 @@ class MyApplication : XLoginApplication() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        CryptoHelper.registerAead()
+        startKoin {
+            androidContext(this@MyApplication)
+            loadKoinModules(
+                listOf(
+                    // 此為登入模組需要的網路或快取定義
+                    memberProfileCacheModule,
+                    // 登入模組內的DI
+                    loginModule,
+                    // 華為/Google的定義
+                    loginServiceModule,
+                    // 訪客使用的API定義
+                    visitBindRepositoryModule,
+                    visitBindViewModelModule,
+                    // 登入提供的SharedPreference定義，需要位於 backendServicesModule 下
+                    loginSharedPreferencesModule,
+                    // backend2
+                    backendServicesModule,
+                    viewModule,
+                    useCaseModule,
+                    appModule,
+                    networkBaseModule,
+                    analyticsModule
+                )
+            )
+        }
+
         FirebaseApp.initializeApp(this)
 
         if (!BuildConfig.DEBUG) {
@@ -39,21 +77,12 @@ class MyApplication : XLoginApplication() {
                 .withPerformanceMetrics(FlurryPerformance.ALL)
                 .build(this, getString(R.string.flurry_api_key))
         }
-        loadKoinModules(
-            listOf(
-                viewModule,
-                useCaseModule,
-                appModule,
-                networkBaseModule
-            )
-        )
         // 設定Backend2
-        getKoin().get<Setting>(BACKEND2_SETTING).apply { // Setup for apis
-            appId = resources.getInteger(R.integer.app_id)
-            clientId = getString(R.string.app_client_id)
-            platform = Platform.Android
-            appVersion = BuildConfig.VERSION_NAME
-            domainUrl = BuildConfig.CM_SERVER_URL
+        val globalBackend2Manager = getKoin().get<GlobalBackend2Manager>().apply {
+            setGlobalDomainUrl(BuildConfig.CM_SERVER_URL)
+            setPlatform(Platform.Android)
+            setClientId(getString(R.string.app_client_id))
+            setAppId(resources.getInteger(R.integer.app_id))
         }
 
         // 根據需求設定是否紀錄API
@@ -68,13 +97,13 @@ class MyApplication : XLoginApplication() {
             identityWeb = get(),
             profileWeb = get(),
             commonWeb = get(),
-            notificationWeb = get()
-        ) { backend2Setting ->
-            backend2Setting.appId = resources.getInteger(R.integer.app_id)
-            backend2Setting.clientId = getString(R.string.app_client_id)
-            backend2Setting.domainUrl = BuildConfig.CM_SERVER_URL
-            backend2Setting.platform = com.cmoney.backend2.base.model.setting.Platform.Android
-        }
+            notificationWeb = get(),
+            globalBackend2Manager = globalBackend2Manager
+        )
 
+        AnalyticsAgent.initialization(context = this) {
+            platform = com.cmoney.domain_user_behavior.data.information.Platform.Android
+            appId = resources.getInteger(R.integer.app_id)
+        }
     }
 }
