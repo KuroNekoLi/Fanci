@@ -4,7 +4,10 @@ import com.cmoney.kolfanci.devtools.ui.data.ScreenshotTarget
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.GroupSettingScreenPreview
+import com.cmoney.kolfanci.ui.screens.my.AccountManageScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.MyScreenPreview
+import com.cmoney.kolfanci.ui.screens.my.avatar.AvatarNicknameChangeScreenPreview
+import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreenPreview
 
 /**
  * 螢幕截圖元件預設
@@ -56,6 +59,24 @@ object ScreenshotScreenDefaults {
                 name = "MyScreen"
             ) {
                 MyScreenPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "my",
+                name = "AccountManageScreen"
+            ) {
+                AccountManageScreenPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "my",
+                name = "AvatarNicknameChangeScreen"
+            ) {
+                AvatarNicknameChangeScreenPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "my",
+                name = "LoginDialogScreen"
+            ) {
+                LoginDialogScreenPreview()
             }
         )
     }

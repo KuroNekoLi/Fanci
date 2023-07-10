@@ -17,8 +17,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.application_user_behavior.AnalyticsAgent
+import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -169,6 +172,14 @@ fun AccountManageScreen(
                 Unit
             }
         }
+        LaunchedEffect(key1 = Unit) {
+            AnalyticsAgent.getInstance()
+                .logPageViewed(Page.MemberPage.AccountManagement.Logout.eventName)
+        }
+    }
+    LaunchedEffect(key1 = Unit) {
+        AnalyticsAgent.getInstance()
+            .logPageViewed(Page.MemberPage.AccountManagement.eventName)
     }
 }
 

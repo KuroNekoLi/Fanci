@@ -21,6 +21,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +39,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.application_user_behavior.AnalyticsAgent
+import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -108,6 +112,10 @@ fun AvatarNicknameChangeScreen(
             onFanciClick = {
             }
         )
+    }
+    LaunchedEffect(key1 = Unit) {
+        AnalyticsAgent.getInstance()
+            .logPageViewed(Page.MemberPage.AvatarAndNickname.eventName)
     }
 }
 
