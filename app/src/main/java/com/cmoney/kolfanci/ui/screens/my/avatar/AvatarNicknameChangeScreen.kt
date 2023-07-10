@@ -39,9 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.cmoney.application_user_behavior.AnalyticsAgent
-import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
@@ -114,8 +113,8 @@ fun AvatarNicknameChangeScreen(
         )
     }
     LaunchedEffect(key1 = Unit) {
-        AnalyticsAgent.getInstance()
-            .logPageViewed(Page.MemberPage.AvatarAndNickname.eventName)
+        AppUserLogger.getInstance()
+            .log(page = Page.MemberPage.AvatarAndNickname)
     }
 }
 

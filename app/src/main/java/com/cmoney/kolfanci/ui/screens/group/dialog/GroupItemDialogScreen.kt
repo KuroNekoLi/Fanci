@@ -2,7 +2,16 @@ package com.cmoney.kolfanci.ui.screens.group.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,15 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import com.cmoney.application_user_behavior.AnalyticsAgent
-import com.cmoney.application_user_behavior.model.event.logPageViewed
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.GroupText
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.model.analytics.data.Page
 
 @Composable
 fun GroupItemDialogScreen(
@@ -63,8 +71,8 @@ fun GroupItemDialogScreen(
         }
     }
     LaunchedEffect(key1 = groupModel) {
-        AnalyticsAgent.getInstance()
-            .logPageViewed(Page.Group.eventName)
+        AppUserLogger.getInstance()
+            .log(page = Page.Group)
     }
 }
 

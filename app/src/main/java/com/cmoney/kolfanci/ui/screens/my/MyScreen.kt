@@ -23,10 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.application_user_behavior.AnalyticsAgent
-import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AccountManageScreenDestination
@@ -156,8 +155,8 @@ fun MyScreen(
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getUserVipPlan()
-        AnalyticsAgent.getInstance()
-            .logPageViewed(Page.MemberPage.eventName)
+        AppUserLogger.getInstance()
+            .log(page = Page.MemberPage)
     }
 }
 
