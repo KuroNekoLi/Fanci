@@ -52,8 +52,6 @@ fun ScreenshotScreen(
         // wait for content create
         delay(500L)
         takeScreenshot(context = context, relativePath = target.relativePath, name = target.name)
-        // wait for bitmap create
-        delay(100L)
         val targetIndex = index.plus(1)
         if (targetIndex <= targets.lastIndex) {
             // 切換內容
