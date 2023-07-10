@@ -7,6 +7,7 @@
 
     <string name="flurry_api_key">DKFFRQNSDSC3BGN9TD9Q</string>
     <string name="facebook_app_id">807119773957521</string>
+    <string name="mixpanel_token">1203044a7c4d51faf75a3721d3458a86</string>
 
     <string name="tab_follow">追蹤</string>
     <string name="tab_notify">通知</string>
