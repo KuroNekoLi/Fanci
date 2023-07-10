@@ -2,8 +2,9 @@ package com.cmoney.kolfanci.devtools.ui
 
 import com.cmoney.kolfanci.devtools.ui.data.ScreenshotTarget
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreenPreview
-import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupPopularScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupLatestScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupPopularScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.GroupSettingScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.AccountManageScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.MyScreenPreview
@@ -24,6 +25,7 @@ object ScreenshotScreenDefaults {
         mutableListOf<ScreenshotTarget>().apply {
             addAll(mainTargets)
             addAll(discoverTargets)
+            addAll(groupTargets)
             addAll(myTargets)
             addAll(chatTargets)
             addAll(postTargets)
@@ -55,6 +57,17 @@ object ScreenshotScreenDefaults {
                 name = "DiscoverGroupLatestScreen"
             ) {
                 DiscoverGroupLatestScreenPreview()
+            }
+        )
+    }
+
+    private val groupTargets by lazy {
+        listOf(
+            ScreenshotTarget(
+                relativePath = "group",
+                name = "GroupItemDialogScreen"
+            ) {
+                GroupItemDialogScreenPreview()
             }
         )
     }
