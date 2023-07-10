@@ -11,10 +11,6 @@ import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.kolfanci.devtools.model.takeScreenshot
 import com.cmoney.kolfanci.devtools.ui.data.ScreenshotTarget
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
-import com.cmoney.kolfanci.ui.screens.follow.FollowScreenPreview
-import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupScreenPreview
-import com.cmoney.kolfanci.ui.screens.group.setting.GroupSettingScreenPreview
-import com.cmoney.kolfanci.ui.screens.my.MyScreenPreview
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import kotlinx.coroutines.delay
@@ -27,7 +23,7 @@ import org.koin.core.context.GlobalContext
  */
 @Composable
 fun ScreenshotScreen(
-    targets: List<ScreenshotTarget> = DefaultTestTargets
+    targets: List<ScreenshotTarget> = ScreenshotScreenDefaults.targets
 ) {
     val themeUseCase = remember {
         GlobalContext.get().get<ThemeUseCase>()
@@ -73,33 +69,4 @@ fun ScreenshotScreen(
             }
         }
     }
-}
-
-private val DefaultTestTargets: List<ScreenshotTarget> by lazy {
-    listOf(
-        ScreenshotTarget(
-            relativePath = "main",
-            name = "FollowScreen"
-        ) {
-            FollowScreenPreview()
-        },
-        ScreenshotTarget(
-            relativePath = "setting",
-            name = "GroupSettingScreen"
-        ) {
-            GroupSettingScreenPreview()
-        },
-        ScreenshotTarget(
-            relativePath = "my",
-            name = "MyScreen"
-        ) {
-            MyScreenPreview()
-        },
-        ScreenshotTarget(
-            relativePath = "discover",
-            name = "DiscoverGroupScreen"
-        ) {
-            DiscoverGroupScreenPreview()
-        }
-    )
 }
