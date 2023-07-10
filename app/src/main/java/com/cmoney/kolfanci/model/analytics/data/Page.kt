@@ -1,5 +1,8 @@
 package com.cmoney.kolfanci.model.analytics.data
 
+import android.renderscript.Allocation
+import android.renderscript.RenderScript
+
 /**
  * 頁面
  *
