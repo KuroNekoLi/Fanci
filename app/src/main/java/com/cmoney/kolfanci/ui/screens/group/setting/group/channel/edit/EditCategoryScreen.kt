@@ -33,6 +33,8 @@ import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -104,6 +106,8 @@ fun EditCategoryScreen(
                 showDialog.value = false
             }
         )
+
+        AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.DeleteCategory)
     }
 
     editInputResult.onNavResult { result ->
@@ -115,6 +119,10 @@ fun EditCategoryScreen(
                 viewModel.setCategoryName(result.value)
             }
         }
+    }
+
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.EditCategory)
     }
 
 }
