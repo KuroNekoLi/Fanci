@@ -423,11 +423,9 @@ fun FollowScreenView(
                                             followGroup = group,
                                             visibleAvatar = visibleAvatar,
                                             modifier = Modifier.background(LocalColor.current.env_80)
-                                        ) { group ->
+                                        ) {
                                             navigator.navigate(
-                                                GroupSettingScreenDestination(
-                                                    initGroup = group
-                                                )
+                                                GroupSettingScreenDestination
                                             )
                                         }
                                     }

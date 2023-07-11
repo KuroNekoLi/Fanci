@@ -19,6 +19,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -62,7 +63,6 @@ import org.koin.androidx.compose.koinViewModel
 fun GroupSettingScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    initGroup: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
     memberViewModel: MemberViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>,
@@ -71,6 +71,9 @@ fun GroupSettingScreen(
     leaveResultBackNavigator: ResultBackNavigator<String>
 ) {
     val globalGroupViewModel = globalGroupViewModel()
+    val initGroup = remember {
+        globalGroupViewModel.currentGroup.value
+    } ?: return
 
     val uiState = viewModel.uiState
 
