@@ -40,6 +40,8 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
@@ -79,7 +81,7 @@ fun GroupSettingSettingScreen(
     val globalGroupViewModel = globalGroupViewModel()
     val viewModel: GroupSettingViewModel = koinViewModel()
 
-    setCallbackHandle(
+    SetCallbackHandle(
         setNameResult = setNameResult,
         setDescResult = setDescResult,
         setAvatarResult = setAvatarResult,
@@ -201,7 +203,7 @@ fun GroupSettingSettingScreen(
  * 處理 所有更改過的 callback
  */
 @Composable
-private fun setCallbackHandle(
+private fun SetCallbackHandle(
     setNameResult: ResultRecipient<EditInputScreenDestination, String>,
     setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
     group: Group,
@@ -302,6 +304,8 @@ fun GroupSettingSettingView(
                                 emptyAlertSubTitle = context.getString(R.string.group_name_empty_desc)
                             )
                         )
+                        AppUserLogger.getInstance()
+                            .log(Page.Group.Settings.GroupSettings.GroupName)
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),

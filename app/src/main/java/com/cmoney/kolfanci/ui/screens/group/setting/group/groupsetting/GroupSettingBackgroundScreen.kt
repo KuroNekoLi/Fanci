@@ -16,6 +16,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.common.TransparentButton
 import com.cmoney.kolfanci.ui.destinations.FanciDefaultCoverScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
@@ -105,6 +108,11 @@ fun GroupSettingBackgroundScreen(
             navController.popBackStack()
         }
     )
+
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance()
+            .log(Page.Group.Settings.GroupSettings.HomeBackground)
+    }
 
 //    LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
 //        if (viewModel.uiState.isGroupSettingPop) {

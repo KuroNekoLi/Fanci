@@ -16,6 +16,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -37,6 +40,9 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 
+/**
+ * 社團設定-社團簡介頁
+ */
 @Destination
 @Composable
 fun GroupSettingDescScreen(
@@ -53,7 +59,8 @@ fun GroupSettingDescScreen(
         modifier = modifier,
         group = group, onChangeDesc = { desc ->
             resultNavigator.navigateBack(desc)
-        }) {
+        }
+    ) {
         showSaveTip = true
     }
 
@@ -67,6 +74,11 @@ fun GroupSettingDescScreen(
             navController.popBackStack()
         }
     )
+
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance()
+            .log(Page.Group.Settings.GroupSettings.GroupIntroduction)
+    }
 }
 
 @Composable

@@ -26,12 +26,16 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemePreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeSettingItemScreen
+import com.cmoney.kolfanci.ui.theme.CoffeeThemeColor
+import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.gson.Gson
@@ -126,6 +130,11 @@ fun GroupSettingThemeScreen(
             )
         }
     }
+
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance()
+            .log(Page.Group.Settings.GroupSettings.ThemeColor)
+    }
 }
 
 @Composable
@@ -198,7 +207,22 @@ fun GroupSettingThemeScreenPreview() {
         GroupSettingThemeView(
             navController = EmptyDestinationsNavigator,
             isLoading = false,
-            groupThemes = emptyList(),
+            groupThemes = listOf(
+                GroupTheme(
+                    id = "",
+                    isSelected = true,
+                    theme = DefaultThemeColor,
+                    name = "測試主題1",
+                    preview = emptyList()
+                ),
+                GroupTheme(
+                    id = "",
+                    isSelected = true,
+                    theme = CoffeeThemeColor,
+                    name = "測試主題2",
+                    preview = emptyList()
+                )
+            ),
             isFromCreate = false,
             onThemeConfirmClick = {}
         )

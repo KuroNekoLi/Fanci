@@ -6,10 +6,15 @@ import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupLatestScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupPopularScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.GroupSettingScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.GroupSettingBackgroundPreview
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.GroupSettingDescViewPreview
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.GroupSettingThemeScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.AccountManageScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.MyScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.avatar.AvatarNicknameChangeScreenPreview
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreenPreview
+import com.cmoney.kolfanci.ui.screens.shared.edit.EditInputScreenPreview
 
 /**
  * 螢幕截圖元件預設
@@ -116,6 +121,36 @@ object ScreenshotScreenDefaults {
                 name = "GroupSettingScreen"
             ) {
                 GroupSettingScreenPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "setting",
+                name = "GroupSettingAvatarScreen"
+            ) {
+                GroupSettingAvatarScreenPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "setting",
+                name = "GroupSettingBackground"
+            ) {
+                GroupSettingBackgroundPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "setting",
+                name = "GroupSettingDescScreen"
+            ) {
+                GroupSettingDescViewPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "setting",
+                name = "GroupSettingThemeScreen"
+            ) {
+                GroupSettingThemeScreenPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "setting",
+                name = "GroupSettingNameScreen"
+            ) {
+                EditInputScreenPreview()
             }
         )
     }
