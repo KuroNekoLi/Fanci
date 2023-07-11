@@ -2,7 +2,7 @@ package com.cmoney.kolfanci.model.notification
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 sealed class TargetType : Parcelable {
 

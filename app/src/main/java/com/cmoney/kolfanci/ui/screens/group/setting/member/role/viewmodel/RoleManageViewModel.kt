@@ -13,7 +13,7 @@ import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -227,17 +227,15 @@ class RoleManageViewModel(
                     KLog.e(TAG, it)
                     if (it is EmptyBodyException) {
                         assignMemberRole(group.id.orEmpty(), editFanciRole!!)
-                    } else {
+                    } else if (it is HttpException) {
                         //Conflict error
-                        if (it is HttpException) {
-                            if ((it as HttpException).code() == 409) {
-                                uiState = uiState.copy(
-                                    addRoleError = Pair(
-                                        "角色名稱重複", "名稱「%s」與現有角色重複\n".format(name) +
-                                                "請修改後再次儲存！"
-                                    )
+                        if (it.code() == 409) {
+                            uiState = uiState.copy(
+                                addRoleError = Pair(
+                                    "角色名稱重複", "名稱「%s」與現有角色重複\n".format(name) +
+                                            "請修改後再次儲存！"
                                 )
-                            }
+                            )
                         }
                     }
                 })
