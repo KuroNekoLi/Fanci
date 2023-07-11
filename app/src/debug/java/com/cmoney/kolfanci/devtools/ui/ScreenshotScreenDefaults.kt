@@ -10,6 +10,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.GroupSett
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.GroupSettingDescViewPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.GroupSettingThemeScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.GroupOpennessScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.AccountManageScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.MyScreenPreview
 import com.cmoney.kolfanci.ui.screens.my.avatar.AvatarNicknameChangeScreenPreview
@@ -151,6 +152,12 @@ object ScreenshotScreenDefaults {
                 name = "GroupSettingNameScreen"
             ) {
                 EditInputScreenPreview()
+            },
+            ScreenshotTarget(
+                relativePath = "setting",
+                name = "GroupOpennessScreen"
+            ) {
+                GroupOpennessScreenPreview()
             }
         )
     }
