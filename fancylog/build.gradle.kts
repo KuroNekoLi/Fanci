@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
 }
+apply(from = "extract-log-event-task.gradle.kts")
 
 android {
     namespace = "com.cmoney.fancylog"
