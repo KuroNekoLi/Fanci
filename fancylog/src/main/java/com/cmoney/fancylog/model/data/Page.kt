@@ -1,4 +1,4 @@
-package com.cmoney.fancylog
+package com.cmoney.fancylog.model.data
 
 /**
  * 頁面事件

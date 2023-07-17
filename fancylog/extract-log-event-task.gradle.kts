@@ -2,7 +2,28 @@ abstract class ExtractLogEventTask : DefaultTask() {
     @TaskAction
     fun invoke() {
         val targetFile = File("fancylog/events", "log_event_20230714.csv")
-        val outputFile = File("fancylog/src/main/java/com/cmoney/fancylog", "Page.kt")
+        val packageName = "com.cmoney.fancylog.model.data"
+        val rootDirectory = "fancylog/src/main/java"
+        val rootPackage = "com.cmoney.fancylog"
+        val directoryPool = packageName.split(".")
+        var index = 0
+        var parentDirectoryFile = File("$rootDirectory/${rootDirectory.replace('.', '/')}")
+        while (index < directoryPool.size) {
+            val subDirectory = directoryPool.subList(0, index)
+                .joinToString("/")
+            val parentParentDirectoryPath = "$rootDirectory" + if (subDirectory.isNotEmpty()) {
+                "/$subDirectory"
+            } else {
+                subDirectory
+            }
+            val parentName = directoryPool[index]
+            println(parentParentDirectoryPath)
+            println(parentName)
+            parentDirectoryFile = File(parentParentDirectoryPath, parentName)
+            parentDirectoryFile.mkdir()
+            index++
+        }
+        val outputFile = File(parentDirectoryFile, "Page.kt")
         if (!outputFile.exists()) {
             outputFile.createNewFile()
         }
@@ -10,7 +31,7 @@ abstract class ExtractLogEventTask : DefaultTask() {
             targetFile.inputStream().use { inputStream ->
                 val indent = "    "
                 val writer = outputStream.bufferedWriter()
-                writer.write("package com.cmoney.fancylog")
+                writer.write("package $packageName")
                 writer.newLine()
                 writer.newLine()
                 writer.write("/**")
