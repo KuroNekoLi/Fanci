@@ -32,7 +32,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -66,7 +66,7 @@ fun LoginDialogScreen(
 
     LaunchedEffect(key1 = Unit) {
         AppUserLogger.getInstance()
-            .log(page = Page.MemberPage.NotLoggedInPage)
+            .log(page = Page.MemberPageNotLoggedInPage)
     }
 }
 

@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -114,7 +114,7 @@ fun AvatarNicknameChangeScreen(
     }
     LaunchedEffect(key1 = Unit) {
         AppUserLogger.getInstance()
-            .log(page = Page.MemberPage.AvatarAndNickname)
+            .log(page = Page.MemberPageAvatarAndNickname)
     }
 }
 

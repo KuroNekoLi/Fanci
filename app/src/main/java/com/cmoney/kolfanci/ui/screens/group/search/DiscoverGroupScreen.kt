@@ -42,7 +42,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
@@ -152,11 +152,11 @@ fun DiscoverGroupScreen(
         when (uiState.tabIndex) {
             0 -> {
                 AppUserLogger.getInstance()
-                    .log(page = Page.ExploreGroup.PopularGroups)
+                    .log(page = Page.ExploreGroupPopularGroups)
             }
             1 -> {
                 AppUserLogger.getInstance()
-                    .log(page = Page.ExploreGroup.NewestGroups)
+                    .log(page = Page.ExploreGroupNewestGroups)
             }
         }
     }

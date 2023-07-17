@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -186,12 +186,12 @@ fun AccountManageScreen(
         }
         LaunchedEffect(key1 = Unit) {
             AppUserLogger.getInstance()
-                .log(page = Page.MemberPage.AccountManagement.Logout)
+                .log(page = Page.AccountManagementLogout)
         }
     }
     LaunchedEffect(key1 = Unit) {
         AppUserLogger.getInstance()
-            .log(page = Page.MemberPage.AccountManagement)
+            .log(page = Page.MemberPageAccountManagement)
     }
 }
 

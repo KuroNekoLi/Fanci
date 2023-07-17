@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -77,7 +77,7 @@ fun GroupSettingDescScreen(
 
     LaunchedEffect(key1 = group) {
         AppUserLogger.getInstance()
-            .log(Page.Group.Settings.GroupSettings.GroupIntroduction)
+            .log(Page.GroupSettingsGroupSettingsGroupIntroduction)
     }
 }
 

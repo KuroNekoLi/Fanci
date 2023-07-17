@@ -27,7 +27,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemePreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
@@ -133,7 +133,7 @@ fun GroupSettingThemeScreen(
 
     LaunchedEffect(key1 = group) {
         AppUserLogger.getInstance()
-            .log(Page.Group.Settings.GroupSettings.ThemeColor)
+            .log(Page.GroupSettingsGroupSettingsThemeColor)
     }
 }
 

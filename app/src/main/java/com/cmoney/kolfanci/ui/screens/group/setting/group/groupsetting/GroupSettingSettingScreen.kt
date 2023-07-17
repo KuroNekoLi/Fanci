@@ -41,7 +41,7 @@ import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
@@ -305,7 +305,7 @@ fun GroupSettingSettingView(
                             )
                         )
                         AppUserLogger.getInstance()
-                            .log(Page.Group.Settings.GroupSettings.GroupName)
+                            .log(Page.GroupSettingsGroupSettingsGroupName)
                     }
                     .padding(start = 24.dp, end = 24.dp)
                     .fillMaxWidth(),
