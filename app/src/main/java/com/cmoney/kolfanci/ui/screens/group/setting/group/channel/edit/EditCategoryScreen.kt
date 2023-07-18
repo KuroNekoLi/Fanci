@@ -31,10 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -107,7 +107,7 @@ fun EditCategoryScreen(
             }
         )
 
-        AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.DeleteCategory)
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementDeleteCategory)
     }
 
     editInputResult.onNavResult { result ->
@@ -122,7 +122,7 @@ fun EditCategoryScreen(
     }
 
     LaunchedEffect(key1 = group) {
-        AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.EditCategory)
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementEditCategory)
     }
 
 }

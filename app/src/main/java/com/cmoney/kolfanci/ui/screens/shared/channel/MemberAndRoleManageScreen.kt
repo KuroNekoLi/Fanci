@@ -31,7 +31,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
@@ -276,7 +276,7 @@ private fun AddMemberListScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
-                    AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.Permissions.Private.AddMember)
+                    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember)
 
                     navigator.navigate(
                         AddMemberScreenDestination(
@@ -340,7 +340,7 @@ private fun AddRoleListScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
-                    AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.Permissions.Private.AddRole)
+                    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole)
 
                     navigator.navigate(
                         ShareAddRoleScreenDestination(
@@ -378,7 +378,7 @@ private fun AddRoleListScreen(
         }
     }
 
-    AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.Permissions.Private.Roles)
+    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateRoles)
 }
 
 @Composable
@@ -408,7 +408,7 @@ private fun AddVipPlanScreen(
                     borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
-                    AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.Permissions.Private.AddPlan)
+                    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan)
 
                     navigator.navigate(
                         AddVipPlanScreenDestination(
@@ -445,7 +445,7 @@ private fun AddVipPlanScreen(
         }
     }
 
-    AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.Permissions.Private.VIP)
+    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateVIP)
 }
 
 

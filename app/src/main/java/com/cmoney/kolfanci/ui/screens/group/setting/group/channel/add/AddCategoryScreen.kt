@@ -25,10 +25,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
@@ -91,7 +91,7 @@ fun AddCategoryScreen(
     }
 
     LaunchedEffect(key1 = group) {
-        AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement.AddCategory)
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementAddCategory)
     }
 }
 

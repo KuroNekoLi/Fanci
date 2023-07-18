@@ -29,7 +29,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.destinations.AddCategoryScreenDestination
@@ -49,6 +49,7 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
+
 
 /**
  * 頻道管理
@@ -160,7 +161,7 @@ fun ChannelSettingScreen(
     }
 
     LaunchedEffect(key1 = group) {
-        AppUserLogger.getInstance().log(Page.Group.Settings.ChannelManagement)
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagement)
     }
 
 }
