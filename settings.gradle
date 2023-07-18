@@ -20,3 +20,4 @@ dependencyResolutionManagement {
 rootProject.name = "Fanci"
 include ':app'
 include ':fancyapi'
+include ':fancylog'

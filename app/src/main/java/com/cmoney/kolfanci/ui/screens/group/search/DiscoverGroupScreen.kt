@@ -27,6 +27,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +41,8 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
@@ -144,6 +147,19 @@ fun DiscoverGroupScreen(
         navController.popBackStack(MainScreenDestination, inclusive = false)
 //        navController.popBackStack()
     }
+
+    LaunchedEffect(key1 = uiState.tabIndex) {
+        when (uiState.tabIndex) {
+            0 -> {
+                AppUserLogger.getInstance()
+                    .log(page = Page.ExploreGroupPopularGroups)
+            }
+            1 -> {
+                AppUserLogger.getInstance()
+                    .log(page = Page.ExploreGroupNewestGroups)
+            }
+        }
+    }
 }
 
 @Composable
@@ -217,18 +233,21 @@ private fun DiscoverGroupScreenView(
                 list.forEachIndexed { index, text ->
                     val selected = selectedIndex == index
                     Tab(
-                        modifier = if (selected) Modifier
-                            .padding(2.dp)
-                            .clip(RoundedCornerShape(35))
-                            .background(
-                                LocalColor.current.env_60
-                            )
-                        else Modifier
-                            .padding(10.dp)
-                            .clip(RoundedCornerShape(35))
-                            .background(
-                                Color.Transparent
-                            ),
+                        modifier = if (selected) {
+                            Modifier
+                                .padding(2.dp)
+                                .clip(RoundedCornerShape(35))
+                                .background(
+                                    LocalColor.current.env_60
+                                )
+                        } else {
+                            Modifier
+                                .padding(10.dp)
+                                .clip(RoundedCornerShape(35))
+                                .background(
+                                    Color.Transparent
+                                )
+                        },
                         selected = selected,
                         onClick = {
                             onTabClick.invoke(index)
@@ -282,11 +301,32 @@ private fun DiscoverGroupScreenView(
 
 @Preview(showBackground = true)
 @Composable
-fun DiscoverGroupScreenPreview() {
+fun DiscoverGroupPopularScreenPreview() {
     FanciTheme {
         DiscoverGroupScreenView(
             navController = EmptyDestinationsNavigator,
             selectedIndex = 0,
+            groupList = listOf(
+                Group(
+                    name = "Hi"
+                )
+            ),
+            onTabClick = {},
+            onGroupItemClick = {},
+            onCreateClick = {},
+            onLoadMore = {},
+            isLoading = true
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DiscoverGroupLatestScreenPreview() {
+    FanciTheme {
+        DiscoverGroupScreenView(
+            navController = EmptyDestinationsNavigator,
+            selectedIndex = 1,
             groupList = listOf(
                 Group(
                     name = "Hi"

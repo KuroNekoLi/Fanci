@@ -197,7 +197,7 @@ fun EditInputScreenView(
 
 @Preview(showBackground = true)
 @Composable
-fun GroupSettingNameScreenPreview() {
+fun EditInputScreenPreview() {
     FanciTheme {
         EditInputScreenView(
             defaultText = "韓勾ㄟ金針菇討論區",

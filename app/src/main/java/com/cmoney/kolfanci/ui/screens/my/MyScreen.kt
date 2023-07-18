@@ -25,11 +25,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AccountManageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.AvatarNicknameChangeScreenDestination
-import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -155,6 +155,8 @@ fun MyScreen(
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getUserVipPlan()
+        AppUserLogger.getInstance()
+            .log(page = Page.MemberPage)
     }
 }
 

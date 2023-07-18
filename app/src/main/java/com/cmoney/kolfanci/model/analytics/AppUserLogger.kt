@@ -7,7 +7,7 @@ import com.cmoney.application_user_behavior.model.event.logPageSwitch
 import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.analytics.data.Page
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.xlogin.XLoginHelper
 import com.flurry.android.FlurryAgent
 import com.mixpanel.android.mpmetrics.MixpanelAPI

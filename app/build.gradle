@@ -125,6 +125,7 @@ dependencies {
 
     //=============== CMoney ===============
     implementation project(path: ':fancyapi')
+    implementation project(path: ':fancylog')
     implementation 'com.cmoney.analytics:analytics-user:5.2.0'
     implementation 'com.cmoney.backend2:backend2:5.53.3'
     implementation 'com.cmoney.firebase-ext:firebase-ext:5.5.0'
