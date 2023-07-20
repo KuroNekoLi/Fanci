@@ -139,13 +139,16 @@ private fun EmptyFollowScreenView(
     ) {
         //Header
         item {
-            Image(
-                painter = painterResource(id = R.drawable.fanci),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(
-                    color = LocalColor.current.primary
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.fanci),
+                    contentDescription = null
                 )
-            )
+            }
+
             Image(
                 modifier = Modifier
                     .fillMaxWidth()

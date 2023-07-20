@@ -225,68 +225,64 @@ fun FollowScreenView(
             .fillMaxSize(),
         backgroundColor = LocalColor.current.env_60,
         scaffoldState = scaffoldState,
-        drawerContent = if (XLoginHelper.isLogin) {
-            {
-                Row(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    DrawerMenuScreen(
-                        modifier = Modifier.fillMaxHeight(),
-                        groupList = groupList,
-                        onClick = {
-                            KLog.i(TAG, "onGroup item click.")
+        drawerContent = {
+            Row(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                DrawerMenuScreen(
+                    modifier = Modifier.fillMaxHeight(),
+                    groupList = groupList,
+                    onClick = {
+                        KLog.i(TAG, "onGroup item click.")
 
-                            //Close Drawer
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.close()
-                            }
-
-                            onGroupItemClick.invoke(it)
-                        },
-                        onSearch = {
-                            KLog.i(TAG, "onSearch click.")
-
-                            //Close Drawer
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.close()
-                            }
-
-                            val arrayGroupItems = arrayListOf<Group>()
-                            arrayGroupItems.addAll(groupList.map {
-                                it.groupModel
-                            })
-
-                            navigator.navigate(
-                                DiscoverGroupScreenDestination(
-                                    groupItems = arrayGroupItems
-                                )
-                            )
-                        },
-                        onProfile = {
-                            KLog.i(TAG, "onProfile click.")
-                            navigator.navigate(MyScreenDestination)
+                        //Close Drawer
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.close()
                         }
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1f)
-                            .clickable(
-                                interactionSource = remember {
-                                    MutableInteractionSource()
-                                },
-                                indication = null,
-                                onClick = {
-                                    coroutineScope.launch {
-                                        scaffoldState.drawerState.close()
-                                    }
-                                }
+
+                        onGroupItemClick.invoke(it)
+                    },
+                    onSearch = {
+                        KLog.i(TAG, "onSearch click.")
+
+                        //Close Drawer
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.close()
+                        }
+
+                        val arrayGroupItems = arrayListOf<Group>()
+                        arrayGroupItems.addAll(groupList.map {
+                            it.groupModel
+                        })
+
+                        navigator.navigate(
+                            DiscoverGroupScreenDestination(
+                                groupItems = arrayGroupItems
                             )
-                    )
-                }
+                        )
+                    },
+                    onProfile = {
+                        KLog.i(TAG, "onProfile click.")
+                        navigator.navigate(MyScreenDestination)
+                    }
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .clickable(
+                            interactionSource = remember {
+                                MutableInteractionSource()
+                            },
+                            indication = null,
+                            onClick = {
+                                coroutineScope.launch {
+                                    scaffoldState.drawerState.close()
+                                }
+                            }
+                        )
+                )
             }
-        } else {
-            null
         },
         drawerBackgroundColor = Color.Transparent,
         drawerElevation = 0.dp,
@@ -302,11 +298,16 @@ fun FollowScreenView(
                 //是否已經加入群組
                 if (group == null) {
                     //Empty follow group
-                    EmptyFollowScreen(
+                    EmptyFollowScreenWithMenu(
                         navigator = navigator,
-                        onLoadMore = onLoadMoreServerGroup,
-                        groupList = emptyGroupList,
-                        isLoading = false
+                        onLoadMoreServerGroup = onLoadMoreServerGroup,
+                        emptyGroupList = emptyGroupList,
+                        isLoading = false,
+                        openDrawer = {
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.open()
+                            }
+                        }
                     )
                 } else {
                     BoxWithConstraints(
@@ -444,11 +445,58 @@ fun FollowScreenView(
                 }
             }
         } else {
-            EmptyFollowScreen(
+            //Empty follow group
+            EmptyFollowScreenWithMenu(
                 navigator = navigator,
-                onLoadMore = onLoadMoreServerGroup,
-                groupList = emptyGroupList,
-                isLoading = isLoading
+                onLoadMoreServerGroup = onLoadMoreServerGroup,
+                emptyGroupList = emptyGroupList,
+                isLoading = isLoading,
+                openDrawer = {
+                    coroutineScope.launch {
+                        scaffoldState.drawerState.open()
+                    }
+                }
+            )
+        }
+    }
+}
+
+/**
+ * 未加入社團 畫面
+ */
+@Composable
+private fun EmptyFollowScreenWithMenu(
+    navigator: DestinationsNavigator,
+    onLoadMoreServerGroup: () -> Unit,
+    emptyGroupList: List<Group>,
+    isLoading: Boolean,
+    openDrawer: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        EmptyFollowScreen(
+            navigator = navigator,
+            onLoadMore = onLoadMoreServerGroup,
+            groupList = emptyGroupList,
+            isLoading = isLoading
+        )
+        //Menu
+        Box(
+            modifier = Modifier
+                .padding(20.dp)
+                .size(45.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(LocalColor.current.env_80)
+                .clickable {
+                    openDrawer.invoke()
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.menu),
+                contentDescription = null
             )
         }
     }
