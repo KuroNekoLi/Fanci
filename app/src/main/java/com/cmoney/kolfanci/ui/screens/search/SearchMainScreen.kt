@@ -44,7 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.SearchChatInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.search.model.SearchChatMessage
@@ -104,11 +106,13 @@ fun SearchMainScreen(
         },
         onChatItemClick = {
             KLog.i(TAG, "onChatItemClick:$it")
-            navController.navigate(SearchChatInfoScreenDestination(
-                group = group,
-                channel = channel,
-                message = it.message
-            ))
+            navController.navigate(
+                SearchChatInfoScreenDestination(
+                    group = group,
+                    channel = channel,
+                    message = it.message
+                )
+            )
         }
     )
 }
@@ -171,7 +175,7 @@ private fun SearchMainScreenView(
                         selected = tabIndex == index,
                         onClick = {
                             coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
+                                pagerState.scrollToPage(index)
                             }
                         }
                     )
@@ -195,10 +199,13 @@ private fun SearchMainScreenView(
                                 }
                             })
                         }
+                        LaunchedEffect(key1 = searchAllResult) {
+                            AppUserLogger.getInstance().log(Page.ContentSearch_All)
+                        }
                     }
                     //聊天
                     1 -> {
-                        if (searchAllResult.isEmpty()) {
+                        if (searchChatResult.isEmpty()) {
                             SearchEmptyScreen(modifier = modifier.fillMaxSize())
                         } else {
                             SearchResultScreen(
@@ -207,10 +214,13 @@ private fun SearchMainScreenView(
                                     onChatItemClick.invoke(it)
                                 })
                         }
+                        LaunchedEffect(key1 = searchChatResult) {
+                            AppUserLogger.getInstance().log(Page.ContentSearch_Chat)
+                        }
                     }
                     //貼文
                     else -> {
-                        if (searchAllResult.isEmpty()) {
+                        if (searchPostResult.isEmpty()) {
                             SearchEmptyScreen(modifier = modifier.fillMaxSize())
                         } else {
                             SearchResultScreen(
@@ -218,6 +228,9 @@ private fun SearchMainScreenView(
                                 onSearchItemClick = {
                                     onPostItemClick.invoke(it)
                                 })
+                        }
+                        LaunchedEffect(key1 = searchPostResult) {
+                            AppUserLogger.getInstance().log(Page.ContentSearch_Post)
                         }
                     }
                 }
