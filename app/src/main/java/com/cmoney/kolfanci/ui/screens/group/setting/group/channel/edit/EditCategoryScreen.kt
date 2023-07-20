@@ -106,8 +106,6 @@ fun EditCategoryScreen(
                 showDialog.value = false
             }
         )
-
-        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementDeleteCategory)
     }
 
     editInputResult.onNavResult { result ->

@@ -194,8 +194,6 @@ fun AddChannelScreen(
                     showDeleteDialog.value = false
                 }
             )
-
-            AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementDeleteChannel)
         }
     }
 
@@ -356,7 +354,9 @@ fun AddChannelScreenView(
                             onDeleteClick = onDeleteClick
                         )
 
-                        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementStyle)
+                        LaunchedEffect(key1 = group) {
+                            AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementStyle)
+                        }
                     }
                     //權限
                     1 -> {
@@ -366,6 +366,10 @@ fun AddChannelScreenView(
                             channelPermissionModel = channelAccessTypeList,
                             onPermissionClick = onPermissionClick
                         )
+
+                        LaunchedEffect(key1 = group) {
+                            AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissions)
+                        }
                     }
                     //管理員
                     2 -> {
