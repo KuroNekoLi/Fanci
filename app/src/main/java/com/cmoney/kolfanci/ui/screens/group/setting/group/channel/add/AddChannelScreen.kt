@@ -354,7 +354,7 @@ fun AddChannelScreenView(
                             onDeleteClick = onDeleteClick
                         )
 
-                        LaunchedEffect(key1 = group) {
+                        LaunchedEffect(key1 = selectedIndex) {
                             AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementStyle)
                         }
                     }
@@ -367,7 +367,7 @@ fun AddChannelScreenView(
                             onPermissionClick = onPermissionClick
                         )
 
-                        LaunchedEffect(key1 = group) {
+                        LaunchedEffect(key1 = selectedIndex) {
                             AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissions)
                         }
                     }
