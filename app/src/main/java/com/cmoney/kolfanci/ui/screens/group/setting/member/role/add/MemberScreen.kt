@@ -28,6 +28,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 
 @Composable
 fun MemberScreen(
@@ -62,58 +63,14 @@ fun MemberScreen(
             verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             items(memberList) { member ->
-                MemberItem(groupMember = member) {
-                    KLog.i(TAG, "remove:$it")
-                    onRemoveClick.invoke(it)
-                }
+                MemberItemScreen(
+                    groupMember = member,
+                    onMemberClick = {
+                        KLog.i(TAG, "remove:$it")
+                        onRemoveClick.invoke(it)
+                    }
+                )
             }
-        }
-    }
-}
-
-@Composable
-private fun MemberItem(
-    groupMember: GroupMember,
-    onMemberClick: (GroupMember) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .background(LocalColor.current.background)
-            .padding(start = 30.dp, top = 8.dp, bottom = 8.dp, end = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(34.dp)
-                .clip(CircleShape),
-            model = groupMember.thumbNail.orEmpty(),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            placeholder = painterResource(id = R.drawable.placeholder)
-        )
-
-        Spacer(modifier = Modifier.width(15.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = groupMember.name.orEmpty(),
-                fontSize = 16.sp,
-                color = LocalColor.current.text.default_100
-            )
-            Text(
-                text = groupMember.serialNumber.toString(),
-                fontSize = 12.sp,
-                color = LocalColor.current.text.default_50
-            )
-        }
-
-        if (Constant.MyGroupPermission.assignRole == true) {
-            Text(
-                modifier = Modifier.clickable {
-                    onMemberClick.invoke(groupMember)
-                },
-                text = "移除", fontSize = 14.sp, color = LocalColor.current.primary
-            )
         }
     }
 }

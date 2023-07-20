@@ -2,7 +2,17 @@ package com.cmoney.kolfanci.ui.screens.group.setting.group.channel.sort
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,23 +30,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.cmoney.fanciapi.fanci.model.Category
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.CategoryText
 import com.cmoney.kolfanci.ui.common.ChannelText
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.theme.Blue_4F70E5
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Category
-import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.Group
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
-import com.cmoney.kolfanci.R
+
 @Destination
 @Composable
 fun SortChannelScreen(
@@ -94,8 +104,6 @@ private fun SortChannelScreenView(
         topBar = {
             TopBarScreen(
                 title = "頻道排序",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     navigator.popBackStack()
                 }
@@ -249,7 +257,7 @@ private fun ChannelBarScreen(
             Image(
                 modifier = Modifier.padding(end = 14.dp),
                 painter = painterResource(id = R.drawable.menu),
-                colorFilter = ColorFilter.tint(color = Blue_4F70E5),
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary),
                 contentDescription = null
             )
         }

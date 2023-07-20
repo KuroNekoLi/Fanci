@@ -36,7 +36,7 @@ fun Activity.showInteractDialogBottomSheet(
         viewGroup.addView(
             ComposeView(viewGroup.context).apply {
                 setContent {
-                    val theme by globalGroupViewModel.theme.collectAsState()
+                    val theme by globalGroupViewModel().theme.collectAsState()
                     FanciTheme(fanciColor = theme) {
                         InteractBottomSheet(viewGroup, this, message, onInteractClick)
                     }
@@ -59,7 +59,7 @@ fun Activity.showColorPickerDialogBottomSheet(
         viewGroup.addView(
             ComposeView(viewGroup.context).apply {
                 setContent {
-                    val theme by globalGroupViewModel.theme.collectAsState()
+                    val theme by globalGroupViewModel().theme.collectAsState()
                     FanciTheme(fanciColor = theme) {
                         ColorPickerBottomSheet(viewGroup, this, selectedColor, onColorPicker)
                     }
@@ -82,7 +82,7 @@ fun Activity.showPostMoreActionDialogBottomSheet(
         viewGroup.addView(
             ComposeView(viewGroup.context).apply {
                 setContent {
-                    val theme by globalGroupViewModel.theme.collectAsState()
+                    val theme by globalGroupViewModel().theme.collectAsState()
                     FanciTheme(fanciColor = theme) {
                         PostMoreActionBottomSheet(
                             parent = viewGroup,

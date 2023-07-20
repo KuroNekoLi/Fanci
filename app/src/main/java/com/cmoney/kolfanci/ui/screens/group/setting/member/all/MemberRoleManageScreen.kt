@@ -34,6 +34,8 @@ import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
+//TODO : check if not used remove it.
+@Deprecated("ui 修改操作邏輯, 此畫面被廢除了")
 @Destination
 @Composable
 fun MemberRoleManageScreen(
@@ -137,8 +139,6 @@ private fun MemberRoleManageScreenView(
         topBar = {
             TopBarScreen(
                 title = "%s的角色管理".format(groupMember.name),
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     KLog.i(TAG, "saveClick click.")
                     onSave.invoke()

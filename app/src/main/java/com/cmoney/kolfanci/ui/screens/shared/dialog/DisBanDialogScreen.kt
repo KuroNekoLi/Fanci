@@ -1,8 +1,8 @@
 package com.cmoney.kolfanci.ui.screens.shared.dialog
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DialogDefaultContentScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
 /**

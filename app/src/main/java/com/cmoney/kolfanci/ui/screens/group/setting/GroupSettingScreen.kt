@@ -1,18 +1,17 @@
 package com.cmoney.kolfanci.ui.screens.group.setting
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -22,30 +21,37 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.share
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
 import com.cmoney.kolfanci.model.Constant.isShowGroupManage
+import com.cmoney.kolfanci.model.Constant.isShowVipManager
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
-import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
+import com.cmoney.kolfanci.ui.destinations.VipManagerScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
+import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -61,9 +67,10 @@ fun GroupSettingScreen(
     memberViewModel: MemberViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>,
     applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
-    reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>
+    reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>,
+    leaveResultBackNavigator: ResultBackNavigator<String>
 ) {
-    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val globalGroupViewModel = globalGroupViewModel()
 
     val uiState = viewModel.uiState
 
@@ -142,6 +149,14 @@ fun GroupSettingScreen(
         onInviteClick = {
             memberViewModel.onInviteClick(group)
         },
+        onLeaveGroup = {
+            val groupId = group.id
+            if (groupId != null) {
+                leaveResultBackNavigator.navigateBack(groupId)
+            } else {
+                leaveResultBackNavigator.navigateBack()
+            }
+        },
         loading = loading
     )
 
@@ -165,98 +180,121 @@ fun GroupSettingScreenView(
     unApplyCount: Long,
     reportList: List<ReportInformation>?,
     onInviteClick: () -> Unit,
+    onLeaveGroup: () -> Unit,
     loading: Boolean
 ) {
+    val TAG = "GroupSettingScreenView"
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
                 title = "設定",
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = {
                     onBackClick.invoke()
                 }
             )
-        }
+        },
+        backgroundColor = LocalColor.current.env_80
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .background(LocalColor.current.env_80)
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                top = innerPadding.calculateTopPadding() + 20.dp,
+                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                bottom = innerPadding.calculateBottomPadding() + 20.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             if (loading) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(size = 32.dp),
-                        color = LocalColor.current.primary
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(size = 32.dp),
+                            color = LocalColor.current.primary
+                        )
+                    }
+                }
+            } else {
+                // 關於社團
+                item {
+                    GroupAboutScreen(
+                        modifier = Modifier.fillMaxWidth(),
+                        isCreator = group.creatorId == Constant.MyInfo?.id,
+                        onInviteClick = onInviteClick,
+                        onLeaveGroup = onLeaveGroup
                     )
                 }
-            }
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            //邀請成員
-            InviteMemberScreen(onInviteClick)
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            //社團管理
-            if (isShowGroupManage()) {
-                GroupManageScreen(
-                    group = group,
-                    navController = navController
-                )
-
-                Spacer(modifier = Modifier.height(28.dp))
-            }
-
-            //成員管理
-            GroupMemberManageScreen(
-                group = group,
-                navController = navController,
-                unApplyCount = unApplyCount
-            )
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            //秩序管理
-            if (isShowApproval()) {
-                GroupRuleManageScreen(
-                    group = group,
-                    reportList = reportList,
-                    navController = navController
-                )
+                //社團管理
+                if (isShowGroupManage()) {
+                    item {
+                        GroupManageScreen(
+                            group = group,
+                            navController = navController
+                        )
+                    }
+                }
+                //成員管理
+                item {
+                    GroupMemberManageScreen(
+                        group = group,
+                        navController = navController,
+                        unApplyCount = unApplyCount
+                    )
+                }
+                //VIP 方案管理
+                if (isShowVipManager()) {
+                    item {
+                        VipPlanManager {
+                            KLog.i(TAG, "VipPlanManager click.")
+                            navController.navigate(
+                                VipManagerScreenDestination(
+                                    group = group
+                                )
+                            )
+                        }
+                    }
+                }
+                //秩序管理
+                if (isShowApproval()) {
+                    item {
+                        GroupRuleManageScreen(
+                            group = group,
+                            reportList = reportList,
+                            navController = navController
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 /**
- * 邀請成員
+ * Vip 方案管理
  */
 @Composable
-private fun InviteMemberScreen(
-    onInviteClick: () -> Unit
+private fun VipPlanManager(
+    onVipManagerClick: () -> Unit
 ) {
     Column {
         Text(
             modifier = Modifier.padding(start = 25.dp, bottom = 9.dp),
-            text = "邀請成員", fontSize = 14.sp, color = LocalColor.current.text.default_100
+            text = stringResource(id = R.string.vip_manager),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
         )
 
         SettingItemScreen(
-            iconRes = R.drawable.invite_member,
-            text = "邀請社團成員",
-            onItemClick = {
-                onInviteClick.invoke()
-            }
+            iconRes = R.drawable.vip_crown,
+            text = stringResource(id = R.string.vip_manager),
+            onItemClick = onVipManagerClick
         )
     }
 }
@@ -272,6 +310,7 @@ fun GroupSettingScreenPreview() {
             unApplyCount = 20,
             reportList = emptyList(),
             onInviteClick = {},
+            onLeaveGroup = {},
             loading = false
         )
     }

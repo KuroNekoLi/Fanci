@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.member.role.add
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +27,6 @@ import com.cmoney.kolfanci.extension.showColorPickerDialogBottomSheet
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
-import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -39,7 +39,6 @@ import com.socks.library.KLog
 @Composable
 fun StyleScreen(
     modifier: Modifier = Modifier,
-    mainActivity: MainActivity,
     navigator: DestinationsNavigator,
     roleName: String,
     roleColor: com.cmoney.fanciapi.fanci.model.Color,
@@ -131,7 +130,7 @@ fun StyleScreen(
                 .height(50.dp)
                 .background(LocalColor.current.background)
                 .clickable {
-                    mainActivity.showColorPickerDialogBottomSheet(
+                    (context as? Activity)?.showColorPickerDialogBottomSheet(
                         selectedColor = defaultColor
                     ) {
                         KLog.i(TAG, "color pick:$it")
@@ -188,7 +187,6 @@ fun StyleScreen(
 fun StyleScreenPreview() {
     FanciTheme {
         StyleScreen(
-            mainActivity = MainActivity(),
             navigator = EmptyDestinationsNavigator,
             roleName = "",
             roleColor = com.cmoney.fanciapi.fanci.model.Color(),

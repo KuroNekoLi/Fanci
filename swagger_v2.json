@@ -10,6 +10,55 @@
     }
   ],
   "paths": {
+    "/api/v2/Channel/AccessType": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "取得私密頻道權限設定文案\r\n提供權限類型，以及權限描述的文案",
+        "parameters": [
+          {
+            "name": "IsWithNoPermission",
+            "in": "query",
+            "description": "是否包含無權限文案",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelAccessOptionV2"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelAccessOptionV2"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelAccessOptionV2"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/Message/{messageType}/{messageId}": {
       "get": {
         "tags": [
@@ -462,10 +511,130 @@
           }
         ]
       }
+    },
+    "/api/v2/Message/Search": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "搜尋功能\r\n代入自訂條件搜尋訊息 全部條件取\"交集\" 不需要的條件請移除 \r\n有範圍小的條件可以不用代範圍大的條件 (如 有Channel可以不用Group)\r\nTODO:貼文回覆先不要 等前端確定 (聊天回復不影響) __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "order",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/OrderType"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "從第幾筆搜尋結果開始取",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "fetch",
+            "in": "query",
+            "description": "共取幾筆搜尋結果",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchMessageParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchMessageParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchMessageParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChatMessage"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChatMessage"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChatMessage"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "ChannelAccessOptionV2": {
+        "type": "object",
+        "properties": {
+          "authType": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "allowedAction": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ChatMessage": {
         "type": "object",
         "properties": {
@@ -503,6 +672,9 @@
           },
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
+          },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
           },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
@@ -610,6 +782,9 @@
           "userCount": {
             "type": "integer",
             "format": "int64"
+          },
+          "isVipRole": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -644,6 +819,10 @@
             },
             "description": "角色資訊(全部)",
             "nullable": true
+          },
+          "isGroupVip": {
+            "type": "boolean",
+            "description": "判斷該成員是否有群組任一種VIP"
           }
         },
         "additionalProperties": false,
@@ -701,6 +880,23 @@
         },
         "additionalProperties": false
       },
+      "IntervalDateRangeParam": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "開始時間",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "description": "結束時間",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "時間區段"
+      },
       "Media": {
         "type": "object",
         "properties": {
@@ -750,6 +946,74 @@
           "TextMessage"
         ],
         "type": "string"
+      },
+      "OrderType": {
+        "enum": [
+          "Latest",
+          "Oldest",
+          "Popular"
+        ],
+        "type": "string"
+      },
+      "SearchMessageParam": {
+        "type": "object",
+        "properties": {
+          "authorId": {
+            "type": "string",
+            "description": "作者 Id",
+            "nullable": true
+          },
+          "nickname": {
+            "type": "string",
+            "description": "作者暱稱",
+            "nullable": true
+          },
+          "searchText": {
+            "type": "string",
+            "description": "搜尋文章內容",
+            "nullable": true
+          },
+          "groupIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "群組社團",
+            "nullable": true
+          },
+          "channelIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "頻道",
+            "nullable": true
+          },
+          "categoryIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "分類",
+            "nullable": true
+          },
+          "messageServiceTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageServiceType"
+            },
+            "description": "聊天室/貼文",
+            "nullable": true
+          },
+          "modifyTime": {
+            "$ref": "#/components/schemas/IntervalDateRangeParam"
+          },
+          "createTime": {
+            "$ref": "#/components/schemas/IntervalDateRangeParam"
+          }
+        },
+        "additionalProperties": false,
+        "description": "訊息搜尋條件"
       },
       "User": {
         "type": "object",

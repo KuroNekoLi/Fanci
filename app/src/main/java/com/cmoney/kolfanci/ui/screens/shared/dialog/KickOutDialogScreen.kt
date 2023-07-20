@@ -1,7 +1,17 @@
 package com.cmoney.kolfanci.ui.screens.shared.dialog
 
-import androidx.compose.runtime.*
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DialogDefaultContentScreen
+import com.cmoney.kolfanci.ui.screens.shared.vip.getVipDiamondInlineContent
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
 /**
@@ -10,6 +20,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 @Composable
 fun KickOutDialogScreen(
     name: String,
+    isVip: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -27,21 +38,45 @@ fun KickOutDialogScreen(
             onDismiss = {
                 onDismiss.invoke()
             },
-            title = "將 $name 踢出社團",
+            title = stringResource(id = R.string.kick_x_out_from_group, name),
         ) {
-            DialogDefaultContentScreen(
-                content = "你確定要將 %s 踢出社團嗎？\n".format(name) +
-                        "一旦踢出他下次要進入，需要重新申請",
-                confirmTitle = "確定",
-                cancelTitle = "取消",
-                onConfirm = {
-                    showFirstDialog = false
-                    showKickOutDoubleConfirmDialog.value = true
-                },
-                onCancel = {
-                    onDismiss.invoke()
+            if (isVip) {
+                val vipId = "vip"
+                val kickContent = buildAnnotatedString {
+                    append(stringResource(id = R.string.kick_vip_x_content, name))
+                    append(' ')
+                    appendInlineContent(vipId)
                 }
-            )
+                DialogDefaultContentScreen(
+                    content = kickContent,
+                    inlineContent = mapOf(
+                        vipId to getVipDiamondInlineContent()
+                    ),
+                    confirmTitle = stringResource(id = R.string.confirm),
+                    cancelTitle = stringResource(id = R.string.cancel),
+                    onConfirm = {
+                        showFirstDialog = false
+                        showKickOutDoubleConfirmDialog.value = true
+                    },
+                    onCancel = {
+                        onDismiss.invoke()
+                    }
+                )
+            } else {
+                val kickContent = stringResource(id = R.string.kick_x_content, name)
+                DialogDefaultContentScreen(
+                    content = kickContent,
+                    confirmTitle = stringResource(id = R.string.confirm),
+                    cancelTitle = stringResource(id = R.string.cancel),
+                    onConfirm = {
+                        showFirstDialog = false
+                        showKickOutDoubleConfirmDialog.value = true
+                    },
+                    onCancel = {
+                        onDismiss.invoke()
+                    }
+                )
+            }
         }
     }
 
@@ -52,22 +87,47 @@ fun KickOutDialogScreen(
                 showKickOutDoubleConfirmDialog.value = false
                 onDismiss.invoke()
             },
-            title = "確定要將 $name 踢出社團",
+            title = stringResource(id = R.string.kick_x_out_from_group, name),
         ) {
-            DialogDefaultContentScreen(
-                content = "你確定要將 %s 踢出社團嗎？\n".format(name) +
-                        "一旦踢出他下次要進入，需要重新申請",
-                confirmTitle = "確定，踢出社團",
-                cancelTitle = "取消",
-                onConfirm = {
-                    showKickOutDoubleConfirmDialog.value = false
-                    onConfirm.invoke()
-                },
-                onCancel = {
-                    showKickOutDoubleConfirmDialog.value = false
-                    onDismiss.invoke()
+            if (isVip) {
+                val vipId = "vip"
+                val kickContent = buildAnnotatedString {
+                    append(stringResource(id = R.string.kick_vip_x_content, name))
+                    append(' ')
+                    appendInlineContent(vipId)
                 }
-            )
+                DialogDefaultContentScreen(
+                    content = kickContent,
+                    inlineContent = mapOf(
+                        vipId to getVipDiamondInlineContent()
+                    ),
+                    confirmTitle = stringResource(id = R.string.confirm_kick_out_from_group),
+                    cancelTitle = stringResource(id = R.string.cancel),
+                    onConfirm = {
+                        showKickOutDoubleConfirmDialog.value = false
+                        onConfirm.invoke()
+                    },
+                    onCancel = {
+                        showKickOutDoubleConfirmDialog.value = false
+                        onDismiss.invoke()
+                    }
+                )
+            } else {
+                val kickContent = stringResource(id = R.string.kick_x_content, name)
+                DialogDefaultContentScreen(
+                    content = kickContent,
+                    confirmTitle = stringResource(id = R.string.confirm_kick_out_from_group),
+                    cancelTitle = stringResource(id = R.string.cancel),
+                    onConfirm = {
+                        showKickOutDoubleConfirmDialog.value = false
+                        onConfirm.invoke()
+                    },
+                    onCancel = {
+                        showKickOutDoubleConfirmDialog.value = false
+                        onDismiss.invoke()
+                    }
+                )
+            }
         }
     }
 }
@@ -78,6 +138,20 @@ fun KickOutDialogScreenPreview() {
     FanciTheme {
         KickOutDialogScreen(
             name = "Hello",
+            isVip = false,
+            onDismiss = {},
+            onConfirm = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun VipKickOutDialogScreenPreview() {
+    FanciTheme {
+        KickOutDialogScreen(
+            name = "Hello",
+            isVip = true,
             onDismiss = {},
             onConfirm = {}
         )

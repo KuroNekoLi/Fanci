@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.socks.library.KLog
@@ -19,7 +20,7 @@ data class UiState(
 )
 
 data class BanUiModel(
-    val user: User?,
+    val user: GroupMember?,
     val startDay: String,   //ex: 2020/10/22
     val duration: String    //ex: 3日
 )

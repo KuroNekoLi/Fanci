@@ -11,7 +11,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -19,8 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemePreviewScreenDestination
-import com.cmoney.kolfanci.ui.main.LocalDependencyContainer
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -53,7 +59,7 @@ fun GroupSettingThemeScreen(
 ) {
     val TAG = "GroupSettingThemeScreen"
 
-    val globalGroupViewModel = LocalDependencyContainer.current.globalGroupViewModel
+    val globalGroupViewModel = globalGroupViewModel()
 
     val state = viewModel.uiState
 
@@ -137,10 +143,6 @@ private fun GroupSettingThemeView(
         topBar = {
             TopBarScreen(
                 title = stringResource(id = R.string.theme_color),
-                leadingEnable = true,
-                moreEnable = false,
-                moreClick = {
-                },
                 backClick = {
                     navController.popBackStack()
                 }

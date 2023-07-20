@@ -1,8 +1,15 @@
 package com.cmoney.kolfanci.ui.screens.shared.channel
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -13,26 +20,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
+import com.cmoney.kolfanci.ui.destinations.AddVipPlanScreenDestination
 import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
+import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
-import com.cmoney.kolfanci.ui.theme.Color_80FFFFFF
+import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -58,17 +68,15 @@ fun MemberAndRoleManageScreen(
     viewModel: MemberViewModel = koinViewModel(),
     addMemberResult: ResultRecipient<AddMemberScreenDestination, String>,
     addRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
+    addVipPlanResult: ResultRecipient<AddVipPlanScreenDestination, VipPlanModel>,
     selectedCallback: ResultBackNavigator<SelectedModel>
 ) {
     val uiState = viewModel.uiState
 
     //init default data
     LaunchedEffect(Unit) {
-        if (selectedModel.selectedMember.isNotEmpty()) {
-            viewModel.addSelectedMember(selectedModel.selectedMember)
-        }
-        if (selectedModel.selectedRole.isNotEmpty()) {
-            viewModel.addSelectedRole(selectedModel.selectedRole)
+        if (uiState.selectedVipPlanModels.isEmpty() && uiState.selectedRole.isEmpty()) {
+            viewModel.initialUiStateFromModel(selectedModel = selectedModel)
         }
     }
 
@@ -97,10 +105,24 @@ fun MemberAndRoleManageScreen(
         }
     }
 
+    // add vip plan callback
+    addVipPlanResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                viewModel.addSelectedVipPlanModel(model = result.value)
+            }
+        }
+    }
+
     val selectedMember by viewModel.selectedMember.collectAsState()
 
     KLog.i("TAG", "selectedMember:$selectedMember")
 
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
+        ?.onBackPressedDispatcher
     MemberAndRoleManageScreenView(
         modifier = modifier,
         navigator = navigator,
@@ -109,6 +131,7 @@ fun MemberAndRoleManageScreen(
         selectedIndex = uiState.tabIndex,
         selectedMember = selectedMember,
         selectedRole = uiState.selectedRole,
+        selectedVipPlanModels = uiState.selectedVipPlanModels,
         onTabClick = {
             viewModel.onTabClick(it)
         },
@@ -118,15 +141,17 @@ fun MemberAndRoleManageScreen(
         onRoleRemoveClick = {
             viewModel.removeSelectedRole(it)
         },
+        onVipPlanRemoveClick = {
+            viewModel.removeSelectedVipPlan(it)
+        },
         onBackClick = {
-            val selectedModel = viewModel.fetchSelected()
-            selectedCallback.navigateBack(result = selectedModel)
+            onBackPressedDispatcher?.onBackPressed()
         }
     )
 
     BackHandler {
-        val selectedModel = viewModel.fetchSelected()
-        selectedCallback.navigateBack(result = selectedModel)
+        val newSelectedModel = viewModel.fetchSelected()
+        selectedCallback.navigateBack(result = newSelectedModel)
     }
 }
 
@@ -139,12 +164,14 @@ private fun MemberAndRoleManageScreenView(
     selectedIndex: Int,
     selectedMember: List<GroupMember>,
     selectedRole: List<FanciRole>,
+    selectedVipPlanModels: List<VipPlanModel>,
     onTabClick: (Int) -> Unit,
     onRemoveClick: (GroupMember) -> Unit,
     onRoleRemoveClick: (FanciRole) -> Unit,
+    onVipPlanRemoveClick: (VipPlanModel) -> Unit,
     onBackClick: () -> Unit
 ) {
-    val list = listOf("成員", "角色")
+    val list = listOf("成員", "角色", stringResource(id = R.string.vip_plan))
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -152,8 +179,6 @@ private fun MemberAndRoleManageScreenView(
         topBar = {
             TopBarScreen(
                 title = topBarTitle,
-                leadingEnable = true,
-                moreEnable = false,
                 backClick = onBackClick
             )
         }
@@ -200,6 +225,15 @@ private fun MemberAndRoleManageScreenView(
                             onRemoveClick = onRoleRemoveClick
                         )
                     }
+                    // VIP方案
+                    2 -> {
+                        AddVipPlanScreen(
+                            navigator = navigator,
+                            title = topBarTitle,
+                            vipPlanModels = selectedVipPlanModels,
+                            onVipPlanRemoveClick = onVipPlanRemoveClick
+                        )
+                    }
 
                     else -> {}
                 }
@@ -236,7 +270,7 @@ private fun AddMemberListScreen(
                         .height(40.dp),
                     text = "新增成員",
                     textColor = Color.White,
-                    borderColor = Color_80FFFFFF
+                    borderColor = LocalColor.current.component.other
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
@@ -287,7 +321,6 @@ private fun AddRoleListScreen(
         verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         item {
-
             Column(
                 modifier = Modifier
                     .background(LocalColor.current.background)
@@ -299,7 +332,7 @@ private fun AddRoleListScreen(
                         .height(40.dp),
                     text = "新增角色",
                     textColor = Color.White,
-                    borderColor = Color_80FFFFFF
+                    borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
@@ -316,7 +349,9 @@ private fun AddRoleListScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = "獲得下列角色的成員，可以獲得「%s」並且在頻道中執行對應的權限資格。".format(title),
+                    text = "獲得下列角色的成員，可以獲得「%s」並且在頻道中執行對應的權限資格。".format(
+                        title
+                    ),
                     fontSize = 14.sp,
                     color = LocalColor.current.text.default_50
                 )
@@ -332,6 +367,69 @@ private fun AddRoleListScreen(
                 editText = "移除",
                 onEditClick = {
                     onRemoveClick.invoke(it)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun AddVipPlanScreen(
+    navigator: DestinationsNavigator,
+    title: String,
+    vipPlanModels: List<VipPlanModel>,
+    onVipPlanRemoveClick: (VipPlanModel) -> Unit
+) {
+    val TAG = "AddVipPlanScreen"
+
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(1.dp)
+    ) {
+        item {
+            Column(
+                modifier = Modifier
+                    .background(LocalColor.current.background)
+                    .padding(top = 12.dp, bottom = 8.dp, start = 24.dp, end = 24.dp)
+            ) {
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    text = stringResource(id = R.string.add_plan),
+                    textColor = LocalColor.current.text.default_100,
+                    borderColor = LocalColor.current.text.default_50
+                ) {
+                    KLog.i(TAG, "BorderButton click.")
+                    navigator.navigate(
+                        AddVipPlanScreenDestination(
+                            authTitle = title,
+                            selectedVipPlanModels = vipPlanModels.toTypedArray()
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = stringResource(
+                        R.string.vip_plan_in_x_channel_permission_description,
+                        title
+                    ),
+                    fontSize = 14.sp,
+                    color = LocalColor.current.text.default_50
+                )
+            }
+        }
+
+        //Role block
+        items(vipPlanModels) { plan ->
+            VipPlanItemScreen(
+                modifier = Modifier.fillMaxWidth(),
+                vipPlanModel = plan,
+                endText = stringResource(id = R.string.remove),
+                subTitle = stringResource(id = R.string.n_member).format(plan.memberCount),
+                onPlanClick = {
+                    onVipPlanRemoveClick(plan)
                 }
             )
         }
@@ -357,9 +455,11 @@ fun MemberAndRoleManageScreenPreview() {
                     userCount = 9
                 )
             ),
+            selectedVipPlanModels = VipManagerUseCase.getVipPlanMockData(),
             onTabClick = {},
             onRemoveClick = {},
             onRoleRemoveClick = {},
+            onVipPlanRemoveClick = {},
             onBackClick = {}
         )
     }

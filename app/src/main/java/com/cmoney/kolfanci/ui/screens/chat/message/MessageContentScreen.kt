@@ -28,7 +28,7 @@ import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.ChatMessageWrapper
-import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
 import com.cmoney.kolfanci.ui.screens.chat.*
@@ -353,9 +353,12 @@ fun MessageContentScreen(
 
 /**
  * 多媒體 型態
+ *
+ * @param medias 圖片清單
+ * @param isClickable 是否可以點擊圖片,放大瀏覽
  */
 @Composable
-private fun MediaContent(modifier: Modifier, medias: List<Media>) {
+fun MediaContent(modifier: Modifier, medias: List<Media>, isClickable: Boolean = true) {
     val imageList = medias.filter {
         it.type == MediaType.image
     }
@@ -365,7 +368,8 @@ private fun MediaContent(modifier: Modifier, medias: List<Media>) {
             images = imageList.map {
                 it.resourceLink.orEmpty()
             },
-            modifier = modifier
+            modifier = modifier,
+            isClickable = isClickable
         )
     }
 }
@@ -376,7 +380,7 @@ fun MessageContentScreenPreview() {
     FanciTheme {
         MessageContentScreen(
             chatMessageWrapper = ChatMessageWrapper(
-                message = ChatRoomUseCase.mockMessage,
+                message = MockData.mockMessage,
                 uploadAttachPreview = listOf(
                     ImageAttachState(
                         uri = Uri.parse("")

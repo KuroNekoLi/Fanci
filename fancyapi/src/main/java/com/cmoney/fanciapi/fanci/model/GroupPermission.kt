@@ -38,6 +38,7 @@ import kotlinx.parcelize.Parcelize
  * @param approveJoinApplies 
  * @param deleteMemberMessage 
  * @param banOrKickMember 
+ * @param editVipRole 
  */
 @Parcelize
 
@@ -87,7 +88,10 @@ data class GroupPermission (
     val deleteMemberMessage: kotlin.Boolean? = null,
 
     @Json(name = "banOrKickMember")
-    val banOrKickMember: kotlin.Boolean? = null
+    val banOrKickMember: kotlin.Boolean? = null,
+
+    @Json(name = "editVipRole")
+    val editVipRole: kotlin.Boolean? = null
 
 ) : Parcelable
 

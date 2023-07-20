@@ -16,7 +16,7 @@
 package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.BanPeriodOption
-import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.fanciapi.fanci.model.GroupMember
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -37,7 +37,7 @@ import kotlinx.parcelize.Parcelize
 data class UserBanInformation (
 
     @Json(name = "user")
-    val user: User? = null,
+    val user: GroupMember? = null,
 
     @Json(name = "startDateTime")
     val startDateTime: kotlin.Long? = null,

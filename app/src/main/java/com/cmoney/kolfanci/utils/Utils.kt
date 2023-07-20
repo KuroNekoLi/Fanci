@@ -140,6 +140,11 @@ class Utils {
             return sdf.format(publishTime)
         }
 
+        fun getSearchDisplayTime(publishTime: Long): String {
+            val sdf = SimpleDateFormat("yyyy.MM.dd")
+            return sdf.format(publishTime)
+        }
+
         fun timesMillisToDate(timestamp: Long): String {
             val calendar = Calendar.getInstance(Locale.TAIWAN).clone() as Calendar
             val timePassed = System.currentTimeMillis() - timestamp

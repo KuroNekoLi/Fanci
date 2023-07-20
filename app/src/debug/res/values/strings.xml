@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screen_shot_application">Fanci頁面截圖</string>
+    <string name="must_provide_external_storage_permission">需要檔案存取權限來儲存螢幕截圖</string>
+    <string name="provide_permission">提供權限</string>
+</resources>

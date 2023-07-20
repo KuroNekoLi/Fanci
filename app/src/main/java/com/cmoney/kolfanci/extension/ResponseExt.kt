@@ -17,6 +17,14 @@ inline fun <reified T : Response<T1>, reified T1> T.checkResponseBody(): T1 {
     return when {
         this.isSuccessful -> {
             this.body() ?: throw EmptyBodyException()
+
+        //TODO: 重新盤點後再來修改
+//            if (this.code() == 204) {
+//                Unit as T1
+//            } else {
+//                this.body() ?: throw EmptyBodyException()
+//            }
+
         }
         else -> {
             when (code()) {

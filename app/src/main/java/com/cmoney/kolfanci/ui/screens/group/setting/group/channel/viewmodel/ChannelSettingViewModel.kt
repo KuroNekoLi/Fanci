@@ -9,6 +9,7 @@ import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.toGroupMember
+import com.cmoney.kolfanci.extension.toVipPlanModel
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.sort.MoveItem
@@ -91,9 +92,11 @@ class ChannelSettingViewModel(
             ).fold({
                 it.map { channelWhiteList ->
                     listPermissionSelected[channelWhiteList.authType.orEmpty()] = SelectedModel(
-                        selectedMember = channelWhiteList.users?.map { it.toGroupMember() }
-                            .orEmpty(),
-                        selectedRole = channelWhiteList.roles.orEmpty()
+                        selectedMember = channelWhiteList.users.orEmpty(),
+                        selectedRole = channelWhiteList.roles.orEmpty(),
+                        selectedVipPlans = channelWhiteList.vipRoles.orEmpty().map { fanciRole ->
+                            fanciRole.toVipPlanModel()
+                        }
                     )
                 }
                 fetchPrivateChannelUserCount()
@@ -222,8 +225,7 @@ class ChannelSettingViewModel(
      * 將新的 channel append 至 原本 group 做顯示
      */
     private fun addChannelToGroup(channel: Channel, group: Group) {
-        val channelCategory = channel.category
-        channelCategory?.let { channelCategory ->
+        channel.category?.let { channelCategory ->
             val newCategory = group.categories?.map { category ->
                 if (category.id == channelCategory.id) {
                     val newChannel = category.channels.orEmpty().toMutableList()
@@ -585,7 +587,7 @@ class ChannelSettingViewModel(
             channel = this.copy(
                 privacy = if (isNeedApproval) {
                     ChannelPrivacy.private
-                }  else {
+                } else {
                     ChannelPrivacy.public
                 }
             )

@@ -11,7 +11,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,19 +18,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogDefaultContentScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DisBanDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberInfoItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -102,9 +103,7 @@ private fun BanListScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "禁言列表",
-                leadingEnable = true,
-                moreEnable = false,
+                title = stringResource(id = R.string.ban_list),
                 backClick = {
                     navigator.popBackStack()
                 }
@@ -155,43 +154,22 @@ private fun BanUserItem(banUiModel: BanUiModel, onClick: () -> Unit) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape),
-                model = user?.thumbNail,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                placeholder = painterResource(id = R.drawable.placeholder)
-            )
-
-            Spacer(modifier = Modifier.width(15.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = user?.name.orEmpty(),
-                    fontSize = 16.sp,
-                    color = LocalColor.current.text.default_100
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = user?.serialNumber.toString(),
-                    fontSize = 12.sp,
-                    color = LocalColor.current.text.default_50
+            user?.apply {
+                MemberInfoItemScreen(
+                    modifier = Modifier.weight(1f),
+                    groupMember = this
                 )
             }
 
             Text(
-                text = "調整", fontSize = 14.sp, color = LocalColor.current.primary
+                text = stringResource(id = R.string.adjust), fontSize = 14.sp, color = LocalColor.current.primary
             )
         }
 
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
-            text = "被禁言日：%s".format(banUiModel.startDay),
+            text = stringResource(R.string.ban_start_at, banUiModel.startDay),
             fontSize = 16.sp,
             color = LocalColor.current.text.default_100
         )
@@ -199,7 +177,7 @@ private fun BanUserItem(banUiModel: BanUiModel, onClick: () -> Unit) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "禁言時長：%s".format(banUiModel.duration),
+            text = stringResource(R.string.ban_duration, banUiModel.duration),
             fontSize = 16.sp,
             color = LocalColor.current.text.default_100
         )
@@ -214,7 +192,7 @@ fun BanListScreenPreview() {
             navigator = EmptyDestinationsNavigator,
             banUserList = listOf(
                 BanUiModel(
-                    user = User(
+                    user = GroupMember(
                         name = "Hi",
                         serialNumber = 123456
                     ),
@@ -222,7 +200,7 @@ fun BanListScreenPreview() {
                     duration = "3日"
                 ),
                 BanUiModel(
-                    user = User(
+                    user = GroupMember(
                         name = "Hi2",
                         serialNumber = 123456
                     ),

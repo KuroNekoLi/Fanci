@@ -24,7 +24,7 @@ before_script:
   - chmod +x ./gradlew
   - chmod +x ./auto_bot.sh
 
-stages:  
+stages:
   - review
 #  - report
 
