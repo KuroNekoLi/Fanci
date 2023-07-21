@@ -6,17 +6,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.Color
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.PermissionCategory
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
-import kotlinx.parcelize.Parcelize
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import retrofit2.HttpException
 import java.lang.reflect.Type
 
@@ -516,6 +520,15 @@ class RoleManageViewModel(
     fun setSortResult(fanciRoleList: List<FanciRole>) {
         uiState = uiState.copy(
             fanciRole = fanciRoleList
+        )
+    }
+
+    /**
+     * 設定 初始化角色顏色
+     */
+    fun setDefaultRoleColor(color: Color) {
+        uiState = uiState.copy(
+            roleColor = color
         )
     }
 }

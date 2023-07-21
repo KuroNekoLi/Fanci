@@ -194,13 +194,17 @@ fun AddRoleScreen(
         )
     }
 
-
     //是否為編輯
     if (fanciRole != null) {
         viewModel.setRoleEdit(group.id.orEmpty(), fanciRole, LocalColor.current.roleColor.colors)
     } else {
         if (uiState.permissionList == null) {
             viewModel.fetchPermissionList()
+        }
+
+        val defaultColor = LocalColor.current.roleColor.colors.first()
+        LaunchedEffect(key1 = group) {
+            viewModel.setDefaultRoleColor(defaultColor)
         }
     }
 
@@ -225,11 +229,6 @@ fun AddRoleScreen(
             }
         }
     }
-
-//    if (uiState.addRoleError.isNotEmpty()) {
-//        LocalContext.current.showToast(uiState.addRoleError)
-//        viewModel.errorShowDone()
-//    }
 
     uiState.fanciRoleCallback?.let {
         resultNavigator.navigateBack(it)
@@ -272,7 +271,6 @@ private fun AddRoleScreenView(
     val tabList = listOf("樣式", "權限", "成員")
     val TAG = "AddRoleScreenView"
     val isEditMode = (fanciRole != null)
-
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
