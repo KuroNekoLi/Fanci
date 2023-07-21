@@ -276,7 +276,8 @@ private fun AddMemberListScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
-                    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember)
+                    AppUserLogger.getInstance()
+                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember)
 
                     navigator.navigate(
                         AddMemberScreenDestination(
@@ -340,7 +341,8 @@ private fun AddRoleListScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
-                    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole)
+                    AppUserLogger.getInstance()
+                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole)
 
                     navigator.navigate(
                         ShareAddRoleScreenDestination(
@@ -408,7 +410,8 @@ private fun AddVipPlanScreen(
                     borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
-                    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan)
+                    AppUserLogger.getInstance()
+                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan)
 
                     navigator.navigate(
                         AddVipPlanScreenDestination(
@@ -445,7 +448,9 @@ private fun AddVipPlanScreen(
         }
     }
 
-    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateVIP)
+    LaunchedEffect(key1 = vipPlanModels) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateVIP)
+    }
 }
 
 
