@@ -17,7 +17,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
@@ -47,6 +47,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -66,22 +67,15 @@ fun GroupSettingThemePreviewScreen(
 ) {
     val TAG = "GroupSettingThemePreviewScreen"
     val globalGroupViewModel = globalGroupViewModel()
-    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
-    var groupParam = currentGroup
-
+    val uiState = viewModel.uiState
     var showConfirmDialog: GroupTheme? by remember {
         mutableStateOf(null)
     }
 
-    viewModel.uiState.settingGroup?.let {
-        groupParam = it
-        globalGroupViewModel.setCurrentGroup(it)
-    }
-
     GroupSettingThemePreviewView(
-        modifier,
-        navController,
-        groupTheme = viewModel.uiState.previewTheme,
+        modifier = modifier,
+        navController = navController,
+        groupTheme = uiState.previewTheme,
     ) {
         KLog.i(TAG, "on theme click.")
         showConfirmDialog = it
@@ -98,9 +92,9 @@ fun GroupSettingThemePreviewScreen(
                 onDismiss = {
                     showConfirmDialog = null
                 },
-                onConfirm = {
+                onConfirm = { groupTheme ->
                     showConfirmDialog = null
-                    viewModel.changeTheme(groupParam, it)
+                    globalGroupViewModel.changeTheme(groupTheme)
                 }
             )
         }
@@ -111,10 +105,13 @@ fun GroupSettingThemePreviewScreen(
             viewModel.fetchThemeInfo(themeId)
         }
         launch {
-            viewModel.confirmNewThemeEvent
-                .onEach { groupThemeId ->
-                    println("confirm")
-                    resultNavigator.navigateBack(groupThemeId)
+            // 當選擇的主題被設定到畫面的狀態時返回前一頁
+            globalGroupViewModel.currentGroup
+                .filter { group ->
+                    group?.colorSchemeGroupKey == ColorTheme.decode(themeId)
+                }
+                .onEach {
+                    resultNavigator.navigateBack(themeId)
                 }
                 .collect()
         }

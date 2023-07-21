@@ -17,9 +17,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -71,12 +71,9 @@ fun GroupSettingScreen(
     leaveResultBackNavigator: ResultBackNavigator<String>
 ) {
     val globalGroupViewModel = globalGroupViewModel()
-    val initGroup = remember {
-        globalGroupViewModel.currentGroup.value
-    } ?: return
-
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
+    val nowGroup = currentGroup ?: return
     val uiState = viewModel.uiState
-
     val loading = memberViewModel.uiState.loading
 
     //邀請加入社團連結
@@ -94,11 +91,9 @@ fun GroupSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
-
             is NavResult.Value -> {
                 val resultGroup = result.value
                 viewModel.settingGroup(resultGroup)
-                globalGroupViewModel.setCurrentGroup(resultGroup)
             }
         }
     }
@@ -112,7 +107,7 @@ fun GroupSettingScreen(
             is NavResult.Value -> {
                 val refreshReport = result.value
                 if (refreshReport) {
-                    viewModel.fetchReportList(groupId = initGroup.id.orEmpty())
+                    viewModel.fetchReportList(groupId = nowGroup.id.orEmpty())
                 }
             }
         }
@@ -126,7 +121,7 @@ fun GroupSettingScreen(
             is NavResult.Value -> {
                 val isNeedRefresh = result.value
                 if (isNeedRefresh) {
-                    viewModel.fetchUnApplyCount(groupId = initGroup.id.orEmpty())
+                    viewModel.fetchUnApplyCount(groupId = nowGroup.id.orEmpty())
                 }
             }
         }
@@ -137,12 +132,10 @@ fun GroupSettingScreen(
         navController.popBackStack()
     }
 
-    val group = uiState.settingGroup ?: initGroup
-
     GroupSettingScreenView(
         modifier = modifier,
         navController = navController,
-        group = group,
+        group = uiState.settingGroup ?: nowGroup,
         unApplyCount = uiState.unApplyCount ?: 0,
         reportList = reportList,
         onBackClick = {
@@ -150,9 +143,10 @@ fun GroupSettingScreen(
             navController.popBackStack()
         },
         onInviteClick = {
-            memberViewModel.onInviteClick(group)
+            memberViewModel.onInviteClick(uiState.settingGroup ?: nowGroup)
         },
         onLeaveGroup = {
+            val group = uiState.settingGroup ?: nowGroup
             val groupId = group.id
             if (groupId != null) {
                 leaveResultBackNavigator.navigateBack(groupId)
@@ -163,14 +157,20 @@ fun GroupSettingScreen(
         loading = loading
     )
 
-    //抓取加入申請 數量
-    if (uiState.unApplyCount == null) {
-        viewModel.fetchUnApplyCount(groupId = initGroup.id.orEmpty())
+    LaunchedEffect(key1 = uiState.unApplyCount) {
+        //抓取加入申請 數量
+        if (uiState.unApplyCount == null) {
+            viewModel.fetchUnApplyCount(groupId = nowGroup.id.orEmpty())
+        }
     }
-
-    //抓取檢舉內容
-    if (reportList.isEmpty()) {
-        viewModel.fetchReportList(groupId = initGroup.id.orEmpty())
+    LaunchedEffect(key1 = reportList) {
+        //抓取檢舉內容
+        if (reportList.isEmpty()) {
+            viewModel.fetchReportList(groupId = nowGroup.id.orEmpty())
+        }
+    }
+    LaunchedEffect(key1 = currentGroup) {
+        viewModel.settingGroup(group = nowGroup)
     }
 }
 

@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.model.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
@@ -9,6 +10,8 @@ import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -170,6 +173,11 @@ class GroupViewModel(
         }
     }
 
+    /**
+     * 解散社團
+     *
+     * @param id
+     */
     fun leaveGroup(id: String) {
         viewModelScope.launch {
             loading()
@@ -235,7 +243,6 @@ class GroupViewModel(
         }
     }
 
-
     /**
      * 根據選擇的社團 設定 theme
      */
@@ -267,5 +274,146 @@ class GroupViewModel(
                 }
             )
         }
+    }
+
+    /**
+     * 更換 社團 簡介
+     * @param desc 簡介
+     */
+    fun changeGroupDesc(desc: String) {
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            groupUseCase.changeGroupDesc(desc, group).fold({
+            }, {
+                KLog.e(TAG, it)
+                if (it is EmptyBodyException) {
+                    _currentGroup.value = group.copy(description = desc)
+                }
+            })
+        }
+    }
+
+    /**
+     * 更換 社團名字
+     * @param name 更換的名字
+     */
+    fun changeGroupName(name: String) {
+        KLog.i(TAG, "changeGroupNameL$name")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            groupUseCase.changeGroupName(name, group).fold({
+            }, {
+                KLog.e(TAG, it)
+                if (it is EmptyBodyException) {
+                    _currentGroup.value = group.copy(name = name)
+                }
+            })
+        }
+    }
+
+    /**
+     * 更換社團 頭貼
+     */
+    fun changeGroupAvatar(data: ImageChangeData) {
+        KLog.i(TAG, "changeGroupAvatar")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            var uri: Any? = data.uri
+            if (uri == null) {
+                uri = data.url
+            }
+            uri?.let {
+                groupUseCase.changeGroupAvatar(uri, group).collect {
+                    _currentGroup.value = group.copy(
+                        thumbnailImageUrl = it
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * 更換 社團 背景圖
+     */
+    fun changeGroupCover(data: ImageChangeData) {
+        KLog.i(TAG, "changeGroupCover")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            var uri: Any? = data.uri
+            if (uri == null) {
+                uri = data.url
+            }
+            uri?.let {
+                groupUseCase.changeGroupBackground(uri, group).collect {
+                    _currentGroup.value = group.copy(
+                        coverImageUrl = it
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Usr 選擇的 預設 大頭貼
+     */
+    fun onGroupAvatarSelect(url: String) {
+        KLog.i(TAG, "onGroupAvatarSelect:$url")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            _currentGroup.value = group.copy(
+                thumbnailImageUrl = url
+            )
+        }
+    }
+
+    /**
+     * Usr 選擇的 預設 背景
+     */
+    fun onGroupCoverSelect(url: String) {
+        KLog.i(TAG, "onGroupCoverSelect:$url")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            _currentGroup.value = group.copy(
+                coverImageUrl = url
+            )
+        }
+    }
+
+    /**
+     * 更換 主題
+     * @param groupTheme 要更換的主題
+     */
+    fun changeTheme(groupTheme: GroupTheme) {
+        KLog.i(TAG, "changeTheme: $groupTheme")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            if (group.id != null) {
+                themeUseCase.changeGroupTheme(group, groupTheme)
+                    .onSuccess {
+                    }
+                    .onFailure {
+                        KLog.e(TAG, it)
+                        if (it is EmptyBodyException) {
+                            ColorTheme.decode(groupTheme.id)?.let { colorTheme ->
+                                themeUseCase.fetchThemeConfig(colorTheme).fold({ localGroupTheme ->
+                                    _theme.value = localGroupTheme.theme
+                                }, { t ->
+                                    KLog.e(TAG, t)
+                                })
+                                setSelectedTheme(group, colorTheme)
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
+    /**
+     * 設定 選中的 Theme
+     */
+    private fun setSelectedTheme(group: Group, colorTheme: ColorTheme) {
+        _currentGroup.value = group.copy(
+            colorSchemeGroupKey = colorTheme
+        )
     }
 }
