@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +34,8 @@ import com.cmoney.kolfanci.ui.screens.shared.CenterTopAppBar
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fancylog.model.data.Page
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.HorizontalMemberItemScreen
 import com.ramcosta.composedestinations.annotation.Destination
@@ -57,6 +60,10 @@ fun GroupApplyScreen(
     resultBackNavigator: ResultBackNavigator<Boolean>
 ) {
     val TAG = "GroupApplyScreen"
+
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsJoinApplication)
+    }
 
     val uiState = viewModel.uiState
 

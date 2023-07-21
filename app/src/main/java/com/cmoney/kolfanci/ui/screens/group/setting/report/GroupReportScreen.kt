@@ -21,6 +21,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,8 +39,10 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isVip
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
@@ -78,6 +81,10 @@ fun GroupReportScreen(
     resultBackNavigator: ResultBackNavigator<Boolean>
 ) {
     val uiState = viewModel.uiState
+
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsReportReview)
+    }
 
     GroupReportScreenView(
         modifier = modifier,
@@ -132,6 +139,8 @@ fun GroupReportScreen(
                 }
             }
         )
+
+        AppUserLogger.getInstance().log(Page.GroupSettingsReportReviewMute)
     }
 
     //踢出 dialog
@@ -152,6 +161,8 @@ fun GroupReportScreen(
                 }
             }
         )
+
+        AppUserLogger.getInstance().log(Page.GroupSettingsReportReviewKickOut)
     }
 
     //返回

@@ -6,6 +6,8 @@ import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupLatestScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.search.DiscoverGroupPopularScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.GroupSettingScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.ChannelSettingScreenPreview
+import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.add.AddCategoryScreenPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.GroupSettingBackgroundPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.GroupSettingDescViewPreview
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarScreenPreview
@@ -122,6 +124,20 @@ object ScreenshotScreenDefaults {
                 name = "GroupSettingScreen"
             ) {
                 GroupSettingScreenPreview()
+            },
+            //頻道管理
+            ScreenshotTarget(
+                relativePath = "setting/channel_manage",
+                name = "ChannelSettingScreen"
+            ) {
+                ChannelSettingScreenPreview()
+            },
+            //頻道管理 - 新增分類
+            ScreenshotTarget(
+                relativePath = "setting/channel_manage",
+                name = "AddCategoryScreen"
+            ) {
+                AddCategoryScreenPreview()
             },
             ScreenshotTarget(
                 relativePath = "setting",
