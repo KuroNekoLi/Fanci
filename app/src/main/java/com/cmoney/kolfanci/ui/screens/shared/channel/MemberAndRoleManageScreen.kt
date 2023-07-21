@@ -30,6 +30,8 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
@@ -274,6 +276,9 @@ private fun AddMemberListScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
+                    AppUserLogger.getInstance()
+                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember)
+
                     navigator.navigate(
                         AddMemberScreenDestination(
                             group = group,
@@ -336,6 +341,9 @@ private fun AddRoleListScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
 
+                    AppUserLogger.getInstance()
+                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole)
+
                     navigator.navigate(
                         ShareAddRoleScreenDestination(
                             group = group,
@@ -371,6 +379,8 @@ private fun AddRoleListScreen(
             )
         }
     }
+
+    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateRoles)
 }
 
 @Composable
@@ -400,6 +410,9 @@ private fun AddVipPlanScreen(
                     borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
+                    AppUserLogger.getInstance()
+                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan)
+
                     navigator.navigate(
                         AddVipPlanScreenDestination(
                             authTitle = title,
@@ -433,6 +446,10 @@ private fun AddVipPlanScreen(
                 }
             )
         }
+    }
+
+    LaunchedEffect(key1 = vipPlanModels) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateVIP)
     }
 }
 

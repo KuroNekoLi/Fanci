@@ -35,7 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.CreateApplyQuestionScreenDestination
@@ -82,6 +84,10 @@ fun GroupOpennessScreen(
         mutableStateOf(false)
     }
 
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsGroupOpennessOpenness)
+    }
+
     //不公開社團, 抓取問題清單
     group.isNeedApproval?.let {
         if (it && uiState.isFirstFetchQuestion) {
@@ -120,6 +126,7 @@ fun GroupOpennessScreen(
             navigator.navigate(
                 CreateApplyQuestionScreenDestination()
             )
+            AppUserLogger.getInstance().log(Page.GroupSettingsGroupOpennessNonPublicReviewQuestionAddReviewQuestion)
         },
         onEditClick = {
             showEditDialog.value = Pair(true, it)
@@ -160,6 +167,7 @@ fun GroupOpennessScreen(
                         question = showEditDialog.value.second
                     )
                 )
+                AppUserLogger.getInstance().log(Page.GroupSettingsGroupOpennessNonPublicReviewQuestionEdit)
                 showEditDialog.value = Pair(false, "")
             },
             onRemove = {

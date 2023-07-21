@@ -47,11 +47,13 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.destinations.MemberManageScreenDestination
@@ -82,6 +84,8 @@ fun AllMemberScreen(
         if (uiState.groupMember.isNullOrEmpty()) {
             viewModel.fetchGroupMember(groupId = group.id.orEmpty())
         }
+
+        AppUserLogger.getInstance().log(Page.GroupSettingsAllMembers)
     }
 
     val shareText by viewModel.shareText.collectAsState()
@@ -232,6 +236,8 @@ fun AllMemberScreenView(
                                     groupMember = groupMember
                                 )
                             )
+
+                            AppUserLogger.getInstance().log(Page.GroupSettingsAllMembersManage)
                         }
                     }
                     Spacer(modifier = Modifier.height(1.dp))

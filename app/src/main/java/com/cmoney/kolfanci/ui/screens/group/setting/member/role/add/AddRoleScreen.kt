@@ -19,6 +19,7 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,8 +33,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
@@ -268,12 +271,14 @@ private fun AddRoleScreenView(
 ) {
     val tabList = listOf("樣式", "權限", "成員")
     val TAG = "AddRoleScreenView"
+    val isEditMode = (fanciRole != null)
+
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            if (fanciRole != null) {
+            if (isEditMode) {
                 TopBarScreen(
                     title = "編輯角色",
                     backClick = {
@@ -354,6 +359,14 @@ private fun AddRoleScreenView(
                             showDelete = fanciRole != null,
                             onDelete = onDelete
                         )
+                        LaunchedEffect(key1 = selectedIndex) {
+                            if (isEditMode) {
+                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementEditRoleStyle)
+                            }
+                            else {
+                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementAddRoleStyle)
+                            }
+                        }
                     }
                     //權限
                     1 -> {
@@ -364,6 +377,15 @@ private fun AddRoleScreenView(
                         ) { key, selected ->
                             onPermissionSwitch.invoke(key, selected)
                         }
+                        LaunchedEffect(key1 = selectedIndex) {
+                            if (isEditMode) {
+                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementEditRolePermissions)
+                            }
+                            else {
+                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementAddRolePermissions)
+                            }
+
+                        }
                     }
                     //成員
                     else -> {
@@ -373,6 +395,14 @@ private fun AddRoleScreenView(
                             memberList = memberList
                         ) {
                             onMemberRemove.invoke(it)
+                        }
+                        LaunchedEffect(key1 = selectedIndex) {
+                            if (isEditMode) {
+                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementEditRoleMembers)
+                            }
+                            else {
+                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementAddRoleMembers)
+                            }
                         }
                     }
                 }

@@ -37,8 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
@@ -171,7 +173,10 @@ fun BasePostContentScreen(
                         .aspectRatio(1f),
                     images = post.content?.medias?.map {
                         it.resourceLink.orEmpty()
-                    }.orEmpty()
+                    }.orEmpty(),
+                    onImageClick = {
+                        AppUserLogger.getInstance().log(Page.PostImage)
+                    }
                 )
             }
 

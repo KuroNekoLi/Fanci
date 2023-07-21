@@ -27,7 +27,9 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.VipPlanInfoEditChannelPermissionScreenDestination
@@ -203,6 +205,10 @@ private fun VipPlanInfoMainScreenView(
                             )
                         }
                     )
+
+                    LaunchedEffect(key1 = selectedTab) {
+                        AppUserLogger.getInstance().log(Page.GroupSettingsVIPINF)
+                    }
                 }
 
                 //權限
@@ -219,6 +225,10 @@ private fun VipPlanInfoMainScreenView(
                             )
                         }
                     )
+
+                    LaunchedEffect(key1 = selectedTab) {
+                        AppUserLogger.getInstance().log(Page.GroupSettingsVIPPermission)
+                    }
                 }
 
                 //成員
@@ -226,6 +236,10 @@ private fun VipPlanInfoMainScreenView(
                     VipMemberPage(
                         members = vipMembers
                     )
+
+                    LaunchedEffect(key1 = selectedTab) {
+                        AppUserLogger.getInstance().log(Page.GroupSettingsVIPMembers)
+                    }
                 }
             }
         }
