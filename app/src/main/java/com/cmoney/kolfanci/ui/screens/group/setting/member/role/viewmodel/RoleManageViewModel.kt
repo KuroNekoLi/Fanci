@@ -432,14 +432,7 @@ class RoleManageViewModel(
                 editMemberList = groupUseCase.fetchRoleMemberList(
                     groupId = groupId,
                     roleId = fanciRole.id.orEmpty()
-                ).getOrNull().orEmpty().map { user ->
-                    GroupMember(
-                        id = user.id,
-                        name = user.name,
-                        thumbNail = user.thumbNail,
-                        serialNumber = user.serialNumber
-                    )
-                }
+                ).getOrNull().orEmpty()
 
                 uiState = uiState.copy(
                     roleName = fanciRole.name.orEmpty(),
