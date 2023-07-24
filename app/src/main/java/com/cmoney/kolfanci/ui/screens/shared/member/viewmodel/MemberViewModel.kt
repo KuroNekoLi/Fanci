@@ -289,9 +289,6 @@ class MemberViewModel(
                 }, {
                     dismissLoading()
                     KLog.e(TAG, it)
-                    uiState = uiState.copy(
-                        groupMember = emptyList()
-                    )
                 })
         }
     }
