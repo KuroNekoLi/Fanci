@@ -17,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.fancylog.model.data.Page
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.ui.common.TransparentButton
 import com.cmoney.kolfanci.ui.destinations.FanciDefaultCoverScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
@@ -67,6 +69,8 @@ fun GroupSettingBackgroundScreen(
     resultNavigator: ResultBackNavigator<ImageChangeData>,
     fanciCoverResult: ResultRecipient<FanciDefaultCoverScreenDestination, String>
 ) {
+    val globalGroupViewModel = globalGroupViewModel()
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
     val state = viewModel.uiState
 
     var showSaveTip by remember {
@@ -77,10 +81,9 @@ fun GroupSettingBackgroundScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
-
             is NavResult.Value -> {
                 val fanciUrl = result.value
-                viewModel.onGroupCoverSelect(fanciUrl, group)
+                globalGroupViewModel.onGroupCoverSelect(fanciUrl)
             }
         }
     }
@@ -112,6 +115,11 @@ fun GroupSettingBackgroundScreen(
     LaunchedEffect(key1 = group) {
         AppUserLogger.getInstance()
             .log(Page.GroupSettingsGroupSettingsHomeBackground)
+    }
+    LaunchedEffect(key1 = currentGroup) {
+        currentGroup?.let { focusGroup ->
+            viewModel.settingGroup(focusGroup)
+        }
     }
 
 //    LaunchedEffect(viewModel.uiState.isGroupSettingPop) {

@@ -22,6 +22,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,12 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
+import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
@@ -80,32 +84,28 @@ fun GroupSettingSettingScreen(
 ) {
     val globalGroupViewModel = globalGroupViewModel()
     val viewModel: GroupSettingViewModel = koinViewModel()
+    val uiState = viewModel.uiState
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
 
     SetCallbackHandle(
         setNameResult = setNameResult,
         setDescResult = setDescResult,
         setAvatarResult = setAvatarResult,
         setBackgroundResult = setBackgroundResult,
-        group = viewModel.uiState.settingGroup ?: group
+        groupViewModel = globalGroupViewModel
     )
 
-    var groupParam = group
-    viewModel.uiState.settingGroup?.let {
-        groupParam = it
-        globalGroupViewModel.setCurrentGroup(it)
-    }
-
     GroupSettingSettingView(
-        modifier,
-        navController,
-        groupParam,
+        modifier = modifier,
+        navController = navController,
+        group = uiState.settingGroup ?: group,
         onDelectClick = {
             viewModel.onDelectClick()
         }
     )
 
     //第一次確認解散
-    if (viewModel.uiState.showDelectDialog) {
+    if (uiState.showDelectDialog) {
         AlertDialogScreen(
             onDismiss = {
                 viewModel.onDismissDelectDialog()
@@ -148,7 +148,7 @@ fun GroupSettingSettingScreen(
     }
 
     //最終確認刪除
-    if (viewModel.uiState.showFinalDelectDialog) {
+    if (uiState.showFinalDelectDialog) {
         AlertDialogScreen(
             onDismiss = {
                 viewModel.onDismissFinalDelectDialog()
@@ -190,13 +190,18 @@ fun GroupSettingSettingScreen(
     }
 
     //最終解散社團, 動作
-    if (viewModel.uiState.popToMain) {
+    if (uiState.popToMain) {
         val intent = Intent(LocalContext.current, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         LocalContext.current.findActivity().finish()
         LocalContext.current.startActivity(intent)
     }
 
+    LaunchedEffect(key1 = currentGroup) {
+        currentGroup?.let { focusGroup ->
+            viewModel.settingGroup(focusGroup)
+        }
+    }
 }
 
 /**
@@ -206,8 +211,7 @@ fun GroupSettingSettingScreen(
 private fun SetCallbackHandle(
     setNameResult: ResultRecipient<EditInputScreenDestination, String>,
     setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
-    group: Group,
-    viewModel: GroupSettingViewModel = koinViewModel(),
+    groupViewModel: GroupViewModel,
     setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>
 ) {
@@ -218,7 +222,7 @@ private fun SetCallbackHandle(
             }
             is NavResult.Value -> {
                 val changeName = result.value
-                viewModel.changeGroupName(name = changeName, group)
+                groupViewModel.changeGroupName(name = changeName)
             }
         }
     }
@@ -230,7 +234,7 @@ private fun SetCallbackHandle(
             }
             is NavResult.Value -> {
                 val desc = result.value
-                viewModel.changeGroupDesc(desc, group)
+                groupViewModel.changeGroupDesc(desc = desc)
             }
         }
     }
@@ -242,7 +246,7 @@ private fun SetCallbackHandle(
             }
             is NavResult.Value -> {
                 val uri = result.value
-                viewModel.changeGroupAvatar(uri, group)
+                groupViewModel.changeGroupAvatar(uri)
             }
         }
     }
@@ -254,7 +258,7 @@ private fun SetCallbackHandle(
             }
             is NavResult.Value -> {
                 val uri = result.value
-                viewModel.changeGroupCover(uri, group)
+                groupViewModel.changeGroupCover(uri)
             }
         }
     }
@@ -304,7 +308,8 @@ fun GroupSettingSettingView(
                                 emptyAlertSubTitle = context.getString(R.string.group_name_empty_desc)
                             )
                         )
-                        AppUserLogger.getInstance()
+                        AppUserLogger
+                            .getInstance()
                             .log(Page.GroupSettingsGroupSettingsGroupName)
                     }
                     .padding(start = 24.dp, end = 24.dp)
