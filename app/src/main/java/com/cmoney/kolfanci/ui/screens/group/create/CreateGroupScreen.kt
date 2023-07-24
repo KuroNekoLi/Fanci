@@ -19,8 +19,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -215,6 +213,7 @@ fun CreateGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val question = result.value
                 if (approvalUiState.isEditMode) {
@@ -234,6 +233,7 @@ fun CreateGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val uri = result.value
                 viewModel.changeGroupAvatar(uri)
@@ -246,6 +246,7 @@ fun CreateGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val uri = result.value
                 viewModel.changeGroupCover(uri)
@@ -258,11 +259,10 @@ fun CreateGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
-                val groupThemeStr = result.value
-                val gson = Gson()
-                val groupTheme = gson.fromJsonTypeToken<GroupTheme>(groupThemeStr)
-                viewModel.setGroupTheme(groupTheme)
+                val groupThemeId = result.value
+                viewModel.setGroupTheme(groupThemeId)
             }
         }
     }

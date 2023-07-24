@@ -84,8 +84,7 @@ fun GroupSettingThemePreviewScreen(
     showConfirmDialog?.let {
         //如果是建立 直接確定並返回
         if (isFromCreate) {
-            val gson = Gson()
-            resultNavigator.navigateBack(gson.toJson(it))
+            resultNavigator.navigateBack(it.id)
         } else {
             ChangeThemeDialogScreen(
                 groupTheme = it,

@@ -54,7 +54,7 @@ val viewModule = module {
         )
     }
     viewModel {
-        CreateGroupViewModel(androidApplication(), get())
+        CreateGroupViewModel(androidApplication(), get(), get())
     }
     viewModel { ApplyForGroupViewModel(get(), get()) }
     viewModel { params ->
