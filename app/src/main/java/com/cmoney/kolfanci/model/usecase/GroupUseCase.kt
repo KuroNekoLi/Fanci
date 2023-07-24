@@ -256,7 +256,7 @@ class GroupUseCase(
             useridsParam = UseridsParam(
                 userIds = memberList
             )
-        )
+        ).checkResponseBody()
     }
 
     /**

@@ -279,7 +279,7 @@ class RoleManageViewModel(
      */
     private fun assignMemberRole(groupId: String, fanciRole: FanciRole) {
         KLog.i(TAG, "assignMemberRole:$groupId , $fanciRole")
-        var editFanciRole = fanciRole.copy()
+        val editFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
         viewModelScope.launch {
             if (uiState.memberList.isNotEmpty()) {
 
@@ -294,7 +294,6 @@ class RoleManageViewModel(
                         }
                     ).fold({
                         KLog.i(TAG, "assignMemberRole complete")
-                        editFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
                         uiState = uiState.copy(
                             fanciRoleCallback = FanciRoleCallback(
                                 fanciRole = editFanciRole
@@ -320,7 +319,6 @@ class RoleManageViewModel(
                     }, {
                         KLog.e(TAG, it)
                         if (it is EmptyBodyException) {
-                            editFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
                             uiState = uiState.copy(
                                 fanciRoleCallback = FanciRoleCallback(
                                     fanciRole = editFanciRole
