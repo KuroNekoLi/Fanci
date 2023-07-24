@@ -279,6 +279,7 @@ class RoleManageViewModel(
      */
     private fun assignMemberRole(groupId: String, fanciRole: FanciRole) {
         KLog.i(TAG, "assignMemberRole:$groupId , $fanciRole")
+        val editFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
         viewModelScope.launch {
             if (uiState.memberList.isNotEmpty()) {
 
@@ -287,22 +288,23 @@ class RoleManageViewModel(
                 if (addMemberList.isNotEmpty()) {
                     groupUseCase.addMemberToRole(
                         groupId = groupId,
-                        roleId = fanciRole.id.orEmpty(),
+                        roleId = editFanciRole.id.orEmpty(),
                         memberList = addMemberList.map {
                             it.id.orEmpty()
                         }
-                    ).fold({
-                        KLog.i(TAG, "assignMemberRole complete")
-                        uiState = uiState.copy(
-                            fanciRoleCallback = FanciRoleCallback(
-                                fanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
-                            ),
-                            addRoleError = null,
-                            addRoleComplete = true
-                        )
-                    }, {
+                    ).onFailure {
                         KLog.e(TAG, it)
-                    })
+                        if (it is EmptyBodyException) {
+                            KLog.i(TAG, "assignMemberRole complete")
+                            uiState = uiState.copy(
+                                fanciRoleCallback = FanciRoleCallback(
+                                    fanciRole = editFanciRole
+                                ),
+                                addRoleError = null,
+                                addRoleComplete = true
+                            )
+                        }
+                    }
                 }
 
                 //要移除的人員
@@ -310,7 +312,7 @@ class RoleManageViewModel(
                 if (removeMemberList.isNotEmpty()) {
                     groupUseCase.removeUserRole(
                         groupId = groupId,
-                        roleId = fanciRole.id.orEmpty(),
+                        roleId = editFanciRole.id.orEmpty(),
                         userId = removeMemberList.map {
                             it.id.orEmpty()
                         }
@@ -320,7 +322,7 @@ class RoleManageViewModel(
                         if (it is EmptyBodyException) {
                             uiState = uiState.copy(
                                 fanciRoleCallback = FanciRoleCallback(
-                                    fanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
+                                    fanciRole = editFanciRole
                                 ),
                                 addRoleError = null,
                                 addRoleComplete = true
@@ -330,7 +332,7 @@ class RoleManageViewModel(
                 } else {
                     uiState = uiState.copy(
                         fanciRoleCallback = FanciRoleCallback(
-                            fanciRole = fanciRole
+                            fanciRole = editFanciRole
                         ),
                         addRoleError = null,
                         addRoleComplete = true
@@ -341,7 +343,7 @@ class RoleManageViewModel(
                 if (editMemberList.isNotEmpty()) {
                     groupUseCase.removeUserRole(
                         groupId = groupId,
-                        roleId = fanciRole.id.orEmpty(),
+                        roleId = editFanciRole.id.orEmpty(),
                         userId = editMemberList.map {
                             it.id.orEmpty()
                         }
@@ -354,7 +356,7 @@ class RoleManageViewModel(
 
                 uiState = uiState.copy(
                     fanciRoleCallback = FanciRoleCallback(
-                        fanciRole = fanciRole
+                        fanciRole = editFanciRole
                     ),
                     addRoleError = null,
                     addRoleComplete = true
