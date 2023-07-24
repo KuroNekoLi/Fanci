@@ -292,18 +292,19 @@ class RoleManageViewModel(
                         memberList = addMemberList.map {
                             it.id.orEmpty()
                         }
-                    ).fold({
-                        KLog.i(TAG, "assignMemberRole complete")
-                        uiState = uiState.copy(
-                            fanciRoleCallback = FanciRoleCallback(
-                                fanciRole = editFanciRole
-                            ),
-                            addRoleError = null,
-                            addRoleComplete = true
-                        )
-                    }, {
+                    ).onFailure {
                         KLog.e(TAG, it)
-                    })
+                        if (it is EmptyBodyException) {
+                            KLog.i(TAG, "assignMemberRole complete")
+                            uiState = uiState.copy(
+                                fanciRoleCallback = FanciRoleCallback(
+                                    fanciRole = editFanciRole
+                                ),
+                                addRoleError = null,
+                                addRoleComplete = true
+                            )
+                        }
+                    }
                 }
 
                 //要移除的人員
