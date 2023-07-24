@@ -19,7 +19,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,10 +33,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
-import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.ui.common.TransparentButton
 import com.cmoney.kolfanci.ui.destinations.FanciDefaultAvatarScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
@@ -48,7 +46,6 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
@@ -73,9 +70,9 @@ fun GroupSettingAvatarScreen(
     resultNavigator: ResultBackNavigator<ImageChangeData>,
     fanciAvatarResult: ResultRecipient<FanciDefaultAvatarScreenDestination, String>
 ) {
-    val globalGroupViewModel = globalGroupViewModel()
-    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
-    val state = viewModel.uiState
+    var settingGroup by remember {
+        mutableStateOf(group)
+    }
 
     val uiState = groupSettingAvatarViewModel.uiState
 
@@ -87,9 +84,13 @@ fun GroupSettingAvatarScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val fanciUrl = result.value
-                globalGroupViewModel.onGroupAvatarSelect(fanciUrl)
+
+                settingGroup = settingGroup.copy(
+                    thumbnailImageUrl = fanciUrl
+                )
                 groupSettingAvatarViewModel.resetCameraUri()
             }
         }
@@ -97,22 +98,20 @@ fun GroupSettingAvatarScreen(
 
     GroupSettingAvatarView(
         modifier = modifier,
-        navController = navController,
+        group = settingGroup,
         isLoading = viewModel.uiState.isLoading,
-        group = state.settingGroup ?: group,
-        avatarImage = uiState.avatarImage,
         onImageChange = {
             resultNavigator.navigateBack(
                 it
             )
         },
+        avatarImage = uiState.avatarImage,
         openCameraDialog = {
             groupSettingAvatarViewModel.openCameraDialog()
-        },
-        onBack = {
-            showSaveTip = true
         }
-    )
+    ) {
+        showSaveTip = true
+    }
 
     if (uiState.openCameraDialog) {
         GroupPhotoPickDialogScreen(
@@ -144,17 +143,11 @@ fun GroupSettingAvatarScreen(
         AppUserLogger.getInstance()
             .log(Page.GroupSettingsGroupSettingsGroupIcon)
     }
-    LaunchedEffect(key1 = currentGroup) {
-        currentGroup?.let { focusGroup ->
-            viewModel.settingGroup(focusGroup)
-        }
-    }
 }
 
 @Composable
 fun GroupSettingAvatarView(
     modifier: Modifier = Modifier,
-    navController: DestinationsNavigator,
     group: Group,
     isLoading: Boolean,
     onImageChange: (ImageChangeData) -> Unit,
@@ -246,13 +239,11 @@ fun GroupSettingAvatarView(
 fun GroupSettingAvatarScreenPreview() {
     FanciTheme {
         GroupSettingAvatarView(
-            navController = EmptyDestinationsNavigator,
             group = Group(),
             isLoading = true,
             onImageChange = {},
             avatarImage = null,
-            openCameraDialog = {},
-            onBack = {}
-        )
+            openCameraDialog = {}
+        ) {}
     }
 }

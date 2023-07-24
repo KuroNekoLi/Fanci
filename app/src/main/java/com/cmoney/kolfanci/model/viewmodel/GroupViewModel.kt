@@ -327,6 +327,19 @@ class GroupViewModel(
                     _currentGroup.value = group.copy(
                         thumbnailImageUrl = it
                     )
+
+                    //refresh group list
+                    _myGroupList.value = _myGroupList.value.map { groupItem ->
+                        if (groupItem.groupModel.id == group.id) {
+                            groupItem.copy(
+                                groupModel = groupItem.groupModel.copy(
+                                    thumbnailImageUrl = it
+                                )
+                            )
+                        } else {
+                            groupItem
+                        }
+                    }
                 }
             }
         }

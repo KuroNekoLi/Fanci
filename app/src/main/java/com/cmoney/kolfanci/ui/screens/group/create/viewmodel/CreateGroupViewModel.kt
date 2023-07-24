@@ -8,19 +8,24 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CreateGroupViewModel(
     val context: Application,
-    val groupUseCase: GroupUseCase
+    val groupUseCase: GroupUseCase,
+    val themeUseCase: ThemeUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = CreateGroupViewModel::class.java.simpleName
@@ -148,14 +153,26 @@ class CreateGroupViewModel(
 
     /**
      * 設定 主題
+     *
+     * @param groupThemeId ex: ThemeSmokePink
      */
-    fun setGroupTheme(groupTheme: GroupTheme) {
-        KLog.i(TAG, "setGroupTheme:$groupTheme")
-        _fanciColor.value = groupTheme.theme
+    fun setGroupTheme(groupThemeId: String) {
+        KLog.i(TAG, "setGroupTheme:$groupThemeId")
+        viewModelScope.launch {
+            ColorTheme.decode(groupThemeId)?.let { colorTheme ->
+                themeUseCase.fetchThemeConfig(colorTheme)
+                    .onSuccess { groupTheme ->
+                        _fanciColor.value = groupTheme.theme
+                    }
+                    .onFailure {
+                        KLog.e(TAG, it)
+                    }
+            }
 
-        _group.value = _group.value.copy(
-            colorSchemeGroupKey = ColorTheme.decode(groupTheme.id)
-        )
+            _group.value = _group.value.copy(
+                colorSchemeGroupKey = ColorTheme.decode(groupThemeId)
+            )
+        }
     }
 
     /**
