@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
-import com.cmoney.kolfanci.extension.toGroupMember
 import com.cmoney.kolfanci.extension.toVipPlanModel
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
