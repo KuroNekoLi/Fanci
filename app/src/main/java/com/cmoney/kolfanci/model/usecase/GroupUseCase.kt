@@ -322,7 +322,11 @@ class GroupUseCase(
             groupMemberApi.apiV1GroupMemberGroupGroupIdGet(
                 groupId = groupId,
                 skip = skipCount,
-                search = search
+                search = if (search?.isEmpty() == true) {
+                    null
+                } else {
+                    search
+                }
             ).checkResponseBody()
         }
 
