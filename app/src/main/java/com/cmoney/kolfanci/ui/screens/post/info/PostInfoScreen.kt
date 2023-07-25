@@ -617,7 +617,7 @@ private fun PostInfoScreenView(
                 }
             )
         },
-        backgroundColor = LocalColor.current.background
+        backgroundColor = LocalColor.current.env_80
     ) { innerPadding ->
 
         Box(
@@ -629,7 +629,6 @@ private fun PostInfoScreenView(
                     //貼文
                     item {
                         BasePostContentScreen(
-                            backgroundColor = LocalColor.current.env_80,
                             post = post,
                             defaultDisplayLine = Int.MAX_VALUE,
                             bottomContent = {
@@ -647,75 +646,75 @@ private fun PostInfoScreenView(
                         )
                     }
 
-                    item {
-                        Spacer(modifier = Modifier.height(15.dp))
-                    }
-
-                    //Comment title
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(45.dp)
-                                .background(LocalColor.current.env_80)
-                                .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
-                        ) {
-                            Text(
-                                text = "貼文留言",
-                                fontSize = 17.sp,
-                                color = LocalColor.current.text.default_100
-                            )
+                    if (comments.isNotEmpty()) {
+                        item {
+                            Spacer(modifier = Modifier.height(15.dp))
                         }
-                    }
 
-                    item {
-                        Spacer(modifier = Modifier.height(1.dp))
-                    }
-
-                    //沒有人留言
-                    item {
-                        if (comments.isEmpty()) {
-                            EmptyCommentView()
-                        }
-                    }
-
-                    //留言內容
-                    items(comments) { comment ->
-                        //如果被刪除
-                        if (comment.isDeleted == true) {
-                            BaseDeletedContentScreen(
+                        //Comment title
+                        item {
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(LocalColor.current.background)
-                                    .padding(
-                                        top = 10.dp,
-                                        start = 20.dp,
-                                        end = 20.dp,
-                                        bottom = 5.dp
-                                    ),
-                                title = "這則留言已被刪除",
-                                content = "已經刪除的留言，你是看不到的！"
-                            )
-                        } else {
-                            BasePostContentScreen(
-                                post = comment,
-                                defaultDisplayLine = Int.MAX_VALUE,
-                                contentModifier = Modifier.padding(start = 40.dp),
-                                hasMoreAction = true,
-                                bottomContent = {
-                                    CommentBottomContent(
-                                        comment = comment,
-                                        reply = replyMapData[comment.id],
-                                        listener = commentBottomContentListener
-                                    )
-                                },
-                                onEmojiClick = {
-                                    postInfoListener.onCommentEmojiClick(comment, it)
-                                },
-                                onMoreClick = {
-                                    commentBottomContentListener.onCommentMoreActionClick(comment)
-                                }
-                            )
+                                    .height(45.dp)
+                                    .background(LocalColor.current.env_80)
+                                    .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
+                            ) {
+                                Text(
+                                    text = "貼文留言",
+                                    fontSize = 17.sp,
+                                    color = LocalColor.current.text.default_100
+                                )
+                            }
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(1.dp))
+                        }
+
+                        //留言內容
+                        items(comments) { comment ->
+                            //如果被刪除
+                            if (comment.isDeleted == true) {
+                                BaseDeletedContentScreen(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(LocalColor.current.background)
+                                        .padding(
+                                            top = 10.dp,
+                                            start = 20.dp,
+                                            end = 20.dp,
+                                            bottom = 5.dp
+                                        ),
+                                    title = "這則留言已被刪除",
+                                    content = "已經刪除的留言，你是看不到的！"
+                                )
+                            } else {
+                                BasePostContentScreen(
+                                    post = comment,
+                                    defaultDisplayLine = Int.MAX_VALUE,
+                                    contentModifier = Modifier.padding(start = 40.dp),
+                                    hasMoreAction = true,
+                                    bottomContent = {
+                                        CommentBottomContent(
+                                            comment = comment,
+                                            reply = replyMapData[comment.id],
+                                            listener = commentBottomContentListener
+                                        )
+                                    },
+                                    onEmojiClick = {
+                                        postInfoListener.onCommentEmojiClick(comment, it)
+                                    },
+                                    onMoreClick = {
+                                        commentBottomContentListener.onCommentMoreActionClick(comment)
+                                    }
+                                )
+                            }
+                        }
+                    } else {
+                        //沒有人留言
+                        item {
+                            EmptyCommentView()
                         }
                     }
                 }
