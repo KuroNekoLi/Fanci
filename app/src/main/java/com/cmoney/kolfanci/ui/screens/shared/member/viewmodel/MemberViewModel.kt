@@ -253,7 +253,7 @@ class MemberViewModel(
 
         viewModelScope.launch {
             showLoading()
-            groupUseCase.getGroupMember(groupId = groupId, skipCount = skip, search = searchKeyword)
+            groupUseCase.getGroupMember(groupId = groupId, skipCount = skip, search = searchKeyword?.trim())
                 .fold({
                     val responseMembers = it.items.orEmpty()
                     if (responseMembers.isNotEmpty()) {
