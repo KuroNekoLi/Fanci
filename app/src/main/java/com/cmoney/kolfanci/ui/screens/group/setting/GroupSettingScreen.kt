@@ -1,17 +1,24 @@
 package com.cmoney.kolfanci.ui.screens.group.setting
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -20,7 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,18 +42,22 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
 import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.model.Constant.isShowVipManager
+import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.ui.destinations.VipManagerScreenDestination
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -154,8 +170,19 @@ fun GroupSettingScreen(
                 leaveResultBackNavigator.navigateBack()
             }
         },
+        onDisbandGroup = {
+            viewModel.onFinalConfirmDelete(group = uiState.settingGroup ?: nowGroup)
+        },
         loading = loading
     )
+
+    //最終解散社團, 動作
+    if (uiState.popToMain) {
+        val intent = Intent(LocalContext.current, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        LocalContext.current.findActivity().finish()
+        LocalContext.current.startActivity(intent)
+    }
 
     LaunchedEffect(key1 = uiState.unApplyCount) {
         //抓取加入申請 數量
@@ -184,6 +211,7 @@ fun GroupSettingScreenView(
     reportList: List<ReportInformation>?,
     onInviteClick: () -> Unit,
     onLeaveGroup: () -> Unit,
+    onDisbandGroup: () -> Unit,
     loading: Boolean
 ) {
     val TAG = "GroupSettingScreenView"
@@ -201,6 +229,15 @@ fun GroupSettingScreenView(
         },
         backgroundColor = LocalColor.current.env_80
     ) { innerPadding ->
+        var showLeaveGroupDialog by remember {
+            mutableStateOf(false)
+        }
+        var showDisbandGroupDialog by remember {
+            mutableStateOf(false)
+        }
+        var showFinalDisbandGroupDialog by remember {
+            mutableStateOf(false)
+        }
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
@@ -208,7 +245,7 @@ fun GroupSettingScreenView(
                 start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                 top = innerPadding.calculateTopPadding() + 20.dp,
                 end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-                bottom = innerPadding.calculateBottomPadding() + 20.dp
+                bottom = innerPadding.calculateBottomPadding() + 50.dp
             ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
@@ -229,9 +266,7 @@ fun GroupSettingScreenView(
                 item {
                     GroupAboutScreen(
                         modifier = Modifier.fillMaxWidth(),
-                        isCreator = group.creatorId == Constant.MyInfo?.id,
-                        onInviteClick = onInviteClick,
-                        onLeaveGroup = onLeaveGroup
+                        onInviteClick = onInviteClick
                     )
                 }
                 //社團管理
@@ -274,6 +309,169 @@ fun GroupSettingScreenView(
                         )
                     }
                 }
+                // 是否為社團建立者，true 解散社團，false 退出社團
+                val isCreator = group.creatorId == Constant.MyInfo?.id
+                item {
+                    Spacer(modifier = Modifier.height(98.dp))
+                    if (!isCreator) {
+                        Box(
+                            modifier = Modifier
+                                .height(50.dp)
+                                .fillMaxWidth()
+                                .background(LocalColor.current.background)
+                                .clickable {
+                                    showLeaveGroupDialog = true
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.leave_group),
+                                fontSize = 17.sp,
+                                color = LocalColor.current.specialColor.red
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .height(50.dp)
+                                .fillMaxWidth()
+                                .background(LocalColor.current.background)
+                                .clickable {
+                                    showDisbandGroupDialog = true
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = stringResource(id = R.string.disband_group), fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+                        }
+                    }
+                }
+            }
+        }
+
+        if (showLeaveGroupDialog) {
+            AlertDialogScreen(
+                title = stringResource(id = R.string.leave_group),
+                onDismiss = {
+                    showLeaveGroupDialog = false
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.leave_group_remind),
+                    color = LocalColor.current.text.default_100,
+                    fontSize = 17.sp
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.confirm),
+                    borderColor = LocalColor.current.component.other,
+                    textColor = LocalColor.current.specialColor.hintRed,
+                    shape = RoundedCornerShape(4.dp),
+                    onClick = {
+                        showLeaveGroupDialog = false
+                        onLeaveGroup()
+                    }
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.cancel),
+                    borderColor = LocalColor.current.component.other,
+                    textColor = LocalColor.current.text.default_100,
+                    shape = RoundedCornerShape(4.dp),
+                    onClick = {
+                        showLeaveGroupDialog = false
+                    }
+                )
+            }
+        }
+
+        //第一次確認解散
+        if (showDisbandGroupDialog) {
+            AlertDialogScreen(
+                onDismiss = {
+                    showDisbandGroupDialog = false
+                },
+                title = "你確定要把社團解散嗎？",
+            ) {
+                Column {
+                    Text(
+                        text = "社團解散，所有內容、成員將會消失 平台「不會」有備份、復原功能。", fontSize = 17.sp, color = Color.White
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    BorderButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "返回",
+                        borderColor = LocalColor.current.component.other,
+                        textColor = Color.White
+                    ) {
+                        showDisbandGroupDialog = false
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    BorderButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "確定解散",
+                        borderColor = LocalColor.current.specialColor.red,
+                        textColor = LocalColor.current.specialColor.red
+                    ) {
+                        showDisbandGroupDialog = false
+                        showFinalDisbandGroupDialog = true
+                    }
+                }
+            }
+        }
+
+        //最終確認刪除
+        if (showFinalDisbandGroupDialog) {
+            AlertDialogScreen(
+                onDismiss = {
+                    showFinalDisbandGroupDialog = false
+                },
+                title = "社團解散，最後確認通知！",
+            ) {
+                Column {
+                    Text(
+                        text = "社團解散，所有內容、成員將會消失 平台「不會」有備份、復原功能。", fontSize = 17.sp, color = Color.White
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    BorderButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "返回",
+                        borderColor = LocalColor.current.component.other,
+                        textColor = Color.White
+                    ) {
+                        showFinalDisbandGroupDialog = false
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    BorderButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "確定解散",
+                        borderColor = LocalColor.current.specialColor.red,
+                        textColor = LocalColor.current.specialColor.red
+                    ) {
+                        onDisbandGroup()
+                    }
+                }
             }
         }
     }
@@ -314,6 +512,7 @@ fun GroupSettingScreenPreview() {
             reportList = emptyList(),
             onInviteClick = {},
             onLeaveGroup = {},
+            onDisbandGroup = {},
             loading = false
         )
     }

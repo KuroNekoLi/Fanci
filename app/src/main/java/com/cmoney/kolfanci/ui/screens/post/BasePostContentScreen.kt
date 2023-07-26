@@ -266,7 +266,7 @@ fun EmojiFeedback(
 }
 
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun PostContentScreenPreview() {
     FanciTheme {
