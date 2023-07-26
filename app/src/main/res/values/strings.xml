@@ -166,4 +166,10 @@
     <string name="empty_follow_tip">加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團</string>
     <string name="create_group">建立社團</string>
     <string name="disband_group">解散社團</string>
+    <string name="group_openness">社團公開度</string>
+    <string name="save_failed">儲存失敗</string>
+    <string name="review_question">審核題目</string>
+    <string name="add_review_question">新增審核題目</string>
+    <string name="full_public_group_desc">任何人都能看到社團，任何人都能進入。</string>
+    <string name="not_public_group_desc">任何人都能看到社團，需要回答問題才能進入。</string>
 </resources>

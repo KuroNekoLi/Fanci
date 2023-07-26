@@ -19,8 +19,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+data class UiState(
+    val createdGroup: Group? = null,
+    val createComplete: Boolean? = null
+)
 
 class CreateGroupViewModel(
     val context: Application,
@@ -42,8 +48,8 @@ class CreateGroupViewModel(
     private val _fanciColor = MutableStateFlow<FanciColor?>(null)   //選擇的Theme Color
     val fanciColor = _fanciColor.asStateFlow()
 
-    private val _createComplete = MutableSharedFlow<Group>()    //建立完成
-    val createComplete = _createComplete.asSharedFlow()
+    private val _uiState = MutableStateFlow<UiState>(UiState())    //建立完成
+    val uiState = _uiState.asStateFlow()
 
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
@@ -208,9 +214,14 @@ class CreateGroupViewModel(
                 coverImageUrl = _group.value.coverImageUrl.orEmpty(),
                 thumbnailImageUrl = _group.value.thumbnailImageUrl.orEmpty(),
                 themeId = preCreateGroup.colorSchemeGroupKey?.value.orEmpty()
-            ).fold({
-                KLog.i(TAG, "createGroup success:$it")
-                _createComplete.emit(it)
+            ).fold({ createdGroup ->
+                KLog.i(TAG, "createGroup success")
+                _uiState.update {
+                    UiState(
+                        createdGroup = createdGroup,
+                        createComplete = true
+                    )
+                }
 //                _group.value = it
             }, {
             })

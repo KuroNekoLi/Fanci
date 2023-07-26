@@ -17,6 +17,7 @@ import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed class ThemeSetting {
@@ -428,5 +429,18 @@ class GroupViewModel(
         _currentGroup.value = group.copy(
             colorSchemeGroupKey = colorTheme
         )
+    }
+
+    /**
+     * 設定公開度
+     *
+     * @param openness 公開度，true 公開，false 不公開
+     */
+    fun changeOpenness(openness: Boolean) {
+        _currentGroup.update { group ->
+            group?.copy(
+                isNeedApproval = !openness
+            )
+        }
     }
 }

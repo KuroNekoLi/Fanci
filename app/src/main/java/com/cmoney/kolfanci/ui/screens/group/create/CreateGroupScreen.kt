@@ -29,13 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.fromJsonTypeToken
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.ui.destinations.CreateApplyQuestionScreenDestination
@@ -45,7 +46,6 @@ import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.TipDialog
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -54,7 +54,6 @@ import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -84,9 +83,9 @@ fun CreateGroupScreen(
     setThemeResult: ResultRecipient<GroupSettingThemeScreenDestination, String>
 ) {
     val TAG = "CreateGroupScreen"
-    val approvalUiState = groupOpennessViewModel.uiState
-
     val globalGroupViewModel = globalGroupViewModel()
+    val approvalUiState = groupOpennessViewModel.uiState
+    val uiState by viewModel.uiState.collectAsState()
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
@@ -151,13 +150,6 @@ fun CreateGroupScreen(
             navigator.popBackStack()
         }
     )
-
-    //建立社團完成
-    LaunchedEffect(Unit) {
-        viewModel.createComplete.collect {
-            groupOpennessViewModel.onSave(it)
-        }
-    }
 
     //不公開 提示
     if (showDialog.value) {
@@ -267,24 +259,33 @@ fun CreateGroupScreen(
         }
     }
 
-    /**
-     * 建立完成, 回到首頁並顯示所建立群組
-     */
-
-    LaunchedEffect(Unit) {
-        groupOpennessViewModel.saveComplete.collect { saveComplete ->
-            if (saveComplete != null) {
-                globalGroupViewModel.setCurrentGroup(saveComplete)
-                navigator.popBackStack(
-                    route = MainScreenDestination,
-                    inclusive = false
-                )
-            } else {
-                viewModel.dismissLoading()
+    // 建立社團完成
+    uiState.createComplete?.let { createComplete ->
+        if (createComplete) {
+            uiState.createdGroup?.let { group ->
+                group.id?.let { id ->
+                    groupOpennessViewModel.onSave(id = id)
+                }
             }
         }
     }
 
+    // 建立完成, 回到首頁並顯示所建立群組
+    approvalUiState.saveComplete?.let { saveComplete ->
+        if (saveComplete) {
+            uiState.createdGroup?.let { group ->
+                globalGroupViewModel.setCurrentGroup(group)
+            }
+            navigator.popBackStack(
+                route = MainScreenDestination,
+                inclusive = false
+            )
+        } else {
+            context.showToast(stringResource(id = R.string.save_failed))
+        }
+        viewModel.dismissLoading()
+        groupOpennessViewModel.onSaveFinish()
+    }
 }
 
 @Composable
@@ -357,7 +358,7 @@ private fun CreateGroupScreenView(
                     //step 2.
                     2 -> {
                         Step2Screen(
-                            question = question,
+                            questions = question,
                             isNeedApproval = approvalUiState.isNeedApproval,
                             onSwitchApprove = onSwitchApprove,
                             onAddQuestion = onAddQuestion,

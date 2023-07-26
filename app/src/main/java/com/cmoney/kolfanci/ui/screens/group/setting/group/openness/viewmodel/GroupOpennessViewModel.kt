@@ -5,12 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
-import com.cmoney.fanciapi.fanci.model.Group
 import com.socks.library.KLog
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 data class UiState(
@@ -18,9 +16,8 @@ data class UiState(
     val isNeedApproval: Boolean = true,
     val isEditMode: Boolean = false,
     val orgQuestion: String = "",
-//    val saveComplete: Boolean = false,
-    val isFirstFetchQuestion: Boolean = true
-
+    val isFirstFetchQuestion: Boolean = true,
+    val saveComplete: Boolean? = null
 )
 
 class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) : ViewModel() {
@@ -28,9 +25,6 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
 
     var uiState by mutableStateOf(UiState())
         private set
-
-    private val _saveComplete = MutableSharedFlow<Group?>()
-    val saveComplete = _saveComplete.asSharedFlow()
 
     init {
         uiState = uiState.copy(
@@ -129,18 +123,16 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
 
     /**
      * 儲存 設定結果
-     * @param group 社團
      */
-    fun onSave(group: Group) {
-        KLog.i(TAG, "onSave:$group")
-        val groupId = group.id.orEmpty()
+    fun onSave(id: String) {
+        KLog.i(TAG, "onSave: $group, (groupId=$id)")
         viewModelScope.launch {
             //公開 or 不公開
             val isNeedApproval = uiState.isNeedApproval
 
             //設定 公開度 to server
             groupUseCase.setGroupNeedApproval(
-                groupId = groupId,
+                groupId = id,
                 isNeedApproval = isNeedApproval
             ).fold({
             }, {
@@ -150,22 +142,27 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
                         //問題清單
                         val questionList = uiState.groupQuestionList.orEmpty()
                         groupUseCase.setGroupRequirementQuestion(
-                            groupId = groupId,
+                            groupId = id,
                             question = questionList
                         ).fold({
-                            _saveComplete.emit(group)
+                            uiState = uiState.copy(saveComplete = true)
                         }, {
                             KLog.e(TAG, it)
                         })
                     } else {
-                        _saveComplete.emit(group)
+                        uiState = uiState.copy(saveComplete = true)
                     }
                 } else {
                     KLog.e(TAG, it)
-                    _saveComplete.emit(null)
+                    uiState = uiState.copy(saveComplete = false)
                 }
             })
         }
+    }
 
+    fun onSaveFinish() {
+        uiState = uiState.copy(
+            saveComplete = null
+        )
     }
 }
