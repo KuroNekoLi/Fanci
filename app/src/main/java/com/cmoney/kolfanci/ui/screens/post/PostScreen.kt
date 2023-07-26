@@ -340,7 +340,10 @@ private fun PostScreenView(
     listState: LazyListState
 ) {
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .background(LocalColor.current.env_80)
+    ) {
         if (postList.isEmpty()) {
             EmptyPostContent(modifier = Modifier.fillMaxSize())
         } else {
