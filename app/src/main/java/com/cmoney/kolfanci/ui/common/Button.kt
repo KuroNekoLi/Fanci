@@ -115,7 +115,7 @@ fun BorderButton(
     shape: RoundedCornerShape = RoundedCornerShape(15),
     borderColor: Color,
     textColor: Color = borderColor,
-    onClick: () -> Unit?
+    onClick: () -> Unit
 ) {
     Button(
         modifier = modifier,
@@ -123,9 +123,8 @@ fun BorderButton(
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
         border = BorderStroke(1.dp, borderColor),
         elevation = ButtonDefaults.elevation(0.dp),
-        onClick = {
-            onClick.invoke()
-        }) {
+        onClick = onClick
+    ) {
         Text(
             text = text,
             color = textColor,

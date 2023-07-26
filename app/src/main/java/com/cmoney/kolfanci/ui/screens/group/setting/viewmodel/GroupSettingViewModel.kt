@@ -178,46 +178,6 @@ class GroupSettingViewModel(
     }
 
     /**
-     * 點擊 解散社團
-     */
-    fun onDelectClick() {
-        KLog.i(TAG, "onDelectClick")
-        uiState = uiState.copy(
-            showDelectDialog = true
-        )
-    }
-
-    /**
-     * 關閉 解散彈窗
-     */
-    fun onDismissDelectDialog() {
-        KLog.i(TAG, "onDismissDelectDialog")
-        uiState = uiState.copy(
-            showDelectDialog = false
-        )
-    }
-
-    /**
-     * 二次確認要刪除
-     */
-    fun onDelectReConfirm() {
-        KLog.i(TAG, "onDelectReConfirm")
-        uiState = uiState.copy(
-            showFinalDelectDialog = true
-        )
-    }
-
-    /**
-     * 關閉 最後解散彈窗
-     */
-    fun onDismissFinalDelectDialog() {
-        KLog.i(TAG, "onDismissDelectDialog")
-        uiState = uiState.copy(
-            showFinalDelectDialog = false
-        )
-    }
-
-    /**
      * 最終 確認刪除
      */
     fun onFinalConfirmDelete(group: Group) {
@@ -227,7 +187,6 @@ class GroupSettingViewModel(
             }, {
                 if (it is EmptyBodyException) {
                     KLog.i(TAG, "Group delete complete.")
-                    onDismissFinalDelectDialog()
                     uiState = uiState.copy(
                         popToMain = true
                     )
