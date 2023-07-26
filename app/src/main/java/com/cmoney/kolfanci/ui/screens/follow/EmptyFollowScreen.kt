@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,10 +26,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -140,30 +142,35 @@ private fun EmptyFollowScreenView(
         //Header
         item {
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.fanci),
-                    contentDescription = null
-                )
-            }
-
-            Image(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1.3f),
-                contentScale = ContentScale.Fit,
-                painter = painterResource(id = R.drawable.follow_empty),
-                contentDescription = null,
-            )
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團",
-                fontSize = 14.sp,
-                color = LocalColor.current.text.default_100,
-                textAlign = TextAlign.Center
-            )
+                    .height(334.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .width(113.dp)
+                            .aspectRatio(1f),
+                        contentScale = ContentScale.Fit,
+                        painter = painterResource(id = R.drawable.planetary),
+                        contentDescription = null,
+                    )
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(id = R.string.empty_follow_tip),
+                        fontSize = 16.sp,
+                        color = LocalColor.current.text.default_30,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(20.dp))
 
             Box(
@@ -178,7 +185,7 @@ private fun EmptyFollowScreenView(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "建立社團",
+                    text = stringResource(id = R.string.create_group),
                     fontSize = 16.sp,
                     color = LocalColor.current.text.other,
                     textAlign = TextAlign.Center
@@ -187,7 +194,7 @@ private fun EmptyFollowScreenView(
         }
         //List group
         items(groupList) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             GroupItemScreen(
                 groupModel = it
             ) { groupModel ->
