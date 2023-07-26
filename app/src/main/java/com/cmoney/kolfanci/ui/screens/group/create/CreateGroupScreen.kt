@@ -85,7 +85,7 @@ fun CreateGroupScreen(
     val TAG = "CreateGroupScreen"
     val globalGroupViewModel = globalGroupViewModel()
     val approvalUiState = groupOpennessViewModel.uiState
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
@@ -268,6 +268,7 @@ fun CreateGroupScreen(
                 }
             }
         }
+        viewModel.onCreateFinish()
     }
 
     // 建立完成, 回到首頁並顯示所建立群組

@@ -1,6 +1,9 @@
 package com.cmoney.kolfanci.ui.screens.group.create.viewmodel
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
@@ -19,7 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -48,8 +50,8 @@ class CreateGroupViewModel(
     private val _fanciColor = MutableStateFlow<FanciColor?>(null)   //選擇的Theme Color
     val fanciColor = _fanciColor.asStateFlow()
 
-    private val _uiState = MutableStateFlow<UiState>(UiState())    //建立完成
-    val uiState = _uiState.asStateFlow()
+    var uiState by mutableStateOf(UiState())
+        private set
 
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
@@ -216,15 +218,19 @@ class CreateGroupViewModel(
                 themeId = preCreateGroup.colorSchemeGroupKey?.value.orEmpty()
             ).fold({ createdGroup ->
                 KLog.i(TAG, "createGroup success")
-                _uiState.update {
-                    UiState(
-                        createdGroup = createdGroup,
-                        createComplete = true
-                    )
-                }
-//                _group.value = it
+                uiState = uiState.copy(
+                    createdGroup = createdGroup,
+                    createComplete = true
+                )
+                // _group.value = it
             }, {
             })
         }
+    }
+
+    fun onCreateFinish() {
+        uiState = uiState.copy(
+            createComplete = null
+        )
     }
 }
