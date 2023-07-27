@@ -1,40 +1,22 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
@@ -49,6 +31,10 @@ import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
+import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
+import com.cmoney.kolfanci.ui.screens.shared.item.WideItem
+import com.cmoney.kolfanci.ui.screens.shared.item.WideItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -181,18 +167,24 @@ fun GroupSettingSettingView(
         }
     ) { innerPadding ->
         val context = LocalContext.current
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .background(LocalColor.current.env_80)
                 .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             //========== 名稱 ==========
-            Row(
-                modifier = Modifier
-                    .background(LocalColor.current.background)
-                    .clickable {
+            item {
+                NarrowItem(
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .background(color = LocalColor.current.background)
+                        .padding(NarrowItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.group_name),
+                    subTitle = group.name.orEmpty(),
+                    actionContent = NarrowItemDefaults.nextIcon(),
+                    onClick = {
                         KLog.i(TAG, "name click")
                         navController.navigate(
                             EditInputScreenDestination(
@@ -207,133 +199,62 @@ fun GroupSettingSettingView(
                             .getInstance()
                             .log(Page.GroupSettingsGroupSettingsGroupName)
                     }
-                    .padding(start = 24.dp, end = 24.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "社團名稱",
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = group.name.orEmpty(),
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-
-                Image(
-                    painter = painterResource(id = R.drawable.next),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
                 )
             }
-            Spacer(modifier = Modifier.height(1.dp))
 
             //========== 簡介 ==========
-            Row(
-                modifier = Modifier
-                    .background(LocalColor.current.background)
-                    .clickable {
+            item {
+                val isNoDescription = group.description.isNullOrBlank()
+                NarrowItem(
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .background(color = LocalColor.current.background)
+                        .padding(NarrowItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.group_description),
+                    subTitle = if (isNoDescription) {
+                        stringResource(id = R.string.group_description_placeholder)
+                    } else {
+                        group.description.orEmpty()
+                    },
+                    subTitleColor = if (isNoDescription) {
+                        LocalColor.current.text.default_30
+                    } else {
+                        LocalColor.current.text.default_100
+                    },
+                    actionContent = NarrowItemDefaults.nextIcon(),
+                    onClick = {
                         KLog.i(TAG, "description click")
                         navController.navigate(GroupSettingDescScreenDestination(group = group))
                     }
-                    .padding(start = 24.dp, end = 24.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "社團簡介",
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    if (group.description?.isNotEmpty() == true) {
-                        Text(
-                            text = group.description.orEmpty(),
-                            fontSize = 17.sp,
-                            color = LocalColor.current.text.default_100
-                        )
-                    } else {
-                        Text(
-                            text = "填寫專屬於社團的簡介吧！",
-                            fontSize = 17.sp,
-                            color = LocalColor.current.text.default_30
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-
-                Image(
-                    painter = painterResource(id = R.drawable.next),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
                 )
             }
 
-            Spacer(modifier = Modifier.height(1.dp))
-
             //========== 社團圖示 ==========
-            Row(
-                modifier = Modifier
-                    .background(LocalColor.current.background)
-                    .clickable {
+            item {
+                WideItem(
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .background(LocalColor.current.background)
+                        .padding(WideItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.group_avatar),
+                    displayContent = WideItemDefaults.imageDisplay(model = group.thumbnailImageUrl),
+                    onClick = {
                         KLog.i(TAG, "avatar image click")
                         navController.navigate(GroupSettingAvatarScreenDestination(group = group))
                     }
-                    .padding(start = 24.dp, end = 24.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "社團圖示",
-                    fontSize = 17.sp,
-                    color = LocalColor.current.text.default_100,
-                    fontWeight = FontWeight.Bold
-                )
-
-                AsyncImage(
-                    model = group.thumbnailImageUrl,
-                    modifier = Modifier
-                        .padding(top = 15.dp, bottom = 15.dp)
-                        .size(55.dp)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.placeholder)
                 )
             }
 
-            Spacer(modifier = Modifier.height(1.dp))
-
             //========== 首頁背景 ==========
-            Row(
-                modifier = Modifier
-                    .background(LocalColor.current.background)
-                    .clickable {
+            item {
+                WideItem(
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .background(LocalColor.current.background)
+                        .padding(WideItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.group_homepage_background),
+                    displayContent = WideItemDefaults.imageDisplay(model = group.coverImageUrl),
+                    onClick = {
                         KLog.i(TAG, "background image click")
                         navController.navigate(
                             GroupSettingBackgroundScreenDestination(
@@ -341,40 +262,21 @@ fun GroupSettingSettingView(
                             )
                         )
                     }
-                    .padding(start = 24.dp, end = 24.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "首頁背景",
-                    fontSize = 17.sp,
-                    color = LocalColor.current.text.default_100,
-                    fontWeight = FontWeight.Bold
-                )
-
-                AsyncImage(
-                    model = group.coverImageUrl,
-                    modifier = Modifier
-                        .padding(top = 15.dp, bottom = 15.dp)
-                        .size(55.dp)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.placeholder)
                 )
             }
 
-            Spacer(modifier = Modifier.height(1.dp))
-
             //========== 主題色彩 ==========
-            Row(
-                modifier = Modifier
-                    .background(LocalColor.current.background)
-                    .clickable {
+            item {
+                WideItem(
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .background(LocalColor.current.background)
+                        .padding(WideItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.theme_color),
+                    displayContent = {
+                        ThemeColorCardScreen(modifier = Modifier.size(56.dp))
+                    },
+                    onClick = {
                         KLog.i(TAG, "theme click")
                         navController.navigate(
                             GroupSettingThemeScreenDestination(
@@ -382,28 +284,6 @@ fun GroupSettingSettingView(
                             )
                         )
                     }
-                    .padding(start = 24.dp, end = 24.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "主題色彩",
-                    fontSize = 17.sp,
-                    color = LocalColor.current.text.default_100,
-                    fontWeight = FontWeight.Bold
-                )
-
-                ThemeColorCardScreen(
-                    modifier = Modifier
-                        .padding(top = 15.dp, bottom = 15.dp)
-                        .size(55.dp),
-                    primary = LocalColor.current.primary,
-                    env_100 = LocalColor.current.env_100,
-                    env_80 = LocalColor.current.env_80,
-                    env_60 = LocalColor.current.env_60
                 )
             }
         }

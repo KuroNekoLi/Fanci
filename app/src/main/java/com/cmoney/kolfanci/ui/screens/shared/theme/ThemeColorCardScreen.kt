@@ -9,6 +9,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
  * 呈現 色卡資訊
@@ -16,10 +17,10 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ThemeColorCardScreen(
     modifier: Modifier = Modifier,
-    primary: Color,
-    env_100: Color,
-    env_80: Color,
-    env_60: Color
+    primary: Color = LocalColor.current.primary,
+    env_100: Color = LocalColor.current.env_100,
+    env_80: Color = LocalColor.current.env_80,
+    env_60: Color = LocalColor.current.env_60
 ) {
     Box(
         modifier = modifier
