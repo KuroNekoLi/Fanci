@@ -176,4 +176,5 @@
 
     <string name="report_review">檢舉審核</string>
     <string name="report_is_empty">目前沒有待審核的檢舉</string>
+    <string name="not_create_any_role">尚未建立任何角色</string>
 </resources>
