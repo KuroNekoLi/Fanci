@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -161,7 +162,9 @@ private fun EmptyVipPlanScreen() {
 
         Image(
             modifier = Modifier.size(105.dp),
-            painter = painterResource(id = R.drawable.flower_box), contentDescription = null
+            painter = painterResource(id = R.drawable.flower_box),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(LocalColor.current.text.default_30)
         )
 
         Spacer(modifier = Modifier.height(20.dp))

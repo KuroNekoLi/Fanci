@@ -173,4 +173,7 @@
     <string name="add_review_question">新增審核題目</string>
     <string name="full_public_group_desc">任何人都能看到社團，任何人都能進入。</string>
     <string name="not_public_group_desc">任何人都能看到社團，需要回答問題才能進入。</string>
+
+    <string name="report_review">檢舉審核</string>
+    <string name="report_is_empty">目前沒有待審核的檢舉</string>
 </resources>
