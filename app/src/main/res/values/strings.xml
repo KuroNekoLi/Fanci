@@ -166,4 +166,7 @@
     <string name="empty_follow_tip">加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團</string>
     <string name="create_group">建立社團</string>
     <string name="disband_group">解散社團</string>
+
+    <string name="report_review">檢舉審核</string>
+    <string name="report_is_empty">目前沒有待審核的檢舉</string>
 </resources>
