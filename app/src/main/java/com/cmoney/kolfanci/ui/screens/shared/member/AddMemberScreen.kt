@@ -91,6 +91,9 @@ fun AddMemberScreen(
         },
         onAddClick = {
             viewModel.onAddSelectedMember()
+            resultNavigator.navigateBack(
+                result = viewModel.fetchSelectedMember()
+            )
         },
         onLoadMore = {
             viewModel.onLoadMoreGroupMember(group.id.orEmpty())

@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.apply
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +33,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +46,7 @@ import com.cmoney.fanciapi.fanci.model.GroupRequirementApply
 import com.cmoney.fanciapi.fanci.model.IGroupRequirementAnswer
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.fancylog.model.data.Page
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.asGroupMember
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -156,28 +161,51 @@ private fun GroupApplyScreenView(
         backgroundColor = LocalColor.current.env_80
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                items(groupRequirementApplyList) { question ->
-                    ApplyQuestionItem(question) {
-                        onApplyClick.invoke(it)
-                    }
-                }
-
-                if (loading) {
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(size = 32.dp),
-                                color = LocalColor.current.primary
-                            )
+            if (groupRequirementApplyList.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    items(groupRequirementApplyList) { question ->
+                        ApplyQuestionItem(question) {
+                            onApplyClick.invoke(it)
                         }
                     }
+
+                    if (loading) {
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(size = 32.dp),
+                                    color = LocalColor.current.primary
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.flower_box),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_30)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.apply_is_empty),
+                        fontSize = 16.sp,
+                        color = LocalColor.current.text.default_30
+                    )
                 }
             }
 

@@ -176,7 +176,9 @@
 
     <string name="report_review">檢舉審核</string>
     <string name="report_is_empty">目前沒有待審核的檢舉</string>
+    <string name="apply_is_empty">目前沒有待審核的加入申請</string>
     <string name="not_create_any_role">尚未建立任何角色</string>
     <string name="sort_channel">頻道排序</string>
     <string name="sort_category">分類排序</string>
+
 </resources>
