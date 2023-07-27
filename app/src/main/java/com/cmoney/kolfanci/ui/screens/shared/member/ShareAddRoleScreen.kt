@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -184,10 +185,18 @@ fun ShareAddRoleScreenView(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.flower_box),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_30)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     Text(
-                        text = "尚未建立任何角色",
-                        fontSize = 14.sp,
-                        color = LocalColor.current.component.other
+                        text = stringResource(id = R.string.not_create_any_role),
+                        fontSize = 16.sp,
+                        color = LocalColor.current.text.default_30
                     )
                 }
             }
