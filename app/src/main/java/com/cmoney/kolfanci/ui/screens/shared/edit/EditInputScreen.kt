@@ -79,23 +79,21 @@ fun EditInputScreen(
 
     if (showEmptyTip) {
         DialogScreen(
-            onDismiss = {
-                showEmptyTip = false
-            },
-            titleIconRes = R.drawable.edit,
             title = emptyAlertTitle,
             subTitle = emptyAlertSubTitle,
-            content = {
-                BlueButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    text = stringResource(id = R.string.modify)
-                ) {
-                    showEmptyTip = false
-                }
+            onDismiss = {
+                showEmptyTip = false
             }
-        )
+        ) {
+            BlueButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = stringResource(id = R.string.modify)
+            ) {
+                showEmptyTip = false
+            }
+        }
     }
 
     SaveConfirmDialogScreen(

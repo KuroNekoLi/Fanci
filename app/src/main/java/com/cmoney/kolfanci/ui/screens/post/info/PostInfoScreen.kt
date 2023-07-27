@@ -530,16 +530,14 @@ fun PostInfoScreen(
     //置頂提示彈窗
     if (showPinDialogTip.first) {
         DialogScreen(
-            onDismiss = {
-                showPinDialogTip = Pair(false, null)
-            },
-            titleIconRes = R.drawable.pin,
-            iconFilter = LocalColor.current.component.other,
             title = "置頂文章",
             subTitle = if (isPinPost) {
                 ""
             } else {
                 "置頂這篇文章，重要貼文不再被淹沒！"
+            },
+            onDismiss = {
+                showPinDialogTip = Pair(false, null)
             }
         ) {
             BorderButton(

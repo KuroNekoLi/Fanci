@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.fancylog.model.data.Page
-import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -210,12 +209,11 @@ fun AddRoleScreen(
 
     uiState.addRoleError?.let {
         DialogScreen(
-            titleIconRes = R.drawable.edit,
+            title = it.first,
+            subTitle = it.second,
             onDismiss = {
                 viewModel.errorShowDone()
-            },
-            title = it.first,
-            subTitle = it.second
+            }
         ) {
             BlueButton(
                 modifier = Modifier

@@ -22,7 +22,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
@@ -63,10 +62,9 @@ fun CreateApplyQuestionScreen(
 
     if (showEmptyTipDialog) {
         DialogScreen(
-            onDismiss = { showEmptyTipDialog = false },
-            titleIconRes = R.drawable.edit,
             title = "審核題目空白",
-            subTitle = "審核題目不可以是空白的唷！"
+            subTitle = "審核題目不可以是空白的唷！",
+            onDismiss = { showEmptyTipDialog = false }
         ) {
             BlueButton(
                 modifier = Modifier
