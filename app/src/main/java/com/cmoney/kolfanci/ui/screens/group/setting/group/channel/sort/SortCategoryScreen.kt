@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,7 +36,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -89,8 +92,14 @@ private fun SortCategoryScreenView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
-                title = "分類排序",
+            EditToolbarScreen(
+                title = stringResource(id = R.string.sort_category),
+                leadingIcon = Icons.Filled.ArrowBack,
+                saveClick = {
+                    val newList = data.value.toMutableList()
+                    newList.add(0, category[0])
+                    onSave.invoke(newList)
+                },
                 backClick = {
                     navigator.popBackStack()
                 }
@@ -129,24 +138,8 @@ private fun SortCategoryScreenView(
                         }
                     }
                 }
-
-                //========== 儲存 ==========
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(135.dp)
-                        .background(LocalColor.current.env_100),
-                    contentAlignment = Alignment.Center
-                ) {
-                    BlueButton(text = "儲存") {
-                        val newList = data.value.toMutableList()
-                        newList.add(0, category[0])
-                        onSave.invoke(newList)
-                    }
-                }
             }
         }
-
     }
 }
 

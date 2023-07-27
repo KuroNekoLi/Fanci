@@ -150,10 +150,9 @@ fun FollowScreen(
 
     if (openDialog.value) {
         DialogScreen(
-            onDismiss = { openDialog.value = false },
-            titleIconRes = R.drawable.minus_people,
             title = "不具有此頻道的權限",
-            subTitle = "這是個上了鎖的頻道，你目前沒有權限能夠進入喔！"
+            subTitle = "這是個上了鎖的頻道，你目前沒有權限能夠進入喔！",
+            onDismiss = { openDialog.value = false }
         ) {
             BorderButton(
                 modifier = Modifier

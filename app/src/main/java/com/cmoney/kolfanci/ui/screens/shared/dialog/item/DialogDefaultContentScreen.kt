@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,9 +65,11 @@ fun DialogDefaultContentScreen(
         showContent = content.isNotBlank(),
         content = {
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = content,
                 fontSize = 17.sp,
-                color = LocalColor.current.text.default_100
+                color = LocalColor.current.text.default_100,
+                textAlign = TextAlign.Center
             )
         },
         confirmTitle = confirmTitle,

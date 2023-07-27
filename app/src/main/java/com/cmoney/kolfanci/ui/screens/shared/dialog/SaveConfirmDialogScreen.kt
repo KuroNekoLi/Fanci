@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.shared.dialog
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,24 +64,14 @@ fun SaveConfirmDialogScreen(
                     modifier = Modifier.padding(20.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.dialog_ban),
-                                colorFilter = ColorFilter.tint(color = LocalColor.current.specialColor.red),
-                                contentDescription = null
-                            )
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Text(
-                                text = title,
-                                fontSize = 19.sp,
-                                color = LocalColor.current.specialColor.red
-                            )
-                        }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = title,
+                            fontSize = 19.sp,
+                            color = LocalColor.current.specialColor.red
+                        )
 
                         Spacer(modifier = Modifier.height(20.dp))
 
