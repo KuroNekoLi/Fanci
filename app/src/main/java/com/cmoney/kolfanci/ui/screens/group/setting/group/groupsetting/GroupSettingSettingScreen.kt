@@ -1,35 +1,22 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
@@ -46,6 +33,8 @@ import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewMo
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
+import com.cmoney.kolfanci.ui.screens.shared.item.WideItem
+import com.cmoney.kolfanci.ui.screens.shared.item.WideItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -242,119 +231,60 @@ fun GroupSettingSettingView(
 
             //========== 社團圖示 ==========
             item {
-                Row(
+                WideItem(
                     modifier = Modifier
+                        .fillParentMaxWidth()
                         .background(LocalColor.current.background)
-                        .clickable {
-                            KLog.i(TAG, "avatar image click")
-                            navController.navigate(GroupSettingAvatarScreenDestination(group = group))
-                        }
-                        .padding(start = 24.dp, end = 24.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = "社團圖示",
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    AsyncImage(
-                        model = group.thumbnailImageUrl,
-                        modifier = Modifier
-                            .padding(top = 15.dp, bottom = 15.dp)
-                            .size(55.dp)
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(10.dp)),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        placeholder = painterResource(id = R.drawable.placeholder)
-                    )
-                }
+                        .padding(WideItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.group_avatar),
+                    displayContent = WideItemDefaults.imageDisplay(model = group.thumbnailImageUrl),
+                    onClick = {
+                        KLog.i(TAG, "avatar image click")
+                        navController.navigate(GroupSettingAvatarScreenDestination(group = group))
+                    }
+                )
             }
 
             //========== 首頁背景 ==========
             item {
-                Row(
+                WideItem(
                     modifier = Modifier
+                        .fillParentMaxWidth()
                         .background(LocalColor.current.background)
-                        .clickable {
-                            KLog.i(TAG, "background image click")
-                            navController.navigate(
-                                GroupSettingBackgroundScreenDestination(
-                                    group = group
-                                )
+                        .padding(WideItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.group_homepage_background),
+                    displayContent = WideItemDefaults.imageDisplay(model = group.coverImageUrl),
+                    onClick = {
+                        KLog.i(TAG, "background image click")
+                        navController.navigate(
+                            GroupSettingBackgroundScreenDestination(
+                                group = group
                             )
-                        }
-                        .padding(start = 24.dp, end = 24.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = "首頁背景",
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    AsyncImage(
-                        model = group.coverImageUrl,
-                        modifier = Modifier
-                            .padding(top = 15.dp, bottom = 15.dp)
-                            .size(55.dp)
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(10.dp)),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        placeholder = painterResource(id = R.drawable.placeholder)
-                    )
-                }
+                        )
+                    }
+                )
             }
 
             //========== 主題色彩 ==========
             item {
-                Row(
+                WideItem(
                     modifier = Modifier
+                        .fillParentMaxWidth()
                         .background(LocalColor.current.background)
-                        .clickable {
-                            KLog.i(TAG, "theme click")
-                            navController.navigate(
-                                GroupSettingThemeScreenDestination(
-                                    group = group
-                                )
+                        .padding(WideItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.theme_color),
+                    displayContent = {
+                        ThemeColorCardScreen(modifier = Modifier.size(56.dp))
+                    },
+                    onClick = {
+                        KLog.i(TAG, "theme click")
+                        navController.navigate(
+                            GroupSettingThemeScreenDestination(
+                                group = group
                             )
-                        }
-                        .padding(start = 24.dp, end = 24.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = "主題色彩",
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    ThemeColorCardScreen(
-                        modifier = Modifier
-                            .padding(top = 15.dp, bottom = 15.dp)
-                            .size(55.dp),
-                        primary = LocalColor.current.primary,
-                        env_100 = LocalColor.current.env_100,
-                        env_80 = LocalColor.current.env_80,
-                        env_60 = LocalColor.current.env_60
-                    )
-                }
+                        )
+                    }
+                )
             }
         }
     }

@@ -54,12 +54,12 @@ fun NarrowItem(
 ) {
     val itemModifier = if (onClick != null) {
         Modifier
+            .heightIn(min = 44.dp)
             .clickable(
                 interactionSource = interactionSource,
                 indication = indication,
                 onClick = onClick
             )
-            .heightIn(min = 44.dp)
             .then(modifier)
     } else {
         Modifier

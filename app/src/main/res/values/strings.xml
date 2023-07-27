@@ -52,6 +52,7 @@
     <string name="group_description_placeholder">填寫專屬於社團的簡介吧！</string>
     <string name="group_avatar">社團圖示</string>
     <string name="group_background">社團背景</string>
+    <string name="group_homepage_background">首頁背景</string>
     <string name="group_board_place">面板覆蓋處</string>
     <string name="theme_color">主題色彩</string>
     <string name="theme_preview">主題預覽</string>
