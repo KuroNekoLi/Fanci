@@ -116,9 +116,9 @@ fun MyScreen(
 
     if (isShowPurchasePlanTip) {
         DialogScreen(
-            onDismiss = { isShowPurchasePlanTip = false },
             title = stringResource(id = R.string.forward_to_official_web_title),
-            subTitle = stringResource(id = R.string.forward_to_official_web_subtitle)
+            subTitle = stringResource(id = R.string.forward_to_official_web_subtitle),
+            onDismiss = { isShowPurchasePlanTip = false }
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 

@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,31 +58,23 @@ fun DeleteConfirmDialogScreen(
                     modifier = Modifier.padding(20.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.dialog_ban),
-                                colorFilter = ColorFilter.tint(color = LocalColor.current.specialColor.red),
-                                contentDescription = null
-                            )
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Text(
-                                text = title,
-                                fontSize = 19.sp,
-                                color = LocalColor.current.specialColor.red
-                            )
-                        }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = title,
+                            fontSize = 19.sp,
+                            color = LocalColor.current.specialColor.red,
+                            textAlign = TextAlign.Center
+                        )
 
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Text(
                             text = content,
                             fontSize = 17.sp,
-                            color = LocalColor.current.text.default_100
+                            color = LocalColor.current.text.default_100,
+                            textAlign = TextAlign.Center
                         )
 
                         Spacer(modifier = Modifier.height(20.dp))

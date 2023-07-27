@@ -275,16 +275,14 @@ fun PostScreen(
     if (showPinDialogTip.first) {
         val isPinPost = showPinDialogTip.third
         DialogScreen(
-            onDismiss = {
-                showPinDialogTip = Triple(false, null, false)
-            },
-            titleIconRes = R.drawable.pin,
-            iconFilter = LocalColor.current.component.other,
             title = "置頂文章",
             subTitle = if (isPinPost) {
                 ""
             } else {
                 "置頂這篇文章，重要貼文不再被淹沒！"
+            },
+            onDismiss = {
+                showPinDialogTip = Triple(false, null, false)
             }
         ) {
             BorderButton(

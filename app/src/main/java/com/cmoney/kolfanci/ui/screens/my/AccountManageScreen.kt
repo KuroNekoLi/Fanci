@@ -148,7 +148,6 @@ fun AccountManageScreen(
 
     if (showConfirmDialog) {
         DialogScreen(
-            titleIconRes = R.drawable.logout,
             title = "確定要登出帳號嗎？",
             subTitle = "你確定要將 登出帳號嗎？\n" +
                     "（帳號登出社團資料皆會保留）",

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -24,39 +23,38 @@ fun ChangeThemeDialogScreen(
 ) {
     DialogScreen(
         modifier = modifier,
-        onDismiss = onDismiss,
-        titleIconRes = com.cmoney.kolfanci.R.drawable.painter,
         title = "確定套用「%s」主題？".format(groupTheme.name),
         subTitle = "主題套用後，所有成員的社團主題將會同步更改。",
-        content = {
-            Column {
-                Spacer(modifier = Modifier.height(10.dp))
+        onDismiss = onDismiss
+    ) {
+        Column {
+            Spacer(modifier = Modifier.height(10.dp))
 
-                BorderButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    text = "確定",
-                    borderColor = LocalColor.current.component.other,
-                    textColor = LocalColor.current.text.default_100
-                ) {
-                    onConfirm.invoke(groupTheme)
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                BorderButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    text = "取消",
-                    borderColor = LocalColor.current.component.other,
-                    textColor = LocalColor.current.text.default_100
-                ) {
-                    onDismiss.invoke()
-                }
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "確定",
+                borderColor = LocalColor.current.component.other,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                onConfirm.invoke(groupTheme)
             }
-        })
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "取消",
+                borderColor = LocalColor.current.component.other,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                onDismiss.invoke()
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
