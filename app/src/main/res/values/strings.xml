@@ -52,6 +52,7 @@
     <string name="group_description_placeholder">填寫專屬於社團的簡介吧！</string>
     <string name="group_avatar">社團圖示</string>
     <string name="group_background">社團背景</string>
+    <string name="group_homepage_background">首頁背景</string>
     <string name="group_board_place">面板覆蓋處</string>
     <string name="theme_color">主題色彩</string>
     <string name="theme_preview">主題預覽</string>
@@ -166,6 +167,12 @@
     <string name="empty_follow_tip">加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團</string>
     <string name="create_group">建立社團</string>
     <string name="disband_group">解散社團</string>
+    <string name="group_openness">社團公開度</string>
+    <string name="save_failed">儲存失敗</string>
+    <string name="review_question">審核題目</string>
+    <string name="add_review_question">新增審核題目</string>
+    <string name="full_public_group_desc">任何人都能看到社團，任何人都能進入。</string>
+    <string name="not_public_group_desc">任何人都能看到社團，需要回答問題才能進入。</string>
 
     <string name="report_review">檢舉審核</string>
     <string name="report_is_empty">目前沒有待審核的檢舉</string>

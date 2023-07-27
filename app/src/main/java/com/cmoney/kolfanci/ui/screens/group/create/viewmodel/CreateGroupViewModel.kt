@@ -1,6 +1,9 @@
 package com.cmoney.kolfanci.ui.screens.group.create.viewmodel
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
@@ -22,6 +25,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+data class UiState(
+    val createdGroup: Group? = null,
+    val createComplete: Boolean? = null
+)
+
 class CreateGroupViewModel(
     val context: Application,
     val groupUseCase: GroupUseCase,
@@ -42,8 +50,8 @@ class CreateGroupViewModel(
     private val _fanciColor = MutableStateFlow<FanciColor?>(null)   //選擇的Theme Color
     val fanciColor = _fanciColor.asStateFlow()
 
-    private val _createComplete = MutableSharedFlow<Group>()    //建立完成
-    val createComplete = _createComplete.asSharedFlow()
+    var uiState by mutableStateOf(UiState())
+        private set
 
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
@@ -208,12 +216,21 @@ class CreateGroupViewModel(
                 coverImageUrl = _group.value.coverImageUrl.orEmpty(),
                 thumbnailImageUrl = _group.value.thumbnailImageUrl.orEmpty(),
                 themeId = preCreateGroup.colorSchemeGroupKey?.value.orEmpty()
-            ).fold({
-                KLog.i(TAG, "createGroup success:$it")
-                _createComplete.emit(it)
-//                _group.value = it
+            ).fold({ createdGroup ->
+                KLog.i(TAG, "createGroup success")
+                uiState = uiState.copy(
+                    createdGroup = createdGroup,
+                    createComplete = true
+                )
+                // _group.value = it
             }, {
             })
         }
+    }
+
+    fun onCreateFinish() {
+        uiState = uiState.copy(
+            createComplete = null
+        )
     }
 }

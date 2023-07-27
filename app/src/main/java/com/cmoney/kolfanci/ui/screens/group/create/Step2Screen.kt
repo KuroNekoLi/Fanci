@@ -33,7 +33,7 @@ fun Step2Screen(
     isNeedApproval: Boolean,
     onSwitchApprove: (Boolean) -> Unit,
     onAddQuestion: () -> Unit,
-    question: List<String>,
+    questions: List<String>,
     onEditClick: (String) -> Unit,
     onNext: () -> Unit,
     onPre: () -> Unit
@@ -118,7 +118,7 @@ fun Step2Screen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                 ) {
-                    question.forEach {
+                    questions.forEach {
                         QuestionItem(question = it, onClick = {
                             onEditClick.invoke(it)
                         })
@@ -183,7 +183,7 @@ fun Step2Screen(
 fun Step2ScreenPreview() {
     FanciTheme {
         Step2Screen(
-            question = emptyList(),
+            questions = emptyList(),
             isNeedApproval = false,
             onSwitchApprove = {},
             onAddQuestion = {},

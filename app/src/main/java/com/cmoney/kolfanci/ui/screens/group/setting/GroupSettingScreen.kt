@@ -51,7 +51,6 @@ import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.model.Constant.isShowVipManager
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
-import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.ui.destinations.VipManagerScreenDestination
 import com.cmoney.kolfanci.ui.main.MainActivity
@@ -81,7 +80,6 @@ fun GroupSettingScreen(
     navController: DestinationsNavigator,
     viewModel: GroupSettingViewModel = koinViewModel(),
     memberViewModel: MemberViewModel = koinViewModel(),
-    resultRecipient: ResultRecipient<GroupOpennessScreenDestination, Group>,
     applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>,
     leaveResultBackNavigator: ResultBackNavigator<String>
@@ -101,18 +99,6 @@ fun GroupSettingScreen(
 
     //檢舉審核 清單
     val reportList by viewModel.reportList.collectAsState()
-
-    //公開度
-    resultRecipient.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                val resultGroup = result.value
-                viewModel.settingGroup(resultGroup)
-            }
-        }
-    }
 
     //是否刷新檢舉
     reportResultRecipient.onNavResult { result ->
