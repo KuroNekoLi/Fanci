@@ -483,18 +483,6 @@ class MemberViewModel(
             val distinctList = addGroupMemberQueue.distinct()
             addGroupMemberQueue.clear()
             addGroupMemberQueue.addAll(distinctList)
-
-            val orgMemberList = uiState.groupMember.orEmpty()
-            val filterMember = orgMemberList.filter {
-                addGroupMemberQueue.find { exclude ->
-                    exclude.id == it.groupMember.id
-                } == null
-            }
-
-            uiState = uiState.copy(
-                groupMember = filterMember,
-                showAddSuccessTip = true
-            )
         }
     }
 
