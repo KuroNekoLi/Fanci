@@ -681,8 +681,7 @@
         "type": "object",
         "properties": {
           "authType": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/ChannelAuthType"
           },
           "title": {
             "type": "string",
@@ -694,6 +693,15 @@
           }
         },
         "additionalProperties": false
+      },
+      "ChannelAuthType": {
+        "enum": [
+          "basic",
+          "inter",
+          "advance",
+          "NoPermission"
+        ],
+        "type": "string"
       },
       "ChatMessage": {
         "type": "object",

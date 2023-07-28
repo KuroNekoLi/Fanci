@@ -51,7 +51,7 @@ class ChannelUseCase(
      */
     suspend fun putPrivateChannelWhiteList(
         channelId: String,
-        authType: String,
+        authType: ChannelAuthType,
         accessorList: List<AccessorParam>
     ) =
         kotlin.runCatching {
