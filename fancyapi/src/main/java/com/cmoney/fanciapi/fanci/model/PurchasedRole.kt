@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.VipSale
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -24,11 +23,13 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param vipSalePlans 
+ * @param packId 
+ * @param type 
+ * @param subjectId 
+ * @param roleId 
  * @param roleName 
  * @param saleBelong 
  * @param isSubscribed 
- * @param currentDeadline 
  * @param paymentDate 
  * @param nextPaymentAlert 
  */
@@ -37,8 +38,17 @@ import kotlinx.parcelize.Parcelize
 
 data class PurchasedRole (
 
-    @Json(name = "vipSalePlans")
-    val vipSalePlans: kotlin.collections.List<VipSale>? = null,
+    @Json(name = "packId")
+    val packId: kotlin.Long? = null,
+
+    @Json(name = "type")
+    val type: kotlin.String? = null,
+
+    @Json(name = "subjectId")
+    val subjectId: kotlin.Int? = null,
+
+    @Json(name = "roleId")
+    val roleId: kotlin.Long? = null,
 
     @Json(name = "roleName")
     val roleName: kotlin.String? = null,
@@ -48,9 +58,6 @@ data class PurchasedRole (
 
     @Json(name = "isSubscribed")
     val isSubscribed: kotlin.Boolean? = null,
-
-    @Json(name = "currentDeadline")
-    val currentDeadline: String? = null,
 
     @Json(name = "paymentDate")
     val paymentDate: String? = null,

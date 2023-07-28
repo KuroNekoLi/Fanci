@@ -189,7 +189,7 @@ interface GroupApi {
     suspend fun apiV1GroupGroupIdRoleRoleIdPut(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String, @Body roleParam: RoleParam? = null): Response<Unit>
 
     /**
-     * 取得Vip角色列表
+     * 取得角色列表 (Vip)
      * 
      * Responses:
      *  - 200: 成功
@@ -200,6 +200,23 @@ interface GroupApi {
      */
     @GET("api/v1/Group/{groupId}/VipRole")
     suspend fun apiV1GroupGroupIdVipRoleGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
+
+    /**
+     * 新增Vip角色(限定後台使用)
+     * 
+     * Responses:
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
+     *  - 409: 已有相同名稱的角色
+     *
+     * @param groupId 社團Id
+     * @param roleParam 角色參數 (optional)
+     * @return [FanciRole]
+     */
+    @POST("api/v1/Group/{groupId}/VipRole")
+    suspend fun apiV1GroupGroupIdVipRolePost(@Path("groupId") groupId: kotlin.String, @Body roleParam: RoleParam? = null): Response<FanciRole>
 
     /**
      * 取得我加入的社團清單 __________🔒 已註冊的fanci使用者

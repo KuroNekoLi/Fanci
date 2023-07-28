@@ -23,23 +23,23 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param authType 
- * @param title 
- * @param allowedAction 
+ * @param packId 
+ * @param type 
+ * @param subjectId 
  */
 @Parcelize
 
 
-data class ChannelAccessOptionV2 (
+data class AuthorizationEntry (
 
-    @Json(name = "authType")
-    val authType: kotlin.String? = null,
+    @Json(name = "packId")
+    val packId: kotlin.Long? = null,
 
-    @Json(name = "title")
-    val title: kotlin.String? = null,
+    @Json(name = "type")
+    val type: kotlin.String? = null,
 
-    @Json(name = "allowedAction")
-    val allowedAction: kotlin.String? = null
+    @Json(name = "subjectId")
+    val subjectId: kotlin.Int? = null
 
 ) : Parcelable
 

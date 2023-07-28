@@ -15,7 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.VipRole
+import com.cmoney.fanciapi.fanci.model.AuthorizationEntry
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -40,7 +40,7 @@ data class VipSale (
     val vipSaleName: kotlin.String? = null,
 
     @Json(name = "vipRoles")
-    val vipRoles: kotlin.collections.List<VipRole>? = null
+    val vipRoles: kotlin.collections.List<AuthorizationEntry>? = null
 
 ) : Parcelable
 
