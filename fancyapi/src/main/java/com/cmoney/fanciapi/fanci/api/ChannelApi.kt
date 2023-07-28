@@ -1,14 +1,9 @@
 package com.cmoney.fanciapi.fanci.api
 
-import com.cmoney.fanciapi.infrastructure.CollectionFormats.*
-import retrofit2.http.*
-import retrofit2.Response
-import okhttp3.RequestBody
-import com.squareup.moshi.Json
-
 import com.cmoney.fanciapi.fanci.model.AccessorTypes
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
+import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.ChannelWhiteList
 import com.cmoney.fanciapi.fanci.model.EditChannelParam
@@ -18,6 +13,9 @@ import com.cmoney.fanciapi.fanci.model.PutAuthTypeRequest
 import com.cmoney.fanciapi.fanci.model.PutWhiteListRequest
 import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 import com.cmoney.fanciapi.fanci.model.WhiteListCount
+import com.cmoney.fanciapi.infrastructure.CollectionFormats.*
+import retrofit2.Response
+import retrofit2.http.*
 
 interface ChannelApi {
     /**

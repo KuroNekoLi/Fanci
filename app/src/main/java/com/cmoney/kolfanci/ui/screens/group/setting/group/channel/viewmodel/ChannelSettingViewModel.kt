@@ -51,7 +51,7 @@ class ChannelSettingViewModel(
     var currentSelectedPermission: ChannelAccessOptionModel? = null
 
     //每個權限所勾選的人員/角色 清單, key = authType
-    private val listPermissionSelected: HashMap<String, SelectedModel> = hashMapOf()
+    private val listPermissionSelected: HashMap<ChannelAuthType, SelectedModel> = hashMapOf()
 
     //預編輯的頻道
     var channel: Channel? = null
@@ -90,7 +90,7 @@ class ChannelSettingViewModel(
                 channelId
             ).fold({
                 it.map { channelWhiteList ->
-                    listPermissionSelected[channelWhiteList.authType.orEmpty()] = SelectedModel(
+                    listPermissionSelected[channelWhiteList.authType!!] = SelectedModel(
                         selectedMember = channelWhiteList.users.orEmpty(),
                         selectedRole = channelWhiteList.roles.orEmpty(),
                         selectedVipPlans = channelWhiteList.vipRoles.orEmpty().map { fanciRole ->
@@ -615,7 +615,7 @@ class ChannelSettingViewModel(
     fun setPermissionMemberSelected(selectedModel: SelectedModel) {
         KLog.i(TAG, "setPermissionMemberSelected:$selectedModel")
         currentSelectedPermission?.let {
-            listPermissionSelected[it.authType.orEmpty()] = selectedModel
+            listPermissionSelected[it.authType!!] = selectedModel
             currentSelectedPermission = null
 
             fetchPrivateChannelUserCount()
@@ -629,7 +629,7 @@ class ChannelSettingViewModel(
         KLog.i(TAG, "onPermissionClick:$channelPermissionModel")
         currentSelectedPermission = channelPermissionModel
 
-        listPermissionSelected[channelPermissionModel.authType.orEmpty()]?.let {
+        listPermissionSelected[channelPermissionModel.authType]?.let {
             uiState = uiState.copy(
                 clickPermissionMemberModel = Pair(channelPermissionModel, it)
             )

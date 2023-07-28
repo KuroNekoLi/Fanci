@@ -41,6 +41,7 @@ import com.cmoney.fanciapi.fanci.model.AuthBulliten
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
@@ -730,7 +731,7 @@ fun AddChannelScreenPreview() {
             group = Group(),
             channelAccessTypeList = listOf(
                 ChannelAccessOptionModel(
-                    authType = "basic",
+                    authType = ChannelAuthType.basic,
                     title = "基本權限",
                     icon = "https://cm-39.s3-ap-northeast-1.amazonaws.com/images/2f9d6a01-d4cd-4190-8907-67adc9e177af.png",
                     bullitens = listOf(
@@ -767,7 +768,7 @@ fun ChannelPermissionItemPreview() {
     FanciTheme {
         ChannelPermissionItem(
             channelAccessOptionModel = ChannelAccessOptionModel(
-                authType = "",
+                authType = ChannelAuthType.basic,
                 title = "基本權限",
                 icon = null,
                 bullitens = listOf(

@@ -35,7 +35,7 @@ import kotlinx.parcelize.Parcelize
 data class ChannelAccessOptionModel (
 
     @Json(name = "authType")
-    val authType: kotlin.String? = null,
+    val authType: ChannelAuthType? = null,
 
     @Json(name = "title")
     val title: kotlin.String? = null,
