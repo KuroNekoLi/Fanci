@@ -145,7 +145,7 @@ class VipManagerViewModel(
     fun fetchPermissions(vipPlanModel: VipPlanModel) {
         KLog.i(TAG, "fetchPermissions.")
         viewModelScope.launch {
-            vipManagerUseCase.getPermissions(group = group, vipPlanModel = vipPlanModel)
+            vipManagerUseCase.getPermissionWithAuthTitle(group = group, vipPlanModel = vipPlanModel)
                 .onSuccess { data ->
                     _permissionModels.value = data
                 }
