@@ -4062,7 +4062,7 @@
         "tags": [
           "Info"
         ],
-        "summary": "密碼是 xlabxlab",
+        "summary": "輸入密碼 以取得環境參數",
         "parameters": [
           {
             "name": "passcode",
@@ -6982,8 +6982,7 @@
         "type": "object",
         "properties": {
           "authType": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/ChannelAuthType"
           },
           "title": {
             "type": "string",
@@ -7116,8 +7115,7 @@
         "type": "object",
         "properties": {
           "authType": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/ChannelAuthType"
           },
           "roles": {
             "type": "array",
@@ -7149,6 +7147,9 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
@@ -7178,6 +7179,9 @@
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
           },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
+          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -7190,12 +7194,6 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
-          },
-          "replyMessage": {
-            "$ref": "#/components/schemas/IReplyMessage"
-          },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false

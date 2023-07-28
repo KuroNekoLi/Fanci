@@ -16,6 +16,7 @@
 package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.AuthBulliten
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
