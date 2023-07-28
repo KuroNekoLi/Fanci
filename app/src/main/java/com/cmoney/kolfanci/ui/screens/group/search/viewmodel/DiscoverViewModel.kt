@@ -9,6 +9,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupPaging
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -16,6 +17,7 @@ data class UiState(
     val groupList: List<Group> = emptyList(),
     val searchGroupClick: Group? = null,
     val joinSuccess: Group? = null,
+    val showLoginDialog: Boolean = false,
     val tabIndex: Int = 0,
     val isLoading: Boolean = false
 )
@@ -104,7 +106,11 @@ class DiscoverViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
 
     fun openGroupItemDialog(groupModel: Group) {
         KLog.i(TAG, "openGroupItemDialog:$groupModel")
-        uiState = uiState.copy(searchGroupClick = groupModel)
+        uiState = if (XLoginHelper.isLogin) {
+            uiState.copy(searchGroupClick = groupModel)
+        } else {
+            uiState.copy(showLoginDialog = true)
+        }
     }
 
     fun closeGroupItemDialog() {
@@ -168,5 +174,23 @@ class DiscoverViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 }
             }
         }
+    }
+
+    /**
+     * 顯示登入彈窗
+     */
+    fun showLoginDialog() {
+        uiState = uiState.copy(
+            showLoginDialog = true
+        )
+    }
+
+    /**
+     * 關閉登入彈窗
+     */
+    fun dismissLoginDialog() {
+        uiState = uiState.copy(
+            showLoginDialog = false
+        )
     }
 }

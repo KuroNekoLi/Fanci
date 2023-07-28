@@ -65,9 +65,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 }
             }
         } else {
-            uiState = uiState.copy(
-                showLoginDialog = true
-            )
+            showLoginDialog()
         }
     }
 
@@ -122,6 +120,15 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 showLoginDialog = true
             )
         }
+    }
+
+    /**
+     * 顯示登入彈窗
+     */
+    fun showLoginDialog() {
+        uiState = uiState.copy(
+            showLoginDialog = true
+        )
     }
 
     /**
