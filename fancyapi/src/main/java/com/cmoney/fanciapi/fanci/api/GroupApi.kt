@@ -247,4 +247,17 @@ interface GroupApi {
     @POST("api/v1/Group")
     suspend fun apiV1GroupPost(@Body groupParam: GroupParam? = null): Response<Group>
 
+    /**
+     * 取得角色列表
+     *
+     * Responses:
+     *  - 200: 成功
+     *  - 404: 找不到該社團
+     *
+     * @param groupId 社團Id
+     * @param isVip  (optional)
+     * @return [kotlin.collections.List<FanciRole>]
+     */
+    @GET("api/v2/Group/{groupId}/Role")
+    suspend fun apiV2GroupGroupIdRoleGet(@Path("groupId") groupId: kotlin.String, @Query("isVip") isVip: kotlin.Boolean? = null): Response<kotlin.collections.List<FanciRole>>
 }
