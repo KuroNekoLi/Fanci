@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,28 +36,21 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
-import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
-import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
-import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EmptyFollowScreen(
-    viewModel: FollowViewModel = koinViewModel(),
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
+    viewModel: FollowViewModel = koinViewModel(),
     groupList: List<Group>,
     onLoadMore: () -> Unit,
     isLoading: Boolean
 ) {
-    val uiState = viewModel.uiState
     val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
     EmptyFollowScreenView(
@@ -87,36 +79,6 @@ fun EmptyFollowScreen(
             }
         )
     }
-
-    if (uiState.showLoginDialog) {
-        val context = LocalContext.current
-        LoginDialogScreen(
-            onDismiss = {
-                viewModel.dismissLoginDialog()
-            },
-            onLogin = {
-                viewModel.dismissLoginDialog()
-                (context as? MainActivity)?.startLogin()
-            }
-        )
-    }
-
-    //打開 建立社團
-    if (uiState.navigateToCreateGroup) {
-        navigator.navigate(CreateGroupScreenDestination)
-        viewModel.navigateDone()
-    }
-
-    //前往社團認證
-    uiState.navigateToApproveGroup?.let {
-        navigator.navigate(
-            ApplyForGroupScreenDestination(
-                group = it
-            )
-        )
-        viewModel.navigateDone()
-    }
-
 }
 
 @Composable

@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,12 +47,15 @@ import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -84,7 +88,11 @@ fun DiscoverGroupScreen(
             viewModel.openGroupItemDialog(it)
         },
         onCreateClick = {
-            navController.navigate(CreateGroupScreenDestination())
+            if (XLoginHelper.isLogin) {
+                navController.navigate(CreateGroupScreenDestination())
+            } else {
+                viewModel.showLoginDialog()
+            }
         },
         onLoadMore = {
             viewModel.onLoadMore()
@@ -146,6 +154,19 @@ fun DiscoverGroupScreen(
         globalGroupViewModel.setCurrentGroup(uiState.joinSuccess)
         navController.popBackStack(MainScreenDestination, inclusive = false)
 //        navController.popBackStack()
+    }
+
+    if (uiState.showLoginDialog) {
+        val context = LocalContext.current
+        LoginDialogScreen(
+            onDismiss = {
+                viewModel.dismissLoginDialog()
+            },
+            onLogin = {
+                viewModel.dismissLoginDialog()
+                (context as? MainActivity)?.startLogin()
+            }
+        )
     }
 
     LaunchedEffect(key1 = uiState.tabIndex) {

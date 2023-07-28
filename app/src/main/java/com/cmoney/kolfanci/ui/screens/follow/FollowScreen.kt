@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -36,11 +37,13 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.*
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -169,6 +172,35 @@ fun FollowScreen(
         }
     }
 
+    if (uiState.showLoginDialog) {
+        val context = LocalContext.current
+        LoginDialogScreen(
+            onDismiss = {
+                viewModel.dismissLoginDialog()
+            },
+            onLogin = {
+                viewModel.dismissLoginDialog()
+                (context as? MainActivity)?.startLogin()
+            }
+        )
+    }
+
+    //打開 建立社團
+    if (uiState.navigateToCreateGroup) {
+        navigator.navigate(CreateGroupScreenDestination)
+        viewModel.navigateDone()
+    }
+
+    //前往社團認證
+    uiState.navigateToApproveGroup?.let {
+        navigator.navigate(
+            ApplyForGroupScreenDestination(
+                group = it
+            )
+        )
+        viewModel.navigateDone()
+    }
+
     FollowScreenView(
         modifier = modifier,
         navigator = navigator,
@@ -190,13 +222,21 @@ fun FollowScreen(
         onChannelClick = {
             chatRoomViewModel.fetchChannelPermission(it)
         },
-        onLoadMoreServerGroup = onLoadMoreServerGroup
+        onLoadMoreServerGroup = onLoadMoreServerGroup,
+        onGoToMy = {
+            if (XLoginHelper.isLogin) {
+                navigator.navigate(MyScreenDestination)
+            } else {
+                viewModel.showLoginDialog()
+            }
+        }
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FollowScreenView(
+    modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     groupList: List<GroupItem>,
     group: Group?,
@@ -210,8 +250,8 @@ fun FollowScreenView(
     isLoading: Boolean,
     onChannelClick: (Channel) -> Unit,
     onLoadMoreServerGroup: () -> Unit,
-    emptyGroupList: List<Group>,
-    modifier: Modifier
+    onGoToMy: () -> Unit,
+    emptyGroupList: List<Group>
 ) {
     val TAG = "FollowScreenView"
 
@@ -262,7 +302,13 @@ fun FollowScreenView(
                     },
                     onProfile = {
                         KLog.i(TAG, "onProfile click.")
-                        navigator.navigate(MyScreenDestination)
+
+                        //Close Drawer
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.close()
+                        }
+
+                        onGoToMy()
                     }
                 )
                 Box(
@@ -298,7 +344,6 @@ fun FollowScreenView(
                 if (group == null) {
                     //Empty follow group
                     EmptyFollowScreenWithMenu(
-                        navigator = navigator,
                         onLoadMoreServerGroup = onLoadMoreServerGroup,
                         emptyGroupList = emptyGroupList,
                         isLoading = false,
@@ -446,7 +491,6 @@ fun FollowScreenView(
         } else {
             //Empty follow group
             EmptyFollowScreenWithMenu(
-                navigator = navigator,
                 onLoadMoreServerGroup = onLoadMoreServerGroup,
                 emptyGroupList = emptyGroupList,
                 isLoading = isLoading,
@@ -465,7 +509,6 @@ fun FollowScreenView(
  */
 @Composable
 private fun EmptyFollowScreenWithMenu(
-    navigator: DestinationsNavigator,
     onLoadMoreServerGroup: () -> Unit,
     emptyGroupList: List<Group>,
     isLoading: Boolean,
@@ -476,7 +519,6 @@ private fun EmptyFollowScreenWithMenu(
             .fillMaxWidth()
     ) {
         EmptyFollowScreen(
-            navigator = navigator,
             onLoadMore = onLoadMoreServerGroup,
             groupList = emptyGroupList,
             isLoading = isLoading
@@ -556,6 +598,7 @@ fun LoadingViewPreview() {
 fun FollowScreenPreview() {
     FanciTheme {
         FollowScreenView(
+            modifier = Modifier,
             navigator = EmptyDestinationsNavigator,
             groupList = emptyList(),
             group = Group(),
@@ -571,8 +614,8 @@ fun FollowScreenPreview() {
             isLoading = true,
             onChannelClick = {},
             onLoadMoreServerGroup = {},
+            onGoToMy = {},
             emptyGroupList = emptyList(),
-            modifier = Modifier
         )
     }
 }
