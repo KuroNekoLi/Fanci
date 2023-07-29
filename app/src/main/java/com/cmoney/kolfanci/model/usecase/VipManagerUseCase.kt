@@ -35,15 +35,6 @@ class VipManagerUseCase(
     }
 
     /**
-     * 取得所有VIP方案
-     */
-    fun getVipPlan(): Result<List<VipPlanModel>> {
-        return kotlin.runCatching {
-            getVipPlanMockData()
-        }
-    }
-
-    /**
      * 取得 vip 方案清單
      *
      * @param group 社團
