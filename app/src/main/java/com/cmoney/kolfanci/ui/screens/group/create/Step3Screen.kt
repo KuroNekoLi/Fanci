@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -16,7 +17,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
@@ -36,20 +39,29 @@ fun Step3Screen(
     onNext: () -> Unit,
     onPre: () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        AppUserLogger.getInstance()
+            .log(Page.CreateGroupGroupArrangement)
+    }
+
     Spacer(modifier = Modifier.height(20.dp))
     Column {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .verticalScroll(rememberScrollState())
                 .weight(1f)
         ) {
 
             Spacer(modifier = Modifier.height(1.dp))
             DescWithImage(desc = "社團圖示", groupIcon) {
+                AppUserLogger.getInstance()
+                    .log(Page.CreateGroupGroupArrangementGroupIcon)
                 onChangeIcon.invoke()
             }
             Spacer(modifier = Modifier.height(1.dp))
             DescWithImage(desc = "首頁背景", groupBackground) {
+                AppUserLogger.getInstance()
+                    .log(Page.CreateGroupGroupArrangementHomeBackground)
                 onChangeBackground.invoke()
             }
             Spacer(modifier = Modifier.height(1.dp))
@@ -57,6 +69,9 @@ fun Step3Screen(
                 modifier = Modifier
                     .background(LocalColor.current.background)
                     .clickable {
+                        AppUserLogger
+                            .getInstance()
+                            .log(Page.CreateGroupGroupArrangementThemeColor)
                         onThemeChange.invoke()
                     }
                     .padding(top = 15.dp, bottom = 15.dp, start = 24.dp, end = 24.dp)
@@ -188,7 +203,7 @@ private fun DescWithImage(desc: String, thumbnail: String, onClick: () -> Unit) 
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun Step3ScreenPreview() {
     FanciTheme {
