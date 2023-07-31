@@ -622,10 +622,9 @@ class ChannelSettingViewModel(
      */
     fun setPermissionMemberSelected(selectedModel: SelectedModel) {
         KLog.i(TAG, "setPermissionMemberSelected:$selectedModel")
-        currentSelectedPermission?.let {
-            listPermissionSelected[it.authType!!] = selectedModel
+        currentSelectedPermission?.authType?.let { authType ->
+            listPermissionSelected[authType] = selectedModel
             currentSelectedPermission = null
-
             fetchPrivateChannelUserCount()
         }
     }
