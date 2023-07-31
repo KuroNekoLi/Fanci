@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Page
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -29,6 +31,11 @@ fun Step1Screen(
 ) {
     var textState by remember { mutableStateOf(defaultName) }
     val maxLength = 20
+
+    LaunchedEffect(Unit) {
+        AppUserLogger.getInstance()
+            .log(Page.CreateGroupGroupName)
+    }
 
     Column(
         modifier = Modifier
