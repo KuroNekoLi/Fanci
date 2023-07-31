@@ -79,7 +79,7 @@ class VipManagerViewModel(
      */
     fun fetchVipPlan() {
         viewModelScope.launch {
-            vipManagerUseCase.getVipPlan(group).fold({
+            vipManagerUseCase.getVipPlan(group.id.orEmpty()).fold({
                 _vipPlanList.value = it.map { role ->
                     role.toVipPlanModel()
                 }
