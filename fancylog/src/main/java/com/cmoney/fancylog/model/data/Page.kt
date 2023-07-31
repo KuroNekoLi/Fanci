@@ -12,6 +12,41 @@ sealed class Page(val eventName: String) {
     object Home : Page(eventName = "Home")
 
     /**
+     * 建立社團.社團名稱_觀看
+     */
+    object CreateGroupGroupName : Page(eventName = "CreateGroup.GroupName")
+
+    /**
+     * 建立社團.社團權限_觀看
+     */
+    object CreateGroupGroupOpenness : Page(eventName = "CreateGroup.GroupOpenness")
+
+    /**
+     * 建立社團.權限.新增審核題目_觀看
+     */
+    object CreateGroupGroupOpennessAddReviewQuestion : Page(eventName = "CreateGroup.GroupOpenness.AddReviewQuestion")
+
+    /**
+     * 建立社團.佈置_觀看
+     */
+    object CreateGroupGroupArrangement : Page(eventName = "CreateGroup.GroupArrangement")
+
+    /**
+     * 建立社團.佈置.社團圖示_觀看
+     */
+    object CreateGroupGroupArrangementGroupIcon : Page(eventName = "CreateGroup.GroupArrangement.GroupIcon")
+
+    /**
+     * 建立社團.佈置.首頁背景_觀看
+     */
+    object CreateGroupGroupArrangementHomeBackground : Page(eventName = "CreateGroup.GroupArrangement.HomeBackground")
+
+    /**
+     * 建立社團.佈置.主題色彩_觀看
+     */
+    object CreateGroupGroupArrangementThemeColor : Page(eventName = "CreateGroup.GroupArrangement.ThemeColor")
+
+    /**
      * 會員頁_觀看
      */
     object MemberPage : Page(eventName = "MemberPage")
@@ -192,6 +227,11 @@ sealed class Page(val eventName: String) {
     object GroupSettingsChannelManagementAddCategory : Page(eventName = "Group.Settings.ChannelManagement.AddCategory")
 
     /**
+     * 社團.設定.頻道管理.新增分類.分類名稱_觀看
+     */
+    object GroupSettingsChannelManagementAddCategoryCategoryName : Page(eventName = "Group.Settings.ChannelManagement.AddCategory.CategoryName")
+
+    /**
      * 社團.設定.頻道管理.編輯分類_觀看
      */
     object GroupSettingsChannelManagementEditCategory : Page(eventName = "Group.Settings.ChannelManagement.EditCategory")
@@ -282,6 +322,11 @@ sealed class Page(val eventName: String) {
     object GroupSettingsRoleManagementAddRoleStyle : Page(eventName = "Group.Settings.RoleManagement.AddRole.Style")
 
     /**
+     * 社團.設定.角色管理.新增角色.樣式.角色名稱_觀看
+     */
+    object GroupSettingsRoleManagementAddRoleStyleRoleName : Page(eventName = "Group.Settings.RoleManagement.AddRole.Style.RoleName")
+
+    /**
      * 社團.設定.角色管理.新增角色.權限_觀看
      */
     object GroupSettingsRoleManagementAddRolePermissions : Page(eventName = "Group.Settings.RoleManagement.AddRole.Permissions")
@@ -335,6 +380,11 @@ sealed class Page(val eventName: String) {
      * 社團.設定.VIP.資訊_觀看
      */
     object GroupSettingsVIPINF : Page(eventName = "Group.Settings.VIP.INF")
+
+    /**
+     * 社團.設定.VIP.資訊.VIP名稱_觀看
+     */
+    object GroupSettingsVIPINFVIPName : Page(eventName = "Group.Settings.VIP.INF.VIPName")
 
     /**
      * 社團.設定.VIP.權限_觀看
