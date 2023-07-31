@@ -13,12 +13,6 @@
             android:label="@string/screen_shot_application"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Fanci">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
         </activity>
     </application>
 
