@@ -41,6 +41,7 @@ import com.cmoney.fanciapi.fanci.model.AuthBulliten
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
+import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
@@ -265,14 +266,14 @@ fun AddChannelScreenView(
     isNeedApproval: Boolean,
     fanciRole: List<FanciRole>?,
     group: Group,
-    channelAccessTypeList: List<ChannelAccessOptionModel>,
+    channelAccessTypeList: List<ChannelAccessOptionV2>,
     isLoading: Boolean,
     withDelete: Boolean,
     uniqueUserCount: Int,
     onConfirm: (String) -> Unit,
     onTabClick: (Int) -> Unit,
     onRemoveRole: (FanciRole) -> Unit,
-    onPermissionClick: (ChannelAccessOptionModel) -> Unit,
+    onPermissionClick: (ChannelAccessOptionV2) -> Unit,
     onDeleteClick: () -> Unit,
     onBack: () -> Unit,
     channel: Channel?
@@ -506,8 +507,8 @@ private fun PermissionTabScreen(
     isNeedApproval: Boolean,
     navigator: DestinationsNavigator,
     uniqueUserCount: Int,
-    channelPermissionModel: List<ChannelAccessOptionModel>,
-    onPermissionClick: (ChannelAccessOptionModel) -> Unit
+    channelPermissionModel: List<ChannelAccessOptionV2>,
+    onPermissionClick: (ChannelAccessOptionV2) -> Unit
 ) {
     val TAG = "PermissionTabScreen"
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -582,8 +583,8 @@ private fun PermissionTabScreen(
  */
 @Composable
 private fun ChannelPermissionItem(
-    channelAccessOptionModel: ChannelAccessOptionModel,
-    onClick: (ChannelAccessOptionModel) -> Unit
+    channelAccessOptionModel: ChannelAccessOptionV2,
+    onClick: (ChannelAccessOptionV2) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -604,15 +605,8 @@ private fun ChannelPermissionItem(
                 fontSize = 17.sp,
                 color = LocalColor.current.text.default_100
             )
-            val subTitle = remember(channelAccessOptionModel.bullitens) {
-                channelAccessOptionModel.bullitens?.filter { bulliten ->
-                    bulliten.title != null
-                }?.joinToString("，") { bulliten ->
-                    bulliten.title.orEmpty()
-                }.orEmpty()
-            }
             Text(
-                text = subTitle,
+                text = channelAccessOptionModel.allowedAction.orEmpty(),
                 fontSize = 14.sp,
                 color = LocalColor.current.text.default_50
             )
@@ -730,22 +724,10 @@ fun AddChannelScreenPreview() {
             fanciRole = emptyList(),
             group = Group(),
             channelAccessTypeList = listOf(
-                ChannelAccessOptionModel(
+                ChannelAccessOptionV2(
                     authType = ChannelAuthType.basic,
                     title = "基本權限",
-                    icon = "https://cm-39.s3-ap-northeast-1.amazonaws.com/images/2f9d6a01-d4cd-4190-8907-67adc9e177af.png",
-                    bullitens = listOf(
-                        AuthBulliten(
-                            title = "觀看頻道內容",
-                            icon = "https://cm-39.s3-ap-northeast-1.amazonaws.com/images/14086db2-34b7-43b9-8c68-8874cd6ab44d.png",
-                            isEnabled = true
-                        ),
-                        AuthBulliten(
-                            title = "與頻道成員互動",
-                            icon = "https://cm-39.s3-ap-northeast-1.amazonaws.com/images/0b135eba-cbeb-4f0f-9c4a-dde85757a9e1.png",
-                            isEnabled = false
-                        )
-                    )
+                    allowedAction = "觀看頻道內容, 與頻道成員互動"
                 )
             ),
             isLoading = true,
@@ -767,17 +749,10 @@ fun AddChannelScreenPreview() {
 fun ChannelPermissionItemPreview() {
     FanciTheme {
         ChannelPermissionItem(
-            channelAccessOptionModel = ChannelAccessOptionModel(
+            channelAccessOptionModel = ChannelAccessOptionV2(
                 authType = ChannelAuthType.basic,
                 title = "基本權限",
-                icon = null,
-                bullitens = listOf(
-                    AuthBulliten(
-                        title = "可以進入此頻道",
-                        icon = null,
-                        isEnabled = true
-                    )
-                )
+                allowedAction = "觀看頻道內容, 與頻道成員互動"
             ),
             onClick = {
             }
