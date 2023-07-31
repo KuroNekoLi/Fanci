@@ -26,10 +26,10 @@ class VipPlanViewModel(
      *
      * @param models 已選擇的VIP方案
      */
-    fun fetchVipPlan(models: Array<VipPlanModel>, group: Group) {
+    fun fetchVipPlan(models: Array<VipPlanModel>, groupId: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            vipManagerUseCase.getVipPlan(group = group)
+            vipManagerUseCase.getVipPlan(groupId = groupId)
                 .onSuccess { data ->
                     val allVipPlanModel = data.map {
                         it.toVipPlanModel()

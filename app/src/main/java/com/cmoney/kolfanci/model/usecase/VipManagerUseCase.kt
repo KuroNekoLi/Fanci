@@ -37,10 +37,10 @@ class VipManagerUseCase(
     /**
      * 取得 vip 方案清單
      *
-     * @param group 社團
+     * @param groupId 社團Id
      */
-    suspend fun getVipPlan(group: Group) = kotlin.runCatching {
-        groupApi.apiV1GroupGroupIdVipRoleGet(groupId = group.id.orEmpty()).checkResponseBody()
+    suspend fun getVipPlan(groupId: String) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdVipRoleGet(groupId = groupId).checkResponseBody()
     }
 
     /**

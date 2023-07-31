@@ -79,7 +79,7 @@ fun AddVipPlanScreen(
         if (vipPlanModels == null) {
             viewModel.fetchVipPlan(
                 models = selectedVipPlanModels,
-                group = group
+                groupId = group.id.orEmpty()
             )
         }
     }
