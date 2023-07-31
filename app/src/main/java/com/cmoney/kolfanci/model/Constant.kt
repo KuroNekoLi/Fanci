@@ -55,9 +55,7 @@ object Constant {
     /**
      * 是否可以管理 vip 方案
      */
-    //TODO: server 還在開發中, 先打開入口
-    fun isShowVipManager(): Boolean = true
-//    fun isShowVipManager(): Boolean = MyGroupPermission.editVipRole == true
+    fun isShowVipManager(): Boolean = MyGroupPermission.editVipRole == true
 
     /**
      * 是否可以管理 加入申請

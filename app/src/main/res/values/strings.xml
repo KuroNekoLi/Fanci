@@ -108,6 +108,7 @@
     <string name="vip_name_empty_desc">VIP 名稱不可以是空白的唷！</string>
 
     <string name="choose_channel">選擇頻道</string>
+    <string name="choose_permission">選擇權限</string>
 
     <string name="vip_member_description">下列為購買此 VIP 方案的成員，他們可以執行此 VIP的權限行為。</string>
     <string name="vip_member_empty_description">目前沒有任何人購買此方案</string>

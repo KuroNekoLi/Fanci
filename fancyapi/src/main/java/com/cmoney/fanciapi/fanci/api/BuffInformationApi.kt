@@ -10,7 +10,7 @@ import com.cmoney.fanciapi.fanci.model.UserBuffInformation
 
 interface BuffInformationApi {
     /**
-     * 取得自己在頻道的Buff/Debuff狀態 __________🔒 已註冊的fanci使用者
+     * 取得自己在頻道的Buff/Debuff狀態
      * 
      * Responses:
      *  - 200: Success
@@ -24,7 +24,7 @@ interface BuffInformationApi {
     suspend fun apiV1BuffInformationChannelChannelIdMeGet(@Path("channelId") channelId: kotlin.String): Response<UserBuffInformation>
 
     /**
-     * 取得自己在社團的Buff/Debuff狀態 __________🔒 已註冊的fanci使用者
+     * 取得自己在社團的Buff/Debuff狀態
      * 
      * Responses:
      *  - 200: Success

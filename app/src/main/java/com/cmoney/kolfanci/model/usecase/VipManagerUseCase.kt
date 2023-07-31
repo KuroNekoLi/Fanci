@@ -5,12 +5,12 @@ import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.RoleUserApi
 import com.cmoney.fanciapi.fanci.api.VipApi
 import com.cmoney.fanciapi.fanci.model.AccessorTypes
-import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.PutAuthTypeRequest
+import com.cmoney.fanciapi.fanci.model.RoleChannelAuthType
 import com.cmoney.fanciapi.fanci.model.RoleParam
 import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.extension.isVip
@@ -35,21 +35,12 @@ class VipManagerUseCase(
     }
 
     /**
-     * 取得所有VIP方案
-     */
-    fun getVipPlan(): Result<List<VipPlanModel>> {
-        return kotlin.runCatching {
-            getVipPlanMockData()
-        }
-    }
-
-    /**
      * 取得 vip 方案清單
      *
-     * @param group 社團
+     * @param groupId 社團Id
      */
-    suspend fun getVipPlan(group: Group) = kotlin.runCatching {
-        groupApi.apiV1GroupGroupIdVipRoleGet(groupId = group.id.orEmpty()).checkResponseBody()
+    suspend fun getVipPlan(groupId: String) = kotlin.runCatching {
+        groupApi.apiV1GroupGroupIdVipRoleGet(groupId = groupId).checkResponseBody()
     }
 
     /**
@@ -96,9 +87,62 @@ class VipManagerUseCase(
                 id = roleChannelAuthType.channelId.orEmpty(),
                 name = roleChannelAuthType.channelName.orEmpty(),
                 canEdit = roleChannelAuthType.isPublic != true,
-                permissionTitle = roleChannelAuthType.channelName.orEmpty(),
+                permissionTitle = "",
                 authType = roleChannelAuthType.authType ?: ChannelAuthType.noPermission
             )
+        }
+    }
+
+    /**
+     * 取得某社團下該 vip 方案的詳細資訊
+     *
+     * @param group 指定社團
+     * @param vipPlanModel 選擇的方案
+     * @return 社團所有頻道此方案下的權限設定
+     */
+    suspend fun getPermissionWithAuthTitle(
+        group: Group,
+        vipPlanModel: VipPlanModel
+    ) = kotlin.runCatching {
+        //權限清單表
+        val permissionList = getPermissionOptions(vipPlanModel = vipPlanModel).getOrNull().orEmpty()
+
+        //取得該角色 在此社團下 所有頻道的權限
+        groupApi.apiV1GroupGroupIdRoleIdChannelAuthTypeGet(
+            groupId = group.id.orEmpty(),
+            roleId = vipPlanModel.id
+        ).checkResponseBody().map { roleChannelAuthType ->
+            val authType = roleChannelAuthType.authType ?: ChannelAuthType.noPermission
+            VipPlanPermissionModel(
+                id = roleChannelAuthType.channelId.orEmpty(),
+                name = roleChannelAuthType.channelName.orEmpty(),
+                canEdit = roleChannelAuthType.isPublic != true,
+                permissionTitle = getPermissionTitle(
+                    roleChannelAuthType = roleChannelAuthType,
+                    authType = authType,
+                    permissionList = permissionList
+                ),
+                authType = authType
+            )
+        }
+    }
+
+    /**
+     * 取得 authType 對應的顯示名稱
+     * @param authType
+     * @param permissionList 權限表
+     */
+    private fun getPermissionTitle(
+        authType: ChannelAuthType,
+        permissionList: List<VipPlanPermissionOptionModel>,
+        roleChannelAuthType: RoleChannelAuthType
+    ): String {
+        return if (roleChannelAuthType.isPublic == true) {
+            "公開頻道"
+        } else {
+            permissionList.first {
+                it.authType == authType
+            }.name
         }
     }
 

@@ -15,13 +15,13 @@ import com.cmoney.fanciapi.fanci.model.PinnedMessageInfo
 
 interface ChatRoomApi {
     /**
-     * 取得聊天室訊息列表
+     * 取得聊天室訊息列表 __________🔒 可看
      * 
      * Responses:
      *  - 200: 成功
      *  - 401: 未驗證
-     *  - 404: 找不到該頻道
      *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
      * @param chatRoomChannelId 聊天室頻道Id
      * @param take 取得筆數 (optional, default to 20)

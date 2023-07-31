@@ -145,7 +145,7 @@ class VipManagerViewModel(
     fun fetchPermissions(vipPlanModel: VipPlanModel) {
         KLog.i(TAG, "fetchPermissions.")
         viewModelScope.launch {
-            vipManagerUseCase.getPermissions(group = group, vipPlanModel = vipPlanModel)
+            vipManagerUseCase.getPermissionWithAuthTitle(group = group, vipPlanModel = vipPlanModel)
                 .onSuccess { data ->
                     _permissionModels.value = data
                 }
@@ -208,16 +208,13 @@ class VipManagerViewModel(
                 groupMember = groupMember
             ).fold({
                 _alreadyPurchasePlan.value = it.map { purchaseRole ->
-                    val plans = purchaseRole.vipSalePlans.orEmpty()
-                    plans.map { plan ->
-                        VipPlanModel(
-                            id = plan.vipSaleId.toString(),
-                            name = purchaseRole.roleName.orEmpty(),
-                            memberCount = 0,
-                            description = plan.vipSaleName.orEmpty()
-                        )
-                    }
-                }.flatten()
+                    VipPlanModel(
+                        id = purchaseRole.roleId.toString(),
+                        name = purchaseRole.roleName.orEmpty(),
+                        memberCount = 0,
+                        description = purchaseRole.saleBelong.orEmpty()
+                    )
+                }
             }, {
                 KLog.e(TAG, it)
             })

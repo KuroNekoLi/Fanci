@@ -5,7 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.Category
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
+import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.toVipPlanModel
@@ -30,8 +36,8 @@ data class UiState(
     val isSoredToServerComplete: Boolean = false,    //完成將排序結果給 server
     val channelSettingTabIndex: Int = 0,             //新增頻道 tab position
     var isNeedApproval: Boolean = false,             //是否公開
-    val channelAccessTypeList: List<ChannelAccessOptionModel> = emptyList(), //私密頻道 權限清單
-    val clickPermissionMemberModel: Pair<ChannelAccessOptionModel, SelectedModel>? = null, //點擊的 Permission 資料
+    val channelAccessTypeList: List<ChannelAccessOptionV2> = emptyList(), //私密頻道 權限清單
+    val clickPermissionMemberModel: Pair<ChannelAccessOptionV2, SelectedModel>? = null, //點擊的 Permission 資料
     val uniqueUserCount: Int = 0                     //私密頻道成員人數
 )
 
@@ -48,10 +54,10 @@ class ChannelSettingViewModel(
 
     var orgChannelRoleList = emptyList<FanciRole>() //原本頻道裡的角色清單
 
-    var currentSelectedPermission: ChannelAccessOptionModel? = null
+    var currentSelectedPermission: ChannelAccessOptionV2? = null
 
     //每個權限所勾選的人員/角色 清單, key = authType
-    private val listPermissionSelected: HashMap<String, SelectedModel> = hashMapOf()
+    private val listPermissionSelected: HashMap<ChannelAuthType, SelectedModel> = hashMapOf()
 
     //預編輯的頻道
     var channel: Channel? = null
@@ -81,7 +87,7 @@ class ChannelSettingViewModel(
     }
 
     /**
-     * 取得 私密頻道 人員/角色 以及 抓取人數
+     * 取得 私密頻道 人員/角色(去除 無權限) 以及 抓取人數
      */
     private fun getPrivateChannelMember(channelId: String) {
         KLog.i(TAG, "getPrivateChannelMember:$channelId")
@@ -89,15 +95,17 @@ class ChannelSettingViewModel(
             channelUseCase.getPrivateChannelWhiteList(
                 channelId
             ).fold({
-                it.map { channelWhiteList ->
-                    listPermissionSelected[channelWhiteList.authType.orEmpty()] = SelectedModel(
-                        selectedMember = channelWhiteList.users.orEmpty(),
-                        selectedRole = channelWhiteList.roles.orEmpty(),
-                        selectedVipPlans = channelWhiteList.vipRoles.orEmpty().map { fanciRole ->
-                            fanciRole.toVipPlanModel()
-                        }
-                    )
-                }
+                it.filter { channelWhiteList -> channelWhiteList.authType != ChannelAuthType.noPermission }
+                    .map { channelWhiteList ->
+                        listPermissionSelected[channelWhiteList.authType!!] = SelectedModel(
+                            selectedMember = channelWhiteList.users.orEmpty(),
+                            selectedRole = channelWhiteList.roles.orEmpty(),
+                            selectedVipPlans = channelWhiteList.vipRoles.orEmpty()
+                                .map { fanciRole ->
+                                    fanciRole.toVipPlanModel()
+                                }
+                        )
+                    }
                 fetchPrivateChannelUserCount()
 
             }, {
@@ -599,7 +607,7 @@ class ChannelSettingViewModel(
     fun fetchChannelPermissionList() {
         KLog.i(TAG, "fetchChannelPermissionList")
         viewModelScope.launch {
-            channelUseCase.getChanelAccessType().fold({
+            channelUseCase.getChanelAccessTypeWithoutNoPermission().fold({
                 uiState = uiState.copy(
                     channelAccessTypeList = it
                 )
@@ -614,10 +622,9 @@ class ChannelSettingViewModel(
      */
     fun setPermissionMemberSelected(selectedModel: SelectedModel) {
         KLog.i(TAG, "setPermissionMemberSelected:$selectedModel")
-        currentSelectedPermission?.let {
-            listPermissionSelected[it.authType.orEmpty()] = selectedModel
+        currentSelectedPermission?.authType?.let { authType ->
+            listPermissionSelected[authType] = selectedModel
             currentSelectedPermission = null
-
             fetchPrivateChannelUserCount()
         }
     }
@@ -625,11 +632,11 @@ class ChannelSettingViewModel(
     /**
      * 設定目前 所點擊的 權限設定
      */
-    fun onPermissionClick(channelPermissionModel: ChannelAccessOptionModel) {
+    fun onPermissionClick(channelPermissionModel: ChannelAccessOptionV2) {
         KLog.i(TAG, "onPermissionClick:$channelPermissionModel")
         currentSelectedPermission = channelPermissionModel
 
-        listPermissionSelected[channelPermissionModel.authType.orEmpty()]?.let {
+        listPermissionSelected[channelPermissionModel.authType]?.let {
             uiState = uiState.copy(
                 clickPermissionMemberModel = Pair(channelPermissionModel, it)
             )
@@ -679,8 +686,16 @@ class ChannelSettingViewModel(
                 it.id.orEmpty()
             }.distinct()
 
+            val vipRoleList = listPermissionSelected.flatMap {
+                it.value.selectedVipPlans
+            }.map {
+                it.id.orEmpty()
+            }.distinct()
+
+            val allRoleIds = roleList.union(vipRoleList).toList()
+
             channelUseCase.getPrivateChannelUserCount(
-                roleIds = roleList,
+                roleIds = allRoleIds,
                 userIds = userList
             ).fold({
                 uiState = uiState.copy(

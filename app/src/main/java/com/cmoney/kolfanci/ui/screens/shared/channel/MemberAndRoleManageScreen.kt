@@ -233,6 +233,7 @@ private fun MemberAndRoleManageScreenView(
                             navigator = navigator,
                             title = topBarTitle,
                             vipPlanModels = selectedVipPlanModels,
+                            group = group,
                             onVipPlanRemoveClick = onVipPlanRemoveClick
                         )
                     }
@@ -387,6 +388,7 @@ private fun AddRoleListScreen(
 private fun AddVipPlanScreen(
     navigator: DestinationsNavigator,
     title: String,
+    group: Group,
     vipPlanModels: List<VipPlanModel>,
     onVipPlanRemoveClick: (VipPlanModel) -> Unit
 ) {
@@ -416,6 +418,7 @@ private fun AddVipPlanScreen(
                     navigator.navigate(
                         AddVipPlanScreenDestination(
                             authTitle = title,
+                            group = group,
                             selectedVipPlanModels = vipPlanModels.toTypedArray()
                         )
                     )

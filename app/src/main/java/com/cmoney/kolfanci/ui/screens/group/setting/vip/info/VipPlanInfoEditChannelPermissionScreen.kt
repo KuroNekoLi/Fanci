@@ -96,7 +96,7 @@ fun VipPlanInfoEditChannelPermissionScreenView(
         modifier = modifier.fillMaxSize(),
         topBar = {
             EditToolbarScreen(
-                title = stringResource(id = R.string.choose_channel),
+                title = stringResource(id = R.string.choose_permission),
                 saveClick = {
                     onSave(selectedIndex)
                 },

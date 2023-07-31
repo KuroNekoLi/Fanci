@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -24,23 +23,23 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param authType 
- * @param title 
- * @param allowedAction 
+ * @param packId 
+ * @param type 
+ * @param subjectId 
  */
 @Parcelize
 
 
-data class ChannelAccessOptionV2 (
+data class AuthorizationEntry (
 
-    @Json(name = "authType")
-    val authType: ChannelAuthType? = null,
+    @Json(name = "packId")
+    val packId: kotlin.Long? = null,
 
-    @Json(name = "title")
-    val title: kotlin.String? = null,
+    @Json(name = "type")
+    val type: kotlin.String? = null,
 
-    @Json(name = "allowedAction")
-    val allowedAction: kotlin.String? = null
+    @Json(name = "subjectId")
+    val subjectId: kotlin.Int? = null
 
 ) : Parcelable
 

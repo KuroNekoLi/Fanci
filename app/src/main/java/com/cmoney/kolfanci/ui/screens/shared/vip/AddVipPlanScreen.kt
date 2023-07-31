@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
@@ -51,6 +52,7 @@ fun AddVipPlanScreen(
     modifier: Modifier = Modifier,
     authTitle: String,
     selectedVipPlanModels: Array<VipPlanModel>,
+    group: Group,
     viewModel: VipPlanViewModel = koinViewModel(),
     selectedCallback: ResultBackNavigator<VipPlanModel>
 ) {
@@ -75,7 +77,10 @@ fun AddVipPlanScreen(
 
     LaunchedEffect(key1 = Unit) {
         if (vipPlanModels == null) {
-            viewModel.fetchVipPlan(models = selectedVipPlanModels)
+            viewModel.fetchVipPlan(
+                models = selectedVipPlanModels,
+                groupId = group.id.orEmpty()
+            )
         }
     }
 }
@@ -181,15 +186,15 @@ private fun EmptyVipPlanScreenView() {
 @Composable
 fun AddVipPlanScreenViewPreview() {
     FanciTheme {
-       AddVipPlanScreenView(
-           authTitle = "基本方案",
-           vipPlanModels = VipManagerUseCase.getVipPlanMockData(),
-           isLoading = false,
-           onBack = {
-           },
-           onConfirm = {
-           }
-       )
+        AddVipPlanScreenView(
+            authTitle = "基本方案",
+            vipPlanModels = VipManagerUseCase.getVipPlanMockData(),
+            isLoading = false,
+            onBack = {
+            },
+            onConfirm = {
+            }
+        )
     }
 }
 
