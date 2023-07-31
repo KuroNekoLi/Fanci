@@ -139,7 +139,7 @@ abstract class ExtractLogEventTask : DefaultTask() {
                             writer.newLine()
                             writer.write("$indent */")
                             writer.newLine()
-                            val englishClassName = englishName.split(".")
+                            val englishClassName = englishName.split(".", "_")
                                 .joinToString(separator = "") { split ->
                                     split.capitalize()
                                 }
