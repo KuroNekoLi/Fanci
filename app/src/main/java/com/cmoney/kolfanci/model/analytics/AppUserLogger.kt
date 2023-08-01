@@ -6,6 +6,7 @@ import com.cmoney.application_user_behavior.AnalyticsAgent
 import com.cmoney.application_user_behavior.model.event.logClicked
 import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.fancylog.model.data.Page
@@ -43,9 +44,10 @@ class AppUserLogger : KoinComponent {
         debugLog(event.name, event.getParameters())
     }
 
-    fun log(clicked: Clicked, description: Map<String, Any>? = null) {
-        val event = ClickedUserEvent(clicked = clicked.eventName, parameters = description)
-        logCM(clicked, description)
+    fun log(clicked: Clicked, from: From? = null) {
+        val descriptions = from?.asParameters()
+        val event = ClickedUserEvent(clicked = clicked.eventName, parameters = descriptions)
+        logCM(clicked, descriptions)
         debugLog(event.name, event.getParameters())
     }
 
