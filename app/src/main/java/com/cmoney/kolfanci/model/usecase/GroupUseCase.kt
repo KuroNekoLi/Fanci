@@ -386,7 +386,8 @@ class GroupUseCase(
                         name = group.name.orEmpty(),
                         description = group.description,
                         coverImageUrl = imageUrl,
-                        thumbnailImageUrl = group.thumbnailImageUrl
+                        thumbnailImageUrl = group.thumbnailImageUrl,
+                        colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
                     )
                 )
             }
@@ -419,7 +420,8 @@ class GroupUseCase(
                         name = group.name.orEmpty(),
                         description = group.description,
                         coverImageUrl = group.coverImageUrl,
-                        thumbnailImageUrl = imageUrl
+                        thumbnailImageUrl = imageUrl,
+                        colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
                     )
                 )
             }
@@ -437,7 +439,8 @@ class GroupUseCase(
                 name = group.name.orEmpty(),
                 description = desc,
                 coverImageUrl = group.coverImageUrl,
-                thumbnailImageUrl = group.thumbnailImageUrl
+                thumbnailImageUrl = group.thumbnailImageUrl,
+                colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
             )
         ).checkResponseBody()
     }
@@ -453,7 +456,8 @@ class GroupUseCase(
                 name = name,
                 description = group.description,
                 coverImageUrl = group.coverImageUrl,
-                thumbnailImageUrl = group.thumbnailImageUrl
+                thumbnailImageUrl = group.thumbnailImageUrl,
+                colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
             )
         ).checkResponseBody()
     }
