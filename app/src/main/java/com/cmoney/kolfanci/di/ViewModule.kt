@@ -106,7 +106,7 @@ val viewModule = module {
         )
     }
     viewModel {
-        MyScreenViewModel(get())
+        MyScreenViewModel(androidApplication(), get())
     }
     viewModel {
         SearchViewModel(get())
