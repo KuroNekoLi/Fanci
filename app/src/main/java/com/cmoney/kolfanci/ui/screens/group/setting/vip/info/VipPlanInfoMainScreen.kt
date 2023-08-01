@@ -195,6 +195,10 @@ private fun VipPlanInfoMainScreenView(
                         planSourceList = planSourceList,
                         onVipNameClick = {
                             KLog.i(TAG, "onVipNameClick:$it")
+
+                            AppUserLogger.getInstance()
+                                .log(Page.GroupSettingsVIPINFVIPName)
+
                             navController.navigate(
                                 EditInputScreenDestination(
                                     defaultText = it,

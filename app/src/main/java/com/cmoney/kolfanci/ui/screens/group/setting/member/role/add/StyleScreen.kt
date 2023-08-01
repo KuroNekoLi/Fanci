@@ -22,10 +22,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.showColorPickerDialogBottomSheet
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -73,6 +75,9 @@ fun StyleScreen(
             modifier = Modifier
                 .background(LocalColor.current.background)
                 .clickable {
+                    AppUserLogger.getInstance()
+                        .log(Page.GroupSettingsRoleManagementAddRoleStyleRoleName)
+
                     navigator.navigate(
                         EditInputScreenDestination(
                             defaultText = roleName,

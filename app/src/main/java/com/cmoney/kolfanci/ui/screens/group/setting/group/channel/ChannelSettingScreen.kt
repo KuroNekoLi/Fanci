@@ -82,6 +82,7 @@ fun ChannelSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.setGroup(result.value)
             }
@@ -92,6 +93,7 @@ fun ChannelSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.setGroup(result.value)
             }
@@ -102,6 +104,7 @@ fun ChannelSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.setGroup(result.value)
             }
@@ -112,6 +115,7 @@ fun ChannelSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.setGroup(result.value)
             }
@@ -122,6 +126,7 @@ fun ChannelSettingScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 viewModel.setGroup(result.value)
             }
@@ -207,6 +212,9 @@ fun ChannelSettingScreenView(
                         borderColor = LocalColor.current.text.default_100
                     ) {
                         KLog.i(TAG, "new category click.")
+                        AppUserLogger.getInstance()
+                            .log(Page.GroupSettingsChannelManagementAddCategoryCategoryName)
+
                         navigator.navigate(
                             AddCategoryScreenDestination(
                                 group = group
