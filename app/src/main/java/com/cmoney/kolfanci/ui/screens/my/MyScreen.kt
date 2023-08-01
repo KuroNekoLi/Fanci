@@ -116,8 +116,8 @@ fun MyScreen(
 
     if (isShowPurchasePlanTip) {
         DialogScreen(
-            title = stringResource(id = R.string.forward_to_official_web_title),
-            subTitle = stringResource(id = R.string.forward_to_official_web_subtitle),
+            title = stringResource(id = R.string.contact_personal_service),
+            subTitle = stringResource(id = R.string.contact_official_mail),
             onDismiss = { isShowPurchasePlanTip = false }
         ) {
             Spacer(modifier = Modifier.height(20.dp))
@@ -126,12 +126,12 @@ fun MyScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                text = stringResource(id = R.string.forward_to_official_web),
+                text = stringResource(id = R.string.copy_mail),
                 borderColor = LocalColor.current.text.default_50,
                 textColor = LocalColor.current.text.default_100,
                 onClick = {
-                    //TODO: go to web url
                     isShowPurchasePlanTip = false
+                    viewModel.onVipDialogClick()
                     Unit
                 }
             )
