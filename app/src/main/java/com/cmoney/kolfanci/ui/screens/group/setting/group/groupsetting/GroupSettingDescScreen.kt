@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -29,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.fancylog.model.data.Page
@@ -128,7 +130,13 @@ fun GroupSettingDescView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
-                        .padding(top = 10.dp),
+                        .padding(top = 10.dp)
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.GroupIntroductionIntroduction)
+                            }
+                        },
                     value = textState,
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = LocalColor.current.text.default_100,
