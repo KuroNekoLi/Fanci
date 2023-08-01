@@ -47,7 +47,7 @@ class AppUserLogger : KoinComponent {
     fun log(clicked: Clicked, from: From? = null) {
         val descriptions = from?.asParameters()
         val event = ClickedUserEvent(clicked = clicked.eventName, parameters = descriptions)
-        logCM(clicked, descriptions)
+        logCM(clicked = clicked, descriptions = descriptions)
         debugLog(event.name, event.getParameters())
     }
 
@@ -93,8 +93,11 @@ class AppUserLogger : KoinComponent {
     /**
      * Log to CMoney
      */
-    private fun logCM(clicked: Clicked, description: Map<String, Any>? = null) {
-        AnalyticsAgent.getInstance().logClicked(clicked.eventName, description)
+    private fun logCM(clicked: Clicked, descriptions: Map<String, Any>? = null) {
+        AnalyticsAgent.getInstance().logClicked(
+            name = clicked.eventName,
+            descriptions = descriptions
+        )
     }
 
     /**
