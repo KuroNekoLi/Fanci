@@ -21,12 +21,12 @@ class AppUserLogger : KoinComponent {
     private val mixpanel: MixpanelAPI by inject()
 
     companion object {
-        private val instance by lazy {
+        private val _instance by lazy {
             AppUserLogger()
         }
 
         fun getInstance(): AppUserLogger {
-            return instance
+            return _instance
         }
     }
 
