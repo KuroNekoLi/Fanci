@@ -3,8 +3,10 @@ package com.cmoney.kolfanci.model.analytics
 import android.util.Log
 import com.cmoney.analytics.user.model.event.UserEvent
 import com.cmoney.application_user_behavior.AnalyticsAgent
-import com.cmoney.application_user_behavior.model.event.logPageSwitch
+import com.cmoney.application_user_behavior.model.event.logClicked
 import com.cmoney.application_user_behavior.model.event.logPageViewed
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.fancylog.model.data.Page
@@ -19,8 +21,12 @@ class AppUserLogger : KoinComponent {
     private val mixpanel: MixpanelAPI by inject()
 
     companion object {
+        private val instance by lazy {
+            AppUserLogger()
+        }
+
         fun getInstance(): AppUserLogger {
-            return AppUserLogger()
+            return instance
         }
     }
 
@@ -38,9 +44,29 @@ class AppUserLogger : KoinComponent {
         debugLog(event.name, event.getParameters())
     }
 
+    fun log(clicked: Clicked, from: From? = null) {
+        val descriptions = from?.asParameters()
+        val event = ClickedUserEvent(clicked = clicked.eventName, parameters = descriptions)
+        logCM(clicked = clicked, descriptions = descriptions)
+        debugLog(event.name, event.getParameters())
+    }
+
     class PageUserEvent(val page: String) : UserEvent() {
         override val name: String
             get() = page
+    }
+
+    class ClickedUserEvent(private val clicked: String, parameters: Map<String, Any>? = null) : UserEvent() {
+        override val name: String
+            get() = clicked
+        init {
+            parameters?.let {
+                val ps = it.toList().map {(key, value) ->
+                    key to value.toString()
+                }.toTypedArray()
+                setParameters(*ps)
+            }
+        }
     }
 
     /**
@@ -62,6 +88,16 @@ class AppUserLogger : KoinComponent {
      */
     private fun logCM(page: Page) {
         AnalyticsAgent.getInstance().logPageViewed(page.eventName)
+    }
+
+    /**
+     * Log to CMoney
+     */
+    private fun logCM(clicked: Clicked, descriptions: Map<String, Any>? = null) {
+        AnalyticsAgent.getInstance().logClicked(
+            name = clicked.eventName,
+            descriptions = descriptions
+        )
     }
 
     /**
