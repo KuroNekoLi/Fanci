@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -143,6 +144,8 @@ fun Step2Screen(
                         borderColor = LocalColor.current.text.default_50,
                         textColor = LocalColor.current.text.default_100
                     ) {
+                        AppUserLogger.getInstance().log(Clicked.CreateGroupAddReviewQuestion)
+
                         AppUserLogger.getInstance()
                             .log(Page.CreateGroupGroupOpennessAddReviewQuestion)
 

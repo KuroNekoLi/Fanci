@@ -36,9 +36,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.CreateApplyQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingBackgroundScreenDestination
@@ -118,7 +121,9 @@ fun CreateGroupScreen(
         },
         onAddQuestion = {
             navigator.navigate(
-                CreateApplyQuestionScreenDestination()
+                CreateApplyQuestionScreenDestination(
+                    keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
+                )
             )
         },
         onEditClick = {
@@ -155,11 +160,15 @@ fun CreateGroupScreen(
     if (showDialog.value) {
         TipDialog(
             onAddTopic = {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.AddQuestion)
                 navigator.navigate(
-                    CreateApplyQuestionScreenDestination()
+                    CreateApplyQuestionScreenDestination(
+                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
+                    )
                 )
             },
             onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.Skip)
                 showDialog.value = false
             }
         )
@@ -177,7 +186,8 @@ fun CreateGroupScreen(
                 groupOpennessViewModel.openEditMode(showEditDialog.value.second)
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
-                        question = showEditDialog.value.second
+                        question = showEditDialog.value.second,
+                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
                     )
                 )
                 showEditDialog.value = Pair(false, "")
