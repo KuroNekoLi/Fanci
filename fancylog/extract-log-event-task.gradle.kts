@@ -1,7 +1,7 @@
 abstract class ExtractLogEventTask : DefaultTask() {
     @TaskAction
     fun invoke() {
-        val targetFile = File("fancylog/events", "log_event_20230731.csv")
+        val targetFile = File("fancylog/events", "log_event_20230802.csv")
         val packageName = "com.cmoney.fancylog.model.data"
         val rootDirectory = "fancylog/src/main/java"
         val rootPackage = "com.cmoney.fancylog"
@@ -199,12 +199,12 @@ abstract class ExtractLogEventTask : DefaultTask() {
                         val columns = nowRow.split(",")
                         // 7 參數群組名稱 8 中文事件名稱, 9 英文事件名稱
                         val nowArgumentName = columns.getOrNull(7)
-                        if (nowArgumentName != null) {
+                        if (nowArgumentName != null && nowArgumentName.isNotEmpty()) {
                             argumentName = nowArgumentName
                         }
                         val chineseName = columns.getOrNull(8)
                         val englishName = columns.getOrNull(9)
-                        if (chineseName != null && englishName != null && englishName.isNotEmpty() && !fromParameterSet.contains(englishName) && argumentName == "from") {
+                        if (chineseName != null && englishName != null && englishName.isNotEmpty() && !fromParameterSet.contains(englishName)) {
                             fromParameterSet.add(englishName)
                             writer.write("$indent/**")
                             writer.newLine()
