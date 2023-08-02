@@ -183,6 +183,8 @@ fun CreateGroupScreen(
             },
             onEdit = {
                 KLog.i(TAG, "onEdit click.")
+                AppUserLogger.getInstance().log(Clicked.CreateGroupQuestionEdit)
+
                 groupOpennessViewModel.openEditMode(showEditDialog.value.second)
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
@@ -194,6 +196,8 @@ fun CreateGroupScreen(
             },
             onRemove = {
                 KLog.i(TAG, "onRemove click.")
+                AppUserLogger.getInstance().log(Clicked.CreateGroupQuestionRemove)
+
                 groupOpennessViewModel.removeQuestion(showEditDialog.value.second)
                 showEditDialog.value = Pair(false, "")
             }

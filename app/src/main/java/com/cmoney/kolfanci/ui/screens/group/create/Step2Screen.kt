@@ -129,6 +129,7 @@ fun Step2Screen(
                 ) {
                     questions.forEach {
                         QuestionItem(question = it, onClick = {
+                            AppUserLogger.getInstance().log(Clicked.CreateGroupQuestionManage)
                             onEditClick.invoke(it)
                         })
                         Spacer(modifier = Modifier.height(1.dp))
