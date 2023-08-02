@@ -112,6 +112,8 @@ fun CreateGroupScreen(
         question = approvalUiState.groupQuestionList.orEmpty(),
         onGroupName = {
             KLog.i(TAG, "onGroupName:$it")
+            KLog.i(TAG, "step1 next click.")
+            AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupName)
             viewModel.setGroupName(it)
             viewModel.nextStep()
         },
@@ -130,6 +132,17 @@ fun CreateGroupScreen(
             showEditDialog.value = Pair(true, it)
         },
         onNextStep = {
+            when (currentStep) {
+                2 -> {
+                    KLog.i(TAG, "step2 next click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupOpenness)
+                }
+                else -> {
+                    KLog.i(TAG, "step3 next click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupArrangement)
+                }
+            }
+
             if (currentStep == viewModel.finalStep) {
                 viewModel.createGroup(
                     isNeedApproval = groupOpennessViewModel.uiState.isNeedApproval
@@ -139,6 +152,17 @@ fun CreateGroupScreen(
             }
         },
         onPreStep = {
+            when (currentStep) {
+                2 -> {
+                    KLog.i(TAG, "step2 back click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupOpenness)
+                }
+                else -> {
+                    KLog.i(TAG, "step3 back click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupArrangement)
+                }
+            }
+
             viewModel.preStep()
         }
     ) {
