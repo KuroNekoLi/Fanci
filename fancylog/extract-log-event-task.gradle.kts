@@ -204,7 +204,7 @@ abstract class ExtractLogEventTask : DefaultTask() {
                         }
                         val chineseName = columns.getOrNull(8)
                         val englishName = columns.getOrNull(9)
-                        if (chineseName != null && englishName != null && englishName.isNotEmpty() && !fromParameterSet.contains(englishName)) {
+                        if (chineseName != null && englishName != null && englishName.isNotEmpty() && !fromParameterSet.contains(englishName) && argumentName == "from") {
                             fromParameterSet.add(englishName)
                             writer.write("$indent/**")
                             writer.newLine()
