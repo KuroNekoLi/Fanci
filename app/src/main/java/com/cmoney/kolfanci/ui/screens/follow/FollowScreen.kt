@@ -33,8 +33,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.*
 import com.cmoney.kolfanci.ui.main.MainActivity
@@ -47,6 +50,7 @@ import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.member.application.model.analytics.event.Click
 import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -187,6 +191,7 @@ fun FollowScreen(
 
     //打開 建立社團
     if (uiState.navigateToCreateGroup) {
+        AppUserLogger.getInstance().log(Clicked.CreateGroup, From.NonGroup)
         navigator.navigate(CreateGroupScreenDestination)
         viewModel.navigateDone()
     }
