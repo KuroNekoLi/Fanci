@@ -81,6 +81,9 @@ fun GroupSettingAvatarScreen(
         mutableStateOf(false)
     }
 
+    //是否為建立社團開啟
+    val isFromCreate = (group.id?.isEmpty() == true)
+
     fanciAvatarResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -108,6 +111,11 @@ fun GroupSettingAvatarScreen(
         },
         avatarImage = uiState.avatarImage,
         openCameraDialog = {
+            if (isFromCreate) {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupChangeGroupIconPicture)
+            } else {
+                AppUserLogger.getInstance().log(Clicked.GroupIconChangePicture)
+            }
             groupSettingAvatarViewModel.openCameraDialog()
         }
     ) {
@@ -226,8 +234,6 @@ fun GroupSettingAvatarView(
                 text = "更換圖片"
             ) {
                 KLog.i(TAG, "button click.")
-                AppUserLogger.getInstance()
-                    .log(Clicked.GroupIconChangePicture)
                 openCameraDialog.invoke()
             }
 
