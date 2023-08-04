@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -196,8 +197,10 @@ private fun VipPlanInfoMainScreenView(
                         onVipNameClick = {
                             KLog.i(TAG, "onVipNameClick:$it")
 
-                            AppUserLogger.getInstance()
-                                .log(Page.GroupSettingsVIPINFVIPName)
+                            with(AppUserLogger.getInstance()) {
+                                log(Clicked.InfoName)
+                                log(Page.GroupSettingsVIPINFVIPName)
+                            }
 
                             navController.navigate(
                                 EditInputScreenDestination(
@@ -212,7 +215,10 @@ private fun VipPlanInfoMainScreenView(
                     )
 
                     LaunchedEffect(key1 = selectedTab) {
-                        AppUserLogger.getInstance().log(Page.GroupSettingsVIPINF)
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ManageInfo)
+                            log(Page.GroupSettingsVIPINF)
+                        }
                     }
                 }
 
@@ -221,6 +227,8 @@ private fun VipPlanInfoMainScreenView(
                     VipPlanInfoPermissionPage(
                         permissionModels = vipPlanPermissionModels,
                         onEditPermission = { index ->
+                            AppUserLogger.getInstance().log(Clicked.PermissionsChannel)
+
                             val permission = vipPlanPermissionModels[index]
                             navController.navigate(
                                 VipPlanInfoEditChannelPermissionScreenDestination(
@@ -232,7 +240,10 @@ private fun VipPlanInfoMainScreenView(
                     )
 
                     LaunchedEffect(key1 = selectedTab) {
-                        AppUserLogger.getInstance().log(Page.GroupSettingsVIPPermission)
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ManagePermissions)
+                            log(Page.GroupSettingsVIPPermission)
+                        }
                     }
                 }
 
@@ -243,7 +254,10 @@ private fun VipPlanInfoMainScreenView(
                     )
 
                     LaunchedEffect(key1 = selectedTab) {
-                        AppUserLogger.getInstance().log(Page.GroupSettingsVIPMembers)
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ManageMembers)
+                            log(Page.GroupSettingsVIPMembers)
+                        }
                     }
                 }
             }

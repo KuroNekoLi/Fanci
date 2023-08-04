@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
@@ -49,6 +50,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
 import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.model.Constant.isShowVipManager
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
@@ -277,6 +279,7 @@ fun GroupSettingScreenView(
                     item {
                         VipPlanManager {
                             KLog.i(TAG, "VipPlanManager click.")
+                            AppUserLogger.getInstance().log(Clicked.GroupSettingsVIPPlanManagement)
                             navController.navigate(
                                 VipManagerScreenDestination(
                                     group = group

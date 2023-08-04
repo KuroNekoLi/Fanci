@@ -31,7 +31,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanPermissionOptionModel
@@ -119,6 +121,7 @@ fun VipPlanInfoEditChannelPermissionScreenView(
                         vipPlanPermissionOptionModel = option,
                         selected = index == selectedIndex,
                         onClick = {
+                            AppUserLogger.getInstance().log(Clicked.PermissionsChannelAnyPermission)
                             selectedIndex = index
                         }
                     )
