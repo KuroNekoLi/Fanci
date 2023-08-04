@@ -45,13 +45,13 @@ import com.socks.library.KLog
 /**
  * 設定 頻道公開度
  * @param isNeedApproval 預設是否公開
- * @param isEditChannel 是否為編輯頻道中
+ * @param from 事件參數
  */
 @Destination
 @Composable
 fun EditChannelOpennessScreen(
     modifier: Modifier = Modifier,
-    isEditChannel: Boolean = false,
+    from: From = From.Edit,
     isNeedApproval: Boolean = true,
     navigator: DestinationsNavigator,
     resultNavigator: ResultBackNavigator<Boolean>
@@ -60,11 +60,6 @@ fun EditChannelOpennessScreen(
 
     var isNeedApprovalCurrent by remember {
         mutableStateOf(isNeedApproval)
-    }
-    val from = if (isEditChannel) {
-        From.Edit
-    } else {
-        From.Create
     }
 
     Scaffold(

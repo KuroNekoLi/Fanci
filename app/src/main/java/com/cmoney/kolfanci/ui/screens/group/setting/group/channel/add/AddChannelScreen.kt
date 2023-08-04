@@ -533,7 +533,7 @@ private fun PermissionTabScreen(
                 KLog.i(TAG, "onItemClick.")
                 navigator.navigate(
                     EditChannelOpennessScreenDestination(
-                        isEditChannel = isEditChannel,
+                        from = from,
                         isNeedApproval = isNeedApproval
                     )
                 )
