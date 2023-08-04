@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -31,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -41,6 +42,9 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.onEach
 
 /**
  * 社團設定-社團簡介頁
@@ -130,13 +134,7 @@ fun GroupSettingDescView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
-                        .padding(top = 10.dp)
-                        .onFocusChanged { focusState ->
-                            if (focusState.isFocused) {
-                                AppUserLogger.getInstance()
-                                    .log(Clicked.GroupIntroductionIntroduction)
-                            }
-                        },
+                        .padding(top = 10.dp),
                     value = textState,
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = LocalColor.current.text.default_100,
@@ -159,9 +157,22 @@ fun GroupSettingDescView(
                             fontSize = 16.sp,
                             color = LocalColor.current.text.default_30
                         )
+                    },
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    }.also { interactionSource ->
+                        LaunchedEffect(key1 = interactionSource) {
+                            interactionSource.interactions
+                                .filterIsInstance<PressInteraction.Release>()
+                                .onEach {
+                                    AppUserLogger
+                                        .getInstance()
+                                        .log(Clicked.GroupIntroductionIntroduction)
+                                }
+                                .collect()
+                        }
                     }
                 )
-
             }
         }
     }
