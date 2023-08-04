@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.fancylog.model.data.Page
@@ -174,6 +175,7 @@ private fun LoginDialogScreenView(
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                     onClick = {
+                        AppUserLogger.getInstance().log(Clicked.EmailLogin)
                         onLogin.invoke()
                     }) {
                     Row {
@@ -203,6 +205,7 @@ private fun LoginDialogScreenView(
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                     onClick = {
+                        AppUserLogger.getInstance().log(Clicked.SocialAccountLogin)
                         onLogin.invoke()
                     }) {
                     Row {

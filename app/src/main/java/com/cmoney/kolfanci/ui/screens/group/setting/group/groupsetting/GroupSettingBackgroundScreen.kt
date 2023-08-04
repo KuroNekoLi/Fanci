@@ -133,6 +133,8 @@ fun GroupSettingBackgroundView(
     val TAG = "GroupSettingAvatarView"
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
+    //是否為建立社團
+    val isFromCreate = (group.id?.isEmpty() == true)
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -223,8 +225,15 @@ fun GroupSettingBackgroundView(
                 text = stringResource(id = R.string.change_image)
             ) {
                 KLog.i(TAG, "button click.")
-                AppUserLogger.getInstance()
-                    .log(Clicked.HomeBackgroundChangePicture)
+                if (isFromCreate) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.CreateGroupChangeHomeBackgroundPicture)
+                }
+                else {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.HomeBackgroundChangePicture)
+                }
+
                 state.openCameraDialog()
             }
         }
