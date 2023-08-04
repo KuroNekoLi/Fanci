@@ -423,6 +423,8 @@ fun AddChannelScreenView(
 
 /**
  * 樣式 Tab Screen
+ *
+ * @param withDelete 是否具有移除頻道按鈕
  */
 @Composable
 private fun StyleTabScreen(
@@ -499,6 +501,8 @@ private fun StyleTabScreen(
                 .height(50.dp)
                 .background(LocalColor.current.background)
                 .clickable {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.ChannelManagementDeleteChannel)
                     onDeleteClick.invoke()
                 },
             contentAlignment = Alignment.Center
