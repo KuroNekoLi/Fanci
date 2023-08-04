@@ -12,11 +12,6 @@ sealed class Clicked(val eventName: String) {
     object HomeNotJoinGroupGroup : Clicked(eventName = "Home.NotJoinGroup_Group")
 
     /**
-     * 建立社團_點擊
-     */
-    object CreateGroup : Clicked(eventName = "CreateGroup")
-
-    /**
      * 建立社團_社團名稱_點擊
      */
     object CreateGroupName : Clicked(eventName = "CreateGroup_Name")

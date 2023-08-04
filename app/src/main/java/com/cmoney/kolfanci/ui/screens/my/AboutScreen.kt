@@ -16,11 +16,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.openCustomTab
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 
 @Composable
@@ -44,6 +46,7 @@ fun AboutScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(bottom = 1.dp),
                 text = stringResource(id = R.string.service_guide_line),
                 onItemClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageTermsOfService)
                     context.openCustomTab(Uri.parse(context.getString(R.string.terms_of_service_url)))
                 }
             )
@@ -53,6 +56,7 @@ fun AboutScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(bottom = 1.dp),
                 text = stringResource(id = R.string.policy),
                 onItemClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPagePrivacyPolicy)
                     context.openCustomTab(Uri.parse(context.getString(R.string.privacy_policy_url)))
                 }
             )
@@ -62,6 +66,7 @@ fun AboutScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(bottom = 1.dp),
                 text = stringResource(id = R.string.editor_policy),
                 onItemClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageCopyrightPolicy)
                     context.openCustomTab(Uri.parse(context.getString(R.string.copyright_policy_url)))
                 }
             )
@@ -71,6 +76,7 @@ fun AboutScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(bottom = 1.dp),
                 text = stringResource(id = R.string.feedback),
                 onItemClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageFeedback)
                     context.openCustomTab(Uri.parse(context.getString(R.string.feedback_url)))
                 }
             )

@@ -30,8 +30,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.ColorTheme
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.ChangeThemeDialogScreen
@@ -84,6 +86,8 @@ fun GroupSettingThemePreviewScreen(
     showConfirmDialog?.let {
         //如果是建立 直接確定並返回
         if (isFromCreate) {
+            AppUserLogger.getInstance().log(Clicked.CreateGroupThemeColorThemeApply)
+
             resultNavigator.navigateBack(it.id)
         } else {
             ChangeThemeDialogScreen(
@@ -92,6 +96,8 @@ fun GroupSettingThemePreviewScreen(
                     showConfirmDialog = null
                 },
                 onConfirm = { groupTheme ->
+                    AppUserLogger.getInstance().log(Clicked.ThemeColorThemeApply)
+
                     showConfirmDialog = null
                     globalGroupViewModel.changeTheme(groupTheme)
                 }

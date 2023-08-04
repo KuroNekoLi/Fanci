@@ -1,5 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.openness
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +14,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +25,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
@@ -33,12 +39,16 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 
+/**
+ * @param keyinTracking 紀錄點擊輸入匡埋點事件
+ */
 @Destination
 @Composable
 fun CreateApplyQuestionScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     question: String = "",
+    keyinTracking: String = Clicked.QuestionTextArea.eventName,
     resultBackNavigator: ResultBackNavigator<String>
 ) {
     val TAG = "CreateApplyQuestionScreen"
@@ -57,6 +67,13 @@ fun CreateApplyQuestionScreen(
             } else {
                 resultBackNavigator.navigateBack(it)
             }
+        },
+        onTextFieldClick = {
+            val clickEvent = when(keyinTracking) {
+                Clicked.CreateGroupQuestionKeyin.eventName -> Clicked.CreateGroupQuestionKeyin
+                else -> Clicked.QuestionTextArea
+            }
+            AppUserLogger.getInstance().log(clickEvent)
         }
     )
 
@@ -86,7 +103,8 @@ private fun CreateApplyQuestionScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     question: String = "",
-    onAdd: (String) -> Unit
+    onAdd: (String) -> Unit,
+    onTextFieldClick: () -> Unit
 ) {
     var textState by remember { mutableStateOf(question) }
     val maxLength = 50
@@ -144,6 +162,15 @@ private fun CreateApplyQuestionScreenView(
                         fontSize = 16.sp,
                         color = LocalColor.current.text.default_30
                     )
+                },
+                interactionSource = remember{ MutableInteractionSource() }.also{ interactionSource->
+                    LaunchedEffect(interactionSource){
+                        interactionSource.interactions.collect{
+                            if (it is PressInteraction.Release) {
+                                onTextFieldClick.invoke()
+                            }
+                        }
+                    }
                 }
             )
         }
@@ -157,8 +184,8 @@ fun CreateApplyQuestionScreenPreview() {
     FanciTheme {
         CreateApplyQuestionScreenView(
             navigator = EmptyDestinationsNavigator,
-            onAdd = {
-            }
+            onAdd = {},
+            onTextFieldClick = {}
         )
     }
 }

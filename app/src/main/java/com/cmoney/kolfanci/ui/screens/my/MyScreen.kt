@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -65,6 +66,7 @@ fun MyScreen(
                 title = "會員中心",
                 leadingIcon = ImageVector.vectorResource(id = R.drawable.house),
                 backClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageHome)
                     navController.popBackStack()
                 }
             )
@@ -102,9 +104,11 @@ fun MyScreen(
                 account = XLoginHelper.account,
                 accountNumber = Constant.MyInfo?.serialNumber.toString(),
                 onChangeAvatarClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageAvatarAndNickname)
                     navController.navigate(AvatarNicknameChangeScreenDestination)
                 },
                 onAccountManageClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageAccountManagement)
                     navController.navigate(AccountManageScreenDestination)
                 }
             )

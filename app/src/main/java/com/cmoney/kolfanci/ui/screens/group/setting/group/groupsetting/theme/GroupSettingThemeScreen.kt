@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
@@ -61,6 +62,7 @@ fun GroupSettingThemeScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val groupThemeStr = result.value
                 if (isFromCreate) {
@@ -81,8 +83,10 @@ fun GroupSettingThemeScreen(
         viewModel.fetchAllTheme(currentGroup)
     }
     LaunchedEffect(key1 = group) {
-        AppUserLogger.getInstance()
-            .log(Page.GroupSettingsGroupSettingsThemeColor)
+        if (!isFromCreate) {
+            AppUserLogger.getInstance()
+                .log(Page.GroupSettingsGroupSettingsThemeColor)
+        }
     }
 }
 
@@ -123,6 +127,12 @@ private fun GroupSettingThemeView(
                         name = it.name,
                         isSelected = (!isFromCreate && it.isSelected),
                         onItemClick = {
+                            if (isFromCreate) {
+                                AppUserLogger.getInstance().log(Clicked.CreateGroupThemeColorTheme)
+                            } else {
+                                AppUserLogger.getInstance().log(Clicked.ThemeColorTheme)
+                            }
+
                             navController.navigate(
                                 GroupSettingThemePreviewScreenDestination(
                                     themeId = it.id,

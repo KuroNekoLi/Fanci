@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -69,14 +70,20 @@ fun Step3Screen(
 
             Spacer(modifier = Modifier.height(1.dp))
             DescWithImage(desc = "社團圖示", groupIcon) {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupGroupIcon)
+
                 AppUserLogger.getInstance()
                     .log(Page.CreateGroupGroupArrangementGroupIcon)
+
                 onChangeIcon.invoke()
             }
             Spacer(modifier = Modifier.height(1.dp))
             DescWithImage(desc = "首頁背景", groupBackground) {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupHomeBackground)
+
                 AppUserLogger.getInstance()
                     .log(Page.CreateGroupGroupArrangementHomeBackground)
+
                 onChangeBackground.invoke()
             }
             Spacer(modifier = Modifier.height(1.dp))
@@ -84,6 +91,8 @@ fun Step3Screen(
                 modifier = Modifier
                     .background(LocalColor.current.background)
                     .clickable {
+                        AppUserLogger.getInstance().log(Clicked.CreateGroupThemeColor)
+
                         AppUserLogger
                             .getInstance()
                             .log(Page.CreateGroupGroupArrangementThemeColor)
