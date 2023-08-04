@@ -80,6 +80,8 @@ fun GroupManageScreen(
                 iconRes = R.drawable.lock,
                 text = "社團公開度",
                 onItemClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupSettingsGroupOpenness)
                     navController.navigate(
                         GroupOpennessScreenDestination(
                             group = group
