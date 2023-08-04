@@ -324,6 +324,8 @@ fun GroupOpennessScreenView(
                     borderColor = LocalColor.current.text.default_50,
                     textColor = LocalColor.current.text.default_100
                 ) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupOpennessAddReviewQuestion)
                     onAddQuestion.invoke()
                 }
 
@@ -448,6 +450,8 @@ fun TipDialog(
                             .height(50.dp),
                         text = "新增審核題目",
                         onClick = {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.GroupOpennessAddQuestion)
                             onAddTopic.invoke()
                         }
                     )
@@ -462,6 +466,8 @@ fun TipDialog(
                         borderColor = LocalColor.current.text.default_50,
                         textColor = LocalColor.current.text.default_100
                     ) {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.GroupOpennessSkipForNow)
                         onDismiss.invoke()
                     }
                 }
