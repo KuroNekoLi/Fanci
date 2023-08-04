@@ -394,6 +394,7 @@ fun AddChannelScreenView(
                             navigator = navigator,
                             group = group,
                             fanciRole = fanciRole,
+                            from = from,
                             onRemoveRole = {
                                 onRemoveRole.invoke(it)
                             }
@@ -644,6 +645,7 @@ private fun ManagerTabScreen(
     navigator: DestinationsNavigator,
     group: Group,
     fanciRole: List<FanciRole>?,
+    from: From,
     onRemoveRole: (FanciRole) -> Unit
 ) {
     Column(
@@ -665,7 +667,10 @@ private fun ManagerTabScreen(
             text = stringResource(id = R.string.add_role),
             borderColor = Color.White
         ) {
-            AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementAdminAddRole)
+            with(AppUserLogger.getInstance()) {
+                log(Page.GroupSettingsChannelManagementAdminAddRole)
+                log(Clicked.AdminAddRole, from)
+            }
 
             navigator.navigate(
                 ShareAddRoleScreenDestination(
@@ -686,8 +691,10 @@ private fun ManagerTabScreen(
                     isShowIndex = false,
                     fanciRole = roleList[it],
                     editText = "移除",
-                    onEditClick = {
-                        onRemoveRole.invoke(it)
+                    onEditClick = { editRole ->
+                        AppUserLogger.getInstance()
+                            .log(Clicked.AdminRemoveRole, from)
+                        onRemoveRole.invoke(editRole)
                     }
                 )
                 Spacer(modifier = Modifier.height(1.dp))
