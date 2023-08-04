@@ -27,6 +27,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -43,11 +45,13 @@ import com.socks.library.KLog
 /**
  * 設定 頻道公開度
  * @param isNeedApproval 預設是否公開
+ * @param isEditChannel 是否為編輯頻道中
  */
 @Destination
 @Composable
 fun EditChannelOpennessScreen(
     modifier: Modifier = Modifier,
+    isEditChannel: Boolean = false,
     isNeedApproval: Boolean = true,
     navigator: DestinationsNavigator,
     resultNavigator: ResultBackNavigator<Boolean>
@@ -56,6 +60,11 @@ fun EditChannelOpennessScreen(
 
     var isNeedApprovalCurrent by remember {
         mutableStateOf(isNeedApproval)
+    }
+    val from = if (isEditChannel) {
+        From.Edit
+    } else {
+        From.Create
     }
 
     Scaffold(
@@ -88,6 +97,8 @@ fun EditChannelOpennessScreen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                         .clickable {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.PermissionsPublic, from)
                             isNeedApprovalCurrent = false
                         }
                         .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
@@ -131,6 +142,8 @@ fun EditChannelOpennessScreen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                         .clickable {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.PermissionsNonPublic, from)
                             isNeedApprovalCurrent = true
                         }
                         .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),

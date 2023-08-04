@@ -283,7 +283,7 @@ fun AddChannelScreenView(
         stringResource(id = R.string.permission),
         stringResource(id = R.string.manager)
     )
-
+    val from = getFromByIsEditChannel(isEditChannel = isEditChannel)
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -327,11 +327,6 @@ fun AddChannelScreenView(
                         selectedIndex = selectedIndex,
                         listItem = list,
                         onTabClick = {
-                            val from = if (isEditChannel) {
-                                From.Edit
-                            } else {
-                                From.Create
-                            }
                             when (it) {
                                 0 -> Clicked.ChannelManagementStyle
                                 1 -> Clicked.ChannelManagementPermissions
@@ -349,12 +344,13 @@ fun AddChannelScreenView(
                     //樣式
                     0 -> {
                         StyleTabScreen(
-                            channelName,
-                            isEditChannel,
+                            textState = channelName,
+                            withDelete = isEditChannel,
                             onChannelNameClick = {
-                                AppUserLogger.getInstance()
-                                    .log(Page.GroupSettingsChannelManagementStyleChannelName)
-
+                                with(AppUserLogger.getInstance()) {
+                                    log(Page.GroupSettingsChannelManagementStyleChannelName)
+                                    log(Clicked.StyleChannelName, from)
+                                }
                                 navigator.navigate(
                                     EditInputScreenDestination(
                                         defaultText = channelName,
@@ -376,7 +372,9 @@ fun AddChannelScreenView(
                     //權限
                     1 -> {
                         PermissionTabScreen(
-                            isNeedApproval, navigator,
+                            isEditChannel = isEditChannel,
+                            isNeedApproval = isNeedApproval,
+                            navigator = navigator,
                             uniqueUserCount = uniqueUserCount,
                             channelPermissionModel = channelAccessTypeList,
                             onPermissionClick = onPermissionClick
@@ -516,6 +514,7 @@ private fun StyleTabScreen(
  */
 @Composable
 private fun PermissionTabScreen(
+    isEditChannel: Boolean,
     isNeedApproval: Boolean,
     navigator: DestinationsNavigator,
     uniqueUserCount: Int,
@@ -523,6 +522,7 @@ private fun PermissionTabScreen(
     onPermissionClick: (ChannelAccessOptionV2) -> Unit
 ) {
     val TAG = "PermissionTabScreen"
+    val from = getFromByIsEditChannel(isEditChannel = isEditChannel)
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -531,9 +531,9 @@ private fun PermissionTabScreen(
             text = stringResource(id = R.string.channel_openness),
             onItemClick = {
                 KLog.i(TAG, "onItemClick.")
-
                 navigator.navigate(
                     EditChannelOpennessScreenDestination(
+                        isEditChannel = isEditChannel,
                         isNeedApproval = isNeedApproval
                     )
                 )
@@ -567,6 +567,8 @@ private fun PermissionTabScreen(
             channelPermissionModel.forEach { it ->
                 ChannelPermissionItem(it) { channelPermissionModel ->
                     KLog.i("PermissionTabScreen", "click:$channelPermissionModel")
+                    AppUserLogger.getInstance()
+                        .log(Clicked.NonPublicAnyPermission, from)
                     onPermissionClick.invoke(channelPermissionModel)
                 }
                 Spacer(modifier = Modifier.height(1.dp))
@@ -706,6 +708,14 @@ private fun ShowDeleteAlert(
         onConfirm = onConfirm,
         onCancel = onCancel
     )
+}
+
+private fun getFromByIsEditChannel(isEditChannel: Boolean): From {
+    return if (isEditChannel) {
+        From.Edit
+    } else {
+        From.Create
+    }
 }
 
 
