@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -115,6 +116,8 @@ fun AccountManageScreen(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i("AccountManageScreen", "Logout click.")
+                        AppUserLogger.getInstance().log(Clicked.AccountManagementLogout)
+
                         showConfirmDialog = true
                     }
                     .padding(
@@ -162,6 +165,8 @@ fun AccountManageScreen(
                 borderColor = LocalColor.current.component.other,
                 textColor = Color.White
             ) {
+                AppUserLogger.getInstance().log(Clicked.LogoutConfirmLogout)
+
                 XLoginHelper.logOut(context)
                 val intent = Intent(context, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -179,6 +184,8 @@ fun AccountManageScreen(
                 borderColor = LocalColor.current.component.other,
                 textColor = Color.White
             ) {
+                AppUserLogger.getInstance().log(Clicked.LogoutReturn)
+                
                 showConfirmDialog = false
                 Unit
             }

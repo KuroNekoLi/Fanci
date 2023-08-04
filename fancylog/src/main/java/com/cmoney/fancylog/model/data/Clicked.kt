@@ -12,6 +12,86 @@ sealed class Clicked(val eventName: String) {
     object HomeNotJoinGroupGroup : Clicked(eventName = "Home.NotJoinGroup_Group")
 
     /**
+     * 建立社團_社團名稱_點擊
+     */
+    object CreateGroupName : Clicked(eventName = "CreateGroup_Name")
+
+    /**
+     * 建立社團_權限_點擊
+     */
+    object CreateGroupOpenness : Clicked(eventName = "CreateGroup_Openness")
+
+    /**
+     * 建立社團_新增審核題目彈窗_點擊
+     */
+    object CreateGroupAddQuestionPopup : Clicked(eventName = "CreateGroup_AddQuestionPopup")
+
+    /**
+     * 建立社團_新增審核題目_點擊
+     */
+    object CreateGroupAddReviewQuestion : Clicked(eventName = "CreateGroup_AddReviewQuestion")
+
+    /**
+     * 建立社團.新增審核題目_新增題目_點擊
+     */
+    object CreateGroupQuestionKeyin : Clicked(eventName = "CreateGroup_QuestionKeyin")
+
+    /**
+     * 建立社團.審核題目_管理題目_點擊
+     */
+    object CreateGroupQuestionManage : Clicked(eventName = "CreateGroup_QuestionManage")
+
+    /**
+     * 建立社團.審核題目_編輯題目_點擊
+     */
+    object CreateGroupQuestionEdit : Clicked(eventName = "CreateGroup_QuestionEdit")
+
+    /**
+     * 建立社團.審核題目_刪除題目_點擊
+     */
+    object CreateGroupQuestionRemove : Clicked(eventName = "CreateGroup_QuestionRemove")
+
+    /**
+     * 建立社團_設定社團圖示_點擊
+     */
+    object CreateGroupGroupIcon : Clicked(eventName = "CreateGroup_GroupIcon")
+
+    /**
+     * 建立社團_設定首頁背景_點擊
+     */
+    object CreateGroupHomeBackground : Clicked(eventName = "CreateGroup_HomeBackground")
+
+    /**
+     * 建立社團_更換圖片_點擊
+     */
+    object CreateGroupChangePicture : Clicked(eventName = "CreateGroup_ChangePicture")
+
+    /**
+     * 建立社團_設定主題色彩_點擊
+     */
+    object CreateGroupThemeColor : Clicked(eventName = "CreateGroup_ThemeColor")
+
+    /**
+     * 建立社團.設定主題色彩_主題_點擊
+     */
+    object CreateGroupThemeColorTheme : Clicked(eventName = "CreateGroup.ThemeColor_Theme")
+
+    /**
+     * 建立社團.設定主題色彩_主題套用_點擊
+     */
+    object CreateGroupThemeColorThemeApply : Clicked(eventName = "CreateGroup.ThemeColor.Theme_Apply")
+
+    /**
+     * 建立社團流程_下一步/建立社團_點擊
+     */
+    object CreateGroupNextStep : Clicked(eventName = "CreateGroup_NextStep")
+
+    /**
+     * 建立社團流程_上一步_點擊
+     */
+    object CreateGroupBackward : Clicked(eventName = "CreateGroup_Backward")
+
+    /**
      * 側邊欄_社團_點擊
      */
     object NavigationBarGroup : Clicked(eventName = "NavigationBar_Group")

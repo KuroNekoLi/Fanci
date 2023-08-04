@@ -36,9 +36,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.CreateApplyQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingBackgroundScreenDestination
@@ -109,6 +112,8 @@ fun CreateGroupScreen(
         question = approvalUiState.groupQuestionList.orEmpty(),
         onGroupName = {
             KLog.i(TAG, "onGroupName:$it")
+            KLog.i(TAG, "step1 next click.")
+            AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupName)
             viewModel.setGroupName(it)
             viewModel.nextStep()
         },
@@ -118,13 +123,26 @@ fun CreateGroupScreen(
         },
         onAddQuestion = {
             navigator.navigate(
-                CreateApplyQuestionScreenDestination()
+                CreateApplyQuestionScreenDestination(
+                    keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
+                )
             )
         },
         onEditClick = {
             showEditDialog.value = Pair(true, it)
         },
         onNextStep = {
+            when (currentStep) {
+                2 -> {
+                    KLog.i(TAG, "step2 next click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupOpenness)
+                }
+                else -> {
+                    KLog.i(TAG, "step3 next click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupArrangement)
+                }
+            }
+
             if (currentStep == viewModel.finalStep) {
                 viewModel.createGroup(
                     isNeedApproval = groupOpennessViewModel.uiState.isNeedApproval
@@ -134,6 +152,17 @@ fun CreateGroupScreen(
             }
         },
         onPreStep = {
+            when (currentStep) {
+                2 -> {
+                    KLog.i(TAG, "step2 back click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupOpenness)
+                }
+                else -> {
+                    KLog.i(TAG, "step3 back click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupArrangement)
+                }
+            }
+
             viewModel.preStep()
         }
     ) {
@@ -155,11 +184,15 @@ fun CreateGroupScreen(
     if (showDialog.value) {
         TipDialog(
             onAddTopic = {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.AddQuestion)
                 navigator.navigate(
-                    CreateApplyQuestionScreenDestination()
+                    CreateApplyQuestionScreenDestination(
+                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
+                    )
                 )
             },
             onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.Skip)
                 showDialog.value = false
             }
         )
@@ -174,16 +207,21 @@ fun CreateGroupScreen(
             },
             onEdit = {
                 KLog.i(TAG, "onEdit click.")
+                AppUserLogger.getInstance().log(Clicked.CreateGroupQuestionEdit)
+
                 groupOpennessViewModel.openEditMode(showEditDialog.value.second)
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
-                        question = showEditDialog.value.second
+                        question = showEditDialog.value.second,
+                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
                     )
                 )
                 showEditDialog.value = Pair(false, "")
             },
             onRemove = {
                 KLog.i(TAG, "onRemove click.")
+                AppUserLogger.getInstance().log(Clicked.CreateGroupQuestionRemove)
+
                 groupOpennessViewModel.removeQuestion(showEditDialog.value.second)
                 showEditDialog.value = Pair(false, "")
             }

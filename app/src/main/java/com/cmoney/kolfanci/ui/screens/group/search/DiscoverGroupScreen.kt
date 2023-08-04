@@ -39,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.globalGroupViewModel
@@ -89,6 +91,16 @@ fun DiscoverGroupScreen(
         },
         onCreateClick = {
             if (XLoginHelper.isLogin) {
+
+                when (uiState.tabIndex){
+                    0 -> {
+                        AppUserLogger.getInstance().log(Clicked.CreateGroup, From.Hot)
+                    }
+                    1 -> {
+                        AppUserLogger.getInstance().log(Clicked.CreateGroup, From.New)
+                    }
+                }
+
                 navController.navigate(CreateGroupScreenDestination())
             } else {
                 viewModel.showLoginDialog()

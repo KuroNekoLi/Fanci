@@ -1,5 +1,8 @@
 package com.cmoney.kolfanci.ui.screens.group.create
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,11 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.socks.library.KLog
 
 /**
  * 設定名稱
@@ -53,7 +58,9 @@ fun Step1Screen(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "社團名稱：", fontSize = 14.sp, color = LocalColor.current.text.default_100
+                    text = "社團名稱：",
+                    fontSize = 14.sp,
+                    color = LocalColor.current.text.default_100
                 )
                 Text(
                     text = "%d/20".format(textState.length),
@@ -89,6 +96,15 @@ fun Step1Screen(
                         fontSize = 16.sp,
                         color = LocalColor.current.text.default_30
                     )
+                },
+                interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
+                    LaunchedEffect(interactionSource) {
+                        interactionSource.interactions.collect {
+                            if (it is PressInteraction.Release) {
+                                AppUserLogger.getInstance().log(Clicked.CreateGroupName)
+                            }
+                        }
+                    }
                 }
             )
 
@@ -106,6 +122,6 @@ fun Step1ScreenPreview() {
     FanciTheme {
         Step1Screen(
             defaultName = "Hello"
-        ){}
+        ) {}
     }
 }
