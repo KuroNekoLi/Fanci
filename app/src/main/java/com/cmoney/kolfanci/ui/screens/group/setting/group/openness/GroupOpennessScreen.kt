@@ -175,11 +175,13 @@ fun GroupOpennessScreen(
                         keyinTracking = Clicked.QuestionTextArea.eventName
                     )
                 )
+                AppUserLogger.getInstance().log(Clicked.GroupOpennessManageEdit)
                 AppUserLogger.getInstance().log(Page.GroupSettingsGroupOpennessNonPublicReviewQuestionEdit)
                 showEditDialog.value = Pair(false, "")
             },
             onRemove = {
                 KLog.i(TAG, "onRemove click.")
+                AppUserLogger.getInstance().log(Clicked.GroupOpennessManageRemove)
                 showDeleteConfirmDialog = true
             }
         )
@@ -341,6 +343,8 @@ fun GroupOpennessScreenView(
                         QuestionItem(
                             question = question,
                             onClick = {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.GroupOpennessManage)
                                 onEditClick.invoke(question)
                             }
                         )
