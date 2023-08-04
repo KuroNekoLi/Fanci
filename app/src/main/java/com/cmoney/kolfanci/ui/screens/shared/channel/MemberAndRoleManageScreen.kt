@@ -206,13 +206,15 @@ private fun MemberAndRoleManageScreenView(
                     listItem = list,
                     onTabClick = {
                         when (it) {
-                            0 -> Clicked.NonPublicAnyPermissionMembers
-                            1 -> Clicked.NonPublicAnyPermissionRoles
-                            2 -> Clicked.NonPublicAnyPermissionPlan
+                            0 -> Clicked.NonPublicAnyPermissionMembers to Page.GroupSettingsChannelManagementPermissionsPrivateMembers
+                            1 -> Clicked.NonPublicAnyPermissionRoles to Page.GroupSettingsChannelManagementPermissionsPrivateRoles
+                            2 -> Clicked.NonPublicAnyPermissionPlan to Page.GroupSettingsChannelManagementPermissionsPrivateVIP
                             else -> null
-                        }?.let { clicked ->
-                            AppUserLogger.getInstance()
-                                .log(clicked, from)
+                        }?.let { (clicked, page) ->
+                            with(AppUserLogger.getInstance()) {
+                                log(clicked, from)
+                                log(page, from)
+                            }
                         }
                         onTabClick.invoke(it)
                     }
@@ -295,7 +297,7 @@ private fun AddMemberListScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
                     with(AppUserLogger.getInstance()) {
-                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember)
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember, from)
                         log(Clicked.NonPublicAnyPermissionMembersAddMember, from)
                     }
                     navigator.navigate(
@@ -363,8 +365,8 @@ private fun AddRoleListScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
                     with(AppUserLogger.getInstance()) {
-                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole)
-                        log(Clicked.NonPublicAnyPermissionRolesAddRole)
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole, from)
+                        log(Clicked.NonPublicAnyPermissionRolesAddRole, from)
                     }
                     navigator.navigate(
                         ShareAddRoleScreenDestination(
@@ -403,8 +405,6 @@ private fun AddRoleListScreen(
             )
         }
     }
-
-    AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateRoles)
 }
 
 @Composable
@@ -437,7 +437,7 @@ private fun AddVipPlanScreen(
                 ) {
                     KLog.i(TAG, "BorderButton click.")
                     with(AppUserLogger.getInstance()) {
-                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan)
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan, from)
                         log(Clicked.NonPublicAnyPermissionPlanAddPlan, from)
                     }
 
@@ -477,10 +477,6 @@ private fun AddVipPlanScreen(
                 }
             )
         }
-    }
-
-    LaunchedEffect(key1 = vipPlanModels) {
-        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsPrivateVIP)
     }
 }
 

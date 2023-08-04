@@ -36,8 +36,9 @@ class AppUserLogger : KoinComponent {
         debugLog(event.name, event.getParameters())
     }
 
-    fun log(page: Page) {
-        val event = PageUserEvent(page = page.eventName)
+    fun log(page: Page, from: From? = null) {
+        val descriptions = from?.asParameters()
+        val event = PageUserEvent(page = page.eventName, parameters = descriptions)
 //        logFlurry(event)
 //        logMixpanel(event)
         logCM(page)
@@ -51,9 +52,17 @@ class AppUserLogger : KoinComponent {
         debugLog(event.name, event.getParameters())
     }
 
-    class PageUserEvent(val page: String) : UserEvent() {
+    class PageUserEvent(val page: String, parameters: Map<String, Any>? = null) : UserEvent() {
         override val name: String
             get() = page
+        init {
+            parameters?.let {
+                val ps = it.toList().map {(key, value) ->
+                    key to value.toString()
+                }.toTypedArray()
+                setParameters(*ps)
+            }
+        }
     }
 
     class ClickedUserEvent(private val clicked: String, parameters: Map<String, Any>? = null) : UserEvent() {

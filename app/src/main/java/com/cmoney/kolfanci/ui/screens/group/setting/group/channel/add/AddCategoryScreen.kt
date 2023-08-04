@@ -14,7 +14,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -91,10 +90,6 @@ fun AddCategoryScreen(
             }
         }
     }
-
-    LaunchedEffect(key1 = group) {
-        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementAddCategory)
-    }
 }
 
 @Composable
@@ -141,8 +136,10 @@ fun AddCategoryScreenView(
                 modifier = Modifier
                     .background(LocalColor.current.background)
                     .clickable {
-                        AppUserLogger.getInstance()
-                            .log(Clicked.CategoryName, From.Create)
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.CategoryName, From.Create)
+                            log(Page.GroupSettingsChannelManagementAddCategoryCategoryName)
+                        }
                         navigator.navigate(
                             EditInputScreenDestination(
                                 defaultText = textState,

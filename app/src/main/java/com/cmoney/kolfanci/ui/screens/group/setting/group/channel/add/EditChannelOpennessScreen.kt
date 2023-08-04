@@ -181,7 +181,7 @@ fun EditChannelOpennessScreen(
     }
 
     LaunchedEffect(key1 = Unit) {
-        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsOpenness)
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsOpenness, from)
     }
 }
 

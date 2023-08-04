@@ -216,7 +216,7 @@ fun ChannelSettingScreenView(
                         KLog.i(TAG, "new category click.")
                         with(AppUserLogger.getInstance()) {
                             log(Clicked.ChannelManagementAddCategory)
-                            log(Page.GroupSettingsChannelManagementAddCategoryCategoryName)
+                            log(Page.GroupSettingsChannelManagementAddCategory)
                         }
                         navigator.navigate(
                             AddCategoryScreenDestination(
@@ -250,8 +250,10 @@ fun ChannelSettingScreenView(
                     channelList = category.channels.orEmpty(),
                     onCategoryEdit = {
                         KLog.i(TAG, "onCategoryEdit:$it")
-                        AppUserLogger.getInstance()
-                            .log(Clicked.ChannelManagementEditCategory)
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ChannelManagementEditCategory)
+                            log(Page.GroupSettingsChannelManagementEditCategory)
+                        }
                         navigator.navigate(
                             EditCategoryScreenDestination(
                                 group = group,

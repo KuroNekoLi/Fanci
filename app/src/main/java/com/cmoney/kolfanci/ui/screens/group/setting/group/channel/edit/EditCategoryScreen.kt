@@ -168,8 +168,10 @@ fun EditCategoryScreenView(
                 modifier = Modifier
                     .background(LocalColor.current.background)
                     .clickable {
-                        AppUserLogger.getInstance()
-                            .log(Clicked.CategoryName, From.Edit)
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.CategoryName, From.Edit)
+                            log(Page.GroupSettingsChannelManagementEditCategoryCategoryName)
+                        }
                         navigator.navigate(
                             EditInputScreenDestination(
                                 defaultText = textState,

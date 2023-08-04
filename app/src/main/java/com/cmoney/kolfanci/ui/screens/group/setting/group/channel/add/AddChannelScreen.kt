@@ -173,9 +173,6 @@ fun AddChannelScreen(
     //點擊的權限
     uiState.clickPermissionMemberModel?.let {
         KLog.i(TAG, "clickPermissionMemberModel:$it")
-        AppUserLogger.getInstance()
-            .log(Page.GroupSettingsChannelManagementPermissionsPrivateMembers)
-
         navigator.navigate(
             MemberAndRoleManageScreenDestination(
                 group = group,
@@ -331,12 +328,15 @@ fun AddChannelScreenView(
                         listItem = list,
                         onTabClick = {
                             when (it) {
-                                0 -> Clicked.ChannelManagementStyle
-                                1 -> Clicked.ChannelManagementPermissions
-                                2 -> Clicked.ChannelManagementAdmin
+                                0 -> Clicked.ChannelManagementStyle to Page.GroupSettingsChannelManagementStyle
+                                1 -> Clicked.ChannelManagementPermissions to Page.GroupSettingsChannelManagementPermissions
+                                2 -> Clicked.ChannelManagementAdmin to Page.GroupSettingsChannelManagementAdmin
                                 else -> null
-                            }?.let { clicked ->
-                                AppUserLogger.getInstance().log(clicked, from)
+                            }?.let { (clicked, page) ->
+                                with(AppUserLogger.getInstance()) {
+                                    log(clicked, from)
+                                    log(page, from)
+                                }
                             }
                             onTabClick.invoke(it)
                         }
@@ -351,7 +351,7 @@ fun AddChannelScreenView(
                             withDelete = isEditChannel,
                             onChannelNameClick = {
                                 with(AppUserLogger.getInstance()) {
-                                    log(Page.GroupSettingsChannelManagementStyleChannelName)
+                                    log(Page.GroupSettingsChannelManagementStyleChannelName, from)
                                     log(Clicked.StyleChannelName, from)
                                 }
                                 navigator.navigate(
@@ -366,11 +366,6 @@ fun AddChannelScreenView(
                             },
                             onDeleteClick = onDeleteClick
                         )
-
-                        LaunchedEffect(key1 = selectedIndex) {
-                            AppUserLogger.getInstance()
-                                .log(Page.GroupSettingsChannelManagementStyle)
-                        }
                     }
                     //權限
                     1 -> {
@@ -382,11 +377,6 @@ fun AddChannelScreenView(
                             channelPermissionModel = channelAccessTypeList,
                             onPermissionClick = onPermissionClick
                         )
-
-                        LaunchedEffect(key1 = selectedIndex) {
-                            AppUserLogger.getInstance()
-                                .log(Page.GroupSettingsChannelManagementPermissions)
-                        }
                     }
                     //管理員
                     2 -> {
@@ -501,7 +491,8 @@ private fun StyleTabScreen(
                 .height(50.dp)
                 .background(LocalColor.current.background)
                 .clickable {
-                    AppUserLogger.getInstance()
+                    AppUserLogger
+                        .getInstance()
                         .log(Clicked.ChannelManagementDeleteChannel)
                     onDeleteClick.invoke()
                 },
@@ -672,7 +663,7 @@ private fun ManagerTabScreen(
             borderColor = Color.White
         ) {
             with(AppUserLogger.getInstance()) {
-                log(Page.GroupSettingsChannelManagementAdminAddRole)
+                log(Page.GroupSettingsChannelManagementAdminAddRole, from)
                 log(Clicked.AdminAddRole, from)
             }
 
@@ -704,10 +695,6 @@ private fun ManagerTabScreen(
                 Spacer(modifier = Modifier.height(1.dp))
             }
         }
-    }
-
-    LaunchedEffect(key1 = group) {
-        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementAdmin)
     }
 }
 
