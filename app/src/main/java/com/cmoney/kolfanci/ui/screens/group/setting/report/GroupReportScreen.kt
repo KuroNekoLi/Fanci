@@ -43,6 +43,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isVip
@@ -98,6 +99,7 @@ fun GroupReportScreen(
             viewModel.ignoreReport(it)
         },
         onBack = {
+            AppUserLogger.getInstance().log(Clicked.PunishBack)
             resultBackNavigator.navigateBack(
                 result = (reportList.size != uiState.reportList.size)
             )
@@ -115,10 +117,12 @@ fun GroupReportScreen(
                 viewModel.dismissReportDialog()
             },
             onSilence = {
+                AppUserLogger.getInstance().log(Clicked.PunishMute)
                 viewModel.dismissReportDialog()
                 viewModel.showSilenceDialog(it)
             },
             onKick = {
+                AppUserLogger.getInstance().log(Clicked.PunishKickOut)
                 viewModel.dismissReportDialog()
                 viewModel.showKickDialog(it)
             }
@@ -134,6 +138,7 @@ fun GroupReportScreen(
             name = name,
             isVip = isVip,
             onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.PunishMuteBack)
                 viewModel.dismissSilenceDialog()
             },
             onConfirm = {
@@ -156,9 +161,11 @@ fun GroupReportScreen(
             name = name,
             isVip = isVip,
             onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.PunishKickOutCancel)
                 viewModel.dismissKickDialog()
             },
             onConfirm = {
+                AppUserLogger.getInstance().log(Clicked.PunishKickOutConfirmKickOut)
                 viewModel.dismissKickDialog()
                 uiState.kickDialog.let {
                     viewModel.kickOutMember(it)
@@ -482,6 +489,7 @@ private fun ReportItem(
                 textColor = LocalColor.current.text.default_100,
                 text = stringResource(id = R.string.not_punish)
             ) {
+                AppUserLogger.getInstance().log(Clicked.ReportReviewNoPunish)
                 onIgnore.invoke(reportInformation)
             }
 
@@ -493,6 +501,7 @@ private fun ReportItem(
                     .height(40.dp),
                 text = stringResource(id = R.string.punish)
             ) {
+                AppUserLogger.getInstance().log(Clicked.ReportReviewPunish)
                 onReportClick.invoke(reportInformation)
             }
         }
