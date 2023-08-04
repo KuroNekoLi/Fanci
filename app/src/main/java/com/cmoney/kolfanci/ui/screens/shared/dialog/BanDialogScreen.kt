@@ -9,8 +9,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.cmoney.fanciapi.fanci.model.BanPeriodOption
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toDisplayDay
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DialogDefaultContentScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -35,12 +37,13 @@ fun BanDialogScreen(
             onDismiss = {
                 onDismiss.invoke()
             },
-            title = stringResource(id = R.string.ban_x),
+            title = stringResource(id = R.string.ban_x, name),
         ) {
             BanDayItemScreen(
                 name = name,
                 isVip = isVip,
                 onClick = {
+                    AppUserLogger.getInstance().log(Clicked.PunishMuteDate)
                     showFirstDialog = false
                     showBanDoubleConfirmDialog.value = it
                 },
