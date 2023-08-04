@@ -12,6 +12,11 @@ sealed class Clicked(val eventName: String) {
     object HomeNotJoinGroupGroup : Clicked(eventName = "Home.NotJoinGroup_Group")
 
     /**
+     * 建立社團_點擊
+     */
+    object CreateGroup : Clicked(eventName = "CreateGroup")
+
+    /**
      * 建立社團_社團名稱_點擊
      */
     object CreateGroupName : Clicked(eventName = "CreateGroup_Name")
@@ -57,14 +62,19 @@ sealed class Clicked(val eventName: String) {
     object CreateGroupGroupIcon : Clicked(eventName = "CreateGroup_GroupIcon")
 
     /**
+     * 建立社團_社團圖示更換圖片_點擊
+     */
+    object CreateGroupChangeGroupIconPicture : Clicked(eventName = "CreateGroup_ChangeGroupIconPicture")
+
+    /**
      * 建立社團_設定首頁背景_點擊
      */
     object CreateGroupHomeBackground : Clicked(eventName = "CreateGroup_HomeBackground")
 
     /**
-     * 建立社團_更換圖片_點擊
+     * 建立社團_首頁背景更換圖片_點擊
      */
-    object CreateGroupChangePicture : Clicked(eventName = "CreateGroup_ChangePicture")
+    object CreateGroupChangeHomeBackgroundPicture : Clicked(eventName = "CreateGroup_ChangeHomeBackgroundPicture")
 
     /**
      * 建立社團_設定主題色彩_點擊
@@ -114,12 +124,12 @@ sealed class Clicked(val eventName: String) {
     /**
      * 會員頁_信箱登入_點擊
      */
-    object MemberPageEmailLogin : Clicked(eventName = "MemberPage_EmailLogin")
+    object EmailLogin : Clicked(eventName = "EmailLogin")
 
     /**
      * 會員頁_社群帳號登入_點擊
      */
-    object MemberPageSocialAccountLogin : Clicked(eventName = "MemberPage_SocialAccountLogin")
+    object SocialAccountLogin : Clicked(eventName = "SocialAccountLogin")
 
     /**
      * 會員頁_首頁_點擊
@@ -272,11 +282,6 @@ sealed class Clicked(val eventName: String) {
     object PostDeletePostCancel : Clicked(eventName = "Post.DeletePost_Cancel")
 
     /**
-     * 留言_開啟鍵盤_點擊
-     */
-    object CommentOpenKeyboard : Clicked(eventName = "Comment_OpenKeyboard")
-
-    /**
      * 留言_回覆_點擊
      */
     object CommentReply : Clicked(eventName = "Comment_Reply")
@@ -322,29 +327,9 @@ sealed class Clicked(val eventName: String) {
     object CommentDeleteReply : Clicked(eventName = "Comment_DeleteReply")
 
     /**
-     * 貼文_開啟鍵盤_點擊
-     */
-    object PostOpenKeyboard : Clicked(eventName = "Post_OpenKeyboard")
-
-    /**
      * 貼文_選取照片_點擊
      */
     object PostSelectPhoto : Clicked(eventName = "Post_SelectPhoto")
-
-    /**
-     * 貼文.選取照片_打開相機_點擊
-     */
-    object PostSelectPhotoOpenCamera : Clicked(eventName = "Post.SelectPhoto_OpenCamera")
-
-    /**
-     * 貼文.選取照片_從相簿選取_點擊
-     */
-    object PostSelectPhotoSelectFromAlbum : Clicked(eventName = "Post.SelectPhoto_SelectFromAlbum")
-
-    /**
-     * 貼文.選取照片_返回_點擊
-     */
-    object PostSelectPhotoReturn : Clicked(eventName = "Post.SelectPhoto_Return")
 
     /**
      * 貼文_發布_點擊
@@ -365,11 +350,6 @@ sealed class Clicked(val eventName: String) {
      * 貼文.空白貼文_修改_點擊
      */
     object PostBlankPostEdit : Clicked(eventName = "Post.BlankPost_Edit")
-
-    /**
-     * 訊息_開啟鍵盤_點擊
-     */
-    object MessageOpenKeyboard : Clicked(eventName = "Message_OpenKeyboard")
 
     /**
      * 訊息_插入圖片_點擊
@@ -462,21 +442,6 @@ sealed class Clicked(val eventName: String) {
     object MessageRetry : Clicked(eventName = "Message_Retry")
 
     /**
-     * 訊息.重試_重新傳送_點擊
-     */
-    object MessageRetryResend : Clicked(eventName = "Message.Retry_Resend")
-
-    /**
-     * 訊息.重試_刪除訊息_點擊
-     */
-    object MessageRetryDeleteMessage : Clicked(eventName = "Message.Retry_DeleteMessage")
-
-    /**
-     * 訊息.重試_返回_點擊
-     */
-    object MessageRetryReturn : Clicked(eventName = "Message.Retry_Return")
-
-    /**
      * 表情符號_現有的表情_點擊
      */
     object EmoticonExistingEmoticon : Clicked(eventName = "Emoticon_ExistingEmoticon")
@@ -530,26 +495,6 @@ sealed class Clicked(val eventName: String) {
      * 探索社團_最新社團_點擊
      */
     object ExploreGroupNewestGroups : Clicked(eventName = "ExploreGroup_NewestGroups")
-
-    /**
-     * 建立社團_點擊
-     */
-    object CreateGroup : Clicked(eventName = "CreateGroup")
-
-    /**
-     * 上一步_點擊
-     */
-    object PreviousStep : Clicked(eventName = "PreviousStep")
-
-    /**
-     * 下一步_點擊
-     */
-    object NextStep : Clicked(eventName = "NextStep")
-
-    /**
-     * 建立社團GO_點擊
-     */
-    object CreateGroupGO : Clicked(eventName = "CreateGroupGO")
 
     /**
      * 社團_加入_點擊
@@ -712,29 +657,9 @@ sealed class Clicked(val eventName: String) {
     object GroupOpennessManageRemove : Clicked(eventName = "GroupOpenness.Manage_Remove")
 
     /**
-     * 社團公開度.管理_返回_點擊
-     */
-    object GroupOpennessManageReturn : Clicked(eventName = "GroupOpenness.Manage_Return")
-
-    /**
      * 題目_文字區_點擊
      */
     object QuestionTextArea : Clicked(eventName = "Question_TextArea")
-
-    /**
-     * 題目_確定新增_點擊
-     */
-    object QuestionConfirmAdd : Clicked(eventName = "Question_ConfirmAdd")
-
-    /**
-     * 返回_繼續建立_點擊
-     */
-    object ReturnContinueCreation : Clicked(eventName = "Return_ContinueCreation")
-
-    /**
-     * 返回_確定並返回_點擊
-     */
-    object ReturnConfirmAndReturn : Clicked(eventName = "Return_ConfirmAndReturn")
 
     /**
      * 社團設定_頻道管理_點擊
@@ -755,6 +680,11 @@ sealed class Clicked(val eventName: String) {
      * 頻道管理_編輯排序_點擊
      */
     object ChannelManagementEditOrder : Clicked(eventName = "ChannelManagement_EditOrder")
+
+    /**
+     * 頻道管理_編輯排序選項_點擊
+     */
+    object ChannelManagementOrderOption : Clicked(eventName = "ChannelManagement_OrderOption")
 
     /**
      * 頻道管理_刪除分類_點擊
@@ -910,76 +840,6 @@ sealed class Clicked(val eventName: String) {
      * 角色管理_權限_點擊
      */
     object RoleManagementPermissions : Clicked(eventName = "RoleManagement_Permissions")
-
-    /**
-     * 權限_編輯社團_點擊
-     */
-    object PermissionsEditGroup : Clicked(eventName = "Permissions_EditGroup")
-
-    /**
-     * 權限_主頁編輯_點擊
-     */
-    object PermissionsHomepageEdit : Clicked(eventName = "Permissions_HomepageEdit")
-
-    /**
-     * 權限_社團公開度_點擊
-     */
-    object PermissionsGroupVisibility : Clicked(eventName = "Permissions_GroupVisibility")
-
-    /**
-     * 權限_建立與編輯分類_點擊
-     */
-    object PermissionsCreateAndEditCategory : Clicked(eventName = "Permissions_CreateAndEditCategory")
-
-    /**
-     * 權限_刪除分類_點擊
-     */
-    object PermissionsDeleteCategory : Clicked(eventName = "Permissions_DeleteCategory")
-
-    /**
-     * 權限_建立與編輯頻道_點擊
-     */
-    object PermissionsCreateAndEditChannel : Clicked(eventName = "Permissions_CreateAndEditChannel")
-
-    /**
-     * 權限_刪除頻道_點擊
-     */
-    object PermissionsDeleteChannel : Clicked(eventName = "Permissions_DeleteChannel")
-
-    /**
-     * 權限_新增、編輯角色_點擊
-     */
-    object PermissionsAddEditRole : Clicked(eventName = "Permissions_AddEditRole")
-
-    /**
-     * 權限_刪除角色_點擊
-     */
-    object PermissionsDeleteRole : Clicked(eventName = "Permissions_DeleteRole")
-
-    /**
-     * 權限_管理角色層級_點擊
-     */
-    object PermissionsManageRoleHierarchy : Clicked(eventName = "Permissions_ManageRoleHierarchy")
-
-    /**
-     * 權限_指派成員角色_點擊
-     */
-    object PermissionsAssignMemberRoles : Clicked(eventName = "Permissions_AssignMemberRoles")
-
-    /**
-     * 權限_管理VIP方案_點擊
-     */
-    object PermissionsManageVIPPlans : Clicked(eventName = "Permissions_ManageVIPPlans")
-
-    /**
-     * 權限_審核入社申請_點擊
-     */
-    object PermissionsReviewMembershipApplication : Clicked(eventName = "Permissions_ReviewMembershipApplication")
-
-    /**
-     * 權限_禁言與移除成員_點擊
-     */
-    object PermissionsMuteAndRemoveMembers : Clicked(eventName = "Permissions_MuteAndRemoveMembers")
 
     /**
      * 角色管理_成員_點擊

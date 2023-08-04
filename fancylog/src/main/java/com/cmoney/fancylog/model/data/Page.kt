@@ -54,17 +54,7 @@ sealed class Page(val eventName: String) {
     /**
      * 會員頁.未登入頁_觀看
      */
-    object MemberPageNotLoggedInPage : Page(eventName = "MemberPage.NotLoggedInPage")
-
-    /**
-     * 會員頁.信箱登入_觀看
-     */
-    object MemberPageEmailLogin : Page(eventName = "MemberPage.EmailLogin")
-
-    /**
-     * 會員頁.社群帳號登入_觀看
-     */
-    object MemberPageSocialAccountLogin : Page(eventName = "MemberPage.SocialAccountLogin")
+    object NotLoggedInPage : Page(eventName = "NotLoggedInPage")
 
     /**
      * 會員頁.頭像與暱稱_觀看
@@ -72,49 +62,9 @@ sealed class Page(val eventName: String) {
     object MemberPageAvatarAndNickname : Page(eventName = "MemberPage.AvatarAndNickname")
 
     /**
-     * 頭像與暱稱.頭像_觀看
-     */
-    object AvatarAndNicknameAvatar : Page(eventName = "AvatarAndNickname.Avatar")
-
-    /**
-     * 頭像與暱稱.暱稱_觀看
-     */
-    object AvatarAndNicknameNickname : Page(eventName = "AvatarAndNickname.Nickname")
-
-    /**
      * 會員頁.帳號管理_觀看
      */
     object MemberPageAccountManagement : Page(eventName = "MemberPage.AccountManagement")
-
-    /**
-     * 帳號管理.登出帳號_觀看
-     */
-    object AccountManagementLogout : Page(eventName = "AccountManagement.Logout")
-
-    /**
-     * 帳號管理.刪除帳號_觀看
-     */
-    object AccountManagementDeleteAccount : Page(eventName = "AccountManagement.DeleteAccount")
-
-    /**
-     * 會員頁.服務條款_觀看
-     */
-    object MemberPageTermsOfService : Page(eventName = "MemberPage.TermsOfService")
-
-    /**
-     * 會員頁.隱私權政策_觀看
-     */
-    object MemberPagePrivacyPolicy : Page(eventName = "MemberPage.PrivacyPolicy")
-
-    /**
-     * 會員頁.著作權政策_觀看
-     */
-    object MemberPageCopyrightPolicy : Page(eventName = "MemberPage.CopyrightPolicy")
-
-    /**
-     * 會員頁.意見回饋_觀看
-     */
-    object MemberPageFeedback : Page(eventName = "MemberPage.Feedback")
 
     /**
      * 貼文牆
@@ -212,11 +162,6 @@ sealed class Page(val eventName: String) {
     object GroupSettingsGroupOpennessNonPublicReviewQuestionEdit : Page(eventName = "Group.Settings.GroupOpenness.NonPublic.ReviewQuestion.Edit")
 
     /**
-     * 社團.設定.社團公開度.不公開.審核題目.移除_觀看
-     */
-    object GroupSettingsGroupOpennessNonPublicReviewQuestionRemove : Page(eventName = "Group.Settings.GroupOpenness.NonPublic.ReviewQuestion.Remove")
-
-    /**
      * 社團.設定.頻道管理_觀看
      */
     object GroupSettingsChannelManagement : Page(eventName = "Group.Settings.ChannelManagement")
@@ -232,14 +177,14 @@ sealed class Page(val eventName: String) {
     object GroupSettingsChannelManagementAddCategoryCategoryName : Page(eventName = "Group.Settings.ChannelManagement.AddCategory.CategoryName")
 
     /**
+     * 社團.設定.頻道管理.編輯分類.分類名稱_觀看
+     */
+    object GroupSettingsChannelManagementEditCategoryCategoryName : Page(eventName = "Group.Settings.ChannelManagement.EditCategory.CategoryName")
+
+    /**
      * 社團.設定.頻道管理.編輯分類_觀看
      */
     object GroupSettingsChannelManagementEditCategory : Page(eventName = "Group.Settings.ChannelManagement.EditCategory")
-
-    /**
-     * 社團.設定.頻道管理.刪除分類_觀看
-     */
-    object GroupSettingsChannelManagementDeleteCategory : Page(eventName = "Group.Settings.ChannelManagement.DeleteCategory")
 
     /**
      * 社團.設定.頻道管理.新增頻道_觀看
@@ -312,11 +257,6 @@ sealed class Page(val eventName: String) {
     object GroupSettingsChannelManagementAdminAddRole : Page(eventName = "Group.Settings.ChannelManagement.Admin.AddRole")
 
     /**
-     * 社團.設定.頻道管理.刪除頻道_觀看
-     */
-    object GroupSettingsChannelManagementDeleteChannel : Page(eventName = "Group.Settings.ChannelManagement.DeleteChannel")
-
-    /**
      * 社團.設定.角色管理.新增角色.樣式_觀看
      */
     object GroupSettingsRoleManagementAddRoleStyle : Page(eventName = "Group.Settings.RoleManagement.AddRole.Style")
@@ -337,9 +277,19 @@ sealed class Page(val eventName: String) {
     object GroupSettingsRoleManagementAddRoleMembers : Page(eventName = "Group.Settings.RoleManagement.AddRole.Members")
 
     /**
+     * 社團.設定.角色管理.新增角色.成員列表_觀看
+     */
+    object GroupSettingsRoleManagementAddRoleMembersList : Page(eventName = "Group.Settings.RoleManagement.AddRole.MembersList")
+
+    /**
      * 社團.設定.角色管理.編輯角色.樣式_觀看
      */
     object GroupSettingsRoleManagementEditRoleStyle : Page(eventName = "Group.Settings.RoleManagement.EditRole.Style")
+
+    /**
+     * 社團.設定.角色管理.編輯角色.樣式.角色名稱_觀看
+     */
+    object GroupSettingsRoleManagementEditRoleStyleRoleName : Page(eventName = "Group.Settings.RoleManagement.EditRole.Style.RoleName")
 
     /**
      * 社團.設定.角色管理.編輯角色.權限_觀看
@@ -352,9 +302,9 @@ sealed class Page(val eventName: String) {
     object GroupSettingsRoleManagementEditRoleMembers : Page(eventName = "Group.Settings.RoleManagement.EditRole.Members")
 
     /**
-     * 社團.設定.角色管理.編輯角色.刪除_觀看
+     * 社團.設定.角色管理.編輯角色.成員列表_觀看
      */
-    object GroupSettingsRoleManagementEditRoleDelete : Page(eventName = "Group.Settings.RoleManagement.EditRole.Delete")
+    object GroupSettingsRoleManagementEditRoleMembersList : Page(eventName = "Group.Settings.RoleManagement.EditRole.MembersList")
 
     /**
      * 社團.設定.所有成員_觀看
@@ -415,10 +365,5 @@ sealed class Page(val eventName: String) {
      * 社團.設定.禁言列表_觀看
      */
     object GroupSettingsMuteList : Page(eventName = "Group.Settings.MuteList")
-
-    /**
-     * 社團.設定.禁言列表.管理_觀看
-     */
-    object GroupSettingsMuteListManage : Page(eventName = "Group.Settings.MuteList.Manage")
 
 }

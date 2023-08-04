@@ -185,14 +185,8 @@ fun AccountManageScreen(
                 textColor = Color.White
             ) {
                 AppUserLogger.getInstance().log(Clicked.LogoutReturn)
-                
                 showConfirmDialog = false
-                Unit
             }
-        }
-        LaunchedEffect(key1 = Unit) {
-            AppUserLogger.getInstance()
-                .log(page = Page.AccountManagementLogout)
         }
     }
     LaunchedEffect(key1 = Unit) {

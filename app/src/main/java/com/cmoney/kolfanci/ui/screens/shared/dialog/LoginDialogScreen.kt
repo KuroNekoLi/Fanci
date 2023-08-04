@@ -66,7 +66,7 @@ fun LoginDialogScreen(
 
     LaunchedEffect(key1 = Unit) {
         AppUserLogger.getInstance()
-            .log(page = Page.MemberPageNotLoggedInPage)
+            .log(page = Page.NotLoggedInPage)
     }
 }
 

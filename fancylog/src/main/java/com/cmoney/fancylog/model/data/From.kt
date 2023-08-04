@@ -45,16 +45,6 @@ sealed class From(val parameterName: String) {
     object Skip : From(parameterName = "Skip")
 
     /**
-     * 社團圖示
-     */
-    object GroupIcon : From(parameterName = "GroupIcon")
-
-    /**
-     * 首頁背景
-     */
-    object HomeBackground : From(parameterName = "HomeBackground")
-
-    /**
      * 建立社團名稱
      */
     object GroupName : From(parameterName = "GroupName")
@@ -70,6 +60,16 @@ sealed class From(val parameterName: String) {
     object GroupArrangement : From(parameterName = "GroupArrangement")
 
     /**
+     * 任一篇貼文的「顯示更多」鍵
+     */
+    object Post : From(parameterName = "Post")
+
+    /**
+     * 任一篇留言的「顯示更多」鍵
+     */
+    object Comment : From(parameterName = "Comment")
+
+    /**
      * 在貼文外層點擊圖片
      */
     object PostList : From(parameterName = "PostList")
@@ -80,11 +80,6 @@ sealed class From(val parameterName: String) {
     object InnerLayer : From(parameterName = "InnerLayer")
 
     /**
-     * 在貼文內層留言區點擊圖片
-     */
-    object Comment : From(parameterName = "Comment")
-
-    /**
      * 自己的貼文
      */
     object Poster : From(parameterName = "Poster")
@@ -93,16 +88,6 @@ sealed class From(val parameterName: String) {
      * 別人的貼文
      */
     object OthersPost : From(parameterName = "OthersPost")
-
-    /**
-     * 打開相機
-     */
-    object OpenCamera : From(parameterName = "OpenCamera")
-
-    /**
-     * 從相簿選擇
-     */
-    object SelectFromAlbum : From(parameterName = "SelectFromAlbum")
 
     /**
      * 濫發廣告訊息
@@ -135,24 +120,9 @@ sealed class From(val parameterName: String) {
     object All : From(parameterName = "All")
 
     /**
-     * 貼文
-     */
-    object Post : From(parameterName = "Post")
-
-    /**
      * 聊天
      */
     object Chat : From(parameterName = "Chat")
-
-    /**
-     * 已登入畫面
-     */
-    object Login : From(parameterName = "Login")
-
-    /**
-     * 未登入畫面
-     */
-    object Logout : From(parameterName = "Logout")
 
     /**
      * 邀請連結
@@ -160,14 +130,14 @@ sealed class From(val parameterName: String) {
     object Link : From(parameterName = "Link")
 
     /**
-     * 從相簿選擇
+     * 頻道排序
      */
-    object Album : From(parameterName = "Album")
+    object Channel : From(parameterName = "Channel")
 
     /**
-     * 從Fanci圖庫選擇
+     * 分類排序
      */
-    object Gallery : From(parameterName = "Gallery")
+    object Category : From(parameterName = "Category")
 
     /**
      * 新增頻道
@@ -183,6 +153,26 @@ sealed class From(val parameterName: String) {
      * 社團簡介頁
      */
     object GroupIntroduction : From(parameterName = "GroupIntroduction")
+
+    /**
+     * 建立社團｜社團圖示
+     */
+    object AddGroupIcon : From(parameterName = "AddGroupIcon")
+
+    /**
+     * 編輯社團｜社團圖示
+     */
+    object EditGroupIcon : From(parameterName = "EditGroupIcon")
+
+    /**
+     * 建立社團｜社團背景
+     */
+    object AddHomeBackground : From(parameterName = "AddHomeBackground")
+
+    /**
+     * 編輯社團｜社團背景
+     */
+    object EditHomeBackground : From(parameterName = "EditHomeBackground")
 
     /**
      * 主題預覽
@@ -220,6 +210,11 @@ sealed class From(val parameterName: String) {
     object ChannelAddVIP : From(parameterName = "ChannelAddVIP")
 
     /**
+     * 頻道管理員新增角色
+     */
+    object AdminAddRole : From(parameterName = "AdminAddRole")
+
+    /**
      * 建立角色
      */
     object AddRole : From(parameterName = "AddRole")
@@ -230,9 +225,24 @@ sealed class From(val parameterName: String) {
     object RoleName : From(parameterName = "RoleName")
 
     /**
+     * 角色名稱(編輯角色)
+     */
+    object EditName : From(parameterName = "EditName")
+
+    /**
      * 新增成員(建立角色)
      */
     object RoleAddMember : From(parameterName = "RoleAddMember")
+
+    /**
+     * 頻道排序
+     */
+    object ChannelOrder : From(parameterName = "ChannelOrder")
+
+    /**
+     * 分類排序
+     */
+    object CategoryOrder : From(parameterName = "CategoryOrder")
 
     /**
      * 新增分類
@@ -240,14 +250,24 @@ sealed class From(val parameterName: String) {
     object AddCategory : From(parameterName = "AddCategory")
 
     /**
-     * 分類名稱
+     * 新增分類時輸入名稱
      */
-    object CategoryName : From(parameterName = "CategoryName")
+    object KeyinCategoryName : From(parameterName = "KeyinCategoryName")
 
     /**
-     * 新增審核題目
+     * 編輯分類名稱
      */
-    object AddReviewQuestion : From(parameterName = "AddReviewQuestion")
+    object EditCategoryName : From(parameterName = "EditCategoryName")
+
+    /**
+     * 建立社團｜新增審核題目
+     */
+    object CreatGroupAddQuestion : From(parameterName = "CreatGroup.AddQuestion")
+
+    /**
+     * 編輯社團｜新增審核題目
+     */
+    object GroupSettingsAddQuestion : From(parameterName = "GroupSettings.AddQuestion")
 
     /**
      * 所有成員_新增角色
