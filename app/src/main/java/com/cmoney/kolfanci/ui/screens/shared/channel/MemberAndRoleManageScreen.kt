@@ -239,6 +239,7 @@ private fun MemberAndRoleManageScreenView(
                             group = group,
                             roles = selectedRole,
                             title = topBarTitle,
+                            from = from,
                             onRemoveClick = onRoleRemoveClick
                         )
                     }
@@ -249,6 +250,7 @@ private fun MemberAndRoleManageScreenView(
                             title = topBarTitle,
                             vipPlanModels = selectedVipPlanModels,
                             group = group,
+                            from = from,
                             onVipPlanRemoveClick = onVipPlanRemoveClick
                         )
                     }
@@ -338,6 +340,7 @@ private fun AddRoleListScreen(
     group: Group,
     roles: List<FanciRole> = emptyList(),
     title: String,
+    from: From,
     onRemoveClick: (FanciRole) -> Unit
 ) {
     val TAG = "AddRoleListScreen"
@@ -359,10 +362,10 @@ private fun AddRoleListScreen(
                     borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
-
-                    AppUserLogger.getInstance()
-                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole)
-
+                    with(AppUserLogger.getInstance()) {
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole)
+                        log(Clicked.NonPublicAnyPermissionRolesAddRole)
+                    }
                     navigator.navigate(
                         ShareAddRoleScreenDestination(
                             group = group,
@@ -393,6 +396,8 @@ private fun AddRoleListScreen(
                 fanciRole = role,
                 editText = "移除",
                 onEditClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.NonPublicAnyPermissionRolesRemoveRole, from)
                     onRemoveClick.invoke(it)
                 }
             )
@@ -408,6 +413,7 @@ private fun AddVipPlanScreen(
     title: String,
     group: Group,
     vipPlanModels: List<VipPlanModel>,
+    from: From,
     onVipPlanRemoveClick: (VipPlanModel) -> Unit
 ) {
     val TAG = "AddVipPlanScreen"
@@ -430,8 +436,10 @@ private fun AddVipPlanScreen(
                     borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
-                    AppUserLogger.getInstance()
-                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan)
+                    with(AppUserLogger.getInstance()) {
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan)
+                        log(Clicked.NonPublicAnyPermissionPlanAddPlan, from)
+                    }
 
                     navigator.navigate(
                         AddVipPlanScreenDestination(
@@ -463,6 +471,8 @@ private fun AddVipPlanScreen(
                 endText = stringResource(id = R.string.remove),
                 subTitle = stringResource(id = R.string.n_member).format(plan.memberCount),
                 onPlanClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.NonPublicAnyPermissionPlanRemovePlan, from)
                     onVipPlanRemoveClick(plan)
                 }
             )
