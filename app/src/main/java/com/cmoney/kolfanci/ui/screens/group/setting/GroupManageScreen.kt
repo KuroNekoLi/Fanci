@@ -65,6 +65,8 @@ fun GroupManageScreen(
                 iconRes = R.drawable.channel_setting,
                 text = "頻道管理",
                 onItemClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupSettingsChannelManagement)
                     navController.navigate(
                         ChannelSettingScreenDestination(
                             group = group

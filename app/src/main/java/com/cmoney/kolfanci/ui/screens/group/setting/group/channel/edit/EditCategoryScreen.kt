@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
@@ -219,6 +220,8 @@ fun EditCategoryScreenView(
                         .height(50.dp)
                         .background(LocalColor.current.background)
                         .clickable {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.ChannelManagementDeleteCategory)
                             onDelete.invoke()
                         },
                     contentAlignment = Alignment.Center
