@@ -2,6 +2,8 @@ package com.cmoney.kolfanci.ui.screens.shared.dialog
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.dialog.item.DialogDefaultContentScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
@@ -35,10 +37,12 @@ fun DisBanDialogScreen(
                 confirmTitle = "解除禁言",
                 cancelTitle = "取消",
                 onConfirm = {
+                    AppUserLogger.getInstance().log(Clicked.ManageUnmute)
                     showFirstDialog = false
                     showDisBanDoubleConfirmDialog = true
                 },
                 onCancel = {
+                    AppUserLogger.getInstance().log(Clicked.ManageCancel)
                     onDismiss.invoke()
                 }
             )
@@ -58,10 +62,12 @@ fun DisBanDialogScreen(
                 confirmTitle = "確認，解除禁言",
                 cancelTitle = "取消",
                 onConfirm = {
+                    AppUserLogger.getInstance().log(Clicked.ManageUnmuteConfirmUnmute)
                     showDisBanDoubleConfirmDialog = false
                     onConfirm.invoke()
                 },
                 onCancel = {
+                    AppUserLogger.getInstance().log(Clicked.ManageUnmuteCancel)
                     showDisBanDoubleConfirmDialog = false
                     onDismiss.invoke()
                 }

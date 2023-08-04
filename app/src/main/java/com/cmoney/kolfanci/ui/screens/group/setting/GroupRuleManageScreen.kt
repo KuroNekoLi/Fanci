@@ -12,7 +12,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.BanListScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
@@ -68,6 +70,7 @@ fun GroupRuleManageScreen(
             iconRes = R.drawable.ban,
             text = "禁言列表",
             onItemClick = {
+                AppUserLogger.getInstance().log(Clicked.GroupSettingsMuteList)
                 navController.navigate(
                     BanListScreenDestination(
                         group = group
@@ -85,7 +88,7 @@ fun GroupRuleManageScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun GroupRuleManageScreenPreview() {
     FanciTheme {

@@ -27,6 +27,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -71,6 +72,7 @@ fun BanListScreen(
         banUserList = uiState.banUserList.orEmpty(),
         onClick = {
             KLog.i(TAG, "on fix click:$it")
+            AppUserLogger.getInstance().log(Clicked.MuteListManage)
             showDisBanDialog.value = Pair(true, it)
         },
         loading = uiState.loading
