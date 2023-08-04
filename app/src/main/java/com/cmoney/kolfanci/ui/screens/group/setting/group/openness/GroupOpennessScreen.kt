@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
@@ -277,6 +278,8 @@ fun GroupOpennessScreenView(
                 description = stringResource(id = R.string.full_public_group_desc),
                 selected = !isNeedApproval,
                 onSwitch = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupPermissionsOpenness, From.Public)
                     onSwitch(false)
                 }
             )
@@ -288,6 +291,8 @@ fun GroupOpennessScreenView(
                 description = stringResource(id = R.string.not_public_group_desc),
                 selected = isNeedApproval,
                 onSwitch = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupPermissionsOpenness, From.NonPublic)
                     onSwitch(true)
                 }
             )
