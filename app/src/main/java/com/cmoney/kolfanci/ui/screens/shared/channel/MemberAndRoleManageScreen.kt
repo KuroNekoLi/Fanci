@@ -228,6 +228,7 @@ private fun MemberAndRoleManageScreenView(
                             group = group,
                             member = selectedMember,
                             title = topBarTitle,
+                            from = from,
                             onRemoveClick = onRemoveClick
                         )
                     }
@@ -268,6 +269,7 @@ private fun AddMemberListScreen(
     group: Group,
     member: List<GroupMember> = emptyList(),
     title: String,
+    from: From,
     onRemoveClick: (GroupMember) -> Unit
 ) {
     val TAG = "AddMemberListScreen"
@@ -290,10 +292,10 @@ private fun AddMemberListScreen(
                     borderColor = LocalColor.current.component.other
                 ) {
                     KLog.i(TAG, "BorderButton click.")
-
-                    AppUserLogger.getInstance()
-                        .log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember)
-
+                    with(AppUserLogger.getInstance()) {
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember)
+                        log(Clicked.NonPublicAnyPermissionMembersAddMember, from)
+                    }
                     navigator.navigate(
                         AddMemberScreenDestination(
                             group = group,
@@ -319,6 +321,8 @@ private fun AddMemberListScreen(
             MemberItemScreen(
                 groupMember = it
             ) { groupMember ->
+                AppUserLogger.getInstance()
+                    .log(Clicked.NonPublicAnyPermissionMembersRemoveMember, from)
                 onRemoveClick.invoke(groupMember)
             }
         }
