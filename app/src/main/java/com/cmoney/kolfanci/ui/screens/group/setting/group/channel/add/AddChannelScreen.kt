@@ -37,14 +37,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanciapi.fanci.model.AuthBulliten
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -113,10 +113,10 @@ fun AddChannelScreen(
         }
     }
 
+    val isEditChannel = channel != null
     AddChannelScreenView(
-        modifier,
-        navigator,
-        channel = channel,
+        modifier = modifier,
+        navigator = navigator,
         selectedIndex = uiState.tabSelected,
         channelName = uiState.channelName,
         isNeedApproval = uiState.isNeedApproval,
@@ -124,7 +124,7 @@ fun AddChannelScreen(
         group = group,
         channelAccessTypeList = uiState.channelAccessTypeList,
         isLoading = uiState.isLoading,
-        withDelete = (channel != null),
+        isEditChannel = isEditChannel,
         uniqueUserCount = uiState.uniqueUserCount,
         onConfirm = {
             if (channel == null) {
@@ -246,7 +246,7 @@ fun AddChannelScreen(
     }
     //========== Result callback End ==========
 
-    if (channel != null) {
+    if (isEditChannel) {
         LaunchedEffect(key1 = group) {
             AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementEditChannel)
         }
@@ -268,15 +268,14 @@ fun AddChannelScreenView(
     group: Group,
     channelAccessTypeList: List<ChannelAccessOptionV2>,
     isLoading: Boolean,
-    withDelete: Boolean,
+    isEditChannel: Boolean,
     uniqueUserCount: Int,
     onConfirm: (String) -> Unit,
     onTabClick: (Int) -> Unit,
     onRemoveRole: (FanciRole) -> Unit,
     onPermissionClick: (ChannelAccessOptionV2) -> Unit,
     onDeleteClick: () -> Unit,
-    onBack: () -> Unit,
-    channel: Channel?
+    onBack: () -> Unit
 ) {
     val TAG = "AddChannelScreenView"
     val list = listOf(
@@ -289,7 +288,7 @@ fun AddChannelScreenView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            if (channel != null) {
+            if (isEditChannel) {
                 TopBarScreen(
                     title = stringResource(id = R.string.edit_channel),
                     backClick = {
@@ -328,6 +327,19 @@ fun AddChannelScreenView(
                         selectedIndex = selectedIndex,
                         listItem = list,
                         onTabClick = {
+                            val from = if (isEditChannel) {
+                                From.Edit
+                            } else {
+                                From.Create
+                            }
+                            when (it) {
+                                0 -> Clicked.ChannelManagementStyle
+                                1 -> Clicked.ChannelManagementPermissions
+                                2 -> Clicked.ChannelManagementAdmin
+                                else -> null
+                            }?.let { clicked ->
+                                AppUserLogger.getInstance().log(clicked, from)
+                            }
                             onTabClick.invoke(it)
                         }
                     )
@@ -338,7 +350,7 @@ fun AddChannelScreenView(
                     0 -> {
                         StyleTabScreen(
                             channelName,
-                            withDelete,
+                            isEditChannel,
                             onChannelNameClick = {
                                 AppUserLogger.getInstance()
                                     .log(Page.GroupSettingsChannelManagementStyleChannelName)
@@ -731,15 +743,14 @@ fun AddChannelScreenPreview() {
                 )
             ),
             isLoading = true,
-            withDelete = true,
+            isEditChannel = true,
             uniqueUserCount = 0,
             onConfirm = {},
             onTabClick = {},
             onRemoveRole = {},
             onPermissionClick = {},
             onDeleteClick = {},
-            onBack = {},
-            channel = null
+            onBack = {}
         )
     }
 }
