@@ -74,30 +74,6 @@ sealed class From(val parameterName: String) : Parcelable {
     object GroupArrangement : From(parameterName = "GroupArrangement")
 
     /**
-     * 任一篇貼文的「顯示更多」鍵
-     */
-    @Parcelize
-    object Post : From(parameterName = "Post")
-
-    /**
-     * 任一篇留言的「顯示更多」鍵
-     */
-    @Parcelize
-    object Comment : From(parameterName = "Comment")
-
-    /**
-     * 在貼文外層點擊圖片
-     */
-    @Parcelize
-    object PostList : From(parameterName = "PostList")
-
-    /**
-     * 在貼文內層點擊圖片
-     */
-    @Parcelize
-    object InnerLayer : From(parameterName = "InnerLayer")
-
-    /**
      * 自己的貼文
      */
     @Parcelize
@@ -140,6 +116,36 @@ sealed class From(val parameterName: String) : Parcelable {
     object Other : From(parameterName = "Other")
 
     /**
+     * 任一篇貼文的「顯示更多」鍵
+     */
+    @Parcelize
+    object Post : From(parameterName = "Post")
+
+    /**
+     * 任一篇留言的「顯示更多」鍵
+     */
+    @Parcelize
+    object Comment : From(parameterName = "Comment")
+
+    /**
+     * 在貼文外層點擊點點點
+     */
+    @Parcelize
+    object PostList : From(parameterName = "PostList")
+
+    /**
+     * 在貼文內層點擊點點點
+     */
+    @Parcelize
+    object InnerLayer : From(parameterName = "InnerLayer")
+
+    /**
+     * 在訊息點擊圖片
+     */
+    @Parcelize
+    object Message : From(parameterName = "Message")
+
+    /**
      * 全部
      */
     @Parcelize
@@ -158,6 +164,18 @@ sealed class From(val parameterName: String) : Parcelable {
     object Link : From(parameterName = "Link")
 
     /**
+     * 新增分類
+     */
+    @Parcelize
+    object Create : From(parameterName = "Create")
+
+    /**
+     * 編輯分類
+     */
+    @Parcelize
+    object Edit : From(parameterName = "Edit")
+
+    /**
      * 頻道排序
      */
     @Parcelize
@@ -168,18 +186,6 @@ sealed class From(val parameterName: String) : Parcelable {
      */
     @Parcelize
     object Category : From(parameterName = "Category")
-
-    /**
-     * 新增頻道
-     */
-    @Parcelize
-    object Create : From(parameterName = "Create")
-
-    /**
-     * 編輯頻道
-     */
-    @Parcelize
-    object Edit : From(parameterName = "Edit")
 
     /**
      * 社團簡介頁
@@ -317,7 +323,7 @@ sealed class From(val parameterName: String) : Parcelable {
      * 建立社團｜新增審核題目
      */
     @Parcelize
-    object CreatGroupAddQuestion : From(parameterName = "CreatGroup.AddQuestion")
+    object CreateGroupAddQuestion : From(parameterName = "CreateGroup.AddQuestion")
 
     /**
      * 編輯社團｜新增審核題目

@@ -207,16 +207,6 @@ sealed class Clicked(val eventName: String) {
     object MemberPageFeedback : Clicked(eventName = "MemberPage_Feedback")
 
     /**
-     * 貼文_顯示更多_點擊
-     */
-    object PostShowMore : Clicked(eventName = "Post_ShowMore")
-
-    /**
-     * 貼文_圖片_點擊
-     */
-    object PostImage : Clicked(eventName = "Post_Image")
-
-    /**
      * 貼文_進入內層_點擊
      */
     object PostEnterInnerLayer : Clicked(eventName = "Post_EnterInnerLayer")
@@ -357,11 +347,6 @@ sealed class Clicked(val eventName: String) {
     object MessageInsertImage : Clicked(eventName = "Message_InsertImage")
 
     /**
-     * 訊息_圖片_點擊
-     */
-    object MessageImage : Clicked(eventName = "Message_Image")
-
-    /**
      * 訊息_傳送鍵_點擊
      */
     object MessageSendButton : Clicked(eventName = "Message_SendButton")
@@ -442,14 +427,29 @@ sealed class Clicked(val eventName: String) {
     object MessageRetry : Clicked(eventName = "Message_Retry")
 
     /**
+     * 顯示更多_點擊
+     */
+    object ShowMore : Clicked(eventName = "ShowMore")
+
+    /**
+     * 更多功能(點點點)_點擊
+     */
+    object MoreAction : Clicked(eventName = "MoreAction")
+
+    /**
+     * 圖片_點擊
+     */
+    object Image : Clicked(eventName = "Image")
+
+    /**
      * 表情符號_現有的表情_點擊
      */
-    object EmoticonExistingEmoticon : Clicked(eventName = "Emoticon_ExistingEmoticon")
+    object ExistingEmoji : Clicked(eventName = "ExistingEmoji")
 
     /**
      * 表情符號_新增表情_點擊
      */
-    object EmoticonAddEmoticon : Clicked(eventName = "Emoticon_AddEmoticon")
+    object AddEmoji : Clicked(eventName = "AddEmoji")
 
     /**
      * 內容搜尋_點擊
@@ -677,6 +677,16 @@ sealed class Clicked(val eventName: String) {
     object ChannelManagementEditCategory : Clicked(eventName = "ChannelManagement_EditCategory")
 
     /**
+     * 分類名稱_點擊
+     */
+    object CategoryName : Clicked(eventName = "CategoryName")
+
+    /**
+     * 分類名稱內層輸入框_點擊
+     */
+    object CategoryNameNameKeyIn : Clicked(eventName = "CategoryName_NameKeyIn")
+
+    /**
      * 頻道管理_編輯排序_點擊
      */
     object ChannelManagementEditOrder : Clicked(eventName = "ChannelManagement_EditOrder")
@@ -710,6 +720,11 @@ sealed class Clicked(val eventName: String) {
      * 樣式_頻道名稱_點擊
      */
     object StyleChannelName : Clicked(eventName = "Style_ChannelName")
+
+    /**
+     * 樣式_頻道名稱內層輸入框_點擊
+     */
+    object StyleChannelNameKeyIn : Clicked(eventName = "Style_ChannelNameKeyIn")
 
     /**
      * 頻道管理_權限_點擊
@@ -832,6 +847,11 @@ sealed class Clicked(val eventName: String) {
     object StyleRoleName : Clicked(eventName = "Style_RoleName")
 
     /**
+     * 樣式_角色名稱內層輸入框_點擊
+     */
+    object StyleRoleNameKeyIn : Clicked(eventName = "Style_RoleNameKeyIn")
+
+    /**
      * 樣式_選取顏色_點擊
      */
     object StyleSelectColor : Clicked(eventName = "Style_SelectColor")
@@ -930,6 +950,11 @@ sealed class Clicked(val eventName: String) {
      * 資訊_名稱_點擊
      */
     object InfoName : Clicked(eventName = "Info_Name")
+
+    /**
+     * 資訊_名稱內層輸入框_點擊
+     */
+    object InfoNameKeyIn : Clicked(eventName = "Info_NameKeyIn")
 
     /**
      * 管理_權限_點擊
