@@ -14,7 +14,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -25,6 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.showToast
@@ -89,10 +90,6 @@ fun AddCategoryScreen(
             }
         }
     }
-
-    LaunchedEffect(key1 = group) {
-        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementAddCategory)
-    }
 }
 
 @Composable
@@ -139,6 +136,10 @@ fun AddCategoryScreenView(
                 modifier = Modifier
                     .background(LocalColor.current.background)
                     .clickable {
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.CategoryName, From.Create)
+                            log(Page.GroupSettingsChannelManagementAddCategoryCategoryName)
+                        }
                         navigator.navigate(
                             EditInputScreenDestination(
                                 defaultText = textState,

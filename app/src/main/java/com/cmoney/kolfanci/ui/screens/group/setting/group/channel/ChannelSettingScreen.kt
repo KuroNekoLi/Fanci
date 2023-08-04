@@ -26,6 +26,8 @@ import androidx.compose.ui.window.Dialog
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -134,9 +136,9 @@ fun ChannelSettingScreen(
     }
     //========== Result callback End ==========
     ChannelSettingScreenView(
-        modifier,
-        navigator,
-        groupParam
+        modifier = modifier,
+        navigator = navigator,
+        group = groupParam
     ) {
         viewModel.onSortClick()
     }
@@ -212,9 +214,10 @@ fun ChannelSettingScreenView(
                         borderColor = LocalColor.current.text.default_100
                     ) {
                         KLog.i(TAG, "new category click.")
-                        AppUserLogger.getInstance()
-                            .log(Page.GroupSettingsChannelManagementAddCategoryCategoryName)
-
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ChannelManagementAddCategory)
+                            log(Page.GroupSettingsChannelManagementAddCategory)
+                        }
                         navigator.navigate(
                             AddCategoryScreenDestination(
                                 group = group
@@ -234,6 +237,8 @@ fun ChannelSettingScreenView(
                         borderColor = LocalColor.current.text.default_100
                     ) {
                         KLog.i(TAG, "category sort click.")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ChannelManagementEditOrder)
                         onSortClick.invoke()
                     }
                 }
@@ -245,6 +250,10 @@ fun ChannelSettingScreenView(
                     channelList = category.channels.orEmpty(),
                     onCategoryEdit = {
                         KLog.i(TAG, "onCategoryEdit:$it")
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ChannelManagementEditCategory)
+                            log(Page.GroupSettingsChannelManagementEditCategory)
+                        }
                         navigator.navigate(
                             EditCategoryScreenDestination(
                                 group = group,
@@ -252,18 +261,22 @@ fun ChannelSettingScreenView(
                             )
                         )
                     },
-                    onChanelEdit = { category, channel ->
+                    onChanelEdit = { currentCategory, channel ->
                         KLog.i(TAG, "onChanelEdit:$channel")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ChannelManagementEditChannel)
                         navigator.navigate(
                             AddChannelScreenDestination(
                                 group = group,
-                                category = category,
+                                category = currentCategory,
                                 channel = channel
                             )
                         )
                     },
                     onAddChannel = {
                         KLog.i(TAG, "onAddChannel:$it")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ChannelManagementAddChannel)
                         navigator.navigate(
                             AddChannelScreenDestination(
                                 group = group,
@@ -302,6 +315,8 @@ private fun SortDialog(
                     text = "頻道排序",
                     shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
                 ) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.ChannelManagementOrderOption, From.Channel)
                     onChannelSort.invoke()
                 }
 
@@ -309,6 +324,8 @@ private fun SortDialog(
                     text = "分類排序",
                     shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
                 ) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.ChannelManagementOrderOption, From.Category)
                     onCategorySort.invoke()
                 }
 

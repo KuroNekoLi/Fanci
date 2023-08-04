@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
@@ -79,8 +81,8 @@ fun EditCategoryScreen(
     }
 
     EditCategoryScreenView(
-        modifier,
-        navigator,
+        modifier = modifier,
+        navigator = navigator,
         textState = textState,
         onConfirm = {
             viewModel.editCategory(group, category, it)
@@ -166,6 +168,10 @@ fun EditCategoryScreenView(
                 modifier = Modifier
                     .background(LocalColor.current.background)
                     .clickable {
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.CategoryName, From.Edit)
+                            log(Page.GroupSettingsChannelManagementEditCategoryCategoryName)
+                        }
                         navigator.navigate(
                             EditInputScreenDestination(
                                 defaultText = textState,
@@ -219,6 +225,8 @@ fun EditCategoryScreenView(
                         .height(50.dp)
                         .background(LocalColor.current.background)
                         .clickable {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.ChannelManagementDeleteCategory)
                             onDelete.invoke()
                         },
                     contentAlignment = Alignment.Center
