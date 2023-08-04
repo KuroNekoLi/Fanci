@@ -29,9 +29,11 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
@@ -67,6 +69,7 @@ fun MemberAndRoleManageScreen(
     group: Group,
     topBarTitle: String,
     selectedModel: SelectedModel,
+    from: From,
     viewModel: MemberViewModel = koinViewModel(),
     addMemberResult: ResultRecipient<AddMemberScreenDestination, String>,
     addRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
@@ -134,6 +137,7 @@ fun MemberAndRoleManageScreen(
         selectedMember = selectedMember,
         selectedRole = uiState.selectedRole,
         selectedVipPlanModels = uiState.selectedVipPlanModels,
+        from = from,
         onTabClick = {
             viewModel.onTabClick(it)
         },
@@ -167,6 +171,7 @@ private fun MemberAndRoleManageScreenView(
     selectedMember: List<GroupMember>,
     selectedRole: List<FanciRole>,
     selectedVipPlanModels: List<VipPlanModel>,
+    from: From,
     onTabClick: (Int) -> Unit,
     onRemoveClick: (GroupMember) -> Unit,
     onRoleRemoveClick: (FanciRole) -> Unit,
@@ -200,6 +205,15 @@ private fun MemberAndRoleManageScreenView(
                     selectedIndex = selectedIndex,
                     listItem = list,
                     onTabClick = {
+                        when (it) {
+                            0 -> Clicked.NonPublicAnyPermissionMembers
+                            1 -> Clicked.NonPublicAnyPermissionRoles
+                            2 -> Clicked.NonPublicAnyPermissionPlan
+                            else -> null
+                        }?.let { clicked ->
+                            AppUserLogger.getInstance()
+                                .log(clicked, from)
+                        }
                         onTabClick.invoke(it)
                     }
                 )
@@ -475,6 +489,7 @@ fun MemberAndRoleManageScreenPreview() {
                     userCount = 9
                 )
             ),
+            from = From.Create,
             selectedVipPlanModels = VipManagerUseCase.getVipPlanMockData(),
             onTabClick = {},
             onRemoveClick = {},

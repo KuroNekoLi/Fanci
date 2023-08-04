@@ -114,6 +114,7 @@ fun AddChannelScreen(
     }
 
     val isEditChannel = channel != null
+    val from = getFromByIsEditChannel(isEditChannel = isEditChannel)
     AddChannelScreenView(
         modifier = modifier,
         navigator = navigator,
@@ -126,6 +127,7 @@ fun AddChannelScreen(
         isLoading = uiState.isLoading,
         isEditChannel = isEditChannel,
         uniqueUserCount = uiState.uniqueUserCount,
+        from = from,
         onConfirm = {
             if (channel == null) {
                 viewModel.addChannel(group, category.id.orEmpty(), it)
@@ -178,7 +180,8 @@ fun AddChannelScreen(
             MemberAndRoleManageScreenDestination(
                 group = group,
                 topBarTitle = it.first.title.orEmpty(),
-                selectedModel = it.second
+                selectedModel = it.second,
+                from = from
             )
         )
         viewModel.dismissPermissionNavigator()
@@ -270,6 +273,7 @@ fun AddChannelScreenView(
     isLoading: Boolean,
     isEditChannel: Boolean,
     uniqueUserCount: Int,
+    from: From,
     onConfirm: (String) -> Unit,
     onTabClick: (Int) -> Unit,
     onRemoveRole: (FanciRole) -> Unit,
@@ -283,7 +287,6 @@ fun AddChannelScreenView(
         stringResource(id = R.string.permission),
         stringResource(id = R.string.manager)
     )
-    val from = getFromByIsEditChannel(isEditChannel = isEditChannel)
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
@@ -755,6 +758,7 @@ fun AddChannelScreenPreview() {
             isLoading = true,
             isEditChannel = true,
             uniqueUserCount = 0,
+            from = From.Create,
             onConfirm = {},
             onTabClick = {},
             onRemoveRole = {},
