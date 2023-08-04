@@ -45,6 +45,7 @@ fun GroupRuleManageScreen(
             iconRes = R.drawable.report_apply,
             text = "檢舉審核",
             onItemClick = {
+                AppUserLogger.getInstance().log(Clicked.GroupSettingsReportReview)
                 reportList?.let {
                     navController.navigate(
                         GroupReportScreenDestination(
