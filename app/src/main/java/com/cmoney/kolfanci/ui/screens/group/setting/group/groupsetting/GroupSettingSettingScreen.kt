@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
@@ -195,9 +196,10 @@ fun GroupSettingSettingView(
                                 emptyAlertSubTitle = context.getString(R.string.group_name_empty_desc)
                             )
                         )
-                        AppUserLogger
-                            .getInstance()
-                            .log(Page.GroupSettingsGroupSettingsGroupName)
+                        with(AppUserLogger.getInstance()) {
+                            log(Page.GroupSettingsGroupSettingsGroupName)
+                            log(Clicked.GroupName)
+                        }
                     }
                 )
             }
@@ -224,6 +226,8 @@ fun GroupSettingSettingView(
                     actionContent = NarrowItemDefaults.nextIcon(),
                     onClick = {
                         KLog.i(TAG, "description click")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.GroupIntroduction)
                         navController.navigate(GroupSettingDescScreenDestination(group = group))
                     }
                 )
@@ -240,6 +244,8 @@ fun GroupSettingSettingView(
                     displayContent = WideItemDefaults.imageDisplay(model = group.thumbnailImageUrl),
                     onClick = {
                         KLog.i(TAG, "avatar image click")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.GroupIcon)
                         navController.navigate(GroupSettingAvatarScreenDestination(group = group))
                     }
                 )
@@ -256,6 +262,8 @@ fun GroupSettingSettingView(
                     displayContent = WideItemDefaults.imageDisplay(model = group.coverImageUrl),
                     onClick = {
                         KLog.i(TAG, "background image click")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.HomeBackground)
                         navController.navigate(
                             GroupSettingBackgroundScreenDestination(
                                 group = group
@@ -278,6 +286,8 @@ fun GroupSettingSettingView(
                     },
                     onClick = {
                         KLog.i(TAG, "theme click")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ThemeColor)
                         navController.navigate(
                             GroupSettingThemeScreenDestination(
                                 group = group
