@@ -548,7 +548,7 @@ class PostInfoViewModel(
                     }
 
                     //我發的
-                    if (comment.isMyPost(Constant.MyInfo)) {
+                    if (comment.isMyPost()) {
                         KLog.i(TAG, "delete my comment.")
                         chatRoomUseCase.takeBackMyMessage(
                             messageServiceType = MessageServiceType.bulletinboard,
@@ -665,7 +665,7 @@ class PostInfoViewModel(
         KLog.i(TAG, "onDeletePostClick:$post")
         viewModelScope.launch {
             //我發的
-            if (post.isMyPost(Constant.MyInfo)) {
+            if (post.isMyPost()) {
                 KLog.i(TAG, "delete my comment.")
                 chatRoomUseCase.takeBackMyMessage(
                     messageServiceType = MessageServiceType.bulletinboard,

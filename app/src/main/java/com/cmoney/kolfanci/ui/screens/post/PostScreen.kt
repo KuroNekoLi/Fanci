@@ -152,7 +152,7 @@ fun PostScreen(
                     when (it) {
                         is PostInteract.Announcement -> {
 
-                            if (post.isMyPost(Constant.MyInfo)) {
+                            if (post.isMyPost()) {
                                 AppUserLogger.getInstance().log(Clicked.PostPinPost, From.Poster)
                             } else {
                                 AppUserLogger.getInstance()
@@ -168,7 +168,7 @@ fun PostScreen(
 
                         is PostInteract.Delete -> {
 
-                            if (post.isMyPost(Constant.MyInfo)) {
+                            if (post.isMyPost()) {
                                 AppUserLogger.getInstance().log(Clicked.PostDeletePost, From.Poster)
                             } else {
                                 AppUserLogger.getInstance()

@@ -252,7 +252,7 @@ class PostViewModel(
         KLog.i(TAG, "deletePost:$post")
         viewModelScope.launch {
             //我發的
-            if (post.isMyPost(Constant.MyInfo)) {
+            if (post.isMyPost()) {
                 KLog.i(TAG, "delete my comment.")
                 chatRoomUseCase.takeBackMyMessage(
                     messageServiceType = MessageServiceType.bulletinboard,

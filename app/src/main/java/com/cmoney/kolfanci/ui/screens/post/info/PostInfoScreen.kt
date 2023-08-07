@@ -339,7 +339,7 @@ fun PostInfoScreen(
                     when (it) {
                         is PostInteract.Announcement -> {}
                         is PostInteract.Delete -> {
-                            if (post.isMyPost(Constant.MyInfo)) {
+                            if (post.isMyPost()) {
                                 AppUserLogger.getInstance()
                                     .log(Clicked.CommentDeleteComment, From.Poster)
                             } else {
@@ -385,7 +385,7 @@ fun PostInfoScreen(
                         is PostInteract.Announcement -> {}
                         is PostInteract.Delete -> {
                             KLog.i(TAG, "PostInteract.Delete click.")
-                            if (reply.isMyPost(Constant.MyInfo)) {
+                            if (reply.isMyPost()) {
                                 AppUserLogger.getInstance().log(Clicked.CommentDeleteReply, From.Poster)
                             }
                             else {
