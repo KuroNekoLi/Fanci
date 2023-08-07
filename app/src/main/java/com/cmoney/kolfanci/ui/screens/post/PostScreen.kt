@@ -412,6 +412,7 @@ private fun PostScreenView(
                                 AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
                             },
                             onAddNewEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.AddEmoji, From.PostList)
                                 onEmojiClick.invoke(pinPost, it)
                             }
                         )
@@ -444,6 +445,7 @@ private fun PostScreenView(
                             AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
                         },
                         onAddNewEmojiClick = {
+                            AppUserLogger.getInstance().log(Clicked.AddEmoji, From.PostList)
                             if (Constant.isCanEmoji()) {
                                 onEmojiClick.invoke(postMessage, it)
                             }

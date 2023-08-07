@@ -658,7 +658,6 @@ class MessageViewModel(
             }
 
             is MessageInteract.EmojiClick -> {
-                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageEmoji)
                 onEmojiClick(
                     messageInteract.message,
                     messageInteract.emojiResId

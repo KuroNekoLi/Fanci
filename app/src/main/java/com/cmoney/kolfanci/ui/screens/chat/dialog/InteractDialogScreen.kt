@@ -16,10 +16,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isMyPostMessage
 import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
@@ -59,6 +61,7 @@ fun InteractDialogScreen(
                 ) {
                     Constant.emojiLit.forEach {
                         EmojiIcon(it) { resId ->
+                            AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageEmoji)
                             onClose(coroutineScope, modalBottomSheetState)
                             onInteractClick.invoke(MessageInteract.EmojiClick(message, resId))
                         }

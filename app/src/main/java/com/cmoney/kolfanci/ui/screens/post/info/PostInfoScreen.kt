@@ -679,6 +679,7 @@ private fun PostInfoScreenView(
                                 AppUserLogger.getInstance().log(Clicked.Image, From.InnerLayer)
                             },
                             onAddNewEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.AddEmoji, From.InnerLayer)
                                 postInfoListener.onEmojiClick(post, it)
                             }
                         )
@@ -753,6 +754,7 @@ private fun PostInfoScreenView(
                                         AppUserLogger.getInstance().log(Clicked.Image, From.Comment)
                                     },
                                     onAddNewEmojiClick = {
+                                        AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Comment)
                                         postInfoListener.onCommentEmojiClick(comment, it)
                                     }
                                 )

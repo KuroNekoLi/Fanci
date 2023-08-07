@@ -281,6 +281,8 @@ fun MessageContentScreen(
                                         emojiResource = emoji.first,
                                         countText = emoji.second.toString()
                                     ) {
+                                        AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.Message)
+
                                         onMessageContentCallback.invoke(
                                             MessageContentCallback.EmojiClick(
                                                 messageModel,
@@ -305,6 +307,8 @@ fun MessageContentScreen(
                                                 .fillMaxWidth()
                                                 .offset(y = (-15).dp)
                                         ) {
+                                            AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Message)
+
                                             onMessageContentCallback.invoke(
                                                 MessageContentCallback.EmojiClick(
                                                     messageModel,

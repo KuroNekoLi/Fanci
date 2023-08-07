@@ -169,8 +169,6 @@ private fun MessageScreenView(
                             when (it) {
                                 is MessageContentCallback.EmojiClick -> {
                                     KLog.i(TAG, "EmojiClick.")
-                                    AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.Message)
-
                                     onInteractClick.invoke(
                                         MessageInteract.EmojiClick(
                                             it.message,
