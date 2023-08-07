@@ -58,6 +58,8 @@ fun GroupMemberManageScreen(
             iconRes = R.drawable.all_member,
             text = "所有成員",
             onItemClick = {
+                AppUserLogger.getInstance()
+                    .log(Clicked.GroupSettingsAllMembers)
                 navController.navigate(
                     AllMemberScreenDestination(
                         group = group

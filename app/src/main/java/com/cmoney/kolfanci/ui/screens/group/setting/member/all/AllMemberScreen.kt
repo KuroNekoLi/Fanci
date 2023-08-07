@@ -47,6 +47,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isVip
@@ -230,14 +231,16 @@ fun AllMemberScreenView(
                     MemberItem(groupMember = groupMember) {
                         KLog.i(TAG, "member click:$it")
                         if (Constant.isCanEnterMemberManager()) {
+                            with(AppUserLogger.getInstance()) {
+                                log(Clicked.AllMembersManage)
+                                log(Page.GroupSettingsAllMembersManage)
+                            }
                             navController.navigate(
                                 MemberManageScreenDestination(
                                     group = group,
                                     groupMember = groupMember
                                 )
                             )
-
-                            AppUserLogger.getInstance().log(Page.GroupSettingsAllMembersManage)
                         }
                     }
                     Spacer(modifier = Modifier.height(1.dp))

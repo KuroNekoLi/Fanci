@@ -37,10 +37,12 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.HexStringMapRoleColor
@@ -344,6 +346,8 @@ private fun MemberManageScreenView(
                             .fillMaxWidth()
                             .background(LocalColor.current.background)
                             .clickable(enabled = Constant.isCanEditRole()) {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.ManageMembersRemove)
                                 onRemoveRole.invoke(roleInfo)
                             }
                             .padding(start = 25.dp, end = 25.dp, top = 14.dp, bottom = 14.dp),
@@ -397,6 +401,8 @@ private fun MemberManageScreenView(
                         textColor = LocalColor.current.text.default_100,
                         onClick = {
                             KLog.i(TAG, "onAddRole click.")
+                            AppUserLogger.getInstance()
+                                .log(Clicked.ManageMembersAddMember)
                             groupMember.roleInfos?.let {
                                 navController.navigate(
                                     ShareAddRoleScreenDestination(
@@ -428,6 +434,8 @@ private fun MemberManageScreenView(
                             banTitle = stringResource(id = R.string.silence_who).format(groupMember.name),
                             desc = stringResource(id = R.string.silence_who_desc).format(groupMember.name)
                         ) {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.ManageMembersMute)
                             onBanClick.invoke()
                         }
                     } else {
@@ -454,6 +462,8 @@ private fun MemberManageScreenView(
                             groupMember.name
                         )
                     ) {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ManageMembersKickOut)
                         onKickClick.invoke()
                     }
                 }
