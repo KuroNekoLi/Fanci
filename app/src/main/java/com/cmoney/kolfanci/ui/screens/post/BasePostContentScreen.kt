@@ -70,6 +70,7 @@ fun BasePostContentScreen(
     backgroundColor: Color = LocalColor.current.background,
     onMoreClick: () -> Unit? = {},
     onEmojiClick: (Int) -> Unit,
+    onAddNewEmojiClick: (Int) -> Unit,
     onImageClick: (() -> Unit)? = null,
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
@@ -217,7 +218,7 @@ fun BasePostContentScreen(
                                 .fillMaxWidth()
                                 .offset(y = (-15).dp)
                         ) {
-                            onEmojiClick.invoke(it)
+                            onAddNewEmojiClick.invoke(it)
                             scope.launch { tooltipStateRich.dismiss() }
                         }
                     },
@@ -303,7 +304,8 @@ fun PostContentScreenPreview() {
                 }
             },
             onMoreClick = {},
-            onEmojiClick = {}
+            onEmojiClick = {},
+            onAddNewEmojiClick = {}
         )
     }
 }

@@ -672,10 +672,14 @@ private fun PostInfoScreenView(
                                 postInfoListener.onPostMoreClick(post)
                             },
                             onEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.InnerLayer)
                                 postInfoListener.onEmojiClick(post, it)
                             },
                             onImageClick = {
                                 AppUserLogger.getInstance().log(Clicked.Image, From.InnerLayer)
+                            },
+                            onAddNewEmojiClick = {
+                                postInfoListener.onEmojiClick(post, it)
                             }
                         )
                     }
@@ -737,6 +741,7 @@ private fun PostInfoScreenView(
                                         )
                                     },
                                     onEmojiClick = {
+                                        AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.Comment)
                                         postInfoListener.onCommentEmojiClick(comment, it)
                                     },
                                     onMoreClick = {
@@ -746,6 +751,9 @@ private fun PostInfoScreenView(
                                     },
                                     onImageClick = {
                                         AppUserLogger.getInstance().log(Clicked.Image, From.Comment)
+                                    },
+                                    onAddNewEmojiClick = {
+                                        postInfoListener.onCommentEmojiClick(comment, it)
                                     }
                                 )
                             }
@@ -928,6 +936,9 @@ private fun CommentBottomContent(
                                 comment = comment,
                                 reply = reply
                             )
+                        },
+                        onAddNewEmojiClick = {
+                            listener.onReplyEmojiClick(comment, reply, it)
                         }
                     )
                 }

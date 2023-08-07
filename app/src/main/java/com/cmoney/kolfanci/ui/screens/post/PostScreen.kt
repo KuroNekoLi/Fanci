@@ -403,10 +403,16 @@ private fun PostScreenView(
                                 onMoreClick.invoke(pinPost)
                             },
                             onEmojiClick = {
-                                onEmojiClick.invoke(pinPost, it)
+                                if (Constant.isCanEmoji()) {
+                                    AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                    onEmojiClick.invoke(pinPost, it)
+                                }
                             },
                             onImageClick = {
                                 AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
+                            },
+                            onAddNewEmojiClick = {
+                                onEmojiClick.invoke(pinPost, it)
                             }
                         )
                     }
@@ -430,11 +436,17 @@ private fun PostScreenView(
                         },
                         onEmojiClick = {
                             if (Constant.isCanEmoji()) {
+                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
                                 onEmojiClick.invoke(postMessage, it)
                             }
                         },
                         onImageClick = {
                             AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
+                        },
+                        onAddNewEmojiClick = {
+                            if (Constant.isCanEmoji()) {
+                                onEmojiClick.invoke(postMessage, it)
+                            }
                         }
                     )
                 }
