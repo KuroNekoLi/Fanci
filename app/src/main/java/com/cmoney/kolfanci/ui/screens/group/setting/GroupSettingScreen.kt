@@ -309,6 +309,8 @@ fun GroupSettingScreenView(
                                 .fillMaxWidth()
                                 .background(LocalColor.current.background)
                                 .clickable {
+                                    AppUserLogger.getInstance()
+                                        .log(Clicked.GroupSettingsLeaveGroup)
                                     showLeaveGroupDialog = true
                                 },
                             contentAlignment = Alignment.Center
@@ -326,6 +328,8 @@ fun GroupSettingScreenView(
                                 .fillMaxWidth()
                                 .background(LocalColor.current.background)
                                 .clickable {
+                                    AppUserLogger.getInstance()
+                                        .log(Clicked.DissolveGroup)
                                     showDisbandGroupDialog = true
                                 },
                             contentAlignment = Alignment.Center
@@ -359,6 +363,8 @@ fun GroupSettingScreenView(
                     textColor = LocalColor.current.specialColor.hintRed,
                     shape = RoundedCornerShape(4.dp),
                     onClick = {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.LeaveGroupConfirmLeave)
                         showLeaveGroupDialog = false
                         onLeaveGroup()
                     }
@@ -373,6 +379,8 @@ fun GroupSettingScreenView(
                     textColor = LocalColor.current.text.default_100,
                     shape = RoundedCornerShape(4.dp),
                     onClick = {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.LeaveGroupCancelLeave)
                         showLeaveGroupDialog = false
                     }
                 )
@@ -402,6 +410,8 @@ fun GroupSettingScreenView(
                         borderColor = LocalColor.current.component.other,
                         textColor = Color.White
                     ) {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.DissolveGroupReturn)
                         showDisbandGroupDialog = false
                     }
 
@@ -415,6 +425,8 @@ fun GroupSettingScreenView(
                         borderColor = LocalColor.current.specialColor.red,
                         textColor = LocalColor.current.specialColor.red
                     ) {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.DissolveGroupConfirmDissolution)
                         showDisbandGroupDialog = false
                         showFinalDisbandGroupDialog = true
                     }
@@ -445,6 +457,8 @@ fun GroupSettingScreenView(
                         borderColor = LocalColor.current.component.other,
                         textColor = Color.White
                     ) {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ConfirmDissolutionReturn)
                         showFinalDisbandGroupDialog = false
                     }
 
@@ -458,6 +472,8 @@ fun GroupSettingScreenView(
                         borderColor = LocalColor.current.specialColor.red,
                         textColor = LocalColor.current.specialColor.red
                     ) {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ConfirmDissolutionConfirmDissolution)
                         onDisbandGroup()
                     }
                 }

@@ -11,7 +11,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -39,6 +41,8 @@ fun GroupAboutScreen(
                 iconRes = R.drawable.invite_member,
                 text = stringResource(id = R.string.invite_group_member),
                 onItemClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupSettingsInviteGroupMember)
                     onInviteClick.invoke()
                 }
             )
