@@ -42,11 +42,14 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -148,6 +151,14 @@ fun PostScreen(
                 onInteractClick = {
                     when (it) {
                         is PostInteract.Announcement -> {
+
+                            if (post.isMyPost(Constant.MyInfo)) {
+                                AppUserLogger.getInstance().log(Clicked.PostPinPost, From.Poster)
+                            } else {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.PostPinPost, From.OthersPost)
+                            }
+
                             showPinDialogTip = Triple(
                                 true,
                                 post,
@@ -161,6 +172,7 @@ fun PostScreen(
 
                         is PostInteract.Edit -> {
                             KLog.i(TAG, "PostInteract.Edit click.")
+                            AppUserLogger.getInstance().log(Clicked.PostEditPost)
                             navController.navigate(
                                 EditPostScreenDestination(
                                     channelId = channel.id.orEmpty(),
@@ -299,8 +311,10 @@ fun PostScreen(
             ) {
                 run {
                     if (isPinPost) {
+                        AppUserLogger.getInstance().log(Clicked.PostUnpinPostConfirmUnpin)
                         viewModel.unPinPost(channel.id.orEmpty(), showPinDialogTip.second)
                     } else {
+                        AppUserLogger.getInstance().log(Clicked.PostPinPostConfirmPin)
                         viewModel.pinPost(channel.id.orEmpty(), showPinDialogTip.second)
                     }
                     showPinDialogTip = Triple(false, null, false)
@@ -318,6 +332,13 @@ fun PostScreen(
                 textColor = LocalColor.current.text.default_100
             ) {
                 run {
+                    if (isPinPost) {
+                        AppUserLogger.getInstance().log(Clicked.PostUnpinPostReturn)
+                    }
+                    else {
+                        AppUserLogger.getInstance().log(Clicked.PostPinPostCancel)
+                    }
+
                     showPinDialogTip = Triple(false, null, false)
                 }
             }
@@ -339,7 +360,8 @@ private fun PostScreenView(
 ) {
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(LocalColor.current.env_80)
     ) {
         if (postList.isEmpty()) {
@@ -405,6 +427,7 @@ private fun PostScreenView(
                     .padding(30.dp)
                     .align(Alignment.BottomEnd),
                 onClick = {
+                    AppUserLogger.getInstance().log(Clicked.PostPublishPost)
                     onPostClick.invoke()
                 },
                 backgroundColor = LocalColor.current.primary,
@@ -433,6 +456,9 @@ fun CommentCount(
             .then(
                 if (post != null && navController != null && channel != null) {
                     Modifier.clickable {
+                        AppUserLogger
+                            .getInstance()
+                            .log(Clicked.PostEnterInnerLayer)
                         navController.navigate(
                             PostInfoScreenDestination(
                                 post = post,
@@ -503,7 +529,11 @@ private fun EmptyPostContent(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(43.dp))
 
-        Text(text = "目前還沒有人發表貼文", fontSize = 16.sp, color = LocalColor.current.text.default_30)
+        Text(
+            text = "目前還沒有人發表貼文",
+            fontSize = 16.sp,
+            color = LocalColor.current.text.default_30
+        )
     }
 }
 
