@@ -50,7 +50,6 @@ import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.member.application.model.analytics.event.Click
 import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -480,6 +479,8 @@ fun FollowScreenView(
                                             visibleAvatar = visibleAvatar,
                                             modifier = Modifier.background(LocalColor.current.env_80)
                                         ) {
+                                            AppUserLogger.getInstance()
+                                                .log(Clicked.GroupGroupSettings)
                                             navigator.navigate(
                                                 GroupSettingScreenDestination
                                             )
