@@ -49,26 +49,32 @@ fun ReportUserDialogScreen(
         mutableStateOf(IntrinsicSize.Min)
     }
 
-    val reportReasonMap = hashMapOf(
-        "濫發廣告訊息" to ReportReason.spamAds,
-        "傳送色情訊息" to ReportReason.adultContent,
-        "騷擾行為" to ReportReason.harass,
-        "內容與主題無關" to ReportReason.notRelated,
-        "其他" to ReportReason.other,
-        "取消檢舉" to null
-    )
+    val reportReasonMap = remember {
+        hashMapOf(
+            "濫發廣告訊息" to ReportReason.spamAds,
+            "傳送色情訊息" to ReportReason.adultContent,
+            "騷擾行為" to ReportReason.harass,
+            "內容與主題無關" to ReportReason.notRelated,
+            "其他" to ReportReason.other,
+            "取消檢舉" to null
+        )
+    }
 
-    val reportLogMap = hashMapOf(
-        "濫發廣告訊息" to From.Spam,
-        "傳送色情訊息" to From.SexualContent,
-        "騷擾行為" to From.Harassment,
-        "內容與主題無關" to From.UnrelatedContent,
-        "其他" to From.Other,
-        "取消檢舉" to null
-    )
+    val reportLogMap = remember {
+        hashMapOf(
+            "濫發廣告訊息" to From.Spam,
+            "傳送色情訊息" to From.SexualContent,
+            "騷擾行為" to From.Harassment,
+            "內容與主題無關" to From.UnrelatedContent,
+            "其他" to From.Other,
+            "取消檢舉" to null
+        )
+    }
 
     val reportReason =
-        listOf("濫發廣告訊息", "傳送色情訊息", "騷擾行為", "內容與主題無關", "其他", "取消檢舉")
+        remember {
+            listOf("濫發廣告訊息", "傳送色情訊息", "騷擾行為", "內容與主題無關", "其他", "取消檢舉")
+        }
 
     if (openDialog.value) {
         Dialog(
