@@ -145,6 +145,10 @@ fun PostScreen(
             AppUserLogger.getInstance().log(Page.PublishPost)
         },
         onMoreClick = { post ->
+            KLog.i(TAG, "onMoreClick")
+
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.PostList)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Post,

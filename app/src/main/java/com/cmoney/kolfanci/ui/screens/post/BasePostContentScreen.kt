@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
@@ -154,6 +156,7 @@ fun BasePostContentScreen(
                         maxDisplayLine = if (maxDisplayLine == Int.MAX_VALUE) {
                             defaultDisplayLine
                         } else {
+                            AppUserLogger.getInstance().log(Clicked.ShowMore, From.Post)
                             Int.MAX_VALUE
                         }
                     },

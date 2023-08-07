@@ -268,6 +268,9 @@ fun PostInfoScreen(
 
         //貼文 更多動作
         override fun onPostMoreClick(post: BulletinboardMessage) {
+            KLog.i(TAG, "onPostMoreClick")
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.InnerLayer)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Post,
@@ -332,6 +335,9 @@ fun PostInfoScreen(
 
         //留言 更多動做
         override fun onCommentMoreActionClick(comment: BulletinboardMessage) {
+            KLog.i(TAG, "onCommentMoreActionClick")
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.Comment)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Comment,
