@@ -95,6 +95,7 @@ fun MessageScreen(
                 messageViewModel.onLoadMore(channelId)
             },
             onReSendClick = {
+                AppUserLogger.getInstance().log(Clicked.MessageRetry)
                 messageViewModel.onReSendClick(it)
             }
         )

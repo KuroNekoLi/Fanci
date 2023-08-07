@@ -188,9 +188,11 @@ fun ChatRoomScreen(
     deleteMessage?.apply {
         DeleteMessageDialogScreen(chatMessageModel = this,
             onConfirm = {
+                AppUserLogger.getInstance().log(Clicked.DeleteMessageConfirmDelete)
                 messageViewModel.onDeleteMessageDialogDismiss()
                 messageViewModel.onDeleteClick(it)
             }) {
+            AppUserLogger.getInstance().log(Clicked.DeleteMessageCancel)
             messageViewModel.onDeleteMessageDialogDismiss()
         }
     }
