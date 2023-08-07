@@ -167,6 +167,14 @@ fun PostScreen(
                         }
 
                         is PostInteract.Delete -> {
+
+                            if (post.isMyPost(Constant.MyInfo)) {
+                                AppUserLogger.getInstance().log(Clicked.PostDeletePost, From.Poster)
+                            } else {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.PostDeletePost, From.OthersPost)
+                            }
+
                             showPostDeleteTip = Pair(true, post)
                         }
 
@@ -184,6 +192,7 @@ fun PostScreen(
 
                         is PostInteract.Report -> {
                             KLog.i(TAG, "PostInteract.Report click.")
+                            AppUserLogger.getInstance().log(Clicked.PostReportPost)
                             showPostReportTip = Pair(true, post)
                         }
                     }
@@ -272,9 +281,11 @@ fun PostScreen(
             title = "確定刪除貼文",
             content = "貼文刪除後，內容將會完全消失。",
             onCancel = {
+                AppUserLogger.getInstance().log(Clicked.PostDeletePostCancel)
                 showPostDeleteTip = showPostDeleteTip.copy(first = false)
             },
             onConfirm = {
+                AppUserLogger.getInstance().log(Clicked.PostDeletePostConfirmDelete)
                 showPostDeleteTip = showPostDeleteTip.copy(first = false)
                 showPostDeleteTip.second?.let {
                     viewModel.onDeletePostClick(it)
@@ -334,8 +345,7 @@ fun PostScreen(
                 run {
                     if (isPinPost) {
                         AppUserLogger.getInstance().log(Clicked.PostUnpinPostReturn)
-                    }
-                    else {
+                    } else {
                         AppUserLogger.getInstance().log(Clicked.PostPinPostCancel)
                     }
 
