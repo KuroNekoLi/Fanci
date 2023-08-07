@@ -51,11 +51,14 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -98,12 +101,12 @@ import org.koin.core.parameter.parametersOf
 data class PostInfoScreenResult(
     val post: BulletinboardMessage,
     val action: PostInfoAction = PostInfoAction.Default
-): Parcelable {
+) : Parcelable {
     @Parcelize
-    sealed class PostInfoAction: Parcelable {
-        object Default: PostInfoAction()
-        object Pin: PostInfoAction()
-        object Delete: PostInfoAction()
+    sealed class PostInfoAction : Parcelable {
+        object Default : PostInfoAction()
+        object Pin : PostInfoAction()
+        object Delete : PostInfoAction()
     }
 }
 
@@ -225,6 +228,7 @@ fun PostInfoScreen(
         }
 
         override fun onCommentSend(text: String) {
+            AppUserLogger.getInstance().log(Clicked.CommentSendButton)
             if (Constant.isCanReply()) {
                 viewModel.onCommentReplySend(text)
                 keyboard?.hide()
@@ -240,6 +244,7 @@ fun PostInfoScreen(
         }
 
         override fun onAttachClick() {
+            AppUserLogger.getInstance().log(Clicked.CommentInsertImage)
             openImagePickDialog = true
         }
 
@@ -299,6 +304,7 @@ fun PostInfoScreen(
     val commentBottomContentListener = object : CommentBottomContentListener {
         override fun onCommentReplyClick(comment: BulletinboardMessage) {
             if (Constant.isCanReply()) {
+                AppUserLogger.getInstance().log(Clicked.CommentReply)
                 viewModel.onCommentReplyClick(comment)
             }
         }
@@ -333,10 +339,20 @@ fun PostInfoScreen(
                     when (it) {
                         is PostInteract.Announcement -> {}
                         is PostInteract.Delete -> {
+                            if (post.isMyPost(Constant.MyInfo)) {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.CommentDeleteComment, From.Poster)
+                            } else {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.CommentDeleteComment, From.OthersPost)
+                            }
+
                             showCommentDeleteTip = Pair(true, comment)
                         }
 
                         is PostInteract.Edit -> {
+                            KLog.i(TAG, "PostInteract.Edit click.")
+                            AppUserLogger.getInstance().log(Clicked.CommentEditComment)
                             navController.navigate(
                                 BaseEditMessageScreenDestination(
                                     channelId = channel.id.orEmpty(),
@@ -348,6 +364,7 @@ fun PostInfoScreen(
 
                         is PostInteract.Report -> {
                             KLog.i(TAG, "PostInteract.Report click.")
+                            AppUserLogger.getInstance().log(Clicked.CommentReportComment)
                             showReportTip = Pair(true, comment)
                         }
                     }
@@ -367,10 +384,20 @@ fun PostInfoScreen(
                     when (it) {
                         is PostInteract.Announcement -> {}
                         is PostInteract.Delete -> {
+                            KLog.i(TAG, "PostInteract.Delete click.")
+                            if (reply.isMyPost(Constant.MyInfo)) {
+                                AppUserLogger.getInstance().log(Clicked.CommentDeleteReply, From.Poster)
+                            }
+                            else {
+                                AppUserLogger.getInstance().log(Clicked.CommentDeleteReply, From.OthersPost)
+                            }
+
                             showReplyDeleteTip = Triple(true, comment, reply)
                         }
 
                         is PostInteract.Edit -> {
+                            KLog.i(TAG, "PostInteract.Edit click.")
+                            AppUserLogger.getInstance().log(Clicked.CommentEditReply)
                             navController.navigate(
                                 BaseEditMessageScreenDestination(
                                     channelId = channel.id.orEmpty(),
@@ -383,6 +410,7 @@ fun PostInfoScreen(
 
                         is PostInteract.Report -> {
                             KLog.i(TAG, "PostInteract.Report click.")
+                            AppUserLogger.getInstance().log(Clicked.CommentReportReply)
                             showReportTip = Pair(true, reply)
                         }
                     }
@@ -439,8 +467,7 @@ fun PostInfoScreen(
             is NavResult.Value -> {
                 if (result.value.isComment) {
                     viewModel.onUpdateComment(result.value.editMessage)
-                }
-                else {
+                } else {
                     viewModel.onUpdateReply(result.value.editMessage, result.value.commentId)
                 }
             }
@@ -704,7 +731,9 @@ private fun PostInfoScreenView(
                                         postInfoListener.onCommentEmojiClick(comment, it)
                                     },
                                     onMoreClick = {
-                                        commentBottomContentListener.onCommentMoreActionClick(comment)
+                                        commentBottomContentListener.onCommentMoreActionClick(
+                                            comment
+                                        )
                                     }
                                 )
                             }
@@ -798,7 +827,11 @@ private fun EmptyCommentView() {
 
         Spacer(modifier = Modifier.height(43.dp))
 
-        Text(text = "目前還沒有人留言", fontSize = 16.sp, color = LocalColor.current.text.default_30)
+        Text(
+            text = "目前還沒有人留言",
+            fontSize = 16.sp,
+            color = LocalColor.current.text.default_30
+        )
     }
 }
 
