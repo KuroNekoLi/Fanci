@@ -43,7 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
@@ -101,6 +103,7 @@ fun EditPostScreen(
         modifier = modifier,
         editPost = editPost,
         onShowImagePicker = {
+            AppUserLogger.getInstance().log(Clicked.PostSelectPhoto)
             showImagePick = true
         },
         attachImages = attachImages,
@@ -108,6 +111,8 @@ fun EditPostScreen(
             viewModel.onDeleteImageClick(it)
         },
         onPostClick = { text ->
+            AppUserLogger.getInstance().log(Clicked.PostPublish)
+            
             if (editPost != null) {
                 viewModel.onUpdatePostClick(editPost, text)
             }
@@ -149,6 +154,7 @@ fun EditPostScreen(
                         text = "修改",
                     ) {
                         run {
+                            AppUserLogger.getInstance().log(Clicked.PostBlankPostEdit)
                             viewModel.dismissEditTip()
                         }
                     }
@@ -174,9 +180,11 @@ fun EditPostScreen(
         title = "是否放棄編輯的內容？",
         content = "貼文尚未發布就離開，文字將會消失",
         onContinue = {
+            AppUserLogger.getInstance().log(Clicked.PostContinueEditing)
             showSaveTip = false
         },
         onGiveUp = {
+            AppUserLogger.getInstance().log(Clicked.PostDiscard)
             showSaveTip = false
             navController.popBackStack()
         }
