@@ -74,6 +74,8 @@ fun GroupMemberManageScreen(
                 iconRes = R.drawable.join_apply,
                 text = "加入申請",
                 onItemClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupSettingsJoinApplication)
                     navController.navigate(
                         GroupApplyScreenDestination(
                             group = group

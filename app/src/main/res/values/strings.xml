@@ -187,4 +187,6 @@
     <string name="contact_official_mail">請聯絡官方信箱\nfanci@cmoney.com.tw</string>
     <string name="copy_mail">複製信箱</string>
     <string name="copy_success">已複製信箱</string>
+    <string name="select_all">全選</string>
+    <string name="unselect_all">取消全選</string>
 </resources>
