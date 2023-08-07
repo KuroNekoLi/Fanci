@@ -22,6 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.showColorPickerDialogBottomSheet
@@ -45,6 +47,7 @@ fun StyleScreen(
     roleName: String,
     roleColor: com.cmoney.fanciapi.fanci.model.Color,
     showDelete: Boolean,
+    from: From = From.Create,
     onChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit,
     onDelete: () -> Unit
 ) {
@@ -75,9 +78,10 @@ fun StyleScreen(
             modifier = Modifier
                 .background(LocalColor.current.background)
                 .clickable {
-                    AppUserLogger.getInstance()
-                        .log(Page.GroupSettingsRoleManagementAddRoleStyleRoleName)
-
+                    with(AppUserLogger.getInstance()) {
+                        log(Page.GroupSettingsRoleManagementAddRoleStyleRoleName)
+                        log(Clicked.StyleRoleName, from)
+                    }
                     navigator.navigate(
                         EditInputScreenDestination(
                             defaultText = roleName,
@@ -135,6 +139,8 @@ fun StyleScreen(
                 .height(50.dp)
                 .background(LocalColor.current.background)
                 .clickable {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.StyleSelectColor)
                     (context as? Activity)?.showColorPickerDialogBottomSheet(
                         selectedColor = defaultColor
                     ) {
