@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.extension
 
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.utils.Utils
 
 fun BulletinboardMessage.displayPostTime(): String {
@@ -11,4 +12,4 @@ fun BulletinboardMessage.displayPostTime(): String {
     return ""
 }
 
-fun BulletinboardMessage.isMyPost(myInfo: User?): Boolean = author?.id == myInfo?.id
+fun BulletinboardMessage.isMyPost(): Boolean = author?.id == Constant.MyInfo?.id
