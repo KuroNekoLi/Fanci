@@ -673,6 +673,9 @@ private fun PostInfoScreenView(
                             },
                             onEmojiClick = {
                                 postInfoListener.onEmojiClick(post, it)
+                            },
+                            onImageClick = {
+                                AppUserLogger.getInstance().log(Clicked.Image, From.InnerLayer)
                             }
                         )
                     }
@@ -740,6 +743,9 @@ private fun PostInfoScreenView(
                                         commentBottomContentListener.onCommentMoreActionClick(
                                             comment
                                         )
+                                    },
+                                    onImageClick = {
+                                        AppUserLogger.getInstance().log(Clicked.Image, From.Comment)
                                     }
                                 )
                             }

@@ -70,6 +70,7 @@ fun BasePostContentScreen(
     backgroundColor: Color = LocalColor.current.background,
     onMoreClick: () -> Unit? = {},
     onEmojiClick: (Int) -> Unit,
+    onImageClick: (() -> Unit)? = null,
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -178,6 +179,7 @@ fun BasePostContentScreen(
                         it.resourceLink.orEmpty()
                     }.orEmpty(),
                     onImageClick = {
+                        onImageClick?.invoke()
                         AppUserLogger.getInstance().log(Page.PostImage)
                     }
                 )

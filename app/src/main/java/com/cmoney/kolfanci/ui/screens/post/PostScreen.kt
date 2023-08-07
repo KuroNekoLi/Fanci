@@ -404,6 +404,9 @@ private fun PostScreenView(
                             },
                             onEmojiClick = {
                                 onEmojiClick.invoke(pinPost, it)
+                            },
+                            onImageClick = {
+                                AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
                             }
                         )
                     }
@@ -429,6 +432,9 @@ private fun PostScreenView(
                             if (Constant.isCanEmoji()) {
                                 onEmojiClick.invoke(postMessage, it)
                             }
+                        },
+                        onImageClick = {
+                            AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
                         }
                     )
                 }

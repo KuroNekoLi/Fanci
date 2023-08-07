@@ -26,6 +26,7 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.ChatMessageWrapper
@@ -372,7 +373,10 @@ fun MediaContent(modifier: Modifier, medias: List<Media>, isClickable: Boolean =
                 it.resourceLink.orEmpty()
             },
             modifier = modifier,
-            isClickable = isClickable
+            isClickable = isClickable,
+            onImageClick = {
+                AppUserLogger.getInstance().log(Clicked.Image, From.Message)
+            }
         )
     }
 }
