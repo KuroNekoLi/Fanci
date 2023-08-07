@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +46,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupRequirementApply
 import com.cmoney.fanciapi.fanci.model.IGroupRequirementAnswer
 import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.asGroupMember
@@ -148,12 +150,25 @@ private fun GroupApplyScreenView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
+            val isSelectAll = remember(groupRequirementApplyList) {
+                groupRequirementApplyList.all { selected ->
+                    selected.isSelected
+                }
+            }
             TopAppBar(
+                isSelectAll = isSelectAll,
                 backClick = {
                     onBackClick.invoke()
                 },
                 onSelectedAll = {
                     KLog.i(TAG, "onSelectedAll click.")
+                    val clicked = if (isSelectAll) {
+                        Clicked.JoinApplicationUnselectAll
+                    } else {
+                        Clicked.JoinApplicationSelectAll
+                    }
+                    AppUserLogger.getInstance()
+                        .log(clicked)
                     onSelectAllClick.invoke()
                 }
             )
@@ -223,6 +238,7 @@ private fun GroupApplyScreenView(
 
 @Composable
 private fun TopAppBar(
+    isSelectAll: Boolean,
     backClick: (() -> Unit)? = null,
     onSelectedAll: (() -> Unit)? = null
 ) {
@@ -243,14 +259,24 @@ private fun TopAppBar(
         trailing = {
             Box(
                 modifier = Modifier
-                    .size(35.dp)
+                    .width(70.dp)
                     .offset(x = (-15).dp)
                     .clickable {
                         onSelectedAll?.invoke()
                     },
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.CenterEnd
             ) {
-                Text(text = "全選", fontSize = 17.sp, color = LocalColor.current.primary)
+                val text = if (isSelectAll) {
+                    stringResource(id = R.string.unselect_all)
+                } else {
+                    stringResource(id = R.string.select_all)
+                }
+                Text(
+                    text = text,
+                    fontSize = 17.sp,
+                    maxLines = 1,
+                    color = LocalColor.current.primary
+                )
             }
         }
     )
@@ -353,6 +379,8 @@ private fun BottomButton(
                 borderColor = LocalColor.current.text.default_50,
                 textColor = LocalColor.current.text.default_100
             ) {
+                AppUserLogger.getInstance()
+                    .log(Clicked.JoinApplicationRejectJoin)
                 onReject.invoke()
             }
 
@@ -365,6 +393,8 @@ private fun BottomButton(
                     .height(45.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
                 onClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.JoinApplicationApproveJoin)
                     onApply.invoke()
                 }) {
                 Text(

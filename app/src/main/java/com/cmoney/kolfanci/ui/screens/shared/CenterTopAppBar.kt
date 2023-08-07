@@ -49,7 +49,13 @@ fun CenterTopAppBar(
             val dx = leftSectionWidth - rightSectionWidth
             var start = 0.dp
             var end = 0.dp
-            if (dx < 0.dp) start += dx else end += dx
+            if (dx < 0.dp) {
+                start += dx
+            } else {
+                end += dx
+            }
+            start = start.coerceAtLeast(0.dp)
+            end = end.coerceAtLeast(0.dp)
             titlePadding = PaddingValues(start = start, end = end)
         }
 
