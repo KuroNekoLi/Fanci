@@ -14,6 +14,7 @@ import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.imagelibrary.UploadImage
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
@@ -21,6 +22,7 @@ import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
@@ -616,37 +618,52 @@ class MessageViewModel(
     fun onInteractClick(messageInteract: MessageInteract) {
         KLog.i(TAG, "onInteractClick:$messageInteract")
         when (messageInteract) {
-            is MessageInteract.Announcement -> announceMessage(messageInteract.message)
+            is MessageInteract.Announcement -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessagePinMessage)
+                announceMessage(messageInteract.message)
+            }
             is MessageInteract.Copy -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageCopyMessage)
                 _copyMessage.value = messageInteract.message
             }
 
-            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
+            is MessageInteract.Delete -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageDeleteMessage)
+                deleteMessage(messageInteract.message)
+            }
             is MessageInteract.HideUser -> {
                 _hideUserMessage.value = messageInteract.message
             }
 
             is MessageInteract.Recycle -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageUnsendMessage)
                 recycleMessage(messageInteract.message)
             }
 
-            is MessageInteract.Reply -> replyMessage(
-                IReplyMessage(
-                    id = messageInteract.message.id,
-                    author = messageInteract.message.author,
-                    content = messageInteract.message.content,
-                    isDeleted = messageInteract.message.isDeleted
+            is MessageInteract.Reply -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageReply)
+                replyMessage(
+                    IReplyMessage(
+                        id = messageInteract.message.id,
+                        author = messageInteract.message.author,
+                        content = messageInteract.message.content,
+                        isDeleted = messageInteract.message.isDeleted
+                    )
                 )
-            )
+            }
 
             is MessageInteract.Report -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageReport)
                 _reportMessage.value = messageInteract.message
             }
 
-            is MessageInteract.EmojiClick -> onEmojiClick(
-                messageInteract.message,
-                messageInteract.emojiResId
-            )
+            is MessageInteract.EmojiClick -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageEmoji)
+                onEmojiClick(
+                    messageInteract.message,
+                    messageInteract.emojiResId
+                )
+            }
 
             else -> {}
         }

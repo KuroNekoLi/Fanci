@@ -95,7 +95,7 @@ fun InteractDialogScreen(
                 }
             }
 
-            //暫時取消此功能
+            //暫時取消此功能, api 未完成
 //            if (Constant.isCanBlock() && !message.isMyPostMessage(Constant.MyInfo)) {
 //                FeatureText(R.drawable.hide, "封鎖此用戶") {
 //                    onClose(coroutineScope, modalBottomSheetState)

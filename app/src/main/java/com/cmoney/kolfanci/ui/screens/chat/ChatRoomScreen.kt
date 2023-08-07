@@ -22,8 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
@@ -142,9 +144,11 @@ fun ChatRoomScreen(
             messageViewModel.removeAttach(it)
         },
         onMessageSend = {
+            AppUserLogger.getInstance().log(Clicked.MessageSendButton)
             messageViewModel.messageSend(channelId, it)
         },
         onAttachClick = {
+            AppUserLogger.getInstance().log(Clicked.MessageInsertImage)
             openImagePickDialog = true
         },
         showOnlyBasicPermissionTip = {
