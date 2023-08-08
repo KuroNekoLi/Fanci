@@ -34,8 +34,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
@@ -75,6 +78,15 @@ fun EmptyFollowScreen(
                 viewModel.closeGroupItemDialog()
             },
             onConfirm = {
+                //私密
+                if (it.isNeedApproval == true) {
+                    AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.NonGroup)
+                }
+                //公開
+                else {
+                    AppUserLogger.getInstance().log(Clicked.GroupJoin, From.NonGroup)
+                }
+
                 viewModel.joinGroup(it)
             }
         )

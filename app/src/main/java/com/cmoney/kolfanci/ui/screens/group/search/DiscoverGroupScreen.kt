@@ -147,6 +147,15 @@ fun DiscoverGroupScreen(
                 } else {
                     //不公開
                     if (it.isNeedApproval == true) {
+                        when (uiState.tabIndex) {
+                            0 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.Hot)
+                            }
+                            1 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.New)
+                            }
+                        }
+
                         navController.navigate(
                             ApplyForGroupScreenDestination(
                                 group = it
@@ -155,6 +164,15 @@ fun DiscoverGroupScreen(
                     }
                     //公開
                     else {
+                        when (uiState.tabIndex) {
+                            0 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Hot)
+                            }
+                            1 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupJoin, From.New)
+                            }
+                        }
+
                         viewModel.joinGroup(it)
                     }
                 }

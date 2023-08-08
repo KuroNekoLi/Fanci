@@ -125,6 +125,15 @@ fun FollowScreen(
                 onDismissInvite.invoke()
             },
             onConfirm = {
+                //via invite link
+                inviteGroup?.run {
+                    if (targetGroup.isNeedApproval == true) {
+                        AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.Link)
+                    } else {
+                        AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Link)
+                    }
+                }
+
                 viewModel.joinGroup(it)
                 onDismissInvite.invoke()
             }
