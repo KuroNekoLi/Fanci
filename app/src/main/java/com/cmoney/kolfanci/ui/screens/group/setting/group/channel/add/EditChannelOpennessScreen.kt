@@ -73,6 +73,7 @@ fun EditChannelOpennessScreen(
                 },
                 saveClick = {
                     KLog.i(TAG, "saveClick click.")
+                    AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelOpenness)
                     resultNavigator.navigateBack(result = isNeedApprovalCurrent)
                 }
             )

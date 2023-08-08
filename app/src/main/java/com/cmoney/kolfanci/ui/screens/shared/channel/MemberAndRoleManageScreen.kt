@@ -92,6 +92,7 @@ fun MemberAndRoleManageScreen(
             }
 
             is NavResult.Value -> {
+                KLog.i("MemberAndRoleManageScreen", "addMemberResult result callback.")
                 val member = result.value
                 viewModel.addSelectedMember(member)
             }
@@ -304,7 +305,8 @@ private fun AddMemberListScreen(
                         AddMemberScreenDestination(
                             group = group,
                             excludeMember = member.toTypedArray(),
-                            title = "新增「%s」成員".format(title)
+                            title = "新增「%s」成員".format(title),
+                            from = From.ChannelManagement
                         )
                     )
                 }

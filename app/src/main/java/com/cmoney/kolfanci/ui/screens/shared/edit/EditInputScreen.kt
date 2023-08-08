@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.shared.edit
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,12 +23,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
@@ -37,6 +42,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.socks.library.KLog
 
 /**
  * 單一輸入編輯畫面
@@ -120,6 +126,7 @@ fun EditInputScreenView(
 ) {
     var textState by remember { mutableStateOf(defaultText) }
     val maxLength = 20
+    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -128,6 +135,11 @@ fun EditInputScreenView(
             EditToolbarScreen(
                 title = toolbarTitle,
                 saveClick = {
+                    logConfirmClick(
+                        toolBarTitle = toolbarTitle,
+                        context = context
+                    )
+
                     if (textState.isEmpty()) {
                         onShowEmptyTip.invoke()
                     } else {
@@ -190,6 +202,25 @@ fun EditInputScreenView(
 
             }
         }
+    }
+}
+
+/**
+ * 紀錄確定點擊事件, 透過 toolbar 去區分是從哪裡近來編輯的
+ *
+ * @param toolBarTitle toolbar title
+ * @param context
+ */
+fun logConfirmClick(toolBarTitle: String, context: Context) {
+    KLog.i("logConfirmClick", "logConfirmClick:$toolBarTitle")
+    when (toolBarTitle) {
+        context.getString(R.string.group_name) -> {
+            AppUserLogger.getInstance().log(Clicked.Confirm, From.GroupName)
+        }
+        context.getString(R.string.channel_name) -> {
+            AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelName)
+        }
+        else -> {}
     }
 }
 

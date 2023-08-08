@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -52,7 +53,8 @@ fun MemberScreen(
                 navigator.navigate(
                     AddMemberScreenDestination(
                         group = group,
-                        excludeMember = memberList.toTypedArray()
+                        excludeMember = memberList.toTypedArray(),
+                        from = From.RoleManagement
                     )
                 )
             }

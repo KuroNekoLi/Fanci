@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -134,7 +135,7 @@ fun GroupSettingBackgroundView(
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     //是否為建立社團
-    val isFromCreate = (group.id?.isEmpty() == true)
+    val isFromCreate = group.id.isNullOrEmpty()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -144,6 +145,12 @@ fun GroupSettingBackgroundView(
                 title = stringResource(id = R.string.group_background),
                 saveClick = {
                     KLog.i(TAG, "on save click.")
+                    if (isFromCreate) {
+                        AppUserLogger.getInstance().log(Clicked.Confirm, From.AddHomeBackground)
+                    }
+                    else {
+                        AppUserLogger.getInstance().log(Clicked.Confirm, From.EditHomeBackground)
+                    }
                     state.coverImageUrl.value?.let {
                         onImageChange.invoke(
                             ImageChangeData(

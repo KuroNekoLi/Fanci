@@ -104,6 +104,7 @@ fun GroupSettingDescView(
             EditToolbarScreen(
                 title = stringResource(id = R.string.group_description),
                 saveClick = {
+                    AppUserLogger.getInstance().log(Clicked.GroupIntroduction)
                     onChangeDesc.invoke(textState)
                 },
                 backClick = onBack

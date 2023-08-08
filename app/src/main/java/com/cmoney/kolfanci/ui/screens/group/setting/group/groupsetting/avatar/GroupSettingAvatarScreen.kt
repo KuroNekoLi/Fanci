@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -82,7 +83,7 @@ fun GroupSettingAvatarScreen(
     }
 
     //是否為建立社團開啟
-    val isFromCreate = (group.id?.isEmpty() == true)
+    val isFromCreate = group.id.isNullOrEmpty()
 
     fanciAvatarResult.onNavResult { result ->
         when (result) {
@@ -105,6 +106,12 @@ fun GroupSettingAvatarScreen(
         group = settingGroup,
         isLoading = viewModel.uiState.isLoading,
         onImageChange = {
+            if (isFromCreate) {
+                AppUserLogger.getInstance().log(Clicked.Confirm, From.AddGroupIcon)
+            }
+            else {
+                AppUserLogger.getInstance().log(Clicked.Confirm, From.EditGroupIcon)
+            }
             resultNavigator.navigateBack(
                 it
             )
