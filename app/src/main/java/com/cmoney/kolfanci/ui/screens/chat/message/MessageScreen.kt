@@ -29,7 +29,6 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fancylog.model.data.Clicked
-import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.findActivity
