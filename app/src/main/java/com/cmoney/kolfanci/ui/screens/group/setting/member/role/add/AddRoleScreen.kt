@@ -289,6 +289,7 @@ private fun AddRoleScreenView(
                     backClick = onBack,
                     saveClick = {
                         KLog.i(TAG, "saveClick click.")
+                        AppUserLogger.getInstance().log(Clicked.Confirm, From.AddRole)
                         onConfirm.invoke()
                     }
                 )

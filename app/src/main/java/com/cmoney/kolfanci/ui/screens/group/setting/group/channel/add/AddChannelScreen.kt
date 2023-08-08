@@ -672,7 +672,7 @@ private fun ManagerTabScreen(
                 ShareAddRoleScreenDestination(
                     group = group,
                     existsRole = fanciRole.orEmpty().toTypedArray(),
-                    from = From.AddRole
+                    from = From.AdminAddRole
                 )
             )
         }
