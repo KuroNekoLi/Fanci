@@ -145,6 +145,10 @@ fun PostScreen(
             AppUserLogger.getInstance().log(Page.PublishPost)
         },
         onMoreClick = { post ->
+            KLog.i(TAG, "onMoreClick")
+
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.PostList)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Post,
@@ -399,6 +403,16 @@ private fun PostScreenView(
                                 onMoreClick.invoke(pinPost)
                             },
                             onEmojiClick = {
+                                if (Constant.isCanEmoji()) {
+                                    AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                    onEmojiClick.invoke(pinPost, it)
+                                }
+                            },
+                            onImageClick = {
+                                AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
+                            },
+                            onAddNewEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.AddEmoji, From.PostList)
                                 onEmojiClick.invoke(pinPost, it)
                             }
                         )
@@ -422,6 +436,16 @@ private fun PostScreenView(
                             onMoreClick.invoke(postMessage)
                         },
                         onEmojiClick = {
+                            if (Constant.isCanEmoji()) {
+                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                onEmojiClick.invoke(postMessage, it)
+                            }
+                        },
+                        onImageClick = {
+                            AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
+                        },
+                        onAddNewEmojiClick = {
+                            AppUserLogger.getInstance().log(Clicked.AddEmoji, From.PostList)
                             if (Constant.isCanEmoji()) {
                                 onEmojiClick.invoke(postMessage, it)
                             }

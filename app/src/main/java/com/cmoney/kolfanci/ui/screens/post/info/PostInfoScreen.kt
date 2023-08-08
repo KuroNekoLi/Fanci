@@ -268,6 +268,9 @@ fun PostInfoScreen(
 
         //貼文 更多動作
         override fun onPostMoreClick(post: BulletinboardMessage) {
+            KLog.i(TAG, "onPostMoreClick")
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.InnerLayer)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Post,
@@ -332,6 +335,9 @@ fun PostInfoScreen(
 
         //留言 更多動做
         override fun onCommentMoreActionClick(comment: BulletinboardMessage) {
+            KLog.i(TAG, "onCommentMoreActionClick")
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.Comment)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Comment,
@@ -666,6 +672,14 @@ private fun PostInfoScreenView(
                                 postInfoListener.onPostMoreClick(post)
                             },
                             onEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.InnerLayer)
+                                postInfoListener.onEmojiClick(post, it)
+                            },
+                            onImageClick = {
+                                AppUserLogger.getInstance().log(Clicked.Image, From.InnerLayer)
+                            },
+                            onAddNewEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.AddEmoji, From.InnerLayer)
                                 postInfoListener.onEmojiClick(post, it)
                             }
                         )
@@ -728,12 +742,20 @@ private fun PostInfoScreenView(
                                         )
                                     },
                                     onEmojiClick = {
+                                        AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.Comment)
                                         postInfoListener.onCommentEmojiClick(comment, it)
                                     },
                                     onMoreClick = {
                                         commentBottomContentListener.onCommentMoreActionClick(
                                             comment
                                         )
+                                    },
+                                    onImageClick = {
+                                        AppUserLogger.getInstance().log(Clicked.Image, From.Comment)
+                                    },
+                                    onAddNewEmojiClick = {
+                                        AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Comment)
+                                        postInfoListener.onCommentEmojiClick(comment, it)
                                     }
                                 )
                             }
@@ -916,6 +938,9 @@ private fun CommentBottomContent(
                                 comment = comment,
                                 reply = reply
                             )
+                        },
+                        onAddNewEmojiClick = {
+                            listener.onReplyEmojiClick(comment, reply, it)
                         }
                     )
                 }
