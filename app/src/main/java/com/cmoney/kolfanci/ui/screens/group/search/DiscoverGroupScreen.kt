@@ -184,12 +184,16 @@ fun DiscoverGroupScreen(
     LaunchedEffect(key1 = uiState.tabIndex) {
         when (uiState.tabIndex) {
             0 -> {
-                AppUserLogger.getInstance()
-                    .log(page = Page.ExploreGroupPopularGroups)
+                AppUserLogger.getInstance().apply {
+                    log(Clicked.ExploreGroupPopularGroups)
+                    log(page = Page.ExploreGroupPopularGroups)
+                }
             }
             1 -> {
-                AppUserLogger.getInstance()
-                    .log(page = Page.ExploreGroupNewestGroups)
+                AppUserLogger.getInstance().apply {
+                    log(Clicked.ExploreGroupNewestGroups)
+                    log(page = Page.ExploreGroupNewestGroups)
+                }
             }
         }
     }
