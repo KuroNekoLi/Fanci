@@ -671,7 +671,8 @@ private fun ManagerTabScreen(
             navigator.navigate(
                 ShareAddRoleScreenDestination(
                     group = group,
-                    existsRole = fanciRole.orEmpty().toTypedArray()
+                    existsRole = fanciRole.orEmpty().toTypedArray(),
+                    from = From.AddRole
                 )
             )
         }

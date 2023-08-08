@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -282,7 +283,8 @@ private fun ManageView(
             navigator.navigate(
                 ShareAddRoleScreenDestination(
                     group = group,
-                    existsRole = fanciRole.orEmpty().toTypedArray()
+                    existsRole = fanciRole.orEmpty().toTypedArray(),
+                    from = From.AddRole
                 )
             )
         }
