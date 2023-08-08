@@ -41,11 +41,11 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
@@ -92,10 +92,11 @@ fun DiscoverGroupScreen(
         onCreateClick = {
             if (XLoginHelper.isLogin) {
 
-                when (uiState.tabIndex){
+                when (uiState.tabIndex) {
                     0 -> {
                         AppUserLogger.getInstance().log(Clicked.CreateGroup, From.Hot)
                     }
+
                     1 -> {
                         AppUserLogger.getInstance().log(Clicked.CreateGroup, From.New)
                     }
@@ -115,6 +116,7 @@ fun DiscoverGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val isJoinComplete = result.value
                 if (isJoinComplete) {
@@ -147,6 +149,16 @@ fun DiscoverGroupScreen(
                 } else {
                     //不公開
                     if (it.isNeedApproval == true) {
+                        when (uiState.tabIndex) {
+                            0 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.Hot)
+                            }
+
+                            1 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.New)
+                            }
+                        }
+
                         navController.navigate(
                             ApplyForGroupScreenDestination(
                                 group = it
@@ -155,6 +167,16 @@ fun DiscoverGroupScreen(
                     }
                     //公開
                     else {
+                        when (uiState.tabIndex) {
+                            0 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Hot)
+                            }
+
+                            1 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupJoin, From.New)
+                            }
+                        }
+
                         viewModel.joinGroup(it)
                     }
                 }
@@ -184,12 +206,17 @@ fun DiscoverGroupScreen(
     LaunchedEffect(key1 = uiState.tabIndex) {
         when (uiState.tabIndex) {
             0 -> {
-                AppUserLogger.getInstance()
-                    .log(page = Page.ExploreGroupPopularGroups)
+                with(AppUserLogger.getInstance()) {
+                    log(Clicked.ExploreGroupPopularGroups)
+                    log(page = Page.ExploreGroupPopularGroups)
+                }
             }
+
             1 -> {
-                AppUserLogger.getInstance()
-                    .log(page = Page.ExploreGroupNewestGroups)
+                with(AppUserLogger.getInstance()) {
+                    log(Clicked.ExploreGroupNewestGroups)
+                    log(page = Page.ExploreGroupNewestGroups)
+                }
             }
         }
     }
