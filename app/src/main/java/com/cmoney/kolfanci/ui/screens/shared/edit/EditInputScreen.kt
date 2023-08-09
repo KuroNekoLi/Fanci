@@ -46,6 +46,8 @@ import com.socks.library.KLog
 
 /**
  * 單一輸入編輯畫面
+ *
+ * @param from log 紀錄用
  */
 @Destination
 @Composable
@@ -57,7 +59,8 @@ fun EditInputScreen(
     placeholderText: String,
     emptyAlertTitle: String,
     emptyAlertSubTitle: String,
-    resultNavigator: ResultBackNavigator<String>
+    resultNavigator: ResultBackNavigator<String>,
+    from: From? = null
 ) {
     var showEmptyTip by remember {
         mutableStateOf(false)
@@ -80,7 +83,8 @@ fun EditInputScreen(
         },
         onBack = {
             showSaveTip = true
-        }
+        },
+        from = from
     )
 
     if (showEmptyTip) {
@@ -122,7 +126,8 @@ fun EditInputScreenView(
     onShowEmptyTip: () -> Unit,
     onBack: () -> Unit,
     toolbarTitle: String,
-    placeholderText: String
+    placeholderText: String,
+    from: From? = null
 ) {
     var textState by remember { mutableStateOf(defaultText) }
     val maxLength = 20
@@ -135,10 +140,14 @@ fun EditInputScreenView(
             EditToolbarScreen(
                 title = toolbarTitle,
                 saveClick = {
-                    logConfirmClick(
-                        toolBarTitle = toolbarTitle,
-                        context = context
-                    )
+                    from?.run {
+                        AppUserLogger.getInstance().log(Clicked.Confirm, this)
+                    }
+
+//                    logConfirmClick(
+//                        toolBarTitle = toolbarTitle,
+//                        context = context
+//                    )
 
                     if (textState.isEmpty()) {
                         onShowEmptyTip.invoke()
@@ -202,25 +211,6 @@ fun EditInputScreenView(
 
             }
         }
-    }
-}
-
-/**
- * 紀錄確定點擊事件, 透過 toolbar 去區分是從哪裡近來編輯的
- *
- * @param toolBarTitle toolbar title
- * @param context
- */
-fun logConfirmClick(toolBarTitle: String, context: Context) {
-    KLog.i("logConfirmClick", "logConfirmClick:$toolBarTitle")
-    when (toolBarTitle) {
-        context.getString(R.string.group_name) -> {
-            AppUserLogger.getInstance().log(Clicked.Confirm, From.GroupName)
-        }
-        context.getString(R.string.channel_name) -> {
-            AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelName)
-        }
-        else -> {}
     }
 }
 

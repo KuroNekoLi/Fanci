@@ -361,7 +361,8 @@ fun AddChannelScreenView(
                                         toolbarTitle = context.getString(R.string.channel_name),
                                         placeholderText = context.getString(R.string.input_channel_name),
                                         emptyAlertTitle = context.getString(R.string.channel_name_empty),
-                                        emptyAlertSubTitle = context.getString(R.string.channel_name_empty_desc)
+                                        emptyAlertSubTitle = context.getString(R.string.channel_name_empty_desc),
+                                        from = From.ChannelName
                                     )
                                 )
                             },

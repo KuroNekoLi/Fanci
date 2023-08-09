@@ -88,7 +88,12 @@ fun StyleScreen(
                             toolbarTitle = "角色名稱",
                             placeholderText = context.getString(R.string.input_role_name),
                             emptyAlertTitle = context.getString(R.string.role_name_empty),
-                            emptyAlertSubTitle = context.getString(R.string.role_name_empty_desc)
+                            emptyAlertSubTitle = context.getString(R.string.role_name_empty_desc),
+                            from = if (from == From.Create) {
+                                From.RoleName
+                            } else {
+                                From.EditName
+                            }
                         )
                     )
                 }
@@ -139,7 +144,8 @@ fun StyleScreen(
                 .height(50.dp)
                 .background(LocalColor.current.background)
                 .clickable {
-                    AppUserLogger.getInstance()
+                    AppUserLogger
+                        .getInstance()
                         .log(Clicked.StyleSelectColor)
                     (context as? Activity)?.showColorPickerDialogBottomSheet(
                         selectedColor = defaultColor
