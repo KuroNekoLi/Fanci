@@ -2,16 +2,22 @@ package com.cmoney.kolfanci.model.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
+import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ColorTheme
+import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
+import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -31,6 +37,7 @@ sealed class ThemeSetting {
 class GroupViewModel(
     private val themeUseCase: ThemeUseCase,
     private val groupUseCase: GroupUseCase,
+    private val channelUseCase: ChannelUseCase,
     private val permissionUseCase: PermissionUseCase
 ) : ViewModel() {
     private val TAG = GroupViewModel::class.java.simpleName
@@ -441,6 +448,266 @@ class GroupViewModel(
             group?.copy(
                 isNeedApproval = !openness
             )
+        }
+    }
+
+    /**
+     * 新增 分類
+     *
+     * @param name 分類名稱
+     */
+    fun addCategory(name: String) {
+        val group = _currentGroup.value ?: return
+        KLog.i(TAG, "addCategory: $group, $name")
+        viewModelScope.launch {
+            channelUseCase.addCategory(groupId = group.id.orEmpty(), name = name).fold({
+                val newCategoryList = group.categories.orEmpty().toMutableList()
+                newCategoryList.add(it)
+                _currentGroup.update { oldGroup ->
+                    oldGroup?.copy(
+                        categories = newCategoryList
+                    )
+                }
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 新增 頻道
+     *
+     * @param categoryId 分類id, 在此分類下建立
+     * @param name 頻道名稱
+     */
+    fun addChannel(
+        categoryId: String,
+        name: String,
+        isNeedApproval: Boolean,
+        listPermissionSelected: Map<ChannelAuthType, SelectedModel>,
+        orgChannelRoleList: List<FanciRole>,
+        channelRole: List<FanciRole>? = null
+    ) {
+        val group = _currentGroup.value ?: return
+        KLog.i(TAG, "addChannel: $categoryId, $name")
+
+        viewModelScope.launch {
+            val privacy = if (isNeedApproval) {
+                ChannelPrivacy.private
+            } else {
+                ChannelPrivacy.public
+            }
+
+            channelUseCase.addChannel(
+                categoryId = categoryId,
+                name = name,
+                privacy = privacy
+            ).fold({ channel ->
+                //新增管理員
+                if (channelRole?.isNotEmpty() == true) {
+                    editChannelRole(
+                        channel = channel,
+                        orgChannelRoleList = orgChannelRoleList,
+                        channelRole = channelRole
+                    )
+                }
+                //私密頻道處理
+                if (privacy == ChannelPrivacy.private) {
+                    setPrivateChannelWhiteList(
+                        channelId = channel.id.orEmpty(),
+                        listPermissionSelected = listPermissionSelected
+                    )
+                }
+                // 設定類別到畫面上
+                addChannelToGroup(channel, group)
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 編輯 頻道
+     *
+     * @param name 要更改的頻道名稱
+     */
+    fun editChannel(
+        channel: Channel?,
+        name: String,
+        isNeedApproval: Boolean,
+        listPermissionSelected: Map<ChannelAuthType, SelectedModel>,
+        orgChannelRoleList: List<FanciRole>,
+        channelRole: List<FanciRole>? = null
+    ) {
+        val group = _currentGroup.value ?: return
+        KLog.i(TAG, "editChannel")
+        viewModelScope.launch {
+            channel?.let { channel ->
+                // 私密頻道處理
+                if (isNeedApproval) {
+                    setPrivateChannelWhiteList(
+                        channelId = channel.id.orEmpty(),
+                        listPermissionSelected = listPermissionSelected
+                    )
+                }
+                // 編輯管理員
+                editChannelRole(
+                    channel = channel,
+                    orgChannelRoleList = orgChannelRoleList,
+                    channelRole = channelRole
+                )
+                // 編輯名稱
+                editChannelName(
+                    group = group,
+                    channel = channel,
+                    name = name,
+                    isNeedApproval = isNeedApproval
+                )
+            }
+        }
+    }
+
+    /**
+     * 刪除 頻道
+     */
+    fun deleteChannel(channel: Channel) {
+        val group = _currentGroup.value ?: return
+        KLog.i(TAG, "deleteChannel:$channel")
+        viewModelScope.launch {
+            channelUseCase.deleteChannel(channel.id.orEmpty()).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    val newCategory = group.categories?.map { category ->
+                        category.copy(
+                            channels = category.channels?.filter { groupChannel ->
+                                groupChannel.id != channel.id
+                            }
+                        )
+                    }
+                    _currentGroup.update { oldGroup ->
+                        oldGroup?.copy(categories = newCategory)
+                    }
+                }
+            })
+        }
+    }
+
+    /**
+     * 編輯 頻道 管理員
+     */
+    private suspend fun editChannelRole(
+        channel: Channel,
+        orgChannelRoleList: List<FanciRole>,
+        channelRole: List<FanciRole>? = null
+    ) {
+        KLog.i(TAG, "editChannelRole")
+        //新增角色至channel
+        val addRoleList =
+            channelRole?.filter { !orgChannelRoleList.contains(it) }.orEmpty()
+        if (addRoleList.isNotEmpty()) {
+            val isSuccess = channelUseCase.addRoleToChannel(
+                channelId = channel.id.orEmpty(),
+                roleIds = addRoleList.map {
+                    it.id.orEmpty()
+                }).getOrNull()
+            KLog.i(TAG, "editChannelRole addRole: $isSuccess")
+        }
+        //要移除的角色
+        val removeRoleList =
+            orgChannelRoleList.filter { !channelRole.orEmpty().contains(it) }
+        if (removeRoleList.isNotEmpty()) {
+            val isSuccess =
+                channelUseCase.deleteRoleFromChannel(channelId = channel.id.orEmpty(),
+                    roleIds = removeRoleList.map {
+                        it.id.orEmpty()
+                    }).isSuccess
+            KLog.i(TAG, "editChannelRole removeRole: $isSuccess")
+        }
+    }
+
+    /**
+     * 設定 私密頻道 白名單
+     */
+    private suspend fun setPrivateChannelWhiteList(
+        channelId: String,
+        listPermissionSelected: Map<ChannelAuthType, SelectedModel>
+    ) {
+        KLog.i(TAG, "setPrivateChannelWhiteList:$channelId")
+        listPermissionSelected.forEach { (authType, selectedModel) ->
+            channelUseCase.putPrivateChannelWhiteList(
+                channelId = channelId,
+                authType = authType,
+                accessorList = selectedModel.toAccessorList()
+            )
+        }
+    }
+
+    /**
+     * 將新的 channel append 至 原本 group 做顯示
+     */
+    private fun addChannelToGroup(channel: Channel, group: Group) {
+        channel.category?.let { channelCategory ->
+            val newCategories = group.categories?.map { category ->
+                if (category.id == channelCategory.id) {
+                    val newChannel = category.channels.orEmpty().toMutableList()
+                    newChannel.add(channel)
+                    category.copy(
+                        channels = newChannel
+                    )
+                } else {
+                    category
+                }
+            }
+            _currentGroup.update {
+                it?.copy(
+                   categories = newCategories
+                )
+            }
+        }
+    }
+
+    /**
+     * 編輯 頻道 名稱
+     */
+    private fun editChannelName(
+        group: Group,
+        channel: Channel,
+        name: String,
+        isNeedApproval: Boolean
+    ) {
+        KLog.i(TAG, "editChanelName")
+        viewModelScope.launch {
+            channelUseCase.editChannelName(
+                channelId = channel.id.orEmpty(),
+                name = name,
+                privacy = if (isNeedApproval) {
+                    ChannelPrivacy.private
+                } else {
+                    ChannelPrivacy.public
+                }
+            ).fold({}, {
+                if (it is EmptyBodyException) {
+                    val newCategory = group.categories?.map { category ->
+                        val newChannel = category.channels?.map { groupChannel ->
+                            if (channel.id == groupChannel.id) {
+                                channel.copy(
+                                    name = name
+                                )
+                            } else {
+                                groupChannel
+                            }
+                        }
+                        category.copy(
+                            channels = newChannel
+                        )
+                    }
+                    _currentGroup.update { oldGroup ->
+                        oldGroup?.copy(categories = newCategory)
+                    }
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
         }
     }
 }

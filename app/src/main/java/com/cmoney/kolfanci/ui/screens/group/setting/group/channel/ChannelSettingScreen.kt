@@ -17,6 +17,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,10 +30,10 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.destinations.AddCategoryScreenDestination
@@ -63,21 +65,16 @@ fun ChannelSettingScreen(
     navigator: DestinationsNavigator,
     group: Group,
     viewModel: ChannelSettingViewModel = koinViewModel(),
-    setChannelResult: ResultRecipient<AddChannelScreenDestination, Group>,
-    setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>,
     setEditCategoryResult: ResultRecipient<EditCategoryScreenDestination, Group>,
     sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>,
     sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
 ) {
     val globalGroupViewModel = globalGroupViewModel()
-    var groupParam = group
-
     val uiState = viewModel.uiState
-
-    uiState.group?.let {
-        groupParam = it
-        globalGroupViewModel.setCurrentGroup(it)
-    }
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
+//    uiState.group?.let {
+//        globalGroupViewModel.setCurrentGroup(it)
+//    }
 
     //========== Result callback Start ==========
     sortChannelResult.onNavResult { result ->
@@ -112,33 +109,11 @@ fun ChannelSettingScreen(
             }
         }
     }
-
-    setChannelResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-
-    setCategoryResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
     //========== Result callback End ==========
     ChannelSettingScreenView(
         modifier = modifier,
         navigator = navigator,
-        group = groupParam
+        group = currentGroup ?: group
     ) {
         viewModel.onSortClick()
     }
@@ -152,7 +127,7 @@ fun ChannelSettingScreen(
                 viewModel.closeSortDialog()
                 navigator.navigate(
                     SortChannelScreenDestination(
-                        group = uiState.group ?: group
+                        group = uiState.group ?: currentGroup ?: group
                     )
                 )
             },
@@ -160,7 +135,7 @@ fun ChannelSettingScreen(
                 viewModel.closeSortDialog()
                 navigator.navigate(
                     SortCategoryScreenDestination(
-                        group = uiState.group ?: group
+                        group = uiState.group ?: currentGroup ?: group
                     )
                 )
             }
@@ -170,7 +145,11 @@ fun ChannelSettingScreen(
     LaunchedEffect(key1 = group) {
         AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagement)
     }
-
+    LaunchedEffect(key1 = currentGroup) {
+        currentGroup?.let { focusGroup ->
+            viewModel.setGroup(group = focusGroup)
+        }
+    }
 }
 
 @Composable

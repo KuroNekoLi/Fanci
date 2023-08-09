@@ -22,6 +22,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,10 +46,11 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditChannelOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
@@ -69,7 +71,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
@@ -86,7 +87,6 @@ fun AddChannelScreen(
     category: Category,
     channel: Channel? = null,
     viewModel: ChannelSettingViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<Group>,
     approvalResult: ResultRecipient<EditChannelOpennessScreenDestination, Boolean>,
     addRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
     permissionMemberResult: ResultRecipient<MemberAndRoleManageScreenDestination, SelectedModel>,
@@ -98,11 +98,8 @@ fun AddChannelScreen(
     var showSaveTip by remember {
         mutableStateOf(false)
     }
-
-    uiState.group?.let {
-        KLog.i("TAG", "channel add.")
-        resultNavigator.navigateBack(result = it)
-    }
+    val groupViewModel = globalGroupViewModel()
+    val currentGroup by groupViewModel.currentGroup.collectAsState()
 
     //if Edit mode
     LaunchedEffect(Unit) {
@@ -112,8 +109,21 @@ fun AddChannelScreen(
             }
         }
     }
-
     val isEditChannel = channel != null
+    if (!isEditChannel) {
+        val originChannelsSize = remember(group, category) {
+            group.categories?.find {
+                it.id == category.id
+            }?.channels?.size ?: 0
+        }
+        val targetCategory = currentGroup?.categories?.find {
+            it.id == category.id
+        }
+        // 當頻道的數量有變化時
+        if (targetCategory != null && ((targetCategory.channels?.size ?: 0) != originChannelsSize)) {
+            navigator.popBackStack()
+        }
+    }
     val from = getFromByIsEditChannel(isEditChannel = isEditChannel)
     AddChannelScreenView(
         modifier = modifier,
@@ -122,7 +132,7 @@ fun AddChannelScreen(
         channelName = uiState.channelName,
         isNeedApproval = uiState.isNeedApproval,
         fanciRole = uiState.channelRole,
-        group = group,
+        group = currentGroup ?: group,
         channelAccessTypeList = uiState.channelAccessTypeList,
         isLoading = uiState.isLoading,
         isEditChannel = isEditChannel,
@@ -130,12 +140,25 @@ fun AddChannelScreen(
         from = from,
         onConfirm = {
             if (channel == null) {
-                viewModel.addChannel(group, category.id.orEmpty(), it)
-            } else {
-                viewModel.editChannel(
-                    group = group,
-                    name = it
+                groupViewModel.addChannel(
+                    categoryId = category.id.orEmpty(),
+                    name = it,
+                    isNeedApproval = uiState.isNeedApproval,
+                    listPermissionSelected = viewModel.listPermissionSelected,
+                    orgChannelRoleList = viewModel.orgChannelRoleList,
+                    channelRole = uiState.channelRole
                 )
+            } else {
+                groupViewModel.editChannel(
+                    channel = viewModel.channel,
+                    name = it,
+                    isNeedApproval = uiState.isNeedApproval,
+                    listPermissionSelected = viewModel.listPermissionSelected,
+                    orgChannelRoleList = viewModel.orgChannelRoleList,
+                    channelRole = uiState.channelRole
+                )
+                // TODO 未等結果回傳即返回上一頁(可能需要改善)
+                navigator.popBackStack()
             }
         },
         onTabClick = {
@@ -191,7 +214,9 @@ fun AddChannelScreen(
                 channelName = channel.name.orEmpty(),
                 onConfirm = {
                     showDeleteDialog.value = false
-                    viewModel.deleteChannel(group, channel)
+                    groupViewModel.deleteChannel(channel = channel)
+                    // TODO 未等結果回傳即返回上一頁(可能需要改善)
+                    navigator.popBackStack()
                 },
                 onCancel = {
                     showDeleteDialog.value = false
