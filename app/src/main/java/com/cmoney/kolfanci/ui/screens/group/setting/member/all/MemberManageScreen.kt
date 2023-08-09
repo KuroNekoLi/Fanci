@@ -409,7 +409,7 @@ private fun MemberManageScreenView(
                                     ShareAddRoleScreenDestination(
                                         group = group,
                                         existsRole = it.toTypedArray(),
-                                        from = From.AddRole
+                                        from = From.AllMembersAddRole
                                     )
                                 )
                             }
