@@ -148,7 +148,9 @@ fun AddCategoryScreenView(
                                 placeholderText = context.getString(R.string.input_category_name),
                                 emptyAlertTitle = context.getString(R.string.category_name_empty),
                                 emptyAlertSubTitle = context.getString(R.string.category_name_empty_desc),
-                                from = From.KeyinCategoryName
+                                from = From.KeyinCategoryName,
+                                textFieldClicked = Clicked.CategoryNameNameKeyIn,
+                                textFieldFrom = From.Create
                             )
                         )
                     }
