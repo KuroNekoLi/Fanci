@@ -49,6 +49,7 @@ import com.ramcosta.composedestinations.result.ResultBackNavigator
  * 單一輸入編輯畫面
  *
  * @param from log 紀錄用
+ * @param textFieldClicked log 紀錄用
  * @param textFieldFrom log 紀錄用
  */
 @Destination
@@ -63,6 +64,7 @@ fun EditInputScreen(
     emptyAlertSubTitle: String,
     resultNavigator: ResultBackNavigator<String>,
     from: From? = null,
+    textFieldClicked: Clicked? = null,
     textFieldFrom: From? = null
 ) {
     var showEmptyTip by remember {
@@ -132,6 +134,7 @@ fun EditInputScreenView(
     toolbarTitle: String,
     placeholderText: String,
     from: From? = null,
+    textFieldClicked: Clicked? = null,
     textFieldFrom: From? = null
 ) {
     var textState by remember { mutableStateOf(defaultText) }
@@ -207,11 +210,14 @@ fun EditInputScreenView(
                             color = LocalColor.current.text.default_30
                         )
                     },
-                    interactionSource = remember{ MutableInteractionSource() }.also{ interactionSource->
-                        LaunchedEffect(interactionSource){
-                            interactionSource.interactions.collect{
+                    interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
+                        LaunchedEffect(interactionSource) {
+                            interactionSource.interactions.collect {
                                 if (it is PressInteraction.Release) {
-                                    AppUserLogger.getInstance().log(Clicked.StyleRoleNameKeyIn, textFieldFrom)
+                                    if (textFieldFrom != null && textFieldClicked != null) {
+                                        AppUserLogger.getInstance()
+                                            .log(textFieldClicked, textFieldFrom)
+                                    }
                                 }
                             }
                         }

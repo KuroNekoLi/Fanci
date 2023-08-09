@@ -94,6 +94,7 @@ fun StyleScreen(
                             } else {
                                 From.EditName
                             },
+                            textFieldClicked = Clicked.StyleRoleNameKeyIn,
                             textFieldFrom = from
                         )
                     )
