@@ -65,6 +65,7 @@ import org.koin.androidx.compose.koinViewModel
 /**
  * 搜尋所有成員畫面,並將勾選成員 callback
  *
+ * @param clicked 紀錄log用
  * @param from 紀錄log用
  */
 @Destination
@@ -79,7 +80,9 @@ fun AddMemberScreen(
     title: String = "新增成員",
     subTitle: String = "",
     btnTitle: String = "新增",
-    from: From
+    searchClicked: Clicked,
+    searchFrom: From,
+    clickFrom: From
 ) {
     val TAG = "AddMemberScreen"
 
@@ -96,9 +99,7 @@ fun AddMemberScreen(
             viewModel.onMemberClick(it)
         },
         onAddClick = {
-            if (from == From.ChannelManagement) {
-                AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelAddMember)
-            }
+            AppUserLogger.getInstance().log(Clicked.Confirm, clickFrom)
 
             viewModel.onAddSelectedMember()
             resultNavigator.navigateBack(
@@ -109,7 +110,7 @@ fun AddMemberScreen(
             viewModel.onLoadMoreGroupMember(group.id.orEmpty())
         },
         onSearch = {
-            AppUserLogger.getInstance().log(Clicked.SearchMember, from = from)
+            AppUserLogger.getInstance().log(searchClicked, from = searchFrom)
 
             viewModel.onSearchMember(
                 groupId = group.id.orEmpty(),

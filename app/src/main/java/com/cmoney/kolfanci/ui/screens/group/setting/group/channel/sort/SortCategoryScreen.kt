@@ -33,7 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
@@ -65,6 +68,7 @@ fun SortCategoryScreen(
         navigator = navigator,
         category = group.categories.orEmpty(),
         onSave = {
+            AppUserLogger.getInstance().log(Clicked.Confirm, From.CategoryOrder)
             viewModel.onSortCategoryOrChannel(group, it)
         }
     )

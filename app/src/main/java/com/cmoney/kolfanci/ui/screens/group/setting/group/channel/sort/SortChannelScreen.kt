@@ -36,7 +36,10 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.CategoryText
 import com.cmoney.kolfanci.ui.common.ChannelText
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
@@ -75,6 +78,7 @@ fun SortChannelScreen(
                 viewModel.sortChannel(it)
             },
             onSave = {
+                AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelOrder)
                 viewModel.onSortCategoryOrChannel(
                     group = group,
                     categories = it

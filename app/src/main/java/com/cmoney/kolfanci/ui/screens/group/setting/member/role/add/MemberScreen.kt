@@ -54,7 +54,9 @@ fun MemberScreen(
                     AddMemberScreenDestination(
                         group = group,
                         excludeMember = memberList.toTypedArray(),
-                        from = From.RoleManagement
+                        clickFrom  = From.RoleAddMember,
+                        searchClicked = Clicked.SearchMember,
+                        searchFrom = From.RoleManagement
                     )
                 )
             }

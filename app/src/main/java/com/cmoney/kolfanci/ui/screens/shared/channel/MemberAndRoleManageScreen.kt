@@ -306,7 +306,9 @@ private fun AddMemberListScreen(
                             group = group,
                             excludeMember = member.toTypedArray(),
                             title = "新增「%s」成員".format(title),
-                            from = From.ChannelManagement
+                            clickFrom = From.RoleAddMember,
+                            searchClicked = Clicked.SearchMember,
+                            searchFrom = From.ChannelManagement
                         )
                     )
                 }
