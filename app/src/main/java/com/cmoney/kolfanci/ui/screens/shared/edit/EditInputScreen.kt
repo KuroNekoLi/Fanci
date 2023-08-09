@@ -90,7 +90,8 @@ fun EditInputScreen(
             showSaveTip = true
         },
         from = from,
-        textFieldFrom = textFieldFrom
+        textFieldFrom = textFieldFrom,
+        textFieldClicked = textFieldClicked
     )
 
     if (showEmptyTip) {

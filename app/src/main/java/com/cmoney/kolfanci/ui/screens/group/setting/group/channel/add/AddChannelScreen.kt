@@ -362,7 +362,13 @@ fun AddChannelScreenView(
                                         placeholderText = context.getString(R.string.input_channel_name),
                                         emptyAlertTitle = context.getString(R.string.channel_name_empty),
                                         emptyAlertSubTitle = context.getString(R.string.channel_name_empty_desc),
-                                        from = From.ChannelName
+                                        from = From.ChannelName,
+                                        textFieldClicked = Clicked.StyleChannelNameKeyIn,
+                                        textFieldFrom = if (isEditChannel) {
+                                            From.Edit
+                                        } else {
+                                            From.Create
+                                        }
                                     )
                                 )
                             },
