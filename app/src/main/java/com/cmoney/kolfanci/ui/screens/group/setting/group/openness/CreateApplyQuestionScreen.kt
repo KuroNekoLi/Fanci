@@ -41,6 +41,7 @@ import com.socks.library.KLog
 
 /**
  * @param keyinTracking 紀錄點擊輸入匡埋點事件
+ * @param from 點擊確認用事件埋點
  */
 @Destination
 @Composable
@@ -49,7 +50,8 @@ fun CreateApplyQuestionScreen(
     navigator: DestinationsNavigator,
     question: String = "",
     keyinTracking: String = Clicked.QuestionTextArea.eventName,
-    resultBackNavigator: ResultBackNavigator<String>
+    resultBackNavigator: ResultBackNavigator<String>,
+    from: From
 ) {
     val TAG = "CreateApplyQuestionScreen"
     var showEmptyTipDialog by remember {
@@ -62,6 +64,7 @@ fun CreateApplyQuestionScreen(
         question = question,
         onAdd = {
             KLog.i(TAG, "onAdd click.")
+            AppUserLogger.getInstance().log(Clicked.Confirm, from)
             if (it.isEmpty()) {
                 showEmptyTipDialog = true
             } else {
