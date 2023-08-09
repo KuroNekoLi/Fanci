@@ -93,7 +93,8 @@ fun StyleScreen(
                                 From.RoleName
                             } else {
                                 From.EditName
-                            }
+                            },
+                            textFieldFrom = from
                         )
                     )
                 }
