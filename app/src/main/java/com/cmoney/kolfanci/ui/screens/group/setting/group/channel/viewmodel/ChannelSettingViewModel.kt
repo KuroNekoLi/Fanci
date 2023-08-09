@@ -57,7 +57,7 @@ class ChannelSettingViewModel(
     var currentSelectedPermission: ChannelAccessOptionV2? = null
 
     //每個權限所勾選的人員/角色 清單, key = authType
-    private val listPermissionSelected: HashMap<ChannelAuthType, SelectedModel> = hashMapOf()
+    private val listPermissionSelected: MutableMap<ChannelAuthType, SelectedModel> = mutableMapOf()
 
     //預編輯的頻道
     var channel: Channel? = null
@@ -689,7 +689,7 @@ class ChannelSettingViewModel(
             val vipRoleList = listPermissionSelected.flatMap {
                 it.value.selectedVipPlans
             }.map {
-                it.id.orEmpty()
+                it.id
             }.distinct()
 
             val allRoleIds = roleList.union(vipRoleList).toList()
