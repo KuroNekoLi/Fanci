@@ -178,7 +178,8 @@ fun EditCategoryScreenView(
                                 toolbarTitle = "編輯分類",
                                 placeholderText = context.getString(R.string.input_category_name),
                                 emptyAlertTitle = context.getString(R.string.category_name_empty),
-                                emptyAlertSubTitle = context.getString(R.string.category_name_empty_desc)
+                                emptyAlertSubTitle = context.getString(R.string.category_name_empty_desc),
+                                from = From.EditCategoryName
                             )
                         )
                     }
