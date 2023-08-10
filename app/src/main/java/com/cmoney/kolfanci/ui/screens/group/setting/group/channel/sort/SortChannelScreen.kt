@@ -22,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +37,7 @@ import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.ui.common.CategoryText
 import com.cmoney.kolfanci.ui.common.ChannelText
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
@@ -46,7 +47,6 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -55,40 +55,33 @@ fun SortChannelScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
-    viewModel: ChannelSettingViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<Group>
+    viewModel: ChannelSettingViewModel = koinViewModel()
 ) {
+    val groupViewModel = globalGroupViewModel()
     val uiState = viewModel.uiState
-
-    val categoryList = if (uiState.group != null) {
-        uiState.group.categories.orEmpty()
-    } else {
+    val categoryList = if (uiState.group == null) {
         group.categories.orEmpty()
+    } else {
+        uiState.group.categories.orEmpty()
     }
 
-    key(uiState.group?.categories) {
-        SortChannelScreenView(
-            modifier = modifier,
-            navigator = navigator,
-            categoryList = categoryList,
-            moveCallback = {
-                viewModel.sortChannel(it)
-            },
-            onSave = {
-                viewModel.onSortCategoryOrChannel(
-                    group = group,
-                    categories = it
-                )
-            }
-        )
-    }
+    SortChannelScreenView(
+        modifier = modifier,
+        navigator = navigator,
+        categoryList = categoryList,
+        moveCallback = {
+            viewModel.sortChannel(it)
+        },
+        onSave = {
+            groupViewModel.updateCategories(it)
+            navigator.popBackStack()
+        }
+    )
 
-    if (uiState.group == null) {
-        viewModel.setGroup(group)
-    }
-
-    if (uiState.isSoredToServerComplete && uiState.group != null) {
-        resultNavigator.navigateBack(uiState.group)
+    LaunchedEffect(key1 = Unit) {
+        if (uiState.group == null) {
+            viewModel.setGroup(group)
+        }
     }
 }
 
@@ -161,9 +154,13 @@ private fun CategoryItem(
         modifier = modifier
             .background(LocalColor.current.background)
             .fillMaxSize()
-    ) { isInBound, moveItem, currentDropTargetPosition ->
+    ) { isInBound, moveItem, _, isDragging ->
 
-        val bgColor = if (isInBound) Color.DarkGray else LocalColor.current.background
+        val bgColor = if (isInBound && isDragging) {
+            Color.DarkGray
+        } else {
+            LocalColor.current.background
+        }
 
         Column(
             modifier = modifier

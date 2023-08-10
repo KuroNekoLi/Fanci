@@ -49,8 +49,6 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
@@ -64,28 +62,11 @@ fun ChannelSettingScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
-    viewModel: ChannelSettingViewModel = koinViewModel(),
-    sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
+    viewModel: ChannelSettingViewModel = koinViewModel()
 ) {
     val globalGroupViewModel = globalGroupViewModel()
     val uiState = viewModel.uiState
     val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
-//    uiState.group?.let {
-//        globalGroupViewModel.setCurrentGroup(it)
-//    }
-
-    //========== Result callback Start ==========
-    sortChannelResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-    //========== Result callback End ==========
     ChannelSettingScreenView(
         modifier = modifier,
         navigator = navigator,

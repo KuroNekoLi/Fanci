@@ -4,11 +4,16 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -45,7 +50,7 @@ fun <T> DragTarget(
                 currentState.dragPosition = currentPosition + it
                 currentState.draggableComposable = content
             }, onDrag = { change, dragAmount ->
-                change.consumeAllChanges()
+                change.consume()
                 currentState.dragOffset += Offset(dragAmount.x, dragAmount.y)
             }, onDragEnd = {
                 currentState.isDragging = false
@@ -108,7 +113,7 @@ fun LongPressDraggable(
 @Composable
 fun <T> DropTarget(
     modifier: Modifier,
-    content: @Composable() (BoxScope.(isInBound: Boolean, data: T?, currentDropTargetPosition: Offset) -> Unit)
+    content: @Composable() (BoxScope.(isInBound: Boolean, data: T?, currentDropTargetPosition: Offset, isDragging: Boolean) -> Unit)
 ) {
     val dragInfo = LocalDragTargetInfo.current
     val dragPosition = dragInfo.dragPosition
@@ -127,10 +132,14 @@ fun <T> DropTarget(
             isCurrentDropTarget = rect.contains(currentDropTargetPosition)
         }
     }) {
-        val data =
-            if (isCurrentDropTarget && !dragInfo.isDragging) dragInfo.dataToDrop as T? else null
+        val data = if (isCurrentDropTarget && !dragInfo.isDragging) {
+            @Suppress("UNCHECKED_CAST")
+            dragInfo.dataToDrop as? T
+        } else {
+            null
+        }
 
-        content(isCurrentDropTarget, data, currentDropTargetPosition)
+        content(isCurrentDropTarget, data, currentDropTargetPosition, dragInfo.isDragging)
 
         if (isCurrentDropTarget && !dragInfo.isDragging) {
             dragInfo.dataToDrop = null
