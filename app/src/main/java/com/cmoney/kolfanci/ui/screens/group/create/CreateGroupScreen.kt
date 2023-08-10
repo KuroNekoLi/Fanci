@@ -124,7 +124,8 @@ fun CreateGroupScreen(
         onAddQuestion = {
             navigator.navigate(
                 CreateApplyQuestionScreenDestination(
-                    keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
+                    keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName,
+                    from = From.CreateGroupAddQuestion
                 )
             )
         },
@@ -187,7 +188,8 @@ fun CreateGroupScreen(
                 AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.AddQuestion)
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
-                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
+                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName,
+                        from = From.CreateGroupAddQuestion
                     )
                 )
             },
@@ -213,7 +215,8 @@ fun CreateGroupScreen(
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
                         question = showEditDialog.value.second,
-                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName
+                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName,
+                        from = From.CreateGroupAddQuestion
                     )
                 )
                 showEditDialog.value = Pair(false, "")

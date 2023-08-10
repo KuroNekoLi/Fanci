@@ -128,7 +128,8 @@ fun GroupOpennessScreen(
         onAddQuestion = {
             navigator.navigate(
                 CreateApplyQuestionScreenDestination(
-                    keyinTracking = Clicked.QuestionTextArea.eventName
+                    keyinTracking = Clicked.QuestionTextArea.eventName,
+                    from = From.GroupSettingsAddQuestion
                 )
             )
             AppUserLogger.getInstance().log(Page.GroupSettingsGroupOpennessNonPublicReviewQuestionAddReviewQuestion)
@@ -149,7 +150,8 @@ fun GroupOpennessScreen(
             onAddTopic = {
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
-                        keyinTracking = Clicked.QuestionTextArea.eventName
+                        keyinTracking = Clicked.QuestionTextArea.eventName,
+                        from = From.GroupSettingsAddQuestion
                     )
                 )
             },
@@ -172,7 +174,8 @@ fun GroupOpennessScreen(
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
                         question = showEditDialog.value.second,
-                        keyinTracking = Clicked.QuestionTextArea.eventName
+                        keyinTracking = Clicked.QuestionTextArea.eventName,
+                        from = From.GroupSettingsAddQuestion
                     )
                 )
                 AppUserLogger.getInstance().log(Clicked.GroupOpennessManageEdit)

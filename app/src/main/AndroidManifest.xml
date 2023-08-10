@@ -47,7 +47,7 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                    android:host="fanci.com.tw"
+                    android:host="invite.fanci.com.tw"
                     android:path="/invite"
                     android:scheme="https" />
             </intent-filter>

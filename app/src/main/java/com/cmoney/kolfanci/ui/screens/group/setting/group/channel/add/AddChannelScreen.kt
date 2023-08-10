@@ -327,6 +327,7 @@ fun AddChannelScreenView(
                     backClick = onBack,
                     saveClick = {
                         KLog.i(TAG, "saveClick click.")
+                        AppUserLogger.getInstance().log(Clicked.Confirm, From.AddChannel)
                         onConfirm.invoke(channelName)
                     }
                 )
@@ -385,7 +386,14 @@ fun AddChannelScreenView(
                                         toolbarTitle = context.getString(R.string.channel_name),
                                         placeholderText = context.getString(R.string.input_channel_name),
                                         emptyAlertTitle = context.getString(R.string.channel_name_empty),
-                                        emptyAlertSubTitle = context.getString(R.string.channel_name_empty_desc)
+                                        emptyAlertSubTitle = context.getString(R.string.channel_name_empty_desc),
+                                        from = From.ChannelName,
+                                        textFieldClicked = Clicked.StyleChannelNameKeyIn,
+                                        textFieldFrom = if (isEditChannel) {
+                                            From.Edit
+                                        } else {
+                                            From.Create
+                                        }
                                     )
                                 )
                             },
@@ -695,7 +703,8 @@ private fun ManagerTabScreen(
             navigator.navigate(
                 ShareAddRoleScreenDestination(
                     group = group,
-                    existsRole = fanciRole.orEmpty().toTypedArray()
+                    existsRole = fanciRole.orEmpty().toTypedArray(),
+                    from = From.AdminAddRole
                 )
             )
         }

@@ -24,7 +24,7 @@ class DynamicLinkUseCase(private val notificationHelper: NotificationHelper) {
             "https://www.fanclub.com.tw/topic?targetType=1&groupId=$groupId"
         Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {
             link = Uri.parse(baseLink)
-            domainUriPrefix = "https://fanci.com.tw/invite"
+            domainUriPrefix = "https://invite.fanci.com.tw/invite"
             androidParameters(BuildConfig.APPLICATION_ID) {
             }
             iosParameters("CMoney.KOLfanci") {

@@ -38,6 +38,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.isVip
@@ -407,7 +408,8 @@ private fun MemberManageScreenView(
                                 navController.navigate(
                                     ShareAddRoleScreenDestination(
                                         group = group,
-                                        existsRole = it.toTypedArray()
+                                        existsRole = it.toTypedArray(),
+                                        from = From.AllMembersAddRole
                                     )
                                 )
                             }

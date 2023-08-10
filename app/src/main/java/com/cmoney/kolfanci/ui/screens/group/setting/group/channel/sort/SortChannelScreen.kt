@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,8 +37,11 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.CategoryText
 import com.cmoney.kolfanci.ui.common.ChannelText
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
@@ -57,7 +61,6 @@ fun SortChannelScreen(
     group: Group,
     viewModel: ChannelSettingViewModel = koinViewModel()
 ) {
-    val groupViewModel = globalGroupViewModel()
     val uiState = viewModel.uiState
     val categoryList = if (uiState.group == null) {
         group.categories.orEmpty()
@@ -65,18 +68,23 @@ fun SortChannelScreen(
         uiState.group.categories.orEmpty()
     }
 
-    SortChannelScreenView(
-        modifier = modifier,
-        navigator = navigator,
-        categoryList = categoryList,
-        moveCallback = {
-            viewModel.sortChannel(it)
-        },
-        onSave = {
-            groupViewModel.updateCategories(it)
-            navigator.popBackStack()
-        }
-    )
+    key(uiState.group?.categories) {
+        SortChannelScreenView(
+            modifier = modifier,
+            navigator = navigator,
+            categoryList = categoryList,
+            moveCallback = {
+                viewModel.sortChannel(it)
+            },
+            onSave = {
+                AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelOrder)
+                viewModel.onSortCategoryOrChannel(
+                    group = group,
+                    categories = it
+                )
+            }
+        )
+    }
 
     LaunchedEffect(key1 = Unit) {
         if (uiState.group == null) {

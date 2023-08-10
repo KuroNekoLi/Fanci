@@ -119,7 +119,7 @@ class ChannelSettingViewModel(
     /**
      * 取得 頻道角色清單
      */
-    private fun getChannelRole(channelId: String) {
+    fun getChannelRole(channelId: String) {
         uiState = uiState.copy(isLoading = true)
         viewModelScope.launch {
             channelUseCase.getChannelRole(channelId).fold({
@@ -381,5 +381,12 @@ class ChannelSettingViewModel(
                 KLog.e(TAG, it)
             })
         }
+    }
+
+    /**
+     * 紀錄 Tab
+     */
+    fun onTabSelected(position: Int) {
+        uiState = uiState.copy(tabSelected = position)
     }
 }

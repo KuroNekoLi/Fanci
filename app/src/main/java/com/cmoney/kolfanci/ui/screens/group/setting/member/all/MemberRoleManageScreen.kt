@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ShareAddRoleScreenDestination
@@ -198,7 +199,8 @@ private fun MemberRoleManageScreenView(
                         navController.navigate(
                             ShareAddRoleScreenDestination(
                                 group = group,
-                                existsRole = roleList.toTypedArray()
+                                existsRole = roleList.toTypedArray(),
+                                from = From.AddRole
                             )
                         )
                     }

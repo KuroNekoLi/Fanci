@@ -33,7 +33,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
@@ -108,6 +111,7 @@ private fun AddVipPlanScreenView(
                 backClick = onBack,
                 saveClick = {
                     KLog.i(TAG, "saveClick click.")
+                    AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelAddVIP)
                     onConfirm.invoke(selectedIndex)
                 }
             )

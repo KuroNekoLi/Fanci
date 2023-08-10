@@ -29,6 +29,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -208,7 +209,8 @@ private fun VipPlanInfoMainScreenView(
                                     toolbarTitle = context.getString(R.string.vip_name),
                                     placeholderText = context.getString(R.string.input_vip_name),
                                     emptyAlertTitle = context.getString(R.string.vip_name_empty),
-                                    emptyAlertSubTitle = context.getString(R.string.vip_name_empty_desc)
+                                    emptyAlertSubTitle = context.getString(R.string.vip_name_empty_desc),
+                                    from = From.VIPName
                                 )
                             )
                         }
