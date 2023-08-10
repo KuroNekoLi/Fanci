@@ -20,9 +20,11 @@ import com.cmoney.loginlibrary.di.memberProfileCacheModule
 import com.cmoney.loginlibrary.di.visitBindRepositoryModule
 import com.cmoney.loginlibrary.di.visitBindViewModelModule
 import com.cmoney.member.application.di.CMoneyMemberServiceLocator
+import com.cmoney.remoteconfig_library.IRemoteConfig
 import com.flurry.android.FlurryAgent
 import com.flurry.android.FlurryPerformance
 import com.google.firebase.FirebaseApp
+import com.socks.library.KLog
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
@@ -78,8 +80,13 @@ class MyApplication : Application() {
                 .build(this, getString(R.string.flurry_api_key))
         }
         // 設定Backend2
+        val remoteConfig = getKoin().get<IRemoteConfig>()
+        val cmServer = remoteConfig.getApiConfig().serverUrl.ifBlank {
+            BuildConfig.CM_SERVER_URL
+        }
+
         val globalBackend2Manager = getKoin().get<GlobalBackend2Manager>().apply {
-            setGlobalDomainUrl(BuildConfig.CM_SERVER_URL)
+            setGlobalDomainUrl(cmServer)
             setPlatform(Platform.Android)
             setClientId(getString(R.string.app_client_id))
             setAppId(resources.getInteger(R.integer.app_id))
