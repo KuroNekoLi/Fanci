@@ -140,7 +140,6 @@ fun EditInputScreenView(
 ) {
     var textState by remember { mutableStateOf(defaultText) }
     val maxLength = 20
-    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -149,8 +148,8 @@ fun EditInputScreenView(
             EditToolbarScreen(
                 title = toolbarTitle,
                 saveClick = {
-                    from?.run {
-                        AppUserLogger.getInstance().log(Clicked.Confirm, this)
+                    from?.let {
+                        AppUserLogger.getInstance().log(Clicked.Confirm, it)
                     }
 
                     if (textState.isEmpty()) {
