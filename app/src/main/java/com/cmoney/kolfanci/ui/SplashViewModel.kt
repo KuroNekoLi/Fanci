@@ -54,15 +54,6 @@ class SplashViewModel(
     fun checkDynamicLink(intent: Intent) {
         viewModelScope.launch {
             _intentPayload.value = dynamicLinkUseCase.getDynamicsLinksParam(intent)
-
-//            dynamicLinkUseCase.getDynamicsLinksParam(intent)?.let {
-//                _intentPayload.value = it
-////                MainActivity.start(this@SplashActivity, it)
-//            } ?: kotlin.run {
-////                delay(1500)
-////                startActivity<MainActivity>()
-//            }
-//            finish()
         }
     }
 
