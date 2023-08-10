@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +60,7 @@ fun SortChannelScreen(
     group: Group,
     viewModel: ChannelSettingViewModel = koinViewModel()
 ) {
+    val groupViewModel = globalGroupViewModel()
     val uiState = viewModel.uiState
     val categoryList = if (uiState.group == null) {
         group.categories.orEmpty()
@@ -68,23 +68,19 @@ fun SortChannelScreen(
         uiState.group.categories.orEmpty()
     }
 
-    key(uiState.group?.categories) {
-        SortChannelScreenView(
-            modifier = modifier,
-            navigator = navigator,
-            categoryList = categoryList,
-            moveCallback = {
-                viewModel.sortChannel(it)
-            },
-            onSave = {
-                AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelOrder)
-                viewModel.onSortCategoryOrChannel(
-                    group = group,
-                    categories = it
-                )
-            }
-        )
-    }
+    SortChannelScreenView(
+        modifier = modifier,
+        navigator = navigator,
+        categoryList = categoryList,
+        moveCallback = {
+            viewModel.sortChannel(it)
+        },
+        onSave = {
+            AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelOrder)
+            groupViewModel.updateCategories(it)
+            navigator.popBackStack()
+        }
+    )
 
     LaunchedEffect(key1 = Unit) {
         if (uiState.group == null) {
