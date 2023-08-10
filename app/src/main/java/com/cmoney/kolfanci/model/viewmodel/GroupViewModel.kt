@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.model.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
@@ -703,6 +704,72 @@ class GroupViewModel(
                     }
                     _currentGroup.update { oldGroup ->
                         oldGroup?.copy(categories = newCategory)
+                    }
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
+
+    /**
+     * 編輯 類別名稱
+     */
+    fun editCategory(category: Category, name: String) {
+        KLog.i(TAG, "editCategory")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            channelUseCase.editCategoryName(categoryId = category.id.orEmpty(), name = name).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    val newCategory = group.categories?.map { groupCategory ->
+                        if (groupCategory.id == category.id) {
+                            groupCategory.copy(name = name)
+                        } else {
+                            groupCategory
+                        }
+                    }
+                    _currentGroup.update { oldGroup ->
+                        oldGroup?.copy(
+                            categories = newCategory
+                        )
+                    }
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
+
+    /**
+     * 刪除 分類, 並將該分類下的頻道分配至 預設
+     */
+    fun deleteCategory(category: Category) {
+        KLog.i(TAG, "deleteCategory")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            channelUseCase.deleteCategory(categoryId = category.id.orEmpty()).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    val targetChannels = category.channels ?: emptyList()
+                    // 刪除分類
+                    val newCategories = group.categories?.filter { groupCategory ->
+                        groupCategory.id != category.id
+                    }
+                        // 將刪除分類下的頻道移至預設分類下
+                        ?.map { groupCategory ->
+                            if (groupCategory.isDefault == true) {
+                                val currentChannels = groupCategory.channels?.toMutableList() ?: mutableListOf()
+                                currentChannels.addAll(targetChannels)
+                                groupCategory.copy(
+                                    channels = currentChannels
+                                )
+                            } else {
+                                groupCategory
+                            }
+                        }
+                    _currentGroup.update { oldGroup ->
+                        oldGroup?.copy(categories = newCategories)
                     }
                 } else {
                     KLog.e(TAG, it)

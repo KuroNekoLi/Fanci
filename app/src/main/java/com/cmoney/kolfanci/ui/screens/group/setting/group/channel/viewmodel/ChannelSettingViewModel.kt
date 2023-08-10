@@ -27,7 +27,7 @@ data class UiState(
     val isLoading: Boolean = false,
     val group: Group? = null,
     var channelName: String = "",                    //頻道名稱
-    var categoryName: String = "",                   //分類名稱
+    val categoryName: String = "",                   //分類名稱
     val channelRole: List<FanciRole>? = null,        //目前頻道顯示角色List, 管理員
     val groupRoleList: List<AddChannelRoleModel> = emptyList(),
     val confirmRoleList: String = "",
@@ -137,76 +137,6 @@ class ChannelSettingViewModel(
      */
     fun setGroup(group: Group) {
         uiState = uiState.copy(group = group)
-    }
-
-    /**
-     * 編輯 類別名稱
-     */
-    fun editCategory(group: Group, category: Category, name: String) {
-        KLog.i(TAG, "editCategory")
-        viewModelScope.launch {
-            channelUseCase.editCategoryName(categoryId = category.id.orEmpty(), name = name).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    val newCategory = group.categories?.map { groupCategory ->
-                        if (groupCategory.id == category.id) {
-                            groupCategory.copy(name = name)
-                        } else {
-                            groupCategory
-                        }
-                    }
-
-                    uiState = uiState.copy(
-                        group = group.copy(
-                            categories = newCategory
-                        )
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
-            })
-
-        }
-    }
-
-    /**
-     * 刪除 分類, 並將該分類下的頻道分配至 預設
-     */
-    fun deleteCategory(group: Group, category: Category) {
-        KLog.i(TAG, "deleteCategory")
-        viewModelScope.launch {
-            channelUseCase.deleteCategory(categoryId = category.id.orEmpty()).fold({
-            }, {
-                if (it is EmptyBodyException) {
-
-                    var newCategory = group.categories?.filter { groupCategory ->
-                        groupCategory.id != category.id
-                    }
-
-                    //將刪除分類下的頻道移至預設分類下
-                    val channels = category.channels ?: emptyList()
-                    newCategory = newCategory?.map { category ->
-                        if (category.isDefault == true) {
-                            val newChannel = category.channels?.toMutableList() ?: mutableListOf()
-                            newChannel.addAll(channels)
-                            category.copy(
-                                channels = newChannel
-                            )
-                        } else {
-                            category
-                        }
-                    }
-
-                    uiState = uiState.copy(
-                        group = group.copy(
-                            categories = newCategory
-                        )
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
-            })
-        }
     }
 
     /**
