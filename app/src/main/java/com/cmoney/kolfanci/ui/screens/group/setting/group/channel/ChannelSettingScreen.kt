@@ -65,7 +65,6 @@ fun ChannelSettingScreen(
     navigator: DestinationsNavigator,
     group: Group,
     viewModel: ChannelSettingViewModel = koinViewModel(),
-    sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>,
     sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
 ) {
     val globalGroupViewModel = globalGroupViewModel()
@@ -77,17 +76,6 @@ fun ChannelSettingScreen(
 
     //========== Result callback Start ==========
     sortChannelResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-
-    sortCategoryResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }

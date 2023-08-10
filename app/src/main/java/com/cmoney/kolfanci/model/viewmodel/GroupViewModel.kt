@@ -13,6 +13,7 @@ import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
@@ -39,7 +40,8 @@ class GroupViewModel(
     private val themeUseCase: ThemeUseCase,
     private val groupUseCase: GroupUseCase,
     private val channelUseCase: ChannelUseCase,
-    private val permissionUseCase: PermissionUseCase
+    private val permissionUseCase: PermissionUseCase,
+    private val orderUseCase: OrderUseCase
 ) : ViewModel() {
     private val TAG = GroupViewModel::class.java.simpleName
 
@@ -770,6 +772,29 @@ class GroupViewModel(
                         }
                     _currentGroup.update { oldGroup ->
                         oldGroup?.copy(categories = newCategories)
+                    }
+                } else {
+                    KLog.e(TAG, it)
+                }
+            })
+        }
+    }
+
+    /**
+     * 儲存 分類排序
+     */
+    fun updateCategories(categories: List<Category>) {
+        val group = _currentGroup.value ?: return
+        KLog.i(TAG, "updateCategories: $categories")
+        viewModelScope.launch {
+            orderUseCase.orderCategoryOrChannel(
+                groupId = group.id.orEmpty(),
+                category = categories
+            ).fold({
+            }, {
+                if (it is EmptyBodyException) {
+                    _currentGroup.update { oldGroup ->
+                        oldGroup?.copy(categories = categories)
                     }
                 } else {
                     KLog.e(TAG, it)

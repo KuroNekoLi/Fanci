@@ -96,7 +96,8 @@ val viewModule = module {
             themeUseCase = get(),
             groupUseCase = get(),
             channelUseCase = get(),
-            permissionUseCase = get()
+            permissionUseCase = get(),
+            orderUseCase = get()
         )
     }
     viewModel { params ->
