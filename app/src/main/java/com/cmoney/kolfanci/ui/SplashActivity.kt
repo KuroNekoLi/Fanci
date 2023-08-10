@@ -7,7 +7,6 @@ import androidx.lifecycle.lifecycleScope
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.goAppStore
 import com.cmoney.kolfanci.extension.startActivity
-import com.cmoney.kolfanci.model.usecase.DynamicLinkUseCase
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.remoteconfig_library.model.config.AppStatus
 import kotlinx.coroutines.delay
