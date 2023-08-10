@@ -27,7 +27,7 @@ data class UiState(
     val isLoading: Boolean = false,
     val group: Group? = null,
     var channelName: String = "",                    //頻道名稱
-    var categoryName: String = "",                   //分類名稱
+    val categoryName: String = "",                   //分類名稱
     val channelRole: List<FanciRole>? = null,        //目前頻道顯示角色List, 管理員
     val groupRoleList: List<AddChannelRoleModel> = emptyList(),
     val confirmRoleList: String = "",
@@ -53,11 +53,13 @@ class ChannelSettingViewModel(
         private set
 
     var orgChannelRoleList = emptyList<FanciRole>() //原本頻道裡的角色清單
+        private set
 
     var currentSelectedPermission: ChannelAccessOptionV2? = null
 
     //每個權限所勾選的人員/角色 清單, key = authType
-    private val listPermissionSelected: HashMap<ChannelAuthType, SelectedModel> = hashMapOf()
+    private val _listPermissionSelected: MutableMap<ChannelAuthType, SelectedModel> = mutableMapOf()
+    val listPermissionSelected: Map<ChannelAuthType, SelectedModel> = _listPermissionSelected
 
     //預編輯的頻道
     var channel: Channel? = null
@@ -97,7 +99,7 @@ class ChannelSettingViewModel(
             ).fold({
                 it.filter { channelWhiteList -> channelWhiteList.authType != ChannelAuthType.noPermission }
                     .map { channelWhiteList ->
-                        listPermissionSelected[channelWhiteList.authType!!] = SelectedModel(
+                        _listPermissionSelected[channelWhiteList.authType!!] = SelectedModel(
                             selectedMember = channelWhiteList.users.orEmpty(),
                             selectedRole = channelWhiteList.roles.orEmpty(),
                             selectedVipPlans = channelWhiteList.vipRoles.orEmpty()
@@ -130,330 +132,11 @@ class ChannelSettingViewModel(
         }
     }
 
-
-    /**
-     * 新增 分類
-     * @param group 群組 要在此群組下建立
-     * @param name 分類名稱
-     */
-    fun addCategory(group: Group, name: String) {
-        KLog.i(TAG, "addCategory: $group, $name")
-        uiState = uiState.copy(
-            isLoading = true
-        )
-        viewModelScope.launch {
-            channelUseCase.addCategory(groupId = group.id.orEmpty(), name = name).fold({
-                val newCategoryList = group.categories.orEmpty().toMutableList()
-                newCategoryList.add(it)
-
-                val newGroup = group.copy(
-                    categories = newCategoryList
-                )
-
-                uiState = uiState.copy(
-                    isLoading = false, group = newGroup
-                )
-
-            }, {
-                KLog.e(TAG, it)
-                uiState = uiState.copy(
-                    isLoading = false
-                )
-            })
-        }
-    }
-
-    /**
-     * 新增 頻道
-     * @param group
-     * @param categoryId 分類id, 在此分類下建立
-     * @param name 頻道名稱
-     */
-    fun addChannel(group: Group, categoryId: String, name: String) {
-        KLog.i(TAG, "addChannel: $categoryId, $name")
-
-        viewModelScope.launch {
-            uiState = uiState.copy(
-                isLoading = true
-            )
-
-            val privacy = if (uiState.isNeedApproval) {
-                ChannelPrivacy.private
-            } else {
-                ChannelPrivacy.public
-            }
-
-            channelUseCase.addChannel(
-                categoryId = categoryId,
-                name = name,
-                privacy = privacy
-            ).fold({ channel ->
-                //新增管理員
-                if (uiState.channelRole?.isNotEmpty() == true) {
-                    editChannelRole(channel)
-                }
-
-                //私密頻道處理
-                if (privacy == ChannelPrivacy.private) {
-                    setPrivateChannelWhiteList(channelId = channel.id.orEmpty())
-                }
-
-                addChannelToGroup(channel, group)
-            }, {
-                KLog.e(TAG, it)
-                uiState = uiState.copy(
-                    isLoading = false
-                )
-            })
-        }
-    }
-
-    /**
-     * 設定 私密頻道 白名單
-     */
-    private suspend fun setPrivateChannelWhiteList(channelId: String) {
-        KLog.i(TAG, "setPrivateChannelWhiteList:$channelId")
-        listPermissionSelected.map {
-            val authType = it.key
-            val selectedModel = it.value
-            val job = viewModelScope.launch {
-                channelUseCase.putPrivateChannelWhiteList(
-                    channelId = channelId,
-                    authType = authType,
-                    accessorList = selectedModel.toAccessorList()
-                ).isSuccess
-            }
-            job.join()
-        }
-    }
-
-
-    /**
-     * 將新的 channel append 至 原本 group 做顯示
-     */
-    private fun addChannelToGroup(channel: Channel, group: Group) {
-        channel.category?.let { channelCategory ->
-            val newCategory = group.categories?.map { category ->
-                if (category.id == channelCategory.id) {
-                    val newChannel = category.channels.orEmpty().toMutableList()
-                    newChannel.add(channel)
-                    category.copy(
-                        channels = newChannel
-                    )
-                } else {
-                    category
-                }
-            }
-
-            uiState = uiState.copy(
-                group = group.copy(
-                    categories = newCategory
-                ), isLoading = false
-            )
-        }
-    }
-
     /**
      * 設定 group to ui display
      */
     fun setGroup(group: Group) {
         uiState = uiState.copy(group = group)
-    }
-
-    /**
-     * 編輯 頻道
-     * @param group 社團 model
-     * @param name 要更改的頻道名稱
-     */
-    fun editChannel(group: Group, name: String) {
-        KLog.i(TAG, "editChannel")
-        viewModelScope.launch {
-            channel?.let { channel ->
-                //私密頻道處理
-                if (uiState.isNeedApproval) {
-                    setPrivateChannelWhiteList(channelId = channel.id.orEmpty())
-                }
-
-                editChannelRole(channel)
-
-                editChannelName(group, channel, name)
-            }
-        }
-    }
-
-    /**
-     * 編輯 頻道 名稱
-     */
-    private fun editChannelName(group: Group, channel: Channel, name: String) {
-        KLog.i(TAG, "editChanelName")
-        viewModelScope.launch {
-            channelUseCase.editChannelName(
-                channelId = channel.id.orEmpty(),
-                name = name,
-                privacy = if (uiState.isNeedApproval) {
-                    ChannelPrivacy.private
-                } else {
-                    ChannelPrivacy.public
-                }
-            ).fold({}, {
-                if (it is EmptyBodyException) {
-                    val newCategory = group.categories?.map { category ->
-                        val newChannel = category.channels?.map { groupChannel ->
-                            if (channel.id == groupChannel.id) {
-                                channel.copy(
-                                    name = name
-                                )
-                            } else {
-                                groupChannel
-                            }
-                        }
-                        category.copy(
-                            channels = newChannel
-                        )
-                    }
-
-                    uiState = uiState.copy(
-                        group = group.copy(
-                            categories = newCategory
-                        )
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
-            })
-        }
-    }
-
-    /**
-     * 編輯 頻道 管理員
-     */
-    private suspend fun editChannelRole(channel: Channel) {
-        KLog.i(TAG, "editChannelRole")
-        val job1 = viewModelScope.launch {
-            //新增角色至channel
-            val addRoleList =
-                uiState.channelRole?.filter { !orgChannelRoleList.contains(it) }.orEmpty()
-            if (addRoleList.isNotEmpty()) {
-                val isSuccess = channelUseCase.addRoleToChannel(
-                    channelId = channel.id.orEmpty(),
-                    roleIds = addRoleList.map {
-                        it.id.orEmpty()
-                    }).getOrNull()
-                KLog.i(TAG, "editChannelRole addRole: $isSuccess")
-            }
-        }
-        job1.join()
-
-        val job2 = viewModelScope.launch {
-            //要移除的角色
-            val removeRoleList =
-                orgChannelRoleList.filter { !uiState.channelRole.orEmpty().contains(it) }
-            if (removeRoleList.isNotEmpty()) {
-                val isSuccess =
-                    channelUseCase.deleteRoleFromChannel(channelId = channel.id.orEmpty(),
-                        roleIds = removeRoleList.map {
-                            it.id.orEmpty()
-                        }).isSuccess
-                KLog.i(TAG, "editChannelRole removeRole: $isSuccess")
-            }
-        }
-        job2.join()
-    }
-
-    /**
-     * 刪除 頻道
-     */
-    fun deleteChannel(group: Group, channel: Channel) {
-        KLog.i(TAG, "deleteChannel:$channel")
-        viewModelScope.launch {
-            channelUseCase.deleteChannel(channel.id.orEmpty()).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    val newCategory = group.categories?.map { category ->
-                        category.copy(
-                            channels = category.channels?.filter { groupChannel ->
-                                groupChannel.id != channel.id
-                            }
-                        )
-                    }
-                    uiState = uiState.copy(
-                        group = group.copy(
-                            categories = newCategory
-                        )
-                    )
-                }
-            })
-        }
-    }
-
-    /**
-     * 編輯 類別名稱
-     */
-    fun editCategory(group: Group, category: Category, name: String) {
-        KLog.i(TAG, "editCategory")
-        viewModelScope.launch {
-            channelUseCase.editCategoryName(categoryId = category.id.orEmpty(), name = name).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    val newCategory = group.categories?.map { groupCategory ->
-                        if (groupCategory.id == category.id) {
-                            groupCategory.copy(name = name)
-                        } else {
-                            groupCategory
-                        }
-                    }
-
-                    uiState = uiState.copy(
-                        group = group.copy(
-                            categories = newCategory
-                        )
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
-            })
-
-        }
-    }
-
-    /**
-     * 刪除 分類, 並將該分類下的頻道分配至 預設
-     */
-    fun deleteCategory(group: Group, category: Category) {
-        KLog.i(TAG, "deleteCategory")
-        viewModelScope.launch {
-            channelUseCase.deleteCategory(categoryId = category.id.orEmpty()).fold({
-            }, {
-                if (it is EmptyBodyException) {
-
-                    var newCategory = group.categories?.filter { groupCategory ->
-                        groupCategory.id != category.id
-                    }
-
-                    //將刪除分類下的頻道移至預設分類下
-                    val channels = category.channels ?: emptyList()
-                    newCategory = newCategory?.map { category ->
-                        if (category.isDefault == true) {
-                            val newChannel = category.channels?.toMutableList() ?: mutableListOf()
-                            newChannel.addAll(channels)
-                            category.copy(
-                                channels = newChannel
-                            )
-                        } else {
-                            category
-                        }
-                    }
-
-                    uiState = uiState.copy(
-                        group = group.copy(
-                            categories = newCategory
-                        )
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
-            })
-        }
     }
 
     /**
@@ -468,13 +151,6 @@ class ChannelSettingViewModel(
         uiState = uiState.copy(
             channelRole = unionList
         )
-    }
-
-    /**
-     * 紀錄 Tab
-     */
-    fun onTabSelected(position: Int) {
-        uiState = uiState.copy(tabSelected = position)
     }
 
     /**
@@ -623,7 +299,7 @@ class ChannelSettingViewModel(
     fun setPermissionMemberSelected(selectedModel: SelectedModel) {
         KLog.i(TAG, "setPermissionMemberSelected:$selectedModel")
         currentSelectedPermission?.authType?.let { authType ->
-            listPermissionSelected[authType] = selectedModel
+            _listPermissionSelected[authType] = selectedModel
             currentSelectedPermission = null
             fetchPrivateChannelUserCount()
         }
@@ -636,7 +312,7 @@ class ChannelSettingViewModel(
         KLog.i(TAG, "onPermissionClick:$channelPermissionModel")
         currentSelectedPermission = channelPermissionModel
 
-        listPermissionSelected[channelPermissionModel.authType]?.let {
+        _listPermissionSelected[channelPermissionModel.authType]?.let {
             uiState = uiState.copy(
                 clickPermissionMemberModel = Pair(channelPermissionModel, it)
             )
@@ -674,22 +350,22 @@ class ChannelSettingViewModel(
     private fun fetchPrivateChannelUserCount() {
         KLog.i(TAG, "fetchPrivateChannelUserCount")
         viewModelScope.launch {
-            val userList = listPermissionSelected.flatMap {
+            val userList = _listPermissionSelected.flatMap {
                 it.value.selectedMember
             }.map {
                 it.id.orEmpty()
             }.distinct()
 
-            val roleList = listPermissionSelected.flatMap {
+            val roleList = _listPermissionSelected.flatMap {
                 it.value.selectedRole
             }.map {
                 it.id.orEmpty()
             }.distinct()
 
-            val vipRoleList = listPermissionSelected.flatMap {
+            val vipRoleList = _listPermissionSelected.flatMap {
                 it.value.selectedVipPlans
             }.map {
-                it.id.orEmpty()
+                it.id
             }.distinct()
 
             val allRoleIds = roleList.union(vipRoleList).toList()
@@ -705,5 +381,12 @@ class ChannelSettingViewModel(
                 KLog.e(TAG, it)
             })
         }
+    }
+
+    /**
+     * 紀錄 Tab
+     */
+    fun onTabSelected(position: Int) {
+        uiState = uiState.copy(tabSelected = position)
     }
 }

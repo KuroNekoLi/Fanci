@@ -92,7 +92,13 @@ val viewModule = module {
         PostInfoViewModel(androidApplication(), get(), get(), params.get(), params.get())
     }
     viewModel {
-        GroupViewModel(get(), get(), get())
+        GroupViewModel(
+            themeUseCase = get(),
+            groupUseCase = get(),
+            channelUseCase = get(),
+            permissionUseCase = get(),
+            orderUseCase = get()
+        )
     }
     viewModel { params ->
         VipManagerViewModel(

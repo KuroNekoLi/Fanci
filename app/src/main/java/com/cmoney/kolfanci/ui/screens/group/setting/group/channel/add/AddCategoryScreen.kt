@@ -14,6 +14,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -28,8 +30,10 @@ import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
@@ -39,7 +43,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
@@ -54,26 +57,26 @@ fun AddCategoryScreen(
     navigator: DestinationsNavigator,
     group: Group,
     viewModel: ChannelSettingViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<Group>,
+    groupViewModel: GroupViewModel = globalGroupViewModel(),
     editInputResult: ResultRecipient<EditInputScreenDestination, String>
 ) {
     val TAG = "AddCategoryScreen"
     val context = LocalContext.current
-
+    val currentGroup by groupViewModel.currentGroup.collectAsState()
     val textState = viewModel.uiState.categoryName
 
-    viewModel.uiState.group?.let {
+    if ((currentGroup?.categories?.size ?: 0) > (group.categories?.size ?: 0)) {
         KLog.i(TAG, "category add.")
-        resultNavigator.navigateBack(result = it)
+        navigator.popBackStack()
     }
 
     AddCategoryScreenView(
-        modifier,
-        navigator,
+        modifier = modifier,
+        navigator = navigator,
         textState = textState,
         onConfirm = {
             if (it.isNotEmpty()) {
-                viewModel.addCategory(group, it)
+                groupViewModel.addCategory(it)
             } else {
                 context.showToast("請輸入類別名稱")
             }

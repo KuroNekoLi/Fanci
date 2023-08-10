@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,56 +35,48 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
-import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
 fun SortCategoryScreen(
     modifier: Modifier = Modifier,
     group: Group,
-    navigator: DestinationsNavigator,
-    viewModel: ChannelSettingViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<Group>
+    navigator: DestinationsNavigator
 ) {
-    val uiState = viewModel.uiState
-
+    val groupViewModel = globalGroupViewModel()
     SortCategoryScreenView(
         modifier = modifier,
         navigator = navigator,
-        category = group.categories.orEmpty(),
+        categories = group.categories.orEmpty(),
         onSave = {
+            groupViewModel.updateCategories(it)
+            // TODO 目前不等待結果
+            navigator.popBackStack()
             AppUserLogger.getInstance().log(Clicked.Confirm, From.CategoryOrder)
-            viewModel.onSortCategoryOrChannel(group, it)
         }
     )
-
-    if (uiState.group != null) {
-        resultNavigator.navigateBack(uiState.group)
-    }
 }
 
 @Composable
 private fun SortCategoryScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    category: List<Category>,
+    categories: List<Category>,
     onSave: (List<Category>) -> Unit
 ) {
-    val data = remember { mutableStateOf(category.drop(1)) }
+    val data = remember { mutableStateOf(categories.drop(1)) }
     val state = rememberReorderableLazyListState(onMove = { from, to ->
         data.value = data.value.toMutableList().apply {
             add(to.index, removeAt(from.index))
@@ -101,7 +92,7 @@ private fun SortCategoryScreenView(
                 leadingIcon = Icons.Filled.ArrowBack,
                 saveClick = {
                     val newList = data.value.toMutableList()
-                    newList.add(0, category[0])
+                    newList.add(0, categories[0])
                     onSave.invoke(newList)
                 },
                 backClick = {
@@ -112,9 +103,9 @@ private fun SortCategoryScreenView(
     ) { padding ->
 
         Column(modifier = Modifier.padding(padding)) {
-            if (category.isNotEmpty()) {
+            if (categories.isNotEmpty()) {
                 CategoryItem(
-                    category = category.first(),
+                    category = categories.first(),
                     withSortIcon = false
                 )
 
@@ -198,7 +189,7 @@ fun SortCategoryScreenPreview() {
     FanciTheme {
         SortCategoryScreenView(
             navigator = EmptyDestinationsNavigator,
-            category = listOf(
+            categories = listOf(
                 Category(
                     name = "1"
                 ),
