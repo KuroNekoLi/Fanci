@@ -215,7 +215,7 @@ fun EditInputScreenView(
                         LaunchedEffect(interactionSource) {
                             interactionSource.interactions.collect {
                                 if (it is PressInteraction.Release) {
-                                    if (textFieldFrom != null && textFieldClicked != null) {
+                                    if (textFieldClicked != null) {
                                         AppUserLogger.getInstance()
                                             .log(textFieldClicked, textFieldFrom)
                                     }

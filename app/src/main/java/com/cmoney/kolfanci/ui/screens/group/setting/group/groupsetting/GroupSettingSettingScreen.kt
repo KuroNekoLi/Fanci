@@ -195,7 +195,8 @@ fun GroupSettingSettingView(
                                 placeholderText = context.getString(R.string.group_name_placeholder),
                                 emptyAlertTitle = context.getString(R.string.group_name_empty),
                                 emptyAlertSubTitle = context.getString(R.string.group_name_empty_desc),
-                                from = From.GroupName
+                                from = From.GroupName,
+                                textFieldClicked = Clicked.GroupNameName
                             )
                         )
                         with(AppUserLogger.getInstance()) {
