@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
@@ -65,6 +66,7 @@ fun VipPlanInfoEditChannelPermissionScreen(
         permissionModel = permissionModel,
         permissionOptionModels = permissionOptionModels,
         onSave = { index ->
+            AppUserLogger.getInstance().log(Clicked.Confirm, From.VIPPermissions)
             val option = permissionOptionModels[index]
             resultNavigator.navigateBack(
                 result = permissionModel.copy(

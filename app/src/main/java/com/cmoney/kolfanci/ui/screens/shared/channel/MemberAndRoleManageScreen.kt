@@ -92,6 +92,7 @@ fun MemberAndRoleManageScreen(
             }
 
             is NavResult.Value -> {
+                KLog.i("MemberAndRoleManageScreen", "addMemberResult result callback.")
                 val member = result.value
                 viewModel.addSelectedMember(member)
             }
@@ -304,7 +305,10 @@ private fun AddMemberListScreen(
                         AddMemberScreenDestination(
                             group = group,
                             excludeMember = member.toTypedArray(),
-                            title = "新增「%s」成員".format(title)
+                            title = "新增「%s」成員".format(title),
+                            clickFrom = From.RoleAddMember,
+                            searchClicked = Clicked.SearchMember,
+                            searchFrom = From.ChannelManagement
                         )
                     )
                 }
@@ -373,7 +377,8 @@ private fun AddRoleListScreen(
                             group = group,
                             title = "新增「%s」角色".format(title),
                             subTitle = "直接指定角色，讓一批成員進入私密頻道。",
-                            existsRole = roles.toTypedArray()
+                            existsRole = roles.toTypedArray(),
+                            from = From.ChannelAddRole
                         )
                     )
                 }

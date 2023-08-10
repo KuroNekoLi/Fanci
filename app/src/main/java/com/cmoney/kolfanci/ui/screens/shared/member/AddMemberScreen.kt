@@ -40,8 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.group.setting.member.all.SearchNoResultView
 import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.GroupMemberSelect
@@ -61,6 +64,9 @@ import org.koin.androidx.compose.koinViewModel
 
 /**
  * 搜尋所有成員畫面,並將勾選成員 callback
+ *
+ * @param clicked 紀錄log用
+ * @param from 紀錄log用
  */
 @Destination
 @Composable
@@ -73,7 +79,10 @@ fun AddMemberScreen(
     resultNavigator: ResultBackNavigator<String>,
     title: String = "新增成員",
     subTitle: String = "",
-    btnTitle: String = "新增"
+    btnTitle: String = "新增",
+    searchClicked: Clicked,
+    searchFrom: From,
+    clickFrom: From
 ) {
     val TAG = "AddMemberScreen"
 
@@ -90,6 +99,8 @@ fun AddMemberScreen(
             viewModel.onMemberClick(it)
         },
         onAddClick = {
+            AppUserLogger.getInstance().log(Clicked.Confirm, clickFrom)
+
             viewModel.onAddSelectedMember()
             resultNavigator.navigateBack(
                 result = viewModel.fetchSelectedMember()
@@ -99,6 +110,8 @@ fun AddMemberScreen(
             viewModel.onLoadMoreGroupMember(group.id.orEmpty())
         },
         onSearch = {
+            AppUserLogger.getInstance().log(searchClicked, from = searchFrom)
+
             viewModel.onSearchMember(
                 groupId = group.id.orEmpty(),
                 keyword = it

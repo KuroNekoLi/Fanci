@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
@@ -193,7 +194,9 @@ fun GroupSettingSettingView(
                                 toolbarTitle = context.getString(R.string.group_name),
                                 placeholderText = context.getString(R.string.group_name_placeholder),
                                 emptyAlertTitle = context.getString(R.string.group_name_empty),
-                                emptyAlertSubTitle = context.getString(R.string.group_name_empty_desc)
+                                emptyAlertSubTitle = context.getString(R.string.group_name_empty_desc),
+                                from = From.GroupName,
+                                textFieldClicked = Clicked.GroupNameName
                             )
                         )
                         with(AppUserLogger.getInstance()) {

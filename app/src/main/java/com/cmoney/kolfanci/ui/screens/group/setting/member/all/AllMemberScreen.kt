@@ -48,6 +48,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isVip
@@ -126,6 +127,8 @@ fun AllMemberScreen(
             it.groupMember
         },
         onSearch = {
+            AppUserLogger.getInstance().log(Clicked.SearchMember, From.AllMembers)
+
             viewModel.onSearchMember(
                 groupId = group.id.orEmpty(),
                 keyword = it

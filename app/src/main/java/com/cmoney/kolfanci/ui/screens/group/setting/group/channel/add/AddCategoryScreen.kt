@@ -112,6 +112,7 @@ fun AddCategoryScreenView(
                 },
                 saveClick = {
                     KLog.i(TAG, "saveClick click.")
+                    AppUserLogger.getInstance().log(Clicked.Confirm, From.AddCategory)
                     onConfirm.invoke(textState)
                 }
             )
@@ -146,7 +147,10 @@ fun AddCategoryScreenView(
                                 toolbarTitle = context.getString(R.string.category_name),
                                 placeholderText = context.getString(R.string.input_category_name),
                                 emptyAlertTitle = context.getString(R.string.category_name_empty),
-                                emptyAlertSubTitle = context.getString(R.string.category_name_empty_desc)
+                                emptyAlertSubTitle = context.getString(R.string.category_name_empty_desc),
+                                from = From.KeyinCategoryName,
+                                textFieldClicked = Clicked.CategoryNameNameKeyIn,
+                                textFieldFrom = From.Create
                             )
                         )
                     }
