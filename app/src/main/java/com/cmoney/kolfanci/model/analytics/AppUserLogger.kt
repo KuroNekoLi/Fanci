@@ -7,9 +7,9 @@ import com.cmoney.application_user_behavior.model.event.logClicked
 import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.xlogin.XLoginHelper
 import com.flurry.android.FlurryAgent
 import com.mixpanel.android.mpmetrics.MixpanelAPI
@@ -52,12 +52,21 @@ class AppUserLogger : KoinComponent {
         debugLog(event.name, event.getParameters())
     }
 
+    fun log(eventName: String, parameters: Map<String, Any>? = null) {
+        val event = OtherEvent(
+            eventName, parameters
+        )
+        logCM(eventName = eventName, descriptions = parameters)
+        debugLog(event.name, event.getParameters())
+    }
+
     class PageUserEvent(val page: String, parameters: Map<String, Any>? = null) : UserEvent() {
         override val name: String
             get() = page
+
         init {
             parameters?.let {
-                val ps = it.toList().map {(key, value) ->
+                val ps = it.toList().map { (key, value) ->
                     key to value.toString()
                 }.toTypedArray()
                 setParameters(*ps)
@@ -65,12 +74,29 @@ class AppUserLogger : KoinComponent {
         }
     }
 
-    class ClickedUserEvent(private val clicked: String, parameters: Map<String, Any>? = null) : UserEvent() {
+    class ClickedUserEvent(private val clicked: String, parameters: Map<String, Any>? = null) :
+        UserEvent() {
         override val name: String
             get() = clicked
+
         init {
             parameters?.let {
-                val ps = it.toList().map {(key, value) ->
+                val ps = it.toList().map { (key, value) ->
+                    key to value.toString()
+                }.toTypedArray()
+                setParameters(*ps)
+            }
+        }
+    }
+
+    class OtherEvent(private val eventName: String, parameters: Map<String, Any>? = null) :
+        UserEvent() {
+        override val name: String
+            get() = eventName
+
+        init {
+            parameters?.let {
+                val ps = it.toList().map { (key, value) ->
                     key to value.toString()
                 }.toTypedArray()
                 setParameters(*ps)
@@ -105,6 +131,16 @@ class AppUserLogger : KoinComponent {
     private fun logCM(clicked: Clicked, descriptions: Map<String, Any>? = null) {
         AnalyticsAgent.getInstance().logClicked(
             name = clicked.eventName,
+            descriptions = descriptions
+        )
+    }
+
+    /**
+     * Log to CMoney
+     */
+    private fun logCM(eventName: String, descriptions: Map<String, Any>? = null) {
+        AnalyticsAgent.getInstance().logEvent(
+            name = eventName,
             descriptions = descriptions
         )
     }
