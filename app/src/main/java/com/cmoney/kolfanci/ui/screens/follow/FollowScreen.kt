@@ -55,6 +55,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -272,6 +273,16 @@ fun FollowScreenView(
     val scaffoldState: ScaffoldState =
         rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
 
+    LaunchedEffect(key1 = scaffoldState) {
+        snapshotFlow {
+            scaffoldState.drawerState.currentValue
+        }.filter {
+            it == DrawerValue.Open
+        }.onEach {
+            AppUserLogger.getInstance().log("Home_NavigationBar_show")
+        }.collect()
+    }
+
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
@@ -409,7 +420,6 @@ fun FollowScreenView(
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(LocalColor.current.env_80)
                                     .clickable {
-                                        AppUserLogger.getInstance().log("Home_NavigationBar_show")
                                         //Open Drawer
                                         coroutineScope.launch {
                                             scaffoldState.drawerState.open()
@@ -440,7 +450,6 @@ fun FollowScreenView(
                                 )
                                 .width(65.dp)
                                 .clickable {
-                                    AppUserLogger.getInstance().log("Home_NavigationBar_show")
                                     //Open Drawer
                                     coroutineScope.launch {
                                         scaffoldState.drawerState.open()
