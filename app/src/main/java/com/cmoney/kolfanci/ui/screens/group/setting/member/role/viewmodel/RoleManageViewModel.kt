@@ -12,6 +12,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.PermissionCategory
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.google.gson.Gson
@@ -110,13 +111,32 @@ class RoleManageViewModel(
                 }
 
                 uiState = uiState.copy(
-                    permissionList = permissionList,
+                    permissionList = filterPermissionInAppReview(permissionList),
                     permissionSelected = permissionCheckedMap
                 )
             }, {
                 KLog.e(TAG, it)
             })
         }
+    }
+
+    /**
+     * App 審核中, 隱藏項目有 vip 相關資訊
+     */
+    private fun filterPermissionInAppReview(permissionList: List<PermissionCategory>): List<PermissionCategory> {
+        var filterPermission = permissionList
+
+        if (!Constant.isAppNotInReview()) {
+            filterPermission = permissionList.map { permissionCategory ->
+                permissionCategory.copy(
+                    permissions = permissionCategory.permissions?.filter { permissions ->
+                        permissions.name?.contains("vip", ignoreCase = true) == false
+                    }
+                )
+            }
+        }
+
+        return filterPermission
     }
 
     /**
@@ -437,7 +457,7 @@ class RoleManageViewModel(
                 uiState = uiState.copy(
                     roleName = fanciRole.name.orEmpty(),
                     roleColor = roleColor,
-                    permissionList = permissionList,
+                    permissionList = filterPermissionInAppReview(permissionList.orEmpty()),
                     permissionSelected = permissionCheckedMap.orEmpty(),
                     memberList = editMemberList
                 )

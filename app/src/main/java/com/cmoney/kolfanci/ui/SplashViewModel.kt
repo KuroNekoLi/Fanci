@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.backend2.base.model.manager.GlobalBackend2Manager
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.usecase.DynamicLinkUseCase
 import com.cmoney.remoteconfig_library.IRemoteConfig
@@ -29,6 +30,8 @@ class SplashViewModel(
     private val _intentPayload = MutableLiveData<Payload?>()
     val intentPayload: LiveData<Payload?> = _intentPayload
 
+    private val FETCH_INTERVAL = 900L
+
     init {
         fetchRemoteConfig()
     }
@@ -36,8 +39,14 @@ class SplashViewModel(
     private fun fetchRemoteConfig() {
         viewModelScope.launch {
             val remoteConfigSetting =
-                RemoteConfigSettingImpl(BuildConfig.VERSION_CODE, R.xml.remote_config_defaults)
+                RemoteConfigSettingImpl(
+                    appVersionCode = BuildConfig.VERSION_CODE,
+                    defaultXml = R.xml.remote_config_defaults,
+                    minimumFetchIntervalInSeconds = if (BuildConfig.DEBUG) 0 else FETCH_INTERVAL
+                )
+            
             val updateResult = remoteConfig.updateAppConfig(remoteConfigSetting)
+
             updateResult.fold({ fetchAndActivateResult ->
                 KLog.i(TAG, fetchAndActivateResult)
                 applyAppConfig(appConfig = fetchAndActivateResult.appConfig)
