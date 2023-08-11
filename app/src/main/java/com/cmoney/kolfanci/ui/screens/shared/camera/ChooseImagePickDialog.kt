@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.shared.camera
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -22,15 +21,11 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.socks.library.KLog
 
 /**
  * 附加圖片 Dialog
  */
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ChooseImagePickDialog(
     onDismiss: () -> Unit,
@@ -64,12 +59,6 @@ fun ChooseImagePickDialog(
         captureResult.launch(captureIntent)
     }
 
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
-        if (granted) {
-            startCameraPicker()
-        }
-    }
-
     val choosePhotoResult =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
@@ -94,13 +83,6 @@ fun ChooseImagePickDialog(
         choosePhotoResult.launch(intent)
     }
 
-    val externalPermissionState =
-        rememberPermissionState(Manifest.permission.READ_EXTERNAL_STORAGE) { granted ->
-            if (granted) {
-                startImagePicker()
-            }
-        }
-
     AlertDialog(
         backgroundColor = LocalColor.current.env_80,
         onDismissRequest = { onDismiss.invoke() },
@@ -111,11 +93,7 @@ fun ChooseImagePickDialog(
                     .padding(start = 10.dp, top = 10.dp, end = 10.dp)
                     .fillMaxWidth(),
                 onClick = {
-                    if (cameraPermissionState.status.isGranted) {
-                        startCameraPicker()
-                    } else {
-                        cameraPermissionState.launchPermissionRequest()
-                    }
+                    startCameraPicker()
                 }) {
                 Text("打開相機", fontSize = 17.sp, color = Color.White)
             }
@@ -127,11 +105,7 @@ fun ChooseImagePickDialog(
                     .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                     .fillMaxWidth(),
                 onClick = {
-                    if (externalPermissionState.status.isGranted) {
-                        startImagePicker()
-                    } else {
-                        externalPermissionState.launchPermissionRequest()
-                    }
+                    startImagePicker()
                 }) {
                 Text("從相簿中選取圖片", fontSize = 17.sp, color = Color.White)
             }
