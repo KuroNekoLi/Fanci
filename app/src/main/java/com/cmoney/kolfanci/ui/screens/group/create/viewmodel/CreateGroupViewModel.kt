@@ -8,13 +8,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.imagelibrary.UploadImage
-import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
+import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.theme.FanciColor
-import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,7 +31,8 @@ data class UiState(
 class CreateGroupViewModel(
     val context: Application,
     val groupUseCase: GroupUseCase,
-    val themeUseCase: ThemeUseCase
+    private val themeUseCase: ThemeUseCase,
+    val uploadImageUseCase: UploadImageUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = CreateGroupViewModel::class.java.simpleName
@@ -113,15 +112,7 @@ class CreateGroupViewModel(
             var imageUrl = data.url.orEmpty()
             if (data.uri != null) {
                 imageUrl = withContext(Dispatchers.IO) {
-                    val uploadImage =
-                        UploadImage(
-                            context,
-                            listOf(data.uri),
-                            XLoginHelper.accessToken,
-                            BuildConfig.DEBUG
-                        )
-
-                    val uploadResult = uploadImage.upload().first()
+                    val uploadResult = uploadImageUseCase.uploadImage(listOf(data.uri)).first()
                     uploadResult.second
                 }
             }
@@ -141,15 +132,7 @@ class CreateGroupViewModel(
             var imageUrl = data.url.orEmpty()
             if (data.uri != null) {
                 imageUrl = withContext(Dispatchers.IO) {
-                    val uploadImage =
-                        UploadImage(
-                            context,
-                            listOf(data.uri),
-                            XLoginHelper.accessToken,
-                            BuildConfig.DEBUG
-                        )
-
-                    val uploadResult = uploadImage.upload().first()
+                    val uploadResult = uploadImageUseCase.uploadImage(listOf(data.uri)).first()
                     uploadResult.second
                 }
             }
