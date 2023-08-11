@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+  <entry>
+    <key>vipServerUrl</key>
+    <value>https://www.cmoney.tw/</value>
+  </entry>
+  <entry>
+    <key>vipServerPushUrl</key>
+    <value>https://www.cmoney.tw/</value>
+  </entry>
+  <entry>
+    <key>serverUrl</key>
+    <value>https://www.cmoney.tw/</value>
+  </entry>
+  <entry>
+    <key>serverPushUrl</key>
+    <value>https://www.cmoney.tw/</value>
+  </entry>
+  <entry>
+    <key>statusAnnouncement</key>
+    <value />
+  </entry>
+  <entry>
+    <key>appStatus</key>
+    <value>1</value>
+  </entry>
+  <entry>
+    <key>baseDomain</key>
+    <value>https://fanci.cmoney.tw/fanci/</value>
+  </entry>
+</defaults>

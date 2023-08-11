@@ -189,4 +189,14 @@
     <string name="copy_success">已複製信箱</string>
     <string name="select_all">全選</string>
     <string name="unselect_all">取消全選</string>
+
+    <!-- Remote Config text  -->
+    <string name="text_remote_config_update_title">系統更新通知</string>
+    <string name="text_remote_config_under_maintain_title">系統維護中</string>
+    <string name="text_remote_config_under_maintain_confirm_button">暫時離開，稍後回來</string>
+    <string name="text_remote_config_under_review_title">審核中</string>
+    <string name="text_remote_config_under_review_message">目前應用程式審核中，請等待審核通過，至商店更新應用程式後再重新開啟。</string>
+    <string name="update_immediately">立即更新</string>
+    <string name="later">稍後</string>
+
 </resources>

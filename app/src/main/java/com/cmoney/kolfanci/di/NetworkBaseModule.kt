@@ -7,6 +7,9 @@ import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.repository.interceptor.AddBearerTokenInterceptor
 import com.cmoney.fanciapi.fanci.api.*
 import com.cmoney.fanciapi.infrastructure.ApiClient
+import com.cmoney.kolfanci.model.remoteconfig.BaseDomainKey
+import com.cmoney.remoteconfig_library.extension.getKeyValue
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.GsonBuilder
 import okhttp3.Cache
 import okhttp3.ConnectionSpec
@@ -123,7 +126,10 @@ val networkBaseModule = module {
 }
 
 private fun getDomain(): String {
-    return BuildConfig.FANCI_SERVER_URL
+    val baseDomain = FirebaseRemoteConfig.getInstance().getKeyValue(BaseDomainKey).ifBlank {
+        BuildConfig.FANCI_SERVER_URL
+    }
+    return baseDomain
 }
 
 private fun createOkHttpClient(
