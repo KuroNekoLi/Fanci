@@ -409,6 +409,7 @@ fun FollowScreenView(
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(LocalColor.current.env_80)
                                     .clickable {
+                                        AppUserLogger.getInstance().log("Home_NavigationBar_show")
                                         //Open Drawer
                                         coroutineScope.launch {
                                             scaffoldState.drawerState.open()
@@ -439,6 +440,7 @@ fun FollowScreenView(
                                 )
                                 .width(65.dp)
                                 .clickable {
+                                    AppUserLogger.getInstance().log("Home_NavigationBar_show")
                                     //Open Drawer
                                     coroutineScope.launch {
                                         scaffoldState.drawerState.open()

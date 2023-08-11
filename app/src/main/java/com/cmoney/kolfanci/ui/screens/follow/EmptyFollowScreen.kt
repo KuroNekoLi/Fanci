@@ -60,6 +60,7 @@ fun EmptyFollowScreen(
         modifier = modifier,
         groupList = groupList,
         onJoinClick = {
+            AppUserLogger.getInstance().log(Clicked.HomeNotJoinGroupGroup)
             viewModel.openGroupItemDialog(it)
         },
         onCreateClick = {
