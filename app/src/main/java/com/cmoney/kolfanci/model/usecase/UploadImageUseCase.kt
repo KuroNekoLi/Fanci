@@ -72,9 +72,9 @@ class UploadImageUseCase(
             inputStream.close()
             outputStream.close()
         } catch (e: FileNotFoundException) {
-            e.printStackTrace()
+            KLog.e(TAG, e)
         } catch (e: IOException) {
-            e.printStackTrace()
+            KLog.e(TAG, e)
         } finally {
             tempFile?.deleteOnExit()
         }
