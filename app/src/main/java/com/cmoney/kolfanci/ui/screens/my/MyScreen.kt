@@ -87,7 +87,7 @@ fun MyScreen(
             )
 
             //購買的vip方案
-            if (vipPlan.isNotEmpty()) {
+            if (vipPlan.isNotEmpty() && !Constant.isAppInReview()) {
                 PurchaseVipPlanScreen(
                     modifier = Modifier.padding(top = 15.dp),
                     vipPlanList = vipPlan,

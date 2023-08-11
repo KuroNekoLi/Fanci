@@ -33,6 +33,7 @@ import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -179,7 +180,11 @@ private fun MemberAndRoleManageScreenView(
     onVipPlanRemoveClick: (VipPlanModel) -> Unit,
     onBackClick: () -> Unit
 ) {
-    val list = listOf("成員", "角色", stringResource(id = R.string.vip_plan))
+    val list = if (Constant.isAppInReview()) {
+        listOf("成員", "角色")
+    } else {
+        listOf("成員", "角色", stringResource(id = R.string.vip_plan))
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

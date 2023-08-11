@@ -301,25 +301,27 @@ private fun MemberManageScreenView(
             }
 
             //購買的VIP方案
-            item {
-                if (purchasesPlan.isNotEmpty()) {
-                    Text(
-                        modifier = Modifier.padding(top = 20.dp, start = 24.dp, bottom = 10.dp),
-                        text = stringResource(id = R.string.already_purchases_plan),
-                        fontSize = 14.sp,
-                        color = LocalColor.current.text.default_80
-                    )
+            if (!Constant.isAppInReview()) {
+                item {
+                    if (purchasesPlan.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier.padding(top = 20.dp, start = 24.dp, bottom = 10.dp),
+                            text = stringResource(id = R.string.already_purchases_plan),
+                            fontSize = 14.sp,
+                            color = LocalColor.current.text.default_80
+                        )
+                    }
                 }
-            }
 
-            items(purchasesPlan) { plan ->
-                VipPlanItemScreen(
-                    modifier = Modifier.fillMaxWidth(),
-                    vipPlanModel = plan,
-                    subTitle = plan.description,
-                    endContent = null
-                )
-                Spacer(modifier = Modifier.height(1.dp))
+                items(purchasesPlan) { plan ->
+                    VipPlanItemScreen(
+                        modifier = Modifier.fillMaxWidth(),
+                        vipPlanModel = plan,
+                        subTitle = plan.description,
+                        endContent = null
+                    )
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
             }
 
             //身份組

@@ -75,7 +75,7 @@ class SplashActivity : AppCompatActivity() {
                         .setTitle(getString(R.string.text_remote_config_under_review_title))
                         .setMessage(getString(R.string.text_remote_config_under_review_message))
                         .setPositiveButton(getString(R.string.confirm)) { _, _ ->
-                            finish()
+                            viewModel.checkDynamicLink(intent)
                         }
                         .create()
                         .show()
