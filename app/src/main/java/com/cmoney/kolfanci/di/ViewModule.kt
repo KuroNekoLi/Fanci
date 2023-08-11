@@ -37,7 +37,7 @@ val viewModule = module {
     viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { FollowViewModel(get()) }
     viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
-    viewModel { MessageViewModel(androidApplication(), get(), get(), get()) }
+    viewModel { MessageViewModel(androidApplication(), get(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get()) }
     viewModel { GroupSettingViewModel(get(), get(), get()) }
 
@@ -56,7 +56,7 @@ val viewModule = module {
         )
     }
     viewModel {
-        CreateGroupViewModel(androidApplication(), get(), get())
+        CreateGroupViewModel(androidApplication(), get(), get(), get())
     }
     viewModel { ApplyForGroupViewModel(get(), get()) }
     viewModel { params ->
@@ -84,14 +84,15 @@ val viewModule = module {
             androidApplication(),
             get(),
             get(),
-            params.get()
+            params.get(),
+            get()
         )
     }
     viewModel {
         ChannelViewModel(get())
     }
     viewModel { params ->
-        PostInfoViewModel(androidApplication(), get(), get(), params.get(), params.get())
+        PostInfoViewModel(androidApplication(), get(), get(), params.get(), params.get(), get())
     }
     viewModel {
         GroupViewModel(
