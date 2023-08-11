@@ -180,10 +180,10 @@ private fun MemberAndRoleManageScreenView(
     onVipPlanRemoveClick: (VipPlanModel) -> Unit,
     onBackClick: () -> Unit
 ) {
-    val list = if (Constant.isAppInReview()) {
-        listOf("成員", "角色")
-    } else {
+    val list = if (Constant.isAppNotInReview()) {
         listOf("成員", "角色", stringResource(id = R.string.vip_plan))
+    } else {
+        listOf("成員", "角色")
     }
 
     Scaffold(

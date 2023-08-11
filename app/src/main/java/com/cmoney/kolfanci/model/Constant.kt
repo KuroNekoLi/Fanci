@@ -5,12 +5,11 @@ import com.cmoney.fanciapi.fanci.model.GroupPermission
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.fanciapi.fanci.model.UserBuffInformation
 import com.cmoney.kolfanci.R
+import com.cmoney.remoteconfig_library.IRemoteConfig
 import com.cmoney.remoteconfig_library.model.config.AppStatus
+import org.koin.core.context.GlobalContext
 
 object Constant {
-
-    //目前 App remote config 狀態
-    var AppStatus: AppStatus? = null
 
     //我的個人資訊
     var MyInfo: User? = null
@@ -57,22 +56,21 @@ object Constant {
     var MyChannelBuff: UserBuffInformation = UserBuffInformation()
 
     /**
-     * 目前 app 是否為 審核中
+     * 目前 app 是否不是審核中
+     *
      */
-    fun isAppInReview(): Boolean =
-        AppStatus?.let { appStatus ->
-            when (appStatus) {
-                is AppStatus.IsUnderReview -> true
-                else -> false
-            }
-        } ?: kotlin.run {
-            false
+    fun isAppNotInReview(): Boolean {
+        val iRemoteConfig = GlobalContext.get().get<IRemoteConfig>()
+        return when (iRemoteConfig.getAppStatus()) {
+            is AppStatus.IsUnderReview -> false
+            else -> true
         }
+    }
 
     /**
      * 是否可以管理 vip 方案
      */
-    fun isShowVipManager(): Boolean = (MyGroupPermission.editVipRole == true && !isAppInReview())
+    fun isShowVipManager(): Boolean = (MyGroupPermission.editVipRole == true && isAppNotInReview())
 
     /**
      * 是否可以管理 加入申請

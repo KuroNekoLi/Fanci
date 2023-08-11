@@ -126,7 +126,7 @@ class RoleManageViewModel(
     private fun filterPermissionInAppReview(permissionList: List<PermissionCategory>): List<PermissionCategory> {
         var filterPermission = permissionList
 
-        if (Constant.isAppInReview()) {
+        if (!Constant.isAppNotInReview()) {
             filterPermission = permissionList.map { permissionCategory ->
                 permissionCategory.copy(
                     permissions = permissionCategory.permissions?.filter { permissions ->

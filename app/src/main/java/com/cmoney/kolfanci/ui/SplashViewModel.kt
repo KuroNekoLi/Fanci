@@ -50,7 +50,6 @@ class SplashViewModel(
             updateResult.fold({ fetchAndActivateResult ->
                 KLog.i(TAG, fetchAndActivateResult)
                 applyAppConfig(appConfig = fetchAndActivateResult.appConfig)
-                Constant.AppStatus = fetchAndActivateResult.appConfig.appStatus
                 _appConfig.value = fetchAndActivateResult.appConfig
             }, { exception ->
                 KLog.e(TAG, exception)

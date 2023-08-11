@@ -301,7 +301,7 @@ private fun MemberManageScreenView(
             }
 
             //購買的VIP方案
-            if (!Constant.isAppInReview()) {
+            if (Constant.isAppNotInReview()) {
                 item {
                     if (purchasesPlan.isNotEmpty()) {
                         Text(
