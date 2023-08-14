@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.model.analytics.data
 
+@Deprecated("改為使用 fancilog module")
 /**
  * 頁面
  *

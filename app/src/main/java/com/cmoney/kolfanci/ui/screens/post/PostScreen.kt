@@ -42,12 +42,14 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
@@ -137,6 +139,7 @@ fun PostScreen(
                     channelId = channel.id.orEmpty()
                 )
             )
+            AppUserLogger.getInstance().log(Page.PublishPost)
         },
         onMoreClick = { post ->
             context.findActivity().showPostMoreActionDialogBottomSheet(
@@ -164,6 +167,7 @@ fun PostScreen(
                                     editPost = post
                                 )
                             )
+                            AppUserLogger.getInstance().log(Page.EditPost)
                         }
 
                         is PostInteract.Report -> {

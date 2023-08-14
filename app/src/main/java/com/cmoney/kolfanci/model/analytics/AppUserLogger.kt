@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.model.analytics
 import android.util.Log
 import com.cmoney.analytics.user.model.event.UserEvent
 import com.cmoney.application_user_behavior.AnalyticsAgent
+import com.cmoney.application_user_behavior.model.event.logPageSwitch
 import com.cmoney.application_user_behavior.model.event.logPageViewed
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.Constant

@@ -45,6 +45,8 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditChannelOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
@@ -167,6 +169,9 @@ fun AddChannelScreen(
     //點擊的權限
     uiState.clickPermissionMemberModel?.let {
         KLog.i(TAG, "clickPermissionMemberModel:$it")
+        AppUserLogger.getInstance()
+            .log(Page.GroupSettingsChannelManagementPermissionsPrivateMembers)
+
         navigator.navigate(
             MemberAndRoleManageScreenDestination(
                 group = group,
@@ -238,6 +243,16 @@ fun AddChannelScreen(
         }
     }
     //========== Result callback End ==========
+
+    if (channel != null) {
+        LaunchedEffect(key1 = group) {
+            AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementEditChannel)
+        }
+    } else {
+        LaunchedEffect(key1 = group) {
+            AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementAddChannel)
+        }
+    }
 }
 
 @Composable
@@ -280,8 +295,7 @@ fun AddChannelScreenView(
                         onConfirm.invoke(channelName)
                     }
                 )
-            }
-            else {
+            } else {
                 EditToolbarScreen(
                     title = stringResource(id = R.string.add_channel),
                     backClick = onBack,
@@ -324,6 +338,9 @@ fun AddChannelScreenView(
                             channelName,
                             withDelete,
                             onChannelNameClick = {
+                                AppUserLogger.getInstance()
+                                    .log(Page.GroupSettingsChannelManagementStyleChannelName)
+
                                 navigator.navigate(
                                     EditInputScreenDestination(
                                         defaultText = channelName,
@@ -336,6 +353,11 @@ fun AddChannelScreenView(
                             },
                             onDeleteClick = onDeleteClick
                         )
+
+                        LaunchedEffect(key1 = selectedIndex) {
+                            AppUserLogger.getInstance()
+                                .log(Page.GroupSettingsChannelManagementStyle)
+                        }
                     }
                     //權限
                     1 -> {
@@ -345,6 +367,11 @@ fun AddChannelScreenView(
                             channelPermissionModel = channelAccessTypeList,
                             onPermissionClick = onPermissionClick
                         )
+
+                        LaunchedEffect(key1 = selectedIndex) {
+                            AppUserLogger.getInstance()
+                                .log(Page.GroupSettingsChannelManagementPermissions)
+                        }
                     }
                     //管理員
                     2 -> {
@@ -626,6 +653,8 @@ private fun ManagerTabScreen(
             text = stringResource(id = R.string.add_role),
             borderColor = Color.White
         ) {
+            AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementAdminAddRole)
+
             navigator.navigate(
                 ShareAddRoleScreenDestination(
                     group = group,
@@ -652,6 +681,10 @@ private fun ManagerTabScreen(
                 Spacer(modifier = Modifier.height(1.dp))
             }
         }
+    }
+
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementAdmin)
     }
 }
 

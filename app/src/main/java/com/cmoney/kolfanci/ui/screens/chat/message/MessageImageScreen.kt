@@ -27,7 +27,8 @@ fun MessageImageScreen(
     images: List<Any>,
     modifier: Modifier = Modifier,
     isShowLoading: Boolean = false,
-    isClickable: Boolean = true
+    isClickable: Boolean = true,
+    onImageClick: (() -> Unit)? = null
 ) {
     val TAG = "MessageImageScreen"
     val context = LocalContext.current
@@ -38,7 +39,7 @@ fun MessageImageScreen(
             .clip(RoundedCornerShape(10.dp))
             .clickable(enabled = isClickable) {
                 KLog.i(TAG, "image click.")
-
+                onImageClick?.invoke()
                 StfalconImageViewer
                     .Builder(
                         context, images
@@ -182,6 +183,7 @@ fun MessageImageScreenPreview() {
             "https://picsum.photos/300/300",
             "https://picsum.photos/300/300",
             "https://picsum.photos/300/300"
-        )
+        ),
+        onImageClick = {}
     )
 }

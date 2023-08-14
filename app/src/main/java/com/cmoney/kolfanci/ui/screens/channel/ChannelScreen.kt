@@ -28,8 +28,10 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
@@ -210,6 +212,10 @@ private fun ChannelScreenView(
                                 resultRecipient = editPostResultRecipient,
                                 postInfoResultRecipient = postInfoResultRecipient
                             )
+
+                            LaunchedEffect(key1 = page) {
+                                AppUserLogger.getInstance().log(Page.PostWall)
+                            }
                         }
                     }
                 }

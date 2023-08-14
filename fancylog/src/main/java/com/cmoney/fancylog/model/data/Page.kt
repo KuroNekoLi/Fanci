@@ -97,6 +97,11 @@ sealed class Page(val eventName: String) {
     object PublishPost : Page(eventName = "PublishPost")
 
     /**
+     * 編輯貼文_觀看
+     */
+    object EditPost : Page(eventName = "EditPost")
+
+    /**
      * 貼文.圖片_觀看
      */
     object PostImage : Page(eventName = "Post.Image")
@@ -215,6 +220,11 @@ sealed class Page(val eventName: String) {
      * 社團.設定.頻道管理.樣式.頻道名稱_觀看
      */
     object GroupSettingsChannelManagementStyleChannelName : Page(eventName = "Group.Settings.ChannelManagement.Style.ChannelName")
+
+    /**
+     * 社團.設定.頻道管理.權限_觀看
+     */
+    object GroupSettingsChannelManagementPermissions : Page(eventName = "Group.Settings.ChannelManagement.Permissions")
 
     /**
      * 社團.設定.頻道管理.權限.公開度_觀看
