@@ -29,7 +29,12 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
@@ -65,6 +70,7 @@ fun MemberAndRoleManageScreen(
     group: Group,
     topBarTitle: String,
     selectedModel: SelectedModel,
+    from: From,
     viewModel: MemberViewModel = koinViewModel(),
     addMemberResult: ResultRecipient<AddMemberScreenDestination, String>,
     addRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
@@ -87,6 +93,7 @@ fun MemberAndRoleManageScreen(
             }
 
             is NavResult.Value -> {
+                KLog.i("MemberAndRoleManageScreen", "addMemberResult result callback.")
                 val member = result.value
                 viewModel.addSelectedMember(member)
             }
@@ -132,6 +139,7 @@ fun MemberAndRoleManageScreen(
         selectedMember = selectedMember,
         selectedRole = uiState.selectedRole,
         selectedVipPlanModels = uiState.selectedVipPlanModels,
+        from = from,
         onTabClick = {
             viewModel.onTabClick(it)
         },
@@ -165,13 +173,18 @@ private fun MemberAndRoleManageScreenView(
     selectedMember: List<GroupMember>,
     selectedRole: List<FanciRole>,
     selectedVipPlanModels: List<VipPlanModel>,
+    from: From,
     onTabClick: (Int) -> Unit,
     onRemoveClick: (GroupMember) -> Unit,
     onRoleRemoveClick: (FanciRole) -> Unit,
     onVipPlanRemoveClick: (VipPlanModel) -> Unit,
     onBackClick: () -> Unit
 ) {
-    val list = listOf("成員", "角色", stringResource(id = R.string.vip_plan))
+    val list = if (Constant.isAppNotInReview()) {
+        listOf("成員", "角色", stringResource(id = R.string.vip_plan))
+    } else {
+        listOf("成員", "角色")
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -198,6 +211,17 @@ private fun MemberAndRoleManageScreenView(
                     selectedIndex = selectedIndex,
                     listItem = list,
                     onTabClick = {
+                        when (it) {
+                            0 -> Clicked.NonPublicAnyPermissionMembers to Page.GroupSettingsChannelManagementPermissionsPrivateMembers
+                            1 -> Clicked.NonPublicAnyPermissionRoles to Page.GroupSettingsChannelManagementPermissionsPrivateRoles
+                            2 -> Clicked.NonPublicAnyPermissionPlan to Page.GroupSettingsChannelManagementPermissionsPrivateVIP
+                            else -> null
+                        }?.let { (clicked, page) ->
+                            with(AppUserLogger.getInstance()) {
+                                log(clicked, from)
+                                log(page, from)
+                            }
+                        }
                         onTabClick.invoke(it)
                     }
                 )
@@ -212,6 +236,7 @@ private fun MemberAndRoleManageScreenView(
                             group = group,
                             member = selectedMember,
                             title = topBarTitle,
+                            from = from,
                             onRemoveClick = onRemoveClick
                         )
                     }
@@ -222,6 +247,7 @@ private fun MemberAndRoleManageScreenView(
                             group = group,
                             roles = selectedRole,
                             title = topBarTitle,
+                            from = from,
                             onRemoveClick = onRoleRemoveClick
                         )
                     }
@@ -231,6 +257,8 @@ private fun MemberAndRoleManageScreenView(
                             navigator = navigator,
                             title = topBarTitle,
                             vipPlanModels = selectedVipPlanModels,
+                            group = group,
+                            from = from,
                             onVipPlanRemoveClick = onVipPlanRemoveClick
                         )
                     }
@@ -251,6 +279,7 @@ private fun AddMemberListScreen(
     group: Group,
     member: List<GroupMember> = emptyList(),
     title: String,
+    from: From,
     onRemoveClick: (GroupMember) -> Unit
 ) {
     val TAG = "AddMemberListScreen"
@@ -273,12 +302,18 @@ private fun AddMemberListScreen(
                     borderColor = LocalColor.current.component.other
                 ) {
                     KLog.i(TAG, "BorderButton click.")
-
+                    with(AppUserLogger.getInstance()) {
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddMember, from)
+                        log(Clicked.NonPublicAnyPermissionMembersAddMember, from)
+                    }
                     navigator.navigate(
                         AddMemberScreenDestination(
                             group = group,
                             excludeMember = member.toTypedArray(),
-                            title = "新增「%s」成員".format(title)
+                            title = "新增「%s」成員".format(title),
+                            clickFrom = From.RoleAddMember,
+                            searchClicked = Clicked.SearchMember,
+                            searchFrom = From.ChannelManagement
                         )
                     )
                 }
@@ -299,6 +334,8 @@ private fun AddMemberListScreen(
             MemberItemScreen(
                 groupMember = it
             ) { groupMember ->
+                AppUserLogger.getInstance()
+                    .log(Clicked.NonPublicAnyPermissionMembersRemoveMember, from)
                 onRemoveClick.invoke(groupMember)
             }
         }
@@ -314,6 +351,7 @@ private fun AddRoleListScreen(
     group: Group,
     roles: List<FanciRole> = emptyList(),
     title: String,
+    from: From,
     onRemoveClick: (FanciRole) -> Unit
 ) {
     val TAG = "AddRoleListScreen"
@@ -335,13 +373,17 @@ private fun AddRoleListScreen(
                     borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
-
+                    with(AppUserLogger.getInstance()) {
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddRole, from)
+                        log(Clicked.NonPublicAnyPermissionRolesAddRole, from)
+                    }
                     navigator.navigate(
                         ShareAddRoleScreenDestination(
                             group = group,
                             title = "新增「%s」角色".format(title),
                             subTitle = "直接指定角色，讓一批成員進入私密頻道。",
-                            existsRole = roles.toTypedArray()
+                            existsRole = roles.toTypedArray(),
+                            from = From.ChannelAddRole
                         )
                     )
                 }
@@ -366,6 +408,8 @@ private fun AddRoleListScreen(
                 fanciRole = role,
                 editText = "移除",
                 onEditClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.NonPublicAnyPermissionRolesRemoveRole, from)
                     onRemoveClick.invoke(it)
                 }
             )
@@ -377,7 +421,9 @@ private fun AddRoleListScreen(
 private fun AddVipPlanScreen(
     navigator: DestinationsNavigator,
     title: String,
+    group: Group,
     vipPlanModels: List<VipPlanModel>,
+    from: From,
     onVipPlanRemoveClick: (VipPlanModel) -> Unit
 ) {
     val TAG = "AddVipPlanScreen"
@@ -400,9 +446,15 @@ private fun AddVipPlanScreen(
                     borderColor = LocalColor.current.text.default_50
                 ) {
                     KLog.i(TAG, "BorderButton click.")
+                    with(AppUserLogger.getInstance()) {
+                        log(Page.GroupSettingsChannelManagementPermissionsPrivateAddPlan, from)
+                        log(Clicked.NonPublicAnyPermissionPlanAddPlan, from)
+                    }
+
                     navigator.navigate(
                         AddVipPlanScreenDestination(
                             authTitle = title,
+                            group = group,
                             selectedVipPlanModels = vipPlanModels.toTypedArray()
                         )
                     )
@@ -429,6 +481,8 @@ private fun AddVipPlanScreen(
                 endText = stringResource(id = R.string.remove),
                 subTitle = stringResource(id = R.string.n_member).format(plan.memberCount),
                 onPlanClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.NonPublicAnyPermissionPlanRemovePlan, from)
                     onVipPlanRemoveClick(plan)
                 }
             )
@@ -455,6 +509,7 @@ fun MemberAndRoleManageScreenPreview() {
                     userCount = 9
                 )
             ),
+            from = From.Create,
             selectedVipPlanModels = VipManagerUseCase.getVipPlanMockData(),
             onTabClick = {},
             onRemoveClick = {},

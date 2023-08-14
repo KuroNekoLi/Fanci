@@ -91,7 +91,7 @@ fun PostMoreActionDialogScreen(
                 //文章
                 PostMoreActionType.Post -> {
                     //自己
-                    if (postMessage.isMyPost(Constant.MyInfo)) {
+                    if (postMessage.isMyPost()) {
                         FeatureText(R.drawable.edit_post, getEditTitle()) {
                             onClose(coroutineScope, modalBottomSheetState)
                             onInteractClick.invoke(PostInteract.Edit(postMessage))
@@ -132,7 +132,7 @@ fun PostMoreActionDialogScreen(
                 //留言, 回覆
                 PostMoreActionType.Comment, PostMoreActionType.Reply -> {
                     //自己
-                    if (postMessage.isMyPost(Constant.MyInfo)) {
+                    if (postMessage.isMyPost()) {
                         FeatureText(R.drawable.edit_post, getEditTitle()) {
                             onClose(coroutineScope, modalBottomSheetState)
                             onInteractClick.invoke(PostInteract.Edit(postMessage))

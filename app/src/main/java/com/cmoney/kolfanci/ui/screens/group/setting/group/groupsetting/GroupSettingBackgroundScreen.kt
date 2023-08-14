@@ -16,6 +16,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.TransparentButton
 import com.cmoney.kolfanci.ui.destinations.FanciDefaultCoverScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
@@ -64,7 +69,9 @@ fun GroupSettingBackgroundScreen(
     resultNavigator: ResultBackNavigator<ImageChangeData>,
     fanciCoverResult: ResultRecipient<FanciDefaultCoverScreenDestination, String>
 ) {
-    val state = viewModel.uiState
+    var settingGroup by remember {
+        mutableStateOf(group)
+    }
 
     var showSaveTip by remember {
         mutableStateOf(false)
@@ -77,7 +84,9 @@ fun GroupSettingBackgroundScreen(
 
             is NavResult.Value -> {
                 val fanciUrl = result.value
-                viewModel.onGroupCoverSelect(fanciUrl, group)
+                settingGroup = settingGroup.copy(
+                    coverImageUrl = fanciUrl
+                )
             }
         }
     }
@@ -86,7 +95,7 @@ fun GroupSettingBackgroundScreen(
         modifier,
         navController,
         isLoading = viewModel.uiState.isLoading,
-        group = state.settingGroup ?: group,
+        group = settingGroup,
         onImageChange = {
             resultNavigator.navigateBack(it)
         },
@@ -106,12 +115,10 @@ fun GroupSettingBackgroundScreen(
         }
     )
 
-//    LaunchedEffect(viewModel.uiState.isGroupSettingPop) {
-//        if (viewModel.uiState.isGroupSettingPop) {
-//            navController.popBackStack()
-//            viewModel.changeGroupInfoScreenDone()
-//        }
-//    }
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance()
+            .log(Page.GroupSettingsGroupSettingsHomeBackground)
+    }
 }
 
 @Composable
@@ -127,6 +134,8 @@ fun GroupSettingBackgroundView(
     val TAG = "GroupSettingAvatarView"
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
+    //是否為建立社團
+    val isFromCreate = group.id.isNullOrEmpty()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -136,6 +145,12 @@ fun GroupSettingBackgroundView(
                 title = stringResource(id = R.string.group_background),
                 saveClick = {
                     KLog.i(TAG, "on save click.")
+                    if (isFromCreate) {
+                        AppUserLogger.getInstance().log(Clicked.Confirm, From.AddHomeBackground)
+                    }
+                    else {
+                        AppUserLogger.getInstance().log(Clicked.Confirm, From.EditHomeBackground)
+                    }
                     state.coverImageUrl.value?.let {
                         onImageChange.invoke(
                             ImageChangeData(
@@ -217,6 +232,15 @@ fun GroupSettingBackgroundView(
                 text = stringResource(id = R.string.change_image)
             ) {
                 KLog.i(TAG, "button click.")
+                if (isFromCreate) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.CreateGroupChangeHomeBackgroundPicture)
+                }
+                else {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.HomeBackgroundChangePicture)
+                }
+
                 state.openCameraDialog()
             }
         }

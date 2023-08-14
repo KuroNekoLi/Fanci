@@ -15,6 +15,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,7 +27,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -40,11 +45,13 @@ import com.socks.library.KLog
 /**
  * 設定 頻道公開度
  * @param isNeedApproval 預設是否公開
+ * @param from 事件參數
  */
 @Destination
 @Composable
 fun EditChannelOpennessScreen(
     modifier: Modifier = Modifier,
+    from: From = From.Edit,
     isNeedApproval: Boolean = true,
     navigator: DestinationsNavigator,
     resultNavigator: ResultBackNavigator<Boolean>
@@ -66,6 +73,7 @@ fun EditChannelOpennessScreen(
                 },
                 saveClick = {
                     KLog.i(TAG, "saveClick click.")
+                    AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelOpenness)
                     resultNavigator.navigateBack(result = isNeedApprovalCurrent)
                 }
             )
@@ -85,6 +93,8 @@ fun EditChannelOpennessScreen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                         .clickable {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.PermissionsPublic, from)
                             isNeedApprovalCurrent = false
                         }
                         .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
@@ -128,6 +138,8 @@ fun EditChannelOpennessScreen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                         .clickable {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.PermissionsNonPublic, from)
                             isNeedApprovalCurrent = true
                         }
                         .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
@@ -167,6 +179,10 @@ fun EditChannelOpennessScreen(
                 }
             }
         }
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementPermissionsOpenness, from)
     }
 }
 

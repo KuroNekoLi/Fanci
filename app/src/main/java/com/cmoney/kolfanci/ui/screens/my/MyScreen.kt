@@ -23,13 +23,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AccountManageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.AvatarNicknameChangeScreenDestination
-import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -65,6 +66,7 @@ fun MyScreen(
                 title = "會員中心",
                 leadingIcon = ImageVector.vectorResource(id = R.drawable.house),
                 backClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageHome)
                     navController.popBackStack()
                 }
             )
@@ -85,7 +87,7 @@ fun MyScreen(
             )
 
             //購買的vip方案
-            if (vipPlan.isNotEmpty()) {
+            if (vipPlan.isNotEmpty() && Constant.isAppNotInReview()) {
                 PurchaseVipPlanScreen(
                     modifier = Modifier.padding(top = 15.dp),
                     vipPlanList = vipPlan,
@@ -102,9 +104,11 @@ fun MyScreen(
                 account = XLoginHelper.account,
                 accountNumber = Constant.MyInfo?.serialNumber.toString(),
                 onChangeAvatarClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageAvatarAndNickname)
                     navController.navigate(AvatarNicknameChangeScreenDestination)
                 },
                 onAccountManageClick = {
+                    AppUserLogger.getInstance().log(Clicked.MemberPageAccountManagement)
                     navController.navigate(AccountManageScreenDestination)
                 }
             )
@@ -116,9 +120,9 @@ fun MyScreen(
 
     if (isShowPurchasePlanTip) {
         DialogScreen(
-            onDismiss = { isShowPurchasePlanTip = false },
-            title = stringResource(id = R.string.forward_to_official_web_title),
-            subTitle = stringResource(id = R.string.forward_to_official_web_subtitle)
+            title = stringResource(id = R.string.contact_personal_service),
+            subTitle = stringResource(id = R.string.contact_official_mail),
+            onDismiss = { isShowPurchasePlanTip = false }
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -126,12 +130,12 @@ fun MyScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                text = stringResource(id = R.string.forward_to_official_web),
+                text = stringResource(id = R.string.copy_mail),
                 borderColor = LocalColor.current.text.default_50,
                 textColor = LocalColor.current.text.default_100,
                 onClick = {
-                    //TODO: go to web url
                     isShowPurchasePlanTip = false
+                    viewModel.onVipDialogClick()
                     Unit
                 }
             )
@@ -155,6 +159,8 @@ fun MyScreen(
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getUserVipPlan()
+        AppUserLogger.getInstance()
+            .log(page = Page.MemberPage)
     }
 }
 

@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
@@ -14,16 +13,17 @@ import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
-import com.cmoney.imagelibrary.UploadImage
-import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
+import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
@@ -55,7 +55,8 @@ class MessageViewModel(
     val context: Application,
     private val chatRoomUseCase: ChatRoomUseCase,
     private val chatRoomPollUseCase: ChatRoomPollUseCase,
-    private val permissionUseCase: PermissionUseCase
+    private val permissionUseCase: PermissionUseCase,
+    private val uploadImageUseCase: UploadImageUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
@@ -351,72 +352,22 @@ class MessageViewModel(
 
         _imageAttach.value = emptyList()
 
-        val uploadImage = UploadImage(
-            context,
-            uriLis,
-            XLoginHelper.accessToken,
-            isStaging = BuildConfig.DEBUG
-        )
-
         val completeImageUrl = mutableListOf<String>()
 
         withContext(Dispatchers.IO) {
-            uploadImage.upload().catch { e ->
+            uploadImageUseCase.uploadImage(uriLis).catch { e ->
                 KLog.e(TAG, e)
                 _imageAttach.value = uriLis
-
                 imageUploadCallback.onFailure(e)
-
             }.collect {
                 KLog.i(TAG, "uploadImage:$it")
-                val uri = it.first
+                val uri = it.first         //之後如果要 mapping 可以用
                 val imageUrl = it.second
-
                 completeImageUrl.add(imageUrl)
 
                 if (completeImageUrl.size == uriLis.size) {
                     imageUploadCallback.complete(completeImageUrl)
                 }
-
-                //TODO 目前不會先產生 preview message 在畫面上,先註解起來
-//                //將 上傳成功的圖片 message overwrite 更改狀態
-//                uiState = uiState.copy(
-//                    message = uiState.message.map { chatMessageWrapper ->
-//                        if (chatMessageWrapper.message.id == preSendChatId) {
-//                            chatMessageWrapper.copy(
-//                                uploadAttachPreview = chatMessageWrapper.uploadAttachPreview.map { attachImage ->
-//                                    if (attachImage.uri == uri) {
-//                                        ChatRoomUiState.ImageAttachState(
-//                                            uri = uri,
-//                                            serverUrl = imageUrl,
-//                                            isUploadComplete = true
-//                                        )
-//                                    } else {
-//                                        attachImage
-//                                    }
-//                                }
-//                            )
-//                        } else {
-//                            chatMessageWrapper
-//                        }
-//                    }
-//                )
-//
-//                //check is all image upload complete
-//                val preSendAttach = uiState.message.find {
-//                    it.message.id == preSendChatId
-//                }?.uploadAttachPreview
-//
-//                val isComplete = preSendAttach?.none { imageAttach ->
-//                    !imageAttach.isUploadComplete
-//                }
-//
-//                if (isComplete == true) {
-//                    imageUploadCallback.complete(preSendAttach.map { attach ->
-//                        attach.serverUrl
-//                    })
-//                }
-
             }
         }
     }
@@ -616,37 +567,53 @@ class MessageViewModel(
     fun onInteractClick(messageInteract: MessageInteract) {
         KLog.i(TAG, "onInteractClick:$messageInteract")
         when (messageInteract) {
-            is MessageInteract.Announcement -> announceMessage(messageInteract.message)
+            is MessageInteract.Announcement -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessagePinMessage)
+                announceMessage(messageInteract.message)
+            }
+
             is MessageInteract.Copy -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageCopyMessage)
                 _copyMessage.value = messageInteract.message
             }
 
-            is MessageInteract.Delete -> deleteMessage(messageInteract.message)
+            is MessageInteract.Delete -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageDeleteMessage)
+                deleteMessage(messageInteract.message)
+            }
+
             is MessageInteract.HideUser -> {
                 _hideUserMessage.value = messageInteract.message
             }
 
             is MessageInteract.Recycle -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageUnsendMessage)
                 recycleMessage(messageInteract.message)
             }
 
-            is MessageInteract.Reply -> replyMessage(
-                IReplyMessage(
-                    id = messageInteract.message.id,
-                    author = messageInteract.message.author,
-                    content = messageInteract.message.content,
-                    isDeleted = messageInteract.message.isDeleted
+            is MessageInteract.Reply -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageReply)
+                replyMessage(
+                    IReplyMessage(
+                        id = messageInteract.message.id,
+                        author = messageInteract.message.author,
+                        content = messageInteract.message.content,
+                        isDeleted = messageInteract.message.isDeleted
+                    )
                 )
-            )
+            }
 
             is MessageInteract.Report -> {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessageReport)
                 _reportMessage.value = messageInteract.message
             }
 
-            is MessageInteract.EmojiClick -> onEmojiClick(
-                messageInteract.message,
-                messageInteract.emojiResId
-            )
+            is MessageInteract.EmojiClick -> {
+                onEmojiClick(
+                    messageInteract.message,
+                    messageInteract.emojiResId
+                )
+            }
 
             else -> {}
         }

@@ -1,34 +1,32 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.member.role.add
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.ui.common.BorderButton
-import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
+import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
+import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
-import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.destinations.AddMemberScreenDestination
-import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 
 @Composable
 fun MemberScreen(
@@ -50,10 +48,15 @@ fun MemberScreen(
                     .height(40.dp),
                 text = "新增成員", borderColor = LocalColor.current.text.default_100
             ) {
+                AppUserLogger.getInstance()
+                    .log(Clicked.MembersAddMember)
                 navigator.navigate(
                     AddMemberScreenDestination(
                         group = group,
-                        excludeMember = memberList.toTypedArray()
+                        excludeMember = memberList.toTypedArray(),
+                        clickFrom  = From.RoleAddMember,
+                        searchClicked = Clicked.SearchMember,
+                        searchFrom = From.RoleManagement
                     )
                 )
             }
@@ -67,6 +70,8 @@ fun MemberScreen(
                     groupMember = member,
                     onMemberClick = {
                         KLog.i(TAG, "remove:$it")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.MembersRemove)
                         onRemoveClick.invoke(it)
                     }
                 )
@@ -75,7 +80,7 @@ fun MemberScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun MemberScreenPreview() {
     FanciTheme {

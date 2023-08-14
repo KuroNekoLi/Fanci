@@ -10,20 +10,15 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
-import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaIChatContent
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
-import com.cmoney.imagelibrary.UploadImage
-import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
-import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
+import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
@@ -32,7 +27,6 @@ import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.Utils
-import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +40,8 @@ class PostInfoViewModel(
     private val postUseCase: PostUseCase,
     private val chatRoomUseCase: ChatRoomUseCase,
     private val bulletinboardMessage: BulletinboardMessage,
-    private val channel: Channel
+    private val channel: Channel,
+    private val uploadImageUseCase: UploadImageUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = PostInfoViewModel::class.java.simpleName
@@ -335,17 +330,11 @@ class PostInfoViewModel(
         imageUploadCallback: MessageViewModel.ImageUploadCallback
     ) {
         KLog.i(TAG, "uploadImages:" + uriLis.size)
-        val uploadImage = UploadImage(
-            context,
-            uriLis,
-            XLoginHelper.accessToken,
-            isStaging = BuildConfig.DEBUG
-        )
 
         val completeImageUrl = mutableListOf<String>()
 
         withContext(Dispatchers.IO) {
-            uploadImage.upload().catch { e ->
+            uploadImageUseCase.uploadImage(uriLis).catch { e ->
                 KLog.e(TAG, e)
                 imageUploadCallback.onFailure(e)
             }.collect {
@@ -548,7 +537,7 @@ class PostInfoViewModel(
                     }
 
                     //我發的
-                    if (comment.isMyPost(Constant.MyInfo)) {
+                    if (comment.isMyPost()) {
                         KLog.i(TAG, "delete my comment.")
                         chatRoomUseCase.takeBackMyMessage(
                             messageServiceType = MessageServiceType.bulletinboard,
@@ -665,7 +654,7 @@ class PostInfoViewModel(
         KLog.i(TAG, "onDeletePostClick:$post")
         viewModelScope.launch {
             //我發的
-            if (post.isMyPost(Constant.MyInfo)) {
+            if (post.isMyPost()) {
                 KLog.i(TAG, "delete my comment.")
                 chatRoomUseCase.takeBackMyMessage(
                     messageServiceType = MessageServiceType.bulletinboard,

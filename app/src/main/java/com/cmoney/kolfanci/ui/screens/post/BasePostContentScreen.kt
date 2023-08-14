@@ -37,8 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
@@ -66,6 +70,8 @@ fun BasePostContentScreen(
     backgroundColor: Color = LocalColor.current.background,
     onMoreClick: () -> Unit? = {},
     onEmojiClick: (Int) -> Unit,
+    onAddNewEmojiClick: (Int) -> Unit,
+    onImageClick: (() -> Unit)? = null,
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -152,6 +158,7 @@ fun BasePostContentScreen(
                         maxDisplayLine = if (maxDisplayLine == Int.MAX_VALUE) {
                             defaultDisplayLine
                         } else {
+                            AppUserLogger.getInstance().log(Clicked.ShowMore, From.Post)
                             Int.MAX_VALUE
                         }
                     },
@@ -171,7 +178,11 @@ fun BasePostContentScreen(
                         .aspectRatio(1f),
                     images = post.content?.medias?.map {
                         it.resourceLink.orEmpty()
-                    }.orEmpty()
+                    }.orEmpty(),
+                    onImageClick = {
+                        onImageClick?.invoke()
+                        AppUserLogger.getInstance().log(Page.PostImage)
+                    }
                 )
             }
 
@@ -207,7 +218,7 @@ fun BasePostContentScreen(
                                 .fillMaxWidth()
                                 .offset(y = (-15).dp)
                         ) {
-                            onEmojiClick.invoke(it)
+                            onAddNewEmojiClick.invoke(it)
                             scope.launch { tooltipStateRich.dismiss() }
                         }
                     },
@@ -261,7 +272,7 @@ fun EmojiFeedback(
 }
 
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun PostContentScreenPreview() {
     FanciTheme {
@@ -293,7 +304,8 @@ fun PostContentScreenPreview() {
                 }
             },
             onMoreClick = {},
-            onEmojiClick = {}
+            onEmojiClick = {},
+            onAddNewEmojiClick = {}
         )
     }
 }

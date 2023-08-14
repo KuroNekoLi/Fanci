@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,8 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toColor
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.AddChannelRoleModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
@@ -45,7 +49,6 @@ import com.cmoney.kolfanci.ui.theme.Color_99FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
@@ -57,13 +60,13 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ShareAddRoleScreen(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
     viewModel: RoleViewModel = koinViewModel(),
     group: Group,
     title: String = "新增角色",
     subTitle: String = "",
     existsRole: Array<FanciRole>,
-    resultNavigator: ResultBackNavigator<String>
+    resultNavigator: ResultBackNavigator<String>,
+    from: From
 ) {
     val TAG = "ShareAddRoleScreen"
     val uiState = viewModel.uiState
@@ -88,6 +91,7 @@ fun ShareAddRoleScreen(
             viewModel.onRoleClick(it)
         },
         onConfirm = {
+            AppUserLogger.getInstance().log(Clicked.Confirm, from)
             viewModel.onAddRoleConfirm()
         }
     ) {
@@ -184,10 +188,18 @@ fun ShareAddRoleScreenView(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.flower_box),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_30)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     Text(
-                        text = "尚未建立任何角色",
-                        fontSize = 14.sp,
-                        color = LocalColor.current.component.other
+                        text = stringResource(id = R.string.not_create_any_role),
+                        fontSize = 16.sp,
+                        color = LocalColor.current.text.default_30
                     )
                 }
             }

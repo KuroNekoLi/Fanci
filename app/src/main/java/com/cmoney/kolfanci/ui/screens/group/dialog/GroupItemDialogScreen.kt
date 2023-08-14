@@ -2,12 +2,22 @@ package com.cmoney.kolfanci.ui.screens.group.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,12 +31,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.GroupText
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.R
+
 @Composable
 fun GroupItemDialogScreen(
     modifier: Modifier = Modifier,
@@ -45,90 +58,117 @@ fun GroupItemDialogScreen(
             openDialog.value = false
             onDismiss.invoke()
         }) {
-            Box(
-                modifier = Modifier
-                    .padding(bottom = 30.dp)
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .clip(RoundedCornerShape(25.dp))
-                    .background(background)
-            ) {
-                Column {
-                    AsyncImage(
-                        model = groupModel.coverImageUrl,
-                        modifier = Modifier
-                            .height(170.dp)
-                            .fillMaxWidth(),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        placeholder = painterResource(id = R.drawable.placeholder)
-                    )
-
-                    GroupText(
-                        modifier = Modifier.padding(top = 15.dp, start = 110.dp),
-                        text = groupModel.name.orEmpty(),
-                        textColor = titleColor
-                    )
-
-                    Spacer(modifier = Modifier.height(35.dp))
-
-                    Column(
-                        modifier = Modifier
-                            .heightIn(0.dp, 300.dp)
-                            .verticalScroll(
-                                rememberScrollState()
-                            )
-                    ) {
-                        AutoLinkText(
-                            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 15.dp),
-                            text = groupModel.description.orEmpty(),
-                            fontSize = 17.sp,
-                            color = descColor
-                        )
-                    }
-
-                    Box(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .background(Color.Transparent)
-                            .clickable {
-                                onConfirm.invoke(groupModel)
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = if (isJoined) {
-                                "已經加入，進入社團"
-                            } else {
-                                "加入社團"
-                            }, fontSize = 16.sp,
-                            color = joinTextColor
-                        )
-                    }
-                }
-
-                AsyncImage(
-                    model = groupModel.thumbnailImageUrl,
-                    modifier = Modifier
-                        .padding(top = 130.dp, start = 20.dp)
-                        .size(75.dp)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(25.dp)),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.placeholder)
-                )
-            }
+            GroupItemDialogScreenView(
+                modifier = modifier,
+                background = background,
+                groupModel = groupModel,
+                titleColor = titleColor,
+                descColor = descColor,
+                onConfirm = onConfirm,
+                isJoined = isJoined,
+                joinTextColor = joinTextColor
+            )
         }
+    }
+    LaunchedEffect(key1 = groupModel) {
+        AppUserLogger.getInstance()
+            .log(page = Page.Group)
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun JoinGroupDialogScreenPreview() {
+private fun GroupItemDialogScreenView(
+    modifier: Modifier = Modifier,
+    groupModel: Group,
+    background: Color = LocalColor.current.env_80,
+    titleColor: Color = LocalColor.current.text.default_100,
+    descColor: Color = LocalColor.current.text.default_80,
+    joinTextColor: Color = LocalColor.current.primary,
+    onConfirm: (Group) -> Unit,
+    isJoined: Boolean
+) {
+    Box(
+        modifier = modifier
+            .padding(bottom = 30.dp)
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .clip(RoundedCornerShape(25.dp))
+            .background(background)
+    ) {
+        Column {
+            AsyncImage(
+                model = groupModel.coverImageUrl,
+                modifier = Modifier
+                    .height(170.dp)
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                placeholder = painterResource(id = R.drawable.placeholder)
+            )
+
+            GroupText(
+                modifier = Modifier.padding(top = 15.dp, start = 110.dp),
+                text = groupModel.name.orEmpty(),
+                textColor = titleColor
+            )
+
+            Spacer(modifier = Modifier.height(35.dp))
+
+            Column(
+                modifier = Modifier
+                    .heightIn(0.dp, 300.dp)
+                    .verticalScroll(
+                        rememberScrollState()
+                    )
+            ) {
+                AutoLinkText(
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 15.dp),
+                    text = groupModel.description.orEmpty(),
+                    fontSize = 17.sp,
+                    color = descColor
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(Color.Transparent)
+                    .clickable {
+                        onConfirm.invoke(groupModel)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (isJoined) {
+                        "已經加入，進入社團"
+                    } else {
+                        "加入社團"
+                    }, fontSize = 16.sp,
+                    color = joinTextColor
+                )
+            }
+        }
+
+        AsyncImage(
+            model = groupModel.thumbnailImageUrl,
+            modifier = Modifier
+                .padding(top = 130.dp, start = 20.dp)
+                .size(75.dp)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(25.dp)),
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
+            placeholder = painterResource(id = R.drawable.placeholder)
+        )
+    }
+}
+
+@Preview
+@Composable
+fun GroupItemDialogScreenPreview() {
     FanciTheme {
-        GroupItemDialogScreen(
+        GroupItemDialogScreenView(
             isJoined = true,
             groupModel = Group(
                 id = "",
@@ -165,9 +205,8 @@ fun JoinGroupDialogScreenPreview() {
                 thumbnailImageUrl = "",
                 categories = emptyList()
             ),
-            onDismiss = {}
-        ) {
-
-        }
+            onConfirm = {
+            }
+        )
     }
 }

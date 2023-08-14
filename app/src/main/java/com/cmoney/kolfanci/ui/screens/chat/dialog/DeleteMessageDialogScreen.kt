@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,26 +55,23 @@ fun DeleteMessageDialogScreen(
                     .background(LocalColor.current.env_80)
                     .padding(20.dp)
             ) {
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.delete),
-                            contentDescription = null
-                        )
-                        Spacer(modifier = Modifier.width(9.dp))
-                        Text(
-                            text = "將此訊息刪除",
-                            fontSize = 19.sp,
-                            color = LocalColor.current.text.default_100
-                        )
-                    }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "將此訊息刪除",
+                        fontSize = 19.sp,
+                        color = LocalColor.current.text.default_100,
+                        textAlign = TextAlign.Center
+                    )
+
                     Spacer(modifier = Modifier.height(25.dp))
+
                     Text(
                         text = "刪除的訊息整個聊天室的成員\n都不會看見它唷！",
                         fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100
+                        color = LocalColor.current.text.default_100,
+                        textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Box(

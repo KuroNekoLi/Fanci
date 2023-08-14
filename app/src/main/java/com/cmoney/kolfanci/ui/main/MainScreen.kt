@@ -15,6 +15,8 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
@@ -45,7 +47,7 @@ fun MainScreen(
     val TAG = "MainScreen"
     val context = LocalContext.current
     val globalViewModel = koinViewModel<MainViewModel>(
-        owner = LocalContext.current as? ComponentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
+        viewModelStoreOwner = LocalContext.current as? ComponentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
     )
     val globalGroupViewModel = globalGroupViewModel()
     val activity = LocalContext.current.findActivity()
@@ -109,6 +111,13 @@ fun MainScreen(
                 val groupId = navResult.value
                 globalGroupViewModel.leaveGroup(id = groupId)
             }
+        }
+    }
+
+    LaunchedEffect(key1 = currentGroup) {
+        if (currentGroup != null) {
+            AppUserLogger.getInstance()
+                .log(page = Page.Home)
         }
     }
 

@@ -1,13 +1,17 @@
 package com.cmoney.kolfanci.ui.screens.shared.dialog
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -21,16 +25,12 @@ import androidx.compose.ui.window.Dialog
 import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.socks.library.KLog
 
 /**
  * 群組設定選擇圖片 彈窗
  * @param isShowFanciPic 是否呈現Fanci 預設圖庫
  */
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GroupPhotoPickDialogScreen(
     modifier: Modifier = Modifier,
@@ -66,13 +66,7 @@ fun GroupPhotoPickDialogScreen(
         captureResult.launch(captureIntent)
     }
 
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA) {
-        if (it) {
-            startCameraPicker()
-        }
-    }
-
-    val choosePhotoResult =
+    val choosePhotoLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
                 it.data?.data?.let { uri ->
@@ -93,15 +87,8 @@ fun GroupPhotoPickDialogScreen(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             "image/*"
         )
-        choosePhotoResult.launch(intent)
+        choosePhotoLauncher.launch(intent)
     }
-
-    val externalPermissionState =
-        rememberPermissionState(Manifest.permission.READ_EXTERNAL_STORAGE) {
-            if (it) {
-                startImagePicker()
-            }
-        }
 
     Dialog(onDismissRequest = {
         onDismiss()
@@ -119,11 +106,7 @@ fun GroupPhotoPickDialogScreen(
                     text = "從相簿中選取圖片",
                     shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
                 ) {
-                    if (externalPermissionState.status.isGranted) {
-                        startImagePicker()
-                    } else {
-                        externalPermissionState.launchPermissionRequest()
-                    }
+                    startImagePicker()
                 }
 
                 GrayButton(
@@ -134,11 +117,7 @@ fun GroupPhotoPickDialogScreen(
                         RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
                     }
                 ) {
-                    if (cameraPermissionState.status.isGranted) {
-                        startCameraPicker()
-                    } else {
-                        cameraPermissionState.launchPermissionRequest()
-                    }
+                    startCameraPicker()
                 }
 
                 if (isShowFanciPic) {

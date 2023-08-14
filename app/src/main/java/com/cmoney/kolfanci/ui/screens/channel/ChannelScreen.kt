@@ -28,8 +28,10 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
@@ -110,30 +112,6 @@ private fun ChannelScreenView(
         topBar = {
             TopBarScreen(
                 title = channel.name.orEmpty(),
-                trailingContent = {
-                    Box(
-                        modifier = Modifier
-                            .size(35.dp)
-                            .offset(x = (-15).dp)
-                            .clickable {
-                                group?.run {
-                                    navController.navigate(
-                                        SearchMainScreenDestination(
-                                            group = this,
-                                            channel = channel
-                                        )
-                                    )
-                                }
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            modifier = Modifier.size(25.dp),
-                            painter = painterResource(id = R.drawable.message_search),
-                            contentDescription = null
-                        )
-                    }
-                },
                 backClick = {
                     navController.popBackStack()
                 }
@@ -210,6 +188,10 @@ private fun ChannelScreenView(
                                 resultRecipient = editPostResultRecipient,
                                 postInfoResultRecipient = postInfoResultRecipient
                             )
+
+                            LaunchedEffect(key1 = page) {
+                                AppUserLogger.getInstance().log(Page.PostWall)
+                            }
                         }
                     }
                 }

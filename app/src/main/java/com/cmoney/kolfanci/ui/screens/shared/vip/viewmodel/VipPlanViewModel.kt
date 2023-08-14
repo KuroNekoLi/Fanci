@@ -2,6 +2,8 @@ package com.cmoney.kolfanci.ui.screens.shared.vip.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.extension.toVipPlanModel
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.socks.library.KLog
@@ -11,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class VipPlanViewModel(
     private val vipManagerUseCase: VipManagerUseCase
-): ViewModel() {
+) : ViewModel() {
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
@@ -24,13 +26,16 @@ class VipPlanViewModel(
      *
      * @param models 已選擇的VIP方案
      */
-    fun fetchVipPlan(models: Array<VipPlanModel>) {
+    fun fetchVipPlan(models: Array<VipPlanModel>, groupId: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            vipManagerUseCase.getVipPlan()
+            vipManagerUseCase.getVipPlan(groupId = groupId)
                 .onSuccess { data ->
+                    val allVipPlanModel = data.map {
+                        it.toVipPlanModel()
+                    }
                     val modelSet = models.toSet()
-                    _vipPlanModels.value = data.filterNot { model ->
+                    _vipPlanModels.value = allVipPlanModel.filterNot { model ->
                         modelSet.contains(model)
                     }
                 }

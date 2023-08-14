@@ -42,12 +42,17 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
@@ -137,14 +142,27 @@ fun PostScreen(
                     channelId = channel.id.orEmpty()
                 )
             )
+            AppUserLogger.getInstance().log(Page.PublishPost)
         },
         onMoreClick = { post ->
+            KLog.i(TAG, "onMoreClick")
+
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.PostList)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Post,
                 onInteractClick = {
                     when (it) {
                         is PostInteract.Announcement -> {
+
+                            if (post.isMyPost()) {
+                                AppUserLogger.getInstance().log(Clicked.PostPinPost, From.Poster)
+                            } else {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.PostPinPost, From.OthersPost)
+                            }
+
                             showPinDialogTip = Triple(
                                 true,
                                 post,
@@ -153,21 +171,32 @@ fun PostScreen(
                         }
 
                         is PostInteract.Delete -> {
+
+                            if (post.isMyPost()) {
+                                AppUserLogger.getInstance().log(Clicked.PostDeletePost, From.Poster)
+                            } else {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.PostDeletePost, From.OthersPost)
+                            }
+
                             showPostDeleteTip = Pair(true, post)
                         }
 
                         is PostInteract.Edit -> {
                             KLog.i(TAG, "PostInteract.Edit click.")
+                            AppUserLogger.getInstance().log(Clicked.PostEditPost)
                             navController.navigate(
                                 EditPostScreenDestination(
                                     channelId = channel.id.orEmpty(),
                                     editPost = post
                                 )
                             )
+                            AppUserLogger.getInstance().log(Page.EditPost)
                         }
 
                         is PostInteract.Report -> {
                             KLog.i(TAG, "PostInteract.Report click.")
+                            AppUserLogger.getInstance().log(Clicked.PostReportPost)
                             showPostReportTip = Pair(true, post)
                         }
                     }
@@ -256,9 +285,11 @@ fun PostScreen(
             title = "確定刪除貼文",
             content = "貼文刪除後，內容將會完全消失。",
             onCancel = {
+                AppUserLogger.getInstance().log(Clicked.PostDeletePostCancel)
                 showPostDeleteTip = showPostDeleteTip.copy(first = false)
             },
             onConfirm = {
+                AppUserLogger.getInstance().log(Clicked.PostDeletePostConfirmDelete)
                 showPostDeleteTip = showPostDeleteTip.copy(first = false)
                 showPostDeleteTip.second?.let {
                     viewModel.onDeletePostClick(it)
@@ -271,16 +302,14 @@ fun PostScreen(
     if (showPinDialogTip.first) {
         val isPinPost = showPinDialogTip.third
         DialogScreen(
-            onDismiss = {
-                showPinDialogTip = Triple(false, null, false)
-            },
-            titleIconRes = R.drawable.pin,
-            iconFilter = LocalColor.current.component.other,
             title = "置頂文章",
             subTitle = if (isPinPost) {
                 ""
             } else {
                 "置頂這篇文章，重要貼文不再被淹沒！"
+            },
+            onDismiss = {
+                showPinDialogTip = Triple(false, null, false)
             }
         ) {
             BorderButton(
@@ -297,8 +326,10 @@ fun PostScreen(
             ) {
                 run {
                     if (isPinPost) {
+                        AppUserLogger.getInstance().log(Clicked.PostUnpinPostConfirmUnpin)
                         viewModel.unPinPost(channel.id.orEmpty(), showPinDialogTip.second)
                     } else {
+                        AppUserLogger.getInstance().log(Clicked.PostPinPostConfirmPin)
                         viewModel.pinPost(channel.id.orEmpty(), showPinDialogTip.second)
                     }
                     showPinDialogTip = Triple(false, null, false)
@@ -316,6 +347,12 @@ fun PostScreen(
                 textColor = LocalColor.current.text.default_100
             ) {
                 run {
+                    if (isPinPost) {
+                        AppUserLogger.getInstance().log(Clicked.PostUnpinPostReturn)
+                    } else {
+                        AppUserLogger.getInstance().log(Clicked.PostPinPostCancel)
+                    }
+
                     showPinDialogTip = Triple(false, null, false)
                 }
             }
@@ -336,7 +373,11 @@ private fun PostScreenView(
     listState: LazyListState
 ) {
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LocalColor.current.env_80)
+    ) {
         if (postList.isEmpty()) {
             EmptyPostContent(modifier = Modifier.fillMaxSize())
         } else {
@@ -362,6 +403,16 @@ private fun PostScreenView(
                                 onMoreClick.invoke(pinPost)
                             },
                             onEmojiClick = {
+                                if (Constant.isCanEmoji()) {
+                                    AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                    onEmojiClick.invoke(pinPost, it)
+                                }
+                            },
+                            onImageClick = {
+                                AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
+                            },
+                            onAddNewEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.AddEmoji, From.PostList)
                                 onEmojiClick.invoke(pinPost, it)
                             }
                         )
@@ -386,6 +437,16 @@ private fun PostScreenView(
                         },
                         onEmojiClick = {
                             if (Constant.isCanEmoji()) {
+                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                onEmojiClick.invoke(postMessage, it)
+                            }
+                        },
+                        onImageClick = {
+                            AppUserLogger.getInstance().log(Clicked.Image, From.PostList)
+                        },
+                        onAddNewEmojiClick = {
+                            AppUserLogger.getInstance().log(Clicked.AddEmoji, From.PostList)
+                            if (Constant.isCanEmoji()) {
                                 onEmojiClick.invoke(postMessage, it)
                             }
                         }
@@ -400,6 +461,7 @@ private fun PostScreenView(
                     .padding(30.dp)
                     .align(Alignment.BottomEnd),
                 onClick = {
+                    AppUserLogger.getInstance().log(Clicked.PostPublishPost)
                     onPostClick.invoke()
                 },
                 backgroundColor = LocalColor.current.primary,
@@ -428,6 +490,9 @@ fun CommentCount(
             .then(
                 if (post != null && navController != null && channel != null) {
                     Modifier.clickable {
+                        AppUserLogger
+                            .getInstance()
+                            .log(Clicked.PostEnterInnerLayer)
                         navController.navigate(
                             PostInfoScreenDestination(
                                 post = post,
@@ -498,7 +563,11 @@ private fun EmptyPostContent(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(43.dp))
 
-        Text(text = "目前還沒有人發表貼文", fontSize = 16.sp, color = LocalColor.current.text.default_30)
+        Text(
+            text = "目前還沒有人發表貼文",
+            fontSize = 16.sp,
+            color = LocalColor.current.text.default_30
+        )
     }
 }
 

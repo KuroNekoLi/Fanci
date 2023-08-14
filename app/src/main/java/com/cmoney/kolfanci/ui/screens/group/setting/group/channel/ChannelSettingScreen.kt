@@ -16,6 +16,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,8 +28,12 @@ import androidx.compose.ui.window.Dialog
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.destinations.AddCategoryScreenDestination
@@ -42,10 +49,9 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
+
 
 /**
  * 頻道管理
@@ -56,78 +62,15 @@ fun ChannelSettingScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
-    viewModel: ChannelSettingViewModel = koinViewModel(),
-    setChannelResult: ResultRecipient<AddChannelScreenDestination, Group>,
-    setCategoryResult: ResultRecipient<AddCategoryScreenDestination, Group>,
-    setEditCategoryResult: ResultRecipient<EditCategoryScreenDestination, Group>,
-    sortCategoryResult: ResultRecipient<SortCategoryScreenDestination, Group>,
-    sortChannelResult: ResultRecipient<SortChannelScreenDestination, Group>
+    viewModel: ChannelSettingViewModel = koinViewModel()
 ) {
     val globalGroupViewModel = globalGroupViewModel()
-    var groupParam = group
-
     val uiState = viewModel.uiState
-
-    uiState.group?.let {
-        groupParam = it
-        globalGroupViewModel.setCurrentGroup(it)
-    }
-
-    //========== Result callback Start ==========
-    sortChannelResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-
-    sortCategoryResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-
-    setEditCategoryResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-
-    setChannelResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-
-    setCategoryResult.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {
-            }
-            is NavResult.Value -> {
-                viewModel.setGroup(result.value)
-            }
-        }
-    }
-    //========== Result callback End ==========
+    val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
     ChannelSettingScreenView(
-        modifier,
-        navigator,
-        groupParam
+        modifier = modifier,
+        navigator = navigator,
+        group = currentGroup ?: group
     ) {
         viewModel.onSortClick()
     }
@@ -141,7 +84,7 @@ fun ChannelSettingScreen(
                 viewModel.closeSortDialog()
                 navigator.navigate(
                     SortChannelScreenDestination(
-                        group = uiState.group ?: group
+                        group = uiState.group ?: currentGroup ?: group
                     )
                 )
             },
@@ -149,11 +92,20 @@ fun ChannelSettingScreen(
                 viewModel.closeSortDialog()
                 navigator.navigate(
                     SortCategoryScreenDestination(
-                        group = uiState.group ?: group
+                        group = uiState.group ?: currentGroup ?: group
                     )
                 )
             }
         )
+    }
+
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagement)
+    }
+    LaunchedEffect(key1 = currentGroup) {
+        currentGroup?.let { focusGroup ->
+            viewModel.setGroup(group = focusGroup)
+        }
     }
 }
 
@@ -198,6 +150,10 @@ fun ChannelSettingScreenView(
                         borderColor = LocalColor.current.text.default_100
                     ) {
                         KLog.i(TAG, "new category click.")
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ChannelManagementAddCategory)
+                            log(Page.GroupSettingsChannelManagementAddCategory)
+                        }
                         navigator.navigate(
                             AddCategoryScreenDestination(
                                 group = group
@@ -217,6 +173,8 @@ fun ChannelSettingScreenView(
                         borderColor = LocalColor.current.text.default_100
                     ) {
                         KLog.i(TAG, "category sort click.")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ChannelManagementEditOrder)
                         onSortClick.invoke()
                     }
                 }
@@ -228,6 +186,10 @@ fun ChannelSettingScreenView(
                     channelList = category.channels.orEmpty(),
                     onCategoryEdit = {
                         KLog.i(TAG, "onCategoryEdit:$it")
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ChannelManagementEditCategory)
+                            log(Page.GroupSettingsChannelManagementEditCategory)
+                        }
                         navigator.navigate(
                             EditCategoryScreenDestination(
                                 group = group,
@@ -235,18 +197,22 @@ fun ChannelSettingScreenView(
                             )
                         )
                     },
-                    onChanelEdit = { category, channel ->
+                    onChanelEdit = { currentCategory, channel ->
                         KLog.i(TAG, "onChanelEdit:$channel")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ChannelManagementEditChannel)
                         navigator.navigate(
                             AddChannelScreenDestination(
                                 group = group,
-                                category = category,
+                                category = currentCategory,
                                 channel = channel
                             )
                         )
                     },
                     onAddChannel = {
                         KLog.i(TAG, "onAddChannel:$it")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.ChannelManagementAddChannel)
                         navigator.navigate(
                             AddChannelScreenDestination(
                                 group = group,
@@ -285,6 +251,8 @@ private fun SortDialog(
                     text = "頻道排序",
                     shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
                 ) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.ChannelManagementOrderOption, From.Channel)
                     onChannelSort.invoke()
                 }
 
@@ -292,6 +260,8 @@ private fun SortDialog(
                     text = "分類排序",
                     shape = RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
                 ) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.ChannelManagementOrderOption, From.Category)
                     onCategorySort.invoke()
                 }
 

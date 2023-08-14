@@ -22,10 +22,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.showColorPickerDialogBottomSheet
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -43,6 +47,7 @@ fun StyleScreen(
     roleName: String,
     roleColor: com.cmoney.fanciapi.fanci.model.Color,
     showDelete: Boolean,
+    from: From = From.Create,
     onChange: (String, com.cmoney.fanciapi.fanci.model.Color) -> Unit,
     onDelete: () -> Unit
 ) {
@@ -73,13 +78,24 @@ fun StyleScreen(
             modifier = Modifier
                 .background(LocalColor.current.background)
                 .clickable {
+                    with(AppUserLogger.getInstance()) {
+                        log(Page.GroupSettingsRoleManagementAddRoleStyleRoleName)
+                        log(Clicked.StyleRoleName, from)
+                    }
                     navigator.navigate(
                         EditInputScreenDestination(
                             defaultText = roleName,
                             toolbarTitle = "角色名稱",
                             placeholderText = context.getString(R.string.input_role_name),
                             emptyAlertTitle = context.getString(R.string.role_name_empty),
-                            emptyAlertSubTitle = context.getString(R.string.role_name_empty_desc)
+                            emptyAlertSubTitle = context.getString(R.string.role_name_empty_desc),
+                            from = if (from == From.Create) {
+                                From.RoleName
+                            } else {
+                                From.EditName
+                            },
+                            textFieldClicked = Clicked.StyleRoleNameKeyIn,
+                            textFieldFrom = from
                         )
                     )
                 }
@@ -130,6 +146,9 @@ fun StyleScreen(
                 .height(50.dp)
                 .background(LocalColor.current.background)
                 .clickable {
+                    AppUserLogger
+                        .getInstance()
+                        .log(Clicked.StyleSelectColor)
                     (context as? Activity)?.showColorPickerDialogBottomSheet(
                         selectedColor = defaultColor
                     ) {

@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -27,7 +28,11 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.VipPlanInfoEditChannelPermissionScreenDestination
@@ -192,17 +197,31 @@ private fun VipPlanInfoMainScreenView(
                         planSourceList = planSourceList,
                         onVipNameClick = {
                             KLog.i(TAG, "onVipNameClick:$it")
+
+                            with(AppUserLogger.getInstance()) {
+                                log(Clicked.InfoName)
+                                log(Page.GroupSettingsVIPINFVIPName)
+                            }
+
                             navController.navigate(
                                 EditInputScreenDestination(
                                     defaultText = it,
                                     toolbarTitle = context.getString(R.string.vip_name),
                                     placeholderText = context.getString(R.string.input_vip_name),
                                     emptyAlertTitle = context.getString(R.string.vip_name_empty),
-                                    emptyAlertSubTitle = context.getString(R.string.vip_name_empty_desc)
+                                    emptyAlertSubTitle = context.getString(R.string.vip_name_empty_desc),
+                                    from = From.VIPName
                                 )
                             )
                         }
                     )
+
+                    LaunchedEffect(key1 = selectedTab) {
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ManageInfo)
+                            log(Page.GroupSettingsVIPINF)
+                        }
+                    }
                 }
 
                 //權限
@@ -210,6 +229,8 @@ private fun VipPlanInfoMainScreenView(
                     VipPlanInfoPermissionPage(
                         permissionModels = vipPlanPermissionModels,
                         onEditPermission = { index ->
+                            AppUserLogger.getInstance().log(Clicked.PermissionsChannel)
+
                             val permission = vipPlanPermissionModels[index]
                             navController.navigate(
                                 VipPlanInfoEditChannelPermissionScreenDestination(
@@ -219,6 +240,13 @@ private fun VipPlanInfoMainScreenView(
                             )
                         }
                     )
+
+                    LaunchedEffect(key1 = selectedTab) {
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ManagePermissions)
+                            log(Page.GroupSettingsVIPPermission)
+                        }
+                    }
                 }
 
                 //成員
@@ -226,6 +254,13 @@ private fun VipPlanInfoMainScreenView(
                     VipMemberPage(
                         members = vipMembers
                     )
+
+                    LaunchedEffect(key1 = selectedTab) {
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.ManageMembers)
+                            log(Page.GroupSettingsVIPMembers)
+                        }
+                    }
                 }
             }
         }
@@ -325,7 +360,9 @@ private fun VipMemberPage(
             ) {
                 Image(
                     modifier = Modifier.size(105.dp),
-                    painter = painterResource(id = R.drawable.flower_box), contentDescription = null
+                    painter = painterResource(id = R.drawable.flower_box),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(LocalColor.current.text.default_30)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))

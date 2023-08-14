@@ -4,6 +4,8 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +23,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +41,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -85,6 +91,7 @@ fun AvatarNicknameChangeScreen(
         },
         isLoading = isLoading.value,
         onChangeAvatar = {
+            AppUserLogger.getInstance().log(Clicked.AvatarAndNicknameAvatar)
             viewModel.openCameraDialog()
         },
         onSave = {
@@ -108,6 +115,10 @@ fun AvatarNicknameChangeScreen(
             onFanciClick = {
             }
         )
+    }
+    LaunchedEffect(key1 = Unit) {
+        AppUserLogger.getInstance()
+            .log(page = Page.MemberPageAvatarAndNickname)
     }
 }
 
@@ -231,6 +242,16 @@ private fun AvatarNicknameChangeScreenView(
                             fontSize = 16.sp,
                             color = LocalColor.current.text.default_30
                         )
+                    },
+                    interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
+                        LaunchedEffect(interactionSource) {
+                            interactionSource.interactions.collect {
+                                if (it is PressInteraction.Release) {
+                                    AppUserLogger.getInstance()
+                                        .log(Clicked.AvatarAndNicknameNickname)
+                                }
+                            }
+                        }
                     }
                 )
 

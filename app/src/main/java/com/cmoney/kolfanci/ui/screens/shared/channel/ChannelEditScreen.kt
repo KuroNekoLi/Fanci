@@ -121,7 +121,7 @@ fun ChannelEditScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun ChannelEditScreenPreview() {
     FanciTheme {

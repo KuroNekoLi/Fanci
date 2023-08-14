@@ -1,5 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.openness
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +14,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,7 +25,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.kolfanci.R
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
@@ -34,13 +39,19 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.socks.library.KLog
 
+/**
+ * @param keyinTracking 紀錄點擊輸入匡埋點事件
+ * @param from 點擊確認用事件埋點
+ */
 @Destination
 @Composable
 fun CreateApplyQuestionScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     question: String = "",
-    resultBackNavigator: ResultBackNavigator<String>
+    keyinTracking: String = Clicked.QuestionTextArea.eventName,
+    resultBackNavigator: ResultBackNavigator<String>,
+    from: From
 ) {
     val TAG = "CreateApplyQuestionScreen"
     var showEmptyTipDialog by remember {
@@ -53,20 +64,27 @@ fun CreateApplyQuestionScreen(
         question = question,
         onAdd = {
             KLog.i(TAG, "onAdd click.")
+            AppUserLogger.getInstance().log(Clicked.Confirm, from)
             if (it.isEmpty()) {
                 showEmptyTipDialog = true
             } else {
                 resultBackNavigator.navigateBack(it)
             }
+        },
+        onTextFieldClick = {
+            val clickEvent = when(keyinTracking) {
+                Clicked.CreateGroupQuestionKeyin.eventName -> Clicked.CreateGroupQuestionKeyin
+                else -> Clicked.QuestionTextArea
+            }
+            AppUserLogger.getInstance().log(clickEvent)
         }
     )
 
     if (showEmptyTipDialog) {
         DialogScreen(
-            onDismiss = { showEmptyTipDialog = false },
-            titleIconRes = R.drawable.edit,
             title = "審核題目空白",
-            subTitle = "審核題目不可以是空白的唷！"
+            subTitle = "審核題目不可以是空白的唷！",
+            onDismiss = { showEmptyTipDialog = false }
         ) {
             BlueButton(
                 modifier = Modifier
@@ -88,7 +106,8 @@ private fun CreateApplyQuestionScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     question: String = "",
-    onAdd: (String) -> Unit
+    onAdd: (String) -> Unit,
+    onTextFieldClick: () -> Unit
 ) {
     var textState by remember { mutableStateOf(question) }
     val maxLength = 50
@@ -146,6 +165,15 @@ private fun CreateApplyQuestionScreenView(
                         fontSize = 16.sp,
                         color = LocalColor.current.text.default_30
                     )
+                },
+                interactionSource = remember{ MutableInteractionSource() }.also{ interactionSource->
+                    LaunchedEffect(interactionSource){
+                        interactionSource.interactions.collect{
+                            if (it is PressInteraction.Release) {
+                                onTextFieldClick.invoke()
+                            }
+                        }
+                    }
                 }
             )
         }
@@ -159,8 +187,8 @@ fun CreateApplyQuestionScreenPreview() {
     FanciTheme {
         CreateApplyQuestionScreenView(
             navigator = EmptyDestinationsNavigator,
-            onAdd = {
-            }
+            onAdd = {},
+            onTextFieldClick = {}
         )
     }
 }

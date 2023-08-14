@@ -1,26 +1,38 @@
 package com.cmoney.kolfanci.ui.screens.group.create.viewmodel
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.imagelibrary.UploadImage
-import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.ThemeUseCase
+import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.theme.FanciColor
-import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+data class UiState(
+    val createdGroup: Group? = null,
+    val createComplete: Boolean? = null
+)
+
 class CreateGroupViewModel(
     val context: Application,
-    val groupUseCase: GroupUseCase
+    val groupUseCase: GroupUseCase,
+    private val themeUseCase: ThemeUseCase,
+    val uploadImageUseCase: UploadImageUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = CreateGroupViewModel::class.java.simpleName
@@ -37,8 +49,8 @@ class CreateGroupViewModel(
     private val _fanciColor = MutableStateFlow<FanciColor?>(null)   //選擇的Theme Color
     val fanciColor = _fanciColor.asStateFlow()
 
-    private val _createComplete = MutableSharedFlow<Group>()    //建立完成
-    val createComplete = _createComplete.asSharedFlow()
+    var uiState by mutableStateOf(UiState())
+        private set
 
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
@@ -100,15 +112,7 @@ class CreateGroupViewModel(
             var imageUrl = data.url.orEmpty()
             if (data.uri != null) {
                 imageUrl = withContext(Dispatchers.IO) {
-                    val uploadImage =
-                        UploadImage(
-                            context,
-                            listOf(data.uri),
-                            XLoginHelper.accessToken,
-                            BuildConfig.DEBUG
-                        )
-
-                    val uploadResult = uploadImage.upload().first()
+                    val uploadResult = uploadImageUseCase.uploadImage(listOf(data.uri)).first()
                     uploadResult.second
                 }
             }
@@ -128,15 +132,7 @@ class CreateGroupViewModel(
             var imageUrl = data.url.orEmpty()
             if (data.uri != null) {
                 imageUrl = withContext(Dispatchers.IO) {
-                    val uploadImage =
-                        UploadImage(
-                            context,
-                            listOf(data.uri),
-                            XLoginHelper.accessToken,
-                            BuildConfig.DEBUG
-                        )
-
-                    val uploadResult = uploadImage.upload().first()
+                    val uploadResult = uploadImageUseCase.uploadImage(listOf(data.uri)).first()
                     uploadResult.second
                 }
             }
@@ -148,14 +144,26 @@ class CreateGroupViewModel(
 
     /**
      * 設定 主題
+     *
+     * @param groupThemeId ex: ThemeSmokePink
      */
-    fun setGroupTheme(groupTheme: GroupTheme) {
-        KLog.i(TAG, "setGroupTheme:$groupTheme")
-        _fanciColor.value = groupTheme.theme
+    fun setGroupTheme(groupThemeId: String) {
+        KLog.i(TAG, "setGroupTheme:$groupThemeId")
+        viewModelScope.launch {
+            ColorTheme.decode(groupThemeId)?.let { colorTheme ->
+                themeUseCase.fetchThemeConfig(colorTheme)
+                    .onSuccess { groupTheme ->
+                        _fanciColor.value = groupTheme.theme
+                    }
+                    .onFailure {
+                        KLog.e(TAG, it)
+                    }
+            }
 
-        _group.value = _group.value.copy(
-            colorSchemeGroupKey = ColorTheme.decode(groupTheme.id)
-        )
+            _group.value = _group.value.copy(
+                colorSchemeGroupKey = ColorTheme.decode(groupThemeId)
+            )
+        }
     }
 
     /**
@@ -191,12 +199,21 @@ class CreateGroupViewModel(
                 coverImageUrl = _group.value.coverImageUrl.orEmpty(),
                 thumbnailImageUrl = _group.value.thumbnailImageUrl.orEmpty(),
                 themeId = preCreateGroup.colorSchemeGroupKey?.value.orEmpty()
-            ).fold({
-                KLog.i(TAG, "createGroup success:$it")
-                _createComplete.emit(it)
-//                _group.value = it
+            ).fold({ createdGroup ->
+                KLog.i(TAG, "createGroup success")
+                uiState = uiState.copy(
+                    createdGroup = createdGroup,
+                    createComplete = true
+                )
+                // _group.value = it
             }, {
             })
         }
+    }
+
+    fun onCreateFinish() {
+        uiState = uiState.copy(
+            createComplete = null
+        )
     }
 }

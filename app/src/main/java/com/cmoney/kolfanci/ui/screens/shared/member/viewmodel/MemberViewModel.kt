@@ -239,7 +239,7 @@ class MemberViewModel(
     }
 
     /**
-     * 獲取群組會員清單
+     * 獲取群組會員清單, 並去除掉vip role
      */
     fun fetchGroupMember(
         groupId: String,
@@ -253,13 +253,22 @@ class MemberViewModel(
 
         viewModelScope.launch {
             showLoading()
-            groupUseCase.getGroupMember(groupId = groupId, skipCount = skip, search = searchKeyword)
+            groupUseCase.getGroupMember(
+                groupId = groupId,
+                skipCount = skip,
+                search = searchKeyword?.trim()
+            )
                 .fold({
                     val responseMembers = it.items.orEmpty()
                     if (responseMembers.isNotEmpty()) {
+                        //轉換model, 並去除vip role
                         val wrapMember = responseMembers.map { member ->
                             GroupMemberSelect(
-                                groupMember = member
+                                groupMember = member.copy(
+                                    roleInfos = member.roleInfos?.filter { role ->
+                                        role.isVipRole == false
+                                    }
+                                )
                             )
                         }
 
@@ -289,9 +298,6 @@ class MemberViewModel(
                 }, {
                     dismissLoading()
                     KLog.e(TAG, it)
-                    uiState = uiState.copy(
-                        groupMember = emptyList()
-                    )
                 })
         }
     }
@@ -486,18 +492,6 @@ class MemberViewModel(
             val distinctList = addGroupMemberQueue.distinct()
             addGroupMemberQueue.clear()
             addGroupMemberQueue.addAll(distinctList)
-
-            val orgMemberList = uiState.groupMember.orEmpty()
-            val filterMember = orgMemberList.filter {
-                addGroupMemberQueue.find { exclude ->
-                    exclude.id == it.groupMember.id
-                } == null
-            }
-
-            uiState = uiState.copy(
-                groupMember = filterMember,
-                showAddSuccessTip = true
-            )
         }
     }
 
@@ -622,11 +616,15 @@ class MemberViewModel(
     }
 
     /**
-     * 設置要編輯的會員info
+     * 設置要編輯的會員info, 去除vip
      */
     fun setManageGroupMember(groupMember: GroupMember) {
         KLog.i(TAG, "setManageGroupMember:$groupMember")
-        _managerMember.value = groupMember
+        _managerMember.value = groupMember.copy(
+            roleInfos = groupMember.roleInfos?.filter {
+                it.isVipRole == false
+            }
+        )
     }
 
     /**

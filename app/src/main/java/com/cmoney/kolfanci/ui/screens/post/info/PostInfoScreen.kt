@@ -27,6 +27,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -50,12 +51,17 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.displayPostTime
 import com.cmoney.kolfanci.extension.findActivity
+import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
@@ -95,12 +101,12 @@ import org.koin.core.parameter.parametersOf
 data class PostInfoScreenResult(
     val post: BulletinboardMessage,
     val action: PostInfoAction = PostInfoAction.Default
-): Parcelable {
+) : Parcelable {
     @Parcelize
-    sealed class PostInfoAction: Parcelable {
-        object Default: PostInfoAction()
-        object Pin: PostInfoAction()
-        object Delete: PostInfoAction()
+    sealed class PostInfoAction : Parcelable {
+        object Default : PostInfoAction()
+        object Pin : PostInfoAction()
+        object Delete : PostInfoAction()
     }
 }
 
@@ -127,6 +133,10 @@ fun PostInfoScreen(
 ) {
     val TAG = "PostInfoScreen"
     val context = LocalContext.current
+
+    LaunchedEffect(key1 = Unit) {
+        AppUserLogger.getInstance().log(Page.PostInnerPage)
+    }
 
     var showPostDeleteTip by remember {
         mutableStateOf(
@@ -218,6 +228,7 @@ fun PostInfoScreen(
         }
 
         override fun onCommentSend(text: String) {
+            AppUserLogger.getInstance().log(Clicked.CommentSendButton)
             if (Constant.isCanReply()) {
                 viewModel.onCommentReplySend(text)
                 keyboard?.hide()
@@ -233,6 +244,7 @@ fun PostInfoScreen(
         }
 
         override fun onAttachClick() {
+            AppUserLogger.getInstance().log(Clicked.CommentInsertImage)
             openImagePickDialog = true
         }
 
@@ -256,6 +268,9 @@ fun PostInfoScreen(
 
         //貼文 更多動作
         override fun onPostMoreClick(post: BulletinboardMessage) {
+            KLog.i(TAG, "onPostMoreClick")
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.InnerLayer)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Post,
@@ -292,6 +307,7 @@ fun PostInfoScreen(
     val commentBottomContentListener = object : CommentBottomContentListener {
         override fun onCommentReplyClick(comment: BulletinboardMessage) {
             if (Constant.isCanReply()) {
+                AppUserLogger.getInstance().log(Clicked.CommentReply)
                 viewModel.onCommentReplyClick(comment)
             }
         }
@@ -319,6 +335,9 @@ fun PostInfoScreen(
 
         //留言 更多動做
         override fun onCommentMoreActionClick(comment: BulletinboardMessage) {
+            KLog.i(TAG, "onCommentMoreActionClick")
+            AppUserLogger.getInstance().log(Clicked.MoreAction, From.Comment)
+
             context.findActivity().showPostMoreActionDialogBottomSheet(
                 postMessage = post,
                 postMoreActionType = PostMoreActionType.Comment,
@@ -326,10 +345,20 @@ fun PostInfoScreen(
                     when (it) {
                         is PostInteract.Announcement -> {}
                         is PostInteract.Delete -> {
+                            if (post.isMyPost()) {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.CommentDeleteComment, From.Poster)
+                            } else {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.CommentDeleteComment, From.OthersPost)
+                            }
+
                             showCommentDeleteTip = Pair(true, comment)
                         }
 
                         is PostInteract.Edit -> {
+                            KLog.i(TAG, "PostInteract.Edit click.")
+                            AppUserLogger.getInstance().log(Clicked.CommentEditComment)
                             navController.navigate(
                                 BaseEditMessageScreenDestination(
                                     channelId = channel.id.orEmpty(),
@@ -341,6 +370,7 @@ fun PostInfoScreen(
 
                         is PostInteract.Report -> {
                             KLog.i(TAG, "PostInteract.Report click.")
+                            AppUserLogger.getInstance().log(Clicked.CommentReportComment)
                             showReportTip = Pair(true, comment)
                         }
                     }
@@ -360,10 +390,20 @@ fun PostInfoScreen(
                     when (it) {
                         is PostInteract.Announcement -> {}
                         is PostInteract.Delete -> {
+                            KLog.i(TAG, "PostInteract.Delete click.")
+                            if (reply.isMyPost()) {
+                                AppUserLogger.getInstance().log(Clicked.CommentDeleteReply, From.Poster)
+                            }
+                            else {
+                                AppUserLogger.getInstance().log(Clicked.CommentDeleteReply, From.OthersPost)
+                            }
+
                             showReplyDeleteTip = Triple(true, comment, reply)
                         }
 
                         is PostInteract.Edit -> {
+                            KLog.i(TAG, "PostInteract.Edit click.")
+                            AppUserLogger.getInstance().log(Clicked.CommentEditReply)
                             navController.navigate(
                                 BaseEditMessageScreenDestination(
                                     channelId = channel.id.orEmpty(),
@@ -376,6 +416,7 @@ fun PostInfoScreen(
 
                         is PostInteract.Report -> {
                             KLog.i(TAG, "PostInteract.Report click.")
+                            AppUserLogger.getInstance().log(Clicked.CommentReportReply)
                             showReportTip = Pair(true, reply)
                         }
                     }
@@ -432,8 +473,7 @@ fun PostInfoScreen(
             is NavResult.Value -> {
                 if (result.value.isComment) {
                     viewModel.onUpdateComment(result.value.editMessage)
-                }
-                else {
+                } else {
                     viewModel.onUpdateReply(result.value.editMessage, result.value.commentId)
                 }
             }
@@ -523,16 +563,14 @@ fun PostInfoScreen(
     //置頂提示彈窗
     if (showPinDialogTip.first) {
         DialogScreen(
-            onDismiss = {
-                showPinDialogTip = Pair(false, null)
-            },
-            titleIconRes = R.drawable.pin,
-            iconFilter = LocalColor.current.component.other,
             title = "置頂文章",
             subTitle = if (isPinPost) {
                 ""
             } else {
                 "置頂這篇文章，重要貼文不再被淹沒！"
+            },
+            onDismiss = {
+                showPinDialogTip = Pair(false, null)
             }
         ) {
             BorderButton(
@@ -610,7 +648,7 @@ private fun PostInfoScreenView(
                 }
             )
         },
-        backgroundColor = LocalColor.current.background
+        backgroundColor = LocalColor.current.env_80
     ) { innerPadding ->
 
         Box(
@@ -622,7 +660,6 @@ private fun PostInfoScreenView(
                     //貼文
                     item {
                         BasePostContentScreen(
-                            backgroundColor = LocalColor.current.env_80,
                             post = post,
                             defaultDisplayLine = Int.MAX_VALUE,
                             bottomContent = {
@@ -635,80 +672,98 @@ private fun PostInfoScreenView(
                                 postInfoListener.onPostMoreClick(post)
                             },
                             onEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.InnerLayer)
+                                postInfoListener.onEmojiClick(post, it)
+                            },
+                            onImageClick = {
+                                AppUserLogger.getInstance().log(Clicked.Image, From.InnerLayer)
+                            },
+                            onAddNewEmojiClick = {
+                                AppUserLogger.getInstance().log(Clicked.AddEmoji, From.InnerLayer)
                                 postInfoListener.onEmojiClick(post, it)
                             }
                         )
                     }
 
-                    item {
-                        Spacer(modifier = Modifier.height(15.dp))
-                    }
-
-                    //Comment title
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(45.dp)
-                                .background(LocalColor.current.env_80)
-                                .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
-                        ) {
-                            Text(
-                                text = "貼文留言",
-                                fontSize = 17.sp,
-                                color = LocalColor.current.text.default_100
-                            )
+                    if (comments.isNotEmpty()) {
+                        item {
+                            Spacer(modifier = Modifier.height(15.dp))
                         }
-                    }
 
-                    item {
-                        Spacer(modifier = Modifier.height(1.dp))
-                    }
-
-                    //沒有人留言
-                    item {
-                        if (comments.isEmpty()) {
-                            EmptyCommentView()
-                        }
-                    }
-
-                    //留言內容
-                    items(comments) { comment ->
-                        //如果被刪除
-                        if (comment.isDeleted == true) {
-                            BaseDeletedContentScreen(
+                        //Comment title
+                        item {
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(LocalColor.current.background)
-                                    .padding(
-                                        top = 10.dp,
-                                        start = 20.dp,
-                                        end = 20.dp,
-                                        bottom = 5.dp
-                                    ),
-                                title = "這則留言已被刪除",
-                                content = "已經刪除的留言，你是看不到的！"
-                            )
-                        } else {
-                            BasePostContentScreen(
-                                post = comment,
-                                defaultDisplayLine = Int.MAX_VALUE,
-                                contentModifier = Modifier.padding(start = 40.dp),
-                                hasMoreAction = true,
-                                bottomContent = {
-                                    CommentBottomContent(
-                                        comment = comment,
-                                        reply = replyMapData[comment.id],
-                                        listener = commentBottomContentListener
-                                    )
-                                },
-                                onEmojiClick = {
-                                    postInfoListener.onCommentEmojiClick(comment, it)
-                                },
-                                onMoreClick = {
-                                    commentBottomContentListener.onCommentMoreActionClick(comment)
-                                }
-                            )
+                                    .height(45.dp)
+                                    .background(LocalColor.current.env_80)
+                                    .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
+                            ) {
+                                Text(
+                                    text = "貼文留言",
+                                    fontSize = 17.sp,
+                                    color = LocalColor.current.text.default_100
+                                )
+                            }
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(1.dp))
+                        }
+
+                        //留言內容
+                        items(comments) { comment ->
+                            //如果被刪除
+                            if (comment.isDeleted == true) {
+                                BaseDeletedContentScreen(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(LocalColor.current.background)
+                                        .padding(
+                                            top = 10.dp,
+                                            start = 20.dp,
+                                            end = 20.dp,
+                                            bottom = 5.dp
+                                        ),
+                                    title = "這則留言已被刪除",
+                                    content = "已經刪除的留言，你是看不到的！"
+                                )
+                            } else {
+                                BasePostContentScreen(
+                                    post = comment,
+                                    defaultDisplayLine = Int.MAX_VALUE,
+                                    contentModifier = Modifier.padding(start = 40.dp),
+                                    hasMoreAction = true,
+                                    bottomContent = {
+                                        CommentBottomContent(
+                                            comment = comment,
+                                            reply = replyMapData[comment.id],
+                                            listener = commentBottomContentListener
+                                        )
+                                    },
+                                    onEmojiClick = {
+                                        AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.Comment)
+                                        postInfoListener.onCommentEmojiClick(comment, it)
+                                    },
+                                    onMoreClick = {
+                                        commentBottomContentListener.onCommentMoreActionClick(
+                                            comment
+                                        )
+                                    },
+                                    onImageClick = {
+                                        AppUserLogger.getInstance().log(Clicked.Image, From.Comment)
+                                    },
+                                    onAddNewEmojiClick = {
+                                        AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Comment)
+                                        postInfoListener.onCommentEmojiClick(comment, it)
+                                    }
+                                )
+                            }
+                        }
+                    } else {
+                        //沒有人留言
+                        item {
+                            EmptyCommentView()
                         }
                     }
                 }
@@ -779,7 +834,8 @@ private fun PostInfoScreenView(
 @Composable
 private fun EmptyCommentView() {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(350.dp)
             .background(LocalColor.current.env_80),
         verticalArrangement = Arrangement.Center,
@@ -793,7 +849,11 @@ private fun EmptyCommentView() {
 
         Spacer(modifier = Modifier.height(43.dp))
 
-        Text(text = "目前還沒有人留言", fontSize = 16.sp, color = LocalColor.current.text.default_30)
+        Text(
+            text = "目前還沒有人留言",
+            fontSize = 16.sp,
+            color = LocalColor.current.text.default_30
+        )
     }
 }
 
@@ -878,6 +938,9 @@ private fun CommentBottomContent(
                                 comment = comment,
                                 reply = reply
                             )
+                        },
+                        onAddNewEmojiClick = {
+                            listener.onReplyEmojiClick(comment, reply, it)
                         }
                     )
                 }

@@ -152,11 +152,9 @@ fun BaseEditMessageScreen(
         when (uiState) {
             UiState.ShowEditTip -> {
                 DialogScreen(
-                    onDismiss = { viewModel.dismissEditTip() },
-                    titleIconRes = R.drawable.edit,
-                    iconFilter = null,
                     title = "文章內容空白",
-                    subTitle = "文章內容不可以是空白的唷！"
+                    subTitle = "文章內容不可以是空白的唷！",
+                    onDismiss = { viewModel.dismissEditTip() }
                 ) {
                     BlueButton(
                         modifier = Modifier

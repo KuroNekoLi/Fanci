@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -26,7 +27,7 @@ import kotlinx.parcelize.Parcelize
  * @param channelId 頻道Id
  * @param channelName 頻道命名
  * @param isPublic 是否為公開頻道
- * @param authType 該角色頻道權限
+ * @param authType 
  */
 @Parcelize
 
@@ -45,7 +46,6 @@ data class RoleChannelAuthType (
     @Json(name = "isPublic")
     val isPublic: kotlin.Boolean? = null,
 
-    /* 該角色頻道權限 */
     @Json(name = "authType")
     val authType: ChannelAuthType? = null
 

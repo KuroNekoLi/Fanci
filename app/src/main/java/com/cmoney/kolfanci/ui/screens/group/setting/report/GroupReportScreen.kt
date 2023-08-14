@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.report
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,9 +23,12 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -38,8 +43,11 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.isVip
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton
@@ -79,6 +87,10 @@ fun GroupReportScreen(
 ) {
     val uiState = viewModel.uiState
 
+    LaunchedEffect(key1 = group) {
+        AppUserLogger.getInstance().log(Page.GroupSettingsReportReview)
+    }
+
     GroupReportScreenView(
         modifier = modifier,
         navigator = navigator,
@@ -87,6 +99,7 @@ fun GroupReportScreen(
             viewModel.ignoreReport(it)
         },
         onBack = {
+            AppUserLogger.getInstance().log(Clicked.PunishBack)
             resultBackNavigator.navigateBack(
                 result = (reportList.size != uiState.reportList.size)
             )
@@ -104,10 +117,12 @@ fun GroupReportScreen(
                 viewModel.dismissReportDialog()
             },
             onSilence = {
+                AppUserLogger.getInstance().log(Clicked.PunishMute)
                 viewModel.dismissReportDialog()
                 viewModel.showSilenceDialog(it)
             },
             onKick = {
+                AppUserLogger.getInstance().log(Clicked.PunishKickOut)
                 viewModel.dismissReportDialog()
                 viewModel.showKickDialog(it)
             }
@@ -123,6 +138,7 @@ fun GroupReportScreen(
             name = name,
             isVip = isVip,
             onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.PunishMuteBack)
                 viewModel.dismissSilenceDialog()
             },
             onConfirm = {
@@ -132,6 +148,8 @@ fun GroupReportScreen(
                 }
             }
         )
+
+        AppUserLogger.getInstance().log(Page.GroupSettingsReportReviewMute)
     }
 
     //踢出 dialog
@@ -143,15 +161,19 @@ fun GroupReportScreen(
             name = name,
             isVip = isVip,
             onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.PunishKickOutCancel)
                 viewModel.dismissKickDialog()
             },
             onConfirm = {
+                AppUserLogger.getInstance().log(Clicked.PunishKickOutConfirmKickOut)
                 viewModel.dismissKickDialog()
                 uiState.kickDialog.let {
                     viewModel.kickOutMember(it)
                 }
             }
         )
+
+        AppUserLogger.getInstance().log(Page.GroupSettingsReportReviewKickOut)
     }
 
     //返回
@@ -222,43 +244,97 @@ private fun GroupReportScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "檢舉審核",
+                title = stringResource(id = R.string.report_review),
                 backClick = {
                     onBack.invoke()
                 }
             )
-        }
+        },
+        backgroundColor = LocalColor.current.env_80
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier.padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(30.dp)
-        ) {
-            items(reportList) { report ->
-                ReportItem(
-                    reportInformation = report,
-                    onFullMessageClick = {
-                        navigator.navigate(
-                            GroupReportMessageScreenDestination(
-                                reportInformation = it
-                            )
-                        )
-                    },
-                    onReporterClick = {
-                        navigator.navigate(
-                            GroupReporterScreenDestination(
-                                it.reporters?.toTypedArray() ?: arrayOf()
-                            )
-                        )
-                    },
-                    onIgnore = {
-                        onIgnore.invoke(it)
-                    },
-                    onReportClick = {
-                        onReport.invoke(it)
-                    }
-                )
-            }
+        if (reportList.isEmpty()) {
+            ReportEmptyScreen(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            )
+        } else {
+            ReportReviewLazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                reportList = reportList,
+                navigator = navigator,
+                onIgnore = onIgnore,
+                onReport = onReport
+            )
         }
+    }
+}
+
+@Composable
+private fun ReportReviewLazyColumn(
+    modifier: Modifier = Modifier,
+    reportList: List<ReportInformation>,
+    navigator: DestinationsNavigator,
+    onIgnore: (ReportInformation) -> Unit,
+    onReport: (ReportInformation) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(30.dp)
+    ) {
+        items(reportList) { report ->
+            ReportItem(
+                reportInformation = report,
+                onFullMessageClick = {
+                    navigator.navigate(
+                        GroupReportMessageScreenDestination(
+                            reportInformation = it
+                        )
+                    )
+                },
+                onReporterClick = {
+                    navigator.navigate(
+                        GroupReporterScreenDestination(
+                            it.reporters?.toTypedArray() ?: arrayOf()
+                        )
+                    )
+                },
+                onIgnore = {
+                    onIgnore.invoke(it)
+                },
+                onReportClick = {
+                    onReport.invoke(it)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReportEmptyScreen(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            modifier = Modifier.size(110.dp),
+            painter = painterResource(id = R.drawable.flower_box),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(LocalColor.current.text.default_30)
+        )
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        Text(
+            text = stringResource(id = R.string.report_is_empty),
+            fontSize = 16.sp,
+            color = LocalColor.current.text.default_30
+        )
     }
 }
 
@@ -413,6 +489,7 @@ private fun ReportItem(
                 textColor = LocalColor.current.text.default_100,
                 text = stringResource(id = R.string.not_punish)
             ) {
+                AppUserLogger.getInstance().log(Clicked.ReportReviewNoPunish)
                 onIgnore.invoke(reportInformation)
             }
 
@@ -424,6 +501,7 @@ private fun ReportItem(
                     .height(40.dp),
                 text = stringResource(id = R.string.punish)
             ) {
+                AppUserLogger.getInstance().log(Clicked.ReportReviewPunish)
                 onReportClick.invoke(reportInformation)
             }
         }
