@@ -33,25 +33,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -84,7 +90,22 @@ fun DiscoverGroupScreen(
             viewModel.openGroupItemDialog(it)
         },
         onCreateClick = {
-            navController.navigate(CreateGroupScreenDestination())
+            if (XLoginHelper.isLogin) {
+
+                when (uiState.tabIndex) {
+                    0 -> {
+                        AppUserLogger.getInstance().log(Clicked.CreateGroup, From.Hot)
+                    }
+
+                    1 -> {
+                        AppUserLogger.getInstance().log(Clicked.CreateGroup, From.New)
+                    }
+                }
+
+                navController.navigate(CreateGroupScreenDestination())
+            } else {
+                viewModel.showLoginDialog()
+            }
         },
         onLoadMore = {
             viewModel.onLoadMore()
@@ -95,6 +116,7 @@ fun DiscoverGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val isJoinComplete = result.value
                 if (isJoinComplete) {
@@ -127,6 +149,16 @@ fun DiscoverGroupScreen(
                 } else {
                     //不公開
                     if (it.isNeedApproval == true) {
+                        when (uiState.tabIndex) {
+                            0 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.Hot)
+                            }
+
+                            1 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.New)
+                            }
+                        }
+
                         navController.navigate(
                             ApplyForGroupScreenDestination(
                                 group = it
@@ -135,6 +167,16 @@ fun DiscoverGroupScreen(
                     }
                     //公開
                     else {
+                        when (uiState.tabIndex) {
+                            0 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Hot)
+                            }
+
+                            1 -> {
+                                AppUserLogger.getInstance().log(Clicked.GroupJoin, From.New)
+                            }
+                        }
+
                         viewModel.joinGroup(it)
                     }
                 }
@@ -148,15 +190,33 @@ fun DiscoverGroupScreen(
 //        navController.popBackStack()
     }
 
+    if (uiState.showLoginDialog) {
+        val context = LocalContext.current
+        LoginDialogScreen(
+            onDismiss = {
+                viewModel.dismissLoginDialog()
+            },
+            onLogin = {
+                viewModel.dismissLoginDialog()
+                (context as? MainActivity)?.startLogin()
+            }
+        )
+    }
+
     LaunchedEffect(key1 = uiState.tabIndex) {
         when (uiState.tabIndex) {
             0 -> {
-                AppUserLogger.getInstance()
-                    .log(page = Page.ExploreGroupPopularGroups)
+                with(AppUserLogger.getInstance()) {
+                    log(Clicked.ExploreGroupPopularGroups)
+                    log(page = Page.ExploreGroupPopularGroups)
+                }
             }
+
             1 -> {
-                AppUserLogger.getInstance()
-                    .log(page = Page.ExploreGroupNewestGroups)
+                with(AppUserLogger.getInstance()) {
+                    log(Clicked.ExploreGroupNewestGroups)
+                    log(page = Page.ExploreGroupNewestGroups)
+                }
             }
         }
     }

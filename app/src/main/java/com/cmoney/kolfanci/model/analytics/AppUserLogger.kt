@@ -3,11 +3,13 @@ package com.cmoney.kolfanci.model.analytics
 import android.util.Log
 import com.cmoney.analytics.user.model.event.UserEvent
 import com.cmoney.application_user_behavior.AnalyticsAgent
-import com.cmoney.application_user_behavior.model.event.logPageSwitch
+import com.cmoney.application_user_behavior.model.event.logClicked
 import com.cmoney.application_user_behavior.model.event.logPageViewed
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.xlogin.XLoginHelper
 import com.flurry.android.FlurryAgent
 import com.mixpanel.android.mpmetrics.MixpanelAPI
@@ -19,8 +21,12 @@ class AppUserLogger : KoinComponent {
     private val mixpanel: MixpanelAPI by inject()
 
     companion object {
+        private val _instance by lazy {
+            AppUserLogger()
+        }
+
         fun getInstance(): AppUserLogger {
-            return AppUserLogger()
+            return _instance
         }
     }
 
@@ -30,17 +36,72 @@ class AppUserLogger : KoinComponent {
         debugLog(event.name, event.getParameters())
     }
 
-    fun log(page: Page) {
-        val event = PageUserEvent(page = page.eventName)
+    fun log(page: Page, from: From? = null) {
+        val descriptions = from?.asParameters()
+        val event = PageUserEvent(page = page.eventName, parameters = descriptions)
 //        logFlurry(event)
 //        logMixpanel(event)
         logCM(page)
         debugLog(event.name, event.getParameters())
     }
 
-    class PageUserEvent(val page: String) : UserEvent() {
+    fun log(clicked: Clicked, from: From? = null) {
+        val descriptions = from?.asParameters()
+        val event = ClickedUserEvent(clicked = clicked.eventName, parameters = descriptions)
+        logCM(clicked = clicked, descriptions = descriptions)
+        debugLog(event.name, event.getParameters())
+    }
+
+    fun log(eventName: String, parameters: Map<String, Any>? = null) {
+        val event = OtherEvent(
+            eventName, parameters
+        )
+        logCM(eventName = eventName, descriptions = parameters)
+        debugLog(event.name, event.getParameters())
+    }
+
+    class PageUserEvent(val page: String, parameters: Map<String, Any>? = null) : UserEvent() {
         override val name: String
             get() = page
+
+        init {
+            parameters?.let {
+                val ps = it.toList().map { (key, value) ->
+                    key to value.toString()
+                }.toTypedArray()
+                setParameters(*ps)
+            }
+        }
+    }
+
+    class ClickedUserEvent(private val clicked: String, parameters: Map<String, Any>? = null) :
+        UserEvent() {
+        override val name: String
+            get() = clicked
+
+        init {
+            parameters?.let {
+                val ps = it.toList().map { (key, value) ->
+                    key to value.toString()
+                }.toTypedArray()
+                setParameters(*ps)
+            }
+        }
+    }
+
+    class OtherEvent(private val eventName: String, parameters: Map<String, Any>? = null) :
+        UserEvent() {
+        override val name: String
+            get() = eventName
+
+        init {
+            parameters?.let {
+                val ps = it.toList().map { (key, value) ->
+                    key to value.toString()
+                }.toTypedArray()
+                setParameters(*ps)
+            }
+        }
     }
 
     /**
@@ -62,6 +123,26 @@ class AppUserLogger : KoinComponent {
      */
     private fun logCM(page: Page) {
         AnalyticsAgent.getInstance().logPageViewed(page.eventName)
+    }
+
+    /**
+     * Log to CMoney
+     */
+    private fun logCM(clicked: Clicked, descriptions: Map<String, Any>? = null) {
+        AnalyticsAgent.getInstance().logClicked(
+            name = clicked.eventName,
+            descriptions = descriptions
+        )
+    }
+
+    /**
+     * Log to CMoney
+     */
+    private fun logCM(eventName: String, descriptions: Map<String, Any>? = null) {
+        AnalyticsAgent.getInstance().logEvent(
+            name = eventName,
+            descriptions = descriptions
+        )
     }
 
     /**

@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.ui.screens.shared.edit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,18 +18,23 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
@@ -40,6 +47,10 @@ import com.ramcosta.composedestinations.result.ResultBackNavigator
 
 /**
  * 單一輸入編輯畫面
+ *
+ * @param from log 紀錄用
+ * @param textFieldClicked log 紀錄用
+ * @param textFieldFrom log 紀錄用
  */
 @Destination
 @Composable
@@ -51,7 +62,10 @@ fun EditInputScreen(
     placeholderText: String,
     emptyAlertTitle: String,
     emptyAlertSubTitle: String,
-    resultNavigator: ResultBackNavigator<String>
+    resultNavigator: ResultBackNavigator<String>,
+    from: From? = null,
+    textFieldClicked: Clicked? = null,
+    textFieldFrom: From? = null
 ) {
     var showEmptyTip by remember {
         mutableStateOf(false)
@@ -74,28 +88,29 @@ fun EditInputScreen(
         },
         onBack = {
             showSaveTip = true
-        }
+        },
+        from = from,
+        textFieldFrom = textFieldFrom,
+        textFieldClicked = textFieldClicked
     )
 
     if (showEmptyTip) {
         DialogScreen(
-            onDismiss = {
-                showEmptyTip = false
-            },
-            titleIconRes = R.drawable.edit,
             title = emptyAlertTitle,
             subTitle = emptyAlertSubTitle,
-            content = {
-                BlueButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    text = stringResource(id = R.string.modify)
-                ) {
-                    showEmptyTip = false
-                }
+            onDismiss = {
+                showEmptyTip = false
             }
-        )
+        ) {
+            BlueButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = stringResource(id = R.string.modify)
+            ) {
+                showEmptyTip = false
+            }
+        }
     }
 
     SaveConfirmDialogScreen(
@@ -118,7 +133,10 @@ fun EditInputScreenView(
     onShowEmptyTip: () -> Unit,
     onBack: () -> Unit,
     toolbarTitle: String,
-    placeholderText: String
+    placeholderText: String,
+    from: From? = null,
+    textFieldClicked: Clicked? = null,
+    textFieldFrom: From? = null
 ) {
     var textState by remember { mutableStateOf(defaultText) }
     val maxLength = 20
@@ -130,6 +148,10 @@ fun EditInputScreenView(
             EditToolbarScreen(
                 title = toolbarTitle,
                 saveClick = {
+                    from?.let {
+                        AppUserLogger.getInstance().log(Clicked.Confirm, it)
+                    }
+
                     if (textState.isEmpty()) {
                         onShowEmptyTip.invoke()
                     } else {
@@ -187,6 +209,18 @@ fun EditInputScreenView(
                             fontSize = 16.sp,
                             color = LocalColor.current.text.default_30
                         )
+                    },
+                    interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
+                        LaunchedEffect(interactionSource) {
+                            interactionSource.interactions.collect {
+                                if (it is PressInteraction.Release) {
+                                    if (textFieldClicked != null) {
+                                        AppUserLogger.getInstance()
+                                            .log(textFieldClicked, textFieldFrom)
+                                    }
+                                }
+                            }
+                        }
                     }
                 )
 

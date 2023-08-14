@@ -15,6 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GroupMember
 
@@ -36,7 +37,7 @@ import kotlinx.parcelize.Parcelize
 data class ChannelWhiteList (
 
     @Json(name = "authType")
-    val authType: kotlin.String? = null,
+    val authType: ChannelAuthType? = null,
 
     @Json(name = "roles")
     val roles: kotlin.collections.List<FanciRole>? = null,

@@ -52,6 +52,7 @@
     <string name="group_description_placeholder">填寫專屬於社團的簡介吧！</string>
     <string name="group_avatar">社團圖示</string>
     <string name="group_background">社團背景</string>
+    <string name="group_homepage_background">首頁背景</string>
     <string name="group_board_place">面板覆蓋處</string>
     <string name="theme_color">主題色彩</string>
     <string name="theme_preview">主題預覽</string>
@@ -107,6 +108,7 @@
     <string name="vip_name_empty_desc">VIP 名稱不可以是空白的唷！</string>
 
     <string name="choose_channel">選擇頻道</string>
+    <string name="choose_permission">選擇權限</string>
 
     <string name="vip_member_description">下列為購買此 VIP 方案的成員，他們可以執行此 VIP的權限行為。</string>
     <string name="vip_member_empty_description">目前沒有任何人購買此方案</string>
@@ -163,4 +165,38 @@
     <string name="search_result_empty">找不到相關內容\n試試看比較簡短的關鍵字呢</string>
     <string name="jump_to_chatroom">跳至訊息，進行更多互動</string>
     <string name="search_keyword_hint">輸入關鍵字</string>
+    <string name="empty_follow_tip">加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團</string>
+    <string name="create_group">建立社團</string>
+    <string name="disband_group">解散社團</string>
+    <string name="group_openness">社團公開度</string>
+    <string name="save_failed">儲存失敗</string>
+    <string name="review_question">審核題目</string>
+    <string name="add_review_question">新增審核題目</string>
+    <string name="full_public_group_desc">任何人都能看到社團，任何人都能進入。</string>
+    <string name="not_public_group_desc">任何人都能看到社團，需要回答問題才能進入。</string>
+
+    <string name="report_review">檢舉審核</string>
+    <string name="report_is_empty">目前沒有待審核的檢舉</string>
+    <string name="apply_is_empty">目前沒有待審核的加入申請</string>
+    <string name="not_create_any_role">尚未建立任何角色</string>
+    <string name="sort_channel">頻道排序</string>
+    <string name="sort_category">分類排序</string>
+
+    <string name="contact_personal_service">聯絡專人管理 VIP 方案</string>
+    <string name="official_mail">fanci@cmoney.com.tw</string>
+    <string name="contact_official_mail">請聯絡官方信箱\nfanci@cmoney.com.tw</string>
+    <string name="copy_mail">複製信箱</string>
+    <string name="copy_success">已複製信箱</string>
+    <string name="select_all">全選</string>
+    <string name="unselect_all">取消全選</string>
+
+    <!-- Remote Config text  -->
+    <string name="text_remote_config_update_title">系統更新通知</string>
+    <string name="text_remote_config_under_maintain_title">系統維護中</string>
+    <string name="text_remote_config_under_maintain_confirm_button">暫時離開，稍後回來</string>
+    <string name="text_remote_config_under_review_title">審核中</string>
+    <string name="text_remote_config_under_review_message">目前應用程式審核中，請等待審核通過，至商店更新應用程式後再重新開啟。</string>
+    <string name="update_immediately">立即更新</string>
+    <string name="later">稍後</string>
+
 </resources>

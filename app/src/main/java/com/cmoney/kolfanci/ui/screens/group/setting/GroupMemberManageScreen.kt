@@ -11,8 +11,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AllMemberScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.RoleManageScreenDestination
@@ -43,6 +45,8 @@ fun GroupMemberManageScreen(
                 iconRes = R.drawable.rule_manage,
                 text = "角色管理",
                 onItemClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupSettingsRoleManagement)
                     navController.navigate(RoleManageScreenDestination(group = group))
                 }
             )
@@ -54,6 +58,8 @@ fun GroupMemberManageScreen(
             iconRes = R.drawable.all_member,
             text = "所有成員",
             onItemClick = {
+                AppUserLogger.getInstance()
+                    .log(Clicked.GroupSettingsAllMembers)
                 navController.navigate(
                     AllMemberScreenDestination(
                         group = group
@@ -68,6 +74,8 @@ fun GroupMemberManageScreen(
                 iconRes = R.drawable.join_apply,
                 text = "加入申請",
                 onItemClick = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupSettingsJoinApplication)
                     navController.navigate(
                         GroupApplyScreenDestination(
                             group = group

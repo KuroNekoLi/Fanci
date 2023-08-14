@@ -6,17 +6,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.Color
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.PermissionCategory
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
-import kotlinx.parcelize.Parcelize
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import retrofit2.HttpException
 import java.lang.reflect.Type
 
@@ -106,13 +111,32 @@ class RoleManageViewModel(
                 }
 
                 uiState = uiState.copy(
-                    permissionList = permissionList,
+                    permissionList = filterPermissionInAppReview(permissionList),
                     permissionSelected = permissionCheckedMap
                 )
             }, {
                 KLog.e(TAG, it)
             })
         }
+    }
+
+    /**
+     * App 審核中, 隱藏項目有 vip 相關資訊
+     */
+    private fun filterPermissionInAppReview(permissionList: List<PermissionCategory>): List<PermissionCategory> {
+        var filterPermission = permissionList
+
+        if (!Constant.isAppNotInReview()) {
+            filterPermission = permissionList.map { permissionCategory ->
+                permissionCategory.copy(
+                    permissions = permissionCategory.permissions?.filter { permissions ->
+                        permissions.name?.contains("vip", ignoreCase = true) == false
+                    }
+                )
+            }
+        }
+
+        return filterPermission
     }
 
     /**
@@ -275,6 +299,7 @@ class RoleManageViewModel(
      */
     private fun assignMemberRole(groupId: String, fanciRole: FanciRole) {
         KLog.i(TAG, "assignMemberRole:$groupId , $fanciRole")
+        val editFanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
         viewModelScope.launch {
             if (uiState.memberList.isNotEmpty()) {
 
@@ -283,22 +308,23 @@ class RoleManageViewModel(
                 if (addMemberList.isNotEmpty()) {
                     groupUseCase.addMemberToRole(
                         groupId = groupId,
-                        roleId = fanciRole.id.orEmpty(),
+                        roleId = editFanciRole.id.orEmpty(),
                         memberList = addMemberList.map {
                             it.id.orEmpty()
                         }
-                    ).fold({
-                        KLog.i(TAG, "assignMemberRole complete")
-                        uiState = uiState.copy(
-                            fanciRoleCallback = FanciRoleCallback(
-                                fanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
-                            ),
-                            addRoleError = null,
-                            addRoleComplete = true
-                        )
-                    }, {
+                    ).onFailure {
                         KLog.e(TAG, it)
-                    })
+                        if (it is EmptyBodyException) {
+                            KLog.i(TAG, "assignMemberRole complete")
+                            uiState = uiState.copy(
+                                fanciRoleCallback = FanciRoleCallback(
+                                    fanciRole = editFanciRole
+                                ),
+                                addRoleError = null,
+                                addRoleComplete = true
+                            )
+                        }
+                    }
                 }
 
                 //要移除的人員
@@ -306,7 +332,7 @@ class RoleManageViewModel(
                 if (removeMemberList.isNotEmpty()) {
                     groupUseCase.removeUserRole(
                         groupId = groupId,
-                        roleId = fanciRole.id.orEmpty(),
+                        roleId = editFanciRole.id.orEmpty(),
                         userId = removeMemberList.map {
                             it.id.orEmpty()
                         }
@@ -316,7 +342,7 @@ class RoleManageViewModel(
                         if (it is EmptyBodyException) {
                             uiState = uiState.copy(
                                 fanciRoleCallback = FanciRoleCallback(
-                                    fanciRole = fanciRole.copy(userCount = uiState.memberList.size.toLong())
+                                    fanciRole = editFanciRole
                                 ),
                                 addRoleError = null,
                                 addRoleComplete = true
@@ -326,7 +352,7 @@ class RoleManageViewModel(
                 } else {
                     uiState = uiState.copy(
                         fanciRoleCallback = FanciRoleCallback(
-                            fanciRole = fanciRole
+                            fanciRole = editFanciRole
                         ),
                         addRoleError = null,
                         addRoleComplete = true
@@ -337,7 +363,7 @@ class RoleManageViewModel(
                 if (editMemberList.isNotEmpty()) {
                     groupUseCase.removeUserRole(
                         groupId = groupId,
-                        roleId = fanciRole.id.orEmpty(),
+                        roleId = editFanciRole.id.orEmpty(),
                         userId = editMemberList.map {
                             it.id.orEmpty()
                         }
@@ -350,7 +376,7 @@ class RoleManageViewModel(
 
                 uiState = uiState.copy(
                     fanciRoleCallback = FanciRoleCallback(
-                        fanciRole = fanciRole
+                        fanciRole = editFanciRole
                     ),
                     addRoleError = null,
                     addRoleComplete = true
@@ -426,19 +452,12 @@ class RoleManageViewModel(
                 editMemberList = groupUseCase.fetchRoleMemberList(
                     groupId = groupId,
                     roleId = fanciRole.id.orEmpty()
-                ).getOrNull().orEmpty().map { user ->
-                    GroupMember(
-                        id = user.id,
-                        name = user.name,
-                        thumbNail = user.thumbNail,
-                        serialNumber = user.serialNumber
-                    )
-                }
+                ).getOrNull().orEmpty()
 
                 uiState = uiState.copy(
                     roleName = fanciRole.name.orEmpty(),
                     roleColor = roleColor,
-                    permissionList = permissionList,
+                    permissionList = filterPermissionInAppReview(permissionList.orEmpty()),
                     permissionSelected = permissionCheckedMap.orEmpty(),
                     memberList = editMemberList
                 )
@@ -516,6 +535,15 @@ class RoleManageViewModel(
     fun setSortResult(fanciRoleList: List<FanciRole>) {
         uiState = uiState.copy(
             fanciRole = fanciRoleList
+        )
+    }
+
+    /**
+     * 設定 初始化角色顏色
+     */
+    fun setDefaultRoleColor(color: Color) {
+        uiState = uiState.copy(
+            roleColor = color
         )
     }
 }

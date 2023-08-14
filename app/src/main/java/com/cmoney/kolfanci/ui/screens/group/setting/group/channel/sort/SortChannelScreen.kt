@@ -18,33 +18,38 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.CategoryText
 import com.cmoney.kolfanci.ui.common.ChannelText
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -53,40 +58,34 @@ fun SortChannelScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
     group: Group,
-    viewModel: ChannelSettingViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<Group>
+    viewModel: ChannelSettingViewModel = koinViewModel()
 ) {
+    val groupViewModel = globalGroupViewModel()
     val uiState = viewModel.uiState
-
-    val categoryList = if (uiState.group != null) {
-        uiState.group.categories.orEmpty()
-    } else {
+    val categoryList = if (uiState.group == null) {
         group.categories.orEmpty()
+    } else {
+        uiState.group.categories.orEmpty()
     }
 
-    key(uiState.group?.categories) {
-        SortChannelScreenView(
-            modifier = modifier,
-            navigator = navigator,
-            categoryList = categoryList,
-            moveCallback = {
-                viewModel.sortChannel(it)
-            },
-            onSave = {
-                viewModel.onSortCategoryOrChannel(
-                    group = group,
-                    categories = it
-                )
-            }
-        )
-    }
+    SortChannelScreenView(
+        modifier = modifier,
+        navigator = navigator,
+        categoryList = categoryList,
+        moveCallback = {
+            viewModel.sortChannel(it)
+        },
+        onSave = {
+            AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelOrder)
+            groupViewModel.updateCategories(it)
+            navigator.popBackStack()
+        }
+    )
 
-    if (uiState.group == null) {
-        viewModel.setGroup(group)
-    }
-
-    if (uiState.isSoredToServerComplete && uiState.group != null) {
-        resultNavigator.navigateBack(uiState.group)
+    LaunchedEffect(key1 = Unit) {
+        if (uiState.group == null) {
+            viewModel.setGroup(group)
+        }
     }
 }
 
@@ -102,8 +101,12 @@ private fun SortChannelScreenView(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TopBarScreen(
-                title = "頻道排序",
+            EditToolbarScreen(
+                title = stringResource(id = R.string.sort_channel),
+                leadingIcon = Icons.Filled.ArrowBack,
+                saveClick = {
+                    onSave.invoke(categoryList)
+                },
                 backClick = {
                     navigator.popBackStack()
                 }
@@ -130,23 +133,8 @@ private fun SortChannelScreenView(
                     }
                 }
             }
-
-            //========== 儲存 ==========
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(135.dp)
-                    .background(LocalColor.current.env_100),
-                contentAlignment = Alignment.Center
-            ) {
-                BlueButton(text = "儲存") {
-                    onSave.invoke(categoryList)
-                }
-            }
         }
-
     }
-
 }
 
 /**
@@ -170,9 +158,13 @@ private fun CategoryItem(
         modifier = modifier
             .background(LocalColor.current.background)
             .fillMaxSize()
-    ) { isInBound, moveItem, currentDropTargetPosition ->
+    ) { isInBound, moveItem, _, isDragging ->
 
-        val bgColor = if (isInBound) Color.DarkGray else LocalColor.current.background
+        val bgColor = if (isInBound && isDragging) {
+            Color.DarkGray
+        } else {
+            LocalColor.current.background
+        }
 
         Column(
             modifier = modifier

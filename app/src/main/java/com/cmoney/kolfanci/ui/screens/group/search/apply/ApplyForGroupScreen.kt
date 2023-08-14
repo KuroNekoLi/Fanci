@@ -10,8 +10,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,7 +92,6 @@ fun ApplyForGroupScreen(
         DialogScreen(
             title = "尚有題目未完成",
             subTitle = "題目未完成前，無法送出邀請。",
-            titleIconRes = R.drawable.edit,
             onDismiss = {
                 viewModel.dismissWarning()
             }) {
@@ -114,7 +111,6 @@ fun ApplyForGroupScreen(
         DialogScreen(
             title = "答案未送出",
             subTitle = "你的答案沒有送出喔！",
-            titleIconRes = R.drawable.edit,
             onDismiss = {
                 viewModel.dismissWarning()
             }) {

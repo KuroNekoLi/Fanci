@@ -104,11 +104,19 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
     fun selectAllClick() {
         KLog.i(TAG, "selectAllClick")
         uiState.applyList?.let { applyList ->
-            val newList = applyList.map {
-                it.copy(
-                    isSelected = !it.isSelected
-                )
+            val hasNotSelect = applyList.any { selected ->
+                !selected.isSelected
             }
+            val newList = if (hasNotSelect) {
+                applyList.map {
+                    it.copy(isSelected = true)
+                }
+            } else {
+                applyList.map {
+                    it.copy(isSelected = false)
+                }
+            }
+
             uiState = uiState.copy(
                 applyList = newList
             )

@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.ui.screens.group.setting.group.openness
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -29,14 +32,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -45,14 +54,11 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.Gro
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
@@ -69,18 +75,15 @@ fun GroupOpennessScreen(
             parametersOf(group)
         }
     ),
-    resultRecipient: ResultRecipient<CreateApplyQuestionScreenDestination, String>,
-    resultBackNavigator: ResultBackNavigator<Group>
+    resultRecipient: ResultRecipient<CreateApplyQuestionScreenDestination, String>
 ) {
     val TAG = "GroupOpennessScreen"
+    val globalGroupViewModel = globalGroupViewModel()
     val uiState = viewModel.uiState
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
     var showDeleteConfirmDialog by remember {
-        mutableStateOf(false)
-    }
-    var showSaveTip by remember {
         mutableStateOf(false)
     }
 
@@ -117,33 +120,39 @@ fun GroupOpennessScreen(
     GroupOpennessScreenView(
         modifier = modifier,
         isNeedApproval = uiState.isNeedApproval,
-        question = uiState.groupQuestionList.orEmpty(),
+        questions = uiState.groupQuestionList.orEmpty(),
         onSwitch = {
             viewModel.onSwitchClick(it)
             showDialog.value = it
         },
         onAddQuestion = {
             navigator.navigate(
-                CreateApplyQuestionScreenDestination()
+                CreateApplyQuestionScreenDestination(
+                    keyinTracking = Clicked.QuestionTextArea.eventName,
+                    from = From.GroupSettingsAddQuestion
+                )
             )
             AppUserLogger.getInstance().log(Page.GroupSettingsGroupOpennessNonPublicReviewQuestionAddReviewQuestion)
         },
         onEditClick = {
             showEditDialog.value = Pair(true, it)
         },
-        onSave = {
-            viewModel.onSave(group = group)
+        onBack = {
+            group.id?.let { id ->
+                viewModel.onSave(id = id)
+            }
         }
-    ) {
-        showSaveTip = true
-    }
+    )
 
     //不公開 提示
     if (showDialog.value) {
         TipDialog(
             onAddTopic = {
                 navigator.navigate(
-                    CreateApplyQuestionScreenDestination()
+                    CreateApplyQuestionScreenDestination(
+                        keyinTracking = Clicked.QuestionTextArea.eventName,
+                        from = From.GroupSettingsAddQuestion
+                    )
                 )
             },
             onDismiss = {
@@ -164,14 +173,18 @@ fun GroupOpennessScreen(
                 viewModel.openEditMode(showEditDialog.value.second)
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
-                        question = showEditDialog.value.second
+                        question = showEditDialog.value.second,
+                        keyinTracking = Clicked.QuestionTextArea.eventName,
+                        from = From.GroupSettingsAddQuestion
                     )
                 )
+                AppUserLogger.getInstance().log(Clicked.GroupOpennessManageEdit)
                 AppUserLogger.getInstance().log(Page.GroupSettingsGroupOpennessNonPublicReviewQuestionEdit)
                 showEditDialog.value = Pair(false, "")
             },
             onRemove = {
                 KLog.i(TAG, "onRemove click.")
+                AppUserLogger.getInstance().log(Clicked.GroupOpennessManageRemove)
                 showDeleteConfirmDialog = true
             }
         )
@@ -221,9 +234,7 @@ fun GroupOpennessScreen(
                             borderColor = LocalColor.current.component.other,
                             textColor = Color.White
                         ) {
-                            kotlin.run {
-                                showDeleteConfirmDialog = false
-                            }
+                            showDeleteConfirmDialog = false
                         }
                     }
                 }
@@ -231,41 +242,26 @@ fun GroupOpennessScreen(
         )
     }
 
-    //設定完成
-    LaunchedEffect(Unit) {
-        viewModel.saveComplete.collect { saveComplete ->
-            if (saveComplete != null) {
-                resultBackNavigator.navigateBack(
-                    group.copy(
-                        isNeedApproval = uiState.isNeedApproval
-                    )
-                )
-            }            
-        }    
-    }
-
-    //離開再次 確認
-    SaveConfirmDialogScreen(
-        isShow = showSaveTip,
-        onContinue = {
-            showSaveTip = false
-        },
-        onGiveUp = {
-            showSaveTip = false
+    val context = LocalContext.current
+    uiState.saveComplete?.let { saveComplete ->
+        if (saveComplete) {
+            globalGroupViewModel.changeOpenness(openness = !uiState.isNeedApproval)
             navigator.popBackStack()
+        } else {
+            context.showToast(stringResource(id = R.string.save_failed))
         }
-    )
+        viewModel.onSaveFinish()
+    }
 }
 
 @Composable
 fun GroupOpennessScreenView(
     modifier: Modifier = Modifier,
     isNeedApproval: Boolean,
-    question: List<String> = emptyList(),
+    questions: List<String> = emptyList(),
     onSwitch: (Boolean) -> Unit,
     onAddQuestion: () -> Unit,
     onEditClick: (String) -> Unit,
-    onSave: () -> Unit,
     onBack: () -> Unit,
 ) {
     Scaffold(
@@ -273,143 +269,142 @@ fun GroupOpennessScreenView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             TopBarScreen(
-                title = "社團公開度",
+                title = stringResource(id = R.string.group_openness),
                 backClick = onBack
             )
-        }
-    ) { padding ->
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(LocalColor.current.background)
-                    .clickable {
-                        onSwitch.invoke(false)
-                    }
-                    .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "完全公開",
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100
-                    )
-
-                    Spacer(modifier = Modifier.height(3.dp))
-
-                    Text(
-                        text = "任何人都能看到社團，任何人都能進入。",
-                        fontSize = 14.sp,
-                        color = LocalColor.current.text.default_50
-                    )
+        },
+        backgroundColor = LocalColor.current.env_80
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            OpennessOptionItem(
+                title = stringResource(id = R.string.full_public),
+                description = stringResource(id = R.string.full_public_group_desc),
+                selected = !isNeedApproval,
+                onSwitch = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupPermissionsOpenness, From.Public)
+                    onSwitch(false)
                 }
+            )
 
-                if (!isNeedApproval) {
-                    Image(
-                        painter = painterResource(id = R.drawable.checked),
-                        contentDescription = null
-                    )
+            Spacer(modifier = Modifier.height(1.dp))
 
-                    Spacer(modifier = Modifier.width(25.dp))
+            OpennessOptionItem(
+                title = stringResource(id = R.string.not_public),
+                description = stringResource(id = R.string.not_public_group_desc),
+                selected = isNeedApproval,
+                onSwitch = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupPermissionsOpenness, From.NonPublic)
+                    onSwitch(true)
                 }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(LocalColor.current.background)
-                    .clickable {
-                        onSwitch.invoke(true)
-                    }
-                    .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "不公開",
-                        fontSize = 17.sp,
-                        color = LocalColor.current.text.default_100
-                    )
-
-                    Spacer(modifier = Modifier.height(3.dp))
-
-                    Text(
-                        text = "任何人都能看到社團，需要回答問題才能進入。",
-                        fontSize = 14.sp,
-                        color = LocalColor.current.text.default_50
-                    )
-                }
-
-                if (isNeedApproval) {
-                    Image(
-                        painter = painterResource(id = R.drawable.checked),
-                        contentDescription = null
-                    )
-
-                    Spacer(modifier = Modifier.width(25.dp))
-                }
-            }
-
-            Text(
-                modifier = Modifier.padding(top = 20.dp, start = 16.dp),
-                text = "*社團無論公開與否，都能被搜尋到*",
-                fontSize = 14.sp,
-                color = LocalColor.current.text.default_50
             )
 
             if (isNeedApproval) {
-                Text(
-                    modifier = Modifier.padding(top = 25.dp, start = 16.dp),
-                    text = "審核問題",
-                    fontSize = 14.sp,
-                    color = LocalColor.current.text.default_50
-                )
 
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(LocalColor.current.background)
+                        .padding(top = 10.dp, bottom = 10.dp, start = 25.dp)
                 ) {
-                    question.forEach {
-                        QuestionItem(question = it, onClick = {
-                            onEditClick.invoke(it)
-                        })
-                        Spacer(modifier = Modifier.height(1.dp))
-                    }
+                    Text(
+                        text = stringResource(id = R.string.review_question),
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_100
+                    )
+                }
 
-                    BorderButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(64.dp)
-                            .background(LocalColor.current.background)
-                            .padding(top = 8.dp, bottom = 8.dp, start = 24.dp, end = 24.dp),
-                        text = "新增審核題目",
-                        borderColor = LocalColor.current.text.default_50,
-                        textColor = LocalColor.current.text.default_100
-                    ) {
-                        onAddQuestion.invoke()
-                    }
+                Spacer(modifier = Modifier.height(10.dp))
 
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .padding(horizontal = 24.dp),
+                    text = stringResource(id = R.string.add_review_question),
+                    borderColor = LocalColor.current.text.default_50,
+                    textColor = LocalColor.current.text.default_100
+                ) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.GroupOpennessAddReviewQuestion)
+                    onAddQuestion.invoke()
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
+                    items(questions) { question ->
+                        QuestionItem(
+                            question = question,
+                            onClick = {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.GroupOpennessManage)
+                                onEditClick.invoke(question)
+                            }
+                        )
+                    }
                 }
             }
+        }
+    }
+}
 
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            BottomButtonScreen(
-                text = "儲存"
-            ) {
-                onSave.invoke()
+@Composable
+private fun OpennessOptionItem(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: String,
+    selected: Boolean,
+    onSwitch: () -> Unit
+) {
+    val fanciColor = LocalColor.current
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(fanciColor.background)
+            .clickable {
+                onSwitch.invoke()
             }
+            .padding(horizontal = 24.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                fontSize = 17.sp,
+                color = if (selected) {
+                    fanciColor.primary
+                } else {
+                    fanciColor.text.default_100
+                }
+            )
+
+            Spacer(modifier = Modifier.height(3.dp))
+
+            Text(
+                text = description,
+                fontSize = 14.sp,
+                color = fanciColor.text.default_50
+            )
+        }
+
+        if (selected) {
+            Image(
+                painter = painterResource(id = R.drawable.checked),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(fanciColor.primary)
+            )
         }
     }
 }
@@ -462,6 +457,8 @@ fun TipDialog(
                             .height(50.dp),
                         text = "新增審核題目",
                         onClick = {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.GroupOpennessAddQuestion)
                             onAddTopic.invoke()
                         }
                     )
@@ -476,6 +473,8 @@ fun TipDialog(
                         borderColor = LocalColor.current.text.default_50,
                         textColor = LocalColor.current.text.default_100
                     ) {
+                        AppUserLogger.getInstance()
+                            .log(Clicked.GroupOpennessSkipForNow)
                         onDismiss.invoke()
                     }
                 }
@@ -485,14 +484,12 @@ fun TipDialog(
 }
 
 @Composable
-fun QuestionItem(question: String, onClick: (String) -> Unit) {
+fun QuestionItem(question: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(LocalColor.current.background)
-            .clickable {
-                onClick.invoke(question)
-            }
+            .clickable(onClick = onClick)
             .padding(top = 12.dp, bottom = 12.dp, start = 30.dp, end = 30.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -515,11 +512,10 @@ fun GroupOpennessScreenPreview() {
     FanciTheme {
         GroupOpennessScreenView(
             isNeedApproval = true,
-            question = listOf("1. 金針菇是哪國人？", "2. 金針菇第一隻破十萬觀看數的影片是哪一隻呢？（敘述即可不用寫出全名）"),
+            questions = listOf("1. 金針菇是哪國人？", "2. 金針菇第一隻破十萬觀看數的影片是哪一隻呢？（敘述即可不用寫出全名）"),
             onSwitch = {},
             onAddQuestion = {},
-            onEditClick = {},
-            onSave = {}
+            onEditClick = {}
         ) {}
     }
 }

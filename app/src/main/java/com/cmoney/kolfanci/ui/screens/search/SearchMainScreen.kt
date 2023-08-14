@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -193,6 +195,7 @@ private fun SearchMainScreenView(
                             SearchEmptyScreen(modifier = modifier.fillMaxSize())
                         } else {
                             SearchResultScreen(searchResult = searchAllResult, onSearchItemClick = {
+                                AppUserLogger.getInstance().log(Clicked.ContentSearchView, From.All)
                                 when (it.searchType) {
                                     SearchType.Chat -> onChatItemClick.invoke(it)
                                     SearchType.Post -> onPostItemClick.invoke(it)
@@ -200,6 +203,7 @@ private fun SearchMainScreenView(
                             })
                         }
                         LaunchedEffect(key1 = searchAllResult) {
+                            AppUserLogger.getInstance().log(Clicked.ContentSearchAll)
                             AppUserLogger.getInstance().log(Page.ContentSearch_All)
                         }
                     }
@@ -211,10 +215,12 @@ private fun SearchMainScreenView(
                             SearchResultScreen(
                                 searchResult = searchChatResult,
                                 onSearchItemClick = {
+                                    AppUserLogger.getInstance().log(Clicked.ContentSearchView, From.Chat)
                                     onChatItemClick.invoke(it)
                                 })
                         }
                         LaunchedEffect(key1 = searchChatResult) {
+                            AppUserLogger.getInstance().log(Clicked.ContentSearchChat)
                             AppUserLogger.getInstance().log(Page.ContentSearch_Chat)
                         }
                     }
@@ -226,10 +232,12 @@ private fun SearchMainScreenView(
                             SearchResultScreen(
                                 searchResult = searchPostResult,
                                 onSearchItemClick = {
+                                    AppUserLogger.getInstance().log(Clicked.ContentSearchView, From.Post)
                                     onPostItemClick.invoke(it)
                                 })
                         }
                         LaunchedEffect(key1 = searchPostResult) {
+                            AppUserLogger.getInstance().log(Clicked.ContentSearchPost)
                             AppUserLogger.getInstance().log(Page.ContentSearch_Post)
                         }
                     }
@@ -274,6 +282,7 @@ private fun SearchToolBar(
             keyboardActions = KeyboardActions(
                 onSearch = {
                     KLog.i(TAG, "onSearch:$textState")
+                    AppUserLogger.getInstance().log(Clicked.ContentSearch)
                     keyboard?.hide()
                     onSearch.invoke(textState)
                 }

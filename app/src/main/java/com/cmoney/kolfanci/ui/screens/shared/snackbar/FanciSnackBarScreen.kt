@@ -16,6 +16,7 @@ import com.radusalagean.infobarcompose.BaseInfoBarMessage
 import com.radusalagean.infobarcompose.InfoBar
 import com.radusalagean.infobarcompose.InfoBarSlideEffect
 import com.cmoney.kolfanci.R
+
 class CustomMessage(
     val textString: String,
     @DrawableRes val iconRes: Int,
@@ -50,17 +51,8 @@ fun FanciSnackBarScreen(
 }
 
 val content: @Composable (CustomMessage) -> Unit = { message ->
-    Row {
-        Icon(
-            modifier = Modifier
-                .padding(8.dp)
-                .align(Alignment.CenterVertically),
-            imageVector = ImageVector.vectorResource(id = message.iconRes),
-            contentDescription = null,
-            tint = message.iconColor
-        )
+    Box(modifier = Modifier, contentAlignment = Alignment.Center) {
         Text(
-            modifier = Modifier.align(Alignment.CenterVertically),
             text = message.textString,
             color = message.textColor
         )

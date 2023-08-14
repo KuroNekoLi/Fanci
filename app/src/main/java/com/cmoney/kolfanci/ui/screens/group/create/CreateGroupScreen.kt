@@ -19,8 +19,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,15 +29,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.fromJsonTypeToken
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.CreateApplyQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingBackgroundScreenDestination
@@ -47,7 +49,6 @@ import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.TipDialog
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -56,7 +57,6 @@ import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.google.gson.Gson
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -86,9 +86,9 @@ fun CreateGroupScreen(
     setThemeResult: ResultRecipient<GroupSettingThemeScreenDestination, String>
 ) {
     val TAG = "CreateGroupScreen"
-    val approvalUiState = groupOpennessViewModel.uiState
-
     val globalGroupViewModel = globalGroupViewModel()
+    val approvalUiState = groupOpennessViewModel.uiState
+    val uiState = viewModel.uiState
     val showDialog = remember { mutableStateOf(false) }
     val defaultEdit = Pair(false, "")
     val showEditDialog = remember { mutableStateOf(defaultEdit) }
@@ -112,6 +112,8 @@ fun CreateGroupScreen(
         question = approvalUiState.groupQuestionList.orEmpty(),
         onGroupName = {
             KLog.i(TAG, "onGroupName:$it")
+            KLog.i(TAG, "step1 next click.")
+            AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupName)
             viewModel.setGroupName(it)
             viewModel.nextStep()
         },
@@ -121,13 +123,27 @@ fun CreateGroupScreen(
         },
         onAddQuestion = {
             navigator.navigate(
-                CreateApplyQuestionScreenDestination()
+                CreateApplyQuestionScreenDestination(
+                    keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName,
+                    from = From.CreateGroupAddQuestion
+                )
             )
         },
         onEditClick = {
             showEditDialog.value = Pair(true, it)
         },
         onNextStep = {
+            when (currentStep) {
+                2 -> {
+                    KLog.i(TAG, "step2 next click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupOpenness)
+                }
+                else -> {
+                    KLog.i(TAG, "step3 next click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupArrangement)
+                }
+            }
+
             if (currentStep == viewModel.finalStep) {
                 viewModel.createGroup(
                     isNeedApproval = groupOpennessViewModel.uiState.isNeedApproval
@@ -137,6 +153,17 @@ fun CreateGroupScreen(
             }
         },
         onPreStep = {
+            when (currentStep) {
+                2 -> {
+                    KLog.i(TAG, "step2 back click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupOpenness)
+                }
+                else -> {
+                    KLog.i(TAG, "step3 back click.")
+                    AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupArrangement)
+                }
+            }
+
             viewModel.preStep()
         }
     ) {
@@ -154,22 +181,20 @@ fun CreateGroupScreen(
         }
     )
 
-    //建立社團完成
-    LaunchedEffect(Unit) {
-        viewModel.createComplete.collect {
-            groupOpennessViewModel.onSave(it)
-        }
-    }
-
     //不公開 提示
     if (showDialog.value) {
         TipDialog(
             onAddTopic = {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.AddQuestion)
                 navigator.navigate(
-                    CreateApplyQuestionScreenDestination()
+                    CreateApplyQuestionScreenDestination(
+                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName,
+                        from = From.CreateGroupAddQuestion
+                    )
                 )
             },
             onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.Skip)
                 showDialog.value = false
             }
         )
@@ -184,16 +209,22 @@ fun CreateGroupScreen(
             },
             onEdit = {
                 KLog.i(TAG, "onEdit click.")
+                AppUserLogger.getInstance().log(Clicked.CreateGroupQuestionEdit)
+
                 groupOpennessViewModel.openEditMode(showEditDialog.value.second)
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
-                        question = showEditDialog.value.second
+                        question = showEditDialog.value.second,
+                        keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName,
+                        from = From.CreateGroupAddQuestion
                     )
                 )
                 showEditDialog.value = Pair(false, "")
             },
             onRemove = {
                 KLog.i(TAG, "onRemove click.")
+                AppUserLogger.getInstance().log(Clicked.CreateGroupQuestionRemove)
+
                 groupOpennessViewModel.removeQuestion(showEditDialog.value.second)
                 showEditDialog.value = Pair(false, "")
             }
@@ -215,6 +246,7 @@ fun CreateGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val question = result.value
                 if (approvalUiState.isEditMode) {
@@ -234,6 +266,7 @@ fun CreateGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val uri = result.value
                 viewModel.changeGroupAvatar(uri)
@@ -246,6 +279,7 @@ fun CreateGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val uri = result.value
                 viewModel.changeGroupCover(uri)
@@ -258,33 +292,42 @@ fun CreateGroupScreen(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
-                val groupThemeStr = result.value
-                val gson = Gson()
-                val groupTheme = gson.fromJsonTypeToken<GroupTheme>(groupThemeStr)
-                viewModel.setGroupTheme(groupTheme)
+                val groupThemeId = result.value
+                viewModel.setGroupTheme(groupThemeId)
             }
         }
     }
 
-    /**
-     * 建立完成, 回到首頁並顯示所建立群組
-     */
-
-    LaunchedEffect(Unit) {
-        groupOpennessViewModel.saveComplete.collect { saveComplete ->
-            if (saveComplete != null) {
-                globalGroupViewModel.setCurrentGroup(saveComplete)
-                navigator.popBackStack(
-                    route = MainScreenDestination,
-                    inclusive = false
-                )
-            } else {
-                viewModel.dismissLoading()
+    // 建立社團完成
+    uiState.createComplete?.let { createComplete ->
+        if (createComplete) {
+            uiState.createdGroup?.let { group ->
+                group.id?.let { id ->
+                    groupOpennessViewModel.onSave(id = id)
+                }
             }
         }
+        viewModel.onCreateFinish()
     }
 
+    // 建立完成, 回到首頁並顯示所建立群組
+    approvalUiState.saveComplete?.let { saveComplete ->
+        if (saveComplete) {
+            uiState.createdGroup?.let { group ->
+                globalGroupViewModel.setCurrentGroup(group)
+            }
+            navigator.popBackStack(
+                route = MainScreenDestination,
+                inclusive = false
+            )
+        } else {
+            context.showToast(stringResource(id = R.string.save_failed))
+        }
+        viewModel.dismissLoading()
+        groupOpennessViewModel.onSaveFinish()
+    }
 }
 
 @Composable
@@ -357,7 +400,7 @@ private fun CreateGroupScreenView(
                     //step 2.
                     2 -> {
                         Step2Screen(
-                            question = question,
+                            questions = question,
                             isNeedApproval = approvalUiState.isNeedApproval,
                             onSwitchApprove = onSwitchApprove,
                             onAddQuestion = onAddQuestion,

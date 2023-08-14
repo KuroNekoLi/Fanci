@@ -9,6 +9,7 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,7 +18,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.QuestionItem
@@ -33,11 +37,16 @@ fun Step2Screen(
     isNeedApproval: Boolean,
     onSwitchApprove: (Boolean) -> Unit,
     onAddQuestion: () -> Unit,
-    question: List<String>,
+    questions: List<String>,
     onEditClick: (String) -> Unit,
     onNext: () -> Unit,
     onPre: () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        AppUserLogger.getInstance()
+            .log(Page.CreateGroupGroupOpenness)
+    }
+
     Spacer(modifier = Modifier.height(20.dp))
     Column {
         Column(
@@ -118,8 +127,9 @@ fun Step2Screen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                 ) {
-                    question.forEach {
+                    questions.forEach {
                         QuestionItem(question = it, onClick = {
+                            AppUserLogger.getInstance().log(Clicked.CreateGroupQuestionManage)
                             onEditClick.invoke(it)
                         })
                         Spacer(modifier = Modifier.height(1.dp))
@@ -135,6 +145,11 @@ fun Step2Screen(
                         borderColor = LocalColor.current.text.default_50,
                         textColor = LocalColor.current.text.default_100
                     ) {
+                        AppUserLogger.getInstance().log(Clicked.CreateGroupAddReviewQuestion)
+
+                        AppUserLogger.getInstance()
+                            .log(Page.CreateGroupGroupOpennessAddReviewQuestion)
+
                         onAddQuestion.invoke()
                     }
                 }
@@ -183,7 +198,7 @@ fun Step2Screen(
 fun Step2ScreenPreview() {
     FanciTheme {
         Step2Screen(
-            question = emptyList(),
+            questions = emptyList(),
             isNeedApproval = false,
             onSwitchApprove = {},
             onAddQuestion = {},

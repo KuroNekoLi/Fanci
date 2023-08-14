@@ -38,7 +38,7 @@ upload_to_test:
     - firebase appdistribution:distribute app/build/outputs/apk/debug/*.apk --app 1:951137938331:android:494c77eb0250eec43d0f3e --release-notes "Fanci" --groups "xlab"
     - ./auto_bot.sh $BOT_HASH1 $BOT_HASH2 $BOT_TITLE $BOT_IMG $BOT_VERSION
   only:
-    - /^release/.*$/
+      - tags
 
 #REMOVE
 #report_failure:

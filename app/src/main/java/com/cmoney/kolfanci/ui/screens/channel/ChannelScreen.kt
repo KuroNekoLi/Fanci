@@ -112,30 +112,6 @@ private fun ChannelScreenView(
         topBar = {
             TopBarScreen(
                 title = channel.name.orEmpty(),
-                trailingContent = {
-                    Box(
-                        modifier = Modifier
-                            .size(35.dp)
-                            .offset(x = (-15).dp)
-                            .clickable {
-                                group?.run {
-                                    navController.navigate(
-                                        SearchMainScreenDestination(
-                                            group = this,
-                                            channel = channel
-                                        )
-                                    )
-                                }
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            modifier = Modifier.size(25.dp),
-                            painter = painterResource(id = R.drawable.message_search),
-                            contentDescription = null
-                        )
-                    }
-                },
                 backClick = {
                     navController.popBackStack()
                 }

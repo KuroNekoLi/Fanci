@@ -25,9 +25,12 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.ChatMessageWrapper
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
@@ -82,6 +85,7 @@ fun MessageContentScreen(
             delay(300)
             //不是刪除訊息  以及 不是未送出訊息
             if (longTap && messageModel.isDeleted != true && !chatMessageWrapper.isPendingSendMessage) {
+                AppUserLogger.getInstance().log(Clicked.MessageLongPressMessage)
                 onMessageContentCallback.invoke(
                     MessageContentCallback.LongClick(messageModel)
                 )
@@ -277,6 +281,8 @@ fun MessageContentScreen(
                                         emojiResource = emoji.first,
                                         countText = emoji.second.toString()
                                     ) {
+                                        AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.Message)
+
                                         onMessageContentCallback.invoke(
                                             MessageContentCallback.EmojiClick(
                                                 messageModel,
@@ -301,6 +307,8 @@ fun MessageContentScreen(
                                                 .fillMaxWidth()
                                                 .offset(y = (-15).dp)
                                         ) {
+                                            AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Message)
+
                                             onMessageContentCallback.invoke(
                                                 MessageContentCallback.EmojiClick(
                                                     messageModel,
@@ -369,7 +377,10 @@ fun MediaContent(modifier: Modifier, medias: List<Media>, isClickable: Boolean =
                 it.resourceLink.orEmpty()
             },
             modifier = modifier,
-            isClickable = isClickable
+            isClickable = isClickable,
+            onImageClick = {
+                AppUserLogger.getInstance().log(Clicked.Image, From.Message)
+            }
         )
     }
 }

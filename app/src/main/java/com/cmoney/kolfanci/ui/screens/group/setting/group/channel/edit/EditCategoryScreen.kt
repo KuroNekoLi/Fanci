@@ -31,8 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
@@ -45,7 +48,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
@@ -61,29 +63,21 @@ fun EditCategoryScreen(
     group: Group,
     category: Category,
     viewModel: ChannelSettingViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<Group>,
     editInputResult: ResultRecipient<EditInputScreenDestination, String>
 ) {
     val TAG = "EditCategoryScreen"
+    val groupViewModel = globalGroupViewModel()
     val showDialog = remember { mutableStateOf(false) }
     val textState = viewModel.uiState.categoryName
 
-    LaunchedEffect(Unit) {
-        if (textState.isEmpty()) {
-            viewModel.setCategoryName(category.name.orEmpty())
-        }
-    }
-
-    viewModel.uiState.group?.let {
-        resultNavigator.navigateBack(result = it)
-    }
-
     EditCategoryScreenView(
-        modifier,
-        navigator,
+        modifier = modifier,
+        navigator = navigator,
         textState = textState,
         onConfirm = {
-            viewModel.editCategory(group, category, it)
+            groupViewModel.editCategory(category, it)
+            // TODO 目前不等待結果
+            navigator.popBackStack()
         }
     ) {
         KLog.i(TAG, "onDelete click")
@@ -91,7 +85,9 @@ fun EditCategoryScreen(
     }
 
     BackHandler {
-        viewModel.editCategory(group, category, textState)
+        groupViewModel.editCategory(category, textState)
+        // TODO 目前不等待結果
+        navigator.popBackStack()
     }
 
     if (showDialog.value) {
@@ -100,7 +96,9 @@ fun EditCategoryScreen(
             subTitle = "分類刪除後，頻道會保留下來。",
             onConfirm = {
                 showDialog.value = false
-                viewModel.deleteCategory(group, category)
+                groupViewModel.deleteCategory(category)
+                // TODO 目前不等待結果
+                navigator.popBackStack()
             },
             onCancel = {
                 showDialog.value = false
@@ -122,7 +120,11 @@ fun EditCategoryScreen(
     LaunchedEffect(key1 = group) {
         AppUserLogger.getInstance().log(Page.GroupSettingsChannelManagementEditCategory)
     }
-
+    LaunchedEffect(key1 = Unit) {
+        if (textState.isEmpty()) {
+            viewModel.setCategoryName(category.name.orEmpty())
+        }
+    }
 }
 
 @Composable
@@ -166,13 +168,20 @@ fun EditCategoryScreenView(
                 modifier = Modifier
                     .background(LocalColor.current.background)
                     .clickable {
+                        with(AppUserLogger.getInstance()) {
+                            log(Clicked.CategoryName, From.Edit)
+                            log(Page.GroupSettingsChannelManagementEditCategoryCategoryName)
+                        }
                         navigator.navigate(
                             EditInputScreenDestination(
                                 defaultText = textState,
                                 toolbarTitle = "編輯分類",
                                 placeholderText = context.getString(R.string.input_category_name),
                                 emptyAlertTitle = context.getString(R.string.category_name_empty),
-                                emptyAlertSubTitle = context.getString(R.string.category_name_empty_desc)
+                                emptyAlertSubTitle = context.getString(R.string.category_name_empty_desc),
+                                from = From.EditCategoryName,
+                                textFieldClicked = Clicked.CategoryNameNameKeyIn,
+                                textFieldFrom = From.Edit
                             )
                         )
                     }
@@ -219,6 +228,9 @@ fun EditCategoryScreenView(
                         .height(50.dp)
                         .background(LocalColor.current.background)
                         .clickable {
+                            AppUserLogger
+                                .getInstance()
+                                .log(Clicked.ChannelManagementDeleteCategory)
                             onDelete.invoke()
                         },
                     contentAlignment = Alignment.Center

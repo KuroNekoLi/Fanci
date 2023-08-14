@@ -28,12 +28,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.showInteractDialogBottomSheet
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
@@ -93,6 +95,7 @@ fun MessageScreen(
                 messageViewModel.onLoadMore(channelId)
             },
             onReSendClick = {
+                AppUserLogger.getInstance().log(Clicked.MessageRetry)
                 messageViewModel.onReSendClick(it)
             }
         )
@@ -164,6 +167,7 @@ private fun MessageScreenView(
                         onMessageContentCallback = {
                             when (it) {
                                 is MessageContentCallback.EmojiClick -> {
+                                    KLog.i(TAG, "EmojiClick.")
                                     onInteractClick.invoke(
                                         MessageInteract.EmojiClick(
                                             it.message,

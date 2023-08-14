@@ -2,13 +2,31 @@ package com.cmoney.kolfanci.model.usecase
 
 import android.content.Context
 import android.net.Uri
-import com.cmoney.fanciapi.fanci.api.*
-import com.cmoney.fanciapi.fanci.model.*
-import com.cmoney.imagelibrary.UploadImage
-import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.fanciapi.fanci.api.DefaultImageApi
+import com.cmoney.fanciapi.fanci.api.GroupApi
+import com.cmoney.fanciapi.fanci.api.GroupMemberApi
+import com.cmoney.fanciapi.fanci.api.GroupRequirementApi
+import com.cmoney.fanciapi.fanci.api.PermissionApi
+import com.cmoney.fanciapi.fanci.api.RoleUserApi
+import com.cmoney.fanciapi.fanci.api.UserReportApi
+import com.cmoney.fanciapi.fanci.model.Color
+import com.cmoney.fanciapi.fanci.model.ColorTheme
+import com.cmoney.fanciapi.fanci.model.EditGroupParam
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupParam
+import com.cmoney.fanciapi.fanci.model.GroupRequirementParam
+import com.cmoney.fanciapi.fanci.model.GroupRequirementQuestion
+import com.cmoney.fanciapi.fanci.model.GroupRequirementQuestionType
+import com.cmoney.fanciapi.fanci.model.OrderType
+import com.cmoney.fanciapi.fanci.model.ReportProcessStatus
+import com.cmoney.fanciapi.fanci.model.ReportStatusUpdateParam
+import com.cmoney.fanciapi.fanci.model.RoleColor
+import com.cmoney.fanciapi.fanci.model.RoleIdsParam
+import com.cmoney.fanciapi.fanci.model.RoleParam
+import com.cmoney.fanciapi.fanci.model.UpdateIsNeedApprovalParam
+import com.cmoney.fanciapi.fanci.model.UseridsParam
 import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
-import com.cmoney.xlogin.XLoginHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -24,7 +42,8 @@ class GroupUseCase(
     private val permissionApi: PermissionApi,
     private val roleUserApi: RoleUserApi,
     private val groupRequirement: GroupRequirementApi,
-    private val userReport: UserReportApi
+    private val userReport: UserReportApi,
+    private val uploadImageUseCase: UploadImageUseCase
 ) {
 
     /**
@@ -256,7 +275,7 @@ class GroupUseCase(
             useridsParam = UseridsParam(
                 userIds = memberList
             )
-        )
+        ).checkResponseBody()
     }
 
     /**
@@ -322,7 +341,11 @@ class GroupUseCase(
             groupMemberApi.apiV1GroupMemberGroupGroupIdGet(
                 groupId = groupId,
                 skip = skipCount,
-                search = search
+                search = if (search?.isEmpty() == true) {
+                    null
+                } else {
+                    search
+                }
             ).checkResponseBody()
         }
 
@@ -365,10 +388,7 @@ class GroupUseCase(
         return flow {
             var imageUrl = ""
             if (uri is Uri) {
-                val uploadImage =
-                    UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
-
-                val uploadResult = uploadImage.upload().first()
+                val uploadResult = uploadImageUseCase.uploadImage(listOf(uri)).first()
                 imageUrl = uploadResult.second
                 emit(imageUrl)
             } else if (uri is String) {
@@ -382,7 +402,8 @@ class GroupUseCase(
                         name = group.name.orEmpty(),
                         description = group.description,
                         coverImageUrl = imageUrl,
-                        thumbnailImageUrl = group.thumbnailImageUrl
+                        thumbnailImageUrl = group.thumbnailImageUrl,
+                        colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
                     )
                 )
             }
@@ -398,10 +419,7 @@ class GroupUseCase(
         return flow {
             var imageUrl = ""
             if (uri is Uri) {
-                val uploadImage =
-                    UploadImage(context, listOf(uri), XLoginHelper.accessToken, BuildConfig.DEBUG)
-
-                val uploadResult = uploadImage.upload().first()
+                val uploadResult = uploadImageUseCase.uploadImage(listOf(uri)).first()
                 imageUrl = uploadResult.second
                 emit(imageUrl)
             } else if (uri is String) {
@@ -415,7 +433,8 @@ class GroupUseCase(
                         name = group.name.orEmpty(),
                         description = group.description,
                         coverImageUrl = group.coverImageUrl,
-                        thumbnailImageUrl = imageUrl
+                        thumbnailImageUrl = imageUrl,
+                        colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
                     )
                 )
             }
@@ -433,7 +452,8 @@ class GroupUseCase(
                 name = group.name.orEmpty(),
                 description = desc,
                 coverImageUrl = group.coverImageUrl,
-                thumbnailImageUrl = group.thumbnailImageUrl
+                thumbnailImageUrl = group.thumbnailImageUrl,
+                colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
             )
         ).checkResponseBody()
     }
@@ -449,7 +469,8 @@ class GroupUseCase(
                 name = name,
                 description = group.description,
                 coverImageUrl = group.coverImageUrl,
-                thumbnailImageUrl = group.thumbnailImageUrl
+                thumbnailImageUrl = group.thumbnailImageUrl,
+                colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
             )
         ).checkResponseBody()
     }

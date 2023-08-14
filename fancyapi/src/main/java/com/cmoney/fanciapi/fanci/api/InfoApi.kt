@@ -9,7 +9,7 @@ import com.squareup.moshi.Json
 
 interface InfoApi {
     /**
-     * 密碼是 xlabxlab
+     * 輸入密碼 以取得環境參數
      * 
      * Responses:
      *  - 200: Success

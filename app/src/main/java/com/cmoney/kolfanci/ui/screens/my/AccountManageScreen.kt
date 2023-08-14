@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -115,6 +116,8 @@ fun AccountManageScreen(
                     .background(LocalColor.current.background)
                     .clickable {
                         KLog.i("AccountManageScreen", "Logout click.")
+                        AppUserLogger.getInstance().log(Clicked.AccountManagementLogout)
+
                         showConfirmDialog = true
                     }
                     .padding(
@@ -148,7 +151,6 @@ fun AccountManageScreen(
 
     if (showConfirmDialog) {
         DialogScreen(
-            titleIconRes = R.drawable.logout,
             title = "確定要登出帳號嗎？",
             subTitle = "你確定要將 登出帳號嗎？\n" +
                     "（帳號登出社團資料皆會保留）",
@@ -163,6 +165,8 @@ fun AccountManageScreen(
                 borderColor = LocalColor.current.component.other,
                 textColor = Color.White
             ) {
+                AppUserLogger.getInstance().log(Clicked.LogoutConfirmLogout)
+
                 XLoginHelper.logOut(context)
                 val intent = Intent(context, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -180,13 +184,9 @@ fun AccountManageScreen(
                 borderColor = LocalColor.current.component.other,
                 textColor = Color.White
             ) {
+                AppUserLogger.getInstance().log(Clicked.LogoutReturn)
                 showConfirmDialog = false
-                Unit
             }
-        }
-        LaunchedEffect(key1 = Unit) {
-            AppUserLogger.getInstance()
-                .log(page = Page.AccountManagementLogout)
         }
     }
     LaunchedEffect(key1 = Unit) {

@@ -41,7 +41,7 @@ interface BanApi {
     suspend fun apiV1BanGroupGroupIdGet(@Path("groupId") groupId: kotlin.String): Response<kotlin.collections.List<UserBanInformation>>
 
     /**
-     * 取得自己在社團的禁言狀態 __________🔒 已註冊的fanci使用者
+     * 取得自己在社團的禁言狀態
      * 
      * Responses:
      *  - 200: Success
@@ -70,7 +70,7 @@ interface BanApi {
     suspend fun apiV1BanGroupGroupIdPut(@Path("groupId") groupId: kotlin.String, @Body banParam: BanParam? = null): Response<Unit>
 
     /**
-     * 取得特定會員在社團的禁言狀態，沒有被ban會回傳404 __________🔒 已註冊的fanci使用者
+     * 取得特定會員在社團的禁言狀態，沒有被ban會回傳404
      * 
      * Responses:
      *  - 200: Success

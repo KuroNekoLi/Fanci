@@ -33,8 +33,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
-import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -108,14 +109,14 @@ fun AddRoleScreen(
     val isLoading by viewModel.loading.collectAsState()
 
     AddRoleScreenView(
-        modifier,
-        navigator,
-        uiState.tabSelected,
-        group,
-        fanciRole = fanciRole,
-        uiState.permissionList.orEmpty(),
-        uiState.permissionSelected,
-        uiState.memberList,
+        modifier = modifier,
+        navigator = navigator,
+        selectedIndex = uiState.tabSelected,
+        group = group,
+        isEditMode = fanciRole != null,
+        permissionList = uiState.permissionList.orEmpty(),
+        permissionSelected = uiState.permissionSelected,
+        memberList = uiState.memberList,
         roleName = uiState.roleName,
         roleColor = uiState.roleColor,
         isLoading = isLoading,
@@ -194,7 +195,6 @@ fun AddRoleScreen(
         )
     }
 
-
     //是否為編輯
     if (fanciRole != null) {
         viewModel.setRoleEdit(group.id.orEmpty(), fanciRole, LocalColor.current.roleColor.colors)
@@ -202,16 +202,20 @@ fun AddRoleScreen(
         if (uiState.permissionList == null) {
             viewModel.fetchPermissionList()
         }
+
+        val defaultColor = LocalColor.current.roleColor.colors.first()
+        LaunchedEffect(key1 = group) {
+            viewModel.setDefaultRoleColor(defaultColor)
+        }
     }
 
     uiState.addRoleError?.let {
         DialogScreen(
-            titleIconRes = R.drawable.edit,
+            title = it.first,
+            subTitle = it.second,
             onDismiss = {
                 viewModel.errorShowDone()
-            },
-            title = it.first,
-            subTitle = it.second
+            }
         ) {
             BlueButton(
                 modifier = Modifier
@@ -225,11 +229,6 @@ fun AddRoleScreen(
             }
         }
     }
-
-//    if (uiState.addRoleError.isNotEmpty()) {
-//        LocalContext.current.showToast(uiState.addRoleError)
-//        viewModel.errorShowDone()
-//    }
 
     uiState.fanciRoleCallback?.let {
         resultNavigator.navigateBack(it)
@@ -254,7 +253,7 @@ private fun AddRoleScreenView(
     navigator: DestinationsNavigator,
     selectedIndex: Int,
     group: Group,
-    fanciRole: FanciRole? = null,
+    isEditMode: Boolean,
     permissionList: List<PermissionCategory>,
     permissionSelected: Map<String, Boolean>,
     memberList: List<GroupMember>,
@@ -271,8 +270,6 @@ private fun AddRoleScreenView(
 ) {
     val tabList = listOf("樣式", "權限", "成員")
     val TAG = "AddRoleScreenView"
-    val isEditMode = (fanciRole != null)
-
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -292,6 +289,7 @@ private fun AddRoleScreenView(
                     backClick = onBack,
                     saveClick = {
                         KLog.i(TAG, "saveClick click.")
+                        AppUserLogger.getInstance().log(Clicked.Confirm, From.AddRole)
                         onConfirm.invoke()
                     }
                 )
@@ -321,6 +319,7 @@ private fun AddRoleScreenView(
                 ) {
                     tabList.forEachIndexed { index, text ->
                         val selected = selectedIndex == index
+
                         Tab(
                             modifier = if (selected) Modifier
                                 .padding(2.dp)
@@ -335,6 +334,7 @@ private fun AddRoleScreenView(
                                 ),
                             selected = selected,
                             onClick = {
+                                onTabClicked(index = index, isEditMode = isEditMode)
                                 onTabSelected.invoke(index)
                             },
                             text = {
@@ -356,17 +356,18 @@ private fun AddRoleScreenView(
                             roleName = roleName,
                             roleColor = roleColor,
                             onChange = onRoleStyleChange,
-                            showDelete = fanciRole != null,
-                            onDelete = onDelete
+                            showDelete = isEditMode,
+                            from = if (isEditMode) {
+                                From.Edit
+                            } else {
+                                From.Create
+                            },
+                            onDelete = {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.RoleManagementEditRoleDeleteRole)
+                                onDelete()
+                            }
                         )
-                        LaunchedEffect(key1 = selectedIndex) {
-                            if (isEditMode) {
-                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementEditRoleStyle)
-                            }
-                            else {
-                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementAddRoleStyle)
-                            }
-                        }
                     }
                     //權限
                     1 -> {
@@ -377,15 +378,6 @@ private fun AddRoleScreenView(
                         ) { key, selected ->
                             onPermissionSwitch.invoke(key, selected)
                         }
-                        LaunchedEffect(key1 = selectedIndex) {
-                            if (isEditMode) {
-                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementEditRolePermissions)
-                            }
-                            else {
-                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementAddRolePermissions)
-                            }
-
-                        }
                     }
                     //成員
                     else -> {
@@ -395,14 +387,6 @@ private fun AddRoleScreenView(
                             memberList = memberList
                         ) {
                             onMemberRemove.invoke(it)
-                        }
-                        LaunchedEffect(key1 = selectedIndex) {
-                            if (isEditMode) {
-                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementEditRoleMembers)
-                            }
-                            else {
-                                AppUserLogger.getInstance().log(Page.GroupSettingsRoleManagementAddRoleMembers)
-                            }
                         }
                     }
                 }
@@ -430,6 +414,41 @@ private fun AddRoleScreenView(
     }
 }
 
+private fun onTabClicked(index: Int, isEditMode: Boolean) {
+    when (index) {
+        0 -> {
+            Clicked.RoleManagementStyle to if (isEditMode) {
+                Page.GroupSettingsRoleManagementEditRoleStyle
+            } else {
+                Page.GroupSettingsRoleManagementAddRoleStyle
+            }
+        }
+
+        1 -> {
+            Clicked.RoleManagementPermissions to if (isEditMode) {
+                Page.GroupSettingsRoleManagementEditRolePermissions
+            } else {
+                Page.GroupSettingsRoleManagementAddRolePermissions
+            }
+        }
+
+        2 -> {
+            Clicked.RoleManagementMembers to if (isEditMode) {
+                Page.GroupSettingsRoleManagementEditRoleMembers
+            } else {
+                Page.GroupSettingsRoleManagementAddRoleMembers
+            }
+        }
+
+        else -> null
+    }?.let { (clicked, page) ->
+        with(AppUserLogger.getInstance()) {
+            log(clicked)
+            log(page)
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun AddRoleScreenPreview() {
@@ -453,6 +472,7 @@ fun AddRoleScreenPreview() {
             ),
             permissionSelected = emptyMap(),
             memberList = emptyList(),
+            isEditMode = false,
             roleName = "Hi",
             roleColor = Color(),
             onTabSelected = {},

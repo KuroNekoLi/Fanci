@@ -19,7 +19,9 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -62,6 +64,8 @@ fun EditChannelScreen(
         resultNavigator.navigateBack(result = it)
     }
 
+    val groupViewModel = globalGroupViewModel()
+
     //Add role callback
     setRoleResult.onNavResult { result ->
         when (result) {
@@ -81,7 +85,14 @@ fun EditChannelScreen(
         group = group,
         selectedIndex = uiState.tabSelected,
         onConfirm = {
-            viewModel.editChannel(group, it)
+            groupViewModel.editChannel(
+                channel = viewModel.channel,
+                name = it,
+                isNeedApproval = uiState.isNeedApproval,
+                listPermissionSelected = viewModel.listPermissionSelected,
+                orgChannelRoleList = viewModel.orgChannelRoleList,
+                channelRole = uiState.channelRole
+            )
         },
         onDelete = {
             KLog.i(TAG, "onDelete click")
@@ -101,7 +112,7 @@ fun EditChannelScreen(
             subTitle = "頻道刪除後，內容將會完全消失。",
             onConfirm = {
                 showDialog.value = false
-                viewModel.deleteChannel(group, channel)
+                groupViewModel.deleteChannel(channel)
             },
             onCancel = {
                 showDialog.value = false
@@ -282,7 +293,8 @@ private fun ManageView(
             navigator.navigate(
                 ShareAddRoleScreenDestination(
                     group = group,
-                    existsRole = fanciRole.orEmpty().toTypedArray()
+                    existsRole = fanciRole.orEmpty().toTypedArray(),
+                    from = From.AddRole
                 )
             )
         }

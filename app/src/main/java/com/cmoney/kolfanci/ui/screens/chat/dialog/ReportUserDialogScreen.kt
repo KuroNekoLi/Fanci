@@ -21,15 +21,18 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.screens.group.search.apply.ApplyForGroupScreenPreview
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.theme.*
 
 /**
- * 隱藏用戶 彈窗
+ * 檢舉用戶 彈窗
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ReportUserDialogScreen(
     user: GroupMember,
@@ -46,16 +49,32 @@ fun ReportUserDialogScreen(
         mutableStateOf(IntrinsicSize.Min)
     }
 
-    val reportReasonMap = hashMapOf(
-        "濫發廣告訊息" to ReportReason.spamAds,
-        "傳送色情訊息" to ReportReason.adultContent,
-        "騷擾行為" to ReportReason.harass,
-        "內容與主題無關" to ReportReason.notRelated,
-        "其他" to ReportReason.other,
-        "取消檢舉" to null
-    )
+    val reportReasonMap = remember {
+        hashMapOf(
+            "濫發廣告訊息" to ReportReason.spamAds,
+            "傳送色情訊息" to ReportReason.adultContent,
+            "騷擾行為" to ReportReason.harass,
+            "內容與主題無關" to ReportReason.notRelated,
+            "其他" to ReportReason.other,
+            "取消檢舉" to null
+        )
+    }
 
-    val reportReason = listOf("濫發廣告訊息", "傳送色情訊息", "騷擾行為", "內容與主題無關", "其他", "取消檢舉")
+    val reportLogMap = remember {
+        hashMapOf(
+            "濫發廣告訊息" to From.Spam,
+            "傳送色情訊息" to From.SexualContent,
+            "騷擾行為" to From.Harassment,
+            "內容與主題無關" to From.UnrelatedContent,
+            "其他" to From.Other,
+            "取消檢舉" to null
+        )
+    }
+
+    val reportReason =
+        remember {
+            listOf("濫發廣告訊息", "傳送色情訊息", "騷擾行為", "內容與主題無關", "其他", "取消檢舉")
+        }
 
     if (openDialog.value) {
         Dialog(
@@ -123,8 +142,14 @@ fun ReportUserDialogScreen(
                                 ),
                                 onClick = {
                                     if (reportReasonMap[reason] == null) {
+                                        AppUserLogger.getInstance()
+                                            .log(Clicked.ReportReasonCancelReport)
+
                                         onDismiss.invoke()
                                     } else {
+                                        AppUserLogger.getInstance()
+                                            .log(Clicked.ReportReasonReason, reportLogMap[reason])
+
                                         onConfirm.invoke(reportReasonMap[reason]!!)
                                     }
                                 }) {
@@ -146,6 +171,7 @@ fun ReportUserDialogScreen(
                             textColor = LocalColor.current.specialColor.red,
                             borderColor = LocalColor.current.text.default_50
                         ) {
+                            AppUserLogger.getInstance().log(Clicked.ReportConfirmReport)
                             dialogHeight.value = IntrinsicSize.Max
                             showReason.value = true
                             Unit
@@ -160,6 +186,7 @@ fun ReportUserDialogScreen(
                             textColor = LocalColor.current.text.default_100,
                             borderColor = LocalColor.current.text.default_50
                         ) {
+                            AppUserLogger.getInstance().log(Clicked.ReportCancel)
                             openDialog.value = false
                             onDismiss.invoke()
                         }

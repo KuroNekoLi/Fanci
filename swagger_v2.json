@@ -59,6 +59,66 @@
         }
       }
     },
+    "/api/v2/Group/{groupId}/Role": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "取得角色列表",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isVip",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FanciRole"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        }
+      }
+    },
     "/api/v2/Message/{messageType}/{messageId}": {
       "get": {
         "tags": [
@@ -621,8 +681,7 @@
         "type": "object",
         "properties": {
           "authType": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/ChannelAuthType"
           },
           "title": {
             "type": "string",
@@ -635,14 +694,20 @@
         },
         "additionalProperties": false
       },
+      "ChannelAuthType": {
+        "enum": [
+          "basic",
+          "inter",
+          "advance",
+          "NoPermission"
+        ],
+        "type": "string"
+      },
       "ChatMessage": {
         "type": "object",
         "properties": {
           "author": {
             "$ref": "#/components/schemas/GroupMember"
-          },
-          "replyMessage": {
-            "$ref": "#/components/schemas/ChatMessage"
           },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
@@ -673,9 +738,6 @@
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
           },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
-          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -688,6 +750,12 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false
@@ -784,7 +852,8 @@
             "format": "int64"
           },
           "isVipRole": {
-            "type": "boolean"
+            "type": "boolean",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -862,6 +931,26 @@
           "angry": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IReplyMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "author": {
+            "$ref": "#/components/schemas/GroupMember"
+          },
+          "content": {
+            "$ref": "#/components/schemas/MediaIChatContent"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "是否刪除"
           }
         },
         "additionalProperties": false

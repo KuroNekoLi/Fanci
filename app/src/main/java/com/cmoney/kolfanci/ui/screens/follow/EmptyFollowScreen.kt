@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,45 +26,41 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
-import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
-import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
-import com.cmoney.kolfanci.ui.main.MainActivity
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.GroupItemScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EmptyFollowScreen(
-    viewModel: FollowViewModel = koinViewModel(),
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
+    viewModel: FollowViewModel = koinViewModel(),
     groupList: List<Group>,
     onLoadMore: () -> Unit,
     isLoading: Boolean
 ) {
-    val uiState = viewModel.uiState
     val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
     EmptyFollowScreenView(
         modifier = modifier,
         groupList = groupList,
         onJoinClick = {
+            AppUserLogger.getInstance().log(Clicked.HomeNotJoinGroupGroup)
             viewModel.openGroupItemDialog(it)
         },
         onCreateClick = {
@@ -81,40 +79,19 @@ fun EmptyFollowScreen(
                 viewModel.closeGroupItemDialog()
             },
             onConfirm = {
+                //私密
+                if (it.isNeedApproval == true) {
+                    AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.NonGroup)
+                }
+                //公開
+                else {
+                    AppUserLogger.getInstance().log(Clicked.GroupJoin, From.NonGroup)
+                }
+
                 viewModel.joinGroup(it)
             }
         )
     }
-
-    if (uiState.showLoginDialog) {
-        val context = LocalContext.current
-        LoginDialogScreen(
-            onDismiss = {
-                viewModel.dismissLoginDialog()
-            },
-            onLogin = {
-                viewModel.dismissLoginDialog()
-                (context as? MainActivity)?.startLogin()
-            }
-        )
-    }
-
-    //打開 建立社團
-    if (uiState.navigateToCreateGroup) {
-        navigator.navigate(CreateGroupScreenDestination)
-        viewModel.navigateDone()
-    }
-
-    //前往社團認證
-    uiState.navigateToApproveGroup?.let {
-        navigator.navigate(
-            ApplyForGroupScreenDestination(
-                group = it
-            )
-        )
-        viewModel.navigateDone()
-    }
-
 }
 
 @Composable
@@ -139,28 +116,36 @@ private fun EmptyFollowScreenView(
     ) {
         //Header
         item {
-            Image(
-                painter = painterResource(id = R.drawable.fanci),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(
-                    color = LocalColor.current.primary
-                )
-            )
-            Image(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1.3f),
-                contentScale = ContentScale.Fit,
-                painter = painterResource(id = R.drawable.follow_empty),
-                contentDescription = null,
-            )
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團",
-                fontSize = 14.sp,
-                color = LocalColor.current.text.default_100,
-                textAlign = TextAlign.Center
-            )
+                    .height(334.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .width(113.dp)
+                            .aspectRatio(1f),
+                        contentScale = ContentScale.Fit,
+                        painter = painterResource(id = R.drawable.planetary),
+                        contentDescription = null,
+                    )
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(id = R.string.empty_follow_tip),
+                        fontSize = 16.sp,
+                        color = LocalColor.current.text.default_30,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(20.dp))
 
             Box(
@@ -175,7 +160,7 @@ private fun EmptyFollowScreenView(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "建立社團",
+                    text = stringResource(id = R.string.create_group),
                     fontSize = 16.sp,
                     color = LocalColor.current.text.other,
                     textAlign = TextAlign.Center
@@ -184,7 +169,7 @@ private fun EmptyFollowScreenView(
         }
         //List group
         items(groupList) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             GroupItemScreen(
                 groupModel = it
             ) { groupModel ->

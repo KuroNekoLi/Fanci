@@ -67,8 +67,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_禁言_0_groupId_groupId"
+              "PERMISSION_禁言_0_groupId_groupId",
+              "user"
             ]
           }
         ]
@@ -123,8 +123,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_禁言_0_groupId_groupId"
+              "PERMISSION_禁言_0_groupId_groupId",
+              "user"
             ]
           }
         ]
@@ -179,8 +179,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_禁言_0_groupId_groupId"
+              "PERMISSION_禁言_0_groupId_groupId",
+              "user"
             ]
           }
         ]
@@ -191,7 +191,7 @@
         "tags": [
           "Ban"
         ],
-        "summary": "取得自己在社團的禁言狀態 __________🔒 已註冊的fanci使用者",
+        "summary": "取得自己在社團的禁言狀態",
         "parameters": [
           {
             "name": "groupId",
@@ -245,7 +245,7 @@
         "tags": [
           "Ban"
         ],
-        "summary": "取得特定會員在社團的禁言狀態，沒有被ban會回傳404 __________🔒 已註冊的fanci使用者",
+        "summary": "取得特定會員在社團的禁言狀態，沒有被ban會回傳404",
         "parameters": [
           {
             "name": "groupId",
@@ -308,7 +308,7 @@
         "tags": [
           "BuffInformation"
         ],
-        "summary": "取得自己在社團的Buff/Debuff狀態 __________🔒 已註冊的fanci使用者",
+        "summary": "取得自己在社團的Buff/Debuff狀態",
         "parameters": [
           {
             "name": "groupId",
@@ -362,7 +362,7 @@
         "tags": [
           "BuffInformation"
         ],
-        "summary": "取得自己在頻道的Buff/Debuff狀態 __________🔒 已註冊的fanci使用者",
+        "summary": "取得自己在頻道的Buff/Debuff狀態",
         "parameters": [
           {
             "name": "channelId",
@@ -493,7 +493,7 @@
         "tags": [
           "BulletinBoard"
         ],
-        "summary": "取得貼文區貼文列表 __________🔒 可看",
+        "summary": "取得貼文區貼文列表",
         "parameters": [
           {
             "name": "channelId",
@@ -556,21 +556,13 @@
           "401": {
             "description": "未驗證"
           },
-          "403": {
-            "description": "沒有權限"
-          },
           "404": {
             "description": "找不到該頻道"
+          },
+          "403": {
+            "description": "沒有權限"
           }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_channelId_none"
-            ]
-          }
-        ]
+        }
       }
     },
     "/api/v1/BulletinBoard/{channelId}/PinnedMessage": {
@@ -1586,40 +1578,17 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FanciRole"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FanciRole"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FanciRole"
-                  }
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "401": {
             "description": "未驗證"
           },
           "403": {
             "description": "沒有權限"
+          },
+          "200": {
+            "description": "成功"
           },
           "404": {
             "description": "找不到該頻道"
@@ -1877,7 +1846,7 @@
         "tags": [
           "Channel"
         ],
-        "summary": "設定私密頻道白名單 (Role/VipRole/Users) __________🔒 編輯頻道",
+        "summary": "設定私密頻道白名單 (Role/VipRole/Users)\r\n把channel底下 對應的authType清單用戶角色VIP全部替換 \r\n(若提供的清單用戶或角色已存在於其他authType，會保持同時存在於多個authType的狀態，所以異動已設定過的用戶或角色，記得到另一個authType將提供的清單一併異動) __________🔒 編輯頻道",
         "parameters": [
           {
             "name": "channelId",
@@ -1894,7 +1863,7 @@
             "description": "指定加入成員的權限類型)",
             "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/ChannelAuthType"
             }
           }
         ],
@@ -1944,7 +1913,7 @@
         "tags": [
           "Channel"
         ],
-        "summary": "編輯指定使用者/角色 於頻道中的權限AuthType \r\n使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 編輯頻道",
+        "summary": "編輯指定使用者/角色 於頻道中的權限AuthType \r\n使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 管理VIP方案",
         "parameters": [
           {
             "name": "channelId",
@@ -2008,7 +1977,7 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
+              "PERMISSION_管理VIP方案_0_channelId_channelGroupId",
               "user"
             ]
           }
@@ -2228,7 +2197,7 @@
         "tags": [
           "ChatRoom"
         ],
-        "summary": "取得聊天室訊息列表",
+        "summary": "取得聊天室訊息列表 __________🔒 可看",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -2291,13 +2260,21 @@
           "401": {
             "description": "未驗證"
           },
-          "404": {
-            "description": "找不到該頻道"
-          },
           "403": {
             "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user",
+              "PERMISSION_CanRead_1_chatRoomChannelId_none"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage": {
@@ -3086,6 +3063,7 @@
         "security": [
           {
             "oauth2": [
+              "user",
               "PERMISSION_新增角色_0_groupId_none"
             ]
           }
@@ -3097,7 +3075,7 @@
         "tags": [
           "Group"
         ],
-        "summary": "取得Vip角色列表",
+        "summary": "取得角色列表 (Vip)",
         "parameters": [
           {
             "name": "groupId",
@@ -3141,6 +3119,77 @@
           },
           "404": {
             "description": "找不到該社團"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "新增Vip角色(限定後台使用)",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "角色參數",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FanciRole"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FanciRole"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FanciRole"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "已有相同名稱的角色"
           }
         }
       }
@@ -4013,7 +4062,7 @@
         "tags": [
           "Info"
         ],
-        "summary": "密碼是 xlabxlab",
+        "summary": "輸入密碼 以取得環境參數",
         "parameters": [
           {
             "name": "passcode",
@@ -5203,6 +5252,92 @@
         ]
       }
     },
+    "/api/v1/RoleUser/Group/{groupId}/NotInRole/{roleId}": {
+      "get": {
+        "tags": [
+          "RoleUser"
+        ],
+        "summary": "取得社團中\"不\"具有此角色身分的用戶清單 (可搜尋) __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMember"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMember"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMember"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          },
+          "409": {
+            "description": "找不到指派的角色"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/RoleUser/Group/{groupId}/VipRole": {
       "get": {
         "tags": [
@@ -5272,12 +5407,12 @@
         ]
       }
     },
-    "/api/v1/RoleUser/Group/{groupId}/Role/{userId}": {
+    "/api/v1/RoleUser/Group/{groupId}/{userId}/Role": {
       "get": {
         "tags": [
           "RoleUser"
         ],
-        "summary": "取得用戶於社團中所擁有的角色清單 (不含Vip __________🔒 已註冊的fanci使用者",
+        "summary": "取得用戶於社團中所擁有的角色清單 (不含Vip) __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
             "name": "groupId",
@@ -5789,52 +5924,6 @@
         ]
       }
     },
-    "/api/v1/RoleUser/VipRole/me": {
-      "get": {
-        "tags": [
-          "RoleUser"
-        ],
-        "summary": "取得我的個人Vip資訊 __________🔒 已註冊的fanci使用者",
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserConsumeInfo"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserConsumeInfo"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserConsumeInfo"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "未驗證"
-          },
-          "403": {
-            "description": "沒有權限"
-          },
-          "404": {
-            "description": "找不到使用者"
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "user"
-            ]
-          }
-        ]
-      }
-    },
     "/api/v1/ThemeColor": {
       "get": {
         "tags": [
@@ -6268,15 +6357,15 @@
         ]
       }
     },
-    "/api/v1/Vip/VipRole/{vipRoleId}/{groupId}": {
-      "put": {
+    "/api/v1/Vip/VipRole/{roleId}/Authorization/{userId}": {
+      "get": {
         "tags": [
           "Vip"
         ],
-        "summary": "當創建一個新的權限包時可打 權限包 = VipRole\r\n提供一個權限包ID 並綁定Group\r\n作法 : 創建一個新的Role 綁定權限包並加入Group中\r\nEX : 理財寶後台新增 9487 權限包\r\n     是對應到16190 Group\r\n     打此方法會新增一個Role\r\n     名稱來自理財寶設定的權限包名稱\r\n     此VipRole便綁定到該角色 __________🔒 已註冊的fanci使用者",
+        "summary": "透過角色Id判斷是否購買VIP __________🔒 已註冊的fanci使用者",
         "parameters": [
           {
-            "name": "vipRoleId",
+            "name": "roleId",
             "in": "path",
             "required": true,
             "schema": {
@@ -6284,7 +6373,7 @@
             }
           },
           {
-            "name": "groupId",
+            "name": "userId",
             "in": "path",
             "required": true,
             "schema": {
@@ -6298,17 +6387,79 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/VipRole"
+                  "type": "boolean"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VipRole"
+                  "type": "boolean"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VipRole"
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Vip/VipRole/{roleId}/Authorization": {
+      "get": {
+        "tags": [
+          "Vip"
+        ],
+        "summary": "取得授權的用戶 __________🔒 已註冊的fanci使用者",
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IUser"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IUser"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IUser"
+                  }
                 }
               }
             }
@@ -6513,6 +6664,24 @@
           "Channel"
         ],
         "type": "string"
+      },
+      "AuthorizationEntry": {
+        "type": "object",
+        "properties": {
+          "packId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       },
       "BanParam": {
         "type": "object",
@@ -6813,8 +6982,7 @@
         "type": "object",
         "properties": {
           "authType": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/ChannelAuthType"
           },
           "title": {
             "type": "string",
@@ -6947,8 +7115,7 @@
         "type": "object",
         "properties": {
           "authType": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/ChannelAuthType"
           },
           "roles": {
             "type": "array",
@@ -6980,6 +7147,9 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
@@ -7009,6 +7179,9 @@
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
           },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
+          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -7021,12 +7194,6 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
-          },
-          "replyMessage": {
-            "$ref": "#/components/schemas/IReplyMessage"
-          },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false
@@ -7250,7 +7417,8 @@
             "format": "int64"
           },
           "isVipRole": {
-            "type": "boolean"
+            "type": "boolean",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -7622,7 +7790,7 @@
           },
           "hasVipRole": {
             "type": "boolean",
-            "description": "是否為社團VIP\r\nTODO:查理財寶VIP"
+            "description": "是否為社團VIP"
           },
           "answers": {
             "type": "array",
@@ -7818,6 +7986,43 @@
         },
         "additionalProperties": false
       },
+      "IUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "cmoneyMemberId": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "thumbNail": {
+            "type": "string",
+            "nullable": true
+          },
+          "serialNumber": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updateUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "IUserMessageReaction": {
         "type": "object",
         "properties": {
@@ -7996,12 +8201,22 @@
       "PurchasedRole": {
         "type": "object",
         "properties": {
-          "vipSalePlans": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VipSale"
-            },
+          "packId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "type": "string",
             "nullable": true
+          },
+          "subjectId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roleId": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
           },
           "roleName": {
             "type": "string",
@@ -8014,17 +8229,14 @@
           "isSubscribed": {
             "type": "boolean"
           },
-          "currentDeadline": {
-            "type": "string",
-            "format": "date-time"
-          },
           "paymentDate": {
             "type": "string",
             "format": "date-time"
           },
           "nextPaymentAlert": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -8038,13 +8250,6 @@
           },
           "vipSaleName": {
             "type": "string",
-            "nullable": true
-          },
-          "vipRoles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VipRole"
-            },
             "nullable": true
           },
           "purchasedRoles": {
@@ -8190,21 +8395,22 @@
           "channelId": {
             "type": "string",
             "description": "頻道Id",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "channelName": {
             "type": "string",
             "description": "頻道命名",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "isPublic": {
             "type": "boolean",
-            "description": "是否為公開頻道"
+            "description": "是否為公開頻道",
+            "readOnly": true
           },
           "authType": {
-            "type": "string",
-            "description": "該角色頻道權限",
-            "nullable": true
+            "$ref": "#/components/schemas/ChannelAuthType"
           }
         },
         "additionalProperties": false,
@@ -8402,27 +8608,6 @@
         },
         "additionalProperties": false
       },
-      "UserConsumeInfo": {
-        "type": "object",
-        "properties": {
-          "cmoneyMemberId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "purchasedSales": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PurchasedSale"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "UserPaging": {
         "type": "object",
         "properties": {
@@ -8479,19 +8664,6 @@
         "additionalProperties": false,
         "description": "使用者陣列參數"
       },
-      "VipRole": {
-        "type": "object",
-        "properties": {
-          "vipSalePlans": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VipSale"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "VipSale": {
         "type": "object",
         "properties": {
@@ -8506,7 +8678,7 @@
           "vipRoles": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/VipRole"
+              "$ref": "#/components/schemas/AuthorizationEntry"
             },
             "nullable": true
           }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,21 +44,15 @@ fun AlertDialogScreen(
                 modifier = Modifier.padding(20.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Column {
-                    Row {
-                        Image(
-                            painter = painterResource(id = R.drawable.dialog_ban),
-                            contentDescription = null
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(
-                            text = title,
-                            fontSize = 19.sp,
-                            color = LocalColor.current.specialColor.hintRed
-                        )
-                    }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = title,
+                        fontSize = 19.sp,
+                        color = LocalColor.current.specialColor.hintRed,
+                        textAlign = TextAlign.Center
+                    )
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -76,7 +71,7 @@ fun AlertDialogScreenPreview() {
         AlertDialogScreen(
             onDismiss = {},
             title = "Hello",
-        ){
+        ) {
             BanDayItemScreen(
                 name = "Hello",
                 isVip = false,

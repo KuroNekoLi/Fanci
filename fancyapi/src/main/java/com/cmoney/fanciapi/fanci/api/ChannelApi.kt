@@ -1,11 +1,5 @@
 package com.cmoney.fanciapi.fanci.api
 
-import com.cmoney.fanciapi.infrastructure.CollectionFormats.*
-import retrofit2.http.*
-import retrofit2.Response
-import okhttp3.RequestBody
-import com.squareup.moshi.Json
-
 import com.cmoney.fanciapi.fanci.model.AccessorTypes
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
@@ -19,6 +13,9 @@ import com.cmoney.fanciapi.fanci.model.PutAuthTypeRequest
 import com.cmoney.fanciapi.fanci.model.PutWhiteListRequest
 import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 import com.cmoney.fanciapi.fanci.model.WhiteListCount
+import com.cmoney.fanciapi.infrastructure.CollectionFormats.*
+import retrofit2.Response
+import retrofit2.http.*
 
 interface ChannelApi {
     /**
@@ -134,19 +131,20 @@ interface ChannelApi {
      * 取得VIP角色清單
      * 
      * Responses:
-     *  - 200: 成功
+     *  - 204: No Content
      *  - 401: 未驗證
      *  - 403: 沒有權限
+     *  - 200: 成功
      *  - 404: 找不到該頻道
      *
      * @param channelId 頻道Id
-     * @return [kotlin.collections.List<FanciRole>]
+     * @return [Unit]
      */
     @GET("api/v1/Channel/{channelId}/VipRole")
-    suspend fun apiV1ChannelChannelIdVipRoleGet(@Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
+    suspend fun apiV1ChannelChannelIdVipRoleGet(@Path("channelId") channelId: kotlin.String): Response<Unit>
 
     /**
-     * 編輯指定使用者/角色 於頻道中的權限AuthType   使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 編輯頻道
+     * 編輯指定使用者/角色 於頻道中的權限AuthType   使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 管理VIP方案
      * 
      * Responses:
      *  - 204: No Content
@@ -178,7 +176,7 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdWhiteListAuthTypeGet(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: ChannelAuthType): Response<ChannelWhiteList>
 
     /**
-     * 設定私密頻道白名單 (Role/VipRole/Users) __________🔒 編輯頻道
+     * 設定私密頻道白名單 (Role/VipRole/Users)  把channel底下 對應的authType清單用戶角色VIP全部替換   (若提供的清單用戶或角色已存在於其他authType，會保持同時存在於多個authType的狀態，所以異動已設定過的用戶或角色，記得到另一個authType將提供的清單一併異動) __________🔒 編輯頻道
      * 
      * Responses:
      *  - 204: No Content
@@ -191,7 +189,7 @@ interface ChannelApi {
      * @return [Unit]
      */
     @PUT("api/v1/Channel/{channelId}/WhiteList/{authType}")
-    suspend fun apiV1ChannelChannelIdWhiteListAuthTypePut(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: kotlin.String, @Body putWhiteListRequest: PutWhiteListRequest? = null): Response<Unit>
+    suspend fun apiV1ChannelChannelIdWhiteListAuthTypePut(@Path("channelId") channelId: kotlin.String, @Path("authType") authType: ChannelAuthType, @Body putWhiteListRequest: PutWhiteListRequest? = null): Response<Unit>
 
     /**
      * 取得私密頻道白名單

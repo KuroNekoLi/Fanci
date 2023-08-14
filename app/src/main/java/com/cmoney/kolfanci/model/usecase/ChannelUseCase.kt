@@ -38,7 +38,7 @@ class ChannelUseCase(
         }
 
     /**
-     * 取得 私密頻道 用戶清單
+     * 取得 私密頻道 白名單
      */
     suspend fun getPrivateChannelWhiteList(channelId: String) = kotlin.runCatching {
         channelApi.apiV1ChannelChannelIdWhiteListGet(
@@ -51,7 +51,7 @@ class ChannelUseCase(
      */
     suspend fun putPrivateChannelWhiteList(
         channelId: String,
-        authType: String,
+        authType: ChannelAuthType,
         accessorList: List<AccessorParam>
     ) =
         kotlin.runCatching {
@@ -65,10 +65,10 @@ class ChannelUseCase(
         }
 
     /**
-     * 抓取 私密頻道 權限類型清單
+     * 抓取 私密頻道 權限類型清單, 不包含 無權限
      */
-    suspend fun getChanelAccessType() = kotlin.runCatching {
-        channelApi.apiV1ChannelAccessTypeGet().checkResponseBody()
+    suspend fun getChanelAccessTypeWithoutNoPermission() = kotlin.runCatching {
+        channelApi.apiV2ChannelAccessTypeGet(isWithNoPermission = false).checkResponseBody()
     }
 
     /**

@@ -26,12 +26,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
 import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
@@ -50,6 +55,7 @@ fun AddVipPlanScreen(
     modifier: Modifier = Modifier,
     authTitle: String,
     selectedVipPlanModels: Array<VipPlanModel>,
+    group: Group,
     viewModel: VipPlanViewModel = koinViewModel(),
     selectedCallback: ResultBackNavigator<VipPlanModel>
 ) {
@@ -74,7 +80,10 @@ fun AddVipPlanScreen(
 
     LaunchedEffect(key1 = Unit) {
         if (vipPlanModels == null) {
-            viewModel.fetchVipPlan(models = selectedVipPlanModels)
+            viewModel.fetchVipPlan(
+                models = selectedVipPlanModels,
+                groupId = group.id.orEmpty()
+            )
         }
     }
 }
@@ -102,6 +111,7 @@ private fun AddVipPlanScreenView(
                 backClick = onBack,
                 saveClick = {
                     KLog.i(TAG, "saveClick click.")
+                    AppUserLogger.getInstance().log(Clicked.Confirm, From.ChannelAddVIP)
                     onConfirm.invoke(selectedIndex)
                 }
             )
@@ -162,7 +172,8 @@ private fun EmptyVipPlanScreenView() {
         Image(
             modifier = Modifier.size(105.dp),
             painter = painterResource(id = R.drawable.flower_box),
-            contentDescription = null
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(LocalColor.current.text.default_30)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -179,15 +190,15 @@ private fun EmptyVipPlanScreenView() {
 @Composable
 fun AddVipPlanScreenViewPreview() {
     FanciTheme {
-       AddVipPlanScreenView(
-           authTitle = "基本方案",
-           vipPlanModels = VipManagerUseCase.getVipPlanMockData(),
-           isLoading = false,
-           onBack = {
-           },
-           onConfirm = {
-           }
-       )
+        AddVipPlanScreenView(
+            authTitle = "基本方案",
+            vipPlanModels = VipManagerUseCase.getVipPlanMockData(),
+            isLoading = false,
+            onBack = {
+            },
+            onConfirm = {
+            }
+        )
     }
 }
 
