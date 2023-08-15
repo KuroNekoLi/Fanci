@@ -731,7 +731,6 @@ private fun PostInfoScreenView(
                             } else {
                                 BasePostContentScreen(
                                     post = comment,
-                                    defaultDisplayLine = Int.MAX_VALUE,
                                     contentModifier = Modifier.padding(start = 40.dp),
                                     hasMoreAction = true,
                                     bottomContent = {
