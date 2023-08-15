@@ -755,6 +755,9 @@ private fun PostInfoScreenView(
                                     onAddNewEmojiClick = {
                                         AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Comment)
                                         postInfoListener.onCommentEmojiClick(comment, it)
+                                    },
+                                    onTextExpandClick = {
+                                        AppUserLogger.getInstance().log(Clicked.ShowMore, From.Comment)
                                     }
                                 )
                             }
