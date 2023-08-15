@@ -17,6 +17,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -48,8 +49,11 @@ fun MemberScreen(
                     .height(40.dp),
                 text = "新增成員", borderColor = LocalColor.current.text.default_100
             ) {
-                AppUserLogger.getInstance()
-                    .log(Clicked.MembersAddMember)
+                with(AppUserLogger.getInstance()) {
+                    log(Clicked.MembersAddMember)
+                    log(Page.GroupSettingsRoleManagementAddRoleMembersList)
+                }
+
                 navigator.navigate(
                     AddMemberScreenDestination(
                         group = group,
