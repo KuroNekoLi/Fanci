@@ -384,7 +384,8 @@ private fun AddRoleScreenView(
                         MemberScreen(
                             navigator = navigator,
                             group = group,
-                            memberList = memberList
+                            memberList = memberList,
+                            isEditMode = isEditMode
                         ) {
                             onMemberRemove.invoke(it)
                         }

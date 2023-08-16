@@ -35,7 +35,8 @@ fun MemberScreen(
     navigator: DestinationsNavigator,
     group: Group,
     memberList: List<GroupMember>,
-    onRemoveClick: (GroupMember) -> Unit
+    isEditMode: Boolean,
+    onRemoveClick: (GroupMember) -> Unit,
 ) {
     val TAG = "MemberScreen"
 
@@ -51,7 +52,12 @@ fun MemberScreen(
             ) {
                 with(AppUserLogger.getInstance()) {
                     log(Clicked.MembersAddMember)
-                    log(Page.GroupSettingsRoleManagementAddRoleMembersList)
+                    if (isEditMode) {
+                        log(Page.GroupSettingsRoleManagementEditRoleMembersList)
+                    }
+                    else {
+                        log(Page.GroupSettingsRoleManagementAddRoleMembersList)
+                    }
                 }
 
                 navigator.navigate(
@@ -91,7 +97,9 @@ fun MemberScreenPreview() {
         MemberScreen(
             navigator = EmptyDestinationsNavigator,
             group = Group(),
-            memberList = emptyList()
-        ) {}
+            memberList = emptyList(),
+            onRemoveClick = {},
+            isEditMode = false
+        )
     }
 }
