@@ -210,7 +210,8 @@ private fun VipPlanInfoMainScreenView(
                                     placeholderText = context.getString(R.string.input_vip_name),
                                     emptyAlertTitle = context.getString(R.string.vip_name_empty),
                                     emptyAlertSubTitle = context.getString(R.string.vip_name_empty_desc),
-                                    from = From.VIPName
+                                    from = From.VIPName,
+                                    textFieldClicked = Clicked.InfoNameKeyIn
                                 )
                             )
                         }
