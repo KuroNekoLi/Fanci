@@ -359,7 +359,7 @@ fun GroupOpennessScreenView(
 }
 
 @Composable
-private fun OpennessOptionItem(
+fun OpennessOptionItem(
     modifier: Modifier = Modifier,
     title: String,
     description: String,

@@ -414,6 +414,9 @@ private fun PostScreenView(
                             onAddNewEmojiClick = {
                                 AppUserLogger.getInstance().log(Clicked.AddEmoji, From.PostList)
                                 onEmojiClick.invoke(pinPost, it)
+                            },
+                            onTextExpandClick = {
+                                AppUserLogger.getInstance().log(Clicked.ShowMore, From.Post)
                             }
                         )
                     }
@@ -449,6 +452,9 @@ private fun PostScreenView(
                             if (Constant.isCanEmoji()) {
                                 onEmojiClick.invoke(postMessage, it)
                             }
+                        },
+                        onTextExpandClick = {
+                            AppUserLogger.getInstance().log(Clicked.ShowMore, From.Post)
                         }
                     )
                 }

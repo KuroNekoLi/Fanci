@@ -731,7 +731,6 @@ private fun PostInfoScreenView(
                             } else {
                                 BasePostContentScreen(
                                     post = comment,
-                                    defaultDisplayLine = Int.MAX_VALUE,
                                     contentModifier = Modifier.padding(start = 40.dp),
                                     hasMoreAction = true,
                                     bottomContent = {
@@ -756,6 +755,9 @@ private fun PostInfoScreenView(
                                     onAddNewEmojiClick = {
                                         AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Comment)
                                         postInfoListener.onCommentEmojiClick(comment, it)
+                                    },
+                                    onTextExpandClick = {
+                                        AppUserLogger.getInstance().log(Clicked.ShowMore, From.Comment)
                                     }
                                 )
                             }
