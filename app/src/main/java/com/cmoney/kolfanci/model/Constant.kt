@@ -223,8 +223,8 @@ object Constant {
                     return@let status.description.orEmpty()
                 }
             }
-            return@let "基本權限，無法與頻道成員互動"
-        } ?: "基本權限，無法與頻道成員互動"
+            return@let "不具權限，無法與頻道成員互動"
+        } ?: "不具權限，無法與頻道成員互動"
     }
 
     val emojiLit = listOf(

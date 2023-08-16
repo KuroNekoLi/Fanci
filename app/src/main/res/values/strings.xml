@@ -190,6 +190,8 @@
     <string name="select_all">全選</string>
     <string name="unselect_all">取消全選</string>
 
+    <string name="silence_result_desc">不具權限，無法與頻道成員互動</string>
+
     <!-- Remote Config text  -->
     <string name="text_remote_config_update_title">系統更新通知</string>
     <string name="text_remote_config_under_maintain_title">系統維護中</string>
