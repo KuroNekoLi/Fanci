@@ -54,9 +54,11 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                     )
                 } else {
                     groupUseCase.joinGroup(group).fold({
+                        closeGroupItemDialog()
                         _refreshMyGroup.value = true
                     }, {
                         if (it is EmptyBodyException) {
+                            closeGroupItemDialog()
                             _refreshMyGroup.value = true
                         } else {
                             KLog.e(TAG, it)
@@ -161,5 +163,13 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     fun closeGroupItemDialog() {
         KLog.i(TAG, "closeGroupItemDialog")
         _openGroupDialog.value = null
+    }
+
+    /**
+     * 關閉刷新任務
+     */
+    fun refreshMyGroupDone() {
+        KLog.i(TAG, "refreshMyGroupDone")
+        _refreshMyGroup.value = false
     }
 }

@@ -113,6 +113,7 @@ fun FollowScreen(
 
     if (isRefreshMyGroupList) {
         onRefreshMyGroupList.invoke()
+        viewModel.refreshMyGroupDone()
     }
 
     //查看該社團info dialog

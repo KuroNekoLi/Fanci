@@ -111,6 +111,7 @@ class GroupViewModel(
                         //抓取選中社團的權限
                         fetchGroupPermission(selectedGroup)
                     } else {
+                        resetToDefault()
                         fetchAllGroupList()
                     }
                     dismissLoading()
@@ -122,6 +123,15 @@ class GroupViewModel(
         } else {
             fetchAllGroupList()
         }
+    }
+
+    /**
+     * 將原本設定過的值, 都恢復至 default value
+     */
+    private fun resetToDefault() {
+        _currentGroup.value = null
+        _myGroupList.value = emptyList()
+        _theme.value = DefaultThemeColor
     }
 
     /**
@@ -213,7 +223,8 @@ class GroupViewModel(
                             _myGroupList.value = newGroups
                             setCurrentGroup(group = selectGroup.groupModel)
                         } else {
-                            fetchAllGroupList()
+//                            fetchAllGroupList()
+                            fetchMyGroup()
                         }
                     } else {
                         KLog.e(TAG, t)
@@ -663,7 +674,7 @@ class GroupViewModel(
             }
             _currentGroup.update {
                 it?.copy(
-                   categories = newCategories
+                    categories = newCategories
                 )
             }
         }
@@ -761,7 +772,8 @@ class GroupViewModel(
                         // 將刪除分類下的頻道移至預設分類下
                         ?.map { groupCategory ->
                             if (groupCategory.isDefault == true) {
-                                val currentChannels = groupCategory.channels?.toMutableList() ?: mutableListOf()
+                                val currentChannels =
+                                    groupCategory.channels?.toMutableList() ?: mutableListOf()
                                 currentChannels.addAll(targetChannels)
                                 groupCategory.copy(
                                     channels = currentChannels
