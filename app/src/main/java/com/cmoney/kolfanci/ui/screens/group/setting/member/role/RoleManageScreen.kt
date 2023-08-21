@@ -20,6 +20,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -202,39 +203,38 @@ fun RoleManageScreenView(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
+                        val isHasEditRolePermission =
+                            (Constant.MyGroupPermission.createOrEditRole == true)
+
                         itemsIndexed(roleList) { index, item ->
                             RoleItemScreen(
                                 index = index + 1,
                                 fanciRole = item,
-                                onEditClick = {
-                                    KLog.i(TAG, "onEditClick")
-                                    AppUserLogger.getInstance()
-                                        .log(Clicked.RoleManagementEditRole)
-                                    navigator.navigate(
-                                        AddRoleScreenDestination(
-                                            group = group,
-                                            fanciRole = it
+                                editText = (if (isHasEditRolePermission) {
+                                    stringResource(id = R.string.edit)
+                                } else {
+                                    ""
+                                }),
+                                onEditClick = if (isHasEditRolePermission) {
+                                    {
+                                        KLog.i(TAG, "onEditClick")
+                                        AppUserLogger.getInstance()
+                                            .log(Clicked.RoleManagementEditRole)
+                                        navigator.navigate(
+                                            AddRoleScreenDestination(
+                                                group = group,
+                                                fanciRole = it
+                                            )
                                         )
-                                    )
+                                    }
+                                } else {
+                                    null
                                 }
                             )
                         }
                     }
                 }
             }
-
-            //========== 儲存 ==========
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(135.dp)
-//                    .background(LocalColor.current.env_100),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                BlueButton(text = "儲存") {
-//                    onSave.invoke()
-//                }
-//            }
         }
     }
 }
