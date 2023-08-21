@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.model
 
+import android.content.Context
 import com.cmoney.fanciapi.fanci.model.ChannelPermission
 import com.cmoney.fanciapi.fanci.model.GroupPermission
 import com.cmoney.fanciapi.fanci.model.User
@@ -216,15 +217,18 @@ object Constant {
     /**
      * 取得 頻道無法發言 原因
      */
-    fun getChannelSilenceDesc(): String {
+    fun getChannelSilenceDesc(
+        context: Context,
+        default: String = context.getString(R.string.silence_result_desc)
+    ): String {
         return MyChannelBuff.buffs?.let { buff ->
             buff.forEach { status ->
                 if (status.name == "禁言") {
                     return@let status.description.orEmpty()
                 }
             }
-            return@let "不具權限，無法與頻道成員互動"
-        } ?: "不具權限，無法與頻道成員互動"
+            return@let context.getString(R.string.silence_result_desc)
+        } ?: default
     }
 
     val emojiLit = listOf(

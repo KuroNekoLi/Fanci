@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -140,7 +141,9 @@ fun MessageInput(
                                 "輸入你想說的話..."
                             } else {
                                 if(Constant.isBuffSilence()) {
-                                    Constant.getChannelSilenceDesc()
+                                    Constant.getChannelSilenceDesc(
+                                        context = LocalContext.current
+                                    )
                                 }
                                 else {
                                     stringResource(id = R.string.silence_result_desc)
@@ -152,7 +155,9 @@ fun MessageInput(
                                 "輸入你想說的話..."
                             } else {
                                 if(Constant.isBuffSilence()) {
-                                    Constant.getChannelSilenceDesc()
+                                    Constant.getChannelSilenceDesc(
+                                        context = LocalContext.current
+                                    )
                                 }
                                 else {
                                     stringResource(id = R.string.silence_result_desc)
