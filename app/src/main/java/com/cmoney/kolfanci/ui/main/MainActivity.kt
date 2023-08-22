@@ -1,7 +1,9 @@
 package com.cmoney.kolfanci.ui.main
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -29,7 +31,12 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.socks.library.KLog
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import permissions.dispatcher.NeedsPermission
+import permissions.dispatcher.OnNeverAskAgain
+import permissions.dispatcher.OnPermissionDenied
+import permissions.dispatcher.RuntimePermissions
 
+@RuntimePermissions
 class MainActivity : BaseWebLoginActivity() {
     private val TAG = MainActivity::class.java.simpleName
     private val globalViewModel by viewModel<MainViewModel>()
@@ -59,12 +66,31 @@ class MainActivity : BaseWebLoginActivity() {
                         TutorialScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            globalViewModel.tutorialOnOpen()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                requestNotificationPermissionWithPermissionCheck()
+                            } else {
+                                globalViewModel.tutorialOnOpen()
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    @NeedsPermission(Manifest.permission.POST_NOTIFICATIONS)
+    fun requestNotificationPermission() {
+        globalViewModel.tutorialOnOpen()
+    }
+
+    @OnPermissionDenied
+    fun notificationPermissionDenied() {
+        globalViewModel.tutorialOnOpen()
+    }
+
+    @OnNeverAskAgain
+    fun notificationPermissionNeverAskAgain() {
+        globalViewModel.tutorialOnOpen()
     }
 
     @Composable
@@ -125,5 +151,15 @@ class MainActivity : BaseWebLoginActivity() {
         KLog.i(TAG, "loginSuccessCallback")
         globalViewModel.loginSuccess()
         globalGroupViewModel.fetchMyGroup()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // NOTE: delegate the permission handling to generated function
+        onRequestPermissionsResult(requestCode, grantResults)
     }
 }

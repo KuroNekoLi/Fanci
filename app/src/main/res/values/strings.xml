@@ -202,4 +202,8 @@
     <string name="update_immediately">立即更新</string>
     <string name="later">稍後</string>
 
+    <!--  Notification  -->
+    <string name="default_notification_channel_id">0</string>
+    <string name="default_notification_channel_message">一般通知</string>
+
 </resources>

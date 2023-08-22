@@ -22,7 +22,7 @@ val appModule = module {
     }
 
     single {
-        NotificationHelper(get(APP_GSON))
+        NotificationHelper(androidApplication(), get(APP_GSON))
     }
 
     single {
