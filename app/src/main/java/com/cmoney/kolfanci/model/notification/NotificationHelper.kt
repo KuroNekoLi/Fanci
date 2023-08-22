@@ -144,8 +144,8 @@ class NotificationHelper(
         KLog.i(TAG, "convertPayloadToTargetType:" + payload.targetType)
         return when (payload.targetType) {
             0 -> {
-                if (payload.parameter.isNotEmpty()) {
-                    val jsonObject = JSONObject(payload.parameter)
+                if (payload.deeplink?.isNotEmpty() == true) {
+                    val jsonObject = JSONObject(payload.deeplink)
                     val targetTypeLowCase = jsonObject.optInt("targetType", 0)
                     jsonObject.remove("targetType")
                     val targetTypeHighCase = jsonObject.optInt("TargetType", 0)
