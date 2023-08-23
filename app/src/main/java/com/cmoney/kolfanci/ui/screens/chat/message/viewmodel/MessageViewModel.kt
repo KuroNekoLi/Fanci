@@ -3,7 +3,6 @@ package com.cmoney.kolfanci.ui.screens.chat.message.viewmodel
 import android.app.Application
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ChatMessage
@@ -915,14 +914,16 @@ class MessageViewModel(
     fun forwardToMessage(channelId: String, jumpChatMessage: ChatMessage) {
         KLog.i(TAG, "forwardToMessage:$jumpChatMessage")
         viewModelScope.launch {
-            val newMessage = listOf(ChatMessageWrapper(message = jumpChatMessage))
+            if (jumpChatMessage.id?.isNotEmpty() == true) {
+                val newMessage = listOf(ChatMessageWrapper(message = jumpChatMessage))
 
-            //檢查插入時間 bar
-            val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
+                //檢查插入時間 bar
+                val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
 
-            processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
-                MessageUtils.defineMessageType(chatMessageWrapper)
-            })
+                processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
+                    MessageUtils.defineMessageType(chatMessageWrapper)
+                })
+            }
 
             //開始指定位置開始 polling
             startPolling(channelId, jumpChatMessage.serialNumber)

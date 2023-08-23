@@ -36,16 +36,12 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.*
 import com.cmoney.kolfanci.ui.main.MainActivity
-import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -67,14 +63,14 @@ fun FollowScreen(
     group: Group?,
     serverGroupList: List<Group>,
     viewModel: FollowViewModel = koinViewModel(),
-    chatRoomViewModel: ChatRoomViewModel = koinViewModel(),
     myGroupList: List<GroupItem>,
     onGroupItemClick: (Group) -> Unit,
     onLoadMoreServerGroup: () -> Unit,
     onRefreshMyGroupList: () -> Unit,
     isLoading: Boolean,
     inviteGroup: Group?,
-    onDismissInvite: () -> Unit
+    onDismissInvite: () -> Unit,
+    onChannelClick: (Channel) -> Unit
 ) {
     val uiState = viewModel.uiState
 
@@ -104,9 +100,6 @@ fun FollowScreen(
             delta
         }
     }
-
-    //禁止進入頻道彈窗
-    val openDialog = remember { mutableStateOf(false) }
 
     //刷新我的社團清單
     val isRefreshMyGroupList by viewModel.refreshMyGroup.collectAsState()
@@ -142,47 +135,10 @@ fun FollowScreen(
         )
     }
 
-    //點擊channel權限檢查完
-    LaunchedEffect(Unit) {
-        chatRoomViewModel.updatePermissionDone.collect {
-            if (Constant.canReadMessage()) {
-                navigator.navigate(
-                    ChannelScreenDestination(
-                        channel = it
-                    )
-                )
-            } else {
-                //禁止進入該頻道,show dialog
-                openDialog.value = true
-            }
-        }
-    }
-
     //邀請加入社團
     LaunchedEffect(inviteGroup) {
         inviteGroup?.let {
             viewModel.openGroupItemDialog(it)
-        }
-    }
-
-    if (openDialog.value) {
-        DialogScreen(
-            title = "不具有此頻道的權限",
-            subTitle = "這是個上了鎖的頻道，你目前沒有權限能夠進入喔！",
-            onDismiss = { openDialog.value = false }
-        ) {
-            BorderButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                text = "返回",
-                borderColor = LocalColor.current.text.default_50,
-                textColor = LocalColor.current.text.default_100
-            ) {
-                run {
-                    openDialog.value = false
-                }
-            }
         }
     }
 
@@ -234,9 +190,7 @@ fun FollowScreen(
             viewModel.lazyColumnAtTop()
         },
         isLoading = isLoading,
-        onChannelClick = {
-            chatRoomViewModel.fetchChannelPermission(it)
-        },
+        onChannelClick = onChannelClick,
         onLoadMoreServerGroup = onLoadMoreServerGroup,
         onGoToMy = {
             if (XLoginHelper.isLogin) {

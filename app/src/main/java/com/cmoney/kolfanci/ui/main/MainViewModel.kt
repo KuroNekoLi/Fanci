@@ -38,6 +38,15 @@ class MainViewModel(
     private val _inviteGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
     val inviteGroup = _inviteGroup.asStateFlow()
 
+    //收到 推播 新訊息
+    private val _receiveNewMessage: MutableStateFlow<TargetType.ReceiveMessage?> =
+        MutableStateFlow(null)
+    val receiveNewMessage = _receiveNewMessage.asStateFlow()
+
+    //收到 推播訊息
+    private val _targetType: MutableStateFlow<TargetType?> = MutableStateFlow(null)
+    val targetType = _targetType.asStateFlow()
+
     init {
         viewModelScope.launch {
             _isOpenTutorial.value = settingsDataStore.isTutorial.first()
@@ -99,16 +108,23 @@ class MainViewModel(
      * 推播 or dynamic link 資料
      */
     fun setNotificationBundle(payLoad: Payload) {
-        KLog.i(TAG, "setNotificationBundle:$payLoad")
+        KLog.i(TAG, "setNotificationBundle payLoad:$payLoad")
         val targetType =
             notificationHelper.convertPayloadToTargetType(payLoad) ?: TargetType.MainPage
 
-        KLog.i(TAG, "setNotificationBundle:${targetType}")
+        KLog.i(TAG, "setNotificationBundle targetType:${targetType}")
+
+        _targetType.value = targetType
 
         when (targetType) {
             is TargetType.InviteGroup -> {
                 val groupId = targetType.groupId
                 fetchInviteGroup(groupId)
+            }
+
+            is TargetType.ReceiveMessage -> {
+                KLog.i(TAG, "receiveNewMessage:$targetType")
+                _receiveNewMessage.value = targetType
             }
 
             TargetType.MainPage -> {}
@@ -135,5 +151,9 @@ class MainViewModel(
 
     fun openedInviteGroup() {
         _inviteGroup.value = null
+    }
+
+    fun clearPushData() {
+        _receiveNewMessage.value = null
     }
 }

@@ -11,6 +11,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
@@ -23,7 +24,9 @@ import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -63,6 +66,10 @@ class GroupViewModel(
     //主題設定檔
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
+
+    //前往指定頻道
+    private val _jumpToChannel = MutableSharedFlow<Channel>()
+    val jumpToChannel = _jumpToChannel.asSharedFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -812,6 +819,37 @@ class GroupViewModel(
                     KLog.e(TAG, it)
                 }
             })
+        }
+    }
+
+    /**
+     * 收到新訊息 推播
+     *
+     * 檢查是否已經加入該社團並打開該社團
+     *
+     * 檢查是否有權限進入該頻道
+     */
+    fun receiveNewMessage(receiveNewMessage: TargetType.ReceiveMessage?) {
+        KLog.i(TAG, "receiveNewMessage:$receiveNewMessage")
+        receiveNewMessage?.let {
+            viewModelScope.launch {
+                val groupId = receiveNewMessage.groupId
+                val channelId = receiveNewMessage.channelId
+                _myGroupList.value.firstOrNull { groupItem ->
+                    groupItem.groupModel.id == groupId
+                }?.also {
+                    //TODO: 因為會重新刷 root view, 造成重複處理 push 資料
+                    setCurrentGroup(it.groupModel)
+
+                    it.groupModel.categories?.flatMap { category ->
+                        category.channels.orEmpty()
+                    }?.firstOrNull { channel ->
+                        channel.id == channelId
+                    }?.also { channel ->
+                        _jumpToChannel.emit(channel)
+                    }
+                }
+            }
         }
     }
 }
