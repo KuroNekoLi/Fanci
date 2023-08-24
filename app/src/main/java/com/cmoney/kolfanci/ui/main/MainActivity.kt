@@ -30,6 +30,8 @@ import com.cmoney.xlogin.base.BaseWebLoginActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.socks.library.KLog
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnNeverAskAgain
@@ -56,8 +58,20 @@ class MainActivity : BaseWebLoginActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkPayload()
+
         setContent {
             val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
+            //收到新訊息 推播
+            val receiveNewMessage by globalViewModel.receiveNewMessage.collectAsState()
+
+            //我的社團清單
+            val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
+
+            if (myGroupList.isNotEmpty() && receiveNewMessage != null) {
+                globalGroupViewModel.receiveNewMessage(receiveNewMessage)
+            }
+
             isOpenTutorial?.let { isCurrentOpenTutorial ->
                 FanciTheme(fanciColor = DefaultThemeColor) {
                     if (isCurrentOpenTutorial) {
@@ -76,6 +90,20 @@ class MainActivity : BaseWebLoginActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * 檢查 推播 or dynamic link
+     */
+    private fun checkPayload() {
+        KLog.i(TAG, "checkPayload")
+        val payLoad =
+            intent.getParcelableExtra<Payload>(FOREGROUND_NOTIFICATION_BUNDLE)
+        KLog.d(TAG, "payLoad = $payLoad")
+        if (payLoad != null) {
+            globalViewModel.setNotificationBundle(payLoad)
+        }
+        intent = null
     }
 
     @NeedsPermission(Manifest.permission.POST_NOTIFICATIONS)

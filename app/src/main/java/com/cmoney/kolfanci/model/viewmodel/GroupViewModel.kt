@@ -24,9 +24,7 @@ import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -68,8 +66,8 @@ class GroupViewModel(
     val theme = _theme.asStateFlow()
 
     //前往指定頻道
-    private val _jumpToChannel = MutableSharedFlow<Channel>()
-    val jumpToChannel = _jumpToChannel.asSharedFlow()
+    private val _jumpToChannel = MutableStateFlow<Channel?>(null)
+    val jumpToChannel = _jumpToChannel.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -835,10 +833,10 @@ class GroupViewModel(
             viewModelScope.launch {
                 val groupId = receiveNewMessage.groupId
                 val channelId = receiveNewMessage.channelId
+
                 _myGroupList.value.firstOrNull { groupItem ->
                     groupItem.groupModel.id == groupId
                 }?.also {
-                    //TODO: 因為會重新刷 root view, 造成重複處理 push 資料
                     setCurrentGroup(it.groupModel)
 
                     it.groupModel.categories?.flatMap { category ->
@@ -846,10 +844,14 @@ class GroupViewModel(
                     }?.firstOrNull { channel ->
                         channel.id == channelId
                     }?.also { channel ->
-                        _jumpToChannel.emit(channel)
+                        _jumpToChannel.value = channel
                     }
                 }
             }
         }
+    }
+
+    fun clearState() {
+        _jumpToChannel.value = null
     }
 }

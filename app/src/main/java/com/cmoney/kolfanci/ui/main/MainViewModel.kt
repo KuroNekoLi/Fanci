@@ -153,7 +153,10 @@ class MainViewModel(
         _inviteGroup.value = null
     }
 
-    fun clearPushData() {
+    /**
+     * reset state
+     */
+    fun clearPushDataState() {
         _receiveNewMessage.value = null
     }
 }

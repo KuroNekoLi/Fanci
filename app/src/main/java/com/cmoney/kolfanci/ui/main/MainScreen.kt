@@ -1,7 +1,5 @@
 package com.cmoney.kolfanci.ui.main
 
-import android.content.Intent
-import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +22,6 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
@@ -40,7 +37,6 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
-import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -80,15 +76,6 @@ fun MainScreen(
     val receiveNewMessage by globalViewModel.receiveNewMessage.collectAsState()
     val serialNumber = receiveNewMessage?.serialNumber
 
-    //處理收到的訊息
-    LaunchedEffect(myGroupList) {
-        if (receiveNewMessage != null && myGroupList.isNotEmpty()) {
-            KLog.i(TAG, "receiveNewMessage:$receiveNewMessage")
-            globalGroupViewModel.receiveNewMessage(receiveNewMessage)
-            globalViewModel.clearPushData()
-        }
-    }
-
     //禁止進入頻道彈窗
     val channelAlertDialog = remember { mutableStateOf(false) }
 
@@ -104,6 +91,7 @@ fun MainScreen(
                             jumpChatMessage = jumpChatMessage
                         )
                     )
+                    globalViewModel.clearPushDataState()
                 } else {
                     navigator.navigate(
                         ChannelScreenDestination(
@@ -119,10 +107,10 @@ fun MainScreen(
     }
 
     //檢查指定頻道權限
-    LaunchedEffect(Unit) {
-        globalGroupViewModel.jumpToChannel.collect {
-            chatRoomViewModel.fetchChannelPermission(it)
-        }
+    val jumpToChannel by globalGroupViewModel.jumpToChannel.collectAsState()
+    jumpToChannel?.let {
+        chatRoomViewModel.fetchChannelPermission(it)
+        globalGroupViewModel.clearState()
     }
 
     FollowScreen(
@@ -144,32 +132,31 @@ fun MainScreen(
         isLoading = isLoading,
         onDismissInvite = {
             globalViewModel.openedInviteGroup()
-            activity.intent.replaceExtras(Bundle())
         },
         onChannelClick = {
             chatRoomViewModel.fetchChannelPermission(it)
         }
     )
 
-    /**
-     * 檢查 推播 or dynamic link
-     */
-    fun checkPayload(intent: Intent) {
-        val payLoad =
-            intent.getParcelableExtra<Payload>(MainActivity.FOREGROUND_NOTIFICATION_BUNDLE)
-        KLog.d(TAG, "payLoad = $payLoad")
-        if (payLoad != null) {
-            globalViewModel.setNotificationBundle(payLoad)
-        }
-    }
+//    /**
+//     * 檢查 推播 or dynamic link
+//     */
+//    fun checkPayload(intent: Intent) {
+//        val payLoad =
+//            intent.getParcelableExtra<Payload>(MainActivity.FOREGROUND_NOTIFICATION_BUNDLE)
+//        KLog.d(TAG, "payLoad = $payLoad")
+//        if (payLoad != null) {
+//            globalViewModel.setNotificationBundle(payLoad)
+//        }
+//    }
 
-    LaunchedEffect(Unit) {
-        KLog.i(TAG, "checkPayload")
-        if (activity.intent != null) {
-            checkPayload(activity.intent)
-        }
-        activity.intent = null
-    }
+//    LaunchedEffect(Unit) {
+//        KLog.i(TAG, "checkPayload")
+//        if (activity.intent != null) {
+//            checkPayload(activity.intent)
+//        }
+//        activity.intent = null
+//    }
 
     leaveResultRecipient.onNavResult { navResult ->
         when (navResult) {
