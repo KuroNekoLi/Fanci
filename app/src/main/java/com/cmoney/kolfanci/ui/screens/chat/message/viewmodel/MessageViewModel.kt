@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.ui.screens.chat.message.viewmodel
 import android.app.Application
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ChatMessage
@@ -869,7 +870,9 @@ class MessageViewModel(
         KLog.i(TAG, "showBasicPermissionTip")
         snackBarMessage(
             CustomMessage(
-                textString = Constant.getChannelSilenceDesc(),
+                textString = Constant.getChannelSilenceDesc(
+                    context = context
+                ),
                 iconRes = R.drawable.minus_people,
                 iconColor = White_767A7F,
                 textColor = Color.White

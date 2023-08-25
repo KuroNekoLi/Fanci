@@ -15,15 +15,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.OpennessOptionItem
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.QuestionItem
 import com.cmoney.kolfanci.ui.theme.Color_29787880
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -54,62 +57,28 @@ fun Step2Screen(
                 .verticalScroll(rememberScrollState())
                 .weight(1f)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(LocalColor.current.background)
-                    .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier.size(16.dp),
-                    painter = painterResource(id = R.drawable.lock),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(color = LocalColor.current.component.other)
-                )
-                Spacer(modifier = Modifier.width(19.dp))
-
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "社團公開度", fontSize = 17.sp, color = LocalColor.current.text.default_100
-                )
-
-                val publicText = if (isNeedApproval) {
-                    "不公開"
-                } else {
-                    "公開"
+            OpennessOptionItem(
+                title = stringResource(id = R.string.full_public),
+                description = stringResource(id = R.string.full_public_group_desc),
+                selected = !isNeedApproval,
+                onSwitch = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.CreateGroupOpenness, From.Public)
+                    onSwitchApprove.invoke(false)
                 }
+            )
 
-                Text(
-                    text = publicText,
-                    fontSize = 17.sp,
-                    color = LocalColor.current.specialColor.red
-                )
+            Spacer(modifier = Modifier.height(1.dp))
 
-                Spacer(modifier = Modifier.width(17.dp))
-
-                Switch(
-                    modifier = Modifier.size(51.dp, 31.dp),
-                    checked = isNeedApproval,
-                    onCheckedChange = {
-                        onSwitchApprove.invoke(it)
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = LocalColor.current.primary,
-                        checkedTrackAlpha = 1f,
-                        uncheckedThumbColor = Color.White,
-                        uncheckedTrackColor = Color_29787880,
-                        uncheckedTrackAlpha = 1f
-                    ),
-                )
-            }
-
-            Text(
-                modifier = Modifier.padding(top = 20.dp, start = 16.dp),
-                text = "*社團無論公開與否，都能被搜尋到*",
-                fontSize = 14.sp,
-                color = LocalColor.current.text.default_50
+            OpennessOptionItem(
+                title = stringResource(id = R.string.not_public),
+                description = stringResource(id = R.string.not_public_group_desc),
+                selected = isNeedApproval,
+                onSwitch = {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.CreateGroupOpenness, From.NonPublic)
+                    onSwitchApprove(true)
+                }
             )
 
             if (isNeedApproval) {
@@ -193,7 +162,7 @@ fun Step2Screen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun Step2ScreenPreview() {
     FanciTheme {

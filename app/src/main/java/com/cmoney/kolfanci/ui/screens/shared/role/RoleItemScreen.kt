@@ -39,17 +39,19 @@ fun RoleItemScreen(
     index: Int,
     isShowIndex: Boolean = false,
     fanciRole: FanciRole,
-    editText: String = "編輯",
+    editText: String = stringResource(id = R.string.edit),
     isSortMode: Boolean = false,
-    onEditClick: (FanciRole) -> Unit
+    onEditClick: ((FanciRole) -> Unit)?
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(LocalColor.current.background)
-            .clickable {
+            .clickable(
+                enabled = onEditClick != null
+            ) {
                 if (!isSortMode) {
-                    onEditClick.invoke(fanciRole)
+                    onEditClick?.invoke(fanciRole)
                 }
             },
         verticalAlignment = Alignment.CenterVertically

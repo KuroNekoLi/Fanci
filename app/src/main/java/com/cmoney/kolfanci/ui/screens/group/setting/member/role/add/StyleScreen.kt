@@ -79,7 +79,13 @@ fun StyleScreen(
                 .background(LocalColor.current.background)
                 .clickable {
                     with(AppUserLogger.getInstance()) {
-                        log(Page.GroupSettingsRoleManagementAddRoleStyleRoleName)
+                        if (from == From.Create) {
+                            log(Page.GroupSettingsRoleManagementAddRoleStyleRoleName)
+                        }
+                        else {
+                            log(Page.GroupSettingsRoleManagementEditRoleStyleRoleName)
+                        }
+
                         log(Clicked.StyleRoleName, from)
                     }
                     navigator.navigate(

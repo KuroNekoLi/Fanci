@@ -74,7 +74,8 @@ fun FollowScreen(
     onRefreshMyGroupList: () -> Unit,
     isLoading: Boolean,
     inviteGroup: Group?,
-    onDismissInvite: () -> Unit
+    onDismissInvite: () -> Unit,
+    onChangeGroup: (Group) -> Unit
 ) {
     val uiState = viewModel.uiState
 
@@ -113,13 +114,19 @@ fun FollowScreen(
 
     if (isRefreshMyGroupList) {
         onRefreshMyGroupList.invoke()
+        viewModel.refreshMyGroupDone()
     }
 
     //查看該社團info dialog
     val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
     openGroupDialog?.let { targetGroup ->
+        val isJoined = myGroupList.any { groupItem ->
+            groupItem.groupModel.id == targetGroup.id
+        }
+
         GroupItemDialogScreen(
+            isJoined = isJoined,
             groupModel = targetGroup,
             onDismiss = {
                 viewModel.closeGroupItemDialog()
@@ -135,7 +142,14 @@ fun FollowScreen(
                     }
                 }
 
-                viewModel.joinGroup(it)
+                if (isJoined) {
+                    onChangeGroup.invoke(it)
+                }
+                else {
+                    viewModel.joinGroup(it)
+                }
+
+                viewModel.closeGroupItemDialog()
                 onDismissInvite.invoke()
             }
         )

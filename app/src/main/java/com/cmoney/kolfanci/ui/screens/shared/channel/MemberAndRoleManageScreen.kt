@@ -81,7 +81,7 @@ fun MemberAndRoleManageScreen(
 
     //init default data
     LaunchedEffect(Unit) {
-        if (uiState.selectedVipPlanModels.isEmpty() && uiState.selectedRole.isEmpty()) {
+        if (uiState.selectedVipPlanModels.isEmpty() && uiState.selectedRole.isEmpty() && viewModel.selectedMember.value.isEmpty()) {
             viewModel.initialUiStateFromModel(selectedModel = selectedModel)
         }
     }

@@ -72,6 +72,7 @@ fun BasePostContentScreen(
     onEmojiClick: (Int) -> Unit,
     onAddNewEmojiClick: (Int) -> Unit,
     onImageClick: (() -> Unit)? = null,
+    onTextExpandClick: (() -> Unit)? = null,
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -143,6 +144,7 @@ fun BasePostContentScreen(
                             maxDisplayLine = if (maxDisplayLine == Int.MAX_VALUE) {
                                 defaultDisplayLine
                             } else {
+                                onTextExpandClick?.invoke()
                                 Int.MAX_VALUE
                             }
                         }
@@ -158,7 +160,7 @@ fun BasePostContentScreen(
                         maxDisplayLine = if (maxDisplayLine == Int.MAX_VALUE) {
                             defaultDisplayLine
                         } else {
-                            AppUserLogger.getInstance().log(Clicked.ShowMore, From.Post)
+                            onTextExpandClick?.invoke()
                             Int.MAX_VALUE
                         }
                     },

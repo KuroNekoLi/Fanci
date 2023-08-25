@@ -17,7 +17,7 @@ val useCaseModule = module {
     factory { PermissionUseCase(get(), get()) }
     factory { OrderUseCase(get()) }
     factory { PostUseCase(get()) }
-    factory { DynamicLinkUseCase(get()) }
+    factory { DynamicLinkUseCase(androidApplication(), get()) }
     factory { VipManagerUseCase(get(), get(), get(), get()) }
     factory { SearchUseCase(get(), get()) }
     factory { UploadImageUseCase(androidApplication(), get()) }
