@@ -139,10 +139,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun clearIntentExtra() {
-        intent.replaceExtras(null)
-        intent.action = ""
-        intent.data = null
-        intent.flags = 0
+        intent = Intent()
     }
 
     private fun showPushToken() {
