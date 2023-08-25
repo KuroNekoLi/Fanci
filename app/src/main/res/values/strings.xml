@@ -202,4 +202,11 @@
     <string name="update_immediately">立即更新</string>
     <string name="later">稍後</string>
 
+    <!--  Deep link  -->
+    <string name="deeplink_baseLink">https://www.fanci.com.tw/landing?targetType=1&amp;groupId=%s</string>
+    <string name="deeplink_domain_prefix">https://invite.fanci.com.tw/invite</string>
+    <string name="deeplink_title">Fanci｜經營個人影響力更輕鬆的選擇</string>
+    <string name="deeplink_description">量身打造高黏著度社團 一站經營你的個人影響力</string>
+    <string name="deeplink_imageUrl">https://i.imgur.com/tt02yvG.png</string>
+
 </resources>
