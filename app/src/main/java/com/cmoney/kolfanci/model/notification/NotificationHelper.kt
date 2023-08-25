@@ -5,7 +5,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
@@ -21,16 +20,15 @@ import org.json.JSONObject
 import java.net.URLDecoder
 
 class NotificationHelper(
-    application: Application,
+    val context: Application,
     val gson: Gson
-) : ContextWrapper(application) {
-
+) {
     private val TAG = NotificationHelper::class.java.simpleName
-    private val DEFAULT_CHANNEL_ID = getString(R.string.default_notification_channel_id)
+    private val DEFAULT_CHANNEL_ID = context.getString(R.string.default_notification_channel_id)
     private val DEFAULT_CHANNEL_ID_MESSAGE =
-        getString(R.string.default_notification_channel_message)
+        context.getString(R.string.default_notification_channel_message)
     private val manager: NotificationManager =
-        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     init {
         createChannels()
@@ -188,7 +186,7 @@ class NotificationHelper(
     }
 
     fun getStyle0(title: String, body: String): NotificationCompat.Builder {
-        return NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
+        return NotificationCompat.Builder(context, DEFAULT_CHANNEL_ID)
             .setSmallIcon(R.drawable.all_member)
 //            .setColor(ContextCompat.getColor(this, R.color.color_ddaf78))
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
