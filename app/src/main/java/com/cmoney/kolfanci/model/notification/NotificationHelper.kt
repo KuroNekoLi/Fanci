@@ -59,7 +59,7 @@ class NotificationHelper(
         val message = customNotification.message
         val sn = customNotification.sn
         val analyticsId = customNotification.analyticsId
-        val customData = customNotification.customData
+        val parameter = customNotification.parameter
         val deeplink = customNotification.deeplink
 
         return Payload(
@@ -69,7 +69,7 @@ class NotificationHelper(
             commonTargetType = commonTargetType,
             commonParameter = commonParameter,
             targetType = targetType,
-            parameter = customData,
+            parameter = parameter,
             analyticsId = analyticsId,
             deeplink = deeplink
         )
@@ -90,7 +90,7 @@ class NotificationHelper(
         } else {
             customTargetType
         }
-        val customData = bundle.getString(CustomNotification.CUSTOM_DATA_PARAMETER).orEmpty()
+        val parameter = bundle.getString(CustomNotification.PARAMETER).orEmpty()
         val commonTargetType =
             bundle.getString(CustomNotification.COMMON_TARGET_TYPE)?.toIntOrNull() ?: 0
         val commonParameter = bundle.getString(CustomNotification.COMMON_PARAMETER).orEmpty()
@@ -104,7 +104,7 @@ class NotificationHelper(
             commonTargetType = commonTargetType,
             commonParameter = commonParameter,
             targetType = targetType,
-            parameter = customData,
+            parameter = parameter,
             analyticsId = analyticsId,
             deeplink = deeplink
         )
