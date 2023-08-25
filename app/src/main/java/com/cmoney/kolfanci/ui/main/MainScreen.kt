@@ -47,7 +47,9 @@ fun MainScreen(
     val TAG = "MainScreen"
     val context = LocalContext.current
     val globalViewModel = koinViewModel<MainViewModel>(
-        viewModelStoreOwner = LocalContext.current as? ComponentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
+        viewModelStoreOwner = LocalContext.current as? ComponentActivity ?: checkNotNull(
+            LocalViewModelStoreOwner.current
+        )
     )
     val globalGroupViewModel = globalGroupViewModel()
     val activity = LocalContext.current.findActivity()
@@ -82,6 +84,9 @@ fun MainScreen(
         onDismissInvite = {
             globalViewModel.openedInviteGroup()
             activity.intent.replaceExtras(Bundle())
+        },
+        onChangeGroup = {
+            globalGroupViewModel.setCurrentGroup(it)
         }
     )
 
@@ -106,6 +111,7 @@ fun MainScreen(
         when (navResult) {
             NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 context.showToast(context.getString(R.string.leaving_group))
                 val groupId = navResult.value
