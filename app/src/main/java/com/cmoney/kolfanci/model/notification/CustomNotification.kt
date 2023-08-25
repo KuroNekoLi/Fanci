@@ -3,6 +3,19 @@ package com.cmoney.kolfanci.model.notification
 import android.content.Intent
 import com.google.firebase.messaging.RemoteMessage
 
+/**
+ *  將 推播訊息 以及 dynamic link 資料 轉為統一物件使用
+ *
+ *  @property title 標題
+ *  @property message 訊息內容
+ *  @property sound 音效
+ *  @property targetType 目標類型
+ *  @property commonTargetType 通用目標類型
+ *  @property commonParameter 通用參數
+ *  @property sn 推播序號
+ *  @property analyticsId 統計用編號
+ *  @property deeplink 跳轉連結
+ */
 class CustomNotification {
     val title: String
     val message: String
@@ -13,7 +26,6 @@ class CustomNotification {
     val commonParameter: String
     val sn: Long?
     val analyticsId: Long?
-    val customData: String
     val deeplink: String?
 
     constructor(intent: Intent?) {
@@ -31,7 +43,6 @@ class CustomNotification {
         commonParameter = intent?.getStringExtra(COMMON_PARAMETER).orEmpty()
         sn = intent?.getStringExtra(SN)?.toLongOrNull()
         analyticsId = intent?.getStringExtra(ANALYTICS_ID)?.toLongOrNull()
-        customData = intent?.getStringExtra(CUSTOM_DATA_PARAMETER).orEmpty()
         deeplink = intent?.getStringExtra(DEEPLINK).orEmpty()
     }
 
@@ -51,7 +62,6 @@ class CustomNotification {
         commonParameter = data?.get(COMMON_PARAMETER).orEmpty()
         sn = data?.get(SN)?.toLongOrNull()
         analyticsId = data?.get(ANALYTICS_ID)?.toLongOrNull()
-        customData = data?.get(CUSTOM_DATA_PARAMETER).orEmpty()
         deeplink = data?.get(DEEPLINK).orEmpty()
     }
 
@@ -66,7 +76,6 @@ class CustomNotification {
         const val COMMON_PARAMETER = "commonParameter"
         const val ANALYTICS_ID = "analyticsId"
         const val CUSTOM_TARGET_TYPE = "targetType"
-        const val CUSTOM_DATA_PARAMETER = "parameter" //帶在CustomData的自定義欄位
         const val DEEPLINK = "deeplink"
     }
 
