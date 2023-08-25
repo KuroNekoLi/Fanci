@@ -193,10 +193,6 @@ dependencies {
     //=============== Mixpanel ===============
     implementation 'com.mixpanel.android:mixpanel-android:6.2.2'
 
-    //=============== Permission ===============
-    implementation "com.github.permissions-dispatcher:permissionsdispatcher:4.8.0"
-    kapt "com.github.permissions-dispatcher:permissionsdispatcher-processor:4.8.0"
-
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

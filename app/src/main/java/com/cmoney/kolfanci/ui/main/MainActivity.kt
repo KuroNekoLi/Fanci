@@ -3,9 +3,11 @@ package com.cmoney.kolfanci.ui.main
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.NavGraphs
@@ -31,12 +34,9 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.socks.library.KLog
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import permissions.dispatcher.NeedsPermission
-import permissions.dispatcher.OnNeverAskAgain
-import permissions.dispatcher.OnPermissionDenied
-import permissions.dispatcher.RuntimePermissions
 
-@RuntimePermissions
+private const val REQUEST_REQUESTNOTIFICATIONPERMISSION: Int = 0
+
 class MainActivity : BaseWebLoginActivity() {
     private val TAG = MainActivity::class.java.simpleName
     private val globalViewModel by viewModel<MainViewModel>()
@@ -104,18 +104,35 @@ class MainActivity : BaseWebLoginActivity() {
         intent = null
     }
 
-    @NeedsPermission(Manifest.permission.POST_NOTIFICATIONS)
+    /**
+     * 檢查是否有開啟通知權限
+     */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestNotificationPermissionWithPermissionCheck() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                REQUEST_REQUESTNOTIFICATIONPERMISSION
+            )
+        } else {
+            requestNotificationPermission()
+        }
+    }
+
+    private fun onRequestPermissionsResult(requestCode: Int, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_REQUESTNOTIFICATIONPERMISSION -> {
+                //不管有沒有同意, 都繼續往下進行
+                requestNotificationPermission()
+            }
+        }
+    }
+
     fun requestNotificationPermission() {
-        globalViewModel.tutorialOnOpen()
-    }
-
-    @OnPermissionDenied
-    fun notificationPermissionDenied() {
-        globalViewModel.tutorialOnOpen()
-    }
-
-    @OnNeverAskAgain
-    fun notificationPermissionNeverAskAgain() {
         globalViewModel.tutorialOnOpen()
     }
 
