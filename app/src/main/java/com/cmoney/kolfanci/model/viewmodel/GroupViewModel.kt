@@ -851,7 +851,7 @@ class GroupViewModel(
         }
     }
 
-    fun clearState() {
+    fun finishJumpToChannel() {
         _jumpToChannel.value = null
     }
 }

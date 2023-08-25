@@ -110,7 +110,7 @@ fun MainScreen(
     val jumpToChannel by globalGroupViewModel.jumpToChannel.collectAsState()
     jumpToChannel?.let {
         chatRoomViewModel.fetchChannelPermission(it)
-        globalGroupViewModel.clearState()
+        globalGroupViewModel.finishJumpToChannel()
     }
 
     FollowScreen(
