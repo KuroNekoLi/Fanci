@@ -21,4 +21,5 @@ val useCaseModule = module {
     factory { VipManagerUseCase(get(), get(), get(), get()) }
     factory { SearchUseCase(get(), get()) }
     factory { UploadImageUseCase(androidApplication(), get()) }
+    factory { NotificationUseCase() }
 }

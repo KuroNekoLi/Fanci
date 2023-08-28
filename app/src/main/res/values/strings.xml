@@ -213,4 +213,6 @@
     <string name="deeplink_description">量身打造高黏著度社團 一站經營你的個人影響力</string>
     <string name="deeplink_imageUrl">https://i.imgur.com/tt02yvG.png</string>
 
+    <string name="notification_center">通知中心</string>
+    
 </resources>

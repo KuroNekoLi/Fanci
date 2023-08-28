@@ -21,6 +21,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReport
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.my.MyScreenViewModel
+import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
@@ -119,5 +120,8 @@ val viewModule = module {
     }
     viewModel {
         SearchViewModel(get())
+    }
+    viewModel {
+        NotificationCenterViewModel(get())
     }
 }

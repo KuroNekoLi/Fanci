@@ -137,8 +137,7 @@ fun FollowScreen(
 
                 if (isJoined) {
                     onChangeGroup.invoke(it)
-                }
-                else {
+                } else {
                     viewModel.joinGroup(it)
                 }
 
@@ -307,6 +306,18 @@ fun FollowScreenView(
                         }
 
                         onGoToMy()
+                    },
+                    onNotification = {
+                        KLog.i(TAG, "onNotification click.")
+
+                        //Close Drawer
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.close()
+                        }
+
+                        navigator.navigate(
+                            NotificationCenterScreenDestination
+                        )
                     }
                 )
                 Box(
