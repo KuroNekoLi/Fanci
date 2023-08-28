@@ -38,11 +38,6 @@ class MainViewModel(
     private val _inviteGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
     val inviteGroup = _inviteGroup.asStateFlow()
 
-    //收到 推播 新訊息
-    private val _receiveNewMessage: MutableStateFlow<TargetType.ReceiveMessage?> =
-        MutableStateFlow(null)
-    val receiveNewMessage = _receiveNewMessage.asStateFlow()
-
     //收到 推播訊息
     private val _targetType: MutableStateFlow<TargetType?> = MutableStateFlow(null)
     val targetType = _targetType.asStateFlow()
@@ -115,26 +110,12 @@ class MainViewModel(
         KLog.i(TAG, "setNotificationBundle targetType:${targetType}")
 
         _targetType.value = targetType
-
-        when (targetType) {
-            is TargetType.InviteGroup -> {
-                val groupId = targetType.groupId
-                fetchInviteGroup(groupId)
-            }
-
-            is TargetType.ReceiveMessage -> {
-                KLog.i(TAG, "receiveNewMessage:$targetType")
-                _receiveNewMessage.value = targetType
-            }
-
-            TargetType.MainPage -> {}
-        }
     }
 
     /**
      * 抓取邀請連結社團的資訊
      */
-    private fun fetchInviteGroup(groupId: String) {
+    fun fetchInviteGroup(groupId: String) {
         KLog.i(TAG, "fetchInviteGroup:$groupId")
         viewModelScope.launch {
             groupUseCase.getGroupById(
@@ -157,6 +138,7 @@ class MainViewModel(
      * reset state
      */
     fun clearPushDataState() {
-        _receiveNewMessage.value = null
+        KLog.i(TAG, "clearPushDataState")
+        _targetType.value = null
     }
 }

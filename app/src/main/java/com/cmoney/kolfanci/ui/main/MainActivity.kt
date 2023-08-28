@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import com.cmoney.kolfanci.model.notification.Payload
+import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
@@ -60,14 +61,31 @@ class MainActivity : BaseWebLoginActivity() {
 
         setContent {
             val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
-            //收到新訊息 推播
-            val receiveNewMessage by globalViewModel.receiveNewMessage.collectAsState()
+
+            val targetType by globalViewModel.targetType.collectAsState()
 
             //我的社團清單
             val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
 
-            if (myGroupList.isNotEmpty() && receiveNewMessage != null) {
-                globalGroupViewModel.receiveNewMessage(receiveNewMessage)
+            targetType?.let { targetType ->
+                when (targetType) {
+                    is TargetType.InviteGroup -> {
+                        val groupId = targetType.groupId
+                        globalViewModel.fetchInviteGroup(groupId)
+                    }
+
+                    is TargetType.ReceiveMessage -> {
+                        if (myGroupList.isNotEmpty()) {
+                            globalGroupViewModel.receiveNewMessage(targetType)
+                        }
+                    }
+
+                    else -> {}
+                }
+
+                if (myGroupList.isNotEmpty()) {
+                    globalViewModel.clearPushDataState()
+                }
             }
 
             isOpenTutorial?.let { isCurrentOpenTutorial ->
@@ -132,7 +150,7 @@ class MainActivity : BaseWebLoginActivity() {
         }
     }
 
-    fun requestNotificationPermission() {
+    private fun requestNotificationPermission() {
         globalViewModel.tutorialOnOpen()
     }
 

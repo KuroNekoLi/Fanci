@@ -65,9 +65,9 @@ class GroupViewModel(
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
 
-    //前往指定頻道
-    private val _jumpToChannel = MutableStateFlow<Channel?>(null)
-    val jumpToChannel = _jumpToChannel.asStateFlow()
+    //前往指定頻道, 指定訊息
+    private val _jumpToChannelMessage = MutableStateFlow<Pair<Channel, String>?>(null)
+    val jumpToChannelMessage = _jumpToChannelMessage.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -824,8 +824,7 @@ class GroupViewModel(
      * 收到新訊息 推播
      *
      * 檢查是否已經加入該社團並打開該社團
-     *
-     * 檢查是否有權限進入該頻道
+     * 確認該社團有此頻道, 並前往該頻道
      */
     fun receiveNewMessage(receiveNewMessage: TargetType.ReceiveMessage?) {
         KLog.i(TAG, "receiveNewMessage:$receiveNewMessage")
@@ -833,6 +832,7 @@ class GroupViewModel(
             viewModelScope.launch {
                 val groupId = receiveNewMessage.groupId
                 val channelId = receiveNewMessage.channelId
+                val serialNumber = receiveNewMessage.serialNumber
 
                 _myGroupList.value.firstOrNull { groupItem ->
                     groupItem.groupModel.id == groupId
@@ -844,7 +844,7 @@ class GroupViewModel(
                     }?.firstOrNull { channel ->
                         channel.id == channelId
                     }?.also { channel ->
-                        _jumpToChannel.value = channel
+                        _jumpToChannelMessage.value = Pair(channel, serialNumber)
                     }
                 }
             }
@@ -852,6 +852,6 @@ class GroupViewModel(
     }
 
     fun finishJumpToChannel() {
-        _jumpToChannel.value = null
+        _jumpToChannelMessage.value = null
     }
 }

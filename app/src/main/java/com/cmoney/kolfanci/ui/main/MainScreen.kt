@@ -72,45 +72,50 @@ fun MainScreen(
     val serverGroupList by globalGroupViewModel.groupList.collectAsState()
     //邀請加入社團
     val inviteGroup by globalViewModel.inviteGroup.collectAsState()
+
     //收到新訊息 推播
-    val receiveNewMessage by globalViewModel.receiveNewMessage.collectAsState()
-    val serialNumber = receiveNewMessage?.serialNumber
+//    val receiveNewMessage by globalViewModel.receiveNewMessage.collectAsState()
+//    val serialNumber = receiveNewMessage?.serialNumber
 
     //禁止進入頻道彈窗
     val channelAlertDialog = remember { mutableStateOf(false) }
 
-    //點擊channel權限檢查
-    LaunchedEffect(Unit) {
-        chatRoomViewModel.updatePermissionDone.collect {
-            if (Constant.canReadMessage()) {
-                if (serialNumber != null) {
-                    val jumpChatMessage = ChatMessage(serialNumber = serialNumber.toLong())
-                    navigator.navigate(
-                        ChannelScreenDestination(
-                            channel = it,
-                            jumpChatMessage = jumpChatMessage
-                        )
-                    )
-                    globalViewModel.clearPushDataState()
-                } else {
-                    navigator.navigate(
-                        ChannelScreenDestination(
-                            channel = it
-                        )
-                    )
-                }
-            } else {
-                //禁止進入該頻道,show dialog
-                channelAlertDialog.value = true
-            }
+    //檢查指定頻道權限
+    val jumpToChannelMessage by globalGroupViewModel.jumpToChannelMessage.collectAsState()
+    val serialNumber = jumpToChannelMessage?.second
+
+    LaunchedEffect(jumpToChannelMessage) {
+        jumpToChannelMessage?.let {
+            chatRoomViewModel.fetchChannelPermission(it.first)
         }
     }
 
-    //檢查指定頻道權限
-    val jumpToChannel by globalGroupViewModel.jumpToChannel.collectAsState()
-    jumpToChannel?.let {
-        chatRoomViewModel.fetchChannelPermission(it)
-        globalGroupViewModel.finishJumpToChannel()
+    // channel權限檢查
+    val updatePermissionDone by chatRoomViewModel.updatePermissionDone.collectAsState()
+    updatePermissionDone?.let {
+        if (Constant.canReadMessage()) {
+            if (serialNumber != null) {
+                val jumpChatMessage = ChatMessage(serialNumber = serialNumber.toLong())
+                navigator.navigate(
+                    ChannelScreenDestination(
+                        channel = it,
+                        jumpChatMessage = jumpChatMessage
+                    )
+                )
+                globalGroupViewModel.finishJumpToChannel()
+            } else {
+                navigator.navigate(
+                    ChannelScreenDestination(
+                        channel = it
+                    )
+                )
+            }
+        } else {
+            //禁止進入該頻道,show dialog
+            channelAlertDialog.value = true
+        }
+
+        chatRoomViewModel.afterUpdatePermissionDone()
     }
 
     FollowScreen(
