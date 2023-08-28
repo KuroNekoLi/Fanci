@@ -32,7 +32,8 @@ fun DrawerMenuScreen(
     groupList: List<GroupItem>,
     onClick: (GroupItem) -> Unit,
     onSearch: () -> Unit,
-    onProfile: () -> Unit
+    onProfile: () -> Unit,
+    onNotification: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -72,21 +73,24 @@ fun DrawerMenuScreen(
             }
         }
 
-        //TODO: 暫時沒有通知中心功能
-//        Box(
-//            modifier = Modifier
-//                .size(60.dp)
-//                .clip(RoundedCornerShape(22.dp))
-//                .background(LocalColor.current.env_80),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Image(
-//                painter = painterResource(id = R.drawable.bell),
-//                contentDescription = null,
-//                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
-//            )
-//        }
-//        Spacer(modifier = Modifier.height(17.dp))
+        Box(
+            modifier = Modifier
+                .size(60.dp)
+                .clip(RoundedCornerShape(22.dp))
+                .background(LocalColor.current.env_80)
+                .clickable {
+                    onNotification.invoke()
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.bell),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(17.dp))
 
         Box(
             modifier = Modifier
@@ -145,7 +149,8 @@ fun DrawerMenuScreenPreview() {
             ),
             onClick = {},
             onSearch = {},
-            onProfile = {}
+            onProfile = {},
+            onNotification = {}
         )
     }
 }
