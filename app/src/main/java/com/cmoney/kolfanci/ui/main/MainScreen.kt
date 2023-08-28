@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.main
 
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -140,6 +141,10 @@ fun MainScreen(
         },
         onChannelClick = {
             chatRoomViewModel.fetchChannelPermission(it)
+            activity.intent.replaceExtras(Bundle())
+        },
+        onChangeGroup = {
+            globalGroupViewModel.setCurrentGroup(it)
         }
     )
 
