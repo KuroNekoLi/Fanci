@@ -38,6 +38,10 @@ class MainViewModel(
     private val _inviteGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
     val inviteGroup = _inviteGroup.asStateFlow()
 
+    //收到 推播訊息
+    private val _targetType: MutableStateFlow<TargetType?> = MutableStateFlow(null)
+    val targetType = _targetType.asStateFlow()
+
     init {
         viewModelScope.launch {
             _isOpenTutorial.value = settingsDataStore.isTutorial.first()
@@ -99,26 +103,19 @@ class MainViewModel(
      * 推播 or dynamic link 資料
      */
     fun setNotificationBundle(payLoad: Payload) {
-        KLog.i(TAG, "setNotificationBundle:$payLoad")
+        KLog.i(TAG, "setNotificationBundle payLoad:$payLoad")
         val targetType =
             notificationHelper.convertPayloadToTargetType(payLoad) ?: TargetType.MainPage
 
-        KLog.i(TAG, "setNotificationBundle:${targetType}")
+        KLog.i(TAG, "setNotificationBundle targetType:${targetType}")
 
-        when (targetType) {
-            is TargetType.InviteGroup -> {
-                val groupId = targetType.groupId
-                fetchInviteGroup(groupId)
-            }
-
-            TargetType.MainPage -> {}
-        }
+        _targetType.value = targetType
     }
 
     /**
      * 抓取邀請連結社團的資訊
      */
-    private fun fetchInviteGroup(groupId: String) {
+    fun fetchInviteGroup(groupId: String) {
         KLog.i(TAG, "fetchInviteGroup:$groupId")
         viewModelScope.launch {
             groupUseCase.getGroupById(
@@ -135,5 +132,13 @@ class MainViewModel(
 
     fun openedInviteGroup() {
         _inviteGroup.value = null
+    }
+
+    /**
+     * reset state
+     */
+    fun clearPushDataState() {
+        KLog.i(TAG, "clearPushDataState")
+        _targetType.value = null
     }
 }

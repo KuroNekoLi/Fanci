@@ -1,9 +1,13 @@
 package com.cmoney.kolfanci.ui.main
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +20,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import com.cmoney.kolfanci.model.notification.Payload
+import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
@@ -29,6 +35,8 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.socks.library.KLog
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
+private const val REQUEST_REQUESTNOTIFICATIONPERMISSION: Int = 0
 
 class MainActivity : BaseWebLoginActivity() {
     private val TAG = MainActivity::class.java.simpleName
@@ -49,8 +57,37 @@ class MainActivity : BaseWebLoginActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkPayload()
+
         setContent {
             val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
+
+            val targetType by globalViewModel.targetType.collectAsState()
+
+            //我的社團清單
+            val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
+
+            targetType?.let { targetType ->
+                when (targetType) {
+                    is TargetType.InviteGroup -> {
+                        val groupId = targetType.groupId
+                        globalViewModel.fetchInviteGroup(groupId)
+                    }
+
+                    is TargetType.ReceiveMessage -> {
+                        if (myGroupList.isNotEmpty()) {
+                            globalGroupViewModel.receiveNewMessage(targetType)
+                        }
+                    }
+
+                    else -> {}
+                }
+
+                if (myGroupList.isNotEmpty()) {
+                    globalViewModel.clearPushDataState()
+                }
+            }
+
             isOpenTutorial?.let { isCurrentOpenTutorial ->
                 FanciTheme(fanciColor = DefaultThemeColor) {
                     if (isCurrentOpenTutorial) {
@@ -59,12 +96,62 @@ class MainActivity : BaseWebLoginActivity() {
                         TutorialScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            globalViewModel.tutorialOnOpen()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                requestNotificationPermissionWithPermissionCheck()
+                            } else {
+                                globalViewModel.tutorialOnOpen()
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * 檢查 推播 or dynamic link
+     */
+    private fun checkPayload() {
+        KLog.i(TAG, "checkPayload")
+        val payLoad =
+            intent.getParcelableExtra<Payload>(FOREGROUND_NOTIFICATION_BUNDLE)
+        KLog.d(TAG, "payLoad = $payLoad")
+        if (payLoad != null) {
+            globalViewModel.setNotificationBundle(payLoad)
+        }
+        intent = null
+    }
+
+    /**
+     * 檢查是否有開啟通知權限
+     */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestNotificationPermissionWithPermissionCheck() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                REQUEST_REQUESTNOTIFICATIONPERMISSION
+            )
+        } else {
+            requestNotificationPermission()
+        }
+    }
+
+    private fun onRequestPermissionsResult(requestCode: Int, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_REQUESTNOTIFICATIONPERMISSION -> {
+                //不管有沒有同意, 都繼續往下進行
+                requestNotificationPermission()
+            }
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        globalViewModel.tutorialOnOpen()
     }
 
     @Composable
@@ -125,5 +212,15 @@ class MainActivity : BaseWebLoginActivity() {
         KLog.i(TAG, "loginSuccessCallback")
         globalViewModel.loginSuccess()
         globalGroupViewModel.fetchMyGroup()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // NOTE: delegate the permission handling to generated function
+        onRequestPermissionsResult(requestCode, grantResults)
     }
 }

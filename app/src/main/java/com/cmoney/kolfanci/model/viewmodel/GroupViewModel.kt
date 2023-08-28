@@ -11,6 +11,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
@@ -63,6 +64,10 @@ class GroupViewModel(
     //主題設定檔
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
+
+    //前往指定頻道, 指定訊息
+    private val _jumpToChannelMessage = MutableStateFlow<Pair<Channel, String>?>(null)
+    val jumpToChannelMessage = _jumpToChannelMessage.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -813,5 +818,40 @@ class GroupViewModel(
                 }
             })
         }
+    }
+
+    /**
+     * 收到新訊息 推播
+     *
+     * 檢查是否已經加入該社團並打開該社團
+     * 確認該社團有此頻道, 並前往該頻道
+     */
+    fun receiveNewMessage(receiveNewMessage: TargetType.ReceiveMessage?) {
+        KLog.i(TAG, "receiveNewMessage:$receiveNewMessage")
+        receiveNewMessage?.let {
+            viewModelScope.launch {
+                val groupId = receiveNewMessage.groupId
+                val channelId = receiveNewMessage.channelId
+                val serialNumber = receiveNewMessage.serialNumber
+
+                _myGroupList.value.firstOrNull { groupItem ->
+                    groupItem.groupModel.id == groupId
+                }?.also {
+                    setCurrentGroup(it.groupModel)
+
+                    it.groupModel.categories?.flatMap { category ->
+                        category.channels.orEmpty()
+                    }?.firstOrNull { channel ->
+                        channel.id == channelId
+                    }?.also { channel ->
+                        _jumpToChannelMessage.value = Pair(channel, serialNumber)
+                    }
+                }
+            }
+        }
+    }
+
+    fun finishJumpToChannel() {
+        _jumpToChannelMessage.value = null
     }
 }

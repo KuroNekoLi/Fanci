@@ -40,8 +40,8 @@ class ChatRoomViewModel(
     val blockingList = _blockingList.asStateFlow()
 
     //是否更新完權限
-    private val _updatePermissionDone = MutableSharedFlow<Channel>()
-    val updatePermissionDone = _updatePermissionDone.asSharedFlow()
+    private val _updatePermissionDone = MutableStateFlow<Channel?>(null)
+    val updatePermissionDone = _updatePermissionDone.asStateFlow()
 
     //公告訊息,顯示用
     private val _announceMessage = MutableStateFlow<ChatMessage?>(null)
@@ -151,10 +151,14 @@ class ChatRoomViewModel(
         viewModelScope.launch {
             permissionUseCase.updateChannelPermissionAndBuff(channelId = channel.id.orEmpty())
                 .fold({
-                    _updatePermissionDone.emit(channel)
+                    _updatePermissionDone.value = channel
                 }, {
                     KLog.e(TAG, it)
                 })
         }
+    }
+
+    fun afterUpdatePermissionDone() {
+        _updatePermissionDone.value = null
     }
 }
