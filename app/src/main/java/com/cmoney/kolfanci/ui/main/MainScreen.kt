@@ -103,7 +103,6 @@ fun MainScreen(
                         jumpChatMessage = jumpChatMessage
                     )
                 )
-                globalGroupViewModel.finishJumpToChannel()
             } else {
                 navigator.navigate(
                     ChannelScreenDestination(
@@ -116,6 +115,7 @@ fun MainScreen(
             channelAlertDialog.value = true
         }
 
+        globalGroupViewModel.finishJumpToChannel()
         chatRoomViewModel.afterUpdatePermissionDone()
     }
 
