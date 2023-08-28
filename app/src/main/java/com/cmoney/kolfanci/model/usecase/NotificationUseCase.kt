@@ -7,6 +7,7 @@ class NotificationUseCase {
     /**
      * 取得 推播中心 資料
      */
-    fun getNotificationCenter() = MockData.mockNotificationCenter
+    suspend fun getNotificationCenter() =
+        Result.success(MockData.mockNotificationCenter)
 
 }

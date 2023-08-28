@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.ui.screens.notification
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
+import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,7 +32,12 @@ class NotificationCenterViewModel(private val notificationUseCase: NotificationU
 
     init {
         viewModelScope.launch {
-            _notificationCenter.value = notificationUseCase.getNotificationCenter()
+            notificationUseCase.getNotificationCenter()
+                .onSuccess {
+                    _notificationCenter.value = it
+                }.onFailure {
+                    KLog.e(TAG, it)
+                }
         }
     }
 }
