@@ -193,7 +193,7 @@ class NotificationHelper(
 
     fun getStyle0(title: String, body: String): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, DEFAULT_CHANNEL_ID)
-            .setSmallIcon(R.drawable.all_member)
+            .setSmallIcon(R.drawable.status_icon)
 //            .setColor(ContextCompat.getColor(this, R.color.color_ddaf78))
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
