@@ -80,6 +80,12 @@ class MainActivity : BaseWebLoginActivity() {
                         }
                     }
 
+                    is TargetType.ReceivePostMessage -> {
+                        if (myGroupList.isNotEmpty()) {
+                            globalGroupViewModel.receiveNewPost(targetType)
+                        }
+                    }
+
                     else -> {}
                 }
 

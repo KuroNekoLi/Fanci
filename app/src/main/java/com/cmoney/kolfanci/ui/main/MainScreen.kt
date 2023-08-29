@@ -23,9 +23,11 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.viewmodel.PushDataWrapper
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
+import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
@@ -74,39 +76,64 @@ fun MainScreen(
     //邀請加入社團
     val inviteGroup by globalViewModel.inviteGroup.collectAsState()
 
-    //收到新訊息 推播
-//    val receiveNewMessage by globalViewModel.receiveNewMessage.collectAsState()
-//    val serialNumber = receiveNewMessage?.serialNumber
-
     //禁止進入頻道彈窗
     val channelAlertDialog = remember { mutableStateOf(false) }
 
-    //檢查指定頻道權限
-    val jumpToChannelMessage by globalGroupViewModel.jumpToChannelMessage.collectAsState()
-    val serialNumber = jumpToChannelMessage?.second
+    //前往指定 訊息/文章...
+    val pushDataWrapper by globalGroupViewModel.jumpToChannelDest.collectAsState()
+    LaunchedEffect(pushDataWrapper) {
+        /**
+         * 處理推播資料
+         * 進入頻道前, 權限檢查
+         */
+        pushDataWrapper?.let { pushDataWrapper ->
+            when (pushDataWrapper) {
+                is PushDataWrapper.ChannelMessage -> {
+                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
+                }
 
-    LaunchedEffect(jumpToChannelMessage) {
-        jumpToChannelMessage?.let {
-            chatRoomViewModel.fetchChannelPermission(it.first)
+                is PushDataWrapper.ChannelPost -> {
+                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
+                }
+            }
         }
     }
 
-    // channel權限檢查
+    // channel權限檢查 結束
     val updatePermissionDone by chatRoomViewModel.updatePermissionDone.collectAsState()
-    updatePermissionDone?.let {
+    updatePermissionDone?.let { channel ->
         if (Constant.canReadMessage()) {
-            if (serialNumber != null) {
-                val jumpChatMessage = ChatMessage(serialNumber = serialNumber.toLong())
+            //是否有推播
+            pushDataWrapper?.let { pushDataWrapper ->
+                when (pushDataWrapper) {
+                    //前往指定訊息
+                    is PushDataWrapper.ChannelMessage -> {
+                        navigator.navigate(
+                            ChannelScreenDestination(
+                                channel = channel,
+                                jumpChatMessage = ChatMessage(
+                                    serialNumber =
+                                    pushDataWrapper.serialNumber.toLong()
+                                )
+                            )
+                        )
+                    }
+
+                    //打開貼文
+                    is PushDataWrapper.ChannelPost -> {
+                        navigator.navigate(
+                            PostInfoScreenDestination(
+                                channel = channel,
+                                post = pushDataWrapper.bulletinboardMessage
+                            )
+                        )
+                    }
+                }
+            } ?: run {
+                //前往頻道
                 navigator.navigate(
                     ChannelScreenDestination(
-                        channel = it,
-                        jumpChatMessage = jumpChatMessage
-                    )
-                )
-            } else {
-                navigator.navigate(
-                    ChannelScreenDestination(
-                        channel = it
+                        channel = channel
                     )
                 )
             }
@@ -115,7 +142,7 @@ fun MainScreen(
             channelAlertDialog.value = true
         }
 
-        globalGroupViewModel.finishJumpToChannel()
+        globalGroupViewModel.finishJumpToChannelDest()
         chatRoomViewModel.afterUpdatePermissionDone()
     }
 
@@ -141,32 +168,12 @@ fun MainScreen(
         },
         onChannelClick = {
             chatRoomViewModel.fetchChannelPermission(it)
-            activity.intent.replaceExtras(Bundle())
+            activity.intent?.replaceExtras(Bundle())
         },
         onChangeGroup = {
             globalGroupViewModel.setCurrentGroup(it)
         }
     )
-
-//    /**
-//     * 檢查 推播 or dynamic link
-//     */
-//    fun checkPayload(intent: Intent) {
-//        val payLoad =
-//            intent.getParcelableExtra<Payload>(MainActivity.FOREGROUND_NOTIFICATION_BUNDLE)
-//        KLog.d(TAG, "payLoad = $payLoad")
-//        if (payLoad != null) {
-//            globalViewModel.setNotificationBundle(payLoad)
-//        }
-//    }
-
-//    LaunchedEffect(Unit) {
-//        KLog.i(TAG, "checkPayload")
-//        if (activity.intent != null) {
-//            checkPayload(activity.intent)
-//        }
-//        activity.intent = null
-//    }
 
     leaveResultRecipient.onNavResult { navResult ->
         when (navResult) {
