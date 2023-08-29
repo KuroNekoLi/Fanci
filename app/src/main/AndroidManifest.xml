@@ -113,7 +113,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/all_member" />
+            android:resource="@drawable/status_icon" />
 
     </application>
 

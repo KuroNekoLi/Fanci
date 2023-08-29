@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.model.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
@@ -9,10 +10,13 @@ import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.extension.toBulletinboardMessage
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
+import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
@@ -35,6 +39,28 @@ sealed class ThemeSetting {
 }
 
 /**
+ * 推播 跳轉頁面所需資料
+ */
+sealed class PushDataWrapper {
+    /**
+     * 前往頻道聊天
+     */
+    data class ChannelMessage(
+        val channel: Channel,
+        val serialNumber: String
+    ) : PushDataWrapper()
+
+    /**
+     * 前往頻道貼文
+     */
+    data class ChannelPost(
+        val channel: Channel,
+        val bulletinboardMessage: BulletinboardMessage
+    ) : PushDataWrapper()
+
+}
+
+/**
  * 社團相關設定
  */
 class GroupViewModel(
@@ -42,7 +68,8 @@ class GroupViewModel(
     private val groupUseCase: GroupUseCase,
     private val channelUseCase: ChannelUseCase,
     private val permissionUseCase: PermissionUseCase,
-    private val orderUseCase: OrderUseCase
+    private val orderUseCase: OrderUseCase,
+    private val chatRoomUseCase: ChatRoomUseCase
 ) : ViewModel() {
     private val TAG = GroupViewModel::class.java.simpleName
 
@@ -65,9 +92,9 @@ class GroupViewModel(
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
 
-    //前往指定頻道, 指定訊息
-    private val _jumpToChannelMessage = MutableStateFlow<Pair<Channel, String>?>(null)
-    val jumpToChannelMessage = _jumpToChannelMessage.asStateFlow()
+    //前往指定頻道, 指定貼文/指定訊息...
+    private val _jumpToChannelDest = MutableStateFlow<PushDataWrapper?>(null)
+    val jumpToChannelDest = _jumpToChannelDest.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -844,14 +871,60 @@ class GroupViewModel(
                     }?.firstOrNull { channel ->
                         channel.id == channelId
                     }?.also { channel ->
-                        _jumpToChannelMessage.value = Pair(channel, serialNumber)
+                        _jumpToChannelDest.value = PushDataWrapper.ChannelMessage(
+                            channel = channel,
+                            serialNumber = serialNumber
+                        )
                     }
                 }
             }
         }
     }
 
-    fun finishJumpToChannel() {
-        _jumpToChannelMessage.value = null
+    /**
+     * 收到 新貼文 推播
+     *
+     * 檢查是否已經加入該社團並打開該社團
+     * 取得指定文章資訊
+     */
+    fun receiveNewPost(receivePostMessage: TargetType.ReceivePostMessage?) {
+        KLog.i(TAG, "receivePostMessage:$receivePostMessage")
+        receivePostMessage?.let {
+            viewModelScope.launch {
+                val groupId = receivePostMessage.groupId
+                val channelId = receivePostMessage.channelId
+                val messageId = receivePostMessage.messageId
+
+                _myGroupList.value.firstOrNull { groupItem ->
+                    groupItem.groupModel.id == groupId
+                }?.also {
+                    setCurrentGroup(it.groupModel)
+
+                    it.groupModel.categories?.flatMap { category ->
+                        category.channels.orEmpty()
+                    }?.firstOrNull { channel ->
+                        channel.id == channelId
+                    }?.also { channel ->
+
+                        //取得指定文章資訊
+                        chatRoomUseCase.getSingleMessage(
+                            messageId = messageId,
+                            messageServiceType = MessageServiceType.bulletinboard
+                        ).onSuccess { chatMessage ->
+                            _jumpToChannelDest.value = PushDataWrapper.ChannelPost(
+                                channel = channel,
+                                bulletinboardMessage = chatMessage.toBulletinboardMessage()
+                            )
+                        }.onFailure { err ->
+                            KLog.e(TAG, err)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun finishJumpToChannelDest() {
+        _jumpToChannelDest.value = null
     }
 }
