@@ -102,12 +102,17 @@ class GroupViewModel(
     /**
      * 有登入狀態, 取得 我的群組, 並設定該主題
      * 未登入, 取得 server 社團清單
+     *
+     * @param isSilent 是否在執行過程中避免影響目前畫面，true 表示會避免，false 表示會影響
      */
-    fun fetchMyGroup() {
+    fun fetchMyGroup(isSilent: Boolean = false) {
         KLog.i(TAG, "fetchMyGroup")
         if (XLoginHelper.isLogin) {
             viewModelScope.launch {
-                loading()
+                val isNotSilent = !isSilent
+                if (isNotSilent) {
+                    loading()
+                }
                 groupUseCase.groupToSelectGroupItem().fold({
                     if (it.isNotEmpty()) {
                         var currentSelectedPos = _myGroupList.value.indexOfFirst { groupItem ->
@@ -146,11 +151,12 @@ class GroupViewModel(
                         resetToDefault()
                         fetchAllGroupList()
                     }
-                    dismissLoading()
                 }, {
-                    dismissLoading()
                     KLog.e(TAG, it)
                 })
+                if (isNotSilent) {
+                    dismissLoading()
+                }
             }
         } else {
             fetchAllGroupList()
