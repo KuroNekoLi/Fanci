@@ -233,4 +233,5 @@
     <string name="open_notification_setting">開啟通知設定</string>
     <string name="open_notification_setting_desc">若想要收到提醒，要先開啟系統設定！</string>
 
+    <string name="channel_manage">頻道管理</string>
 </resources>

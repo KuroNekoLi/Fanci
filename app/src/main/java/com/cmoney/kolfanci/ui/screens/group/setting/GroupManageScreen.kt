@@ -1,14 +1,18 @@
 package com.cmoney.kolfanci.ui.screens.group.setting
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,12 +26,34 @@ import com.cmoney.kolfanci.ui.destinations.ChannelSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.NotificationSettingScreenDestination
+import com.cmoney.kolfanci.ui.screens.group.setting.SettingItemParam.settingItem
 import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
-import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
+import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+
+object SettingItemParam {
+    fun Modifier.settingItem() = composed {
+        then(this)
+            .fillMaxWidth()
+            .background(LocalColor.current.background)
+            .padding(
+                top = 10.dp,
+                bottom = 10.dp,
+                start = 25.dp,
+                end = 10.dp
+            )
+    }
+
+    val titleFontWeight = FontWeight.Normal
+
+    val titleFontSize = 17.sp
+
+    val subTitleFontSize = 17.sp
+}
 
 /**
  * 社團管理
@@ -44,14 +70,21 @@ fun GroupManageScreen(
     ) {
         Text(
             modifier = Modifier.padding(start = 25.dp, bottom = 9.dp),
-            text = stringResource(id = R.string.group_manage), fontSize = 14.sp, color = LocalColor.current.text.default_100
+            text = stringResource(id = R.string.group_manage),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
         )
 
         if (Constant.MyGroupPermission.editGroup == true) {
-            SettingItemScreen(
-                iconRes = R.drawable.info,
-                text = stringResource(id = R.string.group_setting),
-                onItemClick = {
+            NarrowItem(
+                modifier = Modifier.settingItem(),
+                title = stringResource(id = R.string.group_setting),
+                titleFontWeight = SettingItemParam.titleFontWeight,
+                titleFontSize = SettingItemParam.titleFontSize,
+                prefixIcon = painterResource(id = R.drawable.info),
+                prefixIconColor = LocalColor.current.component.other,
+                actionContent = NarrowItemDefaults.nextIcon(),
+                onClick = {
                     AppUserLogger.getInstance()
                         .log(Clicked.GroupSettingsGroupSettingsPage)
                     navController.navigate(
@@ -66,10 +99,15 @@ fun GroupManageScreen(
         }
 
         if (isShowChannelManage()) {
-            SettingItemScreen(
-                iconRes = R.drawable.channel_setting,
-                text = "頻道管理",
-                onItemClick = {
+            NarrowItem(
+                modifier = Modifier.settingItem(),
+                title = stringResource(id = R.string.channel_manage),
+                titleFontWeight = SettingItemParam.titleFontWeight,
+                titleFontSize = SettingItemParam.titleFontSize,
+                prefixIcon = painterResource(id = R.drawable.channel_setting),
+                prefixIconColor = LocalColor.current.component.other,
+                actionContent = NarrowItemDefaults.nextIcon(),
+                onClick = {
                     AppUserLogger.getInstance()
                         .log(Clicked.GroupSettingsChannelManagement)
                     navController.navigate(
@@ -79,14 +117,28 @@ fun GroupManageScreen(
                     )
                 }
             )
+
             Spacer(modifier = Modifier.height(1.dp))
         }
 
         if (Constant.MyGroupPermission.setGroupPublicity == true) {
-            SettingItemScreen(
-                iconRes = R.drawable.lock,
-                text = "社團公開度",
-                onItemClick = {
+
+            NarrowItem(
+                modifier = Modifier.settingItem(),
+                title = stringResource(id = R.string.group_openness),
+                titleFontWeight = SettingItemParam.titleFontWeight,
+                titleFontSize = SettingItemParam.titleFontSize,
+                prefixIcon = painterResource(id = R.drawable.lock),
+                prefixIconColor = LocalColor.current.component.other,
+                actionContent = NarrowItemDefaults.nextIcon(),
+                subTitle = if (group.isNeedApproval == true) {
+                    "不公開"
+                } else {
+                    "公開"
+                },
+                subTitleColor = LocalColor.current.specialColor.red,
+                subTitleFontSize = SettingItemParam.subTitleFontSize,
+                onClick = {
                     AppUserLogger.getInstance()
                         .log(Clicked.GroupSettingsGroupOpenness)
                     navController.navigate(
@@ -95,43 +147,31 @@ fun GroupManageScreen(
                         )
                     )
                 }
-            ) {
-                val publicText = if (group.isNeedApproval == true) {
-                    "不公開"
-                } else {
-                    "公開"
-                }
-                Text(
-                    text = publicText,
-                    fontSize = 17.sp,
-                    color = LocalColor.current.specialColor.red
-                )
-            }
+            )
+
             Spacer(modifier = Modifier.height(1.dp))
         }
 
         if (notificationSettingItem != null) {
-            SettingItemScreen(
-                iconRes = R.drawable.bell,
-                text = "提醒設定",
-                onItemClick = {
+            NarrowItem(
+                modifier = Modifier.settingItem(),
+                title = stringResource(id = R.string.notification_setting),
+                titleFontWeight = SettingItemParam.titleFontWeight,
+                titleFontSize = SettingItemParam.titleFontSize,
+                prefixIcon = painterResource(id = R.drawable.bell),
+                prefixIconColor = LocalColor.current.component.other,
+                actionContent = NarrowItemDefaults.nextIcon(),
+                subTitle = notificationSettingItem.shortTitle,
+                subTitleFontSize = SettingItemParam.subTitleFontSize,
+                onClick = {
                     navController.navigate(
                         NotificationSettingScreenDestination(
                             notificationSettingItem = notificationSettingItem
                         )
                     )
                 }
-            ) {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                    text = notificationSettingItem.shortTitle,
-                    fontSize = 17.sp,
-                    color = LocalColor.current.text.default_100
-                )
-            }
+            )
         }
-
     }
 }
 

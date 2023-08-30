@@ -42,9 +42,12 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun NarrowItem(
     modifier: Modifier = Modifier,
     title: String,
+    titleFontWeight: FontWeight = FontWeight.Bold,
+    titleFontSize: TextUnit = 16.sp,
     prefixIcon: Painter? = null,
     prefixIconColor: Color = LocalColor.current.primary,
     subTitle: String? = null,
+    subTitleFontSize: TextUnit = 16.sp,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     indication: Indication? = LocalIndication.current,
     titleColor: Color = LocalColor.current.text.default_100,
@@ -86,9 +89,9 @@ fun NarrowItem(
             }
             Text(
                 text = title,
-                fontSize = 16.sp,
+                fontSize = titleFontSize,
                 color = titleColor,
-                fontWeight = FontWeight.Bold,
+                fontWeight = titleFontWeight,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -103,7 +106,7 @@ fun NarrowItem(
                     Text(
                         modifier = Modifier.weight(1f, fill = false),
                         text = subTitle,
-                        fontSize = 16.sp,
+                        fontSize = subTitleFontSize,
                         color = subTitleColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
