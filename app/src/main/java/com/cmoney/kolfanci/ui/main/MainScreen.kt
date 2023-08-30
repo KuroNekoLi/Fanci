@@ -159,8 +159,8 @@ fun MainScreen(
         onLoadMoreServerGroup = {
             globalGroupViewModel.onLoadMore()
         },
-        onRefreshMyGroupList = {
-            globalGroupViewModel.fetchMyGroup()
+        onRefreshMyGroupList = { isSilent ->
+            globalGroupViewModel.fetchMyGroup(isSilent = isSilent)
         },
         isLoading = isLoading,
         onDismissInvite = {

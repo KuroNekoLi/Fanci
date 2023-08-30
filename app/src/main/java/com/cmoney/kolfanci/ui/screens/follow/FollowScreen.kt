@@ -66,7 +66,7 @@ fun FollowScreen(
     myGroupList: List<GroupItem>,
     onGroupItemClick: (Group) -> Unit,
     onLoadMoreServerGroup: () -> Unit,
-    onRefreshMyGroupList: () -> Unit,
+    onRefreshMyGroupList: (isSilent: Boolean) -> Unit,
     isLoading: Boolean,
     inviteGroup: Group?,
     onDismissInvite: () -> Unit,
@@ -106,7 +106,7 @@ fun FollowScreen(
     val isRefreshMyGroupList by viewModel.refreshMyGroup.collectAsState()
 
     if (isRefreshMyGroupList) {
-        onRefreshMyGroupList.invoke()
+        onRefreshMyGroupList(false)
         viewModel.refreshMyGroupDone()
     }
 
@@ -210,7 +210,8 @@ fun FollowScreen(
             } else {
                 viewModel.showLoginDialog()
             }
-        }
+        },
+        onRefreshMyGroupList = onRefreshMyGroupList
     )
 }
 
@@ -232,6 +233,7 @@ fun FollowScreenView(
     onChannelClick: (Channel) -> Unit,
     onLoadMoreServerGroup: () -> Unit,
     onGoToMy: () -> Unit,
+    onRefreshMyGroupList: (isSilent: Boolean) -> Unit,
     emptyGroupList: List<Group>
 ) {
     val TAG = "FollowScreenView"
@@ -247,6 +249,7 @@ fun FollowScreenView(
             it == DrawerValue.Open
         }.onEach {
             AppUserLogger.getInstance().log("Home_NavigationBar_show")
+            onRefreshMyGroupList(true)
         }.collect()
     }
 
@@ -626,7 +629,8 @@ fun FollowScreenPreview() {
             onChannelClick = {},
             onLoadMoreServerGroup = {},
             onGoToMy = {},
-            emptyGroupList = emptyList(),
+            onRefreshMyGroupList = {},
+            emptyGroupList = emptyList()
         )
     }
 }
