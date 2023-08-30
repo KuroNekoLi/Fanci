@@ -234,4 +234,8 @@
     <string name="open_notification_setting_desc">若想要收到提醒，要先開啟系統設定！</string>
 
     <string name="channel_manage">頻道管理</string>
+
+    <string name="not_belong_group">你目前不屬於此社團</string>
+    <string name="rejoin_group">請重新加入，或洽社團管理員詢問</string>
+
 </resources>

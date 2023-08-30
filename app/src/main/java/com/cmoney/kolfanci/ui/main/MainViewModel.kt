@@ -42,6 +42,10 @@ class MainViewModel(
     private val _targetType: MutableStateFlow<TargetType?> = MutableStateFlow(null)
     val targetType = _targetType.asStateFlow()
 
+    //登入彈窗
+    private val _showLoginDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showLoginDialog = _showLoginDialog.asStateFlow()
+
     init {
         viewModelScope.launch {
             _isOpenTutorial.value = settingsDataStore.isTutorial.first()
@@ -140,5 +144,13 @@ class MainViewModel(
     fun clearPushDataState() {
         KLog.i(TAG, "clearPushDataState")
         _targetType.value = null
+    }
+
+    fun showLoginDialog() {
+        _showLoginDialog.value = true
+    }
+
+    fun dismissLoginDialog() {
+        _showLoginDialog.value = false
     }
 }

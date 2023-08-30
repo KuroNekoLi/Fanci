@@ -26,10 +26,12 @@ import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
+import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.screens.tutorial.TutorialScreen
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.xlogin.XLoginHelper
 import com.cmoney.xlogin.base.BaseWebLoginActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -60,6 +62,8 @@ class MainActivity : BaseWebLoginActivity() {
         checkPayload()
 
         setContent {
+            val loginLoading by globalViewModel.loginLoading.collectAsState()
+
             val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
 
             val targetType by globalViewModel.targetType.collectAsState()
@@ -67,30 +71,41 @@ class MainActivity : BaseWebLoginActivity() {
             //我的社團清單
             val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
 
+            //登入彈窗
+            val showLoginDialog by globalViewModel.showLoginDialog.collectAsState()
+
             targetType?.let { targetType ->
-                when (targetType) {
-                    is TargetType.InviteGroup -> {
-                        val groupId = targetType.groupId
-                        globalViewModel.fetchInviteGroup(groupId)
-                    }
+                if (!loginLoading) {
+                    if (XLoginHelper.isLogin) {
+                        when (targetType) {
+                            is TargetType.InviteGroup -> {
+                                val groupId = targetType.groupId
+                                globalViewModel.fetchInviteGroup(groupId)
+                            }
 
-                    is TargetType.ReceiveMessage -> {
+                            is TargetType.ReceiveMessage -> {
+                                if (myGroupList.isNotEmpty()) {
+                                    globalGroupViewModel.receiveNewMessage(targetType)
+                                }
+                            }
+
+                            is TargetType.ReceivePostMessage -> {
+                                if (myGroupList.isNotEmpty()) {
+                                    globalGroupViewModel.receiveNewPost(targetType)
+                                }
+                            }
+
+                            else -> {}
+                        }
+
                         if (myGroupList.isNotEmpty()) {
-                            globalGroupViewModel.receiveNewMessage(targetType)
+                            globalViewModel.clearPushDataState()
                         }
                     }
-
-                    is TargetType.ReceivePostMessage -> {
-                        if (myGroupList.isNotEmpty()) {
-                            globalGroupViewModel.receiveNewPost(targetType)
-                        }
+                    //Not Login
+                    else {
+                        globalViewModel.showLoginDialog()
                     }
-
-                    else -> {}
-                }
-
-                if (myGroupList.isNotEmpty()) {
-                    globalViewModel.clearPushDataState()
                 }
             }
 
@@ -108,6 +123,18 @@ class MainActivity : BaseWebLoginActivity() {
                                 globalViewModel.tutorialOnOpen()
                             }
                         }
+                    }
+
+                    if (showLoginDialog) {
+                        LoginDialogScreen(
+                            onDismiss = {
+                                globalViewModel.dismissLoginDialog()
+                            },
+                            onLogin = {
+                                globalViewModel.dismissLoginDialog()
+                                startLogin()
+                            }
+                        )
                     }
                 }
             }
