@@ -5,7 +5,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 
-class NotificationUseCase(val context: Application) {
+class NotificationUseCase(private val context: Application) {
 
     /**
      * 取得 推播中心 資料

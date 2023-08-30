@@ -22,7 +22,7 @@ data class NotificationSettingItem(
 ) : Parcelable
 
 class NotificationSettingViewModel(
-    val context: Application,
+    private val context: Application,
     notificationUseCase: NotificationUseCase
 ) : AndroidViewModel(context) {
     private val TAG = NotificationSettingViewModel::class.java.simpleName
