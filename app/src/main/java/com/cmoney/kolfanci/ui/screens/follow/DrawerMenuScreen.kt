@@ -84,7 +84,7 @@ fun DrawerMenuScreen(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.bell),
+                painter = painterResource(id = R.drawable.menu_bell),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
             )
