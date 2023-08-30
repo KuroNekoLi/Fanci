@@ -9,10 +9,12 @@ import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
+import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +30,8 @@ data class GroupSettingUiState(
     val unApplyCount: Long? = null,                         //等待加入申請數量
     val showDelectDialog: Boolean = false,                  //是否呈現解散彈窗
     val showFinalDelectDialog: Boolean = false,             //是否呈現最後解散彈窗
-    val popToMain: Boolean = false                          //跳回首頁
+    val popToMain: Boolean = false,                         //跳回首頁
+    val notificationSettingItem: NotificationSettingItem? = null    //推播通知設定
 )
 
 class GroupSettingViewModel(
@@ -194,6 +197,29 @@ class GroupSettingViewModel(
                     KLog.e(TAG, it)
                 }
             })
+        }
+    }
+
+    /**
+     * 設定目前 設定的 推播設定
+     */
+    fun setCurrentNotificationSetting(notificationSettingItem: NotificationSettingItem) {
+        KLog.i(TAG, "setCurrentNotificationSetting:$notificationSettingItem")
+        uiState = uiState.copy(
+            notificationSettingItem = notificationSettingItem
+        )
+    }
+
+    /**
+     * 抓取推播通知 設定
+     */
+    fun fetchNotificationSetting() {
+        KLog.i(TAG, "fetchNotificationSetting")
+        viewModelScope.launch {
+            //TODO: call api
+            setCurrentNotificationSetting(
+                MockData.mockNotificationSettingItem
+            )
         }
     }
 }
