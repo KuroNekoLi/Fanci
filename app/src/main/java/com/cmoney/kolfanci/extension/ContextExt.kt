@@ -1,17 +1,21 @@
 package com.cmoney.kolfanci.extension
 
 import android.app.Activity
+import android.app.NotificationManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.os.Environment
+import android.provider.Settings
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
 import java.io.File
+
 
 fun Context.copyToClipboard(text: String) {
     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -93,4 +97,26 @@ fun Context.openCustomTab(uri: Uri) {
         .setShowTitle(true)
         .build()
     customTabsIntent.launchUrl(this, uri)
+}
+
+/**
+ * 是否開啟通知
+ */
+fun Context.isNotificationsEnabled(): Boolean {
+    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        ?: return false
+    return notificationManager.areNotificationsEnabled()
+}
+
+/**
+ * 打開系統 推播設定頁面
+ */
+fun Context.openNotificationSetting() {
+    Intent().apply {
+        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        val uri = Uri.fromParts("package", packageName, null)
+        data = uri
+        flags = FLAG_ACTIVITY_NEW_TASK
+        startActivity(this)
+    }
 }

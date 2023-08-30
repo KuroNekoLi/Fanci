@@ -214,5 +214,23 @@
     <string name="deeplink_imageUrl">https://i.imgur.com/tt02yvG.png</string>
 
     <string name="notification_center">通知中心</string>
-    
+
+    <string name="notification_setting">提醒設定</string>
+
+    <string name="notification_setting_short">新動態都提醒我</string>
+    <string name="notification_setting_all">有任何新動態都提醒我</string>
+    <string name="notification_setting_all_desc">所有新內容，與我的內容有人回饋時請提醒我</string>
+
+    <string name="notification_setting_post_short">新貼文提醒我</string>
+    <string name="notification_setting_post">只有新貼文時提醒我</string>
+    <string name="notification_setting_post_desc">任一頻道之貼文區有新的貼文時 (不論發佈者) 請提醒我</string>
+
+    <string name="notification_setting_silence_short">完全靜音</string>
+    <string name="notification_setting_silence">完全靜音</string>
+    <string name="notification_setting_silence_desc">任何動靜都別提醒我</string>
+
+    <string name="forward_system_setting">前往系統設定</string>
+    <string name="open_notification_setting">開啟通知設定</string>
+    <string name="open_notification_setting_desc">若想要收到提醒，要先開啟系統設定！</string>
+
 </resources>

@@ -48,14 +48,16 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
-import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.model.Constant.isShowVipManager
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
+import com.cmoney.kolfanci.ui.destinations.NotificationSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.VipManagerScreenDestination
 import com.cmoney.kolfanci.ui.main.MainActivity
+import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
@@ -84,7 +86,8 @@ fun GroupSettingScreen(
     memberViewModel: MemberViewModel = koinViewModel(),
     applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>,
-    leaveResultBackNavigator: ResultBackNavigator<String>
+    leaveResultBackNavigator: ResultBackNavigator<String>,
+    setNotificationResult: ResultRecipient<NotificationSettingScreenDestination, NotificationSettingItem>
 ) {
     val globalGroupViewModel = globalGroupViewModel()
     val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
@@ -131,6 +134,18 @@ fun GroupSettingScreen(
         }
     }
 
+    //推播 設定 callback
+    setNotificationResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                viewModel.setCurrentNotificationSetting(result.value)
+            }
+        }
+    }
+
     BackHandler {
 //        globalViewModel.setCurrentGroup(group)
         navController.popBackStack()
@@ -143,7 +158,6 @@ fun GroupSettingScreen(
         unApplyCount = uiState.unApplyCount ?: 0,
         reportList = reportList,
         onBackClick = {
-//            globalViewModel.setCurrentGroup(group)
             navController.popBackStack()
         },
         onInviteClick = {
@@ -161,7 +175,8 @@ fun GroupSettingScreen(
         onDisbandGroup = {
             viewModel.onFinalConfirmDelete(group = uiState.settingGroup ?: nowGroup)
         },
-        loading = loading
+        loading = loading,
+        notificationSettingItem = uiState.notificationSettingItem
     )
 
     //最終解散社團, 動作
@@ -187,6 +202,12 @@ fun GroupSettingScreen(
     LaunchedEffect(key1 = currentGroup) {
         viewModel.settingGroup(group = nowGroup)
     }
+    LaunchedEffect(key1 = uiState.notificationSettingItem) {
+        //抓取之前推播通知設定
+        if (uiState.notificationSettingItem == null) {
+            viewModel.fetchNotificationSetting()
+        }
+    }
 }
 
 @Composable
@@ -200,7 +221,8 @@ fun GroupSettingScreenView(
     onInviteClick: () -> Unit,
     onLeaveGroup: () -> Unit,
     onDisbandGroup: () -> Unit,
-    loading: Boolean
+    loading: Boolean,
+    notificationSettingItem: NotificationSettingItem? = null
 ) {
     val TAG = "GroupSettingScreenView"
 
@@ -258,14 +280,14 @@ fun GroupSettingScreenView(
                     )
                 }
                 //社團管理
-                if (isShowGroupManage()) {
-                    item {
-                        GroupManageScreen(
-                            group = group,
-                            navController = navController
-                        )
-                    }
+                item {
+                    GroupManageScreen(
+                        group = group,
+                        navController = navController,
+                        notificationSettingItem = notificationSettingItem
+                    )
                 }
+
                 //成員管理
                 item {
                     GroupMemberManageScreen(
@@ -309,7 +331,8 @@ fun GroupSettingScreenView(
                                 .fillMaxWidth()
                                 .background(LocalColor.current.background)
                                 .clickable {
-                                    AppUserLogger.getInstance()
+                                    AppUserLogger
+                                        .getInstance()
                                         .log(Clicked.GroupSettingsLeaveGroup)
                                     showLeaveGroupDialog = true
                                 },
@@ -328,13 +351,18 @@ fun GroupSettingScreenView(
                                 .fillMaxWidth()
                                 .background(LocalColor.current.background)
                                 .clickable {
-                                    AppUserLogger.getInstance()
+                                    AppUserLogger
+                                        .getInstance()
                                         .log(Clicked.DissolveGroup)
                                     showDisbandGroupDialog = true
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = stringResource(id = R.string.disband_group), fontSize = 17.sp, color = LocalColor.current.specialColor.red)
+                            Text(
+                                text = stringResource(id = R.string.disband_group),
+                                fontSize = 17.sp,
+                                color = LocalColor.current.specialColor.red
+                            )
                         }
                     }
                 }
@@ -397,7 +425,9 @@ fun GroupSettingScreenView(
             ) {
                 Column {
                     Text(
-                        text = "社團解散，所有內容、成員將會消失 平台「不會」有備份、復原功能。", fontSize = 17.sp, color = Color.White
+                        text = "社團解散，所有內容、成員將會消失 平台「不會」有備份、復原功能。",
+                        fontSize = 17.sp,
+                        color = Color.White
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -444,7 +474,9 @@ fun GroupSettingScreenView(
             ) {
                 Column {
                     Text(
-                        text = "社團解散，所有內容、成員將會消失 平台「不會」有備份、復原功能。", fontSize = 17.sp, color = Color.White
+                        text = "社團解散，所有內容、成員將會消失 平台「不會」有備份、復原功能。",
+                        fontSize = 17.sp,
+                        color = Color.White
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -518,7 +550,8 @@ fun GroupSettingScreenPreview() {
             onInviteClick = {},
             onLeaveGroup = {},
             onDisbandGroup = {},
-            loading = false
+            loading = false,
+            notificationSettingItem = MockData.mockNotificationSettingItem
         )
     }
 }

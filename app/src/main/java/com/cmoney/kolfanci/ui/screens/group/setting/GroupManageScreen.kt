@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -16,9 +17,12 @@ import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.destinations.ChannelSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingSettingScreenDestination
+import com.cmoney.kolfanci.ui.destinations.NotificationSettingScreenDestination
+import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -32,7 +36,8 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 fun GroupManageScreen(
     modifier: Modifier = Modifier,
     group: Group,
-    navController: DestinationsNavigator
+    navController: DestinationsNavigator,
+    notificationSettingItem: NotificationSettingItem? = null
 ) {
     Column(
         modifier = modifier
@@ -102,7 +107,31 @@ fun GroupManageScreen(
                     color = LocalColor.current.specialColor.red
                 )
             }
+            Spacer(modifier = Modifier.height(1.dp))
         }
+
+        if (notificationSettingItem != null) {
+            SettingItemScreen(
+                iconRes = R.drawable.bell,
+                text = "提醒設定",
+                onItemClick = {
+                    navController.navigate(
+                        NotificationSettingScreenDestination(
+                            notificationSettingItem = notificationSettingItem
+                        )
+                    )
+                }
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End,
+                    text = notificationSettingItem.shortTitle,
+                    fontSize = 17.sp,
+                    color = LocalColor.current.text.default_100
+                )
+            }
+        }
+
     }
 }
 
@@ -117,10 +146,14 @@ private fun isShowChannelManage(): Boolean {
             Constant.MyGroupPermission.deleteChannel == true
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun GroupManageScreenPreview() {
     FanciTheme {
-        GroupManageScreen(group = Group(), navController = EmptyDestinationsNavigator)
+        GroupManageScreen(
+            group = Group(),
+            navController = EmptyDestinationsNavigator,
+            notificationSettingItem = MockData.mockNotificationSettingItem
+        )
     }
 }

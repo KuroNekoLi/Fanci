@@ -8,11 +8,19 @@ import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterData
 import org.apache.commons.lang3.RandomStringUtils
 import kotlin.random.Random
 
 object MockData {
+
+    val mockNotificationSettingItem: NotificationSettingItem = NotificationSettingItem(
+        title = "有任何新動態都提醒我",
+        description = "所有新內容，與我的內容有人回饋時請提醒我",
+        isChecked = true,
+        shortTitle = "新動態都提醒我"
+    )
 
     /**
      * 推播中心 假資料

@@ -15,6 +15,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.apply.viewmodel.GroupApplyVi
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
@@ -124,5 +125,8 @@ val viewModule = module {
     }
     viewModel {
         NotificationCenterViewModel(get())
+    }
+    viewModel {
+        NotificationSettingViewModel(androidApplication(), get())
     }
 }
