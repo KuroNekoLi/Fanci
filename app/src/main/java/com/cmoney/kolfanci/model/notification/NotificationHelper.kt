@@ -177,6 +177,10 @@ class NotificationHelper(
                 getParameter<TargetType.ReceivePostMessage>(payload.parameter)
             }
 
+            Payload.TYPE_4 -> {
+                getParameter<TargetType.DissolveGroup>(payload.parameter)
+            }
+
             else -> getParameter<TargetType.InviteGroup>(payload.parameter)
         }
     }

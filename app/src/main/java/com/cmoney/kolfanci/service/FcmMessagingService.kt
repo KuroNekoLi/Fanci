@@ -9,7 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.cmoney.kolfanci.model.notification.CustomNotification
 import com.cmoney.kolfanci.model.notification.NotificationHelper
 import com.cmoney.kolfanci.model.notification.Payload
-import com.cmoney.kolfanci.ui.SplashActivity
+import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.notify_library.fcm.CMoneyBaseMessagingService
 import com.cmoney.notify_library.variable.CommonNotification
 import com.google.firebase.messaging.RemoteMessage
@@ -43,9 +43,8 @@ class FcmMessagingService : CMoneyBaseMessagingService() {
         sn: Int,
         payload: Payload
     ) {
-        val intent = SplashActivity.createIntent(this, payload)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = MainActivity.createIntent(this, payload)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
         val pendingIntent =
             PendingIntent.getActivity(
