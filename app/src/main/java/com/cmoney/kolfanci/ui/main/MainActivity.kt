@@ -74,37 +74,41 @@ class MainActivity : BaseWebLoginActivity() {
             //登入彈窗
             val showLoginDialog by globalViewModel.showLoginDialog.collectAsState()
 
-            targetType?.let { targetType ->
-                if (!loginLoading) {
-                    if (XLoginHelper.isLogin) {
-                        when (targetType) {
-                            is TargetType.InviteGroup -> {
-                                val groupId = targetType.groupId
-                                globalViewModel.fetchInviteGroup(groupId)
-                            }
-
-                            is TargetType.ReceiveMessage -> {
-                                if (myGroupList.isNotEmpty()) {
-                                    globalGroupViewModel.receiveNewMessage(targetType)
+            LaunchedEffect(key1 = targetType, key2 = loginLoading, key3 = myGroupList) {
+                targetType?.let { targetType ->
+                    if (!loginLoading) {
+                        if (XLoginHelper.isLogin) {
+                            when (targetType) {
+                                is TargetType.InviteGroup -> {
+                                    val groupId = targetType.groupId
+                                    globalViewModel.fetchInviteGroup(groupId)
                                 }
-                            }
 
-                            is TargetType.ReceivePostMessage -> {
-                                if (myGroupList.isNotEmpty()) {
-                                    globalGroupViewModel.receiveNewPost(targetType)
+                                is TargetType.ReceiveMessage -> {
+                                    if (myGroupList.isNotEmpty()) {
+                                        globalGroupViewModel.receiveNewMessage(
+                                            targetType
+                                        )
+                                    }
                                 }
+
+                                is TargetType.ReceivePostMessage -> {
+                                    if (myGroupList.isNotEmpty()) {
+                                        globalGroupViewModel.receiveNewPost(targetType)
+                                    }
+                                }
+
+                                else -> {}
                             }
 
-                            else -> {}
+                            if (myGroupList.isNotEmpty()) {
+                                globalViewModel.clearPushDataState()
+                            }
                         }
-
-                        if (myGroupList.isNotEmpty()) {
-                            globalViewModel.clearPushDataState()
+                        //Not Login
+                        else {
+                            globalViewModel.showLoginDialog()
                         }
-                    }
-                    //Not Login
-                    else {
-                        globalViewModel.showLoginDialog()
                     }
                 }
             }
