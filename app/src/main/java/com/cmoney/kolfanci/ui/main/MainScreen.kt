@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -78,6 +79,9 @@ fun MainScreen(
 
     //禁止進入頻道彈窗
     val channelAlertDialog = remember { mutableStateOf(false) }
+
+    //目前不屬於此社團
+    val showNotJoinAlert by globalGroupViewModel.showNotJoinAlert.collectAsState()
 
     //前往指定 訊息/文章...
     val pushDataWrapper by globalGroupViewModel.jumpToChannelDest.collectAsState()
@@ -215,6 +219,26 @@ fun MainScreen(
             }
         }
     }
+
+    if (showNotJoinAlert) {
+        DialogScreen(
+            title = stringResource(id = R.string.not_belong_group),
+            subTitle = stringResource(id = R.string.rejoin_group),
+            onDismiss = { channelAlertDialog.value = false }
+        ) {
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = stringResource(id = R.string.back),
+                borderColor = LocalColor.current.text.default_50,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                globalGroupViewModel.dismissNotJoinAlert()
+            }
+        }
+    }
+
 }
 
 @Preview(showBackground = true)

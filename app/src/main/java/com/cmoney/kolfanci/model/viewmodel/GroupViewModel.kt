@@ -96,6 +96,10 @@ class GroupViewModel(
     private val _jumpToChannelDest = MutableStateFlow<PushDataWrapper?>(null)
     val jumpToChannelDest = _jumpToChannelDest.asStateFlow()
 
+    //目前沒加入該社團, 彈窗
+    private val _showNotJoinAlert = MutableStateFlow<Boolean>(false)
+    val showNotJoinAlert = _showNotJoinAlert.asStateFlow()
+
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
 
@@ -882,9 +886,15 @@ class GroupViewModel(
                             serialNumber = serialNumber
                         )
                     }
+                } ?: kotlin.run {
+                    _showNotJoinAlert.value = true
                 }
             }
         }
+    }
+
+    fun dismissNotJoinAlert() {
+        _showNotJoinAlert.value = false
     }
 
     /**
@@ -925,6 +935,8 @@ class GroupViewModel(
                             KLog.e(TAG, err)
                         }
                     }
+                } ?: kotlin.run {
+                    _showNotJoinAlert.value = true
                 }
             }
         }
