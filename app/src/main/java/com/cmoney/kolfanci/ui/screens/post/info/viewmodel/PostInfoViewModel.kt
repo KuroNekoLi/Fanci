@@ -352,10 +352,10 @@ class PostInfoViewModel(
     /**
      * 附加圖片
      */
-    fun attachImage(uri: Uri) {
-        KLog.i(TAG, "attachImage:$uri")
+    fun attachImage(uris: List<Uri>) {
+        KLog.i(TAG, "attachImage:${uris.joinToString { it.toString() }}")
         val imageList = _imageAttach.value.toMutableList()
-        imageList.add(uri)
+        imageList.addAll(uris)
         _imageAttach.value = imageList
     }
 

@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.ui.screens.chat
 
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -43,7 +45,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun ChatRoomAttachImageScreen(
     modifier: Modifier = Modifier,
     imageAttach: List<Uri>,
-    quantityLimit: Int = AttachImageDefault.QUANTITY_LIMIT,
+    quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDelete: (Uri) -> Unit,
     onAdd: () -> Unit
 ) {
@@ -126,7 +128,13 @@ object AttachImageDefault {
     /**
      * 附加圖片數量上限
      */
-    const val QUANTITY_LIMIT = 5
+    fun getQuantityLimit(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            MediaStore.getPickImagesMaxLimit()
+        } else {
+            6
+        }
+    }
 }
 
 

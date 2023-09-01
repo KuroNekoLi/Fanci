@@ -250,8 +250,11 @@ fun GroupSettingBackgroundView(
                 onDismiss = {
                     state.closeCameraDialog()
                 },
-                onAttach = {
-                    state.setBackgroundImage(it)
+                quantityLimit = 1,
+                onAttach = { photoUris ->
+                    photoUris.firstOrNull()?.let {
+                        state.setBackgroundImage(it)
+                    }
                 },
                 onFanciClick = {
                     navController.navigate(FanciDefaultCoverScreenDestination)

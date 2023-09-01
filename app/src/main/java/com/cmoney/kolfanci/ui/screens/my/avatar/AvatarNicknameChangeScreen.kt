@@ -106,11 +106,14 @@ fun AvatarNicknameChangeScreen(
     if (viewModel.uiState.openCameraDialog) {
         GroupPhotoPickDialogScreen(
             isShowFanciPic = false,
+            quantityLimit = 1,
             onDismiss = {
                 viewModel.closeCameraDialog()
             },
-            onAttach = {
-                viewModel.setAvatarImage(it)
+            onAttach = { photoUris ->
+                photoUris.firstOrNull()?.let {
+                    viewModel.setAvatarImage(it)
+                }
             },
             onFanciClick = {
             }

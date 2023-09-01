@@ -47,10 +47,10 @@ class EditPostViewModel(
     private val _postSuccess: MutableStateFlow<BulletinboardMessage?> = MutableStateFlow(null)
     val postSuccess = _postSuccess.asStateFlow()
 
-    fun addAttachImage(uri: Uri) {
+    fun addAttachImage(uris: List<Uri>) {
         KLog.i(TAG, "addAttachImage")
         val imageList = _attachImages.value.toMutableList()
-        imageList.add(uri)
+        imageList.addAll(uris)
         _attachImages.value = imageList
     }
 
