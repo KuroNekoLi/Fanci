@@ -6,15 +6,18 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
+import com.cmoney.kolfanci.extension.isActivityRunning
 import com.cmoney.kolfanci.model.notification.CustomNotification
 import com.cmoney.kolfanci.model.notification.NotificationHelper
 import com.cmoney.kolfanci.model.notification.Payload
+import com.cmoney.kolfanci.ui.SplashActivity
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.notify_library.fcm.CMoneyBaseMessagingService
 import com.cmoney.notify_library.variable.CommonNotification
 import com.google.firebase.messaging.RemoteMessage
 import com.socks.library.KLog
 import org.koin.android.ext.android.inject
+
 
 class FcmMessagingService : CMoneyBaseMessagingService() {
     private val TAG = FcmMessagingService::class.java.simpleName
@@ -43,7 +46,13 @@ class FcmMessagingService : CMoneyBaseMessagingService() {
         sn: Int,
         payload: Payload
     ) {
-        val intent = MainActivity.createIntent(this, payload)
+
+        val intent = if (this.isActivityRunning(MainActivity::class.java.name)) {
+            MainActivity.createIntent(this, payload)
+        } else {
+            SplashActivity.createIntent(this, payload)
+        }
+
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
         val pendingIntent =
