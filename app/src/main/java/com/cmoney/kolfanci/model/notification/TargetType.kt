@@ -35,4 +35,9 @@ sealed class TargetType : Parcelable {
         val messageId: String = "",
     ) : TargetType()
 
+    @Parcelize
+    data class DissolveGroup(
+        @SerializedName("groupId", alternate = ["GroupId"])
+        val groupId: String = ""
+    ) : TargetType()
 }

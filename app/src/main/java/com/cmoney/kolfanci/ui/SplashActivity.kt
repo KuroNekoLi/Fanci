@@ -111,14 +111,6 @@ class SplashActivity : AppCompatActivity() {
         lifecycleScope.launch {
             delay(1500)
 
-            val foregroundNotification =
-                intent.getParcelableExtra<Payload>(MainActivity.FOREGROUND_NOTIFICATION_BUNDLE)
-            if (foregroundNotification != null) {
-                MainActivity.start(this@SplashActivity, foregroundNotification)
-                finish()
-                return@launch
-            }
-
             val backgroundPayload =
                 intent.getParcelableExtra<Payload>(EXTRA_PUSH_NOTIFICATION_PAYLOAD)
                     ?: notificationHelper.getPayloadFromBackground(intent)
@@ -139,7 +131,10 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun clearIntentExtra() {
-        intent = Intent()
+        intent.replaceExtras(Bundle())
+        intent.action = ""
+        intent.data = null
+        intent.flags = 0
     }
 
     private fun showPushToken() {

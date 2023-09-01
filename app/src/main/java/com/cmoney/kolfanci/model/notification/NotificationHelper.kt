@@ -10,6 +10,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.text.isDigitsOnly
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJson
 import com.google.gson.Gson
@@ -18,6 +19,7 @@ import com.google.gson.JsonSyntaxException
 import com.socks.library.KLog
 import org.json.JSONObject
 import java.net.URLDecoder
+
 
 class NotificationHelper(
     val context: Application,
@@ -138,21 +140,34 @@ class NotificationHelper(
 
     private class GroupModel(val groupId: String)
 
+    /**
+     * payload.deeplink ex:"https://www.fanci.com.tw/landing?targetType=2&serialNumber=2455&groupId=27444&channelId=31913"
+     */
     fun convertPayloadToTargetType(payload: Payload): TargetType? {
         KLog.i(TAG, "convertPayloadToTargetType:" + payload.targetType)
         return when (payload.targetType) {
             0 -> {
                 if (payload.deeplink?.isNotEmpty() == true) {
-                    val jsonObject = JSONObject(payload.deeplink)
-                    val targetTypeLowCase = jsonObject.optInt("targetType", 0)
-                    jsonObject.remove("targetType")
-                    val targetTypeHighCase = jsonObject.optInt("TargetType", 0)
-                    jsonObject.remove("TargetType")
-                    val targetType =
-                        if (targetTypeLowCase == 0) targetTypeHighCase else targetTypeLowCase
+                    val uri = Uri.parse(payload.deeplink)
+                    val targetTypeLowCase = uri.getQueryParameter("targetType")
+                    val targetTypeHighCase = uri.getQueryParameter("TargetType")
+                    val targetTypeStr = targetTypeLowCase ?: targetTypeHighCase
+
+                    if (targetTypeStr?.isDigitsOnly() == false) {
+                        return null
+                    }
+
+                    val targetType = targetTypeStr?.toInt() ?: 0
 
                     if (targetType == 0) {
                         return null
+                    }
+
+                    val jsonObject = JSONObject()
+                    val allKey = uri.queryParameterNames
+                    for (key in allKey) {
+                        val value = uri.getQueryParameter(key)
+                        jsonObject.put(key, value)
                     }
 
                     val parameter = jsonObject.toString()
@@ -175,6 +190,10 @@ class NotificationHelper(
 
             Payload.TYPE_3 -> {
                 getParameter<TargetType.ReceivePostMessage>(payload.parameter)
+            }
+
+            Payload.TYPE_4 -> {
+                getParameter<TargetType.DissolveGroup>(payload.parameter)
             }
 
             else -> getParameter<TargetType.InviteGroup>(payload.parameter)

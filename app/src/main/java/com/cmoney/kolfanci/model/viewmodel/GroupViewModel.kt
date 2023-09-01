@@ -100,6 +100,10 @@ class GroupViewModel(
     private val _showNotJoinAlert = MutableStateFlow<Boolean>(false)
     val showNotJoinAlert = _showNotJoinAlert.asStateFlow()
 
+    //解散社團 彈窗
+    private val _showDissolveGroupDialog = MutableStateFlow<Group?>(null)
+    val showDissolveGroupDialog = _showDissolveGroupDialog.asStateFlow()
+
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
 
@@ -944,5 +948,37 @@ class GroupViewModel(
 
     fun finishJumpToChannelDest() {
         _jumpToChannelDest.value = null
+    }
+
+    /**
+     * 解散 社團
+     */
+    fun dissolveGroup(dissolveGroup: TargetType.DissolveGroup) {
+        KLog.i(TAG, "dissolveGroup:$dissolveGroup")
+        viewModelScope.launch {
+            val groupId = dissolveGroup.groupId
+
+            _myGroupList.value.firstOrNull { groupItem ->
+                groupItem.groupModel.id == groupId
+            }?.also {
+                _showDissolveGroupDialog.value = it.groupModel
+            }
+        }
+    }
+
+    fun dismissDissolveDialog() {
+        _showDissolveGroupDialog.value = null
+    }
+
+    /**
+     *  檢查 解散的社團跟目前選中的社團 是否一樣
+     *  如果一樣-> 就執行刷新動作
+     *  不一樣時-> 不動作
+     */
+    fun onCheckDissolveGroup(group: Group) {
+        KLog.i(TAG, "onCheckDissolveGroup:$group")
+        if (_currentGroup.value?.id == group.id) {
+            fetchMyGroup(isSilent = false)
+        }
     }
 }

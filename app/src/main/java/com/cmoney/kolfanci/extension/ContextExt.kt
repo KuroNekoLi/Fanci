@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.extension
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.NotificationManager
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -14,6 +15,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
+import com.cmoney.kolfanci.ui.main.MainActivity
 import java.io.File
 
 
@@ -119,4 +121,15 @@ fun Context.openNotificationSetting() {
         flags = FLAG_ACTIVITY_NEW_TASK
         startActivity(this)
     }
+}
+
+/**
+ * 檢查該 activity 是否執行中
+ */
+fun Context.isActivityRunning(className: String): Boolean {
+    val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    return activityManager.appTasks
+        .filter { it.taskInfo != null }
+        .filter { it.taskInfo.baseActivity != null }
+        .any { it.taskInfo.baseActivity?.className == className }
 }
