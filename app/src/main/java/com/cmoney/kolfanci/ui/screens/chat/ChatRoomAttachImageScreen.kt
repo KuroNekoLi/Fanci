@@ -126,15 +126,26 @@ private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit) {
 
 object AttachImageDefault {
     /**
+     * 預設附加圖片上限
+     */
+    private const val DEFAULT_QUANTITY_LIMIT = 10
+
+    /**
      * 附加圖片數量上限
      */
     fun getQuantityLimit(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            MediaStore.getPickImagesMaxLimit()
+            val limit = MediaStore.getPickImagesMaxLimit()
+            if (DEFAULT_QUANTITY_LIMIT > limit) {
+                limit
+            } else {
+                DEFAULT_QUANTITY_LIMIT
+            }
         } else {
-            6
+            DEFAULT_QUANTITY_LIMIT
         }
     }
+
 }
 
 
