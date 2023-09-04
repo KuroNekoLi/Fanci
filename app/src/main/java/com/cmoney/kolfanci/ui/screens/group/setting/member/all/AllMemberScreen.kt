@@ -417,7 +417,7 @@ fun RoleItem(roleInfo: FanciRole) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(40.dp))
-            .background(LocalColor.current.env_80)
+            .background(LocalColor.current.background)
             .padding(start = 7.dp, end = 7.dp, top = 2.dp, bottom = 2.dp)
     ) {
         Row(
