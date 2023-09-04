@@ -19,7 +19,6 @@ import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
-import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
@@ -263,6 +262,9 @@ class PostViewModel(
                         _post.value = _post.value.filter {
                             it.message.id != post.id
                         }
+
+                        showPostInfoToast(PostInfoScreenResult.PostInfoAction.Delete)
+
                     } else {
                         it.printStackTrace()
                     }
@@ -270,12 +272,18 @@ class PostViewModel(
             } else {
                 KLog.i(TAG, "delete other comment.")
                 //他人
-                chatRoomUseCase.deleteOtherMessage(messageServiceType = MessageServiceType.bulletinboard,post.id.orEmpty()).fold({
+                chatRoomUseCase.deleteOtherMessage(
+                    messageServiceType = MessageServiceType.bulletinboard,
+                    post.id.orEmpty()
+                ).fold({
                 }, {
                     if (it is EmptyBodyException) {
                         _post.value = _post.value.filter {
                             it.message.id != post.id
                         }
+
+                        showPostInfoToast(PostInfoScreenResult.PostInfoAction.Delete)
+
                     } else {
                         it.printStackTrace()
                     }
