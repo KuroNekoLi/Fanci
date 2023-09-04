@@ -42,13 +42,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.BottomButtonScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -76,6 +79,12 @@ fun AvatarNicknameChangeScreen(
     val isLoading = userViewModel.isLoading.collectAsState(false)
     val isSaveComplete = userViewModel.isComplete.collectAsState(false)
 
+    val showEmptyNameDialog by userViewModel.showEmptyNameDialog.collectAsState()
+
+    var showSaveTip by remember {
+        mutableStateOf(false)
+    }
+
     if (isSaveComplete.value) {
         navController.popBackStack()
     }
@@ -99,8 +108,42 @@ fun AvatarNicknameChangeScreen(
                 nickName = textState,
                 avatarUri = viewModel.uiState.avatarImage
             )
+        },
+        onBack = {
+            showSaveTip = true
         }
     )
+
+    SaveConfirmDialogScreen(
+        isShow = showSaveTip,
+        onContinue = {
+            showSaveTip = false
+        },
+        onGiveUp = {
+            showSaveTip = false
+            navController.popBackStack()
+        }
+    )
+
+    //名稱為空 彈窗
+    if (showEmptyNameDialog) {
+        DialogScreen(
+            title = stringResource(id = R.string.user_name_empty),
+            subTitle = stringResource(id = R.string.user_name_empty_desc),
+            onDismiss = {
+                userViewModel.dismissEmptyNameDialog()
+            }
+        ) {
+            BlueButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = stringResource(id = R.string.confirm)
+            ) {
+                userViewModel.dismissEmptyNameDialog()
+            }
+        }
+    }
 
     //相片選擇 彈窗
     if (viewModel.uiState.openCameraDialog) {
@@ -135,7 +178,8 @@ private fun AvatarNicknameChangeScreenView(
     defaultText: String,
     maxLength: Int,
     input: (String) -> Unit,
-    isLoading: Boolean
+    isLoading: Boolean,
+    onBack: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -143,7 +187,7 @@ private fun AvatarNicknameChangeScreenView(
             TopBarScreen(
                 title = stringResource(id = R.string.avatar_nickname),
                 backClick = {
-                    navController.popBackStack()
+                    onBack.invoke()
                 }
             )
         }
@@ -277,7 +321,7 @@ private fun AvatarNicknameChangeScreenView(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun AvatarNicknameChangeScreenPreview() {
     FanciTheme {
@@ -289,7 +333,8 @@ fun AvatarNicknameChangeScreenPreview() {
             defaultText = "",
             maxLength = 10,
             input = {},
-            isLoading = false
+            isLoading = false,
+            onBack = {}
         )
     }
 }

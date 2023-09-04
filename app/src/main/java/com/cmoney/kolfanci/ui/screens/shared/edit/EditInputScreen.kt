@@ -196,8 +196,9 @@ fun EditInputScreenView(
                         unfocusedIndicatorColor = Color.Transparent
                     ),
                     onValueChange = {
-                        if (it.length <= maxLength) {
-                            textState = it
+                        val input = it.trim()
+                        if (input.length <= maxLength) {
+                            textState = input
                         }
                     },
                     shape = RoundedCornerShape(4.dp),
