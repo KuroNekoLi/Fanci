@@ -10,6 +10,8 @@ import com.cmoney.kolfanci.utils.PhotoUtils
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -29,14 +31,8 @@ class UserViewModel(
     private val _isComplete = MutableLiveData<Boolean>()
     val isComplete = _isComplete.asFlow()
 
-//    private val _changeAvatar = MutableLiveData<String>()
-//    val changeAvatar: LiveData<String> = _changeAvatar
-//
-//    private val _changeNickname = MutableLiveData<String>()
-//    val changeNickname: LiveData<String> = _changeNickname
-//
-//    private val _errorMsg = MutableLiveData<String>()
-//    val errorMsg: LiveData<String> = _errorMsg
+    private val _showEmptyNameDialog = MutableStateFlow(false)
+    val showEmptyNameDialog = _showEmptyNameDialog.asStateFlow()
 
     /**
      * 更換暱稱 以及 大頭貼
@@ -46,6 +42,13 @@ class UserViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             //更換暱稱
+            val nickName = nickName.trim()
+            if (nickName.isEmpty()) {
+                _isLoading.value = false
+                _showEmptyNameDialog.value = true
+                return@launch
+            }
+
             //不一樣才動作
             if (nickName != XLoginHelper.nickName) {
                 val isSuccess = XLoginHelper.changeNickNameRealTime(nickName).isSuccess
@@ -68,6 +71,10 @@ class UserViewModel(
             _isComplete.value = true
             _isLoading.value = false
         }
+    }
+
+    fun dismissEmptyNameDialog() {
+        _showEmptyNameDialog.value = false
     }
 
 }

@@ -241,4 +241,7 @@
     <string name="dissolve_group_title">你加入的社團 %s 已解散</string>
     <string name="dissolve_group_description">如問題請聯繫原社團聯絡人或客服人員</string>
 
+    <string name="user_name_empty">暱稱空白</string>
+    <string name="user_name_empty_desc">暱稱不可以是空白的唷！</string>
+
 </resources>
