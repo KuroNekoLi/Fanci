@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.ui.common.GrayButton
+import com.cmoney.kolfanci.ui.screens.chat.AttachImageDefault
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.socks.library.KLog
 
@@ -35,8 +37,9 @@ import com.socks.library.KLog
 fun GroupPhotoPickDialogScreen(
     modifier: Modifier = Modifier,
     isShowFanciPic: Boolean = true,
+    quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDismiss: () -> Unit,
-    onAttach: (Uri) -> Unit,
+    onAttach: (List<Uri>) -> Unit,
     onFanciClick: () -> Unit
 ) {
     val TAG = "GroupPhotoPickDialogScreen"
@@ -47,7 +50,7 @@ fun GroupPhotoPickDialogScreen(
             if (it.resultCode == Activity.RESULT_OK) {
                 captureUri?.let { uri ->
                     KLog.i(TAG, "get uri:$uri")
-                    onAttach.invoke(uri)
+                    onAttach.invoke(listOf(uri))
                     onDismiss.invoke()
                 }
             }
@@ -67,27 +70,17 @@ fun GroupPhotoPickDialogScreen(
     }
 
     val choosePhotoLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                it.data?.data?.let { uri ->
-                    KLog.i(TAG, "get uri:$uri")
-                    onAttach.invoke(uri)
-                    onDismiss.invoke()
-                }
-            }
+        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(maxItems = quantityLimit)) { photoUris ->
+            KLog.i(TAG, "get uris:${photoUris.joinToString { it.toString() }}")
+            onAttach.invoke(photoUris)
+            onDismiss.invoke()
         }
 
     /**
      * 啟動相簿選相片
      */
     fun startImagePicker() {
-        val intent =
-            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        intent.setDataAndType(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            "image/*"
-        )
-        choosePhotoLauncher.launch(intent)
+        choosePhotoLauncher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     Dialog(onDismissRequest = {

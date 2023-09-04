@@ -131,11 +131,14 @@ fun GroupSettingAvatarScreen(
 
     if (uiState.openCameraDialog) {
         GroupPhotoPickDialogScreen(
+            quantityLimit = 1,
             onDismiss = {
                 groupSettingAvatarViewModel.closeCameraDialog()
             },
-            onAttach = {
-                groupSettingAvatarViewModel.setAvatarImage(it)
+            onAttach = { photoUris ->
+                photoUris.firstOrNull()?.let {
+                    groupSettingAvatarViewModel.setAvatarImage(it)
+                }
             },
             onFanciClick = {
                 groupSettingAvatarViewModel.closeCameraDialog()

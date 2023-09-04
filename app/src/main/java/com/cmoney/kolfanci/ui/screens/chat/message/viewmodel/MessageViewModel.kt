@@ -228,12 +228,12 @@ class MessageViewModel(
 
     /**
      * 附加 圖片
-     * @param uri 圖片 uri.
+     * @param uris 圖片 uri集合
      */
-    fun attachImage(uri: Uri) {
-        KLog.i(TAG, "attachImage:$uri")
+    fun attachImage(uris: List<Uri>) {
+        KLog.i(TAG, "attachImage:${uris.joinToString { it.toString() }}")
         val imageList = _imageAttach.value.toMutableList()
-        imageList.add(uri)
+        imageList.addAll(uris)
         _imageAttach.value = imageList
     }
 

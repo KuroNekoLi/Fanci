@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -60,13 +61,11 @@ fun ChooseImagePickDialog(
     }
 
     val choosePhotoResult =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                it.data?.data?.let { uri ->
-                    KLog.i(TAG, "get uri:$uri")
-                    onAttach.invoke(uri)
-                    onDismiss.invoke()
-                }
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { photoUris ->
+            photoUris?.let { uri ->
+                KLog.i(TAG, "get uri:$uri")
+                onAttach.invoke(uri)
+                onDismiss.invoke()
             }
         }
 
@@ -74,13 +73,7 @@ fun ChooseImagePickDialog(
      * 啟動相簿選相片
      */
     fun startImagePicker() {
-        val intent =
-            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        intent.setDataAndType(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            "image/*"
-        )
-        choosePhotoResult.launch(intent)
+        choosePhotoResult.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     AlertDialog(

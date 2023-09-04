@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.ui.screens.chat
 
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -36,11 +38,14 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
  * 聊天室 附加圖片
+ * 
+ * @param quantityLimit 附加圖片數量上限
  */
 @Composable
 fun ChatRoomAttachImageScreen(
     modifier: Modifier = Modifier,
     imageAttach: List<Uri>,
+    quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDelete: (Uri) -> Unit,
     onAdd: () -> Unit
 ) {
@@ -61,23 +66,24 @@ fun ChatRoomAttachImageScreen(
                         onDelete.invoke(attach)
                     }
                 }
-
-                item {
-                    Button(
-                        onClick = {
-                            onAdd.invoke()
-                        },
-                        modifier = Modifier
-                            .size(108.dp, 135.dp)
-                            .padding(top = 10.dp, bottom = 10.dp),
-                        border = BorderStroke(0.5.dp, LocalColor.current.text.default_100),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        shape = RoundedCornerShape(15)
-                    ) {
-                        Text(
-                            text = "新增圖片",
-                            color = LocalColor.current.text.default_100
-                        )
+                if (imageAttach.size < quantityLimit) {
+                    item {
+                        Button(
+                            onClick = {
+                                onAdd.invoke()
+                            },
+                            modifier = Modifier
+                                .size(108.dp, 135.dp)
+                                .padding(top = 10.dp, bottom = 10.dp),
+                            border = BorderStroke(0.5.dp, LocalColor.current.text.default_100),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                            shape = RoundedCornerShape(15)
+                        ) {
+                            Text(
+                                text = "新增圖片",
+                                color = LocalColor.current.text.default_100
+                            )
+                        }
                     }
                 }
             }
@@ -118,8 +124,32 @@ private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit) {
     }
 }
 
+object AttachImageDefault {
+    /**
+     * 預設附加圖片上限
+     */
+    private const val DEFAULT_QUANTITY_LIMIT = 10
 
-@Preview(showBackground = true)
+    /**
+     * 附加圖片數量上限
+     */
+    fun getQuantityLimit(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val limit = MediaStore.getPickImagesMaxLimit()
+            if (DEFAULT_QUANTITY_LIMIT > limit) {
+                limit
+            } else {
+                DEFAULT_QUANTITY_LIMIT
+            }
+        } else {
+            DEFAULT_QUANTITY_LIMIT
+        }
+    }
+
+}
+
+
+@Preview
 @Composable
 fun ChatRoomAttachImageScreenPreview() {
     FanciTheme {

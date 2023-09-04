@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.cmoney.kolfanci.ui.screens.chat.AttachImageDefault
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
 /**
@@ -12,19 +13,19 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 @Composable
 fun PhotoPickDialogScreen(
     modifier: Modifier = Modifier,
+    quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDismiss: () -> Unit,
-    onAttach: (Uri) -> Unit,
+    onAttach: (List<Uri>) -> Unit,
 ) {
     GroupPhotoPickDialogScreen(
         modifier = modifier,
         isShowFanciPic = false,
+        quantityLimit = quantityLimit,
         onDismiss = onDismiss,
         onAttach = onAttach,
         onFanciClick = {}
     )
 }
-
-private var captureUri: Uri? = null //Camera result callback
 
 @Preview(showBackground = true)
 @Composable
