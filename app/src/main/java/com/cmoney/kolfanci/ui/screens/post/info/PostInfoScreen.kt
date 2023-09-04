@@ -339,7 +339,7 @@ fun PostInfoScreen(
             AppUserLogger.getInstance().log(Clicked.MoreAction, From.Comment)
 
             context.findActivity().showPostMoreActionDialogBottomSheet(
-                postMessage = post,
+                postMessage = comment,
                 postMoreActionType = PostMoreActionType.Comment,
                 onInteractClick = {
                     when (it) {
