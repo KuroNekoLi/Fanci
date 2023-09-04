@@ -69,12 +69,21 @@ fun GroupPhotoPickDialogScreen(
         captureResult.launch(captureIntent)
     }
 
-    val choosePhotoLauncher =
+    val choosePhotoLauncher = if (quantityLimit == 1) {
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { photoUri ->
+            KLog.i(TAG, "get uri: $photoUri")
+            if (photoUri != null) {
+                onAttach.invoke(listOf(photoUri))
+            }
+            onDismiss.invoke()
+        }
+    } else {
         rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(maxItems = quantityLimit)) { photoUris ->
             KLog.i(TAG, "get uris:${photoUris.joinToString { it.toString() }}")
             onAttach.invoke(photoUris)
             onDismiss.invoke()
         }
+    }
 
     /**
      * 啟動相簿選相片
