@@ -53,7 +53,7 @@ class PostViewModel(
     val post = _post.asStateFlow()
 
     //置頂貼文
-    private val _pinPost = MutableStateFlow<BulletinboardMessage?>(null)
+    private val _pinPost = MutableStateFlow<BulletinboardMessageWrapper?>(null)
     val pinPost = _pinPost.asStateFlow()
 
     //Toast message
@@ -108,8 +108,8 @@ class PostViewModel(
                 //有置頂文
                 if (it.isAnnounced == true) {
                     KLog.i(TAG, "has pin post.")
-                    it.message?.let {
-                        val pinPost = it.toBulletinboardMessage()
+                    it.message?.let { message ->
+                        val pinPost = message.toBulletinboardMessage()
                         //fix exists post
                         _post.value = _post.value.map { post ->
                             if (post.message.id == pinPost.id) {
@@ -123,7 +123,8 @@ class PostViewModel(
                             }
                         }
 
-                        _pinPost.value = pinPost
+                        _pinPost.value =
+                            BulletinboardMessageWrapper(message = pinPost, isPin = true)
                     }
                 }
                 //沒有置頂文
@@ -158,13 +159,13 @@ class PostViewModel(
         }
     }
 
-    fun onEmojiClick(postMessage: BulletinboardMessage, resourceId: Int) {
+    fun onEmojiClick(postMessage: BulletinboardMessageWrapper, resourceId: Int) {
         KLog.i(TAG, "onEmojiClick:$resourceId")
         viewModelScope.launch {
             val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
             //判斷是否為收回Emoji
             var emojiCount = 1
-            postMessage.messageReaction?.let {
+            postMessage.message.messageReaction?.let {
                 emojiCount = if (it.emoji.orEmpty().lowercase() == clickEmoji.value.lowercase()) {
                     //收回
                     -1
@@ -174,11 +175,11 @@ class PostViewModel(
                 }
             }
 
-            val orgEmoji = postMessage.emojiCount
+            val orgEmoji = postMessage.message.emojiCount
             val newEmoji = clickEmoji.clickCount(emojiCount, orgEmoji)
 
             //回填資料
-            val newPostMessage = postMessage.copy(
+            val newPostMessage = postMessage.message.copy(
                 emojiCount = newEmoji,
                 messageReaction = if (emojiCount == -1) null else {
                     IUserMessageReaction(
@@ -188,18 +189,23 @@ class PostViewModel(
             )
 
             //UI show
-            _post.value = _post.value.map {
-                if (it.message.id == newPostMessage.id) {
-                    BulletinboardMessageWrapper(message = newPostMessage)
-                } else {
-                    it
+            if (postMessage.isPin) {
+                _pinPost.value = BulletinboardMessageWrapper(message = newPostMessage, isPin = true)
+            } else {
+                _post.value = _post.value.map {
+                    if (it.message.id == newPostMessage.id) {
+                        BulletinboardMessageWrapper(message = newPostMessage)
+                    } else {
+                        it
+                    }
                 }
             }
+
 
             //Call Emoji api
             chatRoomUseCase.clickEmoji(
                 messageServiceType = MessageServiceType.bulletinboard,
-                messageId = postMessage.id.orEmpty(),
+                messageId = postMessage.message.id.orEmpty(),
                 emojiCount = emojiCount,
                 clickEmoji = clickEmoji
             )
@@ -327,7 +333,7 @@ class PostViewModel(
      * 檢查該貼文 是否為 pin
      */
     fun isPinPost(post: BulletinboardMessage): Boolean {
-        return _pinPost.value?.id == post.id
+        return _pinPost.value?.message?.id == post.id
     }
 
     /**
