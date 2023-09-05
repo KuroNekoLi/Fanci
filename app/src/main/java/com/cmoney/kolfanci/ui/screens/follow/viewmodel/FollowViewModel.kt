@@ -8,7 +8,6 @@ import androidx.compose.ui.unit.Density
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.px
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.xlogin.XLoginHelper
@@ -57,12 +56,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                         closeGroupItemDialog()
                         _refreshMyGroup.value = true
                     }, {
-                        if (it is EmptyBodyException) {
-                            closeGroupItemDialog()
-                            _refreshMyGroup.value = true
-                        } else {
-                            KLog.e(TAG, it)
-                        }
+                        KLog.e(TAG, it)
                     })
                 }
             }

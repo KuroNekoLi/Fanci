@@ -13,7 +13,6 @@ import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
@@ -543,16 +542,13 @@ class PostInfoViewModel(
                             messageServiceType = MessageServiceType.bulletinboard,
                             deleteId.orEmpty()
                         ).fold({
-                        }, {
-                            if (it is EmptyBodyException) {
-                                if (isComment) {
-                                    deleteComment(comment)
-                                } else {
-                                    deleteReply(comment, reply)
-                                }
+                            if (isComment) {
+                                deleteComment(comment)
                             } else {
-                                it.printStackTrace()
+                                deleteReply(comment, reply)
                             }
+                        }, {
+                            KLog.e(TAG, it)
                         })
                     } else {
                         KLog.i(TAG, "delete other comment.")
@@ -561,16 +557,13 @@ class PostInfoViewModel(
                             messageServiceType = MessageServiceType.bulletinboard,
                             deleteId.orEmpty()
                         ).fold({
-                        }, {
-                            if (it is EmptyBodyException) {
-                                if (isComment) {
-                                    deleteComment(comment)
-                                } else {
-                                    deleteReply(comment, reply)
-                                }
+                            if (isComment) {
+                                deleteComment(comment)
                             } else {
-                                it.printStackTrace()
+                                deleteReply(comment, reply)
                             }
+                        }, {
+                            KLog.e(TAG, it)
                         })
                     }
                 }
@@ -660,15 +653,12 @@ class PostInfoViewModel(
                     messageServiceType = MessageServiceType.bulletinboard,
                     post.id.orEmpty()
                 ).fold({
+                    _updatePost.value = PostInfoScreenResult(
+                        post = post,
+                        action = PostInfoScreenResult.PostInfoAction.Delete
+                    )
                 }, {
-                    if (it is EmptyBodyException) {
-                        _updatePost.value = PostInfoScreenResult(
-                            post = post,
-                            action = PostInfoScreenResult.PostInfoAction.Delete
-                        )
-                    } else {
-                        it.printStackTrace()
-                    }
+                    KLog.e(TAG, it)
                 })
             } else {
                 KLog.i(TAG, "delete other comment.")
@@ -677,15 +667,12 @@ class PostInfoViewModel(
                     messageServiceType = MessageServiceType.bulletinboard,
                     post.id.orEmpty()
                 ).fold({
+                    _updatePost.value = PostInfoScreenResult(
+                        post = post,
+                        action = PostInfoScreenResult.PostInfoAction.Delete
+                    )
                 }, {
-                    if (it is EmptyBodyException) {
-                        _updatePost.value = PostInfoScreenResult(
-                            post = post,
-                            action = PostInfoScreenResult.PostInfoAction.Delete
-                        )
-                    } else {
-                        it.printStackTrace()
-                    }
+                    KLog.e(TAG, it)
                 })
             }
         }
@@ -711,17 +698,13 @@ class PostInfoViewModel(
                 channelId = channelId,
                 messageId = message?.id.orEmpty()
             ).fold({
+                KLog.i(TAG, "pinPost success.")
+                _updatePost.value = PostInfoScreenResult(
+                    post = message!!,
+                    action = PostInfoScreenResult.PostInfoAction.Pin
+                )
             }, {
-                if (it is EmptyBodyException) {
-                    KLog.i(TAG, "pinPost success.")
-                    _updatePost.value = PostInfoScreenResult(
-                        post = message!!,
-                        action = PostInfoScreenResult.PostInfoAction.Pin
-                    )
-                } else {
-                    it.printStackTrace()
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
 
         }
@@ -736,17 +719,13 @@ class PostInfoViewModel(
         KLog.i(TAG, "unPinPost:$message")
         viewModelScope.launch {
             postUseCase.unPinPost(channelId).fold({
+                KLog.i(TAG, "unPinPost success.")
+                _updatePost.value = PostInfoScreenResult(
+                    post = message!!,
+                    action = PostInfoScreenResult.PostInfoAction.Default
+                )
             }, {
-                if (it is EmptyBodyException) {
-                    KLog.i(TAG, "unPinPost success.")
-                    _updatePost.value = PostInfoScreenResult(
-                        post = message!!,
-                        action = PostInfoScreenResult.PostInfoAction.Default
-                    )
-                } else {
-                    it.printStackTrace()
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
     }

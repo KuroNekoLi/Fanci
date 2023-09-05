@@ -11,7 +11,6 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.PermissionCategory
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
@@ -246,12 +245,12 @@ class RoleManageViewModel(
                     permissionIds = permissionIds,
                     colorCode = uiState.roleColor
                 ).fold({
+                    dismissLoading()
+                    assignMemberRole(group.id.orEmpty(), editFanciRole!!)
                 }, {
                     dismissLoading()
                     KLog.e(TAG, it)
-                    if (it is EmptyBodyException) {
-                        assignMemberRole(group.id.orEmpty(), editFanciRole!!)
-                    } else if (it is HttpException) {
+                    if (it is HttpException) {
                         //Conflict error
                         if (it.code() == 409) {
                             uiState = uiState.copy(
@@ -312,18 +311,17 @@ class RoleManageViewModel(
                         memberList = addMemberList.map {
                             it.id.orEmpty()
                         }
-                    ).onFailure {
+                    ).onSuccess {
+                        KLog.i(TAG, "assignMemberRole complete")
+                        uiState = uiState.copy(
+                            fanciRoleCallback = FanciRoleCallback(
+                                fanciRole = editFanciRole
+                            ),
+                            addRoleError = null,
+                            addRoleComplete = true
+                        )
+                    }.onFailure {
                         KLog.e(TAG, it)
-                        if (it is EmptyBodyException) {
-                            KLog.i(TAG, "assignMemberRole complete")
-                            uiState = uiState.copy(
-                                fanciRoleCallback = FanciRoleCallback(
-                                    fanciRole = editFanciRole
-                                ),
-                                addRoleError = null,
-                                addRoleComplete = true
-                            )
-                        }
                     }
                 }
 
@@ -337,17 +335,15 @@ class RoleManageViewModel(
                             it.id.orEmpty()
                         }
                     ).fold({
+                        uiState = uiState.copy(
+                            fanciRoleCallback = FanciRoleCallback(
+                                fanciRole = editFanciRole
+                            ),
+                            addRoleError = null,
+                            addRoleComplete = true
+                        )
                     }, {
                         KLog.e(TAG, it)
-                        if (it is EmptyBodyException) {
-                            uiState = uiState.copy(
-                                fanciRoleCallback = FanciRoleCallback(
-                                    fanciRole = editFanciRole
-                                ),
-                                addRoleError = null,
-                                addRoleComplete = true
-                            )
-                        }
                     })
                 } else {
                     uiState = uiState.copy(
@@ -475,17 +471,14 @@ class RoleManageViewModel(
                 groupId = group.id.orEmpty(),
                 roleId = fanciRole.id.orEmpty()
             ).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    uiState = uiState.copy(
-                        fanciRoleCallback = FanciRoleCallback(
-                            isAdd = false,
-                            fanciRole = fanciRole
-                        )
+                uiState = uiState.copy(
+                    fanciRoleCallback = FanciRoleCallback(
+                        isAdd = false,
+                        fanciRole = fanciRole
                     )
-                } else {
-                    KLog.e(TAG, it)
-                }
+                )
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -516,15 +509,12 @@ class RoleManageViewModel(
                 groupId = groupId,
                 roleIds = roleList.map { it.id.orEmpty() }
             ).fold({
+                KLog.i(TAG, "sortRole complete.")
+                uiState = uiState.copy(
+                    fanciRole = roleList
+                )
             }, {
-                if (it is EmptyBodyException) {
-                    KLog.i(TAG, "sortRole complete.")
-                    uiState = uiState.copy(
-                        fanciRole = roleList
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
     }

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupPaging
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -124,9 +123,7 @@ class DiscoverViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             groupUseCase.joinGroup(group).fold({
                 uiState = uiState.copy(joinSuccess = group)
             }, {
-                if (it is EmptyBodyException) {
-                    uiState = uiState.copy(joinSuccess = group)
-                }
+                KLog.e(TAG, it)
             })
         }
     }
@@ -144,6 +141,7 @@ class DiscoverViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
             0 -> {
                 fetchPopularGroup()
             }
+
             else -> {
                 fetchLatestGroup()
             }
@@ -169,6 +167,7 @@ class DiscoverViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                 0 -> {
                     fetchPopularGroup()
                 }
+
                 else -> {
                     fetchLatestGroup()
                 }

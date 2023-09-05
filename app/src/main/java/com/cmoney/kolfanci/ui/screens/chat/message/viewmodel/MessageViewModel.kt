@@ -15,7 +15,6 @@ import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
@@ -648,29 +647,24 @@ class MessageViewModel(
                     messageServiceType = MessageServiceType.chatroom,
                     chatMessageModel.id.orEmpty()
                 ).fold({
-                }, {
-                    if (it is EmptyBodyException) {
-                        KLog.i(TAG, "onDelete my post success")
-                        _message.value = _message.value.filter {
-                            it.message != chatMessageModel
-                        }
-
-                        _deleteMessage.value = null
-
-                        snackBarMessage(
-                            CustomMessage(
-                                textString = "成功刪除訊息！",
-                                textColor = Color.White,
-                                iconRes = R.drawable.delete,
-                                iconColor = White_767A7F,
-                                backgroundColor = White_494D54
-                            )
-                        )
-
-                    } else {
-                        it.printStackTrace()
-                        KLog.e(TAG, it)
+                    KLog.i(TAG, "onDelete my post success")
+                    _message.value = _message.value.filter {
+                        it.message != chatMessageModel
                     }
+
+                    _deleteMessage.value = null
+
+                    snackBarMessage(
+                        CustomMessage(
+                            textString = "成功刪除訊息！",
+                            textColor = Color.White,
+                            iconRes = R.drawable.delete,
+                            iconColor = White_767A7F,
+                            backgroundColor = White_494D54
+                        )
+                    )
+                }, {
+                    KLog.e(TAG, it)
                 })
             } else {
                 //別人的文章
@@ -679,29 +673,24 @@ class MessageViewModel(
                     messageServiceType = MessageServiceType.chatroom,
                     chatMessageModel.id.orEmpty()
                 ).fold({
-                }, {
-                    if (it is EmptyBodyException) {
-                        KLog.i(TAG, "onDelete other post success")
-                        _message.value = _message.value.filter {
-                            it.message != chatMessageModel
-                        }
-
-                        _deleteMessage.value = null
-
-                        snackBarMessage(
-                            CustomMessage(
-                                textString = "成功刪除訊息！",
-                                textColor = Color.White,
-                                iconRes = R.drawable.delete,
-                                iconColor = White_767A7F,
-                                backgroundColor = White_494D54
-                            )
-                        )
-
-                    } else {
-                        it.printStackTrace()
-                        KLog.e(TAG, it)
+                    KLog.i(TAG, "onDelete other post success")
+                    _message.value = _message.value.filter {
+                        it.message != chatMessageModel
                     }
+
+                    _deleteMessage.value = null
+
+                    snackBarMessage(
+                        CustomMessage(
+                            textString = "成功刪除訊息！",
+                            textColor = Color.White,
+                            iconRes = R.drawable.delete,
+                            iconColor = White_767A7F,
+                            backgroundColor = White_494D54
+                        )
+                    )
+                }, {
+                    KLog.e(TAG, it)
                 })
             }
         }
@@ -717,23 +706,19 @@ class MessageViewModel(
                 messageServiceType = MessageServiceType.chatroom,
                 messageId = message.id.orEmpty()
             ).fold({
+                _message.value = _message.value.map { chatMessageWrapper ->
+                    if (chatMessageWrapper.message.id == message.id) {
+                        chatMessageWrapper.copy(
+                            message = chatMessageWrapper.message.copy(
+                                isDeleted = true
+                            )
+                        )
+                    } else {
+                        chatMessageWrapper
+                    }
+                }
             }, {
                 KLog.e(TAG, it)
-                if (it is EmptyBodyException) {
-                    _message.value = _message.value.map { chatMessageWrapper ->
-                        if (chatMessageWrapper.message.id == message.id) {
-                            chatMessageWrapper.copy(
-                                message = chatMessageWrapper.message.copy(
-                                    isDeleted = true
-                                )
-                            )
-                        } else {
-                            chatMessageWrapper
-                        }
-                    }
-                } else {
-                    it.printStackTrace()
-                }
             })
         }
     }
