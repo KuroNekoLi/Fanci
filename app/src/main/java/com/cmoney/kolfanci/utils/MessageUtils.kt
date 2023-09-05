@@ -24,14 +24,14 @@ class MessageUtils {
             return if (groupList.size > 1) {
                 val groupMessage = groupList.map {
                     val newList = it.value.toMutableList()
-                    newList.add(0, generateTimeBar(it.value.first()))
+                    newList.add(generateTimeBar(it.value.first()))
                     newList
                 }.flatten().toMutableList()
                 groupMessage
             } else {
                 val newList = newMessage.toMutableList()
                 val timeBarMessage = generateTimeBar(newMessage.first())
-                newList.add(0, timeBarMessage)
+                newList.add(timeBarMessage)
                 return newList
             }
         }
@@ -52,17 +52,20 @@ class MessageUtils {
          * 定義 訊息類型
          */
         fun defineMessageType(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
-            val messageType = if (chatMessageWrapper.isBlocking) {
-                ChatMessageWrapper.MessageType.Blocking
-            } else if (chatMessageWrapper.isBlocker) {
-                ChatMessageWrapper.MessageType.Blocker
-            } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
-                ChatMessageWrapper.MessageType.Delete
-            } else if (chatMessageWrapper.message.isDeleted == true) {
-                ChatMessageWrapper.MessageType.RecycleMessage
-            } else {
-                chatMessageWrapper.messageType
-            }
+            val messageType =
+                if (chatMessageWrapper.messageType == ChatMessageWrapper.MessageType.TimeBar) {
+                    ChatMessageWrapper.MessageType.TimeBar
+                } else if (chatMessageWrapper.isBlocking) {
+                    ChatMessageWrapper.MessageType.Blocking
+                } else if (chatMessageWrapper.isBlocker) {
+                    ChatMessageWrapper.MessageType.Blocker
+                } else if (chatMessageWrapper.message.isDeleted == true && chatMessageWrapper.message.deleteStatus == DeleteStatus.deleted) {
+                    ChatMessageWrapper.MessageType.Delete
+                } else if (chatMessageWrapper.message.isDeleted == true) {
+                    ChatMessageWrapper.MessageType.RecycleMessage
+                } else {
+                    chatMessageWrapper.messageType
+                }
 
             return chatMessageWrapper.copy(
                 messageType = messageType

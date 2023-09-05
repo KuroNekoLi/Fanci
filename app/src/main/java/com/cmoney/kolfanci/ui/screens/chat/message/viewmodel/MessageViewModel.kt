@@ -165,10 +165,9 @@ class MessageViewModel(
     private fun processMessageCombine(
         newChatMessage: List<ChatMessageWrapper>
     ) {
-        //combine old message, 因為原本 output 的資料會 reversed, 所以再 reversed 一次矯正
         val oldMessage = _message.value.filter {
             !it.isPendingSendMessage
-        }.reversed().toMutableList()
+        }.toMutableList()
 
         val pendingSendMessage = _message.value.filter {
             it.isPendingSendMessage
@@ -185,9 +184,9 @@ class MessageViewModel(
             } else {
                 combineMessage.message.id
             }
-        }.sortedBy { it.message.createUnixTime }
+        }
 
-        _message.value = distinctMessage.reversed()
+        _message.value = distinctMessage
     }
 
     /**
@@ -199,7 +198,8 @@ class MessageViewModel(
         viewModelScope.launch {
             //訊息不為空,才抓取分頁,因為預設會有Polling訊息, 超過才需讀取分頁
             if (_message.value.isNotEmpty()) {
-                val lastMessage = _message.value.last()
+                val lastMessage =
+                    _message.value.last { it.messageType != ChatMessageWrapper.MessageType.TimeBar }
 
                 val serialNumber = lastMessage.message.serialNumber
                 chatRoomUseCase.fetchMoreMessage(
@@ -207,6 +207,10 @@ class MessageViewModel(
                     fromSerialNumber = serialNumber,
                 ).fold({
                     it.items?.also { message ->
+                        if (message.isEmpty()) {
+                            return@launch
+                        }
+
                         val newMessage = message.map {
                             ChatMessageWrapper(message = it)
                         }
