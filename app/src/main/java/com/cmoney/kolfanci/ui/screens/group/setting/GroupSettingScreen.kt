@@ -48,6 +48,7 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
+import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.model.Constant.isShowVipManager
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
@@ -279,13 +280,16 @@ fun GroupSettingScreenView(
                         onInviteClick = onInviteClick
                     )
                 }
+                //TODO: push server not ready, 推播設定好之後再移除該判斷
                 //社團管理
-                item {
-                    GroupManageScreen(
-                        group = group,
-                        navController = navController,
-                        notificationSettingItem = notificationSettingItem
-                    )
+                if (isShowGroupManage()) {
+                    item {
+                        GroupManageScreen(
+                            group = group,
+                            navController = navController,
+                            notificationSettingItem = notificationSettingItem
+                        )
+                    }
                 }
 
                 //成員管理
