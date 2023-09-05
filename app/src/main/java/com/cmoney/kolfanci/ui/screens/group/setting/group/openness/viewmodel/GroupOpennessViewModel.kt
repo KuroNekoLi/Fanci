@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
@@ -135,27 +134,24 @@ class GroupOpennessViewModel(val group: Group, val groupUseCase: GroupUseCase) :
                 groupId = id,
                 isNeedApproval = isNeedApproval
             ).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    //設定 問題清單
-                    if (isNeedApproval) {
-                        //問題清單
-                        val questionList = uiState.groupQuestionList.orEmpty()
-                        groupUseCase.setGroupRequirementQuestion(
-                            groupId = id,
-                            question = questionList
-                        ).fold({
-                            uiState = uiState.copy(saveComplete = true)
-                        }, {
-                            KLog.e(TAG, it)
-                        })
-                    } else {
+                //設定 問題清單
+                if (isNeedApproval) {
+                    //問題清單
+                    val questionList = uiState.groupQuestionList.orEmpty()
+                    groupUseCase.setGroupRequirementQuestion(
+                        groupId = id,
+                        question = questionList
+                    ).fold({
                         uiState = uiState.copy(saveComplete = true)
-                    }
+                    }, {
+                        KLog.e(TAG, it)
+                    })
                 } else {
-                    KLog.e(TAG, it)
-                    uiState = uiState.copy(saveComplete = false)
+                    uiState = uiState.copy(saveComplete = true)
                 }
+            }, {
+                KLog.e(TAG, it)
+                uiState = uiState.copy(saveComplete = false)
             })
         }
     }

@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
@@ -187,15 +186,12 @@ class GroupSettingViewModel(
         KLog.i(TAG, "onFinalConfirmDelete:$group")
         viewModelScope.launch {
             groupUseCase.deleteGroup(groupId = group.id.orEmpty()).fold({
+                KLog.i(TAG, "Group delete complete.")
+                uiState = uiState.copy(
+                    popToMain = true
+                )
             }, {
-                if (it is EmptyBodyException) {
-                    KLog.i(TAG, "Group delete complete.")
-                    uiState = uiState.copy(
-                        popToMain = true
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
     }

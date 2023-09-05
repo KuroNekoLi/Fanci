@@ -12,7 +12,6 @@ import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.extension.toVipPlanModel
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
@@ -193,17 +192,14 @@ class ChannelSettingViewModel(
                 groupId = group.id.orEmpty(),
                 category = categories
             ).fold({
+                uiState = uiState.copy(
+                    group = group.copy(
+                        categories = categories
+                    ),
+                    isSoredToServerComplete = true
+                )
             }, {
-                if (it is EmptyBodyException) {
-                    uiState = uiState.copy(
-                        group = group.copy(
-                            categories = categories
-                        ),
-                        isSoredToServerComplete = true
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
     }

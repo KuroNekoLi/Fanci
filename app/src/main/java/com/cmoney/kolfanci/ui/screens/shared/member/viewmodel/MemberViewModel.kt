@@ -12,7 +12,6 @@ import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.cmoney.kolfanci.model.usecase.DynamicLinkUseCase
@@ -167,15 +166,12 @@ class MemberViewModel(
                 groupId = groupId,
                 banPeriodOption = banPeriodOption
             ).fold({
+                fetchUserBanInfo(
+                    groupId = groupId,
+                    userId = userId
+                )
             }, {
-                if (it is EmptyBodyException) {
-                    fetchUserBanInfo(
-                        groupId = groupId,
-                        userId = userId
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
     }
@@ -398,15 +394,11 @@ class MemberViewModel(
                 groupId = groupId,
                 userId = groupMember.id.orEmpty()
             ).fold({
+                uiState = uiState.copy(
+                    kickMember = groupMember
+                )
             }, {
-                if (it is EmptyBodyException) {
-                    uiState = uiState.copy(
-                        kickMember = groupMember
-                    )
-
-                } else {
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
     }

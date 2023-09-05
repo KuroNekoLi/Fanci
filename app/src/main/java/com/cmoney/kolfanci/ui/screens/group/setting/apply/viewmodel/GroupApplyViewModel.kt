@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ApplyStatus
 import com.cmoney.fanciapi.fanci.model.GroupRequirementApply
 import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyPaging
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
@@ -140,14 +139,10 @@ class GroupApplyViewModel(private val groupApplyUseCase: GroupApplyUseCase) : Vi
                         applyId = selectedApplyId,
                         applyStatus = applyStatus
                     ).fold({
-
+                        removeSelectedItem()
+                        showTips("審核完成")
                     }, {
-                        if (it is EmptyBodyException) {
-                            removeSelectedItem()
-                            showTips("審核完成")
-                        } else {
-                            KLog.e(TAG, it)
-                        }
+                        KLog.e(TAG, it)
                     })
                 }
             }
