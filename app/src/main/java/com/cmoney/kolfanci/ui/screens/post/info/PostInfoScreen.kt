@@ -49,6 +49,7 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
+import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fancylog.model.data.Clicked
@@ -392,10 +393,11 @@ fun PostInfoScreen(
                         is PostInteract.Delete -> {
                             KLog.i(TAG, "PostInteract.Delete click.")
                             if (reply.isMyPost()) {
-                                AppUserLogger.getInstance().log(Clicked.CommentDeleteReply, From.Poster)
-                            }
-                            else {
-                                AppUserLogger.getInstance().log(Clicked.CommentDeleteReply, From.OthersPost)
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.CommentDeleteReply, From.Poster)
+                            } else {
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.CommentDeleteReply, From.OthersPost)
                             }
 
                             showReplyDeleteTip = Triple(true, comment, reply)
@@ -652,7 +654,8 @@ private fun PostInfoScreenView(
     ) { innerPadding ->
 
         Box(
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
             Column {
@@ -672,7 +675,8 @@ private fun PostInfoScreenView(
                                 postInfoListener.onPostMoreClick(post)
                             },
                             onEmojiClick = {
-                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.InnerLayer)
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.ExistingEmoji, From.InnerLayer)
                                 postInfoListener.onEmojiClick(post, it)
                             },
                             onImageClick = {
@@ -687,7 +691,11 @@ private fun PostInfoScreenView(
 
                     if (comments.isNotEmpty()) {
                         item {
-                            Spacer(modifier = Modifier.height(15.dp))
+                            Spacer(
+                                modifier = Modifier
+                                    .height(15.dp)
+                                    .background(LocalColor.current.env_80)
+                            )
                         }
 
                         //Comment title
@@ -696,7 +704,7 @@ private fun PostInfoScreenView(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(45.dp)
-                                    .background(LocalColor.current.env_80)
+                                    .background(LocalColor.current.background)
                                     .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
                             ) {
                                 Text(
@@ -707,14 +715,18 @@ private fun PostInfoScreenView(
                             }
                         }
 
-                        item {
-                            Spacer(modifier = Modifier.height(1.dp))
-                        }
-
                         //留言內容
                         items(comments) { comment ->
                             //如果被刪除
                             if (comment.isDeleted == true) {
+                                //被管理員刪除
+                                val title = if (comment.deleteStatus == DeleteStatus.deleted) {
+                                    "這則留言已被管理員刪除"
+                                } else {
+                                    "這則留言已被發文者刪除"
+                                }
+
+
                                 BaseDeletedContentScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -725,7 +737,7 @@ private fun PostInfoScreenView(
                                             end = 20.dp,
                                             bottom = 5.dp
                                         ),
-                                    title = "這則留言已被刪除",
+                                    title = title,
                                     content = "已經刪除的留言，你是看不到的！"
                                 )
                             } else {
@@ -741,7 +753,8 @@ private fun PostInfoScreenView(
                                         )
                                     },
                                     onEmojiClick = {
-                                        AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.Comment)
+                                        AppUserLogger.getInstance()
+                                            .log(Clicked.ExistingEmoji, From.Comment)
                                         postInfoListener.onCommentEmojiClick(comment, it)
                                     },
                                     onMoreClick = {
@@ -753,14 +766,30 @@ private fun PostInfoScreenView(
                                         AppUserLogger.getInstance().log(Clicked.Image, From.Comment)
                                     },
                                     onAddNewEmojiClick = {
-                                        AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Comment)
+                                        AppUserLogger.getInstance()
+                                            .log(Clicked.AddEmoji, From.Comment)
                                         postInfoListener.onCommentEmojiClick(comment, it)
                                     },
                                     onTextExpandClick = {
-                                        AppUserLogger.getInstance().log(Clicked.ShowMore, From.Comment)
+                                        AppUserLogger.getInstance()
+                                            .log(Clicked.ShowMore, From.Comment)
                                     }
                                 )
                             }
+
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(LocalColor.current.background)
+                                    .padding(
+                                        top = 15.dp,
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        bottom = 15.dp
+                                    ),
+                                color = LocalColor.current.background,
+                                thickness = 1.dp
+                            )
                         }
                     } else {
                         //沒有人留言
