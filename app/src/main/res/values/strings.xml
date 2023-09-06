@@ -244,4 +244,7 @@
     <string name="user_name_empty">暱稱空白</string>
     <string name="user_name_empty_desc">暱稱不可以是空白的唷！</string>
 
+    <string name="comment_remove_from_manage">這則留言已被管理員刪除</string>
+    <string name="comment_remove_from_poster">這則留言已被發文者刪除</string>
+
 </resources>

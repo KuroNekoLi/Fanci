@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -721,11 +722,10 @@ private fun PostInfoScreenView(
                             if (comment.isDeleted == true) {
                                 //被管理員刪除
                                 val title = if (comment.deleteStatus == DeleteStatus.deleted) {
-                                    "這則留言已被管理員刪除"
+                                    stringResource(id = R.string.comment_remove_from_manage)
                                 } else {
-                                    "這則留言已被發文者刪除"
+                                    stringResource(id = R.string.comment_remove_from_poster)
                                 }
-
 
                                 BaseDeletedContentScreen(
                                     modifier = Modifier
