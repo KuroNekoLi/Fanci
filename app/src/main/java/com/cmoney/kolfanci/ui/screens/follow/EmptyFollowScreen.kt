@@ -169,13 +169,12 @@ private fun EmptyFollowScreenView(
         }
         //List group
         items(groupList) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             GroupItemScreen(
                 groupModel = it
             ) { groupModel ->
                 onJoinClick.invoke(groupModel)
             }
-            Spacer(modifier = Modifier.height(10.dp))
         }
         if (isLoading) {
             item {
@@ -194,7 +193,7 @@ private fun EmptyFollowScreenView(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun EmptyFollowScreenPreview() {
     FanciTheme {
