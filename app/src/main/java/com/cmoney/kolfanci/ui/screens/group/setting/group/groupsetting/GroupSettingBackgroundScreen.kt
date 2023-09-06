@@ -1,13 +1,16 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
 
+import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -147,8 +150,7 @@ fun GroupSettingBackgroundView(
                     KLog.i(TAG, "on save click.")
                     if (isFromCreate) {
                         AppUserLogger.getInstance().log(Clicked.Confirm, From.AddHomeBackground)
-                    }
-                    else {
+                    } else {
                         AppUserLogger.getInstance().log(Clicked.Confirm, From.EditHomeBackground)
                     }
                     state.coverImageUrl.value?.let {
@@ -177,46 +179,37 @@ fun GroupSettingBackgroundView(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Center
         ) {
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier.weight(0.8f),
+                contentAlignment = Alignment.BottomCenter
             ) {
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    AsyncImage(
-                        model = state.coverImageUrl.value ?: group.coverImageUrl,
-                        modifier = Modifier
-                            .size(screenWidth)
-                            .aspectRatio(1f),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        placeholder = painterResource(id = R.drawable.placeholder)
-                    )
+                AsyncImage(
+                    model = state.coverImageUrl.value ?: group.coverImageUrl,
+                    modifier = Modifier
+                        .size(screenWidth)
+                        .aspectRatio(1f),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    placeholder = painterResource(id = R.drawable.placeholder)
+                )
 
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .size(width = 340.dp, height = 185.dp)
-                            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                            .background(
-                                LocalColor.current.env_80
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.group_board_place),
-                            fontSize = 30.sp,
-                            color = LocalColor.current.text.default_30
-                        )
-                    }
+                Box(
+                    modifier = Modifier
+                        .size(width = 340.dp, height = 185.dp)
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                        .background(
+                            LocalColor.current.env_80
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.group_board_place),
+                        fontSize = 30.sp,
+                        color = LocalColor.current.text.default_30
+                    )
                 }
             }
 
@@ -228,6 +221,8 @@ fun GroupSettingBackgroundView(
                 )
             }
 
+            Spacer(modifier = Modifier.weight(0.2f))
+
             TransparentButton(
                 text = stringResource(id = R.string.change_image)
             ) {
@@ -235,8 +230,7 @@ fun GroupSettingBackgroundView(
                 if (isFromCreate) {
                     AppUserLogger.getInstance()
                         .log(Clicked.CreateGroupChangeHomeBackgroundPicture)
-                }
-                else {
+                } else {
                     AppUserLogger.getInstance()
                         .log(Clicked.HomeBackgroundChangePicture)
                 }
@@ -266,7 +260,7 @@ fun GroupSettingBackgroundView(
 }
 
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun GroupSettingBackgroundPreview() {
     FanciTheme {
