@@ -221,8 +221,8 @@ fun AllMemberScreenView(
             LazyColumn(modifier = Modifier.padding(innerPadding)) {
 
                 item {
-                    if (groupMemberList.isEmpty() && textState.isEmpty()) {
-                        if (groupMemberList.isEmpty()) {
+                    if (groupMemberList.isEmpty()) {
+                        if (textState.isEmpty()) {
                             EmptyAllMemberView(onInviteClick)
                         } else {
                             SearchNoResultView()
