@@ -134,7 +134,7 @@ class MessageViewModel(
 
                     val newMessage = it.items?.map { chatMessage ->
                         ChatMessageWrapper(message = chatMessage)
-                    }.orEmpty()
+                    }?.reversed().orEmpty()
 
 //                    KLog.i(TAG, newMessage.map { it.message.content?.text })
 
@@ -163,7 +163,7 @@ class MessageViewModel(
      *  @param newChatMessage 新訊息
      */
     private fun processMessageCombine(
-        newChatMessage: List<ChatMessageWrapper>
+        newChatMessage: List<ChatMessageWrapper>,
     ) {
         val oldMessage = _message.value.filter {
             !it.isPendingSendMessage
@@ -173,7 +173,14 @@ class MessageViewModel(
             it.isPendingSendMessage
         }
 
-        oldMessage.addAll(0, newChatMessage)
+        //判斷 要合併的訊息是新訊息 or 歷史訊息, 決定要放在 List 的前面 or 後面
+        if ((newChatMessage.firstOrNull()?.message?.serialNumber
+                ?: 0) < (oldMessage.firstOrNull()?.message?.serialNumber ?: 0)
+        ) {
+            oldMessage.addAll(newChatMessage)
+        } else {
+            oldMessage.addAll(0, newChatMessage)
+        }
 
         oldMessage.addAll(0, pendingSendMessage)
 
@@ -213,7 +220,7 @@ class MessageViewModel(
 
                         val newMessage = message.map {
                             ChatMessageWrapper(message = it)
-                        }
+                        }.reversed()
 
                         //檢查插入時間 bar
                         val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
