@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
+import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
@@ -159,10 +160,20 @@ class PostViewModel(
         }
     }
 
+    // TODO: 一個人只能按一個 emoji 處理
     fun onEmojiClick(postMessage: BulletinboardMessageWrapper, resourceId: Int) {
         KLog.i(TAG, "onEmojiClick:$resourceId")
         viewModelScope.launch {
             val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
+
+            var orgEmojiCount = postMessage.message.emojiCount
+            val beforeClickEmojiStr = postMessage.message.messageReaction?.emoji
+            //之前所點擊的 Emoji
+            val beforeClickEmoji = Emojis.decode(beforeClickEmojiStr)
+
+            //將之前所點擊的 Emoji reset
+            orgEmojiCount = beforeClickEmoji?.clickCount(-1, orgEmojiCount)
+
             //判斷是否為收回Emoji
             var emojiCount = 1
             postMessage.message.messageReaction?.let {
@@ -175,8 +186,7 @@ class PostViewModel(
                 }
             }
 
-            val orgEmoji = postMessage.message.emojiCount
-            val newEmoji = clickEmoji.clickCount(emojiCount, orgEmoji)
+            val newEmoji = clickEmoji.clickCount(emojiCount, orgEmojiCount)
 
             //回填資料
             val newPostMessage = postMessage.message.copy(
