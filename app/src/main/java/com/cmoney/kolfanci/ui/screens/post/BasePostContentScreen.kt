@@ -46,6 +46,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
@@ -149,6 +150,16 @@ fun BasePostContentScreen(
                             }
                         }
                     )
+
+                    //OG
+                    Utils.extractLinks(this).forEach { url ->
+                        MessageOGScreen(
+                            modifier = Modifier.padding(
+                                top = 10.dp,
+                                end = 10.dp
+                            ), url = url
+                        )
+                    }
                 }
             }
 

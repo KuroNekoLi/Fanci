@@ -380,7 +380,7 @@ fun AddMemberScreenPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun MemberItemPreview() {
     FanciTheme {

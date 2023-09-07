@@ -363,13 +363,13 @@ fun PostScreen(
 @Composable
 private fun PostScreenView(
     modifier: Modifier = Modifier,
-    pinPost: BulletinboardMessage?,
+    pinPost: PostViewModel.BulletinboardMessageWrapper?,
     postList: List<PostViewModel.BulletinboardMessageWrapper>,
     navController: DestinationsNavigator,
     channel: Channel,
     onPostClick: () -> Unit,
     onMoreClick: (BulletinboardMessage) -> Unit,
-    onEmojiClick: (BulletinboardMessage, Int) -> Unit,
+    onEmojiClick: (PostViewModel.BulletinboardMessageWrapper, Int) -> Unit,
     listState: LazyListState
 ) {
 
@@ -390,17 +390,17 @@ private fun PostScreenView(
                 pinPost?.let { pinPost ->
                     item {
                         BasePostContentScreen(
-                            post = pinPost,
+                            post = pinPost.message,
                             bottomContent = {
                                 CommentCount(
-                                    post = pinPost,
+                                    post = pinPost.message,
                                     navController = navController,
                                     channel = channel,
                                     isPinPost = true
                                 )
                             },
                             onMoreClick = {
-                                onMoreClick.invoke(pinPost)
+                                onMoreClick.invoke(pinPost.message)
                             },
                             onEmojiClick = {
                                 if (Constant.isCanEmoji()) {
@@ -441,7 +441,7 @@ private fun PostScreenView(
                         onEmojiClick = {
                             if (Constant.isCanEmoji()) {
                                 AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
-                                onEmojiClick.invoke(postMessage, it)
+                                onEmojiClick.invoke(post, it)
                             }
                         },
                         onImageClick = {
@@ -450,7 +450,7 @@ private fun PostScreenView(
                         onAddNewEmojiClick = {
                             AppUserLogger.getInstance().log(Clicked.AddEmoji, From.PostList)
                             if (Constant.isCanEmoji()) {
-                                onEmojiClick.invoke(postMessage, it)
+                                onEmojiClick.invoke(post, it)
                             }
                         },
                         onTextExpandClick = {

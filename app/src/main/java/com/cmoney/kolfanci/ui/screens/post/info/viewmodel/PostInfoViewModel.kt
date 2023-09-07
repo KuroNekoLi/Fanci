@@ -107,7 +107,7 @@ class PostInfoViewModel(
             postUseCase.getComments(
                 channelId = channelId,
                 messageId = messageId,
-                fromSerialNumber = nextWeightMap[bulletinboardMessage.id]
+                fromSerialNumber = nextWeightMap[bulletinboardMessage.id] ?: 0
             ).fold({
                 haveNextPageMap[bulletinboardMessage.id.orEmpty()] = (it.haveNextPage == true)
                 nextWeightMap[bulletinboardMessage.id.orEmpty()] = it.nextWeight

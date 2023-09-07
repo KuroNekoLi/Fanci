@@ -496,6 +496,12 @@ class MemberViewModel(
         )
     }
 
+    fun showAddSuccessTip() {
+        uiState = uiState.copy(
+            showAddSuccessTip = true
+        )
+    }
+
     /**
      * 將選中的 會員加入清單
      */
@@ -509,6 +515,7 @@ class MemberViewModel(
             val newList = _selectedMember.value.toMutableList()
             newList.addAll(responseMemberList)
             _selectedMember.value = newList.distinct()
+            showAddSuccessTip()
         }
     }
 

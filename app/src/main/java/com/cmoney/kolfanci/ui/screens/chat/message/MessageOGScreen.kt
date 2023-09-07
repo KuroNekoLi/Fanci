@@ -116,7 +116,7 @@ fun MessageOGScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun MessageArticleScreenPreview() {
     FanciTheme {

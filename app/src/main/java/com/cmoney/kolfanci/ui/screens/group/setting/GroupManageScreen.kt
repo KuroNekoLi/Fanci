@@ -152,26 +152,27 @@ fun GroupManageScreen(
             Spacer(modifier = Modifier.height(1.dp))
         }
 
-        if (notificationSettingItem != null) {
-            NarrowItem(
-                modifier = Modifier.settingItem(),
-                title = stringResource(id = R.string.notification_setting),
-                titleFontWeight = SettingItemParam.titleFontWeight,
-                titleFontSize = SettingItemParam.titleFontSize,
-                prefixIcon = painterResource(id = R.drawable.bell),
-                prefixIconColor = LocalColor.current.component.other,
-                actionContent = NarrowItemDefaults.nextIcon(),
-                subTitle = notificationSettingItem.shortTitle,
-                subTitleFontSize = SettingItemParam.subTitleFontSize,
-                onClick = {
-                    navController.navigate(
-                        NotificationSettingScreenDestination(
-                            notificationSettingItem = notificationSettingItem
-                        )
-                    )
-                }
-            )
-        }
+        //TODO: server not ready
+//        if (notificationSettingItem != null) {
+//            NarrowItem(
+//                modifier = Modifier.settingItem(),
+//                title = stringResource(id = R.string.notification_setting),
+//                titleFontWeight = SettingItemParam.titleFontWeight,
+//                titleFontSize = SettingItemParam.titleFontSize,
+//                prefixIcon = painterResource(id = R.drawable.bell),
+//                prefixIconColor = LocalColor.current.component.other,
+//                actionContent = NarrowItemDefaults.nextIcon(),
+//                subTitle = notificationSettingItem.shortTitle,
+//                subTitleFontSize = SettingItemParam.subTitleFontSize,
+//                onClick = {
+//                    navController.navigate(
+//                        NotificationSettingScreenDestination(
+//                            notificationSettingItem = notificationSettingItem
+//                        )
+//                    )
+//                }
+//            )
+//        }
     }
 }
 
