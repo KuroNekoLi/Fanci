@@ -211,6 +211,11 @@ class MainActivity : BaseWebLoginActivity() {
         }
     }
 
+    fun checkPayload(payload: Payload) {
+        KLog.d(TAG, "payLoad = $payload")
+        globalViewModel.setNotificationBundle(payload)
+    }
+
     /**
      * 檢查是否有開啟通知權限
      */

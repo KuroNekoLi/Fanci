@@ -124,7 +124,7 @@ val viewModule = module {
         SearchViewModel(get())
     }
     viewModel {
-        NotificationCenterViewModel(get())
+        NotificationCenterViewModel(get(), get())
     }
     viewModel {
         NotificationSettingViewModel(androidApplication(), get())

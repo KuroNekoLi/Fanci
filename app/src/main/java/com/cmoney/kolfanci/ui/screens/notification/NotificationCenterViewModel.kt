@@ -1,8 +1,13 @@
 package com.cmoney.kolfanci.ui.screens.notification
 
+import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.kolfanci.model.notification.CustomNotification
+import com.cmoney.kolfanci.model.notification.NotificationHelper
 import com.cmoney.kolfanci.model.notification.NotificationHistory
+import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.notification.toNotificationCenterData
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.socks.library.KLog
@@ -27,13 +32,19 @@ data class NotificationCenterData(
     val displayTime: String
 )
 
-class NotificationCenterViewModel(private val notificationUseCase: NotificationUseCase) :
+class NotificationCenterViewModel(
+    private val notificationUseCase: NotificationUseCase,
+    private val notificationHelper: NotificationHelper
+) :
     ViewModel() {
 
     private val TAG = NotificationCenterViewModel::class.java.simpleName
 
     private val _notificationCenter = MutableStateFlow<List<NotificationCenterData>>(emptyList())
     val notificationCenter = _notificationCenter.asStateFlow()
+
+    private val _payload = MutableStateFlow<Payload?>(null)
+    val payload = _payload.asStateFlow()
 
     //推播原始資料
     private var notificationHistory: NotificationHistory? = null
@@ -72,5 +83,24 @@ class NotificationCenterViewModel(private val notificationUseCase: NotificationU
             }
 
         }
+    }
+
+    /**
+     *  點擊 推播 item
+     */
+    fun onNotificationClick(notificationCenterData: NotificationCenterData) {
+        KLog.i(TAG, "onNotificationClick:$notificationCenterData")
+        val deepLink = notificationCenterData.deepLink
+        if (deepLink.isNotEmpty()) {
+            val intent = Intent().apply {
+                putExtra(CustomNotification.CUSTOM_TARGET_TYPE, 0)
+                putExtra(CustomNotification.DEEPLINK, deepLink)
+            }
+            _payload.value = notificationHelper.getPayloadFromBackground(intent)
+        }
+    }
+
+    fun clickPayloadDone() {
+        _payload.value = null
     }
 }

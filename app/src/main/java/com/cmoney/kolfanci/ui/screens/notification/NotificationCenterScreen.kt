@@ -21,24 +21,38 @@ import androidx.compose.material.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.model.viewmodel.PushDataWrapper
+import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
+import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
+import com.cmoney.kolfanci.ui.main.MainActivity
+import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -50,20 +64,121 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun NotificationCenterScreen(
     navController: DestinationsNavigator,
-    viewModel: NotificationCenterViewModel = koinViewModel()
+    viewModel: NotificationCenterViewModel = koinViewModel(),
+    chatRoomViewModel: ChatRoomViewModel = koinViewModel()
 ) {
     val notificationCenterDataList by viewModel.notificationCenter.collectAsState()
+    val payload by viewModel.payload.collectAsState()
 
     NotificationCenterView(
         navController = navController,
         notificationCenterDataList = notificationCenterDataList,
         onClick = {
-            //TODO
+            viewModel.onNotificationClick(it)
         },
         onLoadMore = {
             viewModel.onLoadMore()
         }
     )
+
+    //點擊動作
+    payload?.let { payload ->
+        val context = LocalContext.current
+        (context as? MainActivity)?.checkPayload(payload)
+        viewModel.clickPayloadDone()
+    }
+
+    //TODO: 需要優化整合 目前跟 MainScreen 處理一樣的東西
+    //禁止進入頻道彈窗
+    val channelAlertDialog = remember { mutableStateOf(false) }
+    val groupViewModel = globalGroupViewModel()
+    val pushDataWrapper by groupViewModel.jumpToChannelDest.collectAsState()
+    LaunchedEffect(pushDataWrapper) {
+        /**
+         * 處理推播資料
+         * 進入頻道前, 權限檢查
+         */
+        pushDataWrapper?.let { pushDataWrapper ->
+            when (pushDataWrapper) {
+                is PushDataWrapper.ChannelMessage -> {
+                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
+                }
+
+                is PushDataWrapper.ChannelPost -> {
+                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
+                }
+            }
+        }
+    }
+
+    // channel權限檢查 結束
+    val updatePermissionDone by chatRoomViewModel.updatePermissionDone.collectAsState()
+    updatePermissionDone?.let { channel ->
+        if (Constant.canReadMessage()) {
+            //是否有推播
+            pushDataWrapper?.let { pushDataWrapper ->
+                when (pushDataWrapper) {
+                    //前往指定訊息
+                    is PushDataWrapper.ChannelMessage -> {
+                        navController.navigate(
+                            ChannelScreenDestination(
+                                channel = channel,
+                                jumpChatMessage = ChatMessage(
+                                    serialNumber =
+                                    pushDataWrapper.serialNumber.toLongOrNull()
+                                )
+                            )
+                        )
+                    }
+
+                    //打開貼文
+                    is PushDataWrapper.ChannelPost -> {
+                        navController.navigate(
+                            PostInfoScreenDestination(
+                                channel = channel,
+                                post = pushDataWrapper.bulletinboardMessage
+                            )
+                        )
+                    }
+                }
+            } ?: run {
+                //前往頻道
+                navController.navigate(
+                    ChannelScreenDestination(
+                        channel = channel
+                    )
+                )
+            }
+        } else {
+            //禁止進入該頻道,show dialog
+            channelAlertDialog.value = true
+        }
+
+        groupViewModel.finishJumpToChannelDest()
+        chatRoomViewModel.afterUpdatePermissionDone()
+    }
+
+    if (channelAlertDialog.value) {
+        DialogScreen(
+            title = "不具有此頻道的權限",
+            subTitle = "這是個上了鎖的頻道，你目前沒有權限能夠進入喔！",
+            onDismiss = { channelAlertDialog.value = false }
+        ) {
+            BorderButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = "返回",
+                borderColor = LocalColor.current.text.default_50,
+                textColor = LocalColor.current.text.default_100
+            ) {
+                run {
+                    channelAlertDialog.value = false
+                }
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -94,7 +209,8 @@ fun NotificationCenterView(
         ) {
             LazyColumn(
                 state = listState,
-                verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                verticalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
                 items(notificationCenterDataList) { notificationCenterData ->
                     NotificationItem(
                         notificationCenterData = notificationCenterData,
