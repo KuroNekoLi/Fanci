@@ -13,8 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
@@ -55,6 +59,9 @@ fun NotificationCenterScreen(
         notificationCenterDataList = notificationCenterDataList,
         onClick = {
             //TODO
+        },
+        onLoadMore = {
+            viewModel.onLoadMore()
         }
     )
 }
@@ -64,8 +71,11 @@ fun NotificationCenterView(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
     notificationCenterDataList: List<NotificationCenterData>,
-    onClick: (NotificationCenterData) -> Unit
+    onClick: (NotificationCenterData) -> Unit,
+    onLoadMore: () -> Unit
 ) {
+    val listState: LazyListState = rememberLazyListState()
+
     Scaffold(modifier = modifier.fillMaxSize(),
         topBar = {
             TopBarScreen(
@@ -82,18 +92,22 @@ fun NotificationCenterView(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                item {
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
-
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(1.dp)) {
                 items(notificationCenterDataList) { notificationCenterData ->
                     NotificationItem(
                         notificationCenterData = notificationCenterData,
                         onClick = onClick
                     )
+
+                    Divider(color = LocalColor.current.background, thickness = 1.dp)
                 }
             }
+        }
+
+        listState.OnBottomReached {
+            onLoadMore.invoke()
         }
     }
 }
@@ -127,7 +141,7 @@ private fun NotificationItem(
                 .size(45.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop,
-            model = notificationCenterData.icon,
+            model = notificationCenterData.image,
             contentDescription = null
         )
 
@@ -146,9 +160,19 @@ private fun NotificationItem(
             //Description
             Text(
                 text = notificationCenterData.description,
-                fontSize = 16.sp,
+                fontSize = 14.sp,
+                color = LocalColor.current.text.default_80
+            )
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            //Time
+            Text(
+                text = notificationCenterData.displayTime,
+                fontSize = 12.sp,
                 color = LocalColor.current.text.default_50
             )
+
         }
     }
 }
@@ -160,7 +184,8 @@ fun NotificationCenterScreenPreview() {
         NotificationCenterView(
             navController = EmptyDestinationsNavigator,
             notificationCenterDataList = MockData.mockNotificationCenter,
-            onClick = {}
+            onClick = {},
+            onLoadMore = {}
         )
     }
 }
