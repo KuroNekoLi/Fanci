@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.model.usecase
 import android.app.Application
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.repository.Network
+import com.cmoney.kolfanci.repository.request.NotificationClick
 import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 
 class NotificationUseCase(private val context: Application, private val network: Network) {
@@ -18,6 +19,15 @@ class NotificationUseCase(private val context: Application, private val network:
     suspend fun getNextPageNotificationCenter(nextPageUrl: String) =
         network.getNextPageNotificationHistory(nextPageUrl = nextPageUrl)
 
+
+    /**
+     * 點擊 通知中心 item
+     */
+    suspend fun setNotificationClick(notificationId: String) = network.setNotificationHistoryClick(
+        NotificationClick(
+            notificationIds = listOf(notificationId)
+        )
+    )
 
     /**
      * 產生 提醒設定 清單

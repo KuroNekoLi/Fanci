@@ -1,7 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.notification
 
 import android.content.Intent
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.model.notification.CustomNotification
@@ -87,16 +86,37 @@ class NotificationCenterViewModel(
 
     /**
      *  點擊 推播 item
+     *  call api update it and refresh ui.
      */
     fun onNotificationClick(notificationCenterData: NotificationCenterData) {
         KLog.i(TAG, "onNotificationClick:$notificationCenterData")
         val deepLink = notificationCenterData.deepLink
         if (deepLink.isNotEmpty()) {
-            val intent = Intent().apply {
-                putExtra(CustomNotification.CUSTOM_TARGET_TYPE, 0)
-                putExtra(CustomNotification.DEEPLINK, deepLink)
+
+            viewModelScope.launch {
+                //call api
+                notificationUseCase.setNotificationClick(notificationCenterData.notificationId)
+                    .onSuccess {
+                        KLog.i(TAG, "setNotificationClick onSuccess")
+                    }
+                    .onFailure { KLog.e(TAG, it) }
+
+                //update click item
+                _notificationCenter.value = _notificationCenter.value.map {
+                    if (it.notificationId == notificationCenterData.notificationId) {
+                        it.copy(isRead = true)
+                    } else {
+                        it
+                    }
+                }
+
+                //handel click deeplink
+                val intent = Intent().apply {
+                    putExtra(CustomNotification.CUSTOM_TARGET_TYPE, 0)
+                    putExtra(CustomNotification.DEEPLINK, deepLink)
+                }
+                _payload.value = notificationHelper.getPayloadFromBackground(intent)
             }
-            _payload.value = notificationHelper.getPayloadFromBackground(intent)
         }
     }
 
