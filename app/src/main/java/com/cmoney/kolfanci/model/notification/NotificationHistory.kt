@@ -7,35 +7,35 @@ import com.google.gson.annotations.SerializedName
 
 data class NotificationHistory(
     @SerializedName("items")
-    val items: List<Item> = listOf(),
+    val items: List<Item>? = listOf(),
     @SerializedName("paging")
-    val paging: Paging = Paging()
+    val paging: Paging? = Paging()
 ) {
     data class Item(
         @SerializedName("body")
-        val body: String = "",
+        val body: String? = null,
         @SerializedName("createTime")
         val createTime: Int = 0,
         @SerializedName("hasClicked")
         val hasClicked: Boolean = false,
         @SerializedName("iconUrl")
-        val iconUrl: String = "",
+        val iconUrl: String? = null,
         @SerializedName("imageUrl")
-        val imageUrl: String = "",
+        val imageUrl: String? = null,
         @SerializedName("link")
-        val link: String = "",
+        val link: String? = null,
         @SerializedName("notificationId")
-        val notificationId: String = ""
+        val notificationId: String? = null
     )
 
     data class Paging(
         @SerializedName("next")
-        val next: String = ""
+        val next: String? = null
     )
 }
 
 fun NotificationHistory.Item.toNotificationCenterData(): NotificationCenterData {
-    val splitStr = body.split("<br>")
+    val splitStr = body?.split("<br>").orEmpty()
     val title = splitStr.firstOrNull().orEmpty()
     val description = if (splitStr.size > 1) {
         splitStr[1]
@@ -44,11 +44,11 @@ fun NotificationHistory.Item.toNotificationCenterData(): NotificationCenterData 
     }
 
     return NotificationCenterData(
-        notificationId = notificationId,
-        image = imageUrl,
+        notificationId = notificationId.orEmpty(),
+        image = imageUrl.orEmpty(),
         title = title,
         description = description,
-        deepLink = link,
+        deepLink = link.orEmpty(),
         isRead = hasClicked,
         displayTime = Utils.timesMillisToDate(
             createTime.toLong().times(1000)

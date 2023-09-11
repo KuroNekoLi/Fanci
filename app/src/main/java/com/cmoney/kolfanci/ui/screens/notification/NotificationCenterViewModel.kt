@@ -53,9 +53,9 @@ class NotificationCenterViewModel(
             notificationUseCase.getNotificationCenter()
                 .onSuccess {
                     notificationHistory = it
-                    _notificationCenter.value = it.items.map { item ->
+                    _notificationCenter.value = it.items?.map { item ->
                         item.toNotificationCenterData()
-                    }.distinctBy { distinctItem -> distinctItem.notificationId }
+                    }?.distinctBy { distinctItem -> distinctItem.notificationId }.orEmpty()
                 }.onFailure {
                     KLog.e(TAG, it)
                 }
@@ -65,7 +65,7 @@ class NotificationCenterViewModel(
     fun onLoadMore() {
         KLog.i(TAG, "onLoadMore")
         notificationHistory?.let {
-            val nextPageUrl = it.paging.next
+            val nextPageUrl = it.paging?.next.orEmpty()
             KLog.i(TAG, "onLoadMore nextPageUrl:$nextPageUrl")
 
             viewModelScope.launch {
@@ -73,7 +73,8 @@ class NotificationCenterViewModel(
                     .fold({ notificationHistoryResponse ->
                         notificationHistory = notificationHistoryResponse
                         val oldData = _notificationCenter.value.toMutableList()
-                        oldData.addAll(notificationHistoryResponse.items.map { item -> item.toNotificationCenterData() })
+                        oldData.addAll(notificationHistoryResponse.items?.map { item -> item.toNotificationCenterData() }
+                            .orEmpty())
                         _notificationCenter.value =
                             oldData.distinctBy { distinctItem -> distinctItem.notificationId }
                     }, { e ->
