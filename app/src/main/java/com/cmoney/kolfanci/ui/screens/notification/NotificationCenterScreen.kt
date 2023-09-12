@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.notification
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fancylog.model.data.Clicked
@@ -45,6 +47,7 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.model.viewmodel.PushDataWrapper
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
@@ -91,8 +94,14 @@ fun NotificationCenterScreen(
     //TODO: 需要優化整合 目前跟 MainScreen 處理一樣的東西
     //禁止進入頻道彈窗
     val channelAlertDialog = remember { mutableStateOf(false) }
-    val groupViewModel = globalGroupViewModel()
-    val pushDataWrapper by groupViewModel.jumpToChannelDest.collectAsState()
+//    val groupViewModel = globalGroupViewModel()
+    val notificationViewModel = koinViewModel<NotificationViewModel>(
+        viewModelStoreOwner = LocalContext.current as? ComponentActivity ?: checkNotNull(
+            LocalViewModelStoreOwner.current
+        )
+    )
+
+    val pushDataWrapper by notificationViewModel.jumpToChannelDest.collectAsState()
     LaunchedEffect(pushDataWrapper) {
         /**
          * 處理推播資料
@@ -154,7 +163,7 @@ fun NotificationCenterScreen(
             channelAlertDialog.value = true
         }
 
-        groupViewModel.finishJumpToChannelDest()
+        notificationViewModel.finishJumpToChannelDest()
         chatRoomViewModel.afterUpdatePermissionDone()
     }
 

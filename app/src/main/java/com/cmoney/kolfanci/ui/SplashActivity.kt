@@ -15,6 +15,7 @@ import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.usecase.DynamicLinkUseCase
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.remoteconfig_library.model.config.AppStatus
+import com.cmoney.xlogin.XLoginHelper
 import com.google.firebase.messaging.FirebaseMessaging
 import com.socks.library.KLog
 import kotlinx.coroutines.delay
@@ -43,7 +44,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         initObserve()
-        showPushToken()
+        showDebugInfo()
     }
 
     private fun initObserve() {
@@ -137,12 +138,14 @@ class SplashActivity : AppCompatActivity() {
         intent.flags = 0
     }
 
-    private fun showPushToken() {
+    private fun showDebugInfo() {
         if (BuildConfig.DEBUG) {
             FirebaseMessaging.getInstance().token.addOnCompleteListener {
                 val token = it.result
                 KLog.i(TAG, "push token:$token")
             }
+
+            KLog.i(TAG, "memberId:" + XLoginHelper.memberPk)
         }
     }
 }
