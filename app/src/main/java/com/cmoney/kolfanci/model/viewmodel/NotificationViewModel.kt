@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.model.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
@@ -10,6 +11,7 @@ import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
@@ -20,8 +22,9 @@ import kotlinx.coroutines.launch
 class NotificationViewModel(
     private val notificationHelper: NotificationHelper,
     private val groupUseCase: GroupUseCase,
-    private val chatRoomUseCase: ChatRoomUseCase
-): ViewModel() {
+    private val chatRoomUseCase: ChatRoomUseCase,
+    private val permissionUseCase: PermissionUseCase
+) : ViewModel() {
     private val TAG = NotificationViewModel::class.java.simpleName
 
     private val _inviteGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
@@ -95,7 +98,10 @@ class NotificationViewModel(
     /**
      * 收到新訊息 推播
      */
-    fun receiveNewMessage(receiveNewMessage: TargetType.ReceiveMessage?, myGroupList: List<GroupItem>) {
+    fun receiveNewMessage(
+        receiveNewMessage: TargetType.ReceiveMessage?,
+        myGroupList: List<GroupItem>
+    ) {
         KLog.i(TAG, "receiveNewMessage:$receiveNewMessage")
         receiveNewMessage?.let {
             viewModelScope.launch {
@@ -111,11 +117,16 @@ class NotificationViewModel(
                     }?.firstOrNull { channel ->
                         channel.id == channelId
                     }?.also { channel ->
-                        _jumpToChannelDest.value = PushDataWrapper.ChannelMessage(
-                            group = it.groupModel,
-                            channel = channel,
-                            serialNumber = serialNumber
-                        )
+
+                        //更新該頻道權限
+                        permissionUseCase.updateChannelPermissionAndBuff(channelId = channel.id.orEmpty())
+                            .onSuccess { _ ->
+                                _jumpToChannelDest.value = PushDataWrapper.ChannelMessage(
+                                    group = it.groupModel,
+                                    channel = channel,
+                                    serialNumber = serialNumber
+                                )
+                            }
                     }
                 } ?: kotlin.run {
                     _showNotJoinAlert.value = true
@@ -130,7 +141,10 @@ class NotificationViewModel(
      * 檢查是否已經加入該社團並打開該社團
      * 取得指定文章資訊
      */
-    fun receiveNewPost(receivePostMessage: TargetType.ReceivePostMessage?, myGroupList: List<GroupItem>) {
+    fun receiveNewPost(
+        receivePostMessage: TargetType.ReceivePostMessage?,
+        myGroupList: List<GroupItem>
+    ) {
         KLog.i(TAG, "receivePostMessage:$receivePostMessage")
         receivePostMessage?.let {
             viewModelScope.launch {
@@ -152,11 +166,16 @@ class NotificationViewModel(
                             messageId = messageId,
                             messageServiceType = MessageServiceType.bulletinboard
                         ).onSuccess { chatMessage ->
-                            _jumpToChannelDest.value = PushDataWrapper.ChannelPost(
-                                group = it.groupModel,
-                                channel = channel,
-                                bulletinboardMessage = chatMessage.toBulletinboardMessage()
-                            )
+
+                            //更新該頻道權限
+                            permissionUseCase.updateChannelPermissionAndBuff(channelId = channel.id.orEmpty())
+                                .onSuccess { _ ->
+                                    _jumpToChannelDest.value = PushDataWrapper.ChannelPost(
+                                        group = it.groupModel,
+                                        channel = channel,
+                                        bulletinboardMessage = chatMessage.toBulletinboardMessage()
+                                    )
+                                }
                         }.onFailure { err ->
                             KLog.e(TAG, err)
                         }

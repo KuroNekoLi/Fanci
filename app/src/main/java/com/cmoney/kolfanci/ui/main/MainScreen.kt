@@ -87,28 +87,7 @@ fun MainScreen(
     //前往指定 訊息/文章...
     val pushDataWrapper by notificationViewModel.jumpToChannelDest.collectAsState()
     LaunchedEffect(pushDataWrapper) {
-        /**
-         * 處理推播資料
-         * 進入頻道前, 權限檢查
-         */
-        pushDataWrapper?.let { pushDataWrapper ->
-            when (pushDataWrapper) {
-                is PushDataWrapper.ChannelMessage -> {
-                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
-                }
-
-                is PushDataWrapper.ChannelPost -> {
-                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
-                }
-            }
-        }
-    }
-
-    // channel權限檢查 結束
-    val updatePermissionDone by chatRoomViewModel.updatePermissionDone.collectAsState()
-    updatePermissionDone?.let { channel ->
         if (Constant.canReadMessage()) {
-            //是否有推播
             pushDataWrapper?.let { pushDataWrapper ->
                 when (pushDataWrapper) {
                     //設定指定社團並前往指定訊息
@@ -118,10 +97,10 @@ fun MainScreen(
 
                         navigator.navigate(
                             ChannelScreenDestination(
-                                channel = channel,
+                                channel = pushDataWrapper.channel,
                                 jumpChatMessage = ChatMessage(
                                     serialNumber =
-                                    pushDataWrapper.serialNumber.toLong()
+                                    pushDataWrapper.serialNumber.toLongOrNull()
                                 )
                             )
                         )
@@ -134,20 +113,31 @@ fun MainScreen(
 
                         navigator.navigate(
                             PostInfoScreenDestination(
-                                channel = channel,
+                                channel = pushDataWrapper.channel,
                                 post = pushDataWrapper.bulletinboardMessage
                             )
                         )
                     }
                 }
-            } ?: run {
-                //前往頻道
-                navigator.navigate(
-                    ChannelScreenDestination(
-                        channel = channel
-                    )
-                )
             }
+        }
+        else {
+            //禁止進入該頻道,show dialog
+            channelAlertDialog.value = true
+        }
+        notificationViewModel.finishJumpToChannelDest()
+    }
+
+    // channel權限檢查 結束
+    val updatePermissionDone by chatRoomViewModel.updatePermissionDone.collectAsState()
+    updatePermissionDone?.let { channel ->
+        if (Constant.canReadMessage()) {
+            //前往頻道
+            navigator.navigate(
+                ChannelScreenDestination(
+                    channel = channel
+                )
+            )
         } else {
             //禁止進入該頻道,show dialog
             channelAlertDialog.value = true

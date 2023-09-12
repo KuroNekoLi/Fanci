@@ -131,6 +131,6 @@ val viewModule = module {
         NotificationSettingViewModel(androidApplication(), get())
     }
     viewModel {
-        NotificationViewModel(get(), get(), get())
+        NotificationViewModel(get(), get(), get(), get())
     }
 }

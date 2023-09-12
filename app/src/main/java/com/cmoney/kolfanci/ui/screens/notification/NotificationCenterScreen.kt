@@ -101,37 +101,17 @@ fun NotificationCenterScreen(
         )
     )
 
+    //前往指定 訊息/文章...
     val pushDataWrapper by notificationViewModel.jumpToChannelDest.collectAsState()
     LaunchedEffect(pushDataWrapper) {
-        /**
-         * 處理推播資料
-         * 進入頻道前, 權限檢查
-         */
-        pushDataWrapper?.let { pushDataWrapper ->
-            when (pushDataWrapper) {
-                is PushDataWrapper.ChannelMessage -> {
-                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
-                }
-
-                is PushDataWrapper.ChannelPost -> {
-                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
-                }
-            }
-        }
-    }
-
-    // channel權限檢查 結束
-    val updatePermissionDone by chatRoomViewModel.updatePermissionDone.collectAsState()
-    updatePermissionDone?.let { channel ->
         if (Constant.canReadMessage()) {
-            //是否有推播
             pushDataWrapper?.let { pushDataWrapper ->
                 when (pushDataWrapper) {
-                    //前往指定訊息
+                    //設定指定社團並前往指定訊息
                     is PushDataWrapper.ChannelMessage -> {
                         navController.navigate(
                             ChannelScreenDestination(
-                                channel = channel,
+                                channel = pushDataWrapper.channel,
                                 jumpChatMessage = ChatMessage(
                                     serialNumber =
                                     pushDataWrapper.serialNumber.toLongOrNull()
@@ -140,31 +120,23 @@ fun NotificationCenterScreen(
                         )
                     }
 
-                    //打開貼文
+                    //設定指定社團並打開貼文
                     is PushDataWrapper.ChannelPost -> {
                         navController.navigate(
                             PostInfoScreenDestination(
-                                channel = channel,
+                                channel = pushDataWrapper.channel,
                                 post = pushDataWrapper.bulletinboardMessage
                             )
                         )
                     }
                 }
-            } ?: run {
-                //前往頻道
-                navController.navigate(
-                    ChannelScreenDestination(
-                        channel = channel
-                    )
-                )
             }
-        } else {
+        }
+        else {
             //禁止進入該頻道,show dialog
             channelAlertDialog.value = true
         }
-
         notificationViewModel.finishJumpToChannelDest()
-        chatRoomViewModel.afterUpdatePermissionDone()
     }
 
     if (channelAlertDialog.value) {
