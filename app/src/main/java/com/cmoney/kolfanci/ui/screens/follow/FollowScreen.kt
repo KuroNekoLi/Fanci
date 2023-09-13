@@ -61,11 +61,9 @@ fun FollowScreen(
     modifier: Modifier,
     navigator: DestinationsNavigator,
     group: Group?,
-    serverGroupList: List<Group>,
     viewModel: FollowViewModel = koinViewModel(),
     myGroupList: List<GroupItem>,
     onGroupItemClick: (Group) -> Unit,
-    onLoadMoreServerGroup: () -> Unit,
     onRefreshMyGroupList: (isSilent: Boolean) -> Unit,
     isLoading: Boolean,
     inviteGroup: Group?,
@@ -189,7 +187,6 @@ fun FollowScreen(
         navigator = navigator,
         groupList = myGroupList,
         group = group,
-        emptyGroupList = serverGroupList,
         imageOffset = uiState.imageOffset,
         spaceHeight = uiState.spaceHeight,
         scrollableState = scrollableState,
@@ -203,7 +200,6 @@ fun FollowScreen(
         },
         isLoading = isLoading,
         onChannelClick = onChannelClick,
-        onLoadMoreServerGroup = onLoadMoreServerGroup,
         onGoToMy = {
             if (XLoginHelper.isLogin) {
                 navigator.navigate(MyScreenDestination)
@@ -231,10 +227,8 @@ fun FollowScreenView(
     lazyColumnAtTop: () -> Unit,
     isLoading: Boolean,
     onChannelClick: (Channel) -> Unit,
-    onLoadMoreServerGroup: () -> Unit,
     onGoToMy: () -> Unit,
-    onRefreshMyGroupList: (isSilent: Boolean) -> Unit,
-    emptyGroupList: List<Group>
+    onRefreshMyGroupList: (isSilent: Boolean) -> Unit
 ) {
     val TAG = "FollowScreenView"
 
@@ -356,9 +350,7 @@ fun FollowScreenView(
                 if (group == null) {
                     //Empty follow group
                     EmptyFollowScreenWithMenu(
-                        onLoadMoreServerGroup = onLoadMoreServerGroup,
-                        emptyGroupList = emptyGroupList,
-                        isLoading = false,
+                        modifier = Modifier.fillMaxSize(),
                         openDrawer = {
                             coroutineScope.launch {
                                 scaffoldState.drawerState.open()
@@ -505,9 +497,6 @@ fun FollowScreenView(
         } else {
             //Empty follow group
             EmptyFollowScreenWithMenu(
-                onLoadMoreServerGroup = onLoadMoreServerGroup,
-                emptyGroupList = emptyGroupList,
-                isLoading = isLoading,
                 openDrawer = {
                     coroutineScope.launch {
                         scaffoldState.drawerState.open()
@@ -523,20 +512,13 @@ fun FollowScreenView(
  */
 @Composable
 private fun EmptyFollowScreenWithMenu(
-    onLoadMoreServerGroup: () -> Unit,
-    emptyGroupList: List<Group>,
-    isLoading: Boolean,
+    modifier: Modifier = Modifier,
     openDrawer: () -> Unit
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
     ) {
-        EmptyFollowScreen(
-            onLoadMore = onLoadMoreServerGroup,
-            groupList = emptyGroupList,
-            isLoading = isLoading
-        )
+        EmptyFollowScreen(modifier = Modifier.fillMaxSize())
         //Menu
         Box(
             modifier = Modifier
@@ -627,10 +609,8 @@ fun FollowScreenPreview() {
             lazyColumnAtTop = {},
             isLoading = true,
             onChannelClick = {},
-            onLoadMoreServerGroup = {},
             onGoToMy = {},
             onRefreshMyGroupList = {},
-            emptyGroupList = emptyList()
         )
     }
 }

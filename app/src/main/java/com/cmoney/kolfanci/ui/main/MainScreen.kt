@@ -73,8 +73,6 @@ fun MainScreen(
     val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
     //目前選中社團
     val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
-    //server 入門社團清單
-    val serverGroupList by globalGroupViewModel.groupList.collectAsState()
     //邀請加入社團
     val inviteGroup by notificationViewModel.inviteGroup.collectAsState()
 
@@ -150,15 +148,11 @@ fun MainScreen(
     FollowScreen(
         modifier = Modifier,
         group = currentGroup,
-        serverGroupList = serverGroupList,
         inviteGroup = inviteGroup,
         navigator = navigator,
         myGroupList = myGroupList,
         onGroupItemClick = {
             globalGroupViewModel.setCurrentGroup(it)
-        },
-        onLoadMoreServerGroup = {
-            globalGroupViewModel.onLoadMore()
         },
         onRefreshMyGroupList = { isSilent ->
             globalGroupViewModel.fetchMyGroup(isSilent = isSilent)
