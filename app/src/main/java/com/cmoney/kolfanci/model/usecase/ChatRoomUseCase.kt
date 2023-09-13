@@ -184,11 +184,12 @@ class ChatRoomUseCase(
      * @param chatRoomChannelId 聊天室 id
      * @param fromSerialNumber 從哪一個序列號開始往回找 (若為Null 則從最新開始拿)
      */
-    suspend fun fetchMoreMessage(chatRoomChannelId: String, fromSerialNumber: Long?) =
+    suspend fun fetchMoreMessage(chatRoomChannelId: String, fromSerialNumber: Long?, order: OrderType = OrderType.latest) =
         kotlin.runCatching {
             chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
                 chatRoomChannelId = chatRoomChannelId,
-                fromSerialNumber = fromSerialNumber
+                fromSerialNumber = fromSerialNumber,
+                order = order
             ).checkResponseBody()
         }
 

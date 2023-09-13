@@ -43,7 +43,6 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
-import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
@@ -113,8 +112,7 @@ fun NotificationCenterScreen(
                             ChannelScreenDestination(
                                 channel = pushDataWrapper.channel,
                                 jumpChatMessage = ChatMessage(
-                                    serialNumber =
-                                    pushDataWrapper.serialNumber.toLongOrNull()
+                                    id = pushDataWrapper.messageId
                                 )
                             )
                         )

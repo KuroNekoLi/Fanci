@@ -97,8 +97,7 @@ fun MainScreen(
                             ChannelScreenDestination(
                                 channel = pushDataWrapper.channel,
                                 jumpChatMessage = ChatMessage(
-                                    serialNumber =
-                                    pushDataWrapper.serialNumber.toLongOrNull()
+                                    id = pushDataWrapper.messageId
                                 )
                             )
                         )

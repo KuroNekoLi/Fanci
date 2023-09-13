@@ -76,6 +76,8 @@ fun MessageScreen(
     val showReSendDialog by messageViewModel.showReSendDialog.collectAsState()
     val message by messageViewModel.message.collectAsState()
 
+    val scrollToPosition by messageViewModel.scrollToPosition.collectAsState()
+
     if (message.isNotEmpty()) {
         MessageScreenView(
             modifier = modifier,
@@ -91,6 +93,7 @@ fun MessageScreen(
             onInteractClick = onInteractClick,
             onMsgDismissHide = onMsgDismissHide,
             isScrollToBottom = isScrollToBottom,
+            scrollToPosition = scrollToPosition,
             onLoadMore = {
                 messageViewModel.onLoadMore(channelId)
             },
@@ -133,7 +136,8 @@ private fun MessageScreenView(
     onMsgDismissHide: (ChatMessage) -> Unit,
     isScrollToBottom: Boolean,
     onLoadMore: () -> Unit,
-    onReSendClick: (ChatMessageWrapper) -> Unit
+    onReSendClick: (ChatMessageWrapper) -> Unit,
+    scrollToPosition: Int?
 ) {
     val TAG = "MessageScreenView"
 
@@ -211,6 +215,14 @@ private fun MessageScreenView(
                 }
             }
         }
+
+        scrollToPosition?.let {
+            LaunchedEffect(message.size) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    listState.scrollToItem(index = it)
+                }
+            }
+        }
     }
 }
 
@@ -273,15 +285,16 @@ fun MessageScreenPreview() {
                     )
                 )
             ),
-            coroutineScope = rememberCoroutineScope(),
-            listState = rememberLazyListState(),
-            isScrollToBottom = false,
-            onInteractClick = {},
-            onMsgDismissHide = {},
-            onLoadMore = {},
             blockingList = emptyList(),
             blockerList = emptyList(),
-            onReSendClick = {}
+            listState = rememberLazyListState(),
+            coroutineScope = rememberCoroutineScope(),
+            onInteractClick = {},
+            onMsgDismissHide = {},
+            isScrollToBottom = false,
+            onLoadMore = {},
+            onReSendClick = {},
+            scrollToPosition = null
         )
     }
 }

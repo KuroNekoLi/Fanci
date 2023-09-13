@@ -2,7 +2,6 @@ package com.cmoney.kolfanci.model.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
@@ -13,7 +12,6 @@ import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
-import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -107,7 +105,7 @@ class NotificationViewModel(
             viewModelScope.launch {
                 val groupId = receiveNewMessage.groupId
                 val channelId = receiveNewMessage.channelId
-                val serialNumber = receiveNewMessage.serialNumber
+                val messageId = receiveNewMessage.messageId
 
                 myGroupList.firstOrNull { groupItem ->
                     groupItem.groupModel.id == groupId
@@ -124,7 +122,7 @@ class NotificationViewModel(
                                 _jumpToChannelDest.value = PushDataWrapper.ChannelMessage(
                                     group = it.groupModel,
                                     channel = channel,
-                                    serialNumber = serialNumber
+                                    messageId = messageId
                                 )
                             }
                     }

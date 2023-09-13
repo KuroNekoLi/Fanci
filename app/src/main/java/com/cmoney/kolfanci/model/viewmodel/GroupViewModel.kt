@@ -44,7 +44,7 @@ sealed class PushDataWrapper {
     data class ChannelMessage(
         val group: Group,
         val channel: Channel,
-        val serialNumber: String
+        val messageId: String
     ) : PushDataWrapper()
 
     /**

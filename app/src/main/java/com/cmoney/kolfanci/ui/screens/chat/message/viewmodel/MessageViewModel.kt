@@ -12,6 +12,7 @@ import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
@@ -104,6 +105,10 @@ class MessageViewModel(
     private val _message = MutableStateFlow<List<ChatMessageWrapper>>(emptyList())
     val message = _message.asStateFlow()
 
+    //聊天室卷動至指定位置
+    private val _scrollToPosition = MutableStateFlow<Int?>(null)
+    val scrollToPosition = _scrollToPosition.asStateFlow()
+
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
 
     private val pollingInterval = 3000L
@@ -118,10 +123,41 @@ class MessageViewModel(
     }
 
     /**
+     * 聊天室一進入時, 先抓取舊資料
+     */
+    fun chatRoomFirstFetch(channelId: String?) {
+        KLog.i(TAG, "chatRoomFirstFetch:$channelId")
+        viewModelScope.launch {
+            if (channelId?.isNotEmpty() == true) {
+                chatRoomUseCase.fetchMoreMessage(
+                    chatRoomChannelId = channelId,
+                    fromSerialNumber = null,
+                ).onSuccess {
+                    val newMessage = it.items?.map { chatMessage ->
+                        ChatMessageWrapper(message = chatMessage)
+                    }?.reversed().orEmpty()
+
+                    //檢查插入時間 bar
+                    val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
+
+                    processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
+                        MessageUtils.defineMessageType(chatMessageWrapper)
+                    })
+
+                    startPolling(channelId = channelId)
+
+                }.onFailure { e ->
+                    KLog.e(TAG, e)
+                }
+            }
+        }
+    }
+
+    /**
      * 開始 Polling 聊天室 訊息
      * @param channelId 聊天室id
      */
-    fun startPolling(channelId: String?, fromIndex: Long? = null) {
+    private fun startPolling(channelId: String?, fromIndex: Long? = null) {
         KLog.i(TAG, "startPolling:$channelId")
         viewModelScope.launch {
             if (channelId?.isNotEmpty() == true) {
@@ -910,20 +946,58 @@ class MessageViewModel(
     fun forwardToMessage(channelId: String, jumpChatMessage: ChatMessage) {
         KLog.i(TAG, "forwardToMessage:$jumpChatMessage")
         viewModelScope.launch {
-            if (jumpChatMessage.id?.isNotEmpty() == true) {
-                val newMessage = listOf(ChatMessageWrapper(message = jumpChatMessage))
+            val messageId = jumpChatMessage.id
+            messageId?.let {
+                chatRoomUseCase.getSingleMessage(
+                    messageId = messageId,
+                    messageServiceType = MessageServiceType.chatroom
+                ).onSuccess { chatMessage ->
+                    KLog.i(TAG, "get single message:$chatMessage")
 
-                //檢查插入時間 bar
-                val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
+                    val allMessage = mutableListOf<ChatMessage>()
 
-                processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
-                    MessageUtils.defineMessageType(chatMessageWrapper)
-                })
+                    //前 20 筆
+                    chatRoomUseCase.fetchMoreMessage(
+                        chatRoomChannelId = channelId,
+                        fromSerialNumber = chatMessage.serialNumber,
+                        order = OrderType.latest
+                    ).getOrNull()?.apply {
+                        allMessage.addAll(this.items.orEmpty())
+                    }
+
+                    //當下訊息
+                    allMessage.add(chatMessage)
+
+                    //後 20 筆
+                    chatRoomUseCase.fetchMoreMessage(
+                        chatRoomChannelId = channelId,
+                        fromSerialNumber = chatMessage.serialNumber,
+                        order = OrderType.oldest
+                    ).getOrNull()?.apply {
+                        allMessage.addAll(this.items.orEmpty())
+                    }
+
+                    val newMessage = allMessage.map { chatMessage ->
+                        ChatMessageWrapper(message = chatMessage)
+                    }.reversed()
+
+                    //檢查插入時間 bar
+                    val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
+
+                    processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
+                        MessageUtils.defineMessageType(chatMessageWrapper)
+                    })
+
+                    //滑動至指定訊息
+                    val scrollPosition =
+                        _message.value.indexOfFirst { it.message == chatMessage }.coerceAtLeast(0)
+                    _scrollToPosition.value = scrollPosition
+
+                    startPolling(channelId, allMessage.last().serialNumber)
+                }.onFailure { e ->
+                    KLog.e(TAG, e)
+                }
             }
-
-            //TODO: 修改讀取方式
-            //開始指定位置開始 polling
-            startPolling(channelId, jumpChatMessage.serialNumber)
         }
     }
 

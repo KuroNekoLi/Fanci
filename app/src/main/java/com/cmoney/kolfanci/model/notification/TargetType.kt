@@ -28,8 +28,8 @@ sealed class TargetType : Parcelable {
     data class ReceiveMessage(
         @SerializedName("groupId", alternate = ["GroupId"])
         val groupId: String = "",
-        @SerializedName("serialNumber", alternate = ["SerialNumber"])
-        val serialNumber: String = "",
+        @SerializedName("messageId", alternate = ["MessageId"])
+        val messageId: String = "",
         @SerializedName("channelId", alternate = ["ChannelId"])
         val channelId: String = "",
     ) : TargetType()
