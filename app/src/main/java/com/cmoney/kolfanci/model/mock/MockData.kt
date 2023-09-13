@@ -42,7 +42,8 @@ object MockData {
      */
     private val mockNotificationCenterKind = listOf<NotificationCenterData>(
         NotificationCenterData(
-            icon = "https://picsum.photos/${
+            notificationId = "",
+            image = "https://picsum.photos/${
                 Random.nextInt(
                     100,
                     300
@@ -51,10 +52,12 @@ object MockData {
             title = "聊天室有新訊息",
             description = "[藝術學院小公主的小畫廊\uD83C\uDFA8] 社團有新訊息",
             deepLink = "{\"targetType\": 2, \"serialNumber\" : \"2455\" ,  \"groupId\" : \"27444\",  \"channelId\": \"31913\"}",
-            isRead = Random.nextBoolean()
+            isRead = Random.nextBoolean(),
+            displayTime = "剛剛"
         ),
         NotificationCenterData(
-            icon = "https://picsum.photos/${
+            notificationId = "",
+            image = "https://picsum.photos/${
                 Random.nextInt(
                     100,
                     300
@@ -63,10 +66,12 @@ object MockData {
             title = "邀請加入社團",
             description = "[藝術學院小公主的小畫廊\uD83C\uDFA8] 社團",
             deepLink = "{\"targetType\": 1, \"groupId\": \"27444\"}",
-            isRead = Random.nextBoolean()
+            isRead = Random.nextBoolean(),
+            displayTime = "剛剛"
         ),
         NotificationCenterData(
-            icon = "https://picsum.photos/${
+            notificationId = "",
+            image = "https://picsum.photos/${
                 Random.nextInt(
                     100,
                     300
@@ -75,10 +80,12 @@ object MockData {
             title = "有新文章",
             description = "[藝術學院小公主的小畫廊\uD83C\uDFA8] 社團有新文章",
             deepLink = "{\"targetType\": 3, \"messageId\" : \"151547560\" ,  \"groupId\" : \"27444\",  \"channelId\": \"31913\"}",
-            isRead = Random.nextBoolean()
+            isRead = Random.nextBoolean(),
+            displayTime = "剛剛"
         ),
         NotificationCenterData(
-            icon = "https://picsum.photos/${
+            notificationId = "",
+            image = "https://picsum.photos/${
                 Random.nextInt(
                     100,
                     300
@@ -87,7 +94,8 @@ object MockData {
             title = "社團解散",
             description = " [XLAB-405] 社團解散了",
             deepLink = "{\"targetType\": 4, \"groupId\" : \"28557\"}",
-            isRead = Random.nextBoolean()
+            isRead = Random.nextBoolean(),
+            displayTime = "剛剛"
         )
     )
 

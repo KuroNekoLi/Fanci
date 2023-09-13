@@ -28,6 +28,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
+import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
@@ -50,6 +51,7 @@ class MainActivity : BaseWebLoginActivity() {
     private val TAG = MainActivity::class.java.simpleName
     private val globalViewModel by viewModel<MainViewModel>()
     private val globalGroupViewModel by viewModel<GroupViewModel>()
+    private val notificationViewModel by viewModel<NotificationViewModel>()
 
     companion object {
         const val FOREGROUND_NOTIFICATION_BUNDLE = "foreground_notification_bundle"
@@ -77,7 +79,7 @@ class MainActivity : BaseWebLoginActivity() {
 
             val isOpenTutorial by globalViewModel.isOpenTutorial.collectAsState()
 
-            val targetType by globalViewModel.targetType.collectAsState()
+            val targetType by notificationViewModel.targetType.collectAsState()
 
             //我的社團清單
             val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
@@ -86,7 +88,10 @@ class MainActivity : BaseWebLoginActivity() {
             val showLoginDialog by globalViewModel.showLoginDialog.collectAsState()
 
             //解散社團 彈窗
-            val showDissolveDialog by globalGroupViewModel.showDissolveGroupDialog.collectAsState()
+            val showDissolveDialog by notificationViewModel.showDissolveGroupDialog.collectAsState()
+
+            //是否刷新我的社團
+            val isRefreshMyGroup by notificationViewModel.refreshGroup.collectAsState()
 
             LaunchedEffect(key1 = targetType, key2 = loginLoading, key3 = myGroupList) {
                 targetType?.let { targetType ->
@@ -95,26 +100,33 @@ class MainActivity : BaseWebLoginActivity() {
                             when (targetType) {
                                 is TargetType.InviteGroup -> {
                                     val groupId = targetType.groupId
-                                    globalViewModel.fetchInviteGroup(groupId)
+                                    notificationViewModel.fetchInviteGroup(groupId)
                                 }
 
                                 is TargetType.ReceiveMessage -> {
                                     if (myGroupList.isNotEmpty()) {
-                                        globalGroupViewModel.receiveNewMessage(
-                                            targetType
+                                        notificationViewModel.receiveNewMessage(
+                                            receiveNewMessage = targetType,
+                                            myGroupList = myGroupList
                                         )
                                     }
                                 }
 
                                 is TargetType.ReceivePostMessage -> {
                                     if (myGroupList.isNotEmpty()) {
-                                        globalGroupViewModel.receiveNewPost(targetType)
+                                        notificationViewModel.receiveNewPost(
+                                            receivePostMessage = targetType,
+                                            myGroupList = myGroupList
+                                        )
                                     }
                                 }
 
                                 is TargetType.DissolveGroup -> {
                                     if (myGroupList.isNotEmpty()) {
-                                        globalGroupViewModel.dissolveGroup(targetType)
+                                        notificationViewModel.dissolveGroup(
+                                            dissolveGroup = targetType,
+                                            myGroupList = myGroupList
+                                        )
                                     }
                                 }
 
@@ -122,7 +134,7 @@ class MainActivity : BaseWebLoginActivity() {
                             }
 
                             if (myGroupList.isNotEmpty()) {
-                                globalViewModel.clearPushDataState()
+                                notificationViewModel.clearPushDataState()
                             }
                         }
                         //Not Login
@@ -149,6 +161,12 @@ class MainActivity : BaseWebLoginActivity() {
                         }
                     }
 
+                    //刷新我的社團
+                    if (isRefreshMyGroup) {
+                        globalGroupViewModel.fetchMyGroup(false)
+                        notificationViewModel.afterRefreshGroup()
+                    }
+
                     //登入彈窗
                     if (showLoginDialog) {
                         LoginDialogScreen(
@@ -170,8 +188,11 @@ class MainActivity : BaseWebLoginActivity() {
                             ),
                             subTitle = stringResource(id = R.string.dissolve_group_description),
                             onDismiss = {
-                                globalGroupViewModel.dismissDissolveDialog()
-                                globalGroupViewModel.onCheckDissolveGroup(group)
+                                notificationViewModel.dismissDissolveDialog()
+                                notificationViewModel.onCheckDissolveGroup(
+                                    group,
+                                    globalGroupViewModel.currentGroup.value
+                                )
                             }) {
                             BlueButton(
                                 modifier = Modifier
@@ -179,8 +200,11 @@ class MainActivity : BaseWebLoginActivity() {
                                     .height(50.dp),
                                 text = stringResource(id = R.string.confirm)
                             ) {
-                                globalGroupViewModel.dismissDissolveDialog()
-                                globalGroupViewModel.onCheckDissolveGroup(group)
+                                notificationViewModel.dismissDissolveDialog()
+                                notificationViewModel.onCheckDissolveGroup(
+                                    group,
+                                    globalGroupViewModel.currentGroup.value
+                                )
                             }
                         }
 
@@ -205,10 +229,15 @@ class MainActivity : BaseWebLoginActivity() {
                 intent.getParcelableExtra<Payload>(FOREGROUND_NOTIFICATION_BUNDLE)
             KLog.d(TAG, "payLoad = $payLoad")
             if (payLoad != null) {
-                globalViewModel.setNotificationBundle(payLoad)
+                notificationViewModel.setNotificationBundle(payLoad)
             }
             this.intent = null
         }
+    }
+
+    fun checkPayload(payload: Payload) {
+        KLog.d(TAG, "payLoad = $payload")
+        notificationViewModel.setNotificationBundle(payload)
     }
 
     /**

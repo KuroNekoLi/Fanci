@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.di
 
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
+import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.SplashViewModel
 import com.cmoney.kolfanci.ui.main.MainViewModel
@@ -124,9 +125,12 @@ val viewModule = module {
         SearchViewModel(get())
     }
     viewModel {
-        NotificationCenterViewModel(get())
+        NotificationCenterViewModel(get(), get())
     }
     viewModel {
         NotificationSettingViewModel(androidApplication(), get())
+    }
+    viewModel {
+        NotificationViewModel(get(), get(), get(), get())
     }
 }

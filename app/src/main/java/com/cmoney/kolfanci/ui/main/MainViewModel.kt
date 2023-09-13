@@ -35,13 +35,6 @@ class MainViewModel(
     private val _isLoginSuccess = MutableStateFlow(false)
     val isLoginSuccess = _isLoginSuccess.asStateFlow()
 
-    private val _inviteGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
-    val inviteGroup = _inviteGroup.asStateFlow()
-
-    //收到 推播訊息
-    private val _targetType: MutableStateFlow<TargetType?> = MutableStateFlow(null)
-    val targetType = _targetType.asStateFlow()
-
     //登入彈窗
     private val _showLoginDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showLoginDialog = _showLoginDialog.asStateFlow()
@@ -101,49 +94,6 @@ class MainViewModel(
     fun loginFail(errorMessage: String) {
         KLog.i(TAG, "loginFail:$errorMessage")
         loginProcessDone()
-    }
-
-    /**
-     * 推播 or dynamic link 資料
-     */
-    fun setNotificationBundle(payLoad: Payload) {
-        KLog.i(TAG, "setNotificationBundle payLoad:$payLoad")
-        val targetType =
-            notificationHelper.convertPayloadToTargetType(payLoad) ?: TargetType.MainPage
-
-        KLog.i(TAG, "setNotificationBundle targetType:${targetType}")
-
-        _targetType.value = targetType
-    }
-
-    /**
-     * 抓取邀請連結社團的資訊
-     */
-    fun fetchInviteGroup(groupId: String) {
-        KLog.i(TAG, "fetchInviteGroup:$groupId")
-        viewModelScope.launch {
-            groupUseCase.getGroupById(
-                groupId
-            ).fold({
-                KLog.i(TAG, "fetchInviteGroup success:$it")
-                _inviteGroup.value = it
-            }, {
-                it.printStackTrace()
-                KLog.e(TAG, it)
-            })
-        }
-    }
-
-    fun openedInviteGroup() {
-        _inviteGroup.value = null
-    }
-
-    /**
-     * reset state
-     */
-    fun clearPushDataState() {
-        KLog.i(TAG, "clearPushDataState")
-        _targetType.value = null
     }
 
     fun showLoginDialog() {

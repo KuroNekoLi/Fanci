@@ -24,6 +24,7 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.model.viewmodel.PushDataWrapper
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
@@ -59,7 +60,7 @@ fun MainScreen(
 ) {
     val TAG = "MainScreen"
     val context = LocalContext.current
-    val globalViewModel = koinViewModel<MainViewModel>(
+    val notificationViewModel = koinViewModel<NotificationViewModel>(
         viewModelStoreOwner = LocalContext.current as? ComponentActivity ?: checkNotNull(
             LocalViewModelStoreOwner.current
         )
@@ -75,78 +76,74 @@ fun MainScreen(
     //server 入門社團清單
     val serverGroupList by globalGroupViewModel.groupList.collectAsState()
     //邀請加入社團
-    val inviteGroup by globalViewModel.inviteGroup.collectAsState()
+    val inviteGroup by notificationViewModel.inviteGroup.collectAsState()
 
     //禁止進入頻道彈窗
     val channelAlertDialog = remember { mutableStateOf(false) }
 
     //目前不屬於此社團
-    val showNotJoinAlert by globalGroupViewModel.showNotJoinAlert.collectAsState()
+    val showNotJoinAlert by notificationViewModel.showNotJoinAlert.collectAsState()
 
     //前往指定 訊息/文章...
-    val pushDataWrapper by globalGroupViewModel.jumpToChannelDest.collectAsState()
+    val pushDataWrapper by notificationViewModel.jumpToChannelDest.collectAsState()
     LaunchedEffect(pushDataWrapper) {
-        /**
-         * 處理推播資料
-         * 進入頻道前, 權限檢查
-         */
-        pushDataWrapper?.let { pushDataWrapper ->
-            when (pushDataWrapper) {
-                is PushDataWrapper.ChannelMessage -> {
-                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
-                }
+        if (Constant.canReadMessage()) {
+            pushDataWrapper?.let { pushDataWrapper ->
+                when (pushDataWrapper) {
+                    //設定指定社團並前往指定訊息
+                    is PushDataWrapper.ChannelMessage -> {
+                        val group = pushDataWrapper.group
+                        globalGroupViewModel.setCurrentGroup(group)
 
-                is PushDataWrapper.ChannelPost -> {
-                    chatRoomViewModel.fetchChannelPermission(pushDataWrapper.channel)
+                        navigator.navigate(
+                            ChannelScreenDestination(
+                                channel = pushDataWrapper.channel,
+                                jumpChatMessage = ChatMessage(
+                                    serialNumber =
+                                    pushDataWrapper.serialNumber.toLongOrNull()
+                                )
+                            )
+                        )
+                    }
+
+                    //設定指定社團並打開貼文
+                    is PushDataWrapper.ChannelPost -> {
+                        val group = pushDataWrapper.group
+                        globalGroupViewModel.setCurrentGroup(group)
+
+                        navigator.navigate(
+                            PostInfoScreenDestination(
+                                channel = pushDataWrapper.channel,
+                                post = pushDataWrapper.bulletinboardMessage
+                            )
+                        )
+                    }
                 }
             }
         }
+        else {
+            //禁止進入該頻道,show dialog
+            channelAlertDialog.value = true
+        }
+        notificationViewModel.finishJumpToChannelDest()
     }
 
     // channel權限檢查 結束
     val updatePermissionDone by chatRoomViewModel.updatePermissionDone.collectAsState()
     updatePermissionDone?.let { channel ->
         if (Constant.canReadMessage()) {
-            //是否有推播
-            pushDataWrapper?.let { pushDataWrapper ->
-                when (pushDataWrapper) {
-                    //前往指定訊息
-                    is PushDataWrapper.ChannelMessage -> {
-                        navigator.navigate(
-                            ChannelScreenDestination(
-                                channel = channel,
-                                jumpChatMessage = ChatMessage(
-                                    serialNumber =
-                                    pushDataWrapper.serialNumber.toLong()
-                                )
-                            )
-                        )
-                    }
-
-                    //打開貼文
-                    is PushDataWrapper.ChannelPost -> {
-                        navigator.navigate(
-                            PostInfoScreenDestination(
-                                channel = channel,
-                                post = pushDataWrapper.bulletinboardMessage
-                            )
-                        )
-                    }
-                }
-            } ?: run {
-                //前往頻道
-                navigator.navigate(
-                    ChannelScreenDestination(
-                        channel = channel
-                    )
+            //前往頻道
+            navigator.navigate(
+                ChannelScreenDestination(
+                    channel = channel
                 )
-            }
+            )
         } else {
             //禁止進入該頻道,show dialog
             channelAlertDialog.value = true
         }
 
-        globalGroupViewModel.finishJumpToChannelDest()
+        notificationViewModel.finishJumpToChannelDest()
         chatRoomViewModel.afterUpdatePermissionDone()
     }
 
@@ -168,7 +165,7 @@ fun MainScreen(
         },
         isLoading = isLoading,
         onDismissInvite = {
-            globalViewModel.openedInviteGroup()
+            notificationViewModel.openedInviteGroup()
         },
         onChannelClick = {
             chatRoomViewModel.fetchChannelPermission(it)
@@ -234,7 +231,7 @@ fun MainScreen(
                 borderColor = LocalColor.current.text.default_50,
                 textColor = LocalColor.current.text.default_100
             ) {
-                globalGroupViewModel.dismissNotJoinAlert()
+                notificationViewModel.dismissNotJoinAlert()
             }
         }
     }

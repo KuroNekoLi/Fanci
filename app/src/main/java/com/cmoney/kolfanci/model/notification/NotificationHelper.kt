@@ -115,7 +115,7 @@ class NotificationHelper(
         val decodeUrl = Uri.parse(decodeString)
         val customTargetType =
             decodeUrl.getQueryParameter("commonTargetType")?.toIntOrNull() ?: -1
-        val targetType = if (customTargetType == -1) {
+        var targetType = if (customTargetType == -1) {
             decodeUrl.getQueryParameter("targetType")?.toIntOrNull() ?: 0
         } else {
             customTargetType
@@ -124,6 +124,9 @@ class NotificationHelper(
             decodeUrl.getQueryParameter("groupId").orEmpty()
 
         val deeplink = decodeUrl.getQueryParameter("deeplink").orEmpty()
+        if (deeplink.isNotEmpty()) {
+            targetType = 0
+        }
 
         return Payload(
             title = "",

@@ -45,6 +45,7 @@ sealed class PushDataWrapper {
      * 前往頻道聊天
      */
     data class ChannelMessage(
+        val group: Group,
         val channel: Channel,
         val serialNumber: String
     ) : PushDataWrapper()
@@ -53,6 +54,7 @@ sealed class PushDataWrapper {
      * 前往頻道貼文
      */
     data class ChannelPost(
+        val group: Group,
         val channel: Channel,
         val bulletinboardMessage: BulletinboardMessage
     ) : PushDataWrapper()
@@ -90,18 +92,6 @@ class GroupViewModel(
     //主題設定檔
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
-
-    //前往指定頻道, 指定貼文/指定訊息...
-    private val _jumpToChannelDest = MutableStateFlow<PushDataWrapper?>(null)
-    val jumpToChannelDest = _jumpToChannelDest.asStateFlow()
-
-    //目前沒加入該社團, 彈窗
-    private val _showNotJoinAlert = MutableStateFlow<Boolean>(false)
-    val showNotJoinAlert = _showNotJoinAlert.asStateFlow()
-
-    //解散社團 彈窗
-    private val _showDissolveGroupDialog = MutableStateFlow<Group?>(null)
-    val showDissolveGroupDialog = _showDissolveGroupDialog.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -834,127 +824,6 @@ class GroupViewModel(
             }, {
                 KLog.e(TAG, it)
             })
-        }
-    }
-
-    /**
-     * 收到新訊息 推播
-     *
-     * 檢查是否已經加入該社團並打開該社團
-     * 確認該社團有此頻道, 並前往該頻道
-     */
-    fun receiveNewMessage(receiveNewMessage: TargetType.ReceiveMessage?) {
-        KLog.i(TAG, "receiveNewMessage:$receiveNewMessage")
-        receiveNewMessage?.let {
-            viewModelScope.launch {
-                val groupId = receiveNewMessage.groupId
-                val channelId = receiveNewMessage.channelId
-                val serialNumber = receiveNewMessage.serialNumber
-
-                _myGroupList.value.firstOrNull { groupItem ->
-                    groupItem.groupModel.id == groupId
-                }?.also {
-                    setCurrentGroup(it.groupModel)
-
-                    it.groupModel.categories?.flatMap { category ->
-                        category.channels.orEmpty()
-                    }?.firstOrNull { channel ->
-                        channel.id == channelId
-                    }?.also { channel ->
-                        _jumpToChannelDest.value = PushDataWrapper.ChannelMessage(
-                            channel = channel,
-                            serialNumber = serialNumber
-                        )
-                    }
-                } ?: kotlin.run {
-                    _showNotJoinAlert.value = true
-                }
-            }
-        }
-    }
-
-    fun dismissNotJoinAlert() {
-        _showNotJoinAlert.value = false
-    }
-
-    /**
-     * 收到 新貼文 推播
-     *
-     * 檢查是否已經加入該社團並打開該社團
-     * 取得指定文章資訊
-     */
-    fun receiveNewPost(receivePostMessage: TargetType.ReceivePostMessage?) {
-        KLog.i(TAG, "receivePostMessage:$receivePostMessage")
-        receivePostMessage?.let {
-            viewModelScope.launch {
-                val groupId = receivePostMessage.groupId
-                val channelId = receivePostMessage.channelId
-                val messageId = receivePostMessage.messageId
-
-                _myGroupList.value.firstOrNull { groupItem ->
-                    groupItem.groupModel.id == groupId
-                }?.also {
-                    setCurrentGroup(it.groupModel)
-
-                    it.groupModel.categories?.flatMap { category ->
-                        category.channels.orEmpty()
-                    }?.firstOrNull { channel ->
-                        channel.id == channelId
-                    }?.also { channel ->
-
-                        //取得指定文章資訊
-                        chatRoomUseCase.getSingleMessage(
-                            messageId = messageId,
-                            messageServiceType = MessageServiceType.bulletinboard
-                        ).onSuccess { chatMessage ->
-                            _jumpToChannelDest.value = PushDataWrapper.ChannelPost(
-                                channel = channel,
-                                bulletinboardMessage = chatMessage.toBulletinboardMessage()
-                            )
-                        }.onFailure { err ->
-                            KLog.e(TAG, err)
-                        }
-                    }
-                } ?: kotlin.run {
-                    _showNotJoinAlert.value = true
-                }
-            }
-        }
-    }
-
-    fun finishJumpToChannelDest() {
-        _jumpToChannelDest.value = null
-    }
-
-    /**
-     * 解散 社團
-     */
-    fun dissolveGroup(dissolveGroup: TargetType.DissolveGroup) {
-        KLog.i(TAG, "dissolveGroup:$dissolveGroup")
-        viewModelScope.launch {
-            val groupId = dissolveGroup.groupId
-
-            _myGroupList.value.firstOrNull { groupItem ->
-                groupItem.groupModel.id == groupId
-            }?.also {
-                _showDissolveGroupDialog.value = it.groupModel
-            }
-        }
-    }
-
-    fun dismissDissolveDialog() {
-        _showDissolveGroupDialog.value = null
-    }
-
-    /**
-     *  檢查 解散的社團跟目前選中的社團 是否一樣
-     *  如果一樣-> 就執行刷新動作
-     *  不一樣時-> 不動作
-     */
-    fun onCheckDissolveGroup(group: Group) {
-        KLog.i(TAG, "onCheckDissolveGroup:$group")
-        if (_currentGroup.value?.id == group.id) {
-            fetchMyGroup(isSilent = false)
         }
     }
 }

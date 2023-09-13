@@ -921,6 +921,7 @@ class MessageViewModel(
                 })
             }
 
+            //TODO: 修改讀取方式
             //開始指定位置開始 polling
             startPolling(channelId, jumpChatMessage.serialNumber)
         }
