@@ -1,6 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting
 
-import android.widget.Space
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,15 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -34,7 +32,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
@@ -52,7 +49,6 @@ import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -182,9 +178,11 @@ fun GroupSettingBackgroundView(
             verticalArrangement = Arrangement.Center
         ) {
 
+            Spacer(modifier = Modifier.height(70.dp))
+
             Box(
-                modifier = Modifier.weight(0.8f),
-                contentAlignment = Alignment.BottomCenter
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.TopCenter
             ) {
                 AsyncImage(
                     model = state.coverImageUrl.value ?: group.coverImageUrl,
@@ -196,46 +194,43 @@ fun GroupSettingBackgroundView(
                     placeholder = painterResource(id = R.drawable.placeholder)
                 )
 
-                Box(
+                Image(
                     modifier = Modifier
-                        .size(width = 340.dp, height = 185.dp)
-                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                        .background(
-                            LocalColor.current.env_80
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.group_board_place),
-                        fontSize = 30.sp,
-                        color = LocalColor.current.text.default_30
-                    )
-                }
-            }
-
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(45.dp)
-                        .align(Alignment.CenterHorizontally)
+                        .size(width = 343.dp, height = 419.dp)
+                        .offset(y = 211.dp),
+                    painter = painterResource(id = R.drawable.create_group_bk),
+                    contentDescription = null
                 )
             }
 
-            Spacer(modifier = Modifier.weight(0.2f))
-
-            TransparentButton(
-                text = stringResource(id = R.string.change_image)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
             ) {
-                KLog.i(TAG, "button click.")
-                if (isFromCreate) {
-                    AppUserLogger.getInstance()
-                        .log(Clicked.CreateGroupChangeHomeBackgroundPicture)
-                } else {
-                    AppUserLogger.getInstance()
-                        .log(Clicked.HomeBackgroundChangePicture)
-                }
+                Column {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(45.dp)
+                        )
+                    }
 
-                state.openCameraDialog()
+                    TransparentButton(
+                        text = stringResource(id = R.string.change_image)
+                    ) {
+                        KLog.i(TAG, "button click.")
+                        if (isFromCreate) {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.CreateGroupChangeHomeBackgroundPicture)
+                        } else {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.HomeBackgroundChangePicture)
+                        }
+
+                        state.openCameraDialog()
+                    }
+                }
             }
         }
 
