@@ -10,10 +10,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.MessageServiceType
-import com.cmoney.kolfanci.extension.toBulletinboardMessage
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
@@ -47,7 +44,7 @@ sealed class PushDataWrapper {
     data class ChannelMessage(
         val group: Group,
         val channel: Channel,
-        val serialNumber: String
+        val messageId: String
     ) : PushDataWrapper()
 
     /**

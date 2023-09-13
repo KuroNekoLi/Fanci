@@ -24,6 +24,10 @@ class ChatRoomPollUseCase(
 
     private val messageTakeSize = 20
 
+    /**
+     *  Latest: 往回取
+     *  Oldest: 往後取
+     */
     override fun poll(delay: Long, channelId: String, fromIndex: Long?): Flow<ChatMessagePaging> {
         isClose = false
         fromIndex?.apply {
@@ -35,12 +39,12 @@ class ChatRoomPollUseCase(
                     chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
                         chatRoomChannelId = channelId,
                         fromSerialNumber = index,
-                        order = OrderType.latest,
+                        order = OrderType.oldest,
                         take = messageTakeSize
                     ).checkResponseBody()
                 }.fold({
-                    //當沒有結果, server 會回傳 -1, 確定這次分頁數量拿滿了, 才拿下一頁
-                    if (it.nextWeight != -1L && it.items?.size?.equals(messageTakeSize) == true) {
+                    //當沒有結果, server 會回傳 -1, 確定這次分頁數量拿滿了, 才拿下一頁, 或是 server 跟前端說有下一頁
+                    if (it.nextWeight != -1L && it.items?.size?.equals(messageTakeSize) == true || it.haveNextPage == true) {
                         index = it.nextWeight
                     }
                     send(it)
