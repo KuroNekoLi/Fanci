@@ -165,7 +165,7 @@
     <string name="search_result_empty">找不到相關內容\n試試看比較簡短的關鍵字呢</string>
     <string name="jump_to_chatroom">跳至訊息，進行更多互動</string>
     <string name="search_keyword_hint">輸入關鍵字</string>
-    <string name="empty_follow_tip">加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團</string>
+    <string name="empty_follow_tip">立即建立社團，或加入熱門社團</string>
     <string name="create_group">建立社團</string>
     <string name="disband_group">解散社團</string>
     <string name="group_openness">社團公開度</string>

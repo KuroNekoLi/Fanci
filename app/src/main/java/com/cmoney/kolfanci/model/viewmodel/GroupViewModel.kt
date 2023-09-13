@@ -10,10 +10,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.fanciapi.fanci.model.MessageServiceType
-import com.cmoney.kolfanci.extension.toBulletinboardMessage
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
@@ -85,10 +82,6 @@ class GroupViewModel(
     private val _myGroupList: MutableStateFlow<List<GroupItem>> = MutableStateFlow(emptyList())
     val myGroupList = _myGroupList.asStateFlow()
 
-    //目前server有的社團清單 (沒加入社團時顯示用)
-    private val _groupList: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
-    val groupList = _groupList.asStateFlow()
-
     //主題設定檔
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
@@ -146,7 +139,6 @@ class GroupViewModel(
                         fetchGroupPermission(selectedGroup)
                     } else {
                         resetToDefault()
-                        fetchAllGroupList()
                     }
                 }, {
                     KLog.e(TAG, it)
@@ -155,8 +147,6 @@ class GroupViewModel(
                     dismissLoading()
                 }
             }
-        } else {
-            fetchAllGroupList()
         }
     }
 
@@ -169,32 +159,6 @@ class GroupViewModel(
         _theme.value = DefaultThemeColor
     }
 
-    /**
-     * 當沒有 加入社團的時候, 取得目前server有的社團
-     */
-    fun fetchAllGroupList() {
-        KLog.i(TAG, "fetchAllGroupList")
-        viewModelScope.launch {
-            loading()
-            groupUseCase.getPopularGroup(
-                pageSize = 10,
-                startWeight = nextWeight ?: Long.MAX_VALUE
-            ).fold({
-                haveNextPage = it.haveNextPage == true
-                nextWeight = it.nextWeight
-                val orgGroupList = _groupList.value.toMutableList()
-                orgGroupList.addAll(it.items.orEmpty())
-                _groupList.value = orgGroupList.distinctBy { group ->
-                    group.id
-                }
-                dismissLoading()
-            }, {
-                dismissLoading()
-                KLog.e(TAG, it)
-            })
-        }
-    }
-
     private fun loading() {
         KLog.i(TAG, "loading")
         _loading.value = true
@@ -203,16 +167,6 @@ class GroupViewModel(
     private fun dismissLoading() {
         KLog.i(TAG, "dismissLoading")
         _loading.value = false
-    }
-
-    /**
-     * 讀取server 社團 下一分頁
-     */
-    fun onLoadMore() {
-        KLog.i(TAG, "onLoadMore: haveNextPage:$haveNextPage nextWeight:$nextWeight")
-        if (haveNextPage && nextWeight != null && nextWeight!! > 0) {
-            fetchAllGroupList()
-        }
     }
 
     /**
