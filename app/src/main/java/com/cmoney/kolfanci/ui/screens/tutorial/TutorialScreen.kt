@@ -38,14 +38,14 @@ fun TutorialScreen(modifier: Modifier = Modifier, onStart: () -> Unit) {
             val pagerState = rememberPagerState()
 
             HorizontalPager(
-                count = 3,
+                count = TutorialItemScreenDefaults.defaultItems.size,
                 state = pagerState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
             ) { page ->
-                TutorialItemScreen(page = page,
-                    isFinalPage = (page == 2),
+                TutorialItemScreen(
+                    page = page,
                     onStart = {
                         onStart.invoke()
                     })

@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.tutorial
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,59 +24,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 @Composable
 fun TutorialItemScreen(
     modifier: Modifier = Modifier,
+    tutorialItems: List<TutorialItem> = TutorialItemScreenDefaults.defaultItems,
     page: Int,
-    isFinalPage: Boolean,
     onStart: () -> Unit
 ) {
-    val imageResource = when (page) {
-        0 -> {
-            R.drawable.tutorial1
-        }
-        1 -> {
-            R.drawable.tutorial2
-        }
-        else -> {
-            R.drawable.tutorial3
-        }
-    }
-
-    val title = when (page) {
-        0 -> {
-            "一手掌握當紅名人所有資訊"
-        }
-        1 -> {
-            "跟同溫層一起聊天嘻嘻哈哈"
-        }
-        else -> {
-            "打開通知即時訊息不漏接"
-        }
-    }
-
-    val desc = when (page) {
-        0 -> {
-            "你喜歡的偶像、網紅、KOL都在這！\n" +
-                    "最新消息、周邊搶賣，加入社團再也不錯過"
-        }
-        1 -> {
-            "生活中沒有人可以跟你一起聊喜愛事物？\n" +
-                    "懂你的朋友都在這，快來一起嘰哩呱啦！"
-        }
-        else -> {
-            "Fanci 能讓你知道最即時的消息！\n" +
-                    "所以...打開通知是你最棒的選擇"
-        }
-    }
-
+    val (imageResource, title, desc) = tutorialItems.getOrNull(page) ?: return
     Column {
-        Column(modifier = modifier
-            .weight(1f)
-            .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.Center) {
+        Column(
+            modifier = modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Center
+        ) {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -107,7 +73,7 @@ fun TutorialItemScreen(
             )
         }
 
-        if (isFinalPage) {
+        if (page == tutorialItems.lastIndex) {
             BlueButton(text = "開始使用 Fanci") {
                 onStart.invoke()
             }
@@ -117,15 +83,15 @@ fun TutorialItemScreen(
 
 @Composable
 fun BlueButton(
-    modifier: Modifier = Modifier
-        .padding(25.dp)
-        .fillMaxWidth()
-        .height(50.dp),
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit
 ) {
     Button(
-        modifier = modifier,
+        modifier = modifier
+            .padding(25.dp)
+            .fillMaxWidth()
+            .height(50.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = LocalColor.current.primary),
         onClick = {
             onClick.invoke()
@@ -138,11 +104,46 @@ fun BlueButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun TutorialItemScreenPreview() {
-    TutorialItemScreen(
-        page = 1,
-        isFinalPage = true,
-        onStart = {})
+    FanciTheme {
+        TutorialItemScreen(
+            page = 1,
+            onStart = {}
+        )
+    }
+}
+
+/**
+ * 新手導覽頁面資訊
+ *
+ * @property imageRes 圖片
+ * @property title 標題
+ * @property description 描述
+ */
+data class TutorialItem(
+    @DrawableRes val imageRes: Int,
+    val title: String,
+    val description: String
+)
+
+object TutorialItemScreenDefaults {
+    /**
+     * 預設新手導覽頁面資訊集合
+     */
+    val defaultItems by lazy {
+        listOf(
+            TutorialItem(
+                imageRes = R.drawable.tutorial1,
+                title = "一手掌握當紅名人所有資訊",
+                description = "你喜歡的偶像、網紅、KOL都在這！\n最新消息、周邊搶賣，加入社團再也不錯過"
+            ),
+            TutorialItem(
+                imageRes = R.drawable.tutorial2,
+                title = "跟同溫層一起聊天嘻嘻哈哈",
+                description = "生活中沒有人可以跟你一起聊喜愛事物？\n懂你的朋友都在這，快來一起嘰哩呱啦！"
+            )
+        )
+    }
 }
