@@ -12,6 +12,7 @@ import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
+import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -43,10 +45,16 @@ class CreateGroupViewModel(
     private val _currentStep = MutableStateFlow(1)  //目前步驟
     val currentStep = _currentStep.asStateFlow()
 
-    private val _group = MutableStateFlow(Group())     //要建立的社團
+    private val _group = MutableStateFlow(
+        //要建立的社團
+        Group()
+    )
     val group = _group.asStateFlow()
 
-    private val _fanciColor = MutableStateFlow<FanciColor?>(null)   //選擇的Theme Color
+    private val _fanciColor = MutableStateFlow<FanciColor?>(
+        //選擇的Theme Color
+        DefaultThemeColor
+    )
     val fanciColor = _fanciColor.asStateFlow()
 
     var uiState by mutableStateOf(UiState())
@@ -83,10 +91,16 @@ class CreateGroupViewModel(
      */
     fun nextStep() {
         //step1 to next, check group name
-        if (_currentStep.value == 1) {
-            if (_group.value.name.isNullOrEmpty()) {
-                sendErrorMsg("請輸入社團名稱")
-                return
+        val currentStepValue = _currentStep.value
+        when(currentStepValue) {
+            1 -> {
+                if (_group.value.name.isNullOrEmpty()) {
+                    sendErrorMsg("請輸入社團名稱")
+                    return
+                }
+            }
+            2 -> {
+                prepareDefaultAvatarAndCover()
             }
         }
 
@@ -101,6 +115,20 @@ class CreateGroupViewModel(
         _group.value = _group.value.copy(
             name = name
         )
+    }
+
+    private fun prepareDefaultAvatarAndCover() {
+        viewModelScope.launch {
+            val thumbnailImageUrl = groupUseCase.fetchGroupAvatarLib()
+                .getOrNull()
+                ?.firstOrNull()
+            val coverImageUrl = groupUseCase.fetchGroupCoverLib()
+                .getOrNull()
+                ?.firstOrNull()
+            _group.update { old ->
+                old.copy(coverImageUrl = coverImageUrl, thumbnailImageUrl = thumbnailImageUrl)
+            }
+        }
     }
 
     /**
