@@ -193,9 +193,11 @@ class FollowViewModel(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val hasNotifyAllowNotificationPermission = notificationUseCase.hasNotifyAllowNotificationPermission()
                     .getOrNull() ?: false
-                uiState = uiState.copy(
-                    needNotifyAllowNotificationPermission = !hasNotifyAllowNotificationPermission
-                )
+                if (!hasNotifyAllowNotificationPermission) {
+                    uiState = uiState.copy(
+                        needNotifyAllowNotificationPermission = true
+                    )
+                }
             }
         }
     }
@@ -206,6 +208,9 @@ class FollowViewModel(
     fun alreadyNotifyAllowNotificationPermission() {
         viewModelScope.launch {
             notificationUseCase.alreadyNotifyAllowNotificationPermission()
+            uiState = uiState.copy(
+                needNotifyAllowNotificationPermission = false
+            )
         }
     }
 
