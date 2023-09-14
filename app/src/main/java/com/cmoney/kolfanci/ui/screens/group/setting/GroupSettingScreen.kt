@@ -87,7 +87,7 @@ fun GroupSettingScreen(
     memberViewModel: MemberViewModel = koinViewModel(),
     applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>,
-    leaveResultBackNavigator: ResultBackNavigator<String>,
+    leaveGroupResultBackNavigator: ResultBackNavigator<String>,
     setNotificationResult: ResultRecipient<NotificationSettingScreenDestination, NotificationSettingItem>
 ) {
     val globalGroupViewModel = globalGroupViewModel()
@@ -147,9 +147,12 @@ fun GroupSettingScreen(
         }
     }
 
-    BackHandler {
-//        globalViewModel.setCurrentGroup(group)
+    fun backClick() {
         navController.popBackStack()
+    }
+
+    BackHandler {
+        backClick()
     }
 
     GroupSettingScreenView(
@@ -159,7 +162,7 @@ fun GroupSettingScreen(
         unApplyCount = uiState.unApplyCount ?: 0,
         reportList = reportList,
         onBackClick = {
-            navController.popBackStack()
+            backClick()
         },
         onInviteClick = {
             memberViewModel.onInviteClick(uiState.settingGroup ?: nowGroup)
@@ -168,9 +171,9 @@ fun GroupSettingScreen(
             val group = uiState.settingGroup ?: nowGroup
             val groupId = group.id
             if (groupId != null) {
-                leaveResultBackNavigator.navigateBack(groupId)
+                leaveGroupResultBackNavigator.navigateBack(groupId)
             } else {
-                leaveResultBackNavigator.navigateBack()
+                leaveGroupResultBackNavigator.navigateBack()
             }
         },
         onDisbandGroup = {

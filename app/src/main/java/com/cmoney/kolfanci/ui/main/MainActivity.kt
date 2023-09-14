@@ -1,13 +1,9 @@
 package com.cmoney.kolfanci.ui.main
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.notification.TargetType
@@ -45,7 +40,6 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.socks.library.KLog
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-private const val REQUEST_REQUESTNOTIFICATIONPERMISSION: Int = 0
 
 class MainActivity : BaseWebLoginActivity() {
     private val TAG = MainActivity::class.java.simpleName
@@ -55,6 +49,7 @@ class MainActivity : BaseWebLoginActivity() {
 
     companion object {
         const val FOREGROUND_NOTIFICATION_BUNDLE = "foreground_notification_bundle"
+        const val REQUEST_CODE_ALLOW_NOTIFICATION_PERMISSION: Int = 1
 
         fun start(context: Context, payload: Payload) {
             KLog.i("MainActivity", "start by Payload")
@@ -153,11 +148,7 @@ class MainActivity : BaseWebLoginActivity() {
                         TutorialScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                requestNotificationPermissionWithPermissionCheck()
-                            } else {
-                                globalViewModel.tutorialOnOpen()
-                            }
+                            globalViewModel.tutorialOnOpen()
                         }
                     }
 
@@ -240,38 +231,6 @@ class MainActivity : BaseWebLoginActivity() {
         notificationViewModel.setNotificationBundle(payload)
     }
 
-    /**
-     * 檢查是否有開啟通知權限
-     */
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun requestNotificationPermissionWithPermissionCheck() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                REQUEST_REQUESTNOTIFICATIONPERMISSION
-            )
-        } else {
-            requestNotificationPermission()
-        }
-    }
-
-    private fun onRequestPermissionsResult(requestCode: Int, grantResults: IntArray) {
-        when (requestCode) {
-            REQUEST_REQUESTNOTIFICATIONPERMISSION -> {
-                //不管有沒有同意, 都繼續往下進行
-                requestNotificationPermission()
-            }
-        }
-    }
-
-    private fun requestNotificationPermission() {
-        globalViewModel.tutorialOnOpen()
-    }
-
     @Composable
     fun MainScreen() {
         StatusBarColorEffect()
@@ -328,15 +287,5 @@ class MainActivity : BaseWebLoginActivity() {
         KLog.i(TAG, "loginSuccessCallback")
         globalViewModel.loginSuccess()
         globalGroupViewModel.fetchMyGroup()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // NOTE: delegate the permission handling to generated function
-        onRequestPermissionsResult(requestCode, grantResults)
     }
 }
