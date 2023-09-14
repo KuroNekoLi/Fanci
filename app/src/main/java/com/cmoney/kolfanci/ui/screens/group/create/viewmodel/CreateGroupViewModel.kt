@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
@@ -34,7 +35,8 @@ class CreateGroupViewModel(
     val context: Application,
     val groupUseCase: GroupUseCase,
     private val themeUseCase: ThemeUseCase,
-    val uploadImageUseCase: UploadImageUseCase
+    val uploadImageUseCase: UploadImageUseCase,
+    val settingsDataStore: SettingsDataStore
 ) : AndroidViewModel(context) {
 
     private val TAG = CreateGroupViewModel::class.java.simpleName
@@ -233,7 +235,8 @@ class CreateGroupViewModel(
                     createdGroup = createdGroup,
                     createComplete = true
                 )
-                // _group.value = it
+
+                settingsDataStore.setHomeBubbleShow()
             }, {
             })
         }

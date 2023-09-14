@@ -58,6 +58,7 @@ fun GroupHeaderScreen(
     followGroup: Group,
     modifier: Modifier = Modifier,
     visibleAvatar: Boolean,
+    isShowBubbleTip: Boolean,
     onMoreClick: (Group) -> Unit
 ) {
     Column(modifier = modifier) {
@@ -80,7 +81,9 @@ fun GroupHeaderScreen(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BubbleTip()
+                if (isShowBubbleTip) {
+                    BubbleTip()
+                }
 
                 Box(
                     modifier = Modifier
@@ -186,7 +189,8 @@ fun GroupHeaderScreenPreview() {
                 thumbnailImageUrl = "https://i.pinimg.com/474x/60/5d/31/605d318d7f932e3ebd1d672e5bff9229.jpg"
             ),
             modifier = Modifier.padding(20.dp),
-            true
+            true,
+            isShowBubbleTip = true,
         ) {}
     }
 }

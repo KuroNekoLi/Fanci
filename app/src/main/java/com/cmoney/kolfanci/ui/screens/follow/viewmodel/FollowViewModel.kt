@@ -9,11 +9,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.px
+import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 data class FollowUiState(
@@ -23,10 +25,11 @@ data class FollowUiState(
     val lazyColumnScrollEnabled: Boolean = false,    //LazyColumn 是否可以滑動
     val showLoginDialog: Boolean = false,        //呈現登入彈窗
     val navigateToCreateGroup: Boolean = false,  //前往建立社團
-    val navigateToApproveGroup: Group? = null,  //前往社團認證
+    val navigateToApproveGroup: Group? = null,    //前往社團認證
+    val isShowBubbleTip: Boolean = false        //是否出現 提示彈窗
 )
 
-class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
+class FollowViewModel(private val groupUseCase: GroupUseCase, val dataStore: SettingsDataStore) : ViewModel() {
     private val TAG = FollowViewModel::class.java.simpleName
 
     //點擊加入群組彈窗
@@ -165,5 +168,18 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     fun refreshMyGroupDone() {
         KLog.i(TAG, "refreshMyGroupDone")
         _refreshMyGroup.value = false
+    }
+
+    fun onMoreClick() {
+        KLog.i(TAG, "onMoreClick")
+        viewModelScope.launch {
+            dataStore.alreadyShowHomeBubble()
+        }
+    }
+
+    fun fetchSetting() {
+        viewModelScope.launch {
+            uiState = uiState.copy(isShowBubbleTip = dataStore.isShowBubble.first())
+        }
     }
 }

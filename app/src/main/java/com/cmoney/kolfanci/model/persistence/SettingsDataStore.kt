@@ -16,13 +16,31 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 class SettingsDataStore(private val preference_datastore: DataStore<Preferences>) {
     private val IS_TUTORIAL = booleanPreferencesKey("is_tutorial")  //是否新手導引過
 
+    private val IS_SHOW_BUBBLE = booleanPreferencesKey("is_show_bubble")  //建立社團後 是否出現 buble
+
     val isTutorial: Flow<Boolean> = preference_datastore.data.map {
         it[IS_TUTORIAL] ?: false
+    }
+
+    val isShowBubble: Flow<Boolean> = preference_datastore.data.map {
+        it[IS_SHOW_BUBBLE] ?: false
     }
 
     suspend fun onTutorialOpen() {
         preference_datastore.edit { preferences ->
             preferences[IS_TUTORIAL] = true
+        }
+    }
+
+    suspend fun setHomeBubbleShow() {
+        preference_datastore.edit { preferences ->
+            preferences[IS_SHOW_BUBBLE] = true
+        }
+    }
+
+    suspend fun alreadyShowHomeBubble() {
+        preference_datastore.edit { preferences ->
+            preferences[IS_SHOW_BUBBLE] = false
         }
     }
 }
