@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Fanci</string>
     <integer name="app_id">176</integer>
     <string name="app_client_id">cmkolfanci</string>
 
