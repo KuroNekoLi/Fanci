@@ -32,6 +32,8 @@ import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
+import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.GroupSettingResult
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -48,15 +50,18 @@ import org.koin.androidx.compose.koinViewModel
  * Main screen
  *
  * @param navigator
- * @param leaveResultRecipient 如果有收到則退出此社團
+ * @param groupSettingResultResultRecipient 從社團設定頁收到的結果,
+ * 如果有收到且[GroupSettingResult.leaveGroupId] 不為空則退出此社團,
+ * 若是[GroupSettingResult.notificationEnabled] 為 true 需要檢查是否通知過顯示允許權限提醒
  */
 @RootNavGraph(start = true)
 @Destination
 @Composable
 fun MainScreen(
     navigator: DestinationsNavigator,
-    leaveResultRecipient: ResultRecipient<GroupSettingScreenDestination, String>,
-    chatRoomViewModel: ChatRoomViewModel = koinViewModel()
+    groupSettingResultResultRecipient: ResultRecipient<GroupSettingScreenDestination, GroupSettingResult>,
+    chatRoomViewModel: ChatRoomViewModel = koinViewModel(),
+    followViewModel: FollowViewModel = koinViewModel()
 ) {
     val TAG = "MainScreen"
     val context = LocalContext.current
@@ -169,15 +174,22 @@ fun MainScreen(
         }
     )
 
-    leaveResultRecipient.onNavResult { navResult ->
+    groupSettingResultResultRecipient.onNavResult { navResult ->
         when (navResult) {
             NavResult.Canceled -> {
             }
 
             is NavResult.Value -> {
-                context.showToast(context.getString(R.string.leaving_group))
-                val groupId = navResult.value
-                globalGroupViewModel.leaveGroup(id = groupId)
+                val groupSettingResult = navResult.value
+                if (groupSettingResult.leaveGroupId.isNotBlank()) {
+                    context.showToast(context.getString(R.string.leaving_group))
+                    val groupId = groupSettingResult.leaveGroupId
+                    globalGroupViewModel.leaveGroup(id = groupId)
+                    return@onNavResult
+                }
+                if (groupSettingResult.notificationEnabled) {
+                    followViewModel.checkNeedNotifyAllowNotificationPermission()
+                }
             }
         }
     }
@@ -237,7 +249,7 @@ fun HomeScreenPreview() {
     FanciTheme {
         MainScreen(
             navigator = EmptyDestinationsNavigator,
-            leaveResultRecipient = EmptyResultRecipient()
+            groupSettingResultResultRecipient = EmptyResultRecipient()
         )
     }
 }

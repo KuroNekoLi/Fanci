@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting
 
 import android.content.Intent
+import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -73,6 +74,7 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -87,7 +89,7 @@ fun GroupSettingScreen(
     memberViewModel: MemberViewModel = koinViewModel(),
     applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>,
-    leaveResultBackNavigator: ResultBackNavigator<String>,
+    backToMainResultBackNavigator: ResultBackNavigator<GroupSettingResult>,
     setNotificationResult: ResultRecipient<NotificationSettingScreenDestination, NotificationSettingItem>
 ) {
     val globalGroupViewModel = globalGroupViewModel()
@@ -147,9 +149,16 @@ fun GroupSettingScreen(
         }
     }
 
+    fun backClick() {
+        backToMainResultBackNavigator.navigateBack(
+            GroupSettingResult(
+                notificationEnabled = uiState.notificationSettingItem?.isChecked ?: false
+            )
+        )
+    }
+
     BackHandler {
-//        globalViewModel.setCurrentGroup(group)
-        navController.popBackStack()
+        backClick()
     }
 
     GroupSettingScreenView(
@@ -159,7 +168,7 @@ fun GroupSettingScreen(
         unApplyCount = uiState.unApplyCount ?: 0,
         reportList = reportList,
         onBackClick = {
-            navController.popBackStack()
+            backClick()
         },
         onInviteClick = {
             memberViewModel.onInviteClick(uiState.settingGroup ?: nowGroup)
@@ -167,10 +176,14 @@ fun GroupSettingScreen(
         onLeaveGroup = {
             val group = uiState.settingGroup ?: nowGroup
             val groupId = group.id
+            val result = GroupSettingResult(
+                leaveGroupId = groupId.orEmpty(),
+                notificationEnabled = false
+            )
             if (groupId != null) {
-                leaveResultBackNavigator.navigateBack(groupId)
+                backToMainResultBackNavigator.navigateBack(result)
             } else {
-                leaveResultBackNavigator.navigateBack()
+                backToMainResultBackNavigator.navigateBack()
             }
         },
         onDisbandGroup = {
@@ -540,6 +553,18 @@ private fun VipPlanManager(
         )
     }
 }
+
+/**
+ * 社團設定頁回傳主頁結果
+ *
+ * @property leaveGroupId 退出社團的社團編號
+ * @property notificationEnabled 是否允許推播通知
+ */
+@Parcelize
+data class GroupSettingResult(
+    val leaveGroupId: String = "",
+    val notificationEnabled: Boolean = true
+): Parcelable
 
 @Preview(showBackground = true)
 @Composable

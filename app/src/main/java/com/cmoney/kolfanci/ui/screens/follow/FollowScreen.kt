@@ -1,5 +1,9 @@
 package com.cmoney.kolfanci.ui.screens.follow
 
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableState
@@ -30,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.Group
@@ -180,6 +185,24 @@ fun FollowScreen(
             )
         )
         viewModel.navigateDone()
+    }
+
+    if (uiState.needNotifyAllowNotificationPermission) {
+        val activity = LocalContext.current as? Activity
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (activity != null && ActivityCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    MainActivity.REQUEST_CODE_ALLOW_NOTIFICATION_PERMISSION
+                )
+            }
+        }
+        viewModel.alreadyNotifyAllowNotificationPermission()
     }
 
     FollowScreenView(
