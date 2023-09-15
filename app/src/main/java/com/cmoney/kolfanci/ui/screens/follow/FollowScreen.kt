@@ -230,8 +230,21 @@ fun FollowScreen(
                 viewModel.showLoginDialog()
             }
         },
-        onRefreshMyGroupList = onRefreshMyGroupList
+        onRefreshMyGroupList = onRefreshMyGroupList,
+        isShowBubbleTip = uiState.isShowBubbleTip,
+        onMoreClick = {
+            viewModel.onMoreClick()
+            AppUserLogger.getInstance()
+                .log(Clicked.GroupGroupSettings)
+            navigator.navigate(
+                GroupSettingScreenDestination
+            )
+        }
     )
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.fetchSetting()
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -251,7 +264,9 @@ fun FollowScreenView(
     isLoading: Boolean,
     onChannelClick: (Channel) -> Unit,
     onGoToMy: () -> Unit,
-    onRefreshMyGroupList: (isSilent: Boolean) -> Unit
+    onRefreshMyGroupList: (isSilent: Boolean) -> Unit,
+    isShowBubbleTip: Boolean,
+    onMoreClick: (Group) -> Unit
 ) {
     val TAG = "FollowScreenView"
 
@@ -494,14 +509,10 @@ fun FollowScreenView(
                                         GroupHeaderScreen(
                                             followGroup = group,
                                             visibleAvatar = visibleAvatar,
-                                            modifier = Modifier.background(LocalColor.current.env_80)
-                                        ) {
-                                            AppUserLogger.getInstance()
-                                                .log(Clicked.GroupGroupSettings)
-                                            navigator.navigate(
-                                                GroupSettingScreenDestination
-                                            )
-                                        }
+                                            modifier = Modifier.background(LocalColor.current.env_80),
+                                            isShowBubbleTip = isShowBubbleTip,
+                                            onMoreClick = onMoreClick
+                                        )
                                     }
 
                                     //頻道
@@ -634,6 +645,8 @@ fun FollowScreenPreview() {
             onChannelClick = {},
             onGoToMy = {},
             onRefreshMyGroupList = {},
+            isShowBubbleTip = false,
+            onMoreClick = {}
         )
     }
 }
