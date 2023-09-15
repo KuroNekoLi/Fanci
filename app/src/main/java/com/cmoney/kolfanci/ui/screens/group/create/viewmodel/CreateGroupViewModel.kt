@@ -13,7 +13,6 @@ import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
-import com.cmoney.kolfanci.ui.theme.DefaultThemeColor
 import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
@@ -53,10 +52,10 @@ class CreateGroupViewModel(
     )
     val group = _group.asStateFlow()
 
-    private val _fanciColor = MutableStateFlow<FanciColor?>(
-        //選擇的Theme Color
-        DefaultThemeColor
-    )
+    /**
+     * 選擇的Theme Color
+     */
+    private val _fanciColor = MutableStateFlow<FanciColor?>(null)
     val fanciColor = _fanciColor.asStateFlow()
 
     var uiState by mutableStateOf(UiState())
@@ -102,7 +101,7 @@ class CreateGroupViewModel(
                 }
             }
             2 -> {
-                prepareDefaultAvatarAndCover()
+                prepareDefaultAvatarAndCoverAndTheme()
             }
         }
 
@@ -119,8 +118,9 @@ class CreateGroupViewModel(
         )
     }
 
-    private fun prepareDefaultAvatarAndCover() {
+    private fun prepareDefaultAvatarAndCoverAndTheme() {
         viewModelScope.launch {
+            // 預設第一個 avatar, cover
             val thumbnailImageUrl = groupUseCase.fetchGroupAvatarLib()
                 .getOrNull()
                 ?.firstOrNull()
@@ -130,6 +130,8 @@ class CreateGroupViewModel(
             _group.update { old ->
                 old.copy(coverImageUrl = coverImageUrl, thumbnailImageUrl = thumbnailImageUrl)
             }
+            // 預設 theme 為 ColorTheme.themeFanciBlue
+            setGroupTheme(ColorTheme.themeFanciBlue.value)
         }
     }
 
@@ -189,10 +191,11 @@ class CreateGroupViewModel(
                         KLog.e(TAG, it)
                     }
             }
-
-            _group.value = _group.value.copy(
-                colorSchemeGroupKey = ColorTheme.decode(groupThemeId)
-            )
+            _group.update { oldGroup ->
+                oldGroup.copy(
+                    colorSchemeGroupKey = ColorTheme.decode(groupThemeId)
+                )
+            }
         }
     }
 

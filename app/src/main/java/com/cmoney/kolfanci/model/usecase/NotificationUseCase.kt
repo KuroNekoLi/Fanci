@@ -1,10 +1,8 @@
 package com.cmoney.kolfanci.model.usecase
 
 import android.app.Application
-import android.content.Context
-import androidx.core.content.edit
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.repository.Network
 import com.cmoney.kolfanci.repository.request.NotificationClick
 import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
@@ -15,12 +13,9 @@ import kotlinx.coroutines.withContext
 class NotificationUseCase(
     private val context: Application,
     private val network: Network,
+    private val settingsDataStore: SettingsDataStore,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-
-    private val sharedPreferences by lazy {
-        context.getSharedPreferences(NOTIFICATION_SHARED_PREFERENCES, Context.MODE_PRIVATE)
-    }
 
     /**
      * 取得 推播中心 資料
@@ -74,7 +69,7 @@ class NotificationUseCase(
      */
     suspend fun hasNotifyAllowNotificationPermission(): Result<Boolean> = withContext(dispatcher) {
         kotlin.runCatching {
-            sharedPreferences.getBoolean(getHasNotifyAllowNotificationPermissionKey(), false)
+            settingsDataStore.hasNotifyAllowNotificationPermission()
         }
     }
 
@@ -82,16 +77,8 @@ class NotificationUseCase(
      * 已通知過使用者允許通知權限
      */
     suspend fun alreadyNotifyAllowNotificationPermission() = withContext(dispatcher) {
-        sharedPreferences.edit {
-            putBoolean(getHasNotifyAllowNotificationPermissionKey(), true)
+        kotlin.runCatching {
+            settingsDataStore.alreadyNotifyAllowNotificationPermission()
         }
-    }
-
-    private fun getHasNotifyAllowNotificationPermissionKey(): String {
-        return "${Constant.MyInfo?.id}_has_notify_allow_notification_permission"
-    }
-
-    companion object {
-        private const val NOTIFICATION_SHARED_PREFERENCES = "fanci_notification_shared_preferences"
     }
 }
