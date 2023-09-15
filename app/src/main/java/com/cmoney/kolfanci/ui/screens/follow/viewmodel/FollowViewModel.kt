@@ -10,12 +10,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.px
+import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -29,6 +31,7 @@ import kotlinx.coroutines.launch
  * @property navigateToCreateGroup 前往建立社團
  * @property navigateToApproveGroup 前往社團認證
  * @property needNotifyAllowNotificationPermission 是否提示使用者允許推播通知，false 表示未處理或是已通知過
+ * @property isShowBubbleTip 是否出現 提示彈窗
  */
 data class FollowUiState(
     val spaceHeight: Int = 190.px,
@@ -38,13 +41,16 @@ data class FollowUiState(
     val showLoginDialog: Boolean = false,
     val navigateToCreateGroup: Boolean = false,
     val navigateToApproveGroup: Group? = null,
-    val needNotifyAllowNotificationPermission: Boolean = false
+    val needNotifyAllowNotificationPermission: Boolean = false,
+    val isShowBubbleTip: Boolean = false
 )
 
 class FollowViewModel(
     private val groupUseCase: GroupUseCase,
-    private val notificationUseCase: NotificationUseCase
+    private val notificationUseCase: NotificationUseCase,
+    private val dataStore: SettingsDataStore
 ) : ViewModel() {
+
     private val TAG = FollowViewModel::class.java.simpleName
 
     //點擊加入群組彈窗
@@ -185,14 +191,28 @@ class FollowViewModel(
         _refreshMyGroup.value = false
     }
 
+    fun onMoreClick() {
+        KLog.i(TAG, "onMoreClick")
+        viewModelScope.launch {
+            dataStore.alreadyShowHomeBubble()
+        }
+    }
+
+    fun fetchSetting() {
+        viewModelScope.launch {
+            uiState = uiState.copy(isShowBubbleTip = dataStore.isShowBubble.first())
+        }
+    }
+
     /**
      * 確認是否通知使用者允許通知權限
      */
     fun checkNeedNotifyAllowNotificationPermission() {
         viewModelScope.launch {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                val hasNotifyAllowNotificationPermission = notificationUseCase.hasNotifyAllowNotificationPermission()
-                    .getOrNull() ?: false
+                val hasNotifyAllowNotificationPermission =
+                    notificationUseCase.hasNotifyAllowNotificationPermission()
+                        .getOrNull() ?: false
                 if (!hasNotifyAllowNotificationPermission) {
                     uiState = uiState.copy(
                         needNotifyAllowNotificationPermission = true
@@ -213,5 +233,4 @@ class FollowViewModel(
             )
         }
     }
-
 }

@@ -38,7 +38,13 @@ import org.koin.dsl.module
 val viewModule = module {
     viewModel { SplashViewModel(get(), get()) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
-    viewModel { FollowViewModel(groupUseCase = get(), notificationUseCase = get()) }
+    viewModel {
+        FollowViewModel(
+            groupUseCase = get(),
+            notificationUseCase = get(),
+            dataStore = get()
+        )
+    }
     viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
     viewModel { MessageViewModel(androidApplication(), get(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get()) }
@@ -59,7 +65,7 @@ val viewModule = module {
         )
     }
     viewModel {
-        CreateGroupViewModel(androidApplication(), get(), get(), get())
+        CreateGroupViewModel(androidApplication(), get(), get(), get(), settingsDataStore = get())
     }
     viewModel { ApplyForGroupViewModel(get(), get()) }
     viewModel { params ->
