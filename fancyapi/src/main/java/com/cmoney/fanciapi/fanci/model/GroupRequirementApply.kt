@@ -27,6 +27,7 @@ import kotlinx.parcelize.Parcelize
  * 社團申請
  *
  * @param id Id
+ * @param groupId 
  * @param user 
  * @param hasVipRole 是否為社團VIP
  * @param answers 回答
@@ -43,6 +44,9 @@ data class GroupRequirementApply (
     /* Id */
     @Json(name = "id")
     val id: kotlin.String? = null,
+
+    @Json(name = "groupId")
+    val groupId: kotlin.String? = null,
 
     @Json(name = "user")
     val user: User? = null,

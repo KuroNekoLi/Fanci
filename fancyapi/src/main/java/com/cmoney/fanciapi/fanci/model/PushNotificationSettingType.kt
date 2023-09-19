@@ -21,25 +21,19 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * Values: themeFanciBlue,themeSmokePink,themeMidnightBlue,themeClassicGreen,themeNeonBlack
+ * Values: silent,newPost,newStory
  */
 
-enum class ColorTheme(val value: kotlin.String) {
+enum class PushNotificationSettingType(val value: kotlin.String) {
 
-    @Json(name = "ThemeFanciBlue")
-    themeFanciBlue("ThemeFanciBlue"),
+    @Json(name = "Silent")
+    silent("Silent"),
 
-    @Json(name = "ThemeSmokePink")
-    themeSmokePink("ThemeSmokePink"),
+    @Json(name = "NewPost")
+    newPost("NewPost"),
 
-    @Json(name = "ThemeMidnightBlue")
-    themeMidnightBlue("ThemeMidnightBlue"),
-
-    @Json(name = "ThemeClassicGreen")
-    themeClassicGreen("ThemeClassicGreen"),
-
-    @Json(name = "ThemeNeonBlack")
-    themeNeonBlack("ThemeNeonBlack");
+    @Json(name = "NewStory")
+    newStory("NewStory");
 
     /**
      * Override toString() to avoid using the enum variable name as the value, and instead use
@@ -54,12 +48,12 @@ enum class ColorTheme(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is ColorTheme) "$data" else null
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is PushNotificationSettingType) "$data" else null
 
         /**
-         * Returns a valid [ColorTheme] for [data], null otherwise.
+         * Returns a valid [PushNotificationSettingType] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): ColorTheme? = data?.let {
+        fun decode(data: kotlin.Any?): PushNotificationSettingType? = data?.let {
           val normalizedData = "$it".lowercase()
           values().firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
