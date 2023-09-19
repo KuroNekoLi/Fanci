@@ -780,4 +780,17 @@ class GroupViewModel(
             })
         }
     }
+
+    /**
+     * 刷新社團資訊
+     */
+    fun refreshGroup() {
+        viewModelScope.launch {
+            val groupId = _currentGroup.value?.id ?: return@launch
+            groupUseCase.getGroupById(groupId = groupId)
+                .onSuccess { group ->
+                    setCurrentGroup(group)
+                }
+        }
+    }
 }
