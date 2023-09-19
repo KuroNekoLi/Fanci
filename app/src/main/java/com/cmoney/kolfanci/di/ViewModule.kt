@@ -42,7 +42,8 @@ val viewModule = module {
         FollowViewModel(
             groupUseCase = get(),
             notificationUseCase = get(),
-            dataStore = get()
+            dataStore = get(),
+            groupApplyUseCase = get()
         )
     }
     viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
