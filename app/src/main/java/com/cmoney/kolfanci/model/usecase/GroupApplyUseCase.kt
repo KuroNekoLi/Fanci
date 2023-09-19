@@ -1,11 +1,11 @@
 package com.cmoney.kolfanci.model.usecase
 
-import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.fanciapi.fanci.api.GroupApplyApi
 import com.cmoney.fanciapi.fanci.model.ApplyStatus
 import com.cmoney.fanciapi.fanci.model.GroupApplyParam
 import com.cmoney.fanciapi.fanci.model.GroupApplyStatusParam
 import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
+import com.cmoney.kolfanci.extension.checkResponseBody
 
 class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi) {
 
@@ -74,6 +74,16 @@ class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi) {
             groupId = groupId,
             applyStatus = applyStatus,
             startWeight = startWeight
+        ).checkResponseBody()
+    }
+
+    /**
+     * 取得 我的社團申請狀態
+     * @param groupId 社團 id
+     */
+    suspend fun fetchMyApply(groupId: String) = kotlin.runCatching {
+        groupApplyApi.apiV1GroupApplyGroupGroupIdMeGet(
+            groupId = groupId
         ).checkResponseBody()
     }
 }

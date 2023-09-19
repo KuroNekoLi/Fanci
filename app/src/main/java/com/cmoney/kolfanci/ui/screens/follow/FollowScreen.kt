@@ -41,6 +41,7 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.GroupJoinStatus
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.*
 import com.cmoney.kolfanci.ui.main.MainActivity
@@ -117,35 +118,46 @@ fun FollowScreen(
     val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
     openGroupDialog?.let { targetGroup ->
-        val isJoined = myGroupList.any { groupItem ->
-            groupItem.groupModel.id == targetGroup.id
-        }
-
+        val context = LocalContext.current
         GroupItemDialogScreen(
-            isJoined = isJoined,
             groupModel = targetGroup,
             onDismiss = {
                 viewModel.closeGroupItemDialog()
                 onDismissInvite.invoke()
             },
-            onConfirm = {
+            onConfirm = { pair ->
+                val group = pair.first
+                val joinStatus = pair.second
+
                 //via invite link
-                inviteGroup?.run {
-                    if (targetGroup.isNeedApproval == true) {
+                if (inviteGroup != null) {
+                    if (group.isNeedApproval == true) {
                         AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.Link)
                     } else {
                         AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Link)
                     }
                 }
 
-                if (isJoined) {
-                    onChangeGroup.invoke(it)
-                } else {
-                    viewModel.joinGroup(it)
-                }
+                when (joinStatus) {
+                    GroupJoinStatus.InReview -> {
+                        viewModel.closeGroupItemDialog()
+                        onDismissInvite.invoke()
+                    }
 
-                viewModel.closeGroupItemDialog()
-                onDismissInvite.invoke()
+                    GroupJoinStatus.Joined -> {
+                        onChangeGroup.invoke(group)
+                        viewModel.closeGroupItemDialog()
+                        onDismissInvite.invoke()
+                    }
+
+                    GroupJoinStatus.NotJoin -> {
+                        if (XLoginHelper.isLogin) {
+                            viewModel.joinGroup(group)
+                        } else {
+                            (context as? MainActivity)?.startLogin()
+                        }
+                    }
+                }
             }
         )
     }

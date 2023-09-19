@@ -43,7 +43,7 @@ fun EmptyFollowScreen(
     modifier: Modifier = Modifier,
     viewModel: FollowViewModel = koinViewModel()
 ) {
-    val openGroupDialog by viewModel.openGroupDialog.collectAsState()
+//    val openGroupDialog by viewModel.openGroupDialog.collectAsState()
 
     EmptyFollowScreenView(
         modifier = modifier,
@@ -51,27 +51,6 @@ fun EmptyFollowScreen(
             viewModel.onCreateGroupClick()
         }
     )
-
-    openGroupDialog?.let { group ->
-        GroupItemDialogScreen(
-            groupModel = group,
-            onDismiss = {
-                viewModel.closeGroupItemDialog()
-            },
-            onConfirm = {
-                //私密
-                if (it.isNeedApproval == true) {
-                    AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.NonGroup)
-                }
-                //公開
-                else {
-                    AppUserLogger.getInstance().log(Clicked.GroupJoin, From.NonGroup)
-                }
-
-                viewModel.joinGroup(it)
-            }
-        )
-    }
 }
 
 @Composable
