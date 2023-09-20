@@ -234,7 +234,7 @@ interface GroupApi {
     suspend fun apiV1GroupMeGet(@Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<GroupPaging>
 
     /**
-     * 新增社團 __________🔒 已註冊的fanci使用者
+     * 新增社團 圖片網址長度限制100 __________🔒 已註冊的fanci使用者
      * 
      * Responses:
      *  - 200: 成功

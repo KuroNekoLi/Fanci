@@ -807,14 +807,15 @@ class GroupViewModel(
                     if (group.isNeedApproval == true) {
                         if (XLoginHelper.isLogin) {
                             val groupRequirementApplyInfo =
-                                groupApplyUseCase.fetchMyApply(groupId = group.id.orEmpty()).getOrElse {
-                                    //Default
-                                    GroupRequirementApplyInfo(
-                                        apply = GroupRequirementApply(
-                                            status = ApplyStatus.confirmed
+                                groupApplyUseCase.fetchMyApply(groupId = group.id.orEmpty())
+                                    .getOrElse {
+                                        //Default
+                                        GroupRequirementApplyInfo(
+                                            apply = GroupRequirementApply(
+                                                status = ApplyStatus.confirmed
+                                            )
                                         )
-                                    )
-                                }
+                                    }
 
                             when (groupRequirementApplyInfo.apply?.status) {
                                 ApplyStatus.unConfirmed -> GroupJoinStatus.InReview
@@ -822,8 +823,7 @@ class GroupViewModel(
                                 ApplyStatus.denied -> GroupJoinStatus.NotJoin
                                 null -> GroupJoinStatus.NotJoin
                             }
-                        }
-                        else {
+                        } else {
                             GroupJoinStatus.NotJoin
                         }
                     } else {
@@ -831,7 +831,16 @@ class GroupViewModel(
                     }
                 }
             }
+        }
+    }
 
+    fun refreshGroup() {
+        viewModelScope.launch {
+            val groupId = _currentGroup.value?.id ?: return@launch
+            groupUseCase.getGroupById(groupId = groupId)
+                .onSuccess { group ->
+                    setCurrentGroup(group)
+                }
         }
     }
 }

@@ -482,9 +482,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_channelId",
-              "PERMISSION_CanPost_1_channelId_none"
+              "PERMISSION_CanPost_1_channelId_none",
+              "user"
             ]
           }
         ]
@@ -493,7 +493,7 @@
         "tags": [
           "BulletinBoard"
         ],
-        "summary": "取得貼文區貼文列表",
+        "summary": "取得貼文區貼文列表 __________🔒 可看",
         "parameters": [
           {
             "name": "channelId",
@@ -517,7 +517,7 @@
           {
             "name": "order",
             "in": "query",
-            "description": "排序依據(預設為新到舊)",
+            "description": "排序依據(預設為Latest) <br></br>Latest:代表從SerialNumber往前找 SerialNumber預設0 代表從最新往舊找,<br></br>Oldest:代表從SerialNumber往後找 SerialNumber預設0 代表從舊往新找<br></br>每次回傳weight為當下已經取得的最底一筆SerialNumber<br></br>所以下輪帶入SerialNumber並不會再包含該筆資料",
             "schema": {
               "$ref": "#/components/schemas/OrderType"
             }
@@ -556,13 +556,21 @@
           "401": {
             "description": "未驗證"
           },
-          "404": {
-            "description": "找不到該頻道"
-          },
           "403": {
             "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_CanRead_1_channelId_none",
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/BulletinBoard/{channelId}/PinnedMessage": {
@@ -616,8 +624,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_channelId_none"
+              "PERMISSION_CanRead_1_channelId_none",
+              "user"
             ]
           }
         ]
@@ -678,9 +686,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_channelId",
-              "PERMISSION_可管理_1_channelId_channelId"
+              "PERMISSION_可管理_1_channelId_channelId",
+              "user"
             ]
           }
         ]
@@ -721,9 +729,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_channelId",
-              "PERMISSION_可管理_1_channelId_channelId"
+              "PERMISSION_可管理_1_channelId_channelId",
+              "user"
             ]
           }
         ]
@@ -806,9 +814,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_channelId",
-              "PERMISSION_CanReply_1_channelId_none"
+              "PERMISSION_CanReply_1_channelId_none",
+              "user"
             ]
           }
         ]
@@ -898,8 +906,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_channelId_none"
+              "PERMISSION_CanRead_1_channelId_none",
+              "user"
             ]
           }
         ]
@@ -2221,7 +2229,7 @@
           {
             "name": "order",
             "in": "query",
-            "description": "排序依據(預設為新到舊)",
+            "description": "排序依據(預設為Latest) <br></br>Latest:代表從SerialNumber往前找 SerialNumber預設0 代表從最新往舊找,<br></br>Oldest:代表從SerialNumber往後找 SerialNumber預設0 代表從舊往新找<br></br>每次回傳weight為當下已經取得的最底一筆SerialNumber<br></br>所以下輪帶入SerialNumber並不會再包含該筆資料",
             "schema": {
               "$ref": "#/components/schemas/OrderType"
             }
@@ -2534,7 +2542,7 @@
         "tags": [
           "Group"
         ],
-        "summary": "新增社團 __________🔒 已註冊的fanci使用者",
+        "summary": "新增社團 圖片網址長度限制100 __________🔒 已註冊的fanci使用者",
         "requestBody": {
           "description": "新增社團參數",
           "content": {
@@ -3377,7 +3385,7 @@
         ]
       }
     },
-    "/api/v1/GroupApply/group/{groupId}": {
+    "/api/v1/GroupApply/Group/{groupId}": {
       "put": {
         "tags": [
           "GroupApply"
@@ -3527,7 +3535,7 @@
         ]
       }
     },
-    "/api/v1/GroupApply/group/{groupId}/me": {
+    "/api/v1/GroupApply/Group/{groupId}/Me": {
       "get": {
         "tags": [
           "GroupApply"
@@ -3584,7 +3592,62 @@
         ]
       }
     },
-    "/api/v1/GroupApply/group/{groupId}/Count": {
+    "/api/v1/GroupApply/Group/All/Me": {
+      "get": {
+        "tags": [
+          "GroupApply"
+        ],
+        "summary": "取得我的所有社團申請 __________🔒 已註冊的fanci使用者",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupApply/Group/{groupId}/Count": {
       "get": {
         "tags": [
           "GroupApply"
@@ -3647,7 +3710,7 @@
         ]
       }
     },
-    "/api/v1/GroupApply/group/{groupId}/Approval": {
+    "/api/v1/GroupApply/Group/{groupId}/Approval": {
       "put": {
         "tags": [
           "GroupApply"
@@ -4478,6 +4541,158 @@
         ]
       }
     },
+    "/api/v1/Notify/SettingType": {
+      "get": {
+        "tags": [
+          "Notify"
+        ],
+        "summary": "取得推播開關設定種類",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Notify/UserSettingType/{groupId}": {
+      "get": {
+        "tags": [
+          "Notify"
+        ],
+        "summary": "取得使用者社團推播設定",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Notify/UserSettingType/{groupId}/{settingType}": {
+      "put": {
+        "tags": [
+          "Notify"
+        ],
+        "summary": "設定使用者社團推播設定",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "settingType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PushNotificationSettingType"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/Order/Group/{groupId}": {
       "put": {
         "tags": [
@@ -4856,6 +5071,158 @@
           }
         },
         "deprecated": true
+      }
+    },
+    "/api/v1/PushNotification/SettingType/All": {
+      "get": {
+        "tags": [
+          "PushNotification"
+        ],
+        "summary": "取得推播開關設定種類",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/PushNotification/User/{groupId}/SettingType": {
+      "get": {
+        "tags": [
+          "PushNotification"
+        ],
+        "summary": "取得使用者社團推播設定",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/PushNotification/User/{groupId}/SettingType/{settingType}": {
+      "put": {
+        "tags": [
+          "PushNotification"
+        ],
+        "summary": "設定使用者社團推播設定",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "settingType",
+            "in": "path",
+            "description": "設定種類",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PushNotificationSettingType"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Relation/{relation}/me": {
@@ -7147,9 +7514,6 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
-          "replyMessage": {
-            "$ref": "#/components/schemas/IReplyMessage"
-          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
@@ -7179,9 +7543,6 @@
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
           },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
-          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -7194,6 +7555,12 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false
@@ -7269,12 +7636,7 @@
           "ThemeSmokePink",
           "ThemeMidnightBlue",
           "ThemeClassicGreen",
-          "ThemeNeonBlack",
-          "ThemeCoffeeBrown",
-          "ThemeMintGreen",
-          "ThemePeachPink",
-          "ThemeDreamyPurple",
-          "ThemeBabyBlue"
+          "ThemeNeonBlack"
         ],
         "type": "string"
       },
@@ -7328,15 +7690,12 @@
         "description": "編輯頻道參數"
       },
       "EditGroupParam": {
-        "required": [
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
-            "minLength": 1,
             "type": "string",
-            "description": "社團命名"
+            "description": "社團命名",
+            "nullable": true
           },
           "description": {
             "type": "string",
@@ -7785,6 +8144,10 @@
             "description": "Id",
             "nullable": true
           },
+          "groupId": {
+            "type": "string",
+            "nullable": true
+          },
           "user": {
             "$ref": "#/components/schemas/User"
           },
@@ -8102,6 +8465,23 @@
         ],
         "type": "string"
       },
+      "NotificationSettingType": {
+        "enum": [
+          "FanciOfficial",
+          "FanciAgreeJoinGroup",
+          "FanciNewGroupApply",
+          "FanciGroupDelete",
+          "FanciNewBulletinMessage",
+          "FanciNewBulletinReplyMessage",
+          "FanciNewBulletinEmoji",
+          "FanciNewBulletinReplyMessageEmoji",
+          "FanciNewBulletinReplyMessageFollow",
+          "FanciNewChatMessage",
+          "FanciNewChatEmoji",
+          "FanciSendGroupApply"
+        ],
+        "type": "string"
+      },
       "OrderParam": {
         "type": "object",
         "properties": {
@@ -8261,6 +8641,42 @@
           }
         },
         "additionalProperties": false
+      },
+      "PushNotificationSetting": {
+        "type": "object",
+        "properties": {
+          "settingType": {
+            "$ref": "#/components/schemas/PushNotificationSettingType"
+          },
+          "shortTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "notificationTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotificationSettingType"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PushNotificationSettingType": {
+        "enum": [
+          "Silent",
+          "NewPost",
+          "NewStory"
+        ],
+        "type": "string"
       },
       "PutAuthTypeRequest": {
         "type": "object",
