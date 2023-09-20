@@ -58,7 +58,7 @@ fun GroupItemDialogScreen(
     modifier: Modifier = Modifier,
     groupModel: Group,
     onDismiss: () -> Unit,
-    onConfirm: (Pair<Group, GroupJoinStatus>) -> Unit,
+    onConfirm: (Group, GroupJoinStatus) -> Unit,
     background: Color = LocalColor.current.env_80,
     titleColor: Color = LocalColor.current.text.default_100,
     descColor: Color = LocalColor.current.text.default_80
@@ -105,7 +105,7 @@ private fun GroupItemDialogScreenView(
     background: Color = LocalColor.current.env_80,
     titleColor: Color = LocalColor.current.text.default_100,
     descColor: Color = LocalColor.current.text.default_80,
-    onConfirm: (Pair<Group, GroupJoinStatus>) -> Unit,
+    onConfirm: (Group, GroupJoinStatus) -> Unit,
     groupStatus: GroupJoinStatus
 ) {
     Box(
@@ -158,7 +158,7 @@ private fun GroupItemDialogScreenView(
                         modifier = Modifier.padding(start = 20.dp, end = 20.dp),
                         text = "等待審核中...",
                         onClick = {
-                            onConfirm.invoke(Pair(groupModel, groupStatus))
+                            onConfirm.invoke(groupModel, groupStatus)
                         }
                     )
                 }
@@ -172,7 +172,7 @@ private fun GroupItemDialogScreenView(
                         text = "已經加入，進入社團",
                         borderColor = LocalColor.current.text.default_100,
                         onClick = {
-                            onConfirm.invoke(Pair(groupModel, groupStatus))
+                            onConfirm.invoke(groupModel, groupStatus)
                         }
                     )
                 }
@@ -181,7 +181,7 @@ private fun GroupItemDialogScreenView(
                     BlueButton(
                         text = "加入社團",
                         onClick = {
-                            onConfirm.invoke(Pair(groupModel, groupStatus))
+                            onConfirm.invoke(groupModel, groupStatus)
                         }
                     )
                 }
@@ -208,7 +208,7 @@ fun GroupItemDialogScreenPreview() {
     FanciTheme {
         GroupItemDialogScreenView(
             groupModel = MockData.mockGroup,
-            onConfirm = {
+            onConfirm = { group, joinStatus ->
             },
             groupStatus = GroupJoinStatus.NotJoin
         )

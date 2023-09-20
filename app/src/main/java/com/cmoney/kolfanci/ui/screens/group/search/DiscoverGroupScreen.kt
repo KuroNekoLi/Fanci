@@ -139,8 +139,7 @@ fun DiscoverGroupScreen(
             onDismiss = {
                 viewModel.closeGroupItemDialog()
             },
-            onConfirm = { pair ->
-                val group = pair.first
+            onConfirm = { group, joinStatus ->
                 if (isJoined) {
                     //global change group
                     globalGroupViewModel.setCurrentGroup(group)

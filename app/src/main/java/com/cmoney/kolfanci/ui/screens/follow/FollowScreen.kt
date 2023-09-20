@@ -125,10 +125,7 @@ fun FollowScreen(
                 viewModel.closeGroupItemDialog()
                 onDismissInvite.invoke()
             },
-            onConfirm = { pair ->
-                val group = pair.first
-                val joinStatus = pair.second
-
+            onConfirm = { group, joinStatus  ->
                 //via invite link
                 if (inviteGroup != null) {
                     if (group.isNeedApproval == true) {
