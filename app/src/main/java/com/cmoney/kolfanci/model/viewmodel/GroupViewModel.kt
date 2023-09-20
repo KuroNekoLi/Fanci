@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.model.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.ApplyStatus
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
@@ -10,9 +11,12 @@ import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.GroupRequirementApply
+import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyInfo
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.GroupJoinStatus
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
-import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
+import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
@@ -67,7 +71,7 @@ class GroupViewModel(
     private val channelUseCase: ChannelUseCase,
     private val permissionUseCase: PermissionUseCase,
     private val orderUseCase: OrderUseCase,
-    private val chatRoomUseCase: ChatRoomUseCase
+    private val groupApplyUseCase: GroupApplyUseCase
 ) : ViewModel() {
     private val TAG = GroupViewModel::class.java.simpleName
 
@@ -85,6 +89,11 @@ class GroupViewModel(
     //主題設定檔
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
+
+    //加入社團狀態
+    private val _joinGroupStatus: MutableStateFlow<GroupJoinStatus> =
+        MutableStateFlow(GroupJoinStatus.NotJoin)
+    val joinGroupStatus = _joinGroupStatus.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -782,8 +791,49 @@ class GroupViewModel(
     }
 
     /**
-     * 刷新社團資訊
+     * 取得 User 對於 準備加入該社團的狀態
+     * ex: 已經加入, 審核中, 未加入
      */
+    fun getGroupJoinStatus(group: Group) {
+        KLog.i(TAG, "getGroupStatus:$group")
+        viewModelScope.launch {
+            _myGroupList.value.any { myGroup ->
+                myGroup.groupModel.id == group.id
+            }.let { isJoined ->
+                _joinGroupStatus.value = if (isJoined) {
+                    GroupJoinStatus.Joined
+                } else {
+                    //私密社團
+                    if (group.isNeedApproval == true) {
+                        if (XLoginHelper.isLogin) {
+                            val groupRequirementApplyInfo =
+                                groupApplyUseCase.fetchMyApply(groupId = group.id.orEmpty())
+                                    .getOrElse {
+                                        //Default
+                                        GroupRequirementApplyInfo(
+                                            apply = GroupRequirementApply(
+                                                status = ApplyStatus.confirmed
+                                            )
+                                        )
+                                    }
+
+                            when (groupRequirementApplyInfo.apply?.status) {
+                                ApplyStatus.unConfirmed -> GroupJoinStatus.InReview
+                                ApplyStatus.confirmed -> GroupJoinStatus.Joined
+                                ApplyStatus.denied -> GroupJoinStatus.NotJoin
+                                null -> GroupJoinStatus.NotJoin
+                            }
+                        } else {
+                            GroupJoinStatus.NotJoin
+                        }
+                    } else {
+                        GroupJoinStatus.NotJoin
+                    }
+                }
+            }
+        }
+    }
+
     fun refreshGroup() {
         viewModelScope.launch {
             val groupId = _currentGroup.value?.id ?: return@launch

@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.model.mock
 
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.Media
@@ -14,6 +15,47 @@ import org.apache.commons.lang3.RandomStringUtils
 import kotlin.random.Random
 
 object MockData {
+
+    val mockGroup: Group = Group(
+        id = "",
+        name = "愛莉莎莎Alisasa",
+        description = "大家好，我是愛莉莎莎Alisasa！\n" +
+                "\n" +
+                "台灣人在韓國留學八個月 \n" +
+                "已經在2018 一月\n" +
+                "回到台灣當全職Youtuber囉！\n" +
+                "\n" +
+                "但是我還是每個月會去韓國\n" +
+                "更新最新的韓國情報 （流行 美妝 美食等等） \n" +
+                "提供給大家不同於一般觀光客\n" +
+                "內行的認識韓國新角度\n" +
+                "\n" +
+                "另外也因為感情經驗豐富（？）\n" +
+                "可以提供給大家一些女生的秘密想法～\n" +
+                "\n" +
+                "希望大家喜歡我的頻道＾＾\n" +
+                "\n" +
+                "\n" +
+                "如果你喜歡我的影片，希望你可以幫我訂閱＋分享\n" +
+                "\n" +
+                "任何合作邀約請洽Pressplay Email :\n" +
+                "alisasa@pressplay.cc\n" +
+                "═════════════════════════════════════\n" +
+                "\n" +
+                "追蹤我 Follow Me \n" +
+                "\n" +
+                "★Facebook社團『愛莉莎莎敗家基地』: https://www.facebook.com/groups/924974291237889/\n" +
+                "★Facebook粉絲專頁: https://www.facebook.com/alisasa11111/\n" +
+                "★Instagram: goodalicia",
+        coverImageUrl = "https://img.ltn.com.tw/Upload/health/page/800/2021/02/14/phpo5UnZT.png",
+        thumbnailImageUrl = "https://picsum.photos/${
+            Random.nextInt(
+                100,
+                300
+            )
+        }/${Random.nextInt(100, 300)}",
+        categories = emptyList()
+    )
 
     val mockNotificationSettingItem: NotificationSettingItem = NotificationSettingItem(
         title = "有任何新動態都提醒我",

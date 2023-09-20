@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.common
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -9,6 +10,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -78,6 +80,43 @@ fun BlueButtonPreview() {
 }
 
 @Composable
+fun GroupJoinButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    shape: RoundedCornerShape = RoundedCornerShape(4.dp),
+    onClick: () -> Unit
+) {
+
+    androidx.compose.material3.Button(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+            containerColor = LocalColor.current.background,
+            contentColor = LocalColor.current.background
+        ),
+        shape = shape,
+        onClick = {
+            onClick.invoke()
+        }
+    ) {
+        Text(
+            text = text,
+            color = LocalColor.current.text.default_100,
+            fontSize = 16.sp
+        )
+    }
+}
+
+@Preview
+@Composable
+fun GroupJoinButtonPreview() {
+    FanciTheme {
+        GroupJoinButton(text = "Hello") {}
+    }
+}
+
+@Composable
 fun GrayButton(
     text: String,
     shape: RoundedCornerShape = RoundedCornerShape(15),
@@ -117,12 +156,14 @@ fun BorderButton(
     textColor: Color = borderColor,
     onClick: () -> Unit
 ) {
-    Button(
+    androidx.compose.material3.Button(
         modifier = modifier,
         shape = shape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = Color.Transparent
+        ),
         border = BorderStroke(1.dp, borderColor),
-        elevation = ButtonDefaults.elevation(0.dp),
         onClick = onClick
     ) {
         Text(

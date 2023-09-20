@@ -47,6 +47,8 @@ class MainActivity : BaseWebLoginActivity() {
     private val globalGroupViewModel by viewModel<GroupViewModel>()
     private val notificationViewModel by viewModel<NotificationViewModel>()
 
+    private var payLoad: Payload? = null
+
     companion object {
         const val FOREGROUND_NOTIFICATION_BUNDLE = "foreground_notification_bundle"
         const val REQUEST_CODE_ALLOW_NOTIFICATION_PERMISSION: Int = 1
@@ -134,7 +136,15 @@ class MainActivity : BaseWebLoginActivity() {
                         }
                         //Not Login
                         else {
-                            globalViewModel.showLoginDialog()
+                            when (targetType) {
+                                is TargetType.InviteGroup -> {
+                                    val groupId = targetType.groupId
+                                    notificationViewModel.fetchInviteGroup(groupId)
+                                }
+                                else -> {
+                                    globalViewModel.showLoginDialog()
+                                }
+                            }
                         }
                     }
                 }
@@ -145,10 +155,15 @@ class MainActivity : BaseWebLoginActivity() {
                     if (isCurrentOpenTutorial) {
                         MainScreen()
                     } else {
-                        TutorialScreen(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            globalViewModel.tutorialOnOpen()
+                        //是否為 邀請啟動
+                        if (isInvitePayload(payLoad)) {
+                            MainScreen()
+                        } else {
+                            TutorialScreen(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                globalViewModel.tutorialOnOpen()
+                            }
                         }
                     }
 
@@ -216,14 +231,22 @@ class MainActivity : BaseWebLoginActivity() {
     private fun checkPayload(intent: Intent?) {
         KLog.i(TAG, "checkPayload")
         intent?.let {
-            val payLoad =
+            payLoad =
                 intent.getParcelableExtra<Payload>(FOREGROUND_NOTIFICATION_BUNDLE)
             KLog.d(TAG, "payLoad = $payLoad")
-            if (payLoad != null) {
-                notificationViewModel.setNotificationBundle(payLoad)
+
+            payLoad?.let {
+                notificationViewModel.setNotificationBundle(it)
             }
             this.intent = null
         }
+    }
+
+    /**
+     * 是否為邀請連結啟動
+     */
+    private fun isInvitePayload(payload: Payload?): Boolean {
+        return payload?.targetType == Payload.TYPE_1
     }
 
     fun checkPayload(payload: Payload) {
@@ -232,7 +255,7 @@ class MainActivity : BaseWebLoginActivity() {
     }
 
     @Composable
-    fun MainScreen() {
+    fun  MainScreen() {
         StatusBarColorEffect()
         Scaffold(
             modifier = Modifier
