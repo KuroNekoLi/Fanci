@@ -110,7 +110,7 @@ class SplashActivity : AppCompatActivity() {
 
     private fun startMainActivity() {
         lifecycleScope.launch {
-            delay(1500)
+            delay(2000)
 
             val backgroundPayload =
                 intent.getParcelableExtra<Payload>(EXTRA_PUSH_NOTIFICATION_PAYLOAD)
