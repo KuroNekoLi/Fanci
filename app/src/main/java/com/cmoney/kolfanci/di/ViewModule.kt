@@ -111,7 +111,7 @@ val viewModule = module {
             channelUseCase = get(),
             permissionUseCase = get(),
             orderUseCase = get(),
-            chatRoomUseCase = get()
+            groupApplyUseCase = get()
         )
     }
     viewModel { params ->

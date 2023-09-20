@@ -52,8 +52,6 @@ fun EmptyFollowScreen(
     modifier: Modifier = Modifier,
     viewModel: FollowViewModel = koinViewModel()
 ) {
-//    val openGroupDialog by viewModel.openGroupDialog.collectAsState()
-
     val allMyApplyGroup by viewModel.allMyApplyGroup.collectAsState()
 
     EmptyFollowScreenView(
@@ -66,28 +64,6 @@ fun EmptyFollowScreen(
             viewModel.openGroupItemDialog(it)
         }
     )
-
-//    openGroupDialog?.let { group ->
-//        GroupItemDialogScreen(
-//            groupModel = group,
-//            onDismiss = {
-//                viewModel.closeGroupItemDialog()
-//            },
-//            onConfirm = {
-//                viewModel.closeGroupItemDialog()
-//                //私密
-//                if (it.isNeedApproval == true) {
-//                    AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.NonGroup)
-//                }
-//                //公開
-//                else {
-//                    AppUserLogger.getInstance().log(Clicked.GroupJoin, From.NonGroup)
-//                }
-//
-//                viewModel.joinGroup(it)
-//            }
-//        )
-//    }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchAllMyGroupApplyUnConfirmed()

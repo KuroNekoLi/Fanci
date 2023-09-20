@@ -16,6 +16,6 @@ import org.koin.androidx.compose.koinViewModel
 fun globalGroupViewModel(): GroupViewModel {
     val context = LocalContext.current
     return koinViewModel(
-        viewModelStoreOwner = (context as? ComponentActivity) ?: checkNotNull(LocalViewModelStoreOwner.current),
+        viewModelStoreOwner = (context as? ComponentActivity) ?: checkNotNull(LocalViewModelStoreOwner.current)
     )
 }

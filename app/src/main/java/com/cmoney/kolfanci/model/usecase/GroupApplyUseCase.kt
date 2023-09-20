@@ -89,4 +89,14 @@ class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi, private val gr
             groupApi.apiV1GroupGroupIdGet(groupId = groupId).checkResponseBody()
         }
     }
+
+    /**
+     * 取得 我的社團申請狀態
+     * @param groupId 社團 id
+     */
+    suspend fun fetchMyApply(groupId: String) = kotlin.runCatching {
+        groupApplyApi.apiV1GroupApplyGroupGroupIdMeGet(
+            groupId = groupId
+        ).checkResponseBody()
+        }
 }
