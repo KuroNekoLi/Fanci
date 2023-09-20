@@ -233,6 +233,9 @@ fun MainScreen(
         mutableStateOf(false)
     }
     LaunchedEffect(key1 = Unit) {
+        // 刷新社團資訊
+        globalGroupViewModel.refreshGroup()
+        // 檢查推播權限
         if (hasShown) {
             followViewModel.checkNeedNotifyAllowNotificationPermission()
         } else {
