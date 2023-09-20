@@ -309,25 +309,16 @@ fun FollowScreenView(
 
                         onGroupItemClick.invoke(it)
                     },
-                    onSearch = {
-                        KLog.i(TAG, "onSearch click.")
-
-                        AppUserLogger.getInstance().log(Clicked.NavigationBarExploreGroup)
+                    onPlusClick = {
+                        KLog.i(TAG, "onPlusClick.")
 
                         //Close Drawer
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
                         }
 
-                        val arrayGroupItems = arrayListOf<Group>()
-                        arrayGroupItems.addAll(groupList.map {
-                            it.groupModel
-                        })
-
                         navigator.navigate(
-                            DiscoverGroupScreenDestination(
-                                groupItems = arrayGroupItems
-                            )
+                            CreateGroupScreenDestination
                         )
                     },
                     onProfile = {

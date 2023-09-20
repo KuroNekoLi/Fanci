@@ -31,7 +31,7 @@ fun DrawerMenuScreen(
     modifier: Modifier = Modifier,
     groupList: List<GroupItem>,
     onClick: (GroupItem) -> Unit,
-    onSearch: () -> Unit,
+    onPlusClick: () -> Unit,
     onProfile: () -> Unit,
     onNotification: () -> Unit
 ) {
@@ -98,7 +98,7 @@ fun DrawerMenuScreen(
                 .clip(RoundedCornerShape(22.dp))
                 .background(LocalColor.current.env_80)
                 .clickable {
-                    onSearch.invoke()
+                    onPlusClick.invoke()
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -148,7 +148,7 @@ fun DrawerMenuScreenPreview() {
                 )
             ),
             onClick = {},
-            onSearch = {},
+            onPlusClick = {},
             onProfile = {},
             onNotification = {}
         )
