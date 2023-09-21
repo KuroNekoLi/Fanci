@@ -85,7 +85,7 @@ class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi, private val gr
         groupApplyApi.apiV1GroupApplyGroupAllMeGet().checkResponseBody().filter {
             it.apply?.status == ApplyStatus.unConfirmed
         }.mapNotNull {
-            val groupId = it.apply?.groupId.orEmpty()
+            val groupId = it.apply?.groupId ?: return@mapNotNull null
             groupApi.apiV1GroupGroupIdGet(groupId = groupId).checkResponseBody()
         }
     }
