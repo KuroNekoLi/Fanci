@@ -15,8 +15,8 @@ class NotificationUseCase(
     private val context: Application,
     private val network: Network,
     private val settingsDataStore: SettingsDataStore,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val pushNotificationApi: PushNotificationApi
+    private val pushNotificationApi: PushNotificationApi,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     /**
