@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.px
 import com.cmoney.kolfanci.model.persistence.SettingsDataStore
+import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.xlogin.XLoginHelper
@@ -48,7 +49,8 @@ data class FollowUiState(
 class FollowViewModel(
     private val groupUseCase: GroupUseCase,
     private val notificationUseCase: NotificationUseCase,
-    private val dataStore: SettingsDataStore
+    private val dataStore: SettingsDataStore,
+    private val groupApplyUseCase: GroupApplyUseCase
 ) : ViewModel() {
 
     private val TAG = FollowViewModel::class.java.simpleName
@@ -60,6 +62,10 @@ class FollowViewModel(
     //刷新 我目前的社團清單
     private val _refreshMyGroup: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val refreshMyGroup = _refreshMyGroup.asStateFlow()
+
+    //我申請中的社團
+    private val _allMyApplyGroup: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
+    val allMyApplyGroup = _allMyApplyGroup.asStateFlow()
 
     var uiState by mutableStateOf(FollowUiState())
         private set
@@ -231,6 +237,22 @@ class FollowViewModel(
             uiState = uiState.copy(
                 needNotifyAllowNotificationPermission = false
             )
+        }
+    }
+
+    /**
+     * 取得 我申請的社團-審核中
+     */
+    fun fetchAllMyGroupApplyUnConfirmed() {
+        KLog.i(TAG, "fetchAllMyGroupApplyUnConfirmed.")
+        viewModelScope.launch {
+            groupApplyUseCase.fetchAllMyGroupApplyUnConfirmed()
+                .onSuccess { groupList ->
+                    _allMyApplyGroup.value = groupList
+                }
+                .onFailure { err ->
+                    KLog.e(TAG, err)
+                }
         }
     }
 }

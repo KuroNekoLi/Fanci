@@ -246,4 +246,7 @@
     <string name="comment_remove_from_manage">這則留言已被管理員刪除</string>
     <string name="comment_remove_from_poster">這則留言已被發文者刪除</string>
 
+    <string name="wait_for_apply">申請已送出，等待審核加入</string>
+    <string name="wait_for_group_apply">等待 %s 審核中</string>
+
 </resources>
