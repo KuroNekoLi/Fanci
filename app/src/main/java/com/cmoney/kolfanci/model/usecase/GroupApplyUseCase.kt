@@ -84,7 +84,7 @@ class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi, private val gr
     suspend fun fetchAllMyGroupApplyUnConfirmed() = kotlin.runCatching {
         groupApplyApi.apiV1GroupApplyGroupAllMeGet().checkResponseBody().filter {
             it.apply?.status == ApplyStatus.unConfirmed
-        }.map {
+        }.mapNotNull {
             val groupId = it.apply?.groupId.orEmpty()
             groupApi.apiV1GroupGroupIdGet(groupId = groupId).checkResponseBody()
         }
