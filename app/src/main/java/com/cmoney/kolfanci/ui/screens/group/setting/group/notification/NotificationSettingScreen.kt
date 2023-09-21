@@ -30,12 +30,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.mock.MockData
-import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -43,18 +41,19 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
 
+//TODO
+
 @Destination
 @Composable
 fun NotificationSettingScreen(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
+    groupId: String,
     viewModel: NotificationSettingViewModel = koinViewModel(),
-    notificationSettingItem: NotificationSettingItem,
-    resultNavigator: ResultBackNavigator<NotificationSettingItem>
+    pushNotificationSetting: PushNotificationSetting,
+    resultNavigator: ResultBackNavigator<PushNotificationSetting>
 ) {
     val notificationItems by viewModel.notificationSetting.collectAsState()
-
-    val isShowNotificationOpenAlert by viewModel.showOpenNotificationSettingAlert.collectAsState()
 
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
         ?.onBackPressedDispatcher
@@ -62,7 +61,7 @@ fun NotificationSettingScreen(
     val saveSettingComplete by viewModel.saveSettingComplete.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.onSettingItemClick(notificationSettingItem)
+        viewModel.fetchAllNotificationSetting(pushNotificationSetting)
     }
 
     NotificationSettingView(
@@ -72,58 +71,24 @@ fun NotificationSettingScreen(
             onBackPressedDispatcher?.onBackPressed()
         }
     ) {
-        viewModel.onSettingItemClick(it)
+        viewModel.onNotificationSettingItemClick(it)
     }
 
     BackHandler {
-        viewModel.saveNotificationSetting()
+        viewModel.saveNotificationSetting(groupId)
     }
 
     saveSettingComplete?.let {
         resultNavigator.navigateBack(it)
     }
-
-    if (isShowNotificationOpenAlert) {
-        DialogScreen(
-            title = stringResource(id = R.string.open_notification_setting),
-            subTitle = stringResource(id = R.string.open_notification_setting_desc),
-            onDismiss = {
-                viewModel.dismissNotificationOpenAlert()
-            }) {
-            Column {
-                BlueButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    text = stringResource(id = R.string.forward_system_setting)
-                ) {
-                    viewModel.dismissNotificationOpenAlert()
-                    viewModel.openSystemNotificationSetting()
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                BorderButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    text = stringResource(id = R.string.back),
-                    borderColor = LocalColor.current.text.default_100
-                ) {
-                    viewModel.dismissNotificationOpenAlert()
-                }
-            }
-        }
-    }
-
 }
 
 @Composable
 private fun NotificationSettingView(
     modifier: Modifier = Modifier,
-    notificationSettingItems: List<NotificationSettingItem>,
+    notificationSettingItems: List<PushNotificationSettingWrap>,
     onBackClick: () -> Unit,
-    onClick: (NotificationSettingItem) -> Unit
+    onClick: (PushNotificationSettingWrap) -> Unit
 ) {
     Scaffold(modifier = modifier.fillMaxSize(),
         topBar = {
@@ -147,7 +112,7 @@ private fun NotificationSettingView(
 
                 items(notificationSettingItems) { notificationSettingItem ->
                     NotificationSettingItemView(
-                        notificationSettingItem = notificationSettingItem,
+                        pushNotificationSettingWrap = notificationSettingItem,
                         onClick = onClick
                     )
                 }
@@ -159,15 +124,18 @@ private fun NotificationSettingView(
 @Composable
 private fun NotificationSettingItemView(
     modifier: Modifier = Modifier,
-    notificationSettingItem: NotificationSettingItem,
-    onClick: (NotificationSettingItem) -> Unit
+    pushNotificationSettingWrap: PushNotificationSettingWrap,
+    onClick: (PushNotificationSettingWrap) -> Unit
 ) {
+
+    val pushNotificationSetting = pushNotificationSettingWrap.pushNotificationSetting
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(LocalColor.current.background)
-            .clickable(enabled = !notificationSettingItem.isChecked) {
-                onClick.invoke(notificationSettingItem)
+            .clickable(enabled = !pushNotificationSettingWrap.isChecked) {
+                onClick.invoke(pushNotificationSettingWrap)
             }
             .padding(top = 10.dp, bottom = 10.dp, start = 24.dp, end = 24.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -177,9 +145,9 @@ private fun NotificationSettingItemView(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = notificationSettingItem.title,
+                text = pushNotificationSetting.title.orEmpty(),
                 fontSize = 16.sp,
-                color = if (notificationSettingItem.isChecked) {
+                color = if (pushNotificationSettingWrap.isChecked) {
                     LocalColor.current.primary
                 } else {
                     LocalColor.current.text.default_100
@@ -189,13 +157,13 @@ private fun NotificationSettingItemView(
             Spacer(modifier = Modifier.height(2.dp))
 
             Text(
-                text = notificationSettingItem.description,
+                text = pushNotificationSetting.description.orEmpty(),
                 fontSize = 12.sp,
                 color = LocalColor.current.text.default_50
             )
         }
 
-        if (notificationSettingItem.isChecked) {
+        if (pushNotificationSettingWrap.isChecked) {
             Image(
                 modifier = Modifier.size(20.dp),
                 painter = painterResource(id = R.drawable.checked),
@@ -205,9 +173,7 @@ private fun NotificationSettingItemView(
                 contentDescription = null
             )
         }
-
     }
-
 }
 
 @Preview
@@ -215,26 +181,7 @@ private fun NotificationSettingItemView(
 fun NotificationSettingScreenPreview() {
     FanciTheme {
         NotificationSettingView(
-            notificationSettingItems = listOf(
-                NotificationSettingItem(
-                    title = "title",
-                    description = "description",
-                    isChecked = true,
-                    shortTitle = ""
-                ),
-                NotificationSettingItem(
-                    title = "title1",
-                    description = "description2",
-                    isChecked = false,
-                    shortTitle = ""
-                ),
-                NotificationSettingItem(
-                    title = "title2",
-                    description = "description2",
-                    isChecked = false,
-                    shortTitle = ""
-                )
-            ),
+            notificationSettingItems = MockData.mockNotificationSettingItemWrapList,
             onBackClick = {}
         ) {}
     }
@@ -245,7 +192,7 @@ fun NotificationSettingScreenPreview() {
 fun NotificationSettingItemViewPreview() {
     FanciTheme {
         NotificationSettingItemView(
-            notificationSettingItem = MockData.mockNotificationSettingItem,
+            pushNotificationSettingWrap = MockData.mockNotificationSettingItemWrapList.first(),
             onClick = {}
         )
     }
