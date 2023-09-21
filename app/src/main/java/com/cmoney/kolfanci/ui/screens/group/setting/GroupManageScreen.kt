@@ -8,8 +8,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -17,17 +22,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.openNotificationSetting
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ChannelSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.NotificationSettingScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.SettingItemParam.settingItem
-import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -63,8 +72,14 @@ fun GroupManageScreen(
     modifier: Modifier = Modifier,
     group: Group,
     navController: DestinationsNavigator,
-    notificationSettingItem: NotificationSettingItem? = null
+    pushNotificationSetting: PushNotificationSetting? = null
 ) {
+    var openNotificationSettingTipDialog by remember {
+        mutableStateOf(false)
+    }
+
+    val context = LocalContext.current
+
     Column(
         modifier = modifier
     ) {
@@ -152,27 +167,65 @@ fun GroupManageScreen(
             Spacer(modifier = Modifier.height(1.dp))
         }
 
-        //TODO: server not ready
-//        if (notificationSettingItem != null) {
-//            NarrowItem(
-//                modifier = Modifier.settingItem(),
-//                title = stringResource(id = R.string.notification_setting),
-//                titleFontWeight = SettingItemParam.titleFontWeight,
-//                titleFontSize = SettingItemParam.titleFontSize,
-//                prefixIcon = painterResource(id = R.drawable.bell),
-//                prefixIconColor = LocalColor.current.component.other,
-//                actionContent = NarrowItemDefaults.nextIcon(),
-//                subTitle = notificationSettingItem.shortTitle,
-//                subTitleFontSize = SettingItemParam.subTitleFontSize,
-//                onClick = {
-//                    navController.navigate(
-//                        NotificationSettingScreenDestination(
-//                            notificationSettingItem = notificationSettingItem
-//                        )
-//                    )
-//                }
-//            )
-//        }
+        //推播設定
+        NarrowItem(
+            modifier = Modifier.settingItem(),
+            title = stringResource(id = R.string.notification_setting),
+            titleFontWeight = SettingItemParam.titleFontWeight,
+            titleFontSize = SettingItemParam.titleFontSize,
+            prefixIcon = painterResource(id = R.drawable.bell),
+            prefixIconColor = LocalColor.current.component.other,
+            actionContent = NarrowItemDefaults.nextIcon(),
+            subTitle = pushNotificationSetting?.shortTitle.orEmpty(),
+            subTitleFontSize = SettingItemParam.subTitleFontSize,
+            onClick = {
+                if (pushNotificationSetting == null) {
+                    openNotificationSettingTipDialog = true
+                } else {
+                    navController.navigate(
+                        NotificationSettingScreenDestination(
+                            groupId = group.id.orEmpty(),
+                            pushNotificationSetting = pushNotificationSetting
+                        )
+                    )
+                }
+            }
+        )
+    }
+
+
+    //========== Dialog ==========
+    if (openNotificationSettingTipDialog) {
+        DialogScreen(
+            title = stringResource(id = R.string.open_notification_setting),
+            subTitle = stringResource(id = R.string.open_notification_setting_desc),
+            onDismiss = {
+                openNotificationSettingTipDialog = false
+            }) {
+            Column {
+                BlueButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.forward_system_setting)
+                ) {
+                    context.openNotificationSetting()
+                    openNotificationSettingTipDialog = false
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.back),
+                    borderColor = LocalColor.current.text.default_100
+                ) {
+                    openNotificationSettingTipDialog = false
+                }
+            }
+        }
     }
 }
 
@@ -194,7 +247,7 @@ fun GroupManageScreenPreview() {
         GroupManageScreen(
             group = Group(),
             navController = EmptyDestinationsNavigator,
-            notificationSettingItem = MockData.mockNotificationSettingItem
+            pushNotificationSetting = MockData.mockNotificationSettingItem
         )
     }
 }

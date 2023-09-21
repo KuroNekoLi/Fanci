@@ -1,11 +1,12 @@
 package com.cmoney.kolfanci.model.usecase
 
 import android.app.Application
-import com.cmoney.kolfanci.R
+import com.cmoney.fanciapi.fanci.api.PushNotificationApi
+import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
+import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.repository.Network
 import com.cmoney.kolfanci.repository.request.NotificationClick
-import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,7 +15,8 @@ class NotificationUseCase(
     private val context: Application,
     private val network: Network,
     private val settingsDataStore: SettingsDataStore,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val pushNotificationApi: PushNotificationApi
 ) {
 
     /**
@@ -39,30 +41,6 @@ class NotificationUseCase(
     )
 
     /**
-     * 產生 提醒設定 清單
-     */
-    fun generateNotificationSettingItems(): List<NotificationSettingItem> = listOf(
-        NotificationSettingItem(
-            title = context.getString(R.string.notification_setting_all),
-            description = context.getString(R.string.notification_setting_all_desc),
-            isChecked = true,
-            shortTitle = context.getString(R.string.notification_setting_short)
-        ),
-        NotificationSettingItem(
-            title = context.getString(R.string.notification_setting_post),
-            description = context.getString(R.string.notification_setting_post_desc),
-            isChecked = false,
-            shortTitle = context.getString(R.string.notification_setting_post_short)
-        ),
-        NotificationSettingItem(
-            title = context.getString(R.string.notification_setting_silence),
-            description = context.getString(R.string.notification_setting_silence_desc),
-            isChecked = false,
-            shortTitle = context.getString(R.string.notification_setting_silence_short)
-        )
-    )
-
-    /**
      * 是否通知過使用者允許通知權限
      *
      * @return Result.success true 表示已通知, false 未通知, Result.failure 有例外發生
@@ -81,4 +59,39 @@ class NotificationUseCase(
             settingsDataStore.alreadyNotifyAllowNotificationPermission()
         }
     }
+
+    /**
+     * 取得該社團的推播設定
+     */
+    suspend fun getNotificationSetting(groupId: String) = withContext(dispatcher) {
+        kotlin.runCatching {
+            pushNotificationApi.apiV1PushNotificationUserGroupIdSettingTypeGet(groupId = groupId)
+                .checkResponseBody()
+        }
+    }
+
+    /**
+     * 設定指定社團的推播設定值
+     */
+    suspend fun setNotificationSetting(
+        groupId: String,
+        pushNotificationSettingType: PushNotificationSettingType
+    ) = withContext(dispatcher) {
+        kotlin.runCatching {
+            pushNotificationApi.apiV1PushNotificationUserGroupIdSettingTypeSettingTypePut(
+                groupId = groupId,
+                settingType = pushNotificationSettingType
+            ).checkResponseBody()
+        }
+    }
+
+    /**
+     * 取得所有推播設定檔
+     */
+    suspend fun getAllNotificationSetting() = withContext(dispatcher) {
+        kotlin.runCatching {
+            pushNotificationApi.apiV1PushNotificationSettingTypeAllGet().checkResponseBody()
+        }
+    }
+
 }

@@ -7,13 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.fanciapi.fanci.model.ReportInformation
-import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
-import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,13 +30,14 @@ data class GroupSettingUiState(
     val showDelectDialog: Boolean = false,                  //是否呈現解散彈窗
     val showFinalDelectDialog: Boolean = false,             //是否呈現最後解散彈窗
     val popToMain: Boolean = false,                         //跳回首頁
-    val notificationSettingItem: NotificationSettingItem? = null    //推播通知設定
+    val pushNotificationSetting: PushNotificationSetting? = null    //推播通知設定
 )
 
 class GroupSettingViewModel(
     private val groupUseCase: GroupUseCase,
     private val themeUseCase: ThemeUseCase,
     private val groupApplyUseCase: GroupApplyUseCase,
+    private val notificationUseCase: NotificationUseCase
 ) : ViewModel() {
     private val TAG = GroupSettingViewModel::class.java.simpleName
 
@@ -199,23 +200,37 @@ class GroupSettingViewModel(
     /**
      * 設定目前 設定的 推播設定
      */
-    fun setCurrentNotificationSetting(notificationSettingItem: NotificationSettingItem) {
-        KLog.i(TAG, "setCurrentNotificationSetting:$notificationSettingItem")
+    fun setCurrentNotificationSetting(pushNotificationSetting: PushNotificationSetting) {
+        KLog.i(TAG, "setCurrentNotificationSetting:$pushNotificationSetting")
         uiState = uiState.copy(
-            notificationSettingItem = notificationSettingItem
+            pushNotificationSetting = pushNotificationSetting
         )
     }
 
     /**
      * 抓取推播通知 設定
      */
-    fun fetchNotificationSetting() {
+    fun fetchNotificationSetting(groupId: String) {
         KLog.i(TAG, "fetchNotificationSetting")
         viewModelScope.launch {
-            //TODO: call api
-            setCurrentNotificationSetting(
-                MockData.mockNotificationSettingItem
-            )
+            notificationUseCase.getNotificationSetting(groupId)
+                .onSuccess {
+                    uiState = uiState.copy(
+                        pushNotificationSetting = it
+                    )
+                }
+                .onFailure {
+                    KLog.e(TAG, it)
+                }
         }
+    }
+
+    /**
+     * 清除 推播設定
+     */
+    fun clearNotificationSetting() {
+        uiState = uiState.copy(
+            pushNotificationSetting = null
+        )
     }
 }

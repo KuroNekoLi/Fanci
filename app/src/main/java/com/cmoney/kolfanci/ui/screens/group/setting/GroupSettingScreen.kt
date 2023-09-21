@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.group.setting
 
 import android.content.Intent
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,12 +40,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.extension.isNotificationsEnabled
+import com.cmoney.kolfanci.extension.lifecycleEventListener
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
@@ -58,7 +63,6 @@ import com.cmoney.kolfanci.ui.destinations.GroupReportScreenDestination
 import com.cmoney.kolfanci.ui.destinations.NotificationSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.VipManagerScreenDestination
 import com.cmoney.kolfanci.ui.main.MainActivity
-import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
@@ -88,13 +92,14 @@ fun GroupSettingScreen(
     applyResultRecipient: ResultRecipient<GroupApplyScreenDestination, Boolean>,
     reportResultRecipient: ResultRecipient<GroupReportScreenDestination, Boolean>,
     leaveGroupResultBackNavigator: ResultBackNavigator<String>,
-    setNotificationResult: ResultRecipient<NotificationSettingScreenDestination, NotificationSettingItem>
+    setNotificationResult: ResultRecipient<NotificationSettingScreenDestination, PushNotificationSetting>
 ) {
     val globalGroupViewModel = globalGroupViewModel()
     val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
     val nowGroup = currentGroup ?: return
     val uiState = viewModel.uiState
     val loading = memberViewModel.uiState.loading
+    val context = LocalContext.current
 
     //邀請加入社團連結
     val shareText by memberViewModel.shareText.collectAsState()
@@ -180,7 +185,7 @@ fun GroupSettingScreen(
             viewModel.onFinalConfirmDelete(group = uiState.settingGroup ?: nowGroup)
         },
         loading = loading,
-        notificationSettingItem = uiState.notificationSettingItem
+        pushNotificationSetting = uiState.pushNotificationSetting
     )
 
     //最終解散社團, 動作
@@ -203,15 +208,34 @@ fun GroupSettingScreen(
             viewModel.fetchReportList(groupId = nowGroup.id.orEmpty())
         }
     }
+
     LaunchedEffect(key1 = currentGroup) {
         viewModel.settingGroup(group = nowGroup)
     }
-    LaunchedEffect(key1 = uiState.notificationSettingItem) {
-        //抓取之前推播通知設定
-        if (uiState.notificationSettingItem == null) {
-            viewModel.fetchNotificationSetting()
+
+    val activity = LocalContext.current as ComponentActivity
+    activity.lifecycleEventListener { event ->
+        when (event.targetState) {
+            Lifecycle.State.RESUMED -> {
+                if (context.isNotificationsEnabled()) {
+                    //抓取推播通知設定
+                    viewModel.fetchNotificationSetting(groupId = nowGroup.id.orEmpty())
+                }
+                else {
+                    viewModel.clearNotificationSetting()
+                }
+            }
+            else ->{
+            }
         }
     }
+
+//    LaunchedEffect(key1 = uiState.pushNotificationSetting) {
+//        //抓取之前推播通知設定
+//        if (uiState.pushNotificationSetting == null) {
+//            viewModel.fetchNotificationSetting()
+//        }
+//    }
 }
 
 @Composable
@@ -226,7 +250,7 @@ fun GroupSettingScreenView(
     onLeaveGroup: () -> Unit,
     onDisbandGroup: () -> Unit,
     loading: Boolean,
-    notificationSettingItem: NotificationSettingItem? = null
+    pushNotificationSetting: PushNotificationSetting? = null
 ) {
     val TAG = "GroupSettingScreenView"
 
@@ -283,14 +307,14 @@ fun GroupSettingScreenView(
                         onInviteClick = onInviteClick
                     )
                 }
-                //TODO: push server not ready, 推播設定好之後再移除該判斷
+
                 //社團管理
                 if (isShowGroupManage()) {
                     item {
                         GroupManageScreen(
                             group = group,
                             navController = navController,
-                            notificationSettingItem = notificationSettingItem
+                            pushNotificationSetting = pushNotificationSetting
                         )
                     }
                 }
@@ -558,7 +582,7 @@ fun GroupSettingScreenPreview() {
             onLeaveGroup = {},
             onDisbandGroup = {},
             loading = false,
-            notificationSettingItem = MockData.mockNotificationSettingItem
+            pushNotificationSetting = MockData.mockNotificationSettingItem
         )
     }
 }

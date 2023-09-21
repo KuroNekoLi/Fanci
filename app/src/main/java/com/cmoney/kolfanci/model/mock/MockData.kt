@@ -8,8 +8,10 @@ import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
+import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
 import com.cmoney.kolfanci.BuildConfig
-import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingItem
+import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.PushNotificationSettingWrap
 import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterData
 import org.apache.commons.lang3.RandomStringUtils
 import kotlin.random.Random
@@ -57,12 +59,28 @@ object MockData {
         categories = emptyList()
     )
 
-    val mockNotificationSettingItem: NotificationSettingItem = NotificationSettingItem(
+    val mockNotificationSettingItem: PushNotificationSetting = PushNotificationSetting(
+        settingType = PushNotificationSettingType.newPost,
         title = "有任何新動態都提醒我",
         description = "所有新內容，與我的內容有人回饋時請提醒我",
-        isChecked = true,
         shortTitle = "新動態都提醒我"
     )
+
+    val mockNotificationSettingItemWrapList: List<PushNotificationSettingWrap> = listOf(
+        PushNotificationSettingWrap(
+            pushNotificationSetting = mockNotificationSettingItem,
+            isChecked = true
+        ),
+        PushNotificationSettingWrap(
+            pushNotificationSetting = mockNotificationSettingItem,
+            isChecked = false
+        ),
+        PushNotificationSettingWrap(
+            pushNotificationSetting = mockNotificationSettingItem,
+            isChecked = false
+        )
+    )
+
 
     /**
      * 推播中心 假資料

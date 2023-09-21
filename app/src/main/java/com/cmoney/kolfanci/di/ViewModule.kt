@@ -49,7 +49,11 @@ val viewModule = module {
     viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
     viewModel { MessageViewModel(androidApplication(), get(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get()) }
-    viewModel { GroupSettingViewModel(get(), get(), get()) }
+    viewModel { GroupSettingViewModel(
+        groupUseCase = get(),
+        themeUseCase = get(),
+        groupApplyUseCase = get(),
+        notificationUseCase = get()) }
 
     viewModel {
         ChannelSettingViewModel(get(), get())

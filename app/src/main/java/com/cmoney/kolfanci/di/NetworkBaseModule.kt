@@ -18,6 +18,7 @@ import com.cmoney.fanciapi.fanci.api.GroupRequirementApi
 import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.api.OrderApi
 import com.cmoney.fanciapi.fanci.api.PermissionApi
+import com.cmoney.fanciapi.fanci.api.PushNotificationApi
 import com.cmoney.fanciapi.fanci.api.RelationApi
 import com.cmoney.fanciapi.fanci.api.RoleUserApi
 import com.cmoney.fanciapi.fanci.api.ThemeColorApi
@@ -164,6 +165,10 @@ val networkBaseModule = module {
 
     single {
         get<ApiClient>().createService(VipApi::class.java)
+    }
+
+    single {
+        get<ApiClient>().createService(PushNotificationApi::class.java)
     }
 }
 
