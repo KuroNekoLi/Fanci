@@ -39,7 +39,7 @@
     <string name="add">新增</string>
 
     <string name="about_group">關於社團</string>
-    <string name="invite_group_member">邀請社團成員</string>
+    <string name="invite_group_member">分享邀請連結</string>
     <string name="leave_group">退出社團</string>
     <string name="group_manage">社團管理</string>
     <string name="group_setting">社團設定</string>
