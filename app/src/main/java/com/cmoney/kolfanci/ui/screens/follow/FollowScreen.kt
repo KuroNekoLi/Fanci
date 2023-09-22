@@ -297,6 +297,9 @@ fun FollowScreenView(
                     onClick = {
                         KLog.i(TAG, "onGroup item click.")
 
+                        AppUserLogger.getInstance()
+                            .log(Clicked.SideBarGroup)
+
                         //Close Drawer
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
@@ -319,6 +322,9 @@ fun FollowScreenView(
                     onProfile = {
                         KLog.i(TAG, "onProfile click.")
 
+                        AppUserLogger.getInstance()
+                            .log(Clicked.SideBarMemberPage)
+
                         //Close Drawer
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
@@ -328,6 +334,9 @@ fun FollowScreenView(
                     },
                     onNotification = {
                         KLog.i(TAG, "onNotification click.")
+
+                        AppUserLogger.getInstance()
+                            .log(Clicked.SideBarNotification)
 
                         //Close Drawer
                         coroutineScope.launch {
