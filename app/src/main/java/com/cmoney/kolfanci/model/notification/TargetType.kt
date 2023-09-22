@@ -55,4 +55,22 @@ sealed class TargetType : Parcelable {
         @SerializedName("groupId", alternate = ["GroupId"])
         val groupId: String = ""
     ) : TargetType()
+
+    /**
+     * 管理者, 前往申請加入審核頁面
+     */
+    @Parcelize
+    data class GroupApprove(
+        @SerializedName("groupId", alternate = ["GroupId"])
+        val groupId: String = ""
+    ) : TargetType()
+
+    /**
+     * 打開指定社團
+     */
+    @Parcelize
+    data class OpenGroup(
+        @SerializedName("groupId", alternate = ["GroupId"])
+        val groupId: String = ""
+    ) : TargetType()
 }

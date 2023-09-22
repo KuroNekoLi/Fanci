@@ -199,6 +199,14 @@ class NotificationHelper(
                 getParameter<TargetType.DissolveGroup>(payload.parameter)
             }
 
+            Payload.TYPE_5 -> {
+                getParameter<TargetType.GroupApprove>(payload.parameter)
+            }
+
+            Payload.TYPE_6 -> {
+                getParameter<TargetType.OpenGroup>(payload.parameter)
+            }
+
             else -> getParameter<TargetType.InviteGroup>(payload.parameter)
         }
     }
