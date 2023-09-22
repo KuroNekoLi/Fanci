@@ -182,7 +182,6 @@ fun NotificationCenterView(
             TopBarScreen(
                 title = stringResource(id = R.string.notification_center),
                 backClick = {
-                    AppUserLogger.getInstance().log(Clicked.MemberPageHome)
                     navController.popBackStack()
                 }
             )
