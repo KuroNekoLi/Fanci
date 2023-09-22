@@ -310,6 +310,9 @@ fun FollowScreenView(
                     onPlusClick = {
                         KLog.i(TAG, "onPlusClick.")
 
+                        AppUserLogger.getInstance()
+                            .log(clicked = Clicked.CreateGroup, from = From.SideBar)
+
                         //Close Drawer
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
