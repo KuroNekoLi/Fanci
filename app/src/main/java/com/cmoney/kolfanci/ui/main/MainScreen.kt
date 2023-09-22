@@ -201,10 +201,6 @@ fun MainScreen(
                 }
             }
         }
-        LaunchedEffect(key1 = currentGroup) {
-            AppUserLogger.getInstance()
-                .log(Clicked.CannotVisit)
-        }
     }
 
     if (showNotJoinAlert) {
