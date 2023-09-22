@@ -263,6 +263,7 @@ fun MainScreen(
     //打開指定社團
     openGroup?.let { group ->
         globalGroupViewModel.setCurrentGroup(group)
+        notificationViewModel.afterOpenGroup()
     }
 
 }
