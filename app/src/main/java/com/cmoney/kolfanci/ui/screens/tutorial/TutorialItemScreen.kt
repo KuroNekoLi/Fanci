@@ -13,6 +13,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -23,7 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -75,8 +79,41 @@ fun TutorialItemScreen(
 
         if (page == tutorialItems.lastIndex) {
             BlueButton(text = "開始使用 Fanci") {
+                val clickEvent = when (page) {
+                    0 -> {
+                        Clicked.OnbordingStart1
+                    }
+                    1 -> {
+                        Clicked.OnbordingStart2
+                    }
+                    else -> {
+                        null
+                    }
+                }
+                if (clickEvent != null) {
+                    AppUserLogger.getInstance()
+                        .log(clickEvent)
+                }
                 onStart.invoke()
             }
+        }
+    }
+
+    LaunchedEffect(key1 = page) {
+        val pageEvent = when (page) {
+            0 -> {
+                Page.Onbording1
+            }
+            1 -> {
+                Page.Onbording2
+            }
+            else -> {
+                null
+            }
+        }
+        if (pageEvent != null) {
+            AppUserLogger.getInstance()
+                .log(pageEvent)
         }
     }
 }
