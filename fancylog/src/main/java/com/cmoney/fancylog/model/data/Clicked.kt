@@ -172,10 +172,10 @@ sealed class Clicked(val eventName: String) : Parcelable {
     object NotificationNotification : Clicked(eventName = "Notification_Notification")
 
     /**
-     * 通知中心_無權造訪彈窗_點擊
+     * 通知中心_無權使用_點擊
      */
     @Parcelize
-    object CannotVisit : Clicked(eventName = "CannotVisit")
+    object CannotUse : Clicked(eventName = "CannotUse")
 
     /**
      * 會員頁_首頁_點擊
