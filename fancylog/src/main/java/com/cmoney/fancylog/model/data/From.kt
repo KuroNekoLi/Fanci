@@ -32,6 +32,12 @@ sealed class From(val parameterName: String) : Parcelable {
     object New : From(parameterName = "New")
 
     /**
+     * 側欄
+     */
+    @Parcelize
+    object SideBar : From(parameterName = "SideBar")
+
+    /**
      * 點擊『完全公開』
      */
     @Parcelize
@@ -72,6 +78,12 @@ sealed class From(val parameterName: String) : Parcelable {
      */
     @Parcelize
     object GroupArrangement : From(parameterName = "GroupArrangement")
+
+    /**
+     * 通知中心
+     */
+    @Parcelize
+    object Notification : From(parameterName = "Notification")
 
     /**
      * 自己的貼文
@@ -216,12 +228,6 @@ sealed class From(val parameterName: String) : Parcelable {
      */
     @Parcelize
     object EditHomeBackground : From(parameterName = "EditHomeBackground")
-
-    /**
-     * 主題預覽
-     */
-    @Parcelize
-    object ThemeColor : From(parameterName = "ThemeColor")
 
     /**
      * 新增頻道
