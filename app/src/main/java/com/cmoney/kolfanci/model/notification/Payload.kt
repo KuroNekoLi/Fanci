@@ -22,5 +22,8 @@ data class Payload (
         const val TYPE_2 = 2        //進入聊天區, 並跳往該訊息
         const val TYPE_3 = 3        //打開貼文詳細頁面
         const val TYPE_4 = 4        //社團解散
+        const val TYPE_5 = 5        //管理者, 前往申請加入審核頁面
+        const val TYPE_6 = 6        //打開指定社團
+
     }
 }

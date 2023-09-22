@@ -95,6 +95,8 @@ class MainActivity : BaseWebLoginActivity() {
                     if (!loginLoading) {
                         if (XLoginHelper.isLogin) {
                             when (targetType) {
+                                TargetType.MainPage -> {}
+
                                 is TargetType.InviteGroup -> {
                                     val groupId = targetType.groupId
                                     notificationViewModel.fetchInviteGroup(groupId)
@@ -127,7 +129,20 @@ class MainActivity : BaseWebLoginActivity() {
                                     }
                                 }
 
-                                else -> {}
+                                is TargetType.GroupApprove -> {
+                                    val groupId = targetType.groupId
+                                    notificationViewModel.groupApprove(groupId)
+                                }
+
+                                is TargetType.OpenGroup -> {
+                                    if (myGroupList.isNotEmpty()) {
+                                        val groupId = targetType.groupId
+                                        notificationViewModel.openGroup(
+                                            groupId = groupId,
+                                            myGroupList = myGroupList
+                                        )
+                                    }
+                                }
                             }
 
                             if (myGroupList.isNotEmpty()) {
@@ -141,6 +156,7 @@ class MainActivity : BaseWebLoginActivity() {
                                     val groupId = targetType.groupId
                                     notificationViewModel.fetchInviteGroup(groupId)
                                 }
+
                                 else -> {
                                     globalViewModel.showLoginDialog()
                                 }
@@ -213,7 +229,6 @@ class MainActivity : BaseWebLoginActivity() {
                                 )
                             }
                         }
-
                     }
                 }
             }
@@ -255,7 +270,7 @@ class MainActivity : BaseWebLoginActivity() {
     }
 
     @Composable
-    fun  MainScreen() {
+    fun MainScreen() {
         StatusBarColorEffect()
         Scaffold(
             modifier = Modifier

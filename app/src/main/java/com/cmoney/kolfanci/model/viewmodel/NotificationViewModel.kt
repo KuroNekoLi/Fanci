@@ -48,6 +48,13 @@ class NotificationViewModel(
     private val _refreshGroup = MutableStateFlow(false)
     val refreshGroup = _refreshGroup.asStateFlow()
 
+    //前往加入審核畫面
+    private val _groupApprovePage = MutableStateFlow<Group?>(null)
+    val groupApprovePage = _groupApprovePage.asStateFlow()
+
+    //打開指定社團
+    private val _openGroup = MutableStateFlow<Group?>(null)
+    val openGroup = _openGroup.asStateFlow()
 
     /**
      * 推播 or dynamic link 資料
@@ -227,5 +234,45 @@ class NotificationViewModel(
 
     fun afterRefreshGroup() {
         _refreshGroup.value = false
+    }
+
+    /**
+     * 管理者, 前往申請加入審核頁面
+     */
+    fun groupApprove(groupId: String) {
+        KLog.i(TAG, "groupApprove:$groupId")
+        viewModelScope.launch {
+            groupUseCase.getGroupById(groupId = groupId)
+                .onSuccess {
+                    _groupApprovePage.value = it
+                }
+                .onFailure {
+                    KLog.e(TAG, it)
+                }
+        }
+    }
+
+    fun afterOpenApprovePage() {
+        _groupApprovePage.value = null
+    }
+
+    /**
+     * 打開 指定社團
+     */
+    fun openGroup(groupId: String, myGroupList: List<GroupItem>) {
+        KLog.i(TAG, "openGroup:$groupId")
+        viewModelScope.launch {
+            myGroupList.firstOrNull { groupItem ->
+                groupItem.groupModel.id == groupId
+            }?.also {
+                _openGroup.value = it.groupModel
+            } ?: kotlin.run {
+                _showNotJoinAlert.value = true
+            }
+        }
+    }
+
+    fun afterOpenGroup() {
+        _openGroup.value = null
     }
 }

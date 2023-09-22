@@ -30,6 +30,7 @@ import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.model.viewmodel.PushDataWrapper
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
@@ -79,6 +80,12 @@ fun MainScreen(
 
     //目前不屬於此社團
     val showNotJoinAlert by notificationViewModel.showNotJoinAlert.collectAsState()
+
+    //前往申請加入審核畫面
+    val groupApprovePage by notificationViewModel.groupApprovePage.collectAsState()
+
+    //打開指定社團
+    val openGroup by notificationViewModel.openGroup.collectAsState()
 
     //前往指定 訊息/文章...
     val pushDataWrapper by notificationViewModel.jumpToChannelDest.collectAsState()
@@ -242,6 +249,23 @@ fun MainScreen(
             hasShown = true
         }
     }
+
+    //打開社團 審核畫面
+    groupApprovePage?.let { group ->
+        navigator.navigate(
+            GroupApplyScreenDestination(
+                group = group
+            )
+        )
+        notificationViewModel.afterOpenApprovePage()
+    }
+
+    //打開指定社團
+    openGroup?.let { group ->
+        globalGroupViewModel.setCurrentGroup(group)
+        notificationViewModel.afterOpenGroup()
+    }
+
 }
 
 @Preview(showBackground = true)
