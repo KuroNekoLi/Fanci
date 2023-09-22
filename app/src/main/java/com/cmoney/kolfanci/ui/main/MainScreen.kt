@@ -19,13 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.findActivity
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.model.viewmodel.PushDataWrapper
 import com.cmoney.kolfanci.ui.common.BorderButton
@@ -36,6 +34,7 @@ import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.kolfanci.ui.screens.notification.NoPermissionDialog
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -87,6 +86,9 @@ fun MainScreen(
     //打開指定社團
     val openGroup by notificationViewModel.openGroup.collectAsState()
 
+    //沒有權限 彈窗
+    val showNoPermissionTip by notificationViewModel.showNoPermissionTip.collectAsState()
+
     //前往指定 訊息/文章...
     val pushDataWrapper by notificationViewModel.jumpToChannelDest.collectAsState()
     LaunchedEffect(pushDataWrapper) {
@@ -122,8 +124,7 @@ fun MainScreen(
                     }
                 }
             }
-        }
-        else {
+        } else {
             //禁止進入該頻道,show dialog
             channelAlertDialog.value = true
         }
@@ -259,6 +260,17 @@ fun MainScreen(
         notificationViewModel.afterOpenGroup()
     }
 
+    //沒有權限 彈窗
+    if (showNoPermissionTip) {
+        NoPermissionDialog(
+            onDismiss = {
+                notificationViewModel.afterOpenApprovePage()
+            },
+            onClick = {
+                notificationViewModel.afterOpenApprovePage()
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true)
