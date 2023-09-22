@@ -34,15 +34,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
-import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
-import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import org.koin.androidx.compose.koinViewModel
@@ -61,6 +58,8 @@ fun EmptyFollowScreen(
             viewModel.onCreateGroupClick()
         },
         onApplyGroupClick = {
+            AppUserLogger.getInstance()
+                .log(Clicked.HomeWaitToJoinGroup)
             viewModel.openGroupItemDialog(it)
         }
     )

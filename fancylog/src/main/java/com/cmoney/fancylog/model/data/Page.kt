@@ -7,9 +7,14 @@ package com.cmoney.fancylog.model.data
  */
 sealed class Page(val eventName: String) {
     /**
-     * 首頁_觀看
+     * 新手流程.第一頁_觀看
      */
-    object Home : Page(eventName = "Home")
+    object Onbording1 : Page(eventName = "Onbording.1")
+
+    /**
+     * 新手流程.第二頁_觀看
+     */
+    object Onbording2 : Page(eventName = "Onbording.2")
 
     /**
      * 建立社團.社團名稱_觀看
@@ -45,6 +50,11 @@ sealed class Page(val eventName: String) {
      * 建立社團.佈置.主題色彩_觀看
      */
     object CreateGroupGroupArrangementThemeColor : Page(eventName = "CreateGroup.GroupArrangement.ThemeColor")
+
+    /**
+     * 通知中心_觀看
+     */
+    object Notification : Page(eventName = "Notification")
 
     /**
      * 會員頁_觀看
@@ -255,6 +265,11 @@ sealed class Page(val eventName: String) {
      * 社團.設定.頻道管理.管理員.新增角色_觀看
      */
     object GroupSettingsChannelManagementAdminAddRole : Page(eventName = "Group.Settings.ChannelManagement.Admin.AddRole")
+
+    /**
+     * 社團.設定.提醒設定_觀看
+     */
+    object GroupSettingsNotificationSetting : Page(eventName = "Group.Settings.NotificationSetting")
 
     /**
      * 社團.設定.角色管理.新增角色.樣式_觀看

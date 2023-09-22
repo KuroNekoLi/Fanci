@@ -179,6 +179,8 @@ fun GroupManageScreen(
             subTitle = pushNotificationSetting?.shortTitle.orEmpty(),
             subTitleFontSize = SettingItemParam.subTitleFontSize,
             onClick = {
+                AppUserLogger.getInstance()
+                    .log(Clicked.GroupSettingsNotificationSetting)
                 if (pushNotificationSetting == null) {
                     openNotificationSettingTipDialog = true
                 } else {
@@ -209,6 +211,8 @@ fun GroupManageScreen(
                         .height(50.dp),
                     text = stringResource(id = R.string.forward_system_setting)
                 ) {
+                    AppUserLogger.getInstance()
+                        .log(Clicked.NotificationSettingGoSystem)
                     context.openNotificationSetting()
                     openNotificationSettingTipDialog = false
                 }

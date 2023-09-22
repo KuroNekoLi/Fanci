@@ -41,6 +41,8 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.model.Constant
@@ -76,6 +78,8 @@ fun NotificationCenterScreen(
         navController = navController,
         notificationCenterDataList = notificationCenterDataList,
         onClick = {
+            AppUserLogger.getInstance()
+                .log(Clicked.NotificationNotification)
             viewModel.onNotificationClick(it)
         },
         onLoadMore = {
@@ -156,8 +160,16 @@ fun NotificationCenterScreen(
                 }
             }
         }
+        LaunchedEffect(key1 = payload) {
+            AppUserLogger.getInstance()
+                .log(clicked = Clicked.CannotVisit, from = From.Notification)
+        }
     }
 
+    LaunchedEffect(key1 = Unit) {
+        AppUserLogger.getInstance()
+            .log(Page.Notification)
+    }
 }
 
 @Composable
@@ -175,7 +187,6 @@ fun NotificationCenterView(
             TopBarScreen(
                 title = stringResource(id = R.string.notification_center),
                 backClick = {
-                    AppUserLogger.getInstance().log(Clicked.MemberPageHome)
                     navController.popBackStack()
                 }
             )

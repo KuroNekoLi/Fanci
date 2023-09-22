@@ -31,7 +31,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
+import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -62,6 +66,8 @@ fun NotificationSettingScreen(
 
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchAllNotificationSetting(pushNotificationSetting)
+        AppUserLogger.getInstance()
+            .log(Page.GroupSettingsNotificationSetting)
     }
 
     NotificationSettingView(
@@ -70,8 +76,26 @@ fun NotificationSettingScreen(
         onBackClick = {
             onBackPressedDispatcher?.onBackPressed()
         }
-    ) {
-        viewModel.onNotificationSettingItemClick(it)
+    ) { pushNotificationSettingWrap ->
+        val clickedEvent = when (pushNotificationSettingWrap.pushNotificationSetting.settingType) {
+            PushNotificationSettingType.silent -> {
+                Clicked.NotificationSettingMute
+            }
+            PushNotificationSettingType.newPost -> {
+                Clicked.NotificationSettingOnlyNewPost
+            }
+            PushNotificationSettingType.newStory -> {
+                Clicked.NotificationSettingAnyNews
+            }
+            else -> {
+                null
+            }
+        }
+        if (clickedEvent != null) {
+            AppUserLogger.getInstance()
+                .log(clickedEvent)
+        }
+        viewModel.onNotificationSettingItemClick(pushNotificationSettingWrap)
     }
 
     BackHandler {

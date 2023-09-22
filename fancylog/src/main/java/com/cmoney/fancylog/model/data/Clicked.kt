@@ -10,10 +10,22 @@ import kotlinx.parcelize.Parcelize
  */
 sealed class Clicked(val eventName: String) : Parcelable {
     /**
-     * 首頁.預設未加入社團_社團_點擊
+     * 新手流程.第1頁立即開始_點擊
      */
     @Parcelize
-    object HomeNotJoinGroupGroup : Clicked(eventName = "Home.NotJoinGroup_Group")
+    object OnbordingStart1 : Clicked(eventName = "Onbording.Start1")
+
+    /**
+     * 新手流程.第2頁立即開始_點擊
+     */
+    @Parcelize
+    object OnbordingStart2 : Clicked(eventName = "Onbording.Start2")
+
+    /**
+     * 首頁.待審核中社團_點擊
+     */
+    @Parcelize
+    object HomeWaitToJoinGroup : Clicked(eventName = "Home_WaitToJoinGroup")
 
     /**
      * 建立社團_點擊
@@ -127,25 +139,19 @@ sealed class Clicked(val eventName: String) : Parcelable {
      * 側邊欄_社團_點擊
      */
     @Parcelize
-    object NavigationBarGroup : Clicked(eventName = "NavigationBar_Group")
-
-    /**
-     * 側邊欄_通知_點擊
-     */
-    @Parcelize
-    object NavigationBarNotification : Clicked(eventName = "NavigationBar_Notification")
-
-    /**
-     * 側邊欄_探索社團_點擊
-     */
-    @Parcelize
-    object NavigationBarExploreGroup : Clicked(eventName = "NavigationBar_ExploreGroup")
+    object SideBarGroup : Clicked(eventName = "SideBar_Group")
 
     /**
      * 側邊欄_會員頁_點擊
      */
     @Parcelize
-    object NavigationBarMemberPage : Clicked(eventName = "NavigationBar_MemberPage")
+    object SideBarMemberPage : Clicked(eventName = "SideBar_MemberPage")
+
+    /**
+     * 側邊欄_通知中心_點擊
+     */
+    @Parcelize
+    object SideBarNotification : Clicked(eventName = "SideBar_Notification")
 
     /**
      * 會員頁_信箱登入_點擊
@@ -158,6 +164,18 @@ sealed class Clicked(val eventName: String) : Parcelable {
      */
     @Parcelize
     object SocialAccountLogin : Clicked(eventName = "SocialAccountLogin")
+
+    /**
+     * 通知中心_通知_點擊
+     */
+    @Parcelize
+    object NotificationNotification : Clicked(eventName = "Notification_Notification")
+
+    /**
+     * 通知中心_無權造訪彈窗_點擊
+     */
+    @Parcelize
+    object CannotVisit : Clicked(eventName = "CannotVisit")
 
     /**
      * 會員頁_首頁_點擊
@@ -580,12 +598,6 @@ sealed class Clicked(val eventName: String) : Parcelable {
     object ContentSearchView : Clicked(eventName = "ContentSearch_View")
 
     /**
-     * 探索社團_搜尋_點擊
-     */
-    @Parcelize
-    object ExploreGroupSearch : Clicked(eventName = "ExploreGroup_Search")
-
-    /**
      * 探索社團_熱門社團_點擊
      */
     @Parcelize
@@ -608,6 +620,18 @@ sealed class Clicked(val eventName: String) : Parcelable {
      */
     @Parcelize
     object GroupApplyToJoin : Clicked(eventName = "Group_ApplyToJoin")
+
+    /**
+     * 社團_進入社團_點擊
+     */
+    @Parcelize
+    object GroupEnter : Clicked(eventName = "Group_enter")
+
+    /**
+     * 社團已被解散彈窗_點擊
+     */
+    @Parcelize
+    object AlreadyDissolve : Clicked(eventName = "AlreadyDissolve")
 
     /**
      * 社團_社團設定_點擊
@@ -974,6 +998,36 @@ sealed class Clicked(val eventName: String) : Parcelable {
      */
     @Parcelize
     object ChannelManagementDeleteChannel : Clicked(eventName = "ChannelManagement_DeleteChannel")
+
+    /**
+     * 社團設定_提醒設定_點擊
+     */
+    @Parcelize
+    object GroupSettingsNotificationSetting : Clicked(eventName = "GroupSettings_NotificationSetting")
+
+    /**
+     * 提醒設定_任何新動態_點擊
+     */
+    @Parcelize
+    object NotificationSettingAnyNews : Clicked(eventName = "NotificationSetting_AnyNews")
+
+    /**
+     * 提醒設定_只有新貼文_點擊
+     */
+    @Parcelize
+    object NotificationSettingOnlyNewPost : Clicked(eventName = "NotificationSetting_OnlyNewPost")
+
+    /**
+     * 提醒設定_完全靜音_點擊
+     */
+    @Parcelize
+    object NotificationSettingMute : Clicked(eventName = "NotificationSetting_Mute")
+
+    /**
+     * 提醒設定_前往系統設定_點擊
+     */
+    @Parcelize
+    object NotificationSettingGoSystem : Clicked(eventName = "NotificationSetting_GoSystem")
 
     /**
      * 社團設定_角色管理_點擊

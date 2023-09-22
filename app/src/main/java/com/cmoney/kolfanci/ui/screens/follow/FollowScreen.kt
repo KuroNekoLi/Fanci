@@ -57,7 +57,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -131,7 +130,12 @@ fun FollowScreen(
                     if (group.isNeedApproval == true) {
                         AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.Link)
                     } else {
-                        AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Link)
+                        if (joinStatus != GroupJoinStatus.Joined) {
+                            AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Link)
+                        } else {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.GroupEnter, From.Link)
+                        }
                     }
                 }
 
@@ -283,17 +287,6 @@ fun FollowScreenView(
     val scaffoldState: ScaffoldState =
         rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
 
-    LaunchedEffect(key1 = scaffoldState) {
-        snapshotFlow {
-            scaffoldState.drawerState.currentValue
-        }.filter {
-            it == DrawerValue.Open
-        }.onEach {
-            AppUserLogger.getInstance().log("Home_NavigationBar_show")
-            onRefreshMyGroupList(true)
-        }.collect()
-    }
-
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
@@ -309,7 +302,8 @@ fun FollowScreenView(
                     onClick = {
                         KLog.i(TAG, "onGroup item click.")
 
-                        AppUserLogger.getInstance().log(Clicked.NavigationBarGroup)
+                        AppUserLogger.getInstance()
+                            .log(Clicked.SideBarGroup)
 
                         //Close Drawer
                         coroutineScope.launch {
@@ -320,6 +314,9 @@ fun FollowScreenView(
                     },
                     onPlusClick = {
                         KLog.i(TAG, "onPlusClick.")
+
+                        AppUserLogger.getInstance()
+                            .log(clicked = Clicked.CreateGroup, from = From.SideBar)
 
                         //Close Drawer
                         coroutineScope.launch {
@@ -333,7 +330,8 @@ fun FollowScreenView(
                     onProfile = {
                         KLog.i(TAG, "onProfile click.")
 
-                        AppUserLogger.getInstance().log(Clicked.NavigationBarMemberPage)
+                        AppUserLogger.getInstance()
+                            .log(Clicked.SideBarMemberPage)
 
                         //Close Drawer
                         coroutineScope.launch {
@@ -344,6 +342,9 @@ fun FollowScreenView(
                     },
                     onNotification = {
                         KLog.i(TAG, "onNotification click.")
+
+                        AppUserLogger.getInstance()
+                            .log(Clicked.SideBarNotification)
 
                         //Close Drawer
                         coroutineScope.launch {
@@ -433,6 +434,8 @@ fun FollowScreenView(
                                     .background(LocalColor.current.env_80)
                                     .clickable {
                                         //Open Drawer
+                                        AppUserLogger.getInstance()
+                                            .log("Home_SideBar_show")
                                         coroutineScope.launch {
                                             scaffoldState.drawerState.open()
                                         }
