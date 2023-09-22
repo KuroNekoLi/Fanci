@@ -130,7 +130,12 @@ fun FollowScreen(
                     if (group.isNeedApproval == true) {
                         AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.Link)
                     } else {
-                        AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Link)
+                        if (joinStatus != GroupJoinStatus.Joined) {
+                            AppUserLogger.getInstance().log(Clicked.GroupJoin, From.Link)
+                        } else {
+                            AppUserLogger.getInstance()
+                                .log(Clicked.GroupEnter, From.Link)
+                        }
                     }
                 }
 
