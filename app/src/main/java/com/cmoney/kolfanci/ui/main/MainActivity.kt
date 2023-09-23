@@ -19,7 +19,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.notification.Payload
 import com.cmoney.kolfanci.model.notification.TargetType
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
@@ -222,6 +224,8 @@ class MainActivity : BaseWebLoginActivity() {
                                     .height(50.dp),
                                 text = stringResource(id = R.string.confirm)
                             ) {
+                                AppUserLogger.getInstance().log(Clicked.AlreadyDissolve)
+
                                 notificationViewModel.dismissDissolveDialog()
                                 notificationViewModel.onCheckDissolveGroup(
                                     group,

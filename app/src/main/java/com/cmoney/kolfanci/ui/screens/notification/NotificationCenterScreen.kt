@@ -173,7 +173,7 @@ fun NotificationCenterScreen(
         }
         LaunchedEffect(key1 = payload) {
             AppUserLogger.getInstance()
-                .log(clicked = Clicked.CannotVisit, from = From.Notification)
+                .log(clicked = Clicked.CannotUse, from = From.Notification)
         }
     }
 
@@ -202,9 +202,11 @@ fun NotificationCenterScreen(
     if (showNoPermissionTip) {
         NoPermissionDialog(
             onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.CannotUse, From.Notification)
                 notificationViewModel.afterOpenApprovePage()
             },
             onClick = {
+                AppUserLogger.getInstance().log(Clicked.CannotUse, From.Notification)
                 notificationViewModel.afterOpenApprovePage()
             }
         )
