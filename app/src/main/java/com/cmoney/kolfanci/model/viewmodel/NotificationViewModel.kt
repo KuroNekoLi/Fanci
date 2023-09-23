@@ -56,6 +56,10 @@ class NotificationViewModel(
     private val _openGroup = MutableStateFlow<Group?>(null)
     val openGroup = _openGroup.asStateFlow()
 
+    //沒有權限 執行動作
+    private val _showNoPermissionTip = MutableStateFlow(false)
+    val showNoPermissionTip = _showNoPermissionTip.asStateFlow()
+
     /**
      * 推播 or dynamic link 資料
      */
@@ -242,18 +246,33 @@ class NotificationViewModel(
     fun groupApprove(groupId: String) {
         KLog.i(TAG, "groupApprove:$groupId")
         viewModelScope.launch {
-            groupUseCase.getGroupById(groupId = groupId)
+            //檢查是否有權限進入
+            permissionUseCase.getPermissionByGroup(groupId = groupId)
                 .onSuccess {
-                    _groupApprovePage.value = it
+                    //有權限審核
+                    if (it.approveJoinApplies == true) {
+                        groupUseCase.getGroupById(groupId = groupId)
+                            .onSuccess { group ->
+                                _groupApprovePage.value = group
+                            }
+                            .onFailure { err ->
+                                KLog.e(TAG, err)
+                            }
+                    }
+                    //沒有該權限審核
+                    else {
+                        _showNoPermissionTip.value = true
+                    }
                 }
-                .onFailure {
-                    KLog.e(TAG, it)
+                .onFailure { err ->
+                    KLog.e(TAG, err)
                 }
         }
     }
 
     fun afterOpenApprovePage() {
         _groupApprovePage.value = null
+        _showNoPermissionTip.value = false
     }
 
     /**

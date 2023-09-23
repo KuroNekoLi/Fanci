@@ -309,14 +309,12 @@ fun GroupSettingScreenView(
                 }
 
                 //社團管理
-                if (isShowGroupManage()) {
-                    item {
-                        GroupManageScreen(
-                            group = group,
-                            navController = navController,
-                            pushNotificationSetting = pushNotificationSetting
-                        )
-                    }
+                item {
+                    GroupManageScreen(
+                        group = group,
+                        navController = navController,
+                        pushNotificationSetting = pushNotificationSetting
+                    )
                 }
 
                 //成員管理

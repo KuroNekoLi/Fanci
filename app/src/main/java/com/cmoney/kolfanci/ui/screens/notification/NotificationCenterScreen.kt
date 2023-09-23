@@ -45,13 +45,16 @@ import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.model.viewmodel.PushDataWrapper
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
@@ -97,12 +100,21 @@ fun NotificationCenterScreen(
     //TODO: 需要優化整合 目前跟 MainScreen 處理一樣的東西
     //禁止進入頻道彈窗
     val channelAlertDialog = remember { mutableStateOf(false) }
-//    val groupViewModel = globalGroupViewModel()
+    val globalGroupViewModel = globalGroupViewModel()
     val notificationViewModel = koinViewModel<NotificationViewModel>(
         viewModelStoreOwner = LocalContext.current as? ComponentActivity ?: checkNotNull(
             LocalViewModelStoreOwner.current
         )
     )
+
+    //打開指定社團
+    val openGroup by notificationViewModel.openGroup.collectAsState()
+
+    //前往申請加入審核畫面
+    val groupApprovePage by notificationViewModel.groupApprovePage.collectAsState()
+
+    //沒有權限 彈窗
+    val showNoPermissionTip by notificationViewModel.showNoPermissionTip.collectAsState()
 
     //前往指定 訊息/文章...
     val pushDataWrapper by notificationViewModel.jumpToChannelDest.collectAsState()
@@ -133,8 +145,7 @@ fun NotificationCenterScreen(
                     }
                 }
             }
-        }
-        else {
+        } else {
             //禁止進入該頻道,show dialog
             channelAlertDialog.value = true
         }
@@ -169,6 +180,53 @@ fun NotificationCenterScreen(
     LaunchedEffect(key1 = Unit) {
         AppUserLogger.getInstance()
             .log(Page.Notification)
+    }
+
+    //打開社團 審核畫面
+    groupApprovePage?.let { group ->
+        navController.navigate(
+            GroupApplyScreenDestination(
+                group = group
+            )
+        )
+        notificationViewModel.afterOpenApprovePage()
+    }
+
+    //打開指定社團
+    openGroup?.let { group ->
+        globalGroupViewModel.setCurrentGroup(group)
+        notificationViewModel.afterOpenGroup()
+    }
+
+    //沒有權限 彈窗
+    if (showNoPermissionTip) {
+        NoPermissionDialog(
+            onDismiss = {
+                AppUserLogger.getInstance().log(Clicked.CannotUse, From.Notification)
+                notificationViewModel.afterOpenApprovePage()
+            },
+            onClick = {
+                AppUserLogger.getInstance().log(Clicked.CannotUse, From.Notification)
+                notificationViewModel.afterOpenApprovePage()
+            }
+        )
+    }
+}
+
+@Composable
+fun NoPermissionDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
+    DialogScreen(
+        title = stringResource(id = R.string.has_no_permission_title),
+        subTitle = stringResource(id = R.string.has_no_permission_description),
+        onDismiss = onDismiss
+    ) {
+        BlueButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            text = stringResource(id = R.string.i_know),
+            onClick = onClick
+        )
     }
 }
 
