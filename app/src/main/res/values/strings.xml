@@ -249,4 +249,8 @@
     <string name="wait_for_apply">申請已送出，等待審核加入</string>
     <string name="wait_for_group_apply">等待 %s 審核中</string>
 
+    <string name="has_no_permission_title">沒有權限執行動作</string>
+    <string name="has_no_permission_description">你在此社團的權限有了改變\n目前無法執行這個動作</string>
+    <string name="i_know">我知道了</string>
+
 </resources>
