@@ -230,6 +230,7 @@ fun FollowScreen(
         visibleAvatar = uiState.visibleAvatar,
         onGroupItemClick = {
             onGroupItemClick.invoke(it.groupModel)
+            viewModel.disableBubbleTip()
         },
         lazyColumnAtTop = {
             viewModel.lazyColumnAtTop()
@@ -246,7 +247,7 @@ fun FollowScreen(
         onRefreshMyGroupList = onRefreshMyGroupList,
         isShowBubbleTip = uiState.isShowBubbleTip,
         onMoreClick = {
-            viewModel.onMoreClick()
+            viewModel.disableBubbleTip()
             AppUserLogger.getInstance()
                 .log(Clicked.GroupGroupSettings)
             navigator.navigate(
