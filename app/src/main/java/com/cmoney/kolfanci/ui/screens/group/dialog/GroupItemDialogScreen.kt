@@ -155,7 +155,7 @@ private fun GroupItemDialogScreenView(
             when (groupStatus) {
                 GroupJoinStatus.InReview -> {
                     GroupJoinButton(
-                        modifier = Modifier.padding(start = 20.dp, end = 20.dp),
+                        modifier = Modifier.padding(20.dp),
                         text = "等待審核中...",
                         onClick = {
                             onConfirm.invoke(groupModel, groupStatus)
@@ -166,9 +166,9 @@ private fun GroupItemDialogScreenView(
                 GroupJoinStatus.Joined -> {
                     BorderButton(
                         modifier = Modifier
+                            .padding(20.dp)
                             .fillMaxWidth()
-                            .height(50.dp)
-                            .padding(start = 20.dp, end = 20.dp),
+                            .height(50.dp),
                         text = "已經加入，進入社團",
                         borderColor = LocalColor.current.text.default_100,
                         onClick = {
@@ -179,6 +179,10 @@ private fun GroupItemDialogScreenView(
 
                 GroupJoinStatus.NotJoin -> {
                     BlueButton(
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth()
+                            .height(50.dp),
                         text = "加入社團",
                         onClick = {
                             onConfirm.invoke(groupModel, groupStatus)
@@ -210,7 +214,7 @@ fun GroupItemDialogScreenPreview() {
             groupModel = MockData.mockGroup,
             onConfirm = { group, joinStatus ->
             },
-            groupStatus = GroupJoinStatus.NotJoin
+            groupStatus = GroupJoinStatus.Joined
         )
     }
 }

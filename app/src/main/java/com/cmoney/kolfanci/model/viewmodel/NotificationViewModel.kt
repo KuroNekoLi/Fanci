@@ -41,7 +41,7 @@ class NotificationViewModel(
     val showNotJoinAlert = _showNotJoinAlert.asStateFlow()
 
     //解散社團 彈窗
-    private val _showDissolveGroupDialog = MutableStateFlow<Group?>(null)
+    private val _showDissolveGroupDialog = MutableStateFlow<String?>(null)
     val showDissolveGroupDialog = _showDissolveGroupDialog.asStateFlow()
 
     //刷新 我的社團
@@ -199,17 +199,9 @@ class NotificationViewModel(
     /**
      * 解散 社團
      */
-    fun dissolveGroup(dissolveGroup: TargetType.DissolveGroup, myGroupList: List<GroupItem>) {
+    fun dissolveGroup(dissolveGroup: TargetType.DissolveGroup) {
         KLog.i(TAG, "dissolveGroup:$dissolveGroup")
-        viewModelScope.launch {
-            val groupId = dissolveGroup.groupId
-
-            myGroupList.firstOrNull { groupItem ->
-                groupItem.groupModel.id == groupId
-            }?.also {
-                _showDissolveGroupDialog.value = it.groupModel
-            }
-        }
+        _showDissolveGroupDialog.value = dissolveGroup.groupId
     }
 
     /**
@@ -217,9 +209,9 @@ class NotificationViewModel(
      *  如果一樣-> 就執行刷新動作
      *  不一樣時-> 不動作
      */
-    fun onCheckDissolveGroup(group: Group, currentGroup: Group?) {
-        KLog.i(TAG, "onCheckDissolveGroup:$group")
-        if (currentGroup?.id == group.id) {
+    fun onCheckDissolveGroup(groupId: String, currentGroup: Group?) {
+        KLog.i(TAG, "onCheckDissolveGroup:$groupId")
+        if (currentGroup?.id == groupId) {
             _refreshGroup.value = true
         }
     }

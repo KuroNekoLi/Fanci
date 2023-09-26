@@ -47,6 +47,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.GroupJoinStatus
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
@@ -57,7 +58,7 @@ import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.main.MainActivity
-import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
+import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -71,8 +72,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun NotificationCenterScreen(
     navController: DestinationsNavigator,
-    viewModel: NotificationCenterViewModel = koinViewModel(),
-    chatRoomViewModel: ChatRoomViewModel = koinViewModel()
+    viewModel: NotificationCenterViewModel = koinViewModel()
 ) {
     val notificationCenterDataList by viewModel.notificationCenter.collectAsState()
     val payload by viewModel.payload.collectAsState()
@@ -115,6 +115,12 @@ fun NotificationCenterScreen(
 
     //沒有權限 彈窗
     val showNoPermissionTip by notificationViewModel.showNoPermissionTip.collectAsState()
+
+    //邀請加入社團
+    val openGroupDialog by notificationViewModel.inviteGroup.collectAsState()
+
+    //解散社團 彈窗
+    val showDissolveDialog by notificationViewModel.showDissolveGroupDialog.collectAsState()
 
     //前往指定 訊息/文章...
     val pushDataWrapper by notificationViewModel.jumpToChannelDest.collectAsState()
@@ -210,6 +216,62 @@ fun NotificationCenterScreen(
                 notificationViewModel.afterOpenApprovePage()
             }
         )
+    }
+
+    //加入彈窗
+    openGroupDialog?.let { targetGroup ->
+        GroupItemDialogScreen(
+            groupModel = targetGroup,
+            onDismiss = {
+                notificationViewModel.openedInviteGroup()
+            },
+            onConfirm = { group, joinStatus ->
+                when (joinStatus) {
+                    GroupJoinStatus.InReview -> {
+                        notificationViewModel.openedInviteGroup()
+                    }
+
+                    GroupJoinStatus.Joined -> {
+                        globalGroupViewModel.setCurrentGroup(group)
+                        notificationViewModel.openedInviteGroup()
+                        navController.popBackStack()
+                    }
+
+                    GroupJoinStatus.NotJoin -> {
+                    }
+                }
+            }
+        )
+    }
+
+
+    //解散社團 彈窗
+    showDissolveDialog?.let { groupId ->
+        DialogScreen(
+            title = stringResource(id = R.string.dissolve_group_title),
+            subTitle = stringResource(id = R.string.dissolve_group_description),
+            onDismiss = {
+                notificationViewModel.dismissDissolveDialog()
+                notificationViewModel.onCheckDissolveGroup(
+                    groupId,
+                    globalGroupViewModel.currentGroup.value
+                )
+            }) {
+            BlueButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = stringResource(id = R.string.confirm)
+            ) {
+                AppUserLogger.getInstance().log(Clicked.AlreadyDissolve)
+
+                notificationViewModel.dismissDissolveDialog()
+                notificationViewModel.onCheckDissolveGroup(
+                    groupId,
+                    globalGroupViewModel.currentGroup.value
+                )
+            }
+        }
     }
 }
 

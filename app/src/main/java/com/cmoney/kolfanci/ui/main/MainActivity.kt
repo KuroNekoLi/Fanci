@@ -125,8 +125,7 @@ class MainActivity : BaseWebLoginActivity() {
                                 is TargetType.DissolveGroup -> {
                                     if (myGroupList.isNotEmpty()) {
                                         notificationViewModel.dissolveGroup(
-                                            dissolveGroup = targetType,
-                                            myGroupList = myGroupList
+                                            dissolveGroup = targetType
                                         )
                                     }
                                 }
@@ -205,16 +204,14 @@ class MainActivity : BaseWebLoginActivity() {
                     }
 
                     //解散社團 彈窗
-                    showDissolveDialog?.let { group ->
+                    showDissolveDialog?.let { groupId ->
                         DialogScreen(
-                            title = stringResource(id = R.string.dissolve_group_title).format(
-                                group.name.orEmpty()
-                            ),
+                            title = stringResource(id = R.string.dissolve_group_title),
                             subTitle = stringResource(id = R.string.dissolve_group_description),
                             onDismiss = {
                                 notificationViewModel.dismissDissolveDialog()
                                 notificationViewModel.onCheckDissolveGroup(
-                                    group,
+                                    groupId,
                                     globalGroupViewModel.currentGroup.value
                                 )
                             }) {
@@ -228,7 +225,7 @@ class MainActivity : BaseWebLoginActivity() {
 
                                 notificationViewModel.dismissDissolveDialog()
                                 notificationViewModel.onCheckDissolveGroup(
-                                    group,
+                                    groupId,
                                     globalGroupViewModel.currentGroup.value
                                 )
                             }
