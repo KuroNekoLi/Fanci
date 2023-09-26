@@ -253,4 +253,6 @@
     <string name="has_no_permission_description">你在此社團的權限有了改變\n目前無法執行這個動作</string>
     <string name="i_know">我知道了</string>
 
+    <string name="input_approve_question">請輸入審核題目</string>
+
 </resources>
