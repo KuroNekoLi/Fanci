@@ -4,7 +4,14 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,11 +27,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
-import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
+import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
+import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.kolfanci.ui.theme.LocalColor
 
 @Composable
 fun DrawerMenuScreen(
@@ -47,25 +55,35 @@ fun DrawerMenuScreen(
                 .padding(bottom = 5.dp)
         ) {
             items(groupList) { item ->
-                Card(
-                    shape = RoundedCornerShape(18.dp),
-                    modifier = Modifier
-                        .size(55.dp)
-                        .aspectRatio(1f)
-                        .clickable {
-                            onClick.invoke(item)
-                        },
-                    border = (if (item.isSelected) {
-                        BorderStroke(2.dp, Color.White)
-                    } else {
-                        null
-                    })
+                Box(
+                    modifier = Modifier,
+                    contentAlignment = Alignment.BottomEnd
                 ) {
-                    AsyncImage(
-                        model = item.groupModel.thumbnailImageUrl,
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        placeholder = painterResource(id = R.drawable.placeholder)
+                    Card(
+                        shape = RoundedCornerShape(18.dp),
+                        modifier = Modifier
+                            .size(55.dp)
+                            .aspectRatio(1f)
+                            .clickable {
+                                onClick.invoke(item)
+                            },
+                        border = (if (item.isSelected) {
+                            BorderStroke(2.dp, Color.White)
+                        } else {
+                            null
+                        })
+                    ) {
+                        AsyncImage(
+                            model = item.groupModel.thumbnailImageUrl,
+                            contentScale = ContentScale.Crop,
+                            contentDescription = null,
+                            placeholder = painterResource(id = R.drawable.placeholder)
+                        )
+                    }
+
+                    //TODO: api data
+                    RedDotItemScreen(
+                        text = "99+"
                     )
                 }
 
@@ -130,7 +148,7 @@ fun DrawerMenuScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun DrawerMenuScreenPreview() {
     FanciTheme {
