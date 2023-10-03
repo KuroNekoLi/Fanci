@@ -147,18 +147,18 @@ fun MessageImageItem(
         mutableStateOf(ContentScale.FillWidth)
     }
 
-    var imageModifier = modifier
+    val imageModifier = modifier
         .heightIn(min = imageHeightMin, max = imageHeightMax)
         .clip(RoundedCornerShape(12.dp))
         .clickable(enabled = isClickable) {
             onClick?.invoke(image)
+        }.let {
+            if (imageWidthMax == 0.dp) {
+                it.then(Modifier.fillMaxWidth())
+            } else {
+                it.then(Modifier.widthIn(min = imageWidthMin, max = maxWidth))
+            }
         }
-
-    imageModifier = if (imageWidthMax == 0.dp) {
-        imageModifier.then(Modifier.fillMaxWidth())
-    } else {
-        imageModifier.then(Modifier.widthIn(min = imageWidthMin, max = maxWidth))
-    }
 
     AsyncImage(
         modifier = imageModifier,
