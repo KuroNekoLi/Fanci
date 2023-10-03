@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -76,7 +77,8 @@ fun MessageImageScreenV2(
     else {
         LazyRow(
             modifier = Modifier
-                .wrapContentSize()
+                .fillMaxWidth()
+                .wrapContentHeight()
                 .padding(5.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
