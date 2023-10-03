@@ -80,8 +80,7 @@ private fun GroupReportMessageScreenView(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            Column(
-            ) {
+            Column {
                 //Message text
                 reportInformation.contentSnapshot?.apply {
                     if (this.isNotEmpty()) {

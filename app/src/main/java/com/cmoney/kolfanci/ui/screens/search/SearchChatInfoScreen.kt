@@ -290,7 +290,7 @@ private fun SearchChatMessageContent(
                 }
 
                 messageModel.content?.medias?.let {
-                    MediaContent(contentPaddingModifier, it, false)
+                    MediaContent(it, false)
                 }
 
                 //Emoji
