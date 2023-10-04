@@ -46,6 +46,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreenV2
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
@@ -185,10 +186,7 @@ fun BasePostContentScreen(
 
             //Image attach
             if (post.content?.medias?.isNotEmpty() == true) {
-                MessageImageScreen(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
+                MessageImageScreenV2(
                     images = post.content?.medias?.map {
                         it.resourceLink.orEmpty()
                     }.orEmpty(),
@@ -197,6 +195,19 @@ fun BasePostContentScreen(
                         AppUserLogger.getInstance().log(Page.PostImage)
                     }
                 )
+
+//                MessageImageScreen(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .aspectRatio(1f),
+//                    images = post.content?.medias?.map {
+//                        it.resourceLink.orEmpty()
+//                    }.orEmpty(),
+//                    onImageClick = {
+//                        onImageClick?.invoke()
+//                        AppUserLogger.getInstance().log(Page.PostImage)
+//                    }
+//                )
             }
 
             Spacer(modifier = Modifier.height(15.dp))

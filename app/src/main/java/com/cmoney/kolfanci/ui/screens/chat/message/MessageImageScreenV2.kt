@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -175,7 +174,7 @@ fun MessageImageItem(
             val width = size.width
             val height = size.height
 
-            KLog.i(TAG, "size:$size")
+            KLog.i(TAG, "size: width = $width, height = $height")
 
             maxWidth = when {
                 (height == width) -> {
@@ -185,7 +184,7 @@ fun MessageImageItem(
                 (height > width) -> {
                     //高度固定時
                     if (imageHeightMin == imageHeightMax) {
-                        scaleType = ContentScale.FillHeight
+                        scaleType = ContentScale.Crop
                     }
                     imageWidthMin
                 }
