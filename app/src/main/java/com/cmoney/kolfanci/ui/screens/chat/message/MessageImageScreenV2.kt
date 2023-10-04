@@ -37,6 +37,7 @@ import com.stfalcon.imageviewer.StfalconImageViewer
  *
  * @param modifier 第一張圖的 Modifier, 因為聊天室第一張比較內縮
  * @param otherItemModifier 非第一張圖的 Modifier
+ * @param multiImageHeight 多張圖時, 固定的高度
  * @param isClickable 是否可以點擊
  * @param onImageClick 點擊 callback
  */
@@ -45,6 +46,7 @@ fun MessageImageScreenV2(
     images: List<Any>,
     modifier: Modifier = Modifier,
     otherItemModifier: Modifier = Modifier,
+    multiImageHeight: Dp = 220.dp,
     isClickable: Boolean = true,
     onImageClick: ((Any) -> Unit)? = null
 ) {
@@ -92,8 +94,8 @@ fun MessageImageScreenV2(
                 MessageImageItem(
                     modifier = fixModifier,
                     image = image,
-                    imageHeightMin = 220.dp,
-                    imageHeightMax = 220.dp,
+                    imageHeightMin = multiImageHeight,
+                    imageHeightMax = multiImageHeight,
                     imageWidthMin = 165.dp,
                     imageWidthMax = 290.dp,
                     isClickable = isClickable,

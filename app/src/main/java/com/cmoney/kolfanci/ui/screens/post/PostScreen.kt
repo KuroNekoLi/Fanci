@@ -399,6 +399,7 @@ private fun PostScreenView(
                                     isPinPost = true
                                 )
                             },
+                            multiImageHeight = 250.dp,
                             onMoreClick = {
                                 onMoreClick.invoke(pinPost.message)
                             },
@@ -435,6 +436,7 @@ private fun PostScreenView(
                                 channel = channel
                             )
                         },
+                        multiImageHeight = 250.dp,
                         onMoreClick = {
                             onMoreClick.invoke(postMessage)
                         },

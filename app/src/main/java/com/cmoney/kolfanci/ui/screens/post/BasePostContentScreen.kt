@@ -23,6 +23,7 @@ import androidx.compose.material3.RichTooltipState
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -70,6 +72,7 @@ fun BasePostContentScreen(
     contentModifier: Modifier = Modifier,
     hasMoreAction: Boolean = true,
     backgroundColor: Color = LocalColor.current.background,
+    multiImageHeight: Dp = 220.dp,
     onMoreClick: () -> Unit? = {},
     onEmojiClick: (Int) -> Unit,
     onAddNewEmojiClick: (Int) -> Unit,
@@ -83,7 +86,7 @@ fun BasePostContentScreen(
 
     //最多顯示幾行
     var maxDisplayLine by remember {
-        mutableStateOf(defaultDisplayLine)
+        mutableIntStateOf(defaultDisplayLine)
     }
 
     //是否要顯示 顯示更多文案
@@ -190,24 +193,12 @@ fun BasePostContentScreen(
                     images = post.content?.medias?.map {
                         it.resourceLink.orEmpty()
                     }.orEmpty(),
+                    multiImageHeight = multiImageHeight,
                     onImageClick = {
                         onImageClick?.invoke()
                         AppUserLogger.getInstance().log(Page.PostImage)
                     }
                 )
-
-//                MessageImageScreen(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .aspectRatio(1f),
-//                    images = post.content?.medias?.map {
-//                        it.resourceLink.orEmpty()
-//                    }.orEmpty(),
-//                    onImageClick = {
-//                        onImageClick?.invoke()
-//                        AppUserLogger.getInstance().log(Page.PostImage)
-//                    }
-//                )
             }
 
             Spacer(modifier = Modifier.height(15.dp))
