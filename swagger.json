@@ -7258,6 +7258,9 @@
           "isDefault": {
             "type": "boolean",
             "description": "前端顯示是否為隱藏"
+          },
+          "userContext": {
+            "$ref": "#/components/schemas/IUserContext"
           }
         },
         "additionalProperties": false
@@ -7340,6 +7343,14 @@
           },
           "privacy": {
             "$ref": "#/components/schemas/ChannelPrivacy"
+          },
+          "tabs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IChannelTab"
+            },
+            "description": "頻道有啟用的聊天室版面",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -7869,6 +7880,9 @@
           },
           "ColorSchemeGroupKey": {
             "$ref": "#/components/schemas/ColorTheme"
+          },
+          "userContext": {
+            "$ref": "#/components/schemas/IUserContext"
           }
         },
         "additionalProperties": false,
@@ -8251,6 +8265,23 @@
         ],
         "type": "string"
       },
+      "IChannelTab": {
+        "type": "object",
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ChannelTabType"
+          },
+          "userContext": {
+            "$ref": "#/components/schemas/IUserContext"
+          }
+        },
+        "additionalProperties": false
+      },
       "IEmojiCount": {
         "type": "object",
         "properties": {
@@ -8380,6 +8411,16 @@
             "format": "int64"
           },
           "updateUnixTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IUserContext": {
+        "type": "object",
+        "properties": {
+          "unReadCount": {
             "type": "integer",
             "format": "int64"
           }

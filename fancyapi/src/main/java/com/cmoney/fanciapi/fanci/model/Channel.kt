@@ -18,6 +18,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
+import com.cmoney.fanciapi.fanci.model.IChannelTab
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -36,6 +37,7 @@ import kotlinx.parcelize.Parcelize
  * @param groupId 頻道所屬社團Id
  * @param category 
  * @param privacy 
+ * @param tabs 頻道有啟用的聊天室版面
  */
 @Parcelize
 
@@ -77,7 +79,11 @@ data class Channel (
     val category: Category? = null,
 
     @Json(name = "privacy")
-    val privacy: ChannelPrivacy? = null
+    val privacy: ChannelPrivacy? = null,
+
+    /* 頻道有啟用的聊天室版面 */
+    @Json(name = "tabs")
+    val tabs: kotlin.collections.List<IChannelTab>? = null
 
 ) : Parcelable
 
