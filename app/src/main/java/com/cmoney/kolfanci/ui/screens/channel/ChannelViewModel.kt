@@ -6,12 +6,16 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
+import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ChannelViewModel(private val channelUseCase: ChannelUseCase) : ViewModel() {
+class ChannelViewModel(
+    private val channelUseCase: ChannelUseCase,
+    private val notificationUseCase: NotificationUseCase
+) : ViewModel() {
     private val TAG = ChannelViewModel::class.java.simpleName
 
     private val _channelTabStatus: MutableStateFlow<ChannelTabsStatus> = MutableStateFlow(
@@ -71,24 +75,26 @@ class ChannelViewModel(private val channelUseCase: ChannelUseCase) : ViewModel()
     /**
      * 聊天未讀 清空
      */
-    fun onChatRedDotClick() {
+    fun onChatRedDotClick(channelId: String) {
         KLog.i(TAG, "onChatRedDotClick")
         viewModelScope.launch {
-            //TODO: API
-
-            _unreadCount.value = Pair(0, _unreadCount.value?.second ?: 0)
+            notificationUseCase.clearChatUnReadCount(channelId = channelId)
+                .onSuccess {
+                    _unreadCount.value = Pair(0, _unreadCount.value?.second ?: 0)
+                }
         }
     }
 
     /**
      * 貼文未讀 清空
      */
-    fun onPostRedDotClick() {
+    fun onPostRedDotClick(channelId: String) {
         KLog.i(TAG, "onPostRedDotClick")
         viewModelScope.launch {
-            //TODO: API
-
-            _unreadCount.value = Pair(_unreadCount.value?.first ?: 0, 0)
+            notificationUseCase.clearPostUnReadCount(channelId = channelId)
+                .onSuccess {
+                    _unreadCount.value = Pair(_unreadCount.value?.first ?: 0, 0)
+                }
         }
     }
 

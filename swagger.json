@@ -913,6 +913,55 @@
         ]
       }
     },
+    "/api/v1/BulletinBoard/{channelId}/SetReadWeight": {
+      "put": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "設置使用者當前閱讀位置 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "readWeight",
+            "in": "query",
+            "description": "閱讀位置(不填或-1則一律到最新 會比較當前記錄一律取最大) *目前暫時不支援指定位置",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": -1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "BANNED_1_channelId",
+              "PERMISSION_CanRead_1_channelId_none",
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/Category/{categoryId}": {
       "get": {
         "tags": [
@@ -2444,6 +2493,53 @@
               "user",
               "BANNED_1_chatRoomChannelId",
               "PERMISSION_可管理_1_chatRoomChannelId_channelId"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ChatRoom/{chatRoomChannelId}/SetReadWeight": {
+      "put": {
+        "tags": [
+          "ChatRoom"
+        ],
+        "summary": "設置使用者當前閱讀位置 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "chatRoomChannelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "readWeight",
+            "in": "query",
+            "description": "閱讀位置(不填或-1則一律到最新 會比較當前記錄一律取最大) *目前暫時不支援指定位置",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": -1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "BANNED_1_channelId",
+              "PERMISSION_CanRead_1_chatRoomChannelId_none"
             ]
           }
         ]
@@ -7433,10 +7529,10 @@
           "canRead": {
             "type": "boolean"
           },
-          "canPost": {
+          "canReply": {
             "type": "boolean"
           },
-          "canReply": {
+          "canPost": {
             "type": "boolean"
           },
           "canEmoji": {
@@ -7525,6 +7621,9 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
@@ -7554,6 +7653,9 @@
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
           },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
+          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -7566,12 +7668,6 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
-          },
-          "replyMessage": {
-            "$ref": "#/components/schemas/IReplyMessage"
-          },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false

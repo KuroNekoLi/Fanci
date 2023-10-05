@@ -48,7 +48,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.ResultRecipient
-import com.socks.library.KLog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -96,10 +95,14 @@ fun ChannelScreen(
         editPostResultRecipient = editPostResultRecipient,
         postInfoResultRecipient = postInfoResultRecipient,
         onChatPageSelected = {
-            viewMode.onChatRedDotClick()
+            viewMode.onChatRedDotClick(
+                channelId = channel.id.orEmpty()
+            )
         },
         onPostPageSelected = {
-            viewMode.onPostRedDotClick()
+            viewMode.onPostRedDotClick(
+                channelId = channel.id.orEmpty()
+            )
         }
     )
 }

@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.model.usecase
 
 import android.app.Application
+import com.cmoney.fanciapi.fanci.api.BulletinBoardApi
+import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.PushNotificationApi
 import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
 import com.cmoney.kolfanci.extension.checkResponseBody
@@ -16,6 +18,8 @@ class NotificationUseCase(
     private val network: Network,
     private val settingsDataStore: SettingsDataStore,
     private val pushNotificationApi: PushNotificationApi,
+    private val chatRoomApi: ChatRoomApi,
+    private val bulletinBoardApi: BulletinBoardApi,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
@@ -91,6 +95,28 @@ class NotificationUseCase(
     suspend fun getAllNotificationSetting() = withContext(dispatcher) {
         kotlin.runCatching {
             pushNotificationApi.apiV1PushNotificationSettingTypeAllGet().checkResponseBody()
+        }
+    }
+
+    /**
+     * 清除 聊天室 未讀數量
+     */
+    suspend fun clearChatUnReadCount(channelId: String) = withContext(dispatcher) {
+        kotlin.runCatching {
+            chatRoomApi.apiV1ChatRoomChatRoomChannelIdSetReadWeightPut(
+                chatRoomChannelId = channelId
+            ).checkResponseBody()
+        }
+    }
+
+    /**
+     * 清除 貼文 未讀數量
+     */
+    suspend fun clearPostUnReadCount(channelId: String) = withContext(dispatcher) {
+        kotlin.runCatching {
+            bulletinBoardApi.apiV1BulletinBoardChannelIdSetReadWeightPut(
+                channelId = channelId
+            ).checkResponseBody()
         }
     }
 
