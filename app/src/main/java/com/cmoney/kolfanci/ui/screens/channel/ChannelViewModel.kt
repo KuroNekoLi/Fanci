@@ -68,4 +68,28 @@ class ChannelViewModel(private val channelUseCase: ChannelUseCase) : ViewModel()
         }
     }
 
+    /**
+     * 聊天未讀 清空
+     */
+    fun onChatRedDotClick() {
+        KLog.i(TAG, "onChatRedDotClick")
+        viewModelScope.launch {
+            //TODO: API
+
+            _unreadCount.value = Pair(0, _unreadCount.value?.second ?: 0)
+        }
+    }
+
+    /**
+     * 貼文未讀 清空
+     */
+    fun onPostRedDotClick() {
+        KLog.i(TAG, "onPostRedDotClick")
+        viewModelScope.launch {
+            //TODO: API
+
+            _unreadCount.value = Pair(_unreadCount.value?.first ?: 0, 0)
+        }
+    }
+
 }

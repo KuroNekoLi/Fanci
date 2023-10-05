@@ -48,6 +48,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -93,7 +94,13 @@ fun ChannelScreen(
         channelTabStatus = channelTabStatus,
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
-        postInfoResultRecipient = postInfoResultRecipient
+        postInfoResultRecipient = postInfoResultRecipient,
+        onChatPageSelected = {
+            viewMode.onChatRedDotClick()
+        },
+        onPostPageSelected = {
+            viewMode.onPostRedDotClick()
+        }
     )
 }
 
@@ -110,6 +117,8 @@ private fun ChannelScreenView(
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
+    onChatPageSelected: () -> Unit,
+    onPostPageSelected: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -196,6 +205,7 @@ private fun ChannelScreenView(
                     count = pages.size,
                     state = pagerState,
                 ) { page ->
+                    //TODO: 紅點消失
                     when (page) {
                         0 -> {
                             //聊天室 Tab
@@ -205,6 +215,7 @@ private fun ChannelScreenView(
                                 resultRecipient = announcementResultRecipient,
                                 jumpChatMessage = jumpChatMessage
                             )
+                            onChatPageSelected.invoke()
                         }
 
                         else -> {
@@ -215,6 +226,8 @@ private fun ChannelScreenView(
                                 resultRecipient = editPostResultRecipient,
                                 postInfoResultRecipient = postInfoResultRecipient
                             )
+
+                            onPostPageSelected.invoke()
 
                             LaunchedEffect(key1 = page) {
                                 AppUserLogger.getInstance().log(Page.PostWall)
@@ -243,7 +256,13 @@ fun ChannelScreenPreview() {
             channelTabStatus = ChannelTabsStatus(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
-            unreadCount = Pair(10, 20)
+            unreadCount = Pair(10, 20),
+            onChatPageSelected = {
+
+            },
+            onPostPageSelected = {
+
+            }
         )
     }
 }
