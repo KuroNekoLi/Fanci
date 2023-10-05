@@ -16,8 +16,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
+/**
+ * 未讀 小紅點
+ *
+ * @param unReadCount 未讀數量
+ */
 @Composable
-fun RedDotItemScreen(modifier: Modifier = Modifier, text: String) {
+fun RedDotItemScreen(
+    modifier: Modifier = Modifier,
+    unReadCount: Long
+) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(47.dp))
@@ -25,6 +33,12 @@ fun RedDotItemScreen(modifier: Modifier = Modifier, text: String) {
             .padding(start = 7.dp, end = 7.dp, top = 2.dp, bottom = 2.dp),
         contentAlignment = Alignment.Center
     ) {
+        val text = if (unReadCount > 99) {
+            "99+"
+        } else {
+            unReadCount.toString()
+        }
+
         Text(
             text = text, fontSize = 12.sp, color = Color.White, maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -37,7 +51,7 @@ fun RedDotItemScreen(modifier: Modifier = Modifier, text: String) {
 fun RedDotItemScreenPreview() {
     FanciTheme {
         RedDotItemScreen(
-            text = "99+"
+            unReadCount = 100
         )
     }
 }

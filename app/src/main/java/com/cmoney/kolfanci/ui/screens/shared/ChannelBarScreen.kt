@@ -83,11 +83,16 @@ fun ChannelBarScreen(
 
             Spacer(modifier = Modifier.width(4.dp))
 
-            //TODO: api 資料
-            //Unread count
-            RedDotItemScreen(
-                text = "99+"
-            )
+            //小紅點
+            val unReadCount = channel.tabs?.map {
+                it.userContext?.unReadCount ?: 0L
+            }.orEmpty().sum()
+
+            if (unReadCount > 0) {
+                RedDotItemScreen(
+                    unReadCount = unReadCount
+                )
+            }
         }
     }
 }

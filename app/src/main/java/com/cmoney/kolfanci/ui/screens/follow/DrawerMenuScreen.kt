@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.IUserContext
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
@@ -81,10 +82,12 @@ fun DrawerMenuScreen(
                         )
                     }
 
-                    //TODO: api data
-                    RedDotItemScreen(
-                        text = "99+"
-                    )
+                    //未讀小紅點
+                    item.groupModel.userContext?.unReadCount?.let { unReadCount ->
+                        RedDotItemScreen(
+                            unReadCount = unReadCount
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(17.dp))
@@ -155,13 +158,17 @@ fun DrawerMenuScreenPreview() {
         DrawerMenuScreen(
             groupList = listOf(
                 GroupItem(
-                    isSelected = true, groupModel = Group(
+                    isSelected = true,
+                    groupModel = Group(
                         id = "",
                         name = "",
                         description = "Description",
                         coverImageUrl = "",
                         thumbnailImageUrl = "",
-                        categories = emptyList()
+                        categories = emptyList(),
+                        userContext = IUserContext(
+                            unReadCount = 100
+                        )
                     )
                 )
             ),

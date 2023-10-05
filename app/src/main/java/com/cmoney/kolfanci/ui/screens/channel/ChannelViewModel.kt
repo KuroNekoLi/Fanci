@@ -2,6 +2,8 @@ package com.cmoney.kolfanci.ui.screens.channel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.socks.library.KLog
@@ -20,6 +22,10 @@ class ChannelViewModel(private val channelUseCase: ChannelUseCase) : ViewModel()
     )
     val channelTabStatus = _channelTabStatus.asStateFlow()
 
+    //未讀數量 (1.聊天室 2.文章)
+    val _unreadCount: MutableStateFlow<Pair<Long, Long>?> = MutableStateFlow(null)
+    val unreadCount = _unreadCount.asStateFlow()
+
     fun fetchChannelTabStatus(channelId: String) {
         KLog.i(TAG, "fetchChannelTabStatus:$channelId")
         viewModelScope.launch {
@@ -28,6 +34,37 @@ class ChannelViewModel(private val channelUseCase: ChannelUseCase) : ViewModel()
             }, {
                 KLog.e(TAG, it)
             })
+        }
+    }
+
+    /**
+     * 抓取未讀取數量 (聊天室/貼文)
+     */
+    fun fetchAllUnreadCount(channel: Channel) {
+        viewModelScope.launch {
+            var chatRedDotCount = 0L
+            var postRedDotCount = 0L
+
+            channel.tabs?.forEach { tabType ->
+                when (tabType.type) {
+                    //貼文
+                    ChannelTabType.bulletinboard -> {
+                        tabType.userContext?.unReadCount?.let { unReadCount ->
+                            postRedDotCount = unReadCount
+                        }
+                    }
+                    //聊天
+                    ChannelTabType.chatRoom -> {
+                        tabType.userContext?.unReadCount?.let { unReadCount ->
+                            chatRedDotCount = unReadCount
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+
+            _unreadCount.value = Pair(chatRedDotCount, postRedDotCount)
         }
     }
 
