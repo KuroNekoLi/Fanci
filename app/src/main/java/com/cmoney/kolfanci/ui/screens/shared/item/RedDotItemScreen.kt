@@ -26,23 +26,25 @@ fun RedDotItemScreen(
     modifier: Modifier = Modifier,
     unReadCount: Long
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(47.dp))
-            .background(Color.Red)
-            .padding(start = 7.dp, end = 7.dp, top = 2.dp, bottom = 2.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        val text = if (unReadCount > 99) {
-            "99+"
-        } else {
-            unReadCount.toString()
-        }
+    if (unReadCount > 0) {
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(47.dp))
+                .background(Color.Red)
+                .padding(start = 7.dp, end = 7.dp, top = 2.dp, bottom = 2.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            val text = if (unReadCount > 99) {
+                "99+"
+            } else {
+                unReadCount.toString()
+            }
 
-        Text(
-            text = text, fontSize = 12.sp, color = Color.White, maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+            Text(
+                text = text, fontSize = 12.sp, color = Color.White, maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 

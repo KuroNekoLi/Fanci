@@ -39,10 +39,11 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun DrawerMenuScreen(
     modifier: Modifier = Modifier,
     groupList: List<GroupItem>,
+    notificationUnReadCount: Long,
     onClick: (GroupItem) -> Unit,
     onPlusClick: () -> Unit,
     onProfile: () -> Unit,
-    onNotification: () -> Unit
+    onNotification: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -95,19 +96,28 @@ fun DrawerMenuScreen(
         }
 
         Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(22.dp))
-                .background(LocalColor.current.env_80)
-                .clickable {
-                    onNotification.invoke()
-                },
-            contentAlignment = Alignment.Center
+            modifier = Modifier,
+            contentAlignment = Alignment.BottomEnd
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.menu_bell),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(LocalColor.current.env_80)
+                    .clickable {
+                        onNotification.invoke()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.menu_bell),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+                )
+            }
+
+            RedDotItemScreen(
+                unReadCount = notificationUnReadCount
             )
         }
 
@@ -175,7 +185,8 @@ fun DrawerMenuScreenPreview() {
             onClick = {},
             onPlusClick = {},
             onProfile = {},
-            onNotification = {}
+            onNotification = {},
+            notificationUnReadCount = 99
         )
     }
 }

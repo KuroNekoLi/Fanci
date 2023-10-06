@@ -120,4 +120,14 @@ class NotificationUseCase(
         }
     }
 
+    /**
+     * 取得 通知中心 未讀數量
+     */
+    suspend fun getNotificationUnReadCount() = network.getNotificationUnreadCount()
+
+    /**
+     * 通知中心 已讀
+     */
+    suspend fun setNotificationSeen() = network.setNotificationSeen()
+
 }

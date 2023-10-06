@@ -72,9 +72,10 @@ fun FollowScreen(
     onRefreshMyGroupList: (isSilent: Boolean) -> Unit,
     isLoading: Boolean,
     inviteGroup: Group?,
+    notificationUnReadCount: Long,
     onDismissInvite: () -> Unit,
     onChannelClick: (Channel) -> Unit,
-    onChangeGroup: (Group) -> Unit
+    onChangeGroup: (Group) -> Unit,
 ) {
     val uiState = viewModel.uiState
 
@@ -223,6 +224,7 @@ fun FollowScreen(
         navigator = navigator,
         groupList = myGroupList,
         group = group,
+        notificationUnReadCount = notificationUnReadCount,
         imageOffset = uiState.imageOffset,
         spaceHeight = uiState.spaceHeight,
         scrollableState = scrollableState,
@@ -279,7 +281,8 @@ fun FollowScreenView(
     onGoToMy: () -> Unit,
     onRefreshMyGroupList: (isSilent: Boolean) -> Unit,
     isShowBubbleTip: Boolean,
-    onMoreClick: (Group) -> Unit
+    onMoreClick: (Group) -> Unit,
+    notificationUnReadCount: Long
 ) {
     val TAG = "FollowScreenView"
 
@@ -299,6 +302,7 @@ fun FollowScreenView(
                 DrawerMenuScreen(
                     modifier = Modifier.fillMaxHeight(),
                     groupList = groupList,
+                    notificationUnReadCount = notificationUnReadCount,
                     onClick = {
                         KLog.i(TAG, "onGroup item click.")
 
@@ -649,7 +653,8 @@ fun FollowScreenPreview() {
             onGoToMy = {},
             onRefreshMyGroupList = {},
             isShowBubbleTip = false,
-            onMoreClick = {}
+            onMoreClick = {},
+            notificationUnReadCount = 99
         )
     }
 }

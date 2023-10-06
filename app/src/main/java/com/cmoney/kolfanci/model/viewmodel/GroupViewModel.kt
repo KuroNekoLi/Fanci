@@ -18,6 +18,7 @@ import com.cmoney.kolfanci.model.GroupJoinStatus
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
@@ -71,7 +72,8 @@ class GroupViewModel(
     private val channelUseCase: ChannelUseCase,
     private val permissionUseCase: PermissionUseCase,
     private val orderUseCase: OrderUseCase,
-    private val groupApplyUseCase: GroupApplyUseCase
+    private val groupApplyUseCase: GroupApplyUseCase,
+    private val notificationUseCase: NotificationUseCase
 ) : ViewModel() {
     private val TAG = GroupViewModel::class.java.simpleName
 
@@ -94,6 +96,10 @@ class GroupViewModel(
     private val _joinGroupStatus: MutableStateFlow<GroupJoinStatus> =
         MutableStateFlow(GroupJoinStatus.NotJoin)
     val joinGroupStatus = _joinGroupStatus.asStateFlow()
+
+    //推播中心,未讀數量
+    private val _notificationUnreadCount: MutableStateFlow<Long> = MutableStateFlow(0L)
+    val notificationUnreadCount = _notificationUnreadCount.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -834,12 +840,21 @@ class GroupViewModel(
         }
     }
 
-    fun refreshGroup() {
+    /**
+     * 刷新 Group and notification unread count
+     */
+    fun refreshGroupAndNotificationCount() {
+        KLog.i(TAG, "refreshGroup")
         viewModelScope.launch {
             val groupId = _currentGroup.value?.id ?: return@launch
             groupUseCase.getGroupById(groupId = groupId)
                 .onSuccess { group ->
                     setCurrentGroup(group)
+                }
+
+            notificationUseCase.getNotificationUnReadCount()
+                .onSuccess { unReadCount ->
+                    _notificationUnreadCount.value = unReadCount
                 }
         }
     }

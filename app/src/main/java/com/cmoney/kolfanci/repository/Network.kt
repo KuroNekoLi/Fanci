@@ -20,4 +20,14 @@ interface Network {
      */
     suspend fun setNotificationHistoryClick(notificationClick: NotificationClick): Result<Unit>
 
+    /**
+     * 取得 通知中心 未讀數量
+     */
+    suspend fun getNotificationUnreadCount(): Result<Long>
+
+    /**
+     * 通知中心 已讀
+     */
+    suspend fun setNotificationSeen(): Result<Unit>
+
 }
