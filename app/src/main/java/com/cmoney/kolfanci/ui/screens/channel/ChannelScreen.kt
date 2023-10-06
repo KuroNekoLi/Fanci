@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
@@ -24,6 +25,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Page
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
@@ -75,16 +77,33 @@ fun ChannelScreen(
 
     val channelTabStatus by viewMode.channelTabStatus.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewMode.fetchAllUnreadCount(channel)
+    }
+
+    val unreadCount by viewMode.unreadCount.collectAsState()
+
     ChannelScreenView(
         modifier = modifier,
         group = group,
         channel = channel,
+        unreadCount = unreadCount,
         navController = navController,
         jumpChatMessage = jumpChatMessage,
         channelTabStatus = channelTabStatus,
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
-        postInfoResultRecipient = postInfoResultRecipient
+        postInfoResultRecipient = postInfoResultRecipient,
+        onChatPageSelected = {
+            viewMode.onChatRedDotClick(
+                channelId = channel.id.orEmpty()
+            )
+        },
+        onPostPageSelected = {
+            viewMode.onPostRedDotClick(
+                channelId = channel.id.orEmpty()
+            )
+        }
     )
 }
 
@@ -95,11 +114,14 @@ private fun ChannelScreenView(
     group: Group?,
     channel: Channel,
     jumpChatMessage: ChatMessage? = null,
+    channelTabStatus: ChannelTabsStatus,
+    unreadCount: Pair<Long, Long>?,
     navController: DestinationsNavigator,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
-    channelTabStatus: ChannelTabsStatus,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
-    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
+    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
+    onChatPageSelected: () -> Unit,
+    onPostPageSelected: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -116,11 +138,11 @@ private fun ChannelScreenView(
         val pages = mutableListOf<String>()
 
         if (channelTabStatus.chatRoom == true) {
-            pages.add("聊天")
+            pages.add(stringResource(id = R.string.chat))
         }
 
         if (channelTabStatus.bulletinboard == true) {
-            pages.add("貼文")
+            pages.add(stringResource(id = R.string.post))
         }
 
         val pagerState = rememberPagerState()
@@ -154,11 +176,22 @@ private fun ChannelScreenView(
                                         color = LocalColor.current.text.default_80
                                     )
 
-                                    //TODO: api 資料
-                                    RedDotItemScreen(
-                                        modifier = Modifier.align(Alignment.CenterEnd),
-                                        text = "99+"
-                                    )
+                                    //紅點
+                                    unreadCount?.let { unreadCount ->
+                                        val readCount =
+                                            if (title == stringResource(id = R.string.chat)) {
+                                                unreadCount.first
+                                            } else {
+                                                unreadCount.second
+                                            }
+
+                                        if (readCount > 0) {
+                                            RedDotItemScreen(
+                                                modifier = Modifier.align(Alignment.CenterEnd),
+                                                unReadCount = readCount
+                                            )
+                                        }
+                                    }
                                 }
                             },
                             selected = tabIndex == index,
@@ -175,6 +208,7 @@ private fun ChannelScreenView(
                     count = pages.size,
                     state = pagerState,
                 ) { page ->
+                    //TODO: 紅點消失
                     when (page) {
                         0 -> {
                             //聊天室 Tab
@@ -184,6 +218,9 @@ private fun ChannelScreenView(
                                 resultRecipient = announcementResultRecipient,
                                 jumpChatMessage = jumpChatMessage
                             )
+                            LaunchedEffect(key1 = Unit) {
+                                onChatPageSelected.invoke()
+                            }
                         }
 
                         else -> {
@@ -194,6 +231,10 @@ private fun ChannelScreenView(
                                 resultRecipient = editPostResultRecipient,
                                 postInfoResultRecipient = postInfoResultRecipient
                             )
+
+                            LaunchedEffect(key1 = Unit) {
+                                onPostPageSelected.invoke()
+                            }
 
                             LaunchedEffect(key1 = page) {
                                 AppUserLogger.getInstance().log(Page.PostWall)
@@ -213,6 +254,7 @@ private fun ChannelScreenView(
 fun ChannelScreenPreview() {
     FanciTheme {
         ChannelScreenView(
+            group = Group(),
             channel = Channel(
                 name = "\uD83D\uDC57｜金針菇穿什麼"
             ),
@@ -221,7 +263,13 @@ fun ChannelScreenPreview() {
             channelTabStatus = ChannelTabsStatus(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
-            group = Group()
+            unreadCount = Pair(10, 20),
+            onChatPageSelected = {
+
+            },
+            onPostPageSelected = {
+
+            }
         )
     }
 }

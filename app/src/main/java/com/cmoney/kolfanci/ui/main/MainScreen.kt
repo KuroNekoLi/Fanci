@@ -74,6 +74,9 @@ fun MainScreen(
     val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
     //目前選中社團
     val currentGroup by globalGroupViewModel.currentGroup.collectAsState()
+    //目前通知中心,未讀數量
+    val notificationUnReadCount by globalGroupViewModel.notificationUnreadCount.collectAsState()
+
     //邀請加入社團
     val inviteGroup by notificationViewModel.inviteGroup.collectAsState()
 
@@ -159,6 +162,7 @@ fun MainScreen(
         inviteGroup = inviteGroup,
         navigator = navigator,
         myGroupList = myGroupList,
+        notificationUnReadCount = notificationUnReadCount,
         onGroupItemClick = {
             globalGroupViewModel.setCurrentGroup(it)
         },
@@ -238,7 +242,7 @@ fun MainScreen(
     }
     LaunchedEffect(key1 = Unit) {
         // 刷新社團資訊
-        globalGroupViewModel.refreshGroup()
+        globalGroupViewModel.refreshGroupAndNotificationCount()
         // 檢查推播權限
         if (hasShown) {
             followViewModel.checkNeedNotifyAllowNotificationPermission()

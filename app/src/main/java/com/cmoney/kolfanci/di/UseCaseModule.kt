@@ -6,7 +6,19 @@ import org.koin.dsl.module
 
 val useCaseModule = module {
     factory { ChatRoomUseCase(get(), get(), get()) }
-    factory { GroupUseCase(androidApplication(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory {
+        GroupUseCase(
+            androidApplication(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get()
+        )
+    }
     factory { UserUseCase(get()) }
     factory { ChatRoomPollUseCase(get()) }
     factory { ThemeUseCase(get(), get()) }
@@ -21,9 +33,14 @@ val useCaseModule = module {
     factory { VipManagerUseCase(get(), get(), get(), get()) }
     factory { SearchUseCase(get(), get()) }
     factory { UploadImageUseCase(androidApplication(), get()) }
-    factory { NotificationUseCase(
-        context = androidApplication(),
-        network = get(),
-        settingsDataStore = get(),
-        pushNotificationApi = get()) }
+    factory {
+        NotificationUseCase(
+            context = androidApplication(),
+            network = get(),
+            settingsDataStore = get(),
+            chatRoomApi = get(),
+            bulletinBoardApi = get(),
+            pushNotificationApi = get()
+        )
+    }
 }

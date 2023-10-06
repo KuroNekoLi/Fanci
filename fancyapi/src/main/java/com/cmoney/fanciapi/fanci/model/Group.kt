@@ -17,6 +17,7 @@ package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.ColorTheme
+import com.cmoney.fanciapi.fanci.model.IUserContext
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -38,6 +39,7 @@ import kotlinx.parcelize.Parcelize
  * @param updateUnixTime 更新時間
  * @param memberCount 會員總數
  * @param colorSchemeGroupKey 
+ * @param userContext 
  */
 @Parcelize
 
@@ -93,7 +95,10 @@ data class Group (
     val memberCount: kotlin.Int? = null,
 
     @Json(name = "ColorSchemeGroupKey")
-    val colorSchemeGroupKey: ColorTheme? = null
+    val colorSchemeGroupKey: ColorTheme? = null,
+
+    @Json(name = "userContext")
+    val userContext: IUserContext? = null
 
 ) : Parcelable
 

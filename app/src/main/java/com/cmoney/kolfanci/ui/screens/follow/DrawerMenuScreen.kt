@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.IUserContext
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
@@ -38,10 +39,11 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun DrawerMenuScreen(
     modifier: Modifier = Modifier,
     groupList: List<GroupItem>,
+    notificationUnReadCount: Long,
     onClick: (GroupItem) -> Unit,
     onPlusClick: () -> Unit,
     onProfile: () -> Unit,
-    onNotification: () -> Unit
+    onNotification: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -81,10 +83,12 @@ fun DrawerMenuScreen(
                         )
                     }
 
-                    //TODO: api data
-                    RedDotItemScreen(
-                        text = "99+"
-                    )
+                    //未讀小紅點
+                    item.groupModel.userContext?.unReadCount?.let { unReadCount ->
+                        RedDotItemScreen(
+                            unReadCount = unReadCount
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(17.dp))
@@ -92,19 +96,28 @@ fun DrawerMenuScreen(
         }
 
         Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(22.dp))
-                .background(LocalColor.current.env_80)
-                .clickable {
-                    onNotification.invoke()
-                },
-            contentAlignment = Alignment.Center
+            modifier = Modifier,
+            contentAlignment = Alignment.BottomEnd
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.menu_bell),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(LocalColor.current.env_80)
+                    .clickable {
+                        onNotification.invoke()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.menu_bell),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+                )
+            }
+
+            RedDotItemScreen(
+                unReadCount = notificationUnReadCount
             )
         }
 
@@ -155,20 +168,25 @@ fun DrawerMenuScreenPreview() {
         DrawerMenuScreen(
             groupList = listOf(
                 GroupItem(
-                    isSelected = true, groupModel = Group(
+                    isSelected = true,
+                    groupModel = Group(
                         id = "",
                         name = "",
                         description = "Description",
                         coverImageUrl = "",
                         thumbnailImageUrl = "",
-                        categories = emptyList()
+                        categories = emptyList(),
+                        userContext = IUserContext(
+                            unReadCount = 100
+                        )
                     )
                 )
             ),
             onClick = {},
             onPlusClick = {},
             onProfile = {},
-            onNotification = {}
+            onNotification = {},
+            notificationUnReadCount = 99
         )
     }
 }
