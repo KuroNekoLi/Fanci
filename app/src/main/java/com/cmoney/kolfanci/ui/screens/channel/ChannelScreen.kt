@@ -218,7 +218,9 @@ private fun ChannelScreenView(
                                 resultRecipient = announcementResultRecipient,
                                 jumpChatMessage = jumpChatMessage
                             )
-                            onChatPageSelected.invoke()
+                            LaunchedEffect(key1 = Unit) {
+                                onChatPageSelected.invoke()
+                            }
                         }
 
                         else -> {
@@ -230,7 +232,9 @@ private fun ChannelScreenView(
                                 postInfoResultRecipient = postInfoResultRecipient
                             )
 
-                            onPostPageSelected.invoke()
+                            LaunchedEffect(key1 = Unit) {
+                                onPostPageSelected.invoke()
+                            }
 
                             LaunchedEffect(key1 = page) {
                                 AppUserLogger.getInstance().log(Page.PostWall)
