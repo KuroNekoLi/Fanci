@@ -10,6 +10,7 @@ import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ChannelViewModel(
@@ -78,7 +79,10 @@ class ChannelViewModel(
     fun onChatRedDotClick(channelId: String) {
         KLog.i(TAG, "onChatRedDotClick")
         viewModelScope.launch {
-            _unreadCount.value = Pair(0, _unreadCount.value?.second ?: 0)
+            _unreadCount.update {
+                it?.copy(first = 0)
+            }
+
             notificationUseCase.clearChatUnReadCount(channelId = channelId)
                 .onSuccess {
                 }
@@ -91,7 +95,10 @@ class ChannelViewModel(
     fun onPostRedDotClick(channelId: String) {
         KLog.i(TAG, "onPostRedDotClick")
         viewModelScope.launch {
-            _unreadCount.value = Pair(_unreadCount.value?.first ?: 0, 0)
+            _unreadCount.update {
+                it?.copy(second = 0)
+            }
+            
             notificationUseCase.clearPostUnReadCount(channelId = channelId)
                 .onSuccess {
                 }
