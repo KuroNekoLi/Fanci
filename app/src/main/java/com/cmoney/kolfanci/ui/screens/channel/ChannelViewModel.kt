@@ -83,9 +83,7 @@ class ChannelViewModel(
                 it?.copy(first = 0)
             }
 
-            notificationUseCase.clearChatUnReadCount(channelId = channelId)
-                .onSuccess {
-                }
+            notificationUseCase.clearChatUnReadCount(channelId = channelId).getOrNull()
         }
     }
 
@@ -98,10 +96,8 @@ class ChannelViewModel(
             _unreadCount.update {
                 it?.copy(second = 0)
             }
-            
-            notificationUseCase.clearPostUnReadCount(channelId = channelId)
-                .onSuccess {
-                }
+
+            notificationUseCase.clearPostUnReadCount(channelId = channelId).getOrNull()
         }
     }
 
