@@ -78,9 +78,9 @@ class ChannelViewModel(
     fun onChatRedDotClick(channelId: String) {
         KLog.i(TAG, "onChatRedDotClick")
         viewModelScope.launch {
+            _unreadCount.value = Pair(0, _unreadCount.value?.second ?: 0)
             notificationUseCase.clearChatUnReadCount(channelId = channelId)
                 .onSuccess {
-                    _unreadCount.value = Pair(0, _unreadCount.value?.second ?: 0)
                 }
         }
     }
@@ -91,9 +91,9 @@ class ChannelViewModel(
     fun onPostRedDotClick(channelId: String) {
         KLog.i(TAG, "onPostRedDotClick")
         viewModelScope.launch {
+            _unreadCount.value = Pair(_unreadCount.value?.first ?: 0, 0)
             notificationUseCase.clearPostUnReadCount(channelId = channelId)
                 .onSuccess {
-                    _unreadCount.value = Pair(_unreadCount.value?.first ?: 0, 0)
                 }
         }
     }
