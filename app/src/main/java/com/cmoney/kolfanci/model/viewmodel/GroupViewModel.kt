@@ -158,6 +158,9 @@ class GroupViewModel(
                 }, {
                     KLog.e(TAG, it)
                 })
+
+                fetchNotificationCenterCount()
+
                 if (isNotSilent) {
                     dismissLoading()
                 }
@@ -852,8 +855,19 @@ class GroupViewModel(
                     setCurrentGroup(group)
                 }
 
+            fetchNotificationCenterCount()
+        }
+    }
+
+    /**
+     *  抓取 推播中心 未讀數量
+     */
+    private fun fetchNotificationCenterCount() {
+        KLog.i(TAG, "fetchNotificationCenterCount")
+        viewModelScope.launch {
             notificationUseCase.getNotificationUnReadCount()
                 .onSuccess { unReadCount ->
+                    KLog.i(TAG, "NotificationUnReadCount:$unReadCount")
                     _notificationUnreadCount.value = unReadCount
                 }
         }
