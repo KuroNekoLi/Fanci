@@ -97,7 +97,7 @@ interface ChatRoomApi {
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessagePut(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Body messageIdParam: MessageIdParam? = null): Response<Unit>
 
     /**
-     * 設置使用者當前閱讀位置 __________🔒 可看
+     * 清空使用者聊天室未讀數 __________🔒 可看
      * 
      * Responses:
      *  - 200: Success
@@ -105,10 +105,9 @@ interface ChatRoomApi {
      *  - 403: Forbidden
      *
      * @param chatRoomChannelId 
-     * @param readWeight 閱讀位置(不填或-1則一律到最新 會比較當前記錄一律取最大) *目前暫時不支援指定位置 (optional, default to -1L)
      * @return [Unit]
      */
-    @PUT("api/v1/ChatRoom/{chatRoomChannelId}/SetReadWeight")
-    suspend fun apiV1ChatRoomChatRoomChannelIdSetReadWeightPut(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Query("readWeight") readWeight: kotlin.Long? = -1L): Response<Unit>
+    @PUT("api/v1/ChatRoom/{chatRoomChannelId}/ResetUnreadCount")
+    suspend fun apiV1ChatRoomChatRoomChannelIdResetUnreadCountPut(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<Unit>
 
 }

@@ -103,7 +103,7 @@ class NotificationUseCase(
      */
     suspend fun clearChatUnReadCount(channelId: String) = withContext(dispatcher) {
         kotlin.runCatching {
-            chatRoomApi.apiV1ChatRoomChatRoomChannelIdSetReadWeightPut(
+            chatRoomApi.apiV1ChatRoomChatRoomChannelIdResetUnreadCountPut(
                 chatRoomChannelId = channelId
             ).checkResponseBody()
         }
@@ -114,7 +114,7 @@ class NotificationUseCase(
      */
     suspend fun clearPostUnReadCount(channelId: String) = withContext(dispatcher) {
         kotlin.runCatching {
-            bulletinBoardApi.apiV1BulletinBoardChannelIdSetReadWeightPut(
+            bulletinBoardApi.apiV1BulletinBoardChannelIdResetUnreadCountPut(
                 channelId = channelId
             ).checkResponseBody()
         }

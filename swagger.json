@@ -913,12 +913,12 @@
         ]
       }
     },
-    "/api/v1/BulletinBoard/{channelId}/SetReadWeight": {
+    "/api/v1/BulletinBoard/{channelId}/ResetUnreadCount": {
       "put": {
         "tags": [
           "BulletinBoard"
         ],
-        "summary": "設置使用者當前閱讀位置 __________🔒 可看",
+        "summary": "清空使用者貼文未讀數 __________🔒 可看",
         "parameters": [
           {
             "name": "channelId",
@@ -927,16 +927,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "readWeight",
-            "in": "query",
-            "description": "閱讀位置(不填或-1則一律到最新 會比較當前記錄一律取最大) *目前暫時不支援指定位置",
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "default": -1
             }
           }
         ],
@@ -967,7 +957,7 @@
         "tags": [
           "Category"
         ],
-        "summary": "取得特定分類 __________🔒 已註冊的fanci使用者",
+        "summary": "取得特定分類",
         "parameters": [
           {
             "name": "categoryId",
@@ -1051,8 +1041,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_刪除分類_0_categoryId_categoryId"
+              "PERMISSION_刪除分類_0_categoryId_categoryId",
+              "user"
             ]
           }
         ]
@@ -1063,7 +1053,7 @@
         "tags": [
           "Category"
         ],
-        "summary": "取得分類下的頻道 __________🔒 已註冊的fanci使用者",
+        "summary": "取得分類下的頻道",
         "parameters": [
           {
             "name": "categoryId",
@@ -1204,8 +1194,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_建立頻道_0_categoryId_categoryId"
+              "PERMISSION_建立頻道_0_categoryId_categoryId",
+              "user"
             ]
           }
         ]
@@ -1265,8 +1255,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_編輯分類_0_categoryId_categoryId"
+              "PERMISSION_編輯分類_0_categoryId_categoryId",
+              "user"
             ]
           }
         ]
@@ -2243,9 +2233,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_CanPost_1_chatRoomChannelId_none"
+              "PERMISSION_CanPost_1_chatRoomChannelId_none",
+              "user"
             ]
           }
         ]
@@ -2327,8 +2317,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_chatRoomChannelId_none"
+              "PERMISSION_CanRead_1_chatRoomChannelId_none",
+              "user"
             ]
           }
         ]
@@ -2385,8 +2375,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_chatRoomChannelId_none"
+              "PERMISSION_CanRead_1_chatRoomChannelId_none",
+              "user"
             ]
           }
         ]
@@ -2447,9 +2437,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_可管理_1_chatRoomChannelId_channelId"
+              "PERMISSION_可管理_1_chatRoomChannelId_channelId",
+              "user"
             ]
           }
         ]
@@ -2490,20 +2480,20 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_可管理_1_chatRoomChannelId_channelId"
+              "PERMISSION_可管理_1_chatRoomChannelId_channelId",
+              "user"
             ]
           }
         ]
       }
     },
-    "/api/v1/ChatRoom/{chatRoomChannelId}/SetReadWeight": {
+    "/api/v1/ChatRoom/{chatRoomChannelId}/ResetUnreadCount": {
       "put": {
         "tags": [
           "ChatRoom"
         ],
-        "summary": "設置使用者當前閱讀位置 __________🔒 可看",
+        "summary": "清空使用者聊天室未讀數 __________🔒 可看",
         "parameters": [
           {
             "name": "chatRoomChannelId",
@@ -2511,16 +2501,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "readWeight",
-            "in": "query",
-            "description": "閱讀位置(不填或-1則一律到最新 會比較當前記錄一律取最大) *目前暫時不支援指定位置",
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "default": -1
             }
           }
         ],
@@ -2538,8 +2518,9 @@
         "security": [
           {
             "oauth2": [
-              "BANNED_1_channelId",
-              "PERMISSION_CanRead_1_chatRoomChannelId_none"
+              "BANNED_1_chatRoomChannelId",
+              "PERMISSION_CanRead_1_chatRoomChannelId_none",
+              "user"
             ]
           }
         ]
@@ -4632,158 +4613,6 @@
             "oauth2": [
               "user",
               "BANNED_2_messageId"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/v1/Notify/SettingType": {
-      "get": {
-        "tags": [
-          "Notify"
-        ],
-        "summary": "取得推播開關設定種類",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PushNotificationSetting"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PushNotificationSetting"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PushNotificationSetting"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "oauth2": [
-              "user"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/v1/Notify/UserSettingType/{groupId}": {
-      "get": {
-        "tags": [
-          "Notify"
-        ],
-        "summary": "取得使用者社團推播設定",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PushNotificationSetting"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PushNotificationSetting"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PushNotificationSetting"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "oauth2": [
-              "user"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/v1/Notify/UserSettingType/{groupId}/{settingType}": {
-      "put": {
-        "tags": [
-          "Notify"
-        ],
-        "summary": "設定使用者社團推播設定",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "settingType",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PushNotificationSettingType"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "oauth2": [
-              "user"
             ]
           }
         ]
@@ -7529,10 +7358,10 @@
           "canRead": {
             "type": "boolean"
           },
-          "canReply": {
+          "canPost": {
             "type": "boolean"
           },
-          "canPost": {
+          "canReply": {
             "type": "boolean"
           },
           "canEmoji": {
@@ -7621,9 +7450,6 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
-          "replyMessage": {
-            "$ref": "#/components/schemas/IReplyMessage"
-          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
@@ -7653,9 +7479,6 @@
           "messageType": {
             "$ref": "#/components/schemas/MessageType"
           },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
-          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -7668,6 +7491,12 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false
@@ -8516,7 +8345,7 @@
       "IUserContext": {
         "type": "object",
         "properties": {
-          "unReadCount": {
+          "unreadCount": {
             "type": "integer",
             "format": "int64"
           }
