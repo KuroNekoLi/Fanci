@@ -83,7 +83,7 @@ class ChannelViewModel(
                 it?.copy(first = 0)
             }
 
-            notificationUseCase.clearChatUnReadCount(channelId = channelId).getOrNull()
+            notificationUseCase.clearChatUnReadCount(channelId = channelId)
         }
     }
 
@@ -97,7 +97,7 @@ class ChannelViewModel(
                 it?.copy(second = 0)
             }
 
-            notificationUseCase.clearPostUnReadCount(channelId = channelId).getOrNull()
+            notificationUseCase.clearPostUnReadCount(channelId = channelId)
         }
     }
 
