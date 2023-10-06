@@ -130,4 +130,18 @@ interface BulletinBoardApi {
     @PUT("api/v1/BulletinBoard/{channelId}/PinnedMessage")
     suspend fun apiV1BulletinBoardChannelIdPinnedMessagePut(@Path("channelId") channelId: kotlin.String, @Body messageIdParam: MessageIdParam? = null): Response<Unit>
 
+    /**
+     * 清空使用者貼文未讀數 __________🔒 可看
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param channelId 頻道ID
+     * @return [Unit]
+     */
+    @PUT("api/v1/BulletinBoard/{channelId}/ResetUnreadCount")
+    suspend fun apiV1BulletinBoardChannelIdResetUnreadCountPut(@Path("channelId") channelId: kotlin.String): Response<Unit>
+
 }

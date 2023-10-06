@@ -26,6 +26,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.ui.common.ChannelText
+import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -49,7 +50,8 @@ fun ChannelBarScreen(
         contentAlignment = Alignment.CenterStart
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp)
+            modifier = Modifier.padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 painterResource(id = R.drawable.message),
@@ -78,11 +80,24 @@ fun ChannelBarScreen(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            //小紅點
+            val unReadCount = channel.tabs?.map {
+                it.userContext?.unReadCount ?: 0L
+            }.orEmpty().sum()
+
+            if (unReadCount > 0) {
+                RedDotItemScreen(
+                    unReadCount = unReadCount
+                )
+            }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun ChannelBarScreenPreview() {
     FanciTheme {

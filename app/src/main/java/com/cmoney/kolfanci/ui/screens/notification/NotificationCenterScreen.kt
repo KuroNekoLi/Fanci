@@ -97,6 +97,10 @@ fun NotificationCenterScreen(
         viewModel.clickPayloadDone()
     }
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.clearNotificationCenter()
+    }
+
     //TODO: 需要優化整合 目前跟 MainScreen 處理一樣的東西
     //禁止進入頻道彈窗
     val channelAlertDialog = remember { mutableStateOf(false) }

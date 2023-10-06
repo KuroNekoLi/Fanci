@@ -124,4 +124,14 @@ class NotificationCenterViewModel(
     fun clickPayloadDone() {
         _payload.value = null
     }
+
+    /**
+     * 清除 通知中心 所有已讀
+     */
+    fun clearNotificationCenter() {
+        KLog.i(TAG, "clearNotificationCenter")
+        viewModelScope.launch {
+            notificationUseCase.setNotificationSeen()
+        }
+    }
 }

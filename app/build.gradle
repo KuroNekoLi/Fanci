@@ -10,14 +10,14 @@ plugins {
 
 android {
     namespace 'com.cmoney.kolfanci'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.cmoney.kolfanci"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 3
-        versionName "1.0.6.3"
+        versionName "1.0.6.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

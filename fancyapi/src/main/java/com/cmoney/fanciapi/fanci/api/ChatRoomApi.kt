@@ -96,4 +96,18 @@ interface ChatRoomApi {
     @PUT("api/v1/ChatRoom/{chatRoomChannelId}/PinnedMessage")
     suspend fun apiV1ChatRoomChatRoomChannelIdPinnedMessagePut(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String, @Body messageIdParam: MessageIdParam? = null): Response<Unit>
 
+    /**
+     * 清空使用者聊天室未讀數 __________🔒 可看
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param chatRoomChannelId 
+     * @return [Unit]
+     */
+    @PUT("api/v1/ChatRoom/{chatRoomChannelId}/ResetUnreadCount")
+    suspend fun apiV1ChatRoomChatRoomChannelIdResetUnreadCountPut(@Path("chatRoomChannelId") chatRoomChannelId: kotlin.String): Response<Unit>
+
 }
