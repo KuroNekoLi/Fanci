@@ -188,7 +188,7 @@ private fun ChannelScreenView(
                                         if (readCount > 0) {
                                             RedDotItemScreen(
                                                 modifier = Modifier.align(Alignment.CenterEnd),
-                                                unReadCount = readCount
+                                                unreadCount = readCount
                                             )
                                         }
                                     }

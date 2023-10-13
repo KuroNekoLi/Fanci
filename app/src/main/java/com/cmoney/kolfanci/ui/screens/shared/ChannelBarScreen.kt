@@ -84,13 +84,13 @@ fun ChannelBarScreen(
             Spacer(modifier = Modifier.width(4.dp))
 
             //小紅點
-            val unReadCount = channel.tabs?.map {
+            val unreadCount = channel.tabs?.map {
                 it.userContext?.unreadCount ?: 0L
             }.orEmpty().sum()
 
-            if (unReadCount > 0) {
+            if (unreadCount > 0) {
                 RedDotItemScreen(
-                    unReadCount = unReadCount
+                    unreadCount = unreadCount
                 )
             }
         }
