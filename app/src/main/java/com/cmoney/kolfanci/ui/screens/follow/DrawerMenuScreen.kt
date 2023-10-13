@@ -84,7 +84,7 @@ fun DrawerMenuScreen(
                     }
 
                     //未讀小紅點
-                    item.groupModel.userContext?.unReadCount?.let { unReadCount ->
+                    item.groupModel.userContext?.unreadCount?.let { unReadCount ->
                         RedDotItemScreen(
                             unReadCount = unReadCount
                         )
@@ -177,7 +177,7 @@ fun DrawerMenuScreenPreview() {
                         thumbnailImageUrl = "",
                         categories = emptyList(),
                         userContext = IUserContext(
-                            unReadCount = 100
+                            unreadCount = 100
                         )
                     )
                 )

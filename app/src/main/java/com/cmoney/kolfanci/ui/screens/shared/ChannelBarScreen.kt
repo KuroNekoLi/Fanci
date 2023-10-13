@@ -85,7 +85,7 @@ fun ChannelBarScreen(
 
             //小紅點
             val unReadCount = channel.tabs?.map {
-                it.userContext?.unReadCount ?: 0L
+                it.userContext?.unreadCount ?: 0L
             }.orEmpty().sum()
 
             if (unReadCount > 0) {

@@ -174,5 +174,5 @@ task copyV2() {
 task buildApi() {
     dependsOn(buildKotlinClient, copy)
 
-    dependsOn(buildV2KotlinClient, copyV2)
+//    dependsOn(buildV2KotlinClient, copyV2)
 }

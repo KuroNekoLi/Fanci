@@ -32,6 +32,7 @@ import kotlinx.parcelize.Parcelize
  * 
  *
  * @param author 
+ * @param replyMessage 
  * @param content 
  * @param emojiCount 
  * @param id 
@@ -40,12 +41,11 @@ import kotlinx.parcelize.Parcelize
  * @param updateUnixTime 
  * @param serialNumber 
  * @param messageType 
+ * @param messageFromType 
  * @param messageReaction 
  * @param deleteStatus 
  * @param deleteFrom 
  * @param commentCount 
- * @param replyMessage 
- * @param messageFromType 
  */
 @Parcelize
 
@@ -54,6 +54,9 @@ data class ChatMessage (
 
     @Json(name = "author")
     val author: GroupMember? = null,
+
+    @Json(name = "replyMessage")
+    val replyMessage: IReplyMessage? = null,
 
     @Json(name = "content")
     val content: MediaIChatContent? = null,
@@ -80,6 +83,9 @@ data class ChatMessage (
     @Json(name = "messageType")
     val messageType: MessageType? = null,
 
+    @Json(name = "messageFromType")
+    val messageFromType: MessageServiceType? = null,
+
     @Json(name = "messageReaction")
     val messageReaction: IUserMessageReaction? = null,
 
@@ -90,13 +96,7 @@ data class ChatMessage (
     val deleteFrom: GroupMember? = null,
 
     @Json(name = "commentCount")
-    val commentCount: kotlin.Int? = null,
-
-    @Json(name = "replyMessage")
-    val replyMessage: IReplyMessage? = null,
-
-    @Json(name = "messageFromType")
-    val messageFromType: MessageServiceType? = null
+    val commentCount: kotlin.Int? = null
 
 ) : Parcelable
 
