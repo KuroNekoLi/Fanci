@@ -22,6 +22,7 @@ import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
+import com.cmoney.kolfanci.ui.screens.channel.ResetRedDot
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
@@ -844,7 +845,7 @@ class GroupViewModel(
     }
 
     /**
-     * 刷新 Group and notification unread count
+     * 刷新 Group and Group List and notification unread count
      */
     fun refreshGroupAndNotificationCount() {
         KLog.i(TAG, "refreshGroup")
@@ -855,7 +856,7 @@ class GroupViewModel(
                     setCurrentGroup(group)
                 }
 
-            fetchNotificationCenterCount()
+            fetchMyGroup(isSilent = true)
         }
     }
 
@@ -869,5 +870,24 @@ class GroupViewModel(
                 KLog.i(TAG, "NotificationUnReadCount:$unreadCount")
                 _notificationUnreadCount.value = unreadCount
             }
+    }
+
+    /**
+     * 清空 指定紅點, 之後再去拿取最新Group資訊
+     */
+    fun resetRedDot(resetRedDot: ResetRedDot) {
+        KLog.i(TAG, "resetRedDot:$resetRedDot")
+        viewModelScope.launch {
+            val channelId = resetRedDot.channelId
+            if (resetRedDot.isResetChat) {
+                notificationUseCase.clearChatUnReadCount(channelId = channelId)
+            }
+
+            if (resetRedDot.isResetPost) {
+                notificationUseCase.clearPostUnReadCount(channelId = channelId)
+            }
+
+            refreshGroupAndNotificationCount()
+        }
     }
 }

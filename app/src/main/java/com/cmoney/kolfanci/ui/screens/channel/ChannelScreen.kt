@@ -1,5 +1,8 @@
 package com.cmoney.kolfanci.ui.screens.channel
 
+import android.os.Parcelable
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,15 +44,28 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultRecipient
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
+
+/**
+ * 是否 reset 相關 紅點資訊
+ */
+@Parcelize
+data class ResetRedDot(
+    val channelId: String,
+    val isResetPost: Boolean,
+    val isResetChat: Boolean
+): Parcelable
 
 /**
  * 頻道主頁面
@@ -57,6 +73,7 @@ import org.koin.androidx.compose.koinViewModel
  * @param channel 點擊頻道
  * @param jumpChatMessage 打開直接前往的聊天訊息
  */
+@OptIn(ExperimentalPagerApi::class)
 @Destination
 @Composable
 fun ChannelScreen(
@@ -67,7 +84,8 @@ fun ChannelScreen(
     jumpChatMessage: ChatMessage? = null,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
-    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
+    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
+    redDotResultBackNavigator: ResultBackNavigator<ResetRedDot>
 ) {
     val group by globalGroupViewModel().currentGroup.collectAsState()
 
@@ -83,8 +101,14 @@ fun ChannelScreen(
 
     val unreadCount by viewMode.unreadCount.collectAsState()
 
+    val pagerState = rememberPagerState()
+
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
+        ?.onBackPressedDispatcher
+
     ChannelScreenView(
         modifier = modifier,
+        pagerState = pagerState,
         group = group,
         channel = channel,
         unreadCount = unreadCount,
@@ -103,14 +127,30 @@ fun ChannelScreen(
             viewMode.onPostRedDotClick(
                 channelId = channel.id.orEmpty()
             )
+        },
+        onBackClick = {
+            onBackPressedDispatcher?.onBackPressed()
         }
     )
+
+    BackHandler {
+        val currentPage = pagerState.currentPage
+        redDotResultBackNavigator.navigateBack(
+            ResetRedDot(
+                channelId = channel.id.orEmpty(),
+                isResetPost = (currentPage == 0),
+                isResetChat = (currentPage == 1)
+            )
+        )
+    }
+
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun ChannelScreenView(
     modifier: Modifier = Modifier,
+    pagerState: PagerState,
     group: Group?,
     channel: Channel,
     jumpChatMessage: ChatMessage? = null,
@@ -121,7 +161,8 @@ private fun ChannelScreenView(
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
     onChatPageSelected: () -> Unit,
-    onPostPageSelected: () -> Unit
+    onPostPageSelected: () -> Unit,
+    onBackClick: () -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -129,7 +170,7 @@ private fun ChannelScreenView(
             TopBarScreen(
                 title = channel.name.orEmpty(),
                 backClick = {
-                    navController.popBackStack()
+                    onBackClick.invoke()
                 }
             )
         },
@@ -144,8 +185,6 @@ private fun ChannelScreenView(
         if (channelTabStatus.chatRoom == true) {
             pages.add(stringResource(id = R.string.chat))
         }
-
-        val pagerState = rememberPagerState()
 
         val tabIndex = pagerState.currentPage
 
@@ -248,27 +287,30 @@ private fun ChannelScreenView(
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Preview
 @Composable
 fun ChannelScreenPreview() {
     FanciTheme {
         ChannelScreenView(
+            pagerState = rememberPagerState(),
             group = Group(),
             channel = Channel(
                 name = "\uD83D\uDC57｜金針菇穿什麼"
             ),
+            channelTabStatus = ChannelTabsStatus(),
+            unreadCount = Pair(10, 20),
             navController = EmptyDestinationsNavigator,
             announcementResultRecipient = EmptyResultRecipient(),
-            channelTabStatus = ChannelTabsStatus(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
-            unreadCount = Pair(10, 20),
             onChatPageSelected = {
 
             },
             onPostPageSelected = {
 
-            }
+            },
+            onBackClick = {},
         )
     }
 }
