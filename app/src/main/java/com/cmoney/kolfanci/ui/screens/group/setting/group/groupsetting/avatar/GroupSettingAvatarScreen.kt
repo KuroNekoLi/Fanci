@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -26,7 +27,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,8 +111,7 @@ fun GroupSettingAvatarScreen(
         onImageChange = {
             if (isFromCreate) {
                 AppUserLogger.getInstance().log(Clicked.Confirm, From.AddGroupIcon)
-            }
-            else {
+            } else {
                 AppUserLogger.getInstance().log(Clicked.Confirm, From.EditGroupIcon)
             }
             resultNavigator.navigateBack(
@@ -131,11 +133,14 @@ fun GroupSettingAvatarScreen(
 
     if (uiState.openCameraDialog) {
         GroupPhotoPickDialogScreen(
+            quantityLimit = 1,
             onDismiss = {
                 groupSettingAvatarViewModel.closeCameraDialog()
             },
-            onAttach = {
-                groupSettingAvatarViewModel.setAvatarImage(it)
+            onAttach = { photoUris ->
+                photoUris.firstOrNull()?.let {
+                    groupSettingAvatarViewModel.setAvatarImage(it)
+                }
             },
             onFanciClick = {
                 groupSettingAvatarViewModel.closeCameraDialog()
@@ -216,16 +221,29 @@ fun GroupSettingAvatarView(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AsyncImage(
-                    model = avatarImage ?: group.thumbnailImageUrl,
-                    modifier = Modifier
-                        .size(182.dp)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(60.dp)),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.placeholder)
-                )
+                val imageModel = avatarImage ?: group.thumbnailImageUrl
+
+                imageModel?.let {
+                    AsyncImage(
+                        model = imageModel,
+                        modifier = Modifier
+                            .size(182.dp)
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(60.dp)),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        placeholder = painterResource(id = R.drawable.placeholder)
+                    )
+                } ?: kotlin.run {
+                    //Empty View
+                    Box(
+                        modifier = Modifier
+                            .size(182.dp)
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(60.dp))
+                            .background(colorResource(id = R.color.color_D9D9D9))
+                    )
+                }
             }
 
             if (isLoading) {

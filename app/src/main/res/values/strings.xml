@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Fanci</string>
     <integer name="app_id">176</integer>
     <string name="app_client_id">cmkolfanci</string>
 
@@ -40,7 +39,7 @@
     <string name="add">新增</string>
 
     <string name="about_group">關於社團</string>
-    <string name="invite_group_member">邀請社團成員</string>
+    <string name="invite_group_member">分享邀請連結</string>
     <string name="leave_group">退出社團</string>
     <string name="group_manage">社團管理</string>
     <string name="group_setting">社團設定</string>
@@ -165,7 +164,7 @@
     <string name="search_result_empty">找不到相關內容\n試試看比較簡短的關鍵字呢</string>
     <string name="jump_to_chatroom">跳至訊息，進行更多互動</string>
     <string name="search_keyword_hint">輸入關鍵字</string>
-    <string name="empty_follow_tip">加入Fanci社團跟我們一起快快樂樂！\n立即建立、加入熱門社團</string>
+    <string name="empty_follow_tip">立即建立社團，或加入熱門社團</string>
     <string name="create_group">建立社團</string>
     <string name="disband_group">解散社團</string>
     <string name="group_openness">社團公開度</string>
@@ -202,11 +201,58 @@
     <string name="update_immediately">立即更新</string>
     <string name="later">稍後</string>
 
+    <!--  Notification  -->
+    <string name="default_notification_channel_id">0</string>
+    <string name="default_notification_channel_message">一般通知</string>
+
     <!--  Deep link  -->
     <string name="deeplink_baseLink">https://www.fanci.com.tw/landing?targetType=1&amp;groupId=%s</string>
     <string name="deeplink_domain_prefix">https://invite.fanci.com.tw/invite</string>
     <string name="deeplink_title">Fanci｜經營個人影響力更輕鬆的選擇</string>
     <string name="deeplink_description">量身打造高黏著度社團 一站經營你的個人影響力</string>
     <string name="deeplink_imageUrl">https://i.imgur.com/tt02yvG.png</string>
+
+    <string name="notification_center">通知中心</string>
+
+    <string name="notification_setting">提醒設定</string>
+
+    <string name="notification_setting_short">新動態都提醒我</string>
+    <string name="notification_setting_all">有任何新動態都提醒我</string>
+    <string name="notification_setting_all_desc">所有新內容，與我的內容有人回饋時請提醒我</string>
+
+    <string name="notification_setting_post_short">新貼文提醒我</string>
+    <string name="notification_setting_post">只有新貼文時提醒我</string>
+    <string name="notification_setting_post_desc">任一頻道之貼文區有新的貼文時 (不論發佈者) 請提醒我</string>
+
+    <string name="notification_setting_silence_short">完全靜音</string>
+    <string name="notification_setting_silence">完全靜音</string>
+    <string name="notification_setting_silence_desc">任何動靜都別提醒我</string>
+
+    <string name="forward_system_setting">前往系統設定</string>
+    <string name="open_notification_setting">開啟通知設定</string>
+    <string name="open_notification_setting_desc">若想要收到提醒，要先開啟系統設定！</string>
+
+    <string name="channel_manage">頻道管理</string>
+
+    <string name="not_belong_group">你目前不屬於此社團</string>
+    <string name="rejoin_group">請重新加入，或洽社團管理員詢問</string>
+
+    <string name="dissolve_group_title">此社團已被解散</string>
+    <string name="dissolve_group_description">如問題請聯繫原社團聯絡人或客服人員</string>
+
+    <string name="user_name_empty">暱稱空白</string>
+    <string name="user_name_empty_desc">暱稱不可以是空白的唷！</string>
+
+    <string name="comment_remove_from_manage">這則留言已被管理員刪除</string>
+    <string name="comment_remove_from_poster">這則留言已被發文者刪除</string>
+
+    <string name="wait_for_apply">申請已送出，等待審核加入</string>
+    <string name="wait_for_group_apply">等待 %s 審核中</string>
+
+    <string name="has_no_permission_title">沒有權限執行動作</string>
+    <string name="has_no_permission_description">你在此社團的權限有了改變\n目前無法執行這個動作</string>
+    <string name="i_know">我知道了</string>
+
+    <string name="input_approve_question">請輸入審核題目</string>
 
 </resources>

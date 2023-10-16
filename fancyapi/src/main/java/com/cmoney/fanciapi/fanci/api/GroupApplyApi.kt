@@ -15,6 +15,20 @@ import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyPaging
 
 interface GroupApplyApi {
     /**
+     * 取得我的所有社團申請
+     * 
+     * Responses:
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到該社團
+     *
+     * @return [kotlin.collections.List<GroupRequirementApplyInfo>]
+     */
+    @GET("api/v1/GroupApply/Group/All/Me")
+    suspend fun apiV1GroupApplyGroupAllMeGet(): Response<kotlin.collections.List<GroupRequirementApplyInfo>>
+
+    /**
      * 整批更新審核狀態(通過/拒絕) __________🔒 審核入社申請
      * 
      * Responses:
@@ -28,7 +42,7 @@ interface GroupApplyApi {
      * @param groupApplyStatusParam 審核狀態參數 (optional)
      * @return [Unit]
      */
-    @PUT("api/v1/GroupApply/group/{groupId}/Approval")
+    @PUT("api/v1/GroupApply/Group/{groupId}/Approval")
     suspend fun apiV1GroupApplyGroupGroupIdApprovalPut(@Path("groupId") groupId: kotlin.String, @Body groupApplyStatusParam: GroupApplyStatusParam? = null): Response<Unit>
 
     /**
@@ -43,7 +57,7 @@ interface GroupApplyApi {
      * @param applyStatus  (optional)
      * @return [CountResult]
      */
-    @GET("api/v1/GroupApply/group/{groupId}/Count")
+    @GET("api/v1/GroupApply/Group/{groupId}/Count")
     suspend fun apiV1GroupApplyGroupGroupIdCountGet(@Path("groupId") groupId: kotlin.String, @Query("applyStatus") applyStatus: ApplyStatus? = null): Response<CountResult>
 
     /**
@@ -62,11 +76,11 @@ interface GroupApplyApi {
      * @param pageSize 每頁筆數 (optional, default to 20)
      * @return [GroupRequirementApplyPaging]
      */
-    @GET("api/v1/GroupApply/group/{groupId}")
+    @GET("api/v1/GroupApply/Group/{groupId}")
     suspend fun apiV1GroupApplyGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("applyStatus") applyStatus: ApplyStatus? = null, @Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<GroupRequirementApplyPaging>
 
     /**
-     * 取得我的社團申請 __________🔒 已註冊的fanci使用者
+     * 取得我的社團申請
      * 
      * Responses:
      *  - 200: 成功
@@ -77,11 +91,11 @@ interface GroupApplyApi {
      * @param groupId 社團Id
      * @return [GroupRequirementApplyInfo]
      */
-    @GET("api/v1/GroupApply/group/{groupId}/me")
+    @GET("api/v1/GroupApply/Group/{groupId}/Me")
     suspend fun apiV1GroupApplyGroupGroupIdMeGet(@Path("groupId") groupId: kotlin.String): Response<GroupRequirementApplyInfo>
 
     /**
-     * 新增社團申請 __________🔒 已註冊的fanci使用者
+     * 新增社團申請
      * 
      * Responses:
      *  - 409: Conflict
@@ -94,7 +108,7 @@ interface GroupApplyApi {
      * @param groupApplyParam 社團申請參數 (optional)
      * @return [Unit]
      */
-    @PUT("api/v1/GroupApply/group/{groupId}")
+    @PUT("api/v1/GroupApply/Group/{groupId}")
     suspend fun apiV1GroupApplyGroupGroupIdPut(@Path("groupId") groupId: kotlin.String, @Body groupApplyParam: GroupApplyParam? = null): Response<Unit>
 
 }

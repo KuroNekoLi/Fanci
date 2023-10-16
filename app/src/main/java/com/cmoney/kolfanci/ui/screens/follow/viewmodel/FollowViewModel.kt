@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.follow.viewmodel
 
 import android.content.res.Configuration
+import android.os.Build
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,26 +9,50 @@ import androidx.compose.ui.unit.Density
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.px
+import com.cmoney.kolfanci.model.persistence.SettingsDataStore
+import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+/**
+ * Follow ui state
+ *
+ * @property spaceHeight 滑動時的間距
+ * @property imageOffset 滑動時圖片Offset
+ * @property visibleAvatar 是否要顯示大頭貼
+ * @property lazyColumnScrollEnabled LazyColumn 是否可以滑動
+ * @property showLoginDialog 呈現登入彈窗
+ * @property navigateToCreateGroup 前往建立社團
+ * @property navigateToApproveGroup 前往社團認證
+ * @property needNotifyAllowNotificationPermission 是否提示使用者允許推播通知，false 表示未處理或是已通知過
+ * @property isShowBubbleTip 是否出現 提示彈窗
+ */
 data class FollowUiState(
-    val spaceHeight: Int = 190.px,  //滑動時的間距
-    val imageOffset: Int = 0,       //滑動時圖片Offset
-    val visibleAvatar: Boolean = false,  //是否要顯示 大頭貼
-    val lazyColumnScrollEnabled: Boolean = false,    //LazyColumn 是否可以滑動
-    val showLoginDialog: Boolean = false,        //呈現登入彈窗
-    val navigateToCreateGroup: Boolean = false,  //前往建立社團
-    val navigateToApproveGroup: Group? = null,  //前往社團認證
+    val spaceHeight: Int = 190.px,
+    val imageOffset: Int = 0,
+    val visibleAvatar: Boolean = false,
+    val lazyColumnScrollEnabled: Boolean = false,
+    val showLoginDialog: Boolean = false,
+    val navigateToCreateGroup: Boolean = false,
+    val navigateToApproveGroup: Group? = null,
+    val needNotifyAllowNotificationPermission: Boolean = false,
+    val isShowBubbleTip: Boolean = false
 )
 
-class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
+class FollowViewModel(
+    private val groupUseCase: GroupUseCase,
+    private val notificationUseCase: NotificationUseCase,
+    private val dataStore: SettingsDataStore,
+    private val groupApplyUseCase: GroupApplyUseCase
+) : ViewModel() {
+
     private val TAG = FollowViewModel::class.java.simpleName
 
     //點擊加入群組彈窗
@@ -37,6 +62,10 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     //刷新 我目前的社團清單
     private val _refreshMyGroup: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val refreshMyGroup = _refreshMyGroup.asStateFlow()
+
+    //我申請中的社團
+    private val _allMyApplyGroup: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
+    val allMyApplyGroup = _allMyApplyGroup.asStateFlow()
 
     var uiState by mutableStateOf(FollowUiState())
         private set
@@ -57,12 +86,7 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
                         closeGroupItemDialog()
                         _refreshMyGroup.value = true
                     }, {
-                        if (it is EmptyBodyException) {
-                            closeGroupItemDialog()
-                            _refreshMyGroup.value = true
-                        } else {
-                            KLog.e(TAG, it)
-                        }
+                        KLog.e(TAG, it)
                     })
                 }
             }
@@ -171,5 +195,65 @@ class FollowViewModel(private val groupUseCase: GroupUseCase) : ViewModel() {
     fun refreshMyGroupDone() {
         KLog.i(TAG, "refreshMyGroupDone")
         _refreshMyGroup.value = false
+    }
+
+    fun disableBubbleTip() {
+        KLog.i(TAG, "onMoreClick")
+        viewModelScope.launch {
+            dataStore.alreadyShowHomeBubble()
+            uiState = uiState.copy(isShowBubbleTip = false)
+        }
+    }
+
+    fun fetchSetting() {
+        viewModelScope.launch {
+            uiState = uiState.copy(isShowBubbleTip = dataStore.isShowBubble.first())
+        }
+    }
+
+    /**
+     * 確認是否通知使用者允許通知權限
+     */
+    fun checkNeedNotifyAllowNotificationPermission() {
+        viewModelScope.launch {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val hasNotifyAllowNotificationPermission =
+                    notificationUseCase.hasNotifyAllowNotificationPermission()
+                        .getOrNull() ?: false
+                if (!hasNotifyAllowNotificationPermission) {
+                    uiState = uiState.copy(
+                        needNotifyAllowNotificationPermission = true
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * 已通知使用者允許推播通知權限
+     */
+    fun alreadyNotifyAllowNotificationPermission() {
+        viewModelScope.launch {
+            notificationUseCase.alreadyNotifyAllowNotificationPermission()
+            uiState = uiState.copy(
+                needNotifyAllowNotificationPermission = false
+            )
+        }
+    }
+
+    /**
+     * 取得 我申請的社團-審核中
+     */
+    fun fetchAllMyGroupApplyUnConfirmed() {
+        KLog.i(TAG, "fetchAllMyGroupApplyUnConfirmed.")
+        viewModelScope.launch {
+            groupApplyUseCase.fetchAllMyGroupApplyUnConfirmed()
+                .onSuccess { groupList ->
+                    _allMyApplyGroup.value = groupList
+                }
+                .onFailure { err ->
+                    KLog.e(TAG, err)
+                }
+        }
     }
 }

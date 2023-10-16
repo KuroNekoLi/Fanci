@@ -221,8 +221,8 @@ fun AllMemberScreenView(
             LazyColumn(modifier = Modifier.padding(innerPadding)) {
 
                 item {
-                    if (groupMemberList.isEmpty() && textState.isEmpty()) {
-                        if (groupMemberList.isEmpty()) {
+                    if (groupMemberList.isEmpty()) {
+                        if (textState.isEmpty()) {
                             EmptyAllMemberView(onInviteClick)
                         } else {
                             SearchNoResultView()
@@ -417,7 +417,7 @@ fun RoleItem(roleInfo: FanciRole) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(40.dp))
-            .background(LocalColor.current.env_80)
+            .background(LocalColor.current.background)
             .padding(start = 7.dp, end = 7.dp, top = 2.dp, bottom = 2.dp)
     ) {
         Row(

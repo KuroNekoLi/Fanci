@@ -14,7 +14,7 @@ import com.cmoney.fanciapi.fanci.model.ChannelParam
 
 interface CategoryApi {
     /**
-     * 取得分類下的頻道 __________🔒 已註冊的fanci使用者
+     * 取得分類下的頻道
      * 
      * Responses:
      *  - 200: 成功
@@ -62,7 +62,7 @@ interface CategoryApi {
     suspend fun apiV1CategoryCategoryIdDelete(@Path("categoryId") categoryId: kotlin.String): Response<Unit>
 
     /**
-     * 取得特定分類 __________🔒 已註冊的fanci使用者
+     * 取得特定分類
      * 
      * Responses:
      *  - 200: 成功

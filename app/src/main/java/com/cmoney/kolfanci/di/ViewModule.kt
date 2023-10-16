@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.di
 
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
+import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.SplashViewModel
 import com.cmoney.kolfanci.ui.main.MainViewModel
@@ -15,12 +16,14 @@ import com.cmoney.kolfanci.ui.screens.group.setting.apply.viewmodel.GroupApplyVi
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.my.MyScreenViewModel
+import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
@@ -33,13 +36,27 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModule = module {
-    viewModel { SplashViewModel(get(), get(), get()) }
+    viewModel { SplashViewModel(get(), get()) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
-    viewModel { FollowViewModel(get()) }
+    viewModel {
+        FollowViewModel(
+            groupUseCase = get(),
+            notificationUseCase = get(),
+            dataStore = get(),
+            groupApplyUseCase = get()
+        )
+    }
     viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
     viewModel { MessageViewModel(androidApplication(), get(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get()) }
-    viewModel { GroupSettingViewModel(get(), get(), get()) }
+    viewModel {
+        GroupSettingViewModel(
+            groupUseCase = get(),
+            themeUseCase = get(),
+            groupApplyUseCase = get(),
+            notificationUseCase = get()
+        )
+    }
 
     viewModel {
         ChannelSettingViewModel(get(), get())
@@ -56,7 +73,7 @@ val viewModule = module {
         )
     }
     viewModel {
-        CreateGroupViewModel(androidApplication(), get(), get(), get())
+        CreateGroupViewModel(androidApplication(), get(), get(), get(), settingsDataStore = get())
     }
     viewModel { ApplyForGroupViewModel(get(), get()) }
     viewModel { params ->
@@ -89,7 +106,10 @@ val viewModule = module {
         )
     }
     viewModel {
-        ChannelViewModel(get())
+        ChannelViewModel(
+            channelUseCase = get(),
+            notificationUseCase = get()
+        )
     }
     viewModel { params ->
         PostInfoViewModel(androidApplication(), get(), get(), params.get(), params.get(), get())
@@ -100,7 +120,9 @@ val viewModule = module {
             groupUseCase = get(),
             channelUseCase = get(),
             permissionUseCase = get(),
-            orderUseCase = get()
+            orderUseCase = get(),
+            groupApplyUseCase = get(),
+            notificationUseCase = get()
         )
     }
     viewModel { params ->
@@ -119,5 +141,14 @@ val viewModule = module {
     }
     viewModel {
         SearchViewModel(get())
+    }
+    viewModel {
+        NotificationCenterViewModel(get(), get())
+    }
+    viewModel {
+        NotificationSettingViewModel(androidApplication(), get())
+    }
+    viewModel {
+        NotificationViewModel(get(), get(), get(), get())
     }
 }

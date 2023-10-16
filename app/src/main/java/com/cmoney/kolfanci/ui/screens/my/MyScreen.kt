@@ -64,7 +64,6 @@ fun MyScreen(
         topBar = {
             TopBarScreen(
                 title = "會員中心",
-                leadingIcon = ImageVector.vectorResource(id = R.drawable.house),
                 backClick = {
                     AppUserLogger.getInstance().log(Clicked.MemberPageHome)
                     navController.popBackStack()

@@ -1,13 +1,10 @@
 package com.cmoney.kolfanci.ui.screens.channel
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -20,9 +17,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
@@ -35,12 +31,12 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
-import com.cmoney.kolfanci.ui.destinations.SearchMainScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -81,16 +77,33 @@ fun ChannelScreen(
 
     val channelTabStatus by viewMode.channelTabStatus.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewMode.fetchAllUnreadCount(channel)
+    }
+
+    val unreadCount by viewMode.unreadCount.collectAsState()
+
     ChannelScreenView(
         modifier = modifier,
         group = group,
         channel = channel,
+        unreadCount = unreadCount,
         navController = navController,
         jumpChatMessage = jumpChatMessage,
         channelTabStatus = channelTabStatus,
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
-        postInfoResultRecipient = postInfoResultRecipient
+        postInfoResultRecipient = postInfoResultRecipient,
+        onChatPageSelected = {
+            viewMode.onChatRedDotClick(
+                channelId = channel.id.orEmpty()
+            )
+        },
+        onPostPageSelected = {
+            viewMode.onPostRedDotClick(
+                channelId = channel.id.orEmpty()
+            )
+        }
     )
 }
 
@@ -101,11 +114,14 @@ private fun ChannelScreenView(
     group: Group?,
     channel: Channel,
     jumpChatMessage: ChatMessage? = null,
+    channelTabStatus: ChannelTabsStatus,
+    unreadCount: Pair<Long, Long>?,
     navController: DestinationsNavigator,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
-    channelTabStatus: ChannelTabsStatus,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
-    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
+    postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
+    onChatPageSelected: () -> Unit,
+    onPostPageSelected: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -121,12 +137,12 @@ private fun ChannelScreenView(
     ) { innerPadding ->
         val pages = mutableListOf<String>()
 
-        if (channelTabStatus.chatRoom == true) {
-            pages.add("聊天")
+        if (channelTabStatus.bulletinboard == true) {
+            pages.add(stringResource(id = R.string.post))
         }
 
-        if (channelTabStatus.bulletinboard == true) {
-            pages.add("貼文")
+        if (channelTabStatus.chatRoom == true) {
+            pages.add(stringResource(id = R.string.chat))
         }
 
         val pagerState = rememberPagerState()
@@ -149,11 +165,34 @@ private fun ChannelScreenView(
                     pages.forEachIndexed { index, title ->
                         Tab(
                             text = {
-                                Text(
-                                    title,
-                                    fontSize = 14.sp,
-                                    color = LocalColor.current.text.default_80
-                                )
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+
+                                    Text(
+                                        title,
+                                        fontSize = 14.sp,
+                                        color = LocalColor.current.text.default_80
+                                    )
+
+                                    //紅點
+                                    unreadCount?.let { unreadCount ->
+                                        val readCount =
+                                            if (title == stringResource(id = R.string.chat)) {
+                                                unreadCount.first
+                                            } else {
+                                                unreadCount.second
+                                            }
+
+                                        if (readCount > 0) {
+                                            RedDotItemScreen(
+                                                modifier = Modifier.align(Alignment.CenterEnd),
+                                                unreadCount = readCount
+                                            )
+                                        }
+                                    }
+                                }
                             },
                             selected = tabIndex == index,
                             onClick = {
@@ -171,16 +210,6 @@ private fun ChannelScreenView(
                 ) { page ->
                     when (page) {
                         0 -> {
-                            //聊天室 Tab
-                            ChatRoomScreen(
-                                channelId = channel.id.orEmpty(),
-                                navController = navController,
-                                resultRecipient = announcementResultRecipient,
-                                jumpChatMessage = jumpChatMessage
-                            )
-                        }
-
-                        else -> {
                             //貼文 Tab
                             PostScreen(
                                 channel = channel,
@@ -189,8 +218,25 @@ private fun ChannelScreenView(
                                 postInfoResultRecipient = postInfoResultRecipient
                             )
 
+                            LaunchedEffect(key1 = Unit) {
+                                onPostPageSelected.invoke()
+                            }
+
                             LaunchedEffect(key1 = page) {
                                 AppUserLogger.getInstance().log(Page.PostWall)
+                            }
+                        }
+
+                        else -> {
+                            //聊天室 Tab
+                            ChatRoomScreen(
+                                channelId = channel.id.orEmpty(),
+                                navController = navController,
+                                resultRecipient = announcementResultRecipient,
+                                jumpChatMessage = jumpChatMessage
+                            )
+                            LaunchedEffect(key1 = Unit) {
+                                onChatPageSelected.invoke()
                             }
                         }
                     }
@@ -202,11 +248,12 @@ private fun ChannelScreenView(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun ChannelScreenPreview() {
     FanciTheme {
         ChannelScreenView(
+            group = Group(),
             channel = Channel(
                 name = "\uD83D\uDC57｜金針菇穿什麼"
             ),
@@ -215,7 +262,13 @@ fun ChannelScreenPreview() {
             channelTabStatus = ChannelTabsStatus(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
-            group = Group()
+            unreadCount = Pair(10, 20),
+            onChatPageSelected = {
+
+            },
+            onPostPageSelected = {
+
+            }
         )
     }
 }

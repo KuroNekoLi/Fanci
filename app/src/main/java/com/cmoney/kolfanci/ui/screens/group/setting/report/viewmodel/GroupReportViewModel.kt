@@ -5,13 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.kolfanci.extension.EmptyBodyException
-import com.cmoney.kolfanci.model.usecase.BanUseCase
-import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.fanciapi.fanci.model.ReportProcessStatus
+import com.cmoney.kolfanci.model.usecase.BanUseCase
+import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -120,17 +119,14 @@ class GroupReportViewModel(
                 reportId = reportInformation.id.orEmpty(),
                 reportProcessStatus = ReportProcessStatus.ignored
             ).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    val newList = uiState.reportList.filter {
-                        it != reportInformation
-                    }
-                    uiState = uiState.copy(
-                        reportList = newList
-                    )
-                } else {
-                    KLog.e(TAG, it)
+                val newList = uiState.reportList.filter {
+                    it != reportInformation
                 }
+                uiState = uiState.copy(
+                    reportList = newList
+                )
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -146,17 +142,14 @@ class GroupReportViewModel(
                 reportId = reportInformation.id.orEmpty(),
                 reportProcessStatus = ReportProcessStatus.punished
             ).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    val newList = uiState.reportList.filter {
-                        it != reportInformation
-                    }
-                    uiState = uiState.copy(
-                        reportList = newList
-                    )
-                } else {
-                    KLog.e(TAG, it)
+                val newList = uiState.reportList.filter {
+                    it != reportInformation
                 }
+                uiState = uiState.copy(
+                    reportList = newList
+                )
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -176,12 +169,10 @@ class GroupReportViewModel(
                 userId = reportInformation.reportee?.id.orEmpty(),
                 banPeriodOption = banPeriodOption
             ).fold({
-
+                dismissSilenceDialog()
+                punished(reportInformation)
             }, {
-                if (it is EmptyBodyException) {
-                    dismissSilenceDialog()
-                    punished(reportInformation)
-                }
+                KLog.e(TAG, it)
             })
         }
     }
@@ -196,13 +187,10 @@ class GroupReportViewModel(
                 groupId = group.id.orEmpty(),
                 userId = reportInformation.reportee?.id.orEmpty()
             ).fold({
+                dismissKickDialog()
+                punished(reportInformation)
             }, {
-                if (it is EmptyBodyException) {
-                    dismissKickDialog()
-                    punished(reportInformation)
-                } else {
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
     }

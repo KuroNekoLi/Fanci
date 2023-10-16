@@ -1,13 +1,14 @@
 package com.cmoney.kolfanci.model.usecase
 
-import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.fanciapi.fanci.api.GroupApi
 import com.cmoney.fanciapi.fanci.api.GroupApplyApi
 import com.cmoney.fanciapi.fanci.model.ApplyStatus
 import com.cmoney.fanciapi.fanci.model.GroupApplyParam
 import com.cmoney.fanciapi.fanci.model.GroupApplyStatusParam
 import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
+import com.cmoney.kolfanci.extension.checkResponseBody
 
-class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi) {
+class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi, private val groupApi: GroupApi) {
 
     /**
      * 審核加入社團
@@ -76,4 +77,26 @@ class GroupApplyUseCase(private val groupApplyApi: GroupApplyApi) {
             startWeight = startWeight
         ).checkResponseBody()
     }
+
+    /**
+     * 取得 我申請的社團-審核中
+     */
+    suspend fun fetchAllMyGroupApplyUnConfirmed() = kotlin.runCatching {
+        groupApplyApi.apiV1GroupApplyGroupAllMeGet().checkResponseBody().filter {
+            it.apply?.status == ApplyStatus.unConfirmed
+        }.mapNotNull {
+            val groupId = it.apply?.groupId ?: return@mapNotNull null
+            groupApi.apiV1GroupGroupIdGet(groupId = groupId).checkResponseBody()
+        }
+    }
+
+    /**
+     * 取得 我的社團申請狀態
+     * @param groupId 社團 id
+     */
+    suspend fun fetchMyApply(groupId: String) = kotlin.runCatching {
+        groupApplyApi.apiV1GroupApplyGroupGroupIdMeGet(
+            groupId = groupId
+        ).checkResponseBody()
+        }
 }

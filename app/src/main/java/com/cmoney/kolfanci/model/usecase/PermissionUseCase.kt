@@ -21,8 +21,6 @@ class PermissionUseCase(
         Constant.MyChannelBuff =
             buffInformationApi.apiV1BuffInformationChannelChannelIdMeGet(channelId = channelId)
                 .checkResponseBody()
-
-        Result.success(true)
     }
 
     suspend fun getPermissionByChannel(channelId: String) = kotlin.runCatching {

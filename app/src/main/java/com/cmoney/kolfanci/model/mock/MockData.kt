@@ -2,16 +2,163 @@ package com.cmoney.kolfanci.model.mock
 
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
+import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
 import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.PushNotificationSettingWrap
+import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterData
 import org.apache.commons.lang3.RandomStringUtils
 import kotlin.random.Random
 
 object MockData {
+
+    val mockGroup: Group = Group(
+        id = "",
+        name = "愛莉莎莎Alisasa",
+        description = "大家好，我是愛莉莎莎Alisasa！\n" +
+                "\n" +
+                "台灣人在韓國留學八個月 \n" +
+                "已經在2018 一月\n" +
+                "回到台灣當全職Youtuber囉！\n" +
+                "\n" +
+                "但是我還是每個月會去韓國\n" +
+                "更新最新的韓國情報 （流行 美妝 美食等等） \n" +
+                "提供給大家不同於一般觀光客\n" +
+                "內行的認識韓國新角度\n" +
+                "\n" +
+                "另外也因為感情經驗豐富（？）\n" +
+                "可以提供給大家一些女生的秘密想法～\n" +
+                "\n" +
+                "希望大家喜歡我的頻道＾＾\n" +
+                "\n" +
+                "\n" +
+                "如果你喜歡我的影片，希望你可以幫我訂閱＋分享\n" +
+                "\n" +
+                "任何合作邀約請洽Pressplay Email :\n" +
+                "alisasa@pressplay.cc\n" +
+                "═════════════════════════════════════\n" +
+                "\n" +
+                "追蹤我 Follow Me \n" +
+                "\n" +
+                "★Facebook社團『愛莉莎莎敗家基地』: https://www.facebook.com/groups/924974291237889/\n" +
+                "★Facebook粉絲專頁: https://www.facebook.com/alisasa11111/\n" +
+                "★Instagram: goodalicia",
+        coverImageUrl = "https://img.ltn.com.tw/Upload/health/page/800/2021/02/14/phpo5UnZT.png",
+        thumbnailImageUrl = "https://picsum.photos/${
+            Random.nextInt(
+                100,
+                300
+            )
+        }/${Random.nextInt(100, 300)}",
+        categories = emptyList()
+    )
+
+    val mockNotificationSettingItem: PushNotificationSetting = PushNotificationSetting(
+        settingType = PushNotificationSettingType.newPost,
+        title = "有任何新動態都提醒我",
+        description = "所有新內容，與我的內容有人回饋時請提醒我",
+        shortTitle = "新動態都提醒我"
+    )
+
+    val mockNotificationSettingItemWrapList: List<PushNotificationSettingWrap> = listOf(
+        PushNotificationSettingWrap(
+            pushNotificationSetting = mockNotificationSettingItem,
+            isChecked = true
+        ),
+        PushNotificationSettingWrap(
+            pushNotificationSetting = mockNotificationSettingItem,
+            isChecked = false
+        ),
+        PushNotificationSettingWrap(
+            pushNotificationSetting = mockNotificationSettingItem,
+            isChecked = false
+        )
+    )
+
+
+    /**
+     * 推播中心 假資料
+     */
+    val mockNotificationCenter: List<NotificationCenterData>
+        get() {
+            return if (BuildConfig.DEBUG) {
+                val kindSize = mockNotificationCenterKind.size
+                (1..Random.nextInt(2, 20)).map {
+                    mockNotificationCenterKind[Random.nextInt(0, kindSize)]
+                }
+            } else {
+                emptyList()
+            }
+        }
+
+    /**
+     * 所有 推播 種類
+     */
+    private val mockNotificationCenterKind = listOf<NotificationCenterData>(
+        NotificationCenterData(
+            notificationId = "",
+            image = "https://picsum.photos/${
+                Random.nextInt(
+                    100,
+                    300
+                )
+            }/${Random.nextInt(100, 300)}",
+            title = "聊天室有新訊息",
+            description = "[藝術學院小公主的小畫廊\uD83C\uDFA8] 社團有新訊息",
+            deepLink = "{\"targetType\": 2, \"serialNumber\" : \"2455\" ,  \"groupId\" : \"27444\",  \"channelId\": \"31913\"}",
+            isRead = Random.nextBoolean(),
+            displayTime = "剛剛"
+        ),
+        NotificationCenterData(
+            notificationId = "",
+            image = "https://picsum.photos/${
+                Random.nextInt(
+                    100,
+                    300
+                )
+            }/${Random.nextInt(100, 300)}",
+            title = "邀請加入社團",
+            description = "[藝術學院小公主的小畫廊\uD83C\uDFA8] 社團",
+            deepLink = "{\"targetType\": 1, \"groupId\": \"27444\"}",
+            isRead = Random.nextBoolean(),
+            displayTime = "剛剛"
+        ),
+        NotificationCenterData(
+            notificationId = "",
+            image = "https://picsum.photos/${
+                Random.nextInt(
+                    100,
+                    300
+                )
+            }/${Random.nextInt(100, 300)}",
+            title = "有新文章",
+            description = "[藝術學院小公主的小畫廊\uD83C\uDFA8] 社團有新文章",
+            deepLink = "{\"targetType\": 3, \"messageId\" : \"151547560\" ,  \"groupId\" : \"27444\",  \"channelId\": \"31913\"}",
+            isRead = Random.nextBoolean(),
+            displayTime = "剛剛"
+        ),
+        NotificationCenterData(
+            notificationId = "",
+            image = "https://picsum.photos/${
+                Random.nextInt(
+                    100,
+                    300
+                )
+            }/${Random.nextInt(100, 300)}",
+            title = "社團解散",
+            description = " [XLAB-405] 社團解散了",
+            deepLink = "{\"targetType\": 4, \"groupId\" : \"28557\"}",
+            isRead = Random.nextBoolean(),
+            displayTime = "剛剛"
+        )
+    )
+
 
     /**
      * 會員 假資料

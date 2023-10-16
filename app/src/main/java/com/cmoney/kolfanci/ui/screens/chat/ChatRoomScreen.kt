@@ -80,7 +80,7 @@ fun ChatRoomScreen(
             messageViewModel.forwardToMessage(channelId, jumpChatMessage)
         }
         else {
-            messageViewModel.startPolling(channelId)
+            messageViewModel.chatRoomFirstFetch(channelId)
         }
     }
 

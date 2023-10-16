@@ -7,10 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.fanciapi.fanci.model.ReportInformation
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.socks.library.KLog
@@ -28,13 +29,15 @@ data class GroupSettingUiState(
     val unApplyCount: Long? = null,                         //等待加入申請數量
     val showDelectDialog: Boolean = false,                  //是否呈現解散彈窗
     val showFinalDelectDialog: Boolean = false,             //是否呈現最後解散彈窗
-    val popToMain: Boolean = false                          //跳回首頁
+    val popToMain: Boolean = false,                         //跳回首頁
+    val pushNotificationSetting: PushNotificationSetting? = null    //推播通知設定
 )
 
 class GroupSettingViewModel(
     private val groupUseCase: GroupUseCase,
     private val themeUseCase: ThemeUseCase,
     private val groupApplyUseCase: GroupApplyUseCase,
+    private val notificationUseCase: NotificationUseCase
 ) : ViewModel() {
     private val TAG = GroupSettingViewModel::class.java.simpleName
 
@@ -184,16 +187,50 @@ class GroupSettingViewModel(
         KLog.i(TAG, "onFinalConfirmDelete:$group")
         viewModelScope.launch {
             groupUseCase.deleteGroup(groupId = group.id.orEmpty()).fold({
+                KLog.i(TAG, "Group delete complete.")
+                uiState = uiState.copy(
+                    popToMain = true
+                )
             }, {
-                if (it is EmptyBodyException) {
-                    KLog.i(TAG, "Group delete complete.")
-                    uiState = uiState.copy(
-                        popToMain = true
-                    )
-                } else {
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
+    }
+
+    /**
+     * 設定目前 設定的 推播設定
+     */
+    fun setCurrentNotificationSetting(pushNotificationSetting: PushNotificationSetting) {
+        KLog.i(TAG, "setCurrentNotificationSetting:$pushNotificationSetting")
+        uiState = uiState.copy(
+            pushNotificationSetting = pushNotificationSetting
+        )
+    }
+
+    /**
+     * 抓取推播通知 設定
+     */
+    fun fetchNotificationSetting(groupId: String) {
+        KLog.i(TAG, "fetchNotificationSetting")
+        viewModelScope.launch {
+            notificationUseCase.getNotificationSetting(groupId)
+                .onSuccess {
+                    uiState = uiState.copy(
+                        pushNotificationSetting = it
+                    )
+                }
+                .onFailure {
+                    KLog.e(TAG, it)
+                }
+        }
+    }
+
+    /**
+     * 清除 推播設定
+     */
+    fun clearNotificationSetting() {
+        uiState = uiState.copy(
+            pushNotificationSetting = null
+        )
     }
 }

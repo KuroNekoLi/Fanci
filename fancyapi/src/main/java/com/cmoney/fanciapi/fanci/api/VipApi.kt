@@ -12,7 +12,7 @@ import com.cmoney.fanciapi.fanci.model.VipSale
 
 interface VipApi {
     /**
-     * 取得該用戶所購買的所有方案 __________🔒 已註冊的fanci使用者
+     * 取得該用戶所購買的所有方案
      * 
      * Responses:
      *  - 200: Success
@@ -26,7 +26,7 @@ interface VipApi {
     suspend fun apiV1VipPurchasedSaleUserIdGet(@Path("userId") userId: kotlin.String): Response<kotlin.collections.List<PurchasedSale>>
 
     /**
-     * 取得授權的用戶 __________🔒 已註冊的fanci使用者
+     * 取得授權的用戶
      * 
      * Responses:
      *  - 200: Success
@@ -40,7 +40,7 @@ interface VipApi {
     suspend fun apiV1VipVipRoleRoleIdAuthorizationGet(@Path("roleId") roleId: kotlin.String): Response<kotlin.collections.List<IUser>>
 
     /**
-     * 透過角色Id判斷是否購買VIP __________🔒 已註冊的fanci使用者
+     * 透過角色Id判斷是否購買VIP
      * 
      * Responses:
      *  - 200: Success
@@ -55,7 +55,7 @@ interface VipApi {
     suspend fun apiV1VipVipRoleRoleIdAuthorizationUserIdGet(@Path("roleId") roleId: kotlin.String, @Path("userId") userId: kotlin.String): Response<kotlin.Boolean>
 
     /**
-     * 透過角色Id取得該權限包相關的VIP方案 __________🔒 已註冊的fanci使用者
+     * 透過角色Id取得該權限包相關的VIP方案
      * 
      * Responses:
      *  - 200: Success

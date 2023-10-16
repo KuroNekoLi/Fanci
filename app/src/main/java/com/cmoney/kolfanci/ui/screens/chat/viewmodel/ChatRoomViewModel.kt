@@ -7,7 +7,6 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.RelationUseCase
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
@@ -40,8 +38,8 @@ class ChatRoomViewModel(
     val blockingList = _blockingList.asStateFlow()
 
     //是否更新完權限
-    private val _updatePermissionDone = MutableSharedFlow<Channel>()
-    val updatePermissionDone = _updatePermissionDone.asSharedFlow()
+    private val _updatePermissionDone = MutableStateFlow<Channel?>(null)
+    val updatePermissionDone = _updatePermissionDone.asStateFlow()
 
     //公告訊息,顯示用
     private val _announceMessage = MutableStateFlow<ChatMessage?>(null)
@@ -108,18 +106,14 @@ class ChatRoomViewModel(
             relationUseCase.disBlocking(
                 userId = chatMessage.author?.id.orEmpty()
             ).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    KLog.i(TAG, "onMsgDismissHide success")
-                    val newList = _blockingList.value.filter { user ->
-                        user.id != chatMessage.author?.id.orEmpty()
-                    }
-
-                    _blockingList.value = newList.distinct()
-
-                } else {
-                    KLog.e(TAG, it)
+                KLog.i(TAG, "onMsgDismissHide success")
+                val newList = _blockingList.value.filter { user ->
+                    user.id != chatMessage.author?.id.orEmpty()
                 }
+
+                _blockingList.value = newList.distinct()
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -133,12 +127,9 @@ class ChatRoomViewModel(
         KLog.i(TAG, "announceMessageToServer:$chatMessage")
         viewModelScope.launch {
             chatRoomUseCase.setAnnounceMessage(channelId, chatMessage).fold({
+                _announceMessage.value = chatMessage
             }, {
-                if (it is EmptyBodyException) {
-                    _announceMessage.value = chatMessage
-                } else {
-                    _errorMessage.emit(it.toString())
-                }
+                _errorMessage.emit(it.toString())
             })
         }
     }
@@ -151,10 +142,14 @@ class ChatRoomViewModel(
         viewModelScope.launch {
             permissionUseCase.updateChannelPermissionAndBuff(channelId = channel.id.orEmpty())
                 .fold({
-                    _updatePermissionDone.emit(channel)
+                    _updatePermissionDone.value = channel
                 }, {
                     KLog.e(TAG, it)
                 })
         }
+    }
+
+    fun afterUpdatePermissionDone() {
+        _updatePermissionDone.value = null
     }
 }

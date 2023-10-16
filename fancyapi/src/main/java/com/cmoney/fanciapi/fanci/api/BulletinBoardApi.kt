@@ -15,17 +15,17 @@ import com.cmoney.fanciapi.fanci.model.PinnedMessageInfo
 
 interface BulletinBoardApi {
     /**
-     * 取得貼文區貼文列表
+     * 取得貼文區貼文列表 __________🔒 可看
      * 
      * Responses:
      *  - 200: 成功
      *  - 401: 未驗證
-     *  - 404: 找不到該頻道
      *  - 403: 沒有權限
+     *  - 404: 找不到該頻道
      *
      * @param channelId 貼文區頻道Id
      * @param take 取得筆數 (optional, default to 20)
-     * @param order 排序依據(預設為新到舊) (optional)
+     * @param order 排序依據(預設為Latest) &lt;br&gt;&lt;/br&gt;Latest:代表從SerialNumber往前找 SerialNumber預設0 代表從最新往舊找,&lt;br&gt;&lt;/br&gt;Oldest:代表從SerialNumber往後找 SerialNumber預設0 代表從舊往新找&lt;br&gt;&lt;/br&gt;每次回傳weight為當下已經取得的最底一筆SerialNumber&lt;br&gt;&lt;/br&gt;所以下輪帶入SerialNumber並不會再包含該筆資料 (optional)
      * @param fromSerialNumber 從哪一個序列號開始往回找 (optional)
      * @return [BulletinboardMessagePaging]
      */
@@ -129,5 +129,19 @@ interface BulletinBoardApi {
      */
     @PUT("api/v1/BulletinBoard/{channelId}/PinnedMessage")
     suspend fun apiV1BulletinBoardChannelIdPinnedMessagePut(@Path("channelId") channelId: kotlin.String, @Body messageIdParam: MessageIdParam? = null): Response<Unit>
+
+    /**
+     * 清空使用者貼文未讀數 __________🔒 可看
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param channelId 頻道ID
+     * @return [Unit]
+     */
+    @PUT("api/v1/BulletinBoard/{channelId}/ResetUnreadCount")
+    suspend fun apiV1BulletinBoardChannelIdResetUnreadCountPut(@Path("channelId") channelId: kotlin.String): Response<Unit>
 
 }

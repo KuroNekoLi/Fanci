@@ -21,7 +21,7 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * Values: themeFanciBlue,themeSmokePink,themeMidnightBlue,themeClassicGreen,themeNeonBlack,themeCoffeeBrown,themeMintGreen,themePeachPink,themeDreamyPurple,themeBabyBlue
+ * Values: themeFanciBlue,themeSmokePink,themeMidnightBlue,themeClassicGreen,themeNeonBlack
  */
 
 enum class ColorTheme(val value: kotlin.String) {
@@ -39,22 +39,7 @@ enum class ColorTheme(val value: kotlin.String) {
     themeClassicGreen("ThemeClassicGreen"),
 
     @Json(name = "ThemeNeonBlack")
-    themeNeonBlack("ThemeNeonBlack"),
-
-    @Json(name = "ThemeCoffeeBrown")
-    themeCoffeeBrown("ThemeCoffeeBrown"),
-
-    @Json(name = "ThemeMintGreen")
-    themeMintGreen("ThemeMintGreen"),
-
-    @Json(name = "ThemePeachPink")
-    themePeachPink("ThemePeachPink"),
-
-    @Json(name = "ThemeDreamyPurple")
-    themeDreamyPurple("ThemeDreamyPurple"),
-
-    @Json(name = "ThemeBabyBlue")
-    themeBabyBlue("ThemeBabyBlue");
+    themeNeonBlack("ThemeNeonBlack");
 
     /**
      * Override toString() to avoid using the enum variable name as the value, and instead use

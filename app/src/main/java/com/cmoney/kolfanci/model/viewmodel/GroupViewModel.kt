@@ -2,6 +2,8 @@ package com.cmoney.kolfanci.model.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.ApplyStatus
+import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
@@ -9,10 +11,14 @@ import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.extension.EmptyBodyException
+import com.cmoney.fanciapi.fanci.model.GroupRequirementApply
+import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyInfo
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.GroupJoinStatus
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
+import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
+import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
@@ -34,6 +40,30 @@ sealed class ThemeSetting {
 }
 
 /**
+ * 推播 跳轉頁面所需資料
+ */
+sealed class PushDataWrapper {
+    /**
+     * 前往頻道聊天
+     */
+    data class ChannelMessage(
+        val group: Group,
+        val channel: Channel,
+        val messageId: String
+    ) : PushDataWrapper()
+
+    /**
+     * 前往頻道貼文
+     */
+    data class ChannelPost(
+        val group: Group,
+        val channel: Channel,
+        val bulletinboardMessage: BulletinboardMessage
+    ) : PushDataWrapper()
+
+}
+
+/**
  * 社團相關設定
  */
 class GroupViewModel(
@@ -41,7 +71,9 @@ class GroupViewModel(
     private val groupUseCase: GroupUseCase,
     private val channelUseCase: ChannelUseCase,
     private val permissionUseCase: PermissionUseCase,
-    private val orderUseCase: OrderUseCase
+    private val orderUseCase: OrderUseCase,
+    private val groupApplyUseCase: GroupApplyUseCase,
+    private val notificationUseCase: NotificationUseCase
 ) : ViewModel() {
     private val TAG = GroupViewModel::class.java.simpleName
 
@@ -56,13 +88,18 @@ class GroupViewModel(
     private val _myGroupList: MutableStateFlow<List<GroupItem>> = MutableStateFlow(emptyList())
     val myGroupList = _myGroupList.asStateFlow()
 
-    //目前server有的社團清單 (沒加入社團時顯示用)
-    private val _groupList: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
-    val groupList = _groupList.asStateFlow()
-
     //主題設定檔
     private val _theme = MutableStateFlow(DefaultThemeColor)
     val theme = _theme.asStateFlow()
+
+    //加入社團狀態
+    private val _joinGroupStatus: MutableStateFlow<GroupJoinStatus> =
+        MutableStateFlow(GroupJoinStatus.NotJoin)
+    val joinGroupStatus = _joinGroupStatus.asStateFlow()
+
+    //推播中心,未讀數量
+    private val _notificationUnreadCount: MutableStateFlow<Long> = MutableStateFlow(0L)
+    val notificationUnreadCount = _notificationUnreadCount.asStateFlow()
 
     var haveNextPage: Boolean = false       //拿取所有群組時 是否還有分頁
     var nextWeight: Long? = null            //下一分頁權重
@@ -70,12 +107,17 @@ class GroupViewModel(
     /**
      * 有登入狀態, 取得 我的群組, 並設定該主題
      * 未登入, 取得 server 社團清單
+     *
+     * @param isSilent 是否在執行過程中避免影響目前畫面，true 表示會避免，false 表示會影響
      */
-    fun fetchMyGroup() {
+    fun fetchMyGroup(isSilent: Boolean = false) {
         KLog.i(TAG, "fetchMyGroup")
         if (XLoginHelper.isLogin) {
             viewModelScope.launch {
-                loading()
+                val isNotSilent = !isSilent
+                if (isNotSilent) {
+                    loading()
+                }
                 groupUseCase.groupToSelectGroupItem().fold({
                     if (it.isNotEmpty()) {
                         var currentSelectedPos = _myGroupList.value.indexOfFirst { groupItem ->
@@ -112,16 +154,17 @@ class GroupViewModel(
                         fetchGroupPermission(selectedGroup)
                     } else {
                         resetToDefault()
-                        fetchAllGroupList()
                     }
-                    dismissLoading()
                 }, {
-                    dismissLoading()
                     KLog.e(TAG, it)
                 })
+
+                fetchNotificationCenterCount()
+
+                if (isNotSilent) {
+                    dismissLoading()
+                }
             }
-        } else {
-            fetchAllGroupList()
         }
     }
 
@@ -134,32 +177,6 @@ class GroupViewModel(
         _theme.value = DefaultThemeColor
     }
 
-    /**
-     * 當沒有 加入社團的時候, 取得目前server有的社團
-     */
-    fun fetchAllGroupList() {
-        KLog.i(TAG, "fetchAllGroupList")
-        viewModelScope.launch {
-            loading()
-            groupUseCase.getPopularGroup(
-                pageSize = 10,
-                startWeight = nextWeight ?: Long.MAX_VALUE
-            ).fold({
-                haveNextPage = it.haveNextPage == true
-                nextWeight = it.nextWeight
-                val orgGroupList = _groupList.value.toMutableList()
-                orgGroupList.addAll(it.items.orEmpty())
-                _groupList.value = orgGroupList.distinctBy { group ->
-                    group.id
-                }
-                dismissLoading()
-            }, {
-                dismissLoading()
-                KLog.e(TAG, it)
-            })
-        }
-    }
-
     private fun loading() {
         KLog.i(TAG, "loading")
         _loading.value = true
@@ -168,16 +185,6 @@ class GroupViewModel(
     private fun dismissLoading() {
         KLog.i(TAG, "dismissLoading")
         _loading.value = false
-    }
-
-    /**
-     * 讀取server 社團 下一分頁
-     */
-    fun onLoadMore() {
-        KLog.i(TAG, "onLoadMore: haveNextPage:$haveNextPage nextWeight:$nextWeight")
-        if (haveNextPage && nextWeight != null && nextWeight!! > 0) {
-            fetchAllGroupList()
-        }
     }
 
     /**
@@ -204,32 +211,27 @@ class GroupViewModel(
             loading()
             val result = groupUseCase.leaveGroup(id = id)
             result.onSuccess {
-                // TODO 目前不會成功，因為回傳 204 會被轉為 EmptyBodyException
-            }
-                .onFailure { t ->
-                    if (t is EmptyBodyException) {
-                        val myGroup = _myGroupList.value
-                        val newGroups = myGroup.filterNot { groupItem ->
-                            groupItem.groupModel.id == id
-                        }.mapIndexed { index, groupItem ->
-                            if (index == 0) {
-                                groupItem.copy(isSelected = true)
-                            } else {
-                                groupItem
-                            }
-                        }
-                        if (newGroups.isNotEmpty()) {
-                            val selectGroup = newGroups.first()
-                            _myGroupList.value = newGroups
-                            setCurrentGroup(group = selectGroup.groupModel)
-                        } else {
-//                            fetchAllGroupList()
-                            fetchMyGroup()
-                        }
+                val myGroup = _myGroupList.value
+                val newGroups = myGroup.filterNot { groupItem ->
+                    groupItem.groupModel.id == id
+                }.mapIndexed { index, groupItem ->
+                    if (index == 0) {
+                        groupItem.copy(isSelected = true)
                     } else {
-                        KLog.e(TAG, t)
+                        groupItem
                     }
                 }
+                if (newGroups.isNotEmpty()) {
+                    val selectGroup = newGroups.first()
+                    _myGroupList.value = newGroups
+                    setCurrentGroup(group = selectGroup.groupModel)
+                } else {
+//                            fetchAllGroupList()
+                    fetchMyGroup()
+                }
+            }.onFailure { t ->
+                KLog.e(TAG, t)
+            }
             dismissLoading()
         }
     }
@@ -306,11 +308,9 @@ class GroupViewModel(
         val group = _currentGroup.value ?: return
         viewModelScope.launch {
             groupUseCase.changeGroupDesc(desc, group).fold({
+                _currentGroup.value = group.copy(description = desc)
             }, {
                 KLog.e(TAG, it)
-                if (it is EmptyBodyException) {
-                    _currentGroup.value = group.copy(description = desc)
-                }
             })
         }
     }
@@ -324,11 +324,9 @@ class GroupViewModel(
         val group = _currentGroup.value ?: return
         viewModelScope.launch {
             groupUseCase.changeGroupName(name, group).fold({
+                _currentGroup.value = group.copy(name = name)
             }, {
                 KLog.e(TAG, it)
-                if (it is EmptyBodyException) {
-                    _currentGroup.value = group.copy(name = name)
-                }
             })
         }
     }
@@ -425,19 +423,17 @@ class GroupViewModel(
             if (group.id != null) {
                 themeUseCase.changeGroupTheme(group, groupTheme)
                     .onSuccess {
+                        ColorTheme.decode(groupTheme.id)?.let { colorTheme ->
+                            themeUseCase.fetchThemeConfig(colorTheme).fold({ localGroupTheme ->
+                                _theme.value = localGroupTheme.theme
+                            }, { t ->
+                                KLog.e(TAG, t)
+                            })
+                            setSelectedTheme(group, colorTheme)
+                        }
                     }
                     .onFailure {
                         KLog.e(TAG, it)
-                        if (it is EmptyBodyException) {
-                            ColorTheme.decode(groupTheme.id)?.let { colorTheme ->
-                                themeUseCase.fetchThemeConfig(colorTheme).fold({ localGroupTheme ->
-                                    _theme.value = localGroupTheme.theme
-                                }, { t ->
-                                    KLog.e(TAG, t)
-                                })
-                                setSelectedTheme(group, colorTheme)
-                            }
-                        }
                     }
             }
         }
@@ -589,19 +585,18 @@ class GroupViewModel(
         KLog.i(TAG, "deleteChannel:$channel")
         viewModelScope.launch {
             channelUseCase.deleteChannel(channel.id.orEmpty()).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    val newCategory = group.categories?.map { category ->
-                        category.copy(
-                            channels = category.channels?.filter { groupChannel ->
-                                groupChannel.id != channel.id
-                            }
-                        )
-                    }
-                    _currentGroup.update { oldGroup ->
-                        oldGroup?.copy(categories = newCategory)
-                    }
+                val newCategory = group.categories?.map { category ->
+                    category.copy(
+                        channels = category.channels?.filter { groupChannel ->
+                            groupChannel.id != channel.id
+                        }
+                    )
                 }
+                _currentGroup.update { oldGroup ->
+                    oldGroup?.copy(categories = newCategory)
+                }
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -699,28 +694,26 @@ class GroupViewModel(
                 } else {
                     ChannelPrivacy.public
                 }
-            ).fold({}, {
-                if (it is EmptyBodyException) {
-                    val newCategory = group.categories?.map { category ->
-                        val newChannel = category.channels?.map { groupChannel ->
-                            if (channel.id == groupChannel.id) {
-                                channel.copy(
-                                    name = name
-                                )
-                            } else {
-                                groupChannel
-                            }
+            ).fold({
+                val newCategory = group.categories?.map { category ->
+                    val newChannel = category.channels?.map { groupChannel ->
+                        if (channel.id == groupChannel.id) {
+                            channel.copy(
+                                name = name
+                            )
+                        } else {
+                            groupChannel
                         }
-                        category.copy(
-                            channels = newChannel
-                        )
                     }
-                    _currentGroup.update { oldGroup ->
-                        oldGroup?.copy(categories = newCategory)
-                    }
-                } else {
-                    KLog.e(TAG, it)
+                    category.copy(
+                        channels = newChannel
+                    )
                 }
+                _currentGroup.update { oldGroup ->
+                    oldGroup?.copy(categories = newCategory)
+                }
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -733,23 +726,20 @@ class GroupViewModel(
         val group = _currentGroup.value ?: return
         viewModelScope.launch {
             channelUseCase.editCategoryName(categoryId = category.id.orEmpty(), name = name).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    val newCategory = group.categories?.map { groupCategory ->
-                        if (groupCategory.id == category.id) {
-                            groupCategory.copy(name = name)
-                        } else {
-                            groupCategory
-                        }
+                val newCategory = group.categories?.map { groupCategory ->
+                    if (groupCategory.id == category.id) {
+                        groupCategory.copy(name = name)
+                    } else {
+                        groupCategory
                     }
-                    _currentGroup.update { oldGroup ->
-                        oldGroup?.copy(
-                            categories = newCategory
-                        )
-                    }
-                } else {
-                    KLog.e(TAG, it)
                 }
+                _currentGroup.update { oldGroup ->
+                    oldGroup?.copy(
+                        categories = newCategory
+                    )
+                }
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -762,32 +752,29 @@ class GroupViewModel(
         val group = _currentGroup.value ?: return
         viewModelScope.launch {
             channelUseCase.deleteCategory(categoryId = category.id.orEmpty()).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    val targetChannels = category.channels ?: emptyList()
-                    // 刪除分類
-                    val newCategories = group.categories?.filter { groupCategory ->
-                        groupCategory.id != category.id
-                    }
-                        // 將刪除分類下的頻道移至預設分類下
-                        ?.map { groupCategory ->
-                            if (groupCategory.isDefault == true) {
-                                val currentChannels =
-                                    groupCategory.channels?.toMutableList() ?: mutableListOf()
-                                currentChannels.addAll(targetChannels)
-                                groupCategory.copy(
-                                    channels = currentChannels
-                                )
-                            } else {
-                                groupCategory
-                            }
-                        }
-                    _currentGroup.update { oldGroup ->
-                        oldGroup?.copy(categories = newCategories)
-                    }
-                } else {
-                    KLog.e(TAG, it)
+                val targetChannels = category.channels ?: emptyList()
+                // 刪除分類
+                val newCategories = group.categories?.filter { groupCategory ->
+                    groupCategory.id != category.id
                 }
+                    // 將刪除分類下的頻道移至預設分類下
+                    ?.map { groupCategory ->
+                        if (groupCategory.isDefault == true) {
+                            val currentChannels =
+                                groupCategory.channels?.toMutableList() ?: mutableListOf()
+                            currentChannels.addAll(targetChannels)
+                            groupCategory.copy(
+                                channels = currentChannels
+                            )
+                        } else {
+                            groupCategory
+                        }
+                    }
+                _currentGroup.update { oldGroup ->
+                    oldGroup?.copy(categories = newCategories)
+                }
+            }, {
+                KLog.e(TAG, it)
             })
         }
     }
@@ -803,15 +790,84 @@ class GroupViewModel(
                 groupId = group.id.orEmpty(),
                 category = categories
             ).fold({
-            }, {
-                if (it is EmptyBodyException) {
-                    _currentGroup.update { oldGroup ->
-                        oldGroup?.copy(categories = categories)
-                    }
-                } else {
-                    KLog.e(TAG, it)
+                _currentGroup.update { oldGroup ->
+                    oldGroup?.copy(categories = categories)
                 }
+            }, {
+                KLog.e(TAG, it)
             })
         }
+    }
+
+    /**
+     * 取得 User 對於 準備加入該社團的狀態
+     * ex: 已經加入, 審核中, 未加入
+     */
+    fun getGroupJoinStatus(group: Group) {
+        KLog.i(TAG, "getGroupStatus:$group")
+        viewModelScope.launch {
+            _myGroupList.value.any { myGroup ->
+                myGroup.groupModel.id == group.id
+            }.let { isJoined ->
+                _joinGroupStatus.value = if (isJoined) {
+                    GroupJoinStatus.Joined
+                } else {
+                    //私密社團
+                    if (group.isNeedApproval == true) {
+                        if (XLoginHelper.isLogin) {
+                            val groupRequirementApplyInfo =
+                                groupApplyUseCase.fetchMyApply(groupId = group.id.orEmpty())
+                                    .getOrElse {
+                                        //Default
+                                        GroupRequirementApplyInfo(
+                                            apply = GroupRequirementApply(
+                                                status = ApplyStatus.confirmed
+                                            )
+                                        )
+                                    }
+
+                            when (groupRequirementApplyInfo.apply?.status) {
+                                ApplyStatus.unConfirmed -> GroupJoinStatus.InReview
+                                ApplyStatus.confirmed -> GroupJoinStatus.Joined
+                                ApplyStatus.denied -> GroupJoinStatus.NotJoin
+                                null -> GroupJoinStatus.NotJoin
+                            }
+                        } else {
+                            GroupJoinStatus.NotJoin
+                        }
+                    } else {
+                        GroupJoinStatus.NotJoin
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 刷新 Group and notification unread count
+     */
+    fun refreshGroupAndNotificationCount() {
+        KLog.i(TAG, "refreshGroup")
+        viewModelScope.launch {
+            val groupId = _currentGroup.value?.id ?: return@launch
+            groupUseCase.getGroupById(groupId = groupId)
+                .onSuccess { group ->
+                    setCurrentGroup(group)
+                }
+
+            fetchNotificationCenterCount()
+        }
+    }
+
+    /**
+     *  抓取 推播中心 未讀數量
+     */
+    private suspend fun fetchNotificationCenterCount() {
+        KLog.i(TAG, "fetchNotificationCenterCount")
+        notificationUseCase.getNotificationUnReadCount()
+            .onSuccess { unreadCount ->
+                KLog.i(TAG, "NotificationUnReadCount:$unreadCount")
+                _notificationUnreadCount.value = unreadCount
+            }
     }
 }

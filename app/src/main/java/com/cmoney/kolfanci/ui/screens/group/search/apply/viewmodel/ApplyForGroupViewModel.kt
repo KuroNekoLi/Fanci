@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.GroupRequirementAnswer
 import com.cmoney.fanciapi.fanci.model.IGroupRequirementQuestion
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.socks.library.KLog
@@ -106,13 +105,7 @@ class ApplyForGroupViewModel(
                                 isComplete = true
                             )
                         }, {
-                            if (it is EmptyBodyException) {
-                                uiState = uiState.copy(
-                                    isComplete = true
-                                )
-                            } else {
-                                KLog.e(TAG, it)
-                            }
+                            KLog.e(TAG, it)
                         })
                     }
                 }

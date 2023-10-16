@@ -132,23 +132,21 @@ fun DiscoverGroupScreen(
         }
 
         GroupItemDialogScreen(
-            isJoined = isJoined,
             groupModel = this,
             background = LocalColor.current.env_80,
             titleColor = LocalColor.current.text.default_100,
             descColor = LocalColor.current.text.default_80,
-            joinTextColor = LocalColor.current.primary,
             onDismiss = {
                 viewModel.closeGroupItemDialog()
             },
-            onConfirm = {
+            onConfirm = { group, joinStatus ->
                 if (isJoined) {
                     //global change group
-                    globalGroupViewModel.setCurrentGroup(it)
+                    globalGroupViewModel.setCurrentGroup(group)
                     navController.popBackStack()
                 } else {
                     //不公開
-                    if (it.isNeedApproval == true) {
+                    if (group.isNeedApproval == true) {
                         when (uiState.tabIndex) {
                             0 -> {
                                 AppUserLogger.getInstance().log(Clicked.GroupApplyToJoin, From.Hot)
@@ -161,7 +159,7 @@ fun DiscoverGroupScreen(
 
                         navController.navigate(
                             ApplyForGroupScreenDestination(
-                                group = it
+                                group = group
                             )
                         )
                     }
@@ -177,7 +175,7 @@ fun DiscoverGroupScreen(
                             }
                         }
 
-                        viewModel.joinGroup(it)
+                        viewModel.joinGroup(group)
                     }
                 }
             }

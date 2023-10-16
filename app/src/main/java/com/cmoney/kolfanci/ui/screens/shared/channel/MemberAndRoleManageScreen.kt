@@ -47,7 +47,10 @@ import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.vip.VipPlanItemScreen
+import com.cmoney.kolfanci.ui.theme.Color_99FFFFFF
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -93,8 +96,8 @@ fun MemberAndRoleManageScreen(
             }
 
             is NavResult.Value -> {
-                KLog.i("MemberAndRoleManageScreen", "addMemberResult result callback.")
                 val member = result.value
+                KLog.i("MemberAndRoleManageScreen", "addMemberResult result callback:$member")
                 viewModel.addSelectedMember(member)
             }
         }
@@ -156,6 +159,20 @@ fun MemberAndRoleManageScreen(
             onBackPressedDispatcher?.onBackPressed()
         }
     )
+
+    if (uiState.showAddSuccessTip) {
+        FanciSnackBarScreen(
+            modifier = Modifier.padding(bottom = 70.dp),
+            message = CustomMessage(
+                textString = "成員新增成功！",
+                iconRes = R.drawable.all_member,
+                iconColor = Color_99FFFFFF,
+                textColor = Color.White
+            )
+        ) {
+            viewModel.dismissAddSuccessTip()
+        }
+    }
 
     BackHandler {
         val newSelectedModel = viewModel.fetchSelected()

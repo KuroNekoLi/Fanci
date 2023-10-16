@@ -8,7 +8,6 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
@@ -47,10 +46,10 @@ class EditPostViewModel(
     private val _postSuccess: MutableStateFlow<BulletinboardMessage?> = MutableStateFlow(null)
     val postSuccess = _postSuccess.asStateFlow()
 
-    fun addAttachImage(uri: Uri) {
+    fun addAttachImage(uris: List<Uri>) {
         KLog.i(TAG, "addAttachImage")
         val imageList = _attachImages.value.toMutableList()
-        imageList.add(uri)
+        imageList.addAll(uris)
         _attachImages.value = imageList
     }
 
@@ -238,22 +237,20 @@ class EditPostViewModel(
                 text = text,
                 images = images
             ).fold({
+                _postSuccess.value = editPost.copy(
+                    content = editPost.content?.copy(
+                        text = text,
+                        medias = images.map { image ->
+                            Media(
+                                resourceLink = image,
+                                type = MediaType.image
+                            )
+                        }
+                    )
+                )
             }, {
                 it.printStackTrace()
                 KLog.e(TAG, it)
-                if (it is EmptyBodyException) {
-                    _postSuccess.value = editPost.copy(
-                        content = editPost.content?.copy(
-                            text = text,
-                            medias = images.map { image ->
-                                Media(
-                                    resourceLink = image,
-                                    type = MediaType.image
-                                )
-                            }
-                        )
-                    )
-                }
             })
         }
     }

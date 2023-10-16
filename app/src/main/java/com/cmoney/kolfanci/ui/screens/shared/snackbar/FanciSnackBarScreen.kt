@@ -19,8 +19,8 @@ import com.cmoney.kolfanci.R
 
 class CustomMessage(
     val textString: String,
-    @DrawableRes val iconRes: Int,
-    val iconColor: Color,
+    @DrawableRes val iconRes: Int? = null,
+    val iconColor: Color? = null,
     val textColor: Color = Color.Unspecified,
     override val backgroundColor: Color? = null,
     override val displayTimeSeconds: Int? = 3,

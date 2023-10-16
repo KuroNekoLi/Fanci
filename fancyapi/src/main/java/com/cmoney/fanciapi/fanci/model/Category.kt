@@ -16,6 +16,7 @@
 package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.Channel
+import com.cmoney.fanciapi.fanci.model.IUserContext
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -34,6 +35,7 @@ import kotlinx.parcelize.Parcelize
  * @param groupId 所屬社團
  * @param channels 分類下的頻道
  * @param isDefault 前端顯示是否為隱藏
+ * @param userContext 
  */
 @Parcelize
 
@@ -78,7 +80,10 @@ data class Category (
 
     /* 前端顯示是否為隱藏 */
     @Json(name = "isDefault")
-    val isDefault: kotlin.Boolean? = null
+    val isDefault: kotlin.Boolean? = null,
+
+    @Json(name = "userContext")
+    val userContext: IUserContext? = null
 
 ) : Parcelable
 

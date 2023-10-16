@@ -90,7 +90,6 @@ class ScreenshotActivity: BaseWebLoginActivity() {
     override fun autoLoginFailCallback() {
         KLog.e(TAG, "autoLoginFailCallback")
         globalViewModel.loginFail("autoLoginFailCallback")
-        globalGroupViewModel.fetchAllGroupList()
     }
 
     override fun loginCancel() {
@@ -101,7 +100,6 @@ class ScreenshotActivity: BaseWebLoginActivity() {
     override fun loginFailCallback(errorMessage: String) {
         KLog.e(TAG, "loginFailCallback:$errorMessage")
         globalViewModel.loginFail(errorMessage)
-        globalGroupViewModel.fetchAllGroupList()
     }
 
     override fun loginSuccessCallback() {

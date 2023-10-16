@@ -245,7 +245,7 @@ fun MessageContentScreen(
                     }
 
                     messageModel.content?.medias?.let {
-                        MediaContent(contentPaddingModifier, it)
+                        MediaContent(it)
                     }
 
                     //上傳圖片前預覽
@@ -281,7 +281,8 @@ fun MessageContentScreen(
                                         emojiResource = emoji.first,
                                         countText = emoji.second.toString()
                                     ) {
-                                        AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.Message)
+                                        AppUserLogger.getInstance()
+                                            .log(Clicked.ExistingEmoji, From.Message)
 
                                         onMessageContentCallback.invoke(
                                             MessageContentCallback.EmojiClick(
@@ -307,7 +308,8 @@ fun MessageContentScreen(
                                                 .fillMaxWidth()
                                                 .offset(y = (-15).dp)
                                         ) {
-                                            AppUserLogger.getInstance().log(Clicked.AddEmoji, From.Message)
+                                            AppUserLogger.getInstance()
+                                                .log(Clicked.AddEmoji, From.Message)
 
                                             onMessageContentCallback.invoke(
                                                 MessageContentCallback.EmojiClick(
@@ -366,17 +368,18 @@ fun MessageContentScreen(
  * @param isClickable 是否可以點擊圖片,放大瀏覽
  */
 @Composable
-fun MediaContent(modifier: Modifier, medias: List<Media>, isClickable: Boolean = true) {
+fun MediaContent(medias: List<Media>, isClickable: Boolean = true) {
     val imageList = medias.filter {
         it.type == MediaType.image
     }
 
     if (imageList.isNotEmpty()) {
-        MessageImageScreen(
+        MessageImageScreenV2(
             images = imageList.map {
                 it.resourceLink.orEmpty()
             },
-            modifier = modifier,
+            modifier = Modifier.padding(top = 10.dp, start = 40.dp),
+            otherItemModifier = Modifier.padding(top = 10.dp),
             isClickable = isClickable,
             onImageClick = {
                 AppUserLogger.getInstance().log(Clicked.Image, From.Message)

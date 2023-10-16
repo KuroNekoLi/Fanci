@@ -15,6 +15,8 @@ interface ChannelTabApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param channelId 頻道ID
      * @return [ChannelTabsStatus]

@@ -2,7 +2,15 @@ package com.cmoney.kolfanci.ui.screens.group.setting.report
 
 import FlowRow
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -19,15 +27,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.FanciRole
+import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.group.setting.member.all.RoleItem
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.member.HorizontalMemberItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.cmoney.kolfanci.R
+
 /**
  * 檢舉人列表
  */
@@ -69,68 +80,14 @@ private fun GroupReporterScreenView(
             verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             items(reporterList) { reporter ->
-                ReporterItem(reportUser = reporter)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ReporterItem(reportUser: GroupMember) {
-    Row(
-        modifier = Modifier
-            .background(LocalColor.current.env_80)
-            .padding(top = 20.dp, bottom = 20.dp, start = 24.dp, end = 24.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        //大頭貼
-        AsyncImage(
-            modifier = Modifier
-                .size(34.dp)
-                .clip(CircleShape),
-            model = reportUser.thumbNail,
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            placeholder = painterResource(id = R.drawable.placeholder)
-        )
-
-        Spacer(modifier = Modifier.width(15.dp))
-
-        Column {
-            Row {
-                //使用者名稱
-                Text(
-                    text = reportUser.name.orEmpty(),
-                    fontSize = 16.sp,
-                    color = LocalColor.current.text.default_100
+                HorizontalMemberItemScreen(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(LocalColor.current.env_80)
+                        .padding(top = 20.dp, bottom = 20.dp, start = 24.dp, end = 24.dp),
+                    groupMember = reporter,
+                    isShowRoleInfo = true
                 )
-
-                Spacer(modifier = Modifier.width(5.dp))
-
-                //使用者編號
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = reportUser.serialNumber.toString(),
-                    fontSize = 12.sp,
-                    color = LocalColor.current.text.default_50
-                )
-            }
-
-            Spacer(modifier = Modifier.width(7.dp))
-
-            // TODO:
-            //使用者擁有權限
-            FlowRow(
-                horizontalGap = 5.dp,
-                verticalGap = 5.dp,
-            ) {
-                reportUser.roleInfos?.let {
-                    repeat(it.size) { index ->
-                        RoleItem(
-                            it[index]
-                        )
-                    }
-                }
             }
         }
     }
@@ -145,7 +102,13 @@ fun GroupReporterScreenPreview() {
             reporterList = listOf(
                 GroupMember(
                     name = "Name",
-                    serialNumber = 12345
+                    serialNumber = 12345,
+                    roleInfos = listOf(
+                        FanciRole(
+                            name = "Role",
+                            color = ""
+                        )
+                    )
                 )
             )
         )

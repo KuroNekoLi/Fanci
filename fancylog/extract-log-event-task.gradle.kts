@@ -1,7 +1,7 @@
 abstract class ExtractLogEventTask : DefaultTask() {
     @TaskAction
     fun invoke() {
-        val targetFile = File("fancylog/events", "log_event_20230804_v2.csv")
+        val targetFile = File("fancylog/events", "log_event_20230922.csv")
         val packageName = "com.cmoney.fancylog.model.data"
         val rootDirectory = "fancylog/src/main/java"
         val rootPackage = "com.cmoney.fancylog"

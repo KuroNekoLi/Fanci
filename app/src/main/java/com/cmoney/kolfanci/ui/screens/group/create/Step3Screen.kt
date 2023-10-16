@@ -201,7 +201,6 @@ private fun DescWithImage(desc: String, thumbnail: String, onClick: () -> Unit) 
             AsyncImage(
                 model = thumbnail,
                 modifier = Modifier
-                    .padding(top = 15.dp, bottom = 15.dp)
                     .size(55.dp)
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(10.dp)),

@@ -4,7 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -54,18 +56,15 @@ fun EditToolbarScreen(
         backgroundColor = backgroundColor,
         contentColor = LocalColor.current.text.default_100,
         trailing = {
-            Box(
-                modifier = Modifier
-                    .size(35.dp)
-                    .offset(x = (-15).dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        saveClick?.invoke()
-                    },
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier
+                .wrapContentSize()
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    saveClick?.invoke()
+                }
+                .padding(end = 15.dp)) {
                 Text(text = confirmText, fontSize = 17.sp, color = LocalColor.current.primary)
             }
         }

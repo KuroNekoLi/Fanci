@@ -1,7 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.dialog
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -15,12 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -32,27 +31,46 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.fancylog.model.data.Page
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
+import com.cmoney.kolfanci.model.GroupJoinStatus
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.AutoLinkText
+import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.common.GroupJoinButton
 import com.cmoney.kolfanci.ui.common.GroupText
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
+/**
+ * @param groupModel 社團model
+ * @param onDismiss 取消 callback
+ * @param onConfirm 確定按鈕 callback
+ * @param background 背景顏色
+ * @param titleColor title 顏色
+ * @param descColor 內文顏色
+ */
 @Composable
 fun GroupItemDialogScreen(
     modifier: Modifier = Modifier,
-    isJoined: Boolean = false,
     groupModel: Group,
+    onDismiss: () -> Unit,
+    onConfirm: (Group, GroupJoinStatus) -> Unit,
     background: Color = LocalColor.current.env_80,
     titleColor: Color = LocalColor.current.text.default_100,
-    descColor: Color = LocalColor.current.text.default_80,
-    joinTextColor: Color = LocalColor.current.primary,
-    onDismiss: () -> Unit,
-    onConfirm: (Group) -> Unit
+    descColor: Color = LocalColor.current.text.default_80
 ) {
+    val globalGroupViewModel = globalGroupViewModel()
+
+    val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
+
+    val groupStatus by globalGroupViewModel.joinGroupStatus.collectAsState()
+
     val openDialog = remember { mutableStateOf(true) }
+
     if (openDialog.value) {
         Dialog(onDismissRequest = {
             openDialog.value = false
@@ -60,19 +78,23 @@ fun GroupItemDialogScreen(
         }) {
             GroupItemDialogScreenView(
                 modifier = modifier,
-                background = background,
                 groupModel = groupModel,
+                background = background,
                 titleColor = titleColor,
                 descColor = descColor,
                 onConfirm = onConfirm,
-                isJoined = isJoined,
-                joinTextColor = joinTextColor
+                groupStatus = groupStatus
             )
         }
     }
+
     LaunchedEffect(key1 = groupModel) {
         AppUserLogger.getInstance()
             .log(page = Page.Group)
+    }
+
+    LaunchedEffect(key1 = groupStatus, key2 = myGroupList) {
+        globalGroupViewModel.getGroupJoinStatus(groupModel)
     }
 }
 
@@ -83,9 +105,8 @@ private fun GroupItemDialogScreenView(
     background: Color = LocalColor.current.env_80,
     titleColor: Color = LocalColor.current.text.default_100,
     descColor: Color = LocalColor.current.text.default_80,
-    joinTextColor: Color = LocalColor.current.primary,
-    onConfirm: (Group) -> Unit,
-    isJoined: Boolean
+    onConfirm: (Group, GroupJoinStatus) -> Unit,
+    groupStatus: GroupJoinStatus
 ) {
     Box(
         modifier = modifier
@@ -129,24 +150,45 @@ private fun GroupItemDialogScreenView(
                 )
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(Color.Transparent)
-                    .clickable {
-                        onConfirm.invoke(groupModel)
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (isJoined) {
-                        "已經加入，進入社團"
-                    } else {
-                        "加入社團"
-                    }, fontSize = 16.sp,
-                    color = joinTextColor
-                )
+            Spacer(modifier = Modifier.height(35.dp))
+
+            when (groupStatus) {
+                GroupJoinStatus.InReview -> {
+                    GroupJoinButton(
+                        modifier = Modifier.padding(20.dp),
+                        text = "等待審核中...",
+                        onClick = {
+                            onConfirm.invoke(groupModel, groupStatus)
+                        }
+                    )
+                }
+
+                GroupJoinStatus.Joined -> {
+                    BorderButton(
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "已經加入，進入社團",
+                        borderColor = LocalColor.current.text.default_100,
+                        onClick = {
+                            onConfirm.invoke(groupModel, groupStatus)
+                        }
+                    )
+                }
+
+                GroupJoinStatus.NotJoin -> {
+                    BlueButton(
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        text = "加入社團",
+                        onClick = {
+                            onConfirm.invoke(groupModel, groupStatus)
+                        }
+                    )
+                }
             }
         }
 
@@ -169,44 +211,10 @@ private fun GroupItemDialogScreenView(
 fun GroupItemDialogScreenPreview() {
     FanciTheme {
         GroupItemDialogScreenView(
-            isJoined = true,
-            groupModel = Group(
-                id = "",
-                name = "Hello",
-                description = "大家好，我是愛莉莎莎Alisasa！\n" +
-                        "\n" +
-                        "台灣人在韓國留學八個月 \n" +
-                        "已經在2018 一月\n" +
-                        "回到台灣當全職Youtuber囉！\n" +
-                        "\n" +
-                        "但是我還是每個月會去韓國\n" +
-                        "更新最新的韓國情報 （流行 美妝 美食等等） \n" +
-                        "提供給大家不同於一般觀光客\n" +
-                        "內行的認識韓國新角度\n" +
-                        "\n" +
-                        "另外也因為感情經驗豐富（？）\n" +
-                        "可以提供給大家一些女生的秘密想法～\n" +
-                        "\n" +
-                        "希望大家喜歡我的頻道＾＾\n" +
-                        "\n" +
-                        "\n" +
-                        "如果你喜歡我的影片，希望你可以幫我訂閱＋分享\n" +
-                        "\n" +
-                        "任何合作邀約請洽Pressplay Email :\n" +
-                        "alisasa@pressplay.cc\n" +
-                        "═════════════════════════════════════\n" +
-                        "\n" +
-                        "追蹤我 Follow Me \n" +
-                        "\n" +
-                        "★Facebook社團『愛莉莎莎敗家基地』: https://www.facebook.com/groups/924974291237889/\n" +
-                        "★Facebook粉絲專頁: https://www.facebook.com/alisasa11111/\n" +
-                        "★Instagram: goodalicia",
-                coverImageUrl = "",
-                thumbnailImageUrl = "",
-                categories = emptyList()
-            ),
-            onConfirm = {
-            }
+            groupModel = MockData.mockGroup,
+            onConfirm = { group, joinStatus ->
+            },
+            groupStatus = GroupJoinStatus.Joined
         )
     }
 }

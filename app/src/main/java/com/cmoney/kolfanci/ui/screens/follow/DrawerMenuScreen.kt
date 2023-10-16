@@ -4,7 +4,14 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,19 +27,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.IUserContext
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
+import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.cmoney.fanciapi.fanci.model.Group
-import com.cmoney.kolfanci.R
 
 @Composable
 fun DrawerMenuScreen(
     modifier: Modifier = Modifier,
     groupList: List<GroupItem>,
+    notificationUnReadCount: Long,
     onClick: (GroupItem) -> Unit,
-    onSearch: () -> Unit,
-    onProfile: () -> Unit
+    onPlusClick: () -> Unit,
+    onProfile: () -> Unit,
+    onNotification: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -46,47 +57,71 @@ fun DrawerMenuScreen(
                 .padding(bottom = 5.dp)
         ) {
             items(groupList) { item ->
-                Card(
-                    shape = RoundedCornerShape(18.dp),
-                    modifier = Modifier
-                        .size(55.dp)
-                        .aspectRatio(1f)
-                        .clickable {
-                            onClick.invoke(item)
-                        },
-                    border = (if (item.isSelected) {
-                        BorderStroke(2.dp, Color.White)
-                    } else {
-                        null
-                    })
+                Box(
+                    modifier = Modifier,
+                    contentAlignment = Alignment.BottomEnd
                 ) {
-                    AsyncImage(
-                        model = item.groupModel.thumbnailImageUrl,
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        placeholder = painterResource(id = R.drawable.placeholder)
-                    )
+                    Card(
+                        shape = RoundedCornerShape(18.dp),
+                        modifier = Modifier
+                            .size(55.dp)
+                            .aspectRatio(1f)
+                            .clickable {
+                                onClick.invoke(item)
+                            },
+                        border = (if (item.isSelected) {
+                            BorderStroke(2.dp, Color.White)
+                        } else {
+                            null
+                        })
+                    ) {
+                        AsyncImage(
+                            model = item.groupModel.thumbnailImageUrl,
+                            contentScale = ContentScale.Crop,
+                            contentDescription = null,
+                            placeholder = painterResource(id = R.drawable.placeholder)
+                        )
+                    }
+
+                    //未讀小紅點
+                    item.groupModel.userContext?.unreadCount?.let { unreadCount ->
+                        RedDotItemScreen(
+                            unreadCount = unreadCount
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(17.dp))
             }
         }
 
-        //TODO: 暫時沒有通知中心功能
-//        Box(
-//            modifier = Modifier
-//                .size(60.dp)
-//                .clip(RoundedCornerShape(22.dp))
-//                .background(LocalColor.current.env_80),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Image(
-//                painter = painterResource(id = R.drawable.bell),
-//                contentDescription = null,
-//                colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
-//            )
-//        }
-//        Spacer(modifier = Modifier.height(17.dp))
+        Box(
+            modifier = Modifier,
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(LocalColor.current.env_80)
+                    .clickable {
+                        onNotification.invoke()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.menu_bell),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = LocalColor.current.primary)
+                )
+            }
+
+            RedDotItemScreen(
+                unreadCount = notificationUnReadCount
+            )
+        }
+
+        Spacer(modifier = Modifier.height(17.dp))
 
         Box(
             modifier = Modifier
@@ -94,7 +129,7 @@ fun DrawerMenuScreen(
                 .clip(RoundedCornerShape(22.dp))
                 .background(LocalColor.current.env_80)
                 .clickable {
-                    onSearch.invoke()
+                    onPlusClick.invoke()
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -126,26 +161,32 @@ fun DrawerMenuScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun DrawerMenuScreenPreview() {
     FanciTheme {
         DrawerMenuScreen(
             groupList = listOf(
                 GroupItem(
-                    isSelected = true, groupModel = Group(
+                    isSelected = true,
+                    groupModel = Group(
                         id = "",
                         name = "",
                         description = "Description",
                         coverImageUrl = "",
                         thumbnailImageUrl = "",
-                        categories = emptyList()
+                        categories = emptyList(),
+                        userContext = IUserContext(
+                            unreadCount = 100
+                        )
                     )
                 )
             ),
             onClick = {},
-            onSearch = {},
-            onProfile = {}
+            onPlusClick = {},
+            onProfile = {},
+            onNotification = {},
+            notificationUnReadCount = 99
         )
     }
 }

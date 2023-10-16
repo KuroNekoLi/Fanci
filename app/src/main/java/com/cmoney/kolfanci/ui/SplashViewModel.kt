@@ -19,16 +19,12 @@ import kotlinx.coroutines.launch
 
 class SplashViewModel(
     private val remoteConfig: IRemoteConfig,
-    private val dynamicLinkUseCase: DynamicLinkUseCase,
     private val backend2Manager: GlobalBackend2Manager
 ) : ViewModel() {
     private val TAG = SplashViewModel::class.java.simpleName
 
     private val _appConfig = MutableLiveData<AppConfig>()
     val appConfig: LiveData<AppConfig> = _appConfig
-
-    private val _intentPayload = MutableLiveData<Payload?>()
-    val intentPayload: LiveData<Payload?> = _intentPayload
 
     private val FETCH_INTERVAL = 900L
 
@@ -63,14 +59,4 @@ class SplashViewModel(
     private fun applyAppConfig(appConfig: AppConfig) {
         backend2Manager.setGlobalDomainUrl(appConfig.apiConfig.serverUrl)
     }
-
-    /**
-     * 檢查 dynamic link
-     */
-    fun checkDynamicLink(intent: Intent) {
-        viewModelScope.launch {
-            _intentPayload.value = dynamicLinkUseCase.getDynamicsLinksParam(intent)
-        }
-    }
-
 }

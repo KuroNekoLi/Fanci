@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
+import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
@@ -15,11 +16,9 @@ import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.EmptyBodyException
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
-import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
@@ -55,7 +54,7 @@ class PostViewModel(
     val post = _post.asStateFlow()
 
     //置頂貼文
-    private val _pinPost = MutableStateFlow<BulletinboardMessage?>(null)
+    private val _pinPost = MutableStateFlow<BulletinboardMessageWrapper?>(null)
     val pinPost = _pinPost.asStateFlow()
 
     //Toast message
@@ -110,8 +109,8 @@ class PostViewModel(
                 //有置頂文
                 if (it.isAnnounced == true) {
                     KLog.i(TAG, "has pin post.")
-                    it.message?.let {
-                        val pinPost = it.toBulletinboardMessage()
+                    it.message?.let { message ->
+                        val pinPost = message.toBulletinboardMessage()
                         //fix exists post
                         _post.value = _post.value.map { post ->
                             if (post.message.id == pinPost.id) {
@@ -125,7 +124,8 @@ class PostViewModel(
                             }
                         }
 
-                        _pinPost.value = pinPost
+                        _pinPost.value =
+                            BulletinboardMessageWrapper(message = pinPost, isPin = true)
                     }
                 }
                 //沒有置頂文
@@ -160,13 +160,23 @@ class PostViewModel(
         }
     }
 
-    fun onEmojiClick(postMessage: BulletinboardMessage, resourceId: Int) {
+    // TODO: 一個人只能按一個 emoji 處理
+    fun onEmojiClick(postMessage: BulletinboardMessageWrapper, resourceId: Int) {
         KLog.i(TAG, "onEmojiClick:$resourceId")
         viewModelScope.launch {
             val clickEmoji = Utils.emojiResourceToServerKey(resourceId)
+
+            var orgEmojiCount = postMessage.message.emojiCount
+            val beforeClickEmojiStr = postMessage.message.messageReaction?.emoji
+            //之前所點擊的 Emoji
+            val beforeClickEmoji = Emojis.decode(beforeClickEmojiStr)
+
+            //將之前所點擊的 Emoji reset
+            orgEmojiCount = beforeClickEmoji?.clickCount(-1, orgEmojiCount)
+
             //判斷是否為收回Emoji
             var emojiCount = 1
-            postMessage.messageReaction?.let {
+            postMessage.message.messageReaction?.let {
                 emojiCount = if (it.emoji.orEmpty().lowercase() == clickEmoji.value.lowercase()) {
                     //收回
                     -1
@@ -176,11 +186,10 @@ class PostViewModel(
                 }
             }
 
-            val orgEmoji = postMessage.emojiCount
-            val newEmoji = clickEmoji.clickCount(emojiCount, orgEmoji)
+            val newEmoji = clickEmoji.clickCount(emojiCount, orgEmojiCount)
 
             //回填資料
-            val newPostMessage = postMessage.copy(
+            val newPostMessage = postMessage.message.copy(
                 emojiCount = newEmoji,
                 messageReaction = if (emojiCount == -1) null else {
                     IUserMessageReaction(
@@ -190,18 +199,23 @@ class PostViewModel(
             )
 
             //UI show
-            _post.value = _post.value.map {
-                if (it.message.id == newPostMessage.id) {
-                    BulletinboardMessageWrapper(message = newPostMessage)
-                } else {
-                    it
+            if (postMessage.isPin) {
+                _pinPost.value = BulletinboardMessageWrapper(message = newPostMessage, isPin = true)
+            } else {
+                _post.value = _post.value.map {
+                    if (it.message.id == newPostMessage.id) {
+                        BulletinboardMessageWrapper(message = newPostMessage)
+                    } else {
+                        it
+                    }
                 }
             }
+
 
             //Call Emoji api
             chatRoomUseCase.clickEmoji(
                 messageServiceType = MessageServiceType.bulletinboard,
-                messageId = postMessage.id.orEmpty(),
+                messageId = postMessage.message.id.orEmpty(),
                 emojiCount = emojiCount,
                 clickEmoji = clickEmoji
             )
@@ -258,27 +272,28 @@ class PostViewModel(
                     messageServiceType = MessageServiceType.bulletinboard,
                     post.id.orEmpty()
                 ).fold({
-                }, {
-                    if (it is EmptyBodyException) {
-                        _post.value = _post.value.filter {
-                            it.message.id != post.id
-                        }
-                    } else {
-                        it.printStackTrace()
+                    _post.value = _post.value.filter {
+                        it.message.id != post.id
                     }
+
+                    showPostInfoToast(PostInfoScreenResult.PostInfoAction.Delete)
+                }, {
+                    KLog.e(TAG, it)
                 })
             } else {
                 KLog.i(TAG, "delete other comment.")
                 //他人
-                chatRoomUseCase.deleteOtherMessage(messageServiceType = MessageServiceType.bulletinboard,post.id.orEmpty()).fold({
-                }, {
-                    if (it is EmptyBodyException) {
-                        _post.value = _post.value.filter {
-                            it.message.id != post.id
-                        }
-                    } else {
-                        it.printStackTrace()
+                chatRoomUseCase.deleteOtherMessage(
+                    messageServiceType = MessageServiceType.bulletinboard,
+                    post.id.orEmpty()
+                ).fold({
+                    _post.value = _post.value.filter {
+                        it.message.id != post.id
                     }
+
+                    showPostInfoToast(PostInfoScreenResult.PostInfoAction.Delete)
+                }, {
+                    KLog.e(TAG, it)
                 })
             }
 
@@ -298,14 +313,10 @@ class PostViewModel(
                 channelId = channelId,
                 messageId = message?.id.orEmpty()
             ).fold({
+                KLog.i(TAG, "pinPost success.")
+                fetchPinPost()
             }, {
-                if (it is EmptyBodyException) {
-                    KLog.i(TAG, "pinPost success.")
-                    fetchPinPost()
-                } else {
-                    it.printStackTrace()
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
 
         }
@@ -320,14 +331,10 @@ class PostViewModel(
         KLog.i(TAG, "unPinPost:$message")
         viewModelScope.launch {
             postUseCase.unPinPost(channelId).fold({
+                KLog.i(TAG, "unPinPost success.")
+                fetchPinPost()
             }, {
-                if (it is EmptyBodyException) {
-                    KLog.i(TAG, "unPinPost success.")
-                    fetchPinPost()
-                } else {
-                    it.printStackTrace()
-                    KLog.e(TAG, it)
-                }
+                KLog.e(TAG, it)
             })
         }
     }
@@ -336,7 +343,7 @@ class PostViewModel(
      * 檢查該貼文 是否為 pin
      */
     fun isPinPost(post: BulletinboardMessage): Boolean {
-        return _pinPost.value?.id == post.id
+        return _pinPost.value?.message?.id == post.id
     }
 
     /**

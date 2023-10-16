@@ -482,9 +482,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_channelId",
-              "PERMISSION_CanPost_1_channelId_none"
+              "PERMISSION_CanPost_1_channelId_none",
+              "user"
             ]
           }
         ]
@@ -493,7 +493,7 @@
         "tags": [
           "BulletinBoard"
         ],
-        "summary": "取得貼文區貼文列表",
+        "summary": "取得貼文區貼文列表 __________🔒 可看",
         "parameters": [
           {
             "name": "channelId",
@@ -517,7 +517,7 @@
           {
             "name": "order",
             "in": "query",
-            "description": "排序依據(預設為新到舊)",
+            "description": "排序依據(預設為Latest) <br></br>Latest:代表從SerialNumber往前找 SerialNumber預設0 代表從最新往舊找,<br></br>Oldest:代表從SerialNumber往後找 SerialNumber預設0 代表從舊往新找<br></br>每次回傳weight為當下已經取得的最底一筆SerialNumber<br></br>所以下輪帶入SerialNumber並不會再包含該筆資料",
             "schema": {
               "$ref": "#/components/schemas/OrderType"
             }
@@ -556,13 +556,21 @@
           "401": {
             "description": "未驗證"
           },
-          "404": {
-            "description": "找不到該頻道"
-          },
           "403": {
             "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該頻道"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_CanRead_1_channelId_none",
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/BulletinBoard/{channelId}/PinnedMessage": {
@@ -616,8 +624,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_channelId_none"
+              "PERMISSION_CanRead_1_channelId_none",
+              "user"
             ]
           }
         ]
@@ -678,9 +686,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_channelId",
-              "PERMISSION_可管理_1_channelId_channelId"
+              "PERMISSION_可管理_1_channelId_channelId",
+              "user"
             ]
           }
         ]
@@ -721,9 +729,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_channelId",
-              "PERMISSION_可管理_1_channelId_channelId"
+              "PERMISSION_可管理_1_channelId_channelId",
+              "user"
             ]
           }
         ]
@@ -806,9 +814,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_channelId",
-              "PERMISSION_CanReply_1_channelId_none"
+              "PERMISSION_CanReply_1_channelId_none",
+              "user"
             ]
           }
         ]
@@ -898,8 +906,47 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_channelId_none"
+              "PERMISSION_CanRead_1_channelId_none",
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/BulletinBoard/{channelId}/ResetUnreadCount": {
+      "put": {
+        "tags": [
+          "BulletinBoard"
+        ],
+        "summary": "清空使用者貼文未讀數 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "BANNED_1_channelId",
+              "PERMISSION_CanRead_1_channelId_none",
+              "user"
             ]
           }
         ]
@@ -910,7 +957,7 @@
         "tags": [
           "Category"
         ],
-        "summary": "取得特定分類 __________🔒 已註冊的fanci使用者",
+        "summary": "取得特定分類",
         "parameters": [
           {
             "name": "categoryId",
@@ -994,8 +1041,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_刪除分類_0_categoryId_categoryId"
+              "PERMISSION_刪除分類_0_categoryId_categoryId",
+              "user"
             ]
           }
         ]
@@ -1006,7 +1053,7 @@
         "tags": [
           "Category"
         ],
-        "summary": "取得分類下的頻道 __________🔒 已註冊的fanci使用者",
+        "summary": "取得分類下的頻道",
         "parameters": [
           {
             "name": "categoryId",
@@ -1147,8 +1194,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_建立頻道_0_categoryId_categoryId"
+              "PERMISSION_建立頻道_0_categoryId_categoryId",
+              "user"
             ]
           }
         ]
@@ -1208,8 +1255,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_編輯分類_0_categoryId_categoryId"
+              "PERMISSION_編輯分類_0_categoryId_categoryId",
+              "user"
             ]
           }
         ]
@@ -2024,7 +2071,8 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
+              "user"
             ]
           }
         ]
@@ -2068,7 +2116,8 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_編輯頻道_0_channelId_channelGroupId"
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
+              "user"
             ]
           }
         ]
@@ -2111,8 +2160,21 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/ChatRoom/{chatRoomChannelId}/Message": {
@@ -2186,9 +2248,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_CanPost_1_chatRoomChannelId_none"
+              "PERMISSION_CanPost_1_chatRoomChannelId_none",
+              "user"
             ]
           }
         ]
@@ -2221,7 +2283,7 @@
           {
             "name": "order",
             "in": "query",
-            "description": "排序依據(預設為新到舊)",
+            "description": "排序依據(預設為Latest) <br></br>Latest:代表從SerialNumber往前找 SerialNumber預設0 代表從最新往舊找,<br></br>Oldest:代表從SerialNumber往後找 SerialNumber預設0 代表從舊往新找<br></br>每次回傳weight為當下已經取得的最底一筆SerialNumber<br></br>所以下輪帶入SerialNumber並不會再包含該筆資料",
             "schema": {
               "$ref": "#/components/schemas/OrderType"
             }
@@ -2270,8 +2332,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_chatRoomChannelId_none"
+              "PERMISSION_CanRead_1_chatRoomChannelId_none",
+              "user"
             ]
           }
         ]
@@ -2328,8 +2390,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_CanRead_1_chatRoomChannelId_none"
+              "PERMISSION_CanRead_1_chatRoomChannelId_none",
+              "user"
             ]
           }
         ]
@@ -2390,9 +2452,9 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_可管理_1_chatRoomChannelId_channelId"
+              "PERMISSION_可管理_1_chatRoomChannelId_channelId",
+              "user"
             ]
           }
         ]
@@ -2433,9 +2495,47 @@
         "security": [
           {
             "oauth2": [
-              "user",
               "BANNED_1_chatRoomChannelId",
-              "PERMISSION_可管理_1_chatRoomChannelId_channelId"
+              "PERMISSION_可管理_1_chatRoomChannelId_channelId",
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ChatRoom/{chatRoomChannelId}/ResetUnreadCount": {
+      "put": {
+        "tags": [
+          "ChatRoom"
+        ],
+        "summary": "清空使用者聊天室未讀數 __________🔒 可看",
+        "parameters": [
+          {
+            "name": "chatRoomChannelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "BANNED_1_chatRoomChannelId",
+              "PERMISSION_CanRead_1_chatRoomChannelId_none",
+              "user"
             ]
           }
         ]
@@ -2534,7 +2634,7 @@
         "tags": [
           "Group"
         ],
-        "summary": "新增社團 __________🔒 已註冊的fanci使用者",
+        "summary": "新增社團 圖片網址長度限制100",
         "requestBody": {
           "description": "新增社團參數",
           "content": {
@@ -2668,8 +2768,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_0_groupId_none"
+              "PERMISSION_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -2727,8 +2827,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_編輯社團_0_groupId_none"
+              "PERMISSION_編輯社團_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -2788,8 +2888,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_設定社團公開私密_0_groupId_none"
+              "PERMISSION_設定社團公開私密_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -2866,8 +2966,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_建立分類_0_groupId_none"
+              "PERMISSION_建立分類_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -2878,7 +2978,7 @@
         "tags": [
           "Group"
         ],
-        "summary": "取得我加入的社團清單 __________🔒 已註冊的fanci使用者",
+        "summary": "取得我加入的社團清單",
         "parameters": [
           {
             "name": "startWeight",
@@ -2985,10 +3085,23 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "找不到該社團"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -3063,8 +3176,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_新增角色_0_groupId_none"
+              "PERMISSION_新增角色_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -3117,10 +3230,23 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "找不到該社團"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -3191,7 +3317,14 @@
           "409": {
             "description": "已有相同名稱的角色"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Group/{groupId}/{roleId}/ChannelAuthType": {
@@ -3249,10 +3382,23 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "找不到該社團"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Group/{groupId}/Role/{roleId}": {
@@ -3321,7 +3467,8 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_編輯角色_0_groupId_none"
+              "PERMISSION_編輯角色_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -3371,18 +3518,19 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_刪除角色_0_groupId_none"
+              "PERMISSION_刪除角色_0_groupId_none",
+              "user"
             ]
           }
         ]
       }
     },
-    "/api/v1/GroupApply/group/{groupId}": {
+    "/api/v1/GroupApply/Group/{groupId}": {
       "put": {
         "tags": [
           "GroupApply"
         ],
-        "summary": "新增社團申請 __________🔒 已註冊的fanci使用者",
+        "summary": "新增社團申請",
         "parameters": [
           {
             "name": "groupId",
@@ -3520,19 +3668,19 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_審核入社申請_0_groupId_none"
+              "PERMISSION_審核入社申請_0_groupId_none",
+              "user"
             ]
           }
         ]
       }
     },
-    "/api/v1/GroupApply/group/{groupId}/me": {
+    "/api/v1/GroupApply/Group/{groupId}/Me": {
       "get": {
         "tags": [
           "GroupApply"
         ],
-        "summary": "取得我的社團申請 __________🔒 已註冊的fanci使用者",
+        "summary": "取得我的社團申請",
         "parameters": [
           {
             "name": "groupId",
@@ -3584,7 +3732,62 @@
         ]
       }
     },
-    "/api/v1/GroupApply/group/{groupId}/Count": {
+    "/api/v1/GroupApply/Group/All/Me": {
+      "get": {
+        "tags": [
+          "GroupApply"
+        ],
+        "summary": "取得我的所有社團申請",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupRequirementApplyInfo"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到該社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/GroupApply/Group/{groupId}/Count": {
       "get": {
         "tags": [
           "GroupApply"
@@ -3640,14 +3843,14 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_審核入社申請_0_groupId_none"
+              "PERMISSION_審核入社申請_0_groupId_none",
+              "user"
             ]
           }
         ]
       }
     },
-    "/api/v1/GroupApply/group/{groupId}/Approval": {
+    "/api/v1/GroupApply/Group/{groupId}/Approval": {
       "put": {
         "tags": [
           "GroupApply"
@@ -3704,8 +3907,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_審核入社申請_0_groupId_none"
+              "PERMISSION_審核入社申請_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -3716,7 +3919,7 @@
         "tags": [
           "GroupMember"
         ],
-        "summary": "取得社團會員清單 __________🔒 已註冊的fanci使用者",
+        "summary": "取得社團會員清單",
         "parameters": [
           {
             "name": "groupId",
@@ -3802,7 +4005,7 @@
         "tags": [
           "GroupMember"
         ],
-        "summary": "加入社團 __________🔒 已註冊的fanci使用者",
+        "summary": "加入社團",
         "parameters": [
           {
             "name": "groupId",
@@ -3843,7 +4046,7 @@
         "tags": [
           "GroupMember"
         ],
-        "summary": "離開社團 __________🔒 已註冊的fanci使用者",
+        "summary": "離開社團",
         "parameters": [
           {
             "name": "groupId",
@@ -3927,8 +4130,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_踢除_0_groupId_none"
+              "PERMISSION_踢除_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -3972,10 +4175,23 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "找不到社團"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -4050,8 +4266,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_建立與編輯入社問題_0_groupId_none"
+              "PERMISSION_建立與編輯入社問題_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -4532,8 +4748,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_重新排列_0_groupId_none"
+              "PERMISSION_重新排列_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -4593,7 +4809,8 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_管理角色層級_0_groupId_none"
+              "PERMISSION_管理角色層級_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -4634,8 +4851,21 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Permission/Group/{groupId}": {
@@ -4643,7 +4873,7 @@
         "tags": [
           "Permission"
         ],
-        "summary": "取得user在此社團擁有的權限 __________🔒 已註冊的fanci使用者",
+        "summary": "取得user在此社團擁有的權限",
         "parameters": [
           {
             "name": "groupId",
@@ -4700,7 +4930,7 @@
         "tags": [
           "Permission"
         ],
-        "summary": "取得user在此頻道擁有的權限 __________🔒 已註冊的fanci使用者",
+        "summary": "取得user在此頻道擁有的權限",
         "parameters": [
           {
             "name": "channelId",
@@ -4813,9 +5043,22 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
-        "deprecated": true
+        "deprecated": true,
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       },
       "get": {
         "tags": [
@@ -4853,9 +5096,174 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
-        "deprecated": true
+        "deprecated": true,
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/PushNotification/SettingType/All": {
+      "get": {
+        "tags": [
+          "PushNotification"
+        ],
+        "summary": "取得推播開關設定種類",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PushNotificationSetting"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/PushNotification/User/{groupId}/SettingType": {
+      "get": {
+        "tags": [
+          "PushNotification"
+        ],
+        "summary": "取得使用者社團推播設定",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushNotificationSetting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/PushNotification/User/{groupId}/SettingType/{settingType}": {
+      "put": {
+        "tags": [
+          "PushNotification"
+        ],
+        "summary": "設定使用者社團推播設定",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "settingType",
+            "in": "path",
+            "description": "設定種類",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PushNotificationSettingType"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
       }
     },
     "/api/v1/Relation/{relation}/me": {
@@ -4863,7 +5271,7 @@
         "tags": [
           "Relation"
         ],
-        "summary": "取得有此關係的用戶清單 __________🔒 已註冊的fanci使用者",
+        "summary": "取得有此關係的用戶清單",
         "parameters": [
           {
             "name": "relation",
@@ -4934,7 +5342,7 @@
         "tags": [
           "Relation"
         ],
-        "summary": "增加與用戶的關係 __________🔒 已註冊的fanci使用者",
+        "summary": "增加與用戶的關係",
         "parameters": [
           {
             "name": "relation",
@@ -4993,7 +5401,7 @@
         "tags": [
           "Relation"
         ],
-        "summary": "解除與用戶的關係 __________🔒 已註冊的fanci使用者",
+        "summary": "解除與用戶的關係",
         "parameters": [
           {
             "name": "relation",
@@ -5037,7 +5445,7 @@
         "tags": [
           "RoleUser"
         ],
-        "summary": "取得社團中具有此角色身分的用戶清單 __________🔒 已註冊的fanci使用者",
+        "summary": "取得社團中具有此角色身分的用戶清單",
         "parameters": [
           {
             "name": "groupId",
@@ -5174,8 +5582,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_指派身分_0_groupId_none"
+              "PERMISSION_指派身分_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -5245,8 +5653,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_指派身分_0_groupId_none"
+              "PERMISSION_指派身分_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -5257,7 +5665,7 @@
         "tags": [
           "RoleUser"
         ],
-        "summary": "取得社團中\"不\"具有此角色身分的用戶清單 (可搜尋) __________🔒 已註冊的fanci使用者",
+        "summary": "取得社團中\"不\"具有此角色身分的用戶清單 (可搜尋)",
         "parameters": [
           {
             "name": "groupId",
@@ -5343,7 +5751,7 @@
         "tags": [
           "RoleUser"
         ],
-        "summary": "取得社團中具有Vip角色身分的用戶清單 (任一種VIP) __________🔒 已註冊的fanci使用者",
+        "summary": "取得社團中具有Vip角色身分的用戶清單 (任一種VIP)",
         "parameters": [
           {
             "name": "groupId",
@@ -5412,7 +5820,7 @@
         "tags": [
           "RoleUser"
         ],
-        "summary": "取得用戶於社團中所擁有的角色清單 (不含Vip) __________🔒 已註冊的fanci使用者",
+        "summary": "取得用戶於社團中所擁有的角色清單 (不含Vip)",
         "parameters": [
           {
             "name": "groupId",
@@ -5489,7 +5897,7 @@
         "tags": [
           "RoleUser"
         ],
-        "summary": "取得用戶所擁有的社團Vip角色清單 __________🔒 已註冊的fanci使用者",
+        "summary": "取得用戶所擁有的社團Vip角色清單",
         "parameters": [
           {
             "name": "groupId",
@@ -5566,7 +5974,7 @@
         "tags": [
           "RoleUser"
         ],
-        "summary": "判斷用戶是否擁有社團的Vip角色 __________🔒 已註冊的fanci使用者",
+        "summary": "判斷用戶是否擁有社團的Vip角色",
         "parameters": [
           {
             "name": "groupId",
@@ -5634,7 +6042,7 @@
         "tags": [
           "RoleUser"
         ],
-        "summary": "取得頻道中具有Vip角色身分的用戶清單 (任一種VIP) __________🔒 已註冊的fanci使用者",
+        "summary": "取得頻道中具有Vip角色身分的用戶清單 (任一種VIP)",
         "parameters": [
           {
             "name": "groupId",
@@ -5772,8 +6180,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_指派身分_0_groupId_none"
+              "PERMISSION_指派身分_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -5843,8 +6251,8 @@
         "security": [
           {
             "oauth2": [
-              "user",
-              "PERMISSION_指派身分_0_groupId_none"
+              "PERMISSION_指派身分_0_groupId_none",
+              "user"
             ]
           }
         ]
@@ -5855,7 +6263,7 @@
         "tags": [
           "RoleUser"
         ],
-        "summary": "取得用戶ID清單的角色列表 __________🔒 已註冊的fanci使用者",
+        "summary": "取得用戶ID清單的角色列表",
         "parameters": [
           {
             "name": "groupId",
@@ -6151,7 +6559,7 @@
         "tags": [
           "UserReport"
         ],
-        "summary": "檢舉某頻道的內容 __________🔒 已註冊的fanci使用者",
+        "summary": "檢舉某頻道的內容",
         "parameters": [
           {
             "name": "channelId",
@@ -6362,7 +6770,7 @@
         "tags": [
           "Vip"
         ],
-        "summary": "透過角色Id判斷是否購買VIP __________🔒 已註冊的fanci使用者",
+        "summary": "透過角色Id判斷是否購買VIP",
         "parameters": [
           {
             "name": "roleId",
@@ -6423,7 +6831,7 @@
         "tags": [
           "Vip"
         ],
-        "summary": "取得授權的用戶 __________🔒 已註冊的fanci使用者",
+        "summary": "取得授權的用戶",
         "parameters": [
           {
             "name": "roleId",
@@ -6485,7 +6893,7 @@
         "tags": [
           "Vip"
         ],
-        "summary": "透過角色Id取得該權限包相關的VIP方案 __________🔒 已註冊的fanci使用者",
+        "summary": "透過角色Id取得該權限包相關的VIP方案",
         "parameters": [
           {
             "name": "roleId",
@@ -6547,7 +6955,7 @@
         "tags": [
           "Vip"
         ],
-        "summary": "取得該用戶所購買的所有方案 __________🔒 已註冊的fanci使用者",
+        "summary": "取得該用戶所購買的所有方案",
         "parameters": [
           {
             "name": "userId",
@@ -6891,6 +7299,9 @@
           "isDefault": {
             "type": "boolean",
             "description": "前端顯示是否為隱藏"
+          },
+          "userContext": {
+            "$ref": "#/components/schemas/IUserContext"
           }
         },
         "additionalProperties": false
@@ -6973,6 +7384,14 @@
           },
           "privacy": {
             "$ref": "#/components/schemas/ChannelPrivacy"
+          },
+          "tabs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IChannelTab"
+            },
+            "description": "頻道有啟用的聊天室版面",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -7052,15 +7471,6 @@
       "ChannelPermission": {
         "type": "object",
         "properties": {
-          "canRead": {
-            "type": "boolean"
-          },
-          "canPost": {
-            "type": "boolean"
-          },
-          "canReply": {
-            "type": "boolean"
-          },
           "canEmoji": {
             "type": "boolean"
           },
@@ -7077,6 +7487,15 @@
             "type": "boolean"
           },
           "canTakeback": {
+            "type": "boolean"
+          },
+          "canRead": {
+            "type": "boolean"
+          },
+          "canReply": {
+            "type": "boolean"
+          },
+          "canPost": {
             "type": "boolean"
           }
         },
@@ -7269,12 +7688,7 @@
           "ThemeSmokePink",
           "ThemeMidnightBlue",
           "ThemeClassicGreen",
-          "ThemeNeonBlack",
-          "ThemeCoffeeBrown",
-          "ThemeMintGreen",
-          "ThemePeachPink",
-          "ThemeDreamyPurple",
-          "ThemeBabyBlue"
+          "ThemeNeonBlack"
         ],
         "type": "string"
       },
@@ -7328,15 +7742,12 @@
         "description": "編輯頻道參數"
       },
       "EditGroupParam": {
-        "required": [
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
-            "minLength": 1,
             "type": "string",
-            "description": "社團命名"
+            "description": "社團命名",
+            "nullable": true
           },
           "description": {
             "type": "string",
@@ -7510,6 +7921,9 @@
           },
           "ColorSchemeGroupKey": {
             "$ref": "#/components/schemas/ColorTheme"
+          },
+          "userContext": {
+            "$ref": "#/components/schemas/IUserContext"
           }
         },
         "additionalProperties": false,
@@ -7785,6 +8199,10 @@
             "description": "Id",
             "nullable": true
           },
+          "groupId": {
+            "type": "string",
+            "nullable": true
+          },
           "user": {
             "$ref": "#/components/schemas/User"
           },
@@ -7887,6 +8305,23 @@
           "Written"
         ],
         "type": "string"
+      },
+      "IChannelTab": {
+        "type": "object",
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ChannelTabType"
+          },
+          "userContext": {
+            "$ref": "#/components/schemas/IUserContext"
+          }
+        },
+        "additionalProperties": false
       },
       "IEmojiCount": {
         "type": "object",
@@ -8023,6 +8458,16 @@
         },
         "additionalProperties": false
       },
+      "IUserContext": {
+        "type": "object",
+        "properties": {
+          "unreadCount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "IUserMessageReaction": {
         "type": "object",
         "properties": {
@@ -8099,6 +8544,23 @@
       "MessageType": {
         "enum": [
           "TextMessage"
+        ],
+        "type": "string"
+      },
+      "NotificationSettingType": {
+        "enum": [
+          "FanciOfficial",
+          "FanciAgreeJoinGroup",
+          "FanciNewGroupApply",
+          "FanciGroupDelete",
+          "FanciNewBulletinMessage",
+          "FanciNewBulletinReplyMessage",
+          "FanciNewBulletinEmoji",
+          "FanciNewBulletinReplyMessageEmoji",
+          "FanciNewBulletinReplyMessageFollow",
+          "FanciNewChatMessage",
+          "FanciNewChatEmoji",
+          "FanciSendGroupApply"
         ],
         "type": "string"
       },
@@ -8261,6 +8723,42 @@
           }
         },
         "additionalProperties": false
+      },
+      "PushNotificationSetting": {
+        "type": "object",
+        "properties": {
+          "settingType": {
+            "$ref": "#/components/schemas/PushNotificationSettingType"
+          },
+          "shortTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "notificationTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotificationSettingType"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PushNotificationSettingType": {
+        "enum": [
+          "Silent",
+          "NewPost",
+          "NewStory"
+        ],
+        "type": "string"
       },
       "PutAuthTypeRequest": {
         "type": "object",

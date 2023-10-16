@@ -37,7 +37,7 @@ data class EditGroupParam (
 
     /* 社團命名 */
     @Json(name = "name")
-    val name: kotlin.String,
+    val name: kotlin.String? = null,
 
     /* 社團簡介 */
     @Json(name = "description")

@@ -130,9 +130,9 @@ private fun addContentToView(
 }
 
 @Composable
-fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
+fun ComponentActivity.lifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
     val eventHandler by rememberUpdatedState(newValue = event)
-    val lifecycle = this@LifecycleEventListener.lifecycle
+    val lifecycle = this@lifecycleEventListener.lifecycle
     DisposableEffect(lifecycle) {
         val observer = LifecycleEventObserver { _, event ->
             eventHandler(event)

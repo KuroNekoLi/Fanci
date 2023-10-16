@@ -3,11 +3,35 @@ package com.cmoney.kolfanci.di
 import android.app.Application
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.cmoney.kolfanci.BuildConfig
-import com.cmoney.kolfanci.repository.interceptor.AddBearerTokenInterceptor
-import com.cmoney.fanciapi.fanci.api.*
+import com.cmoney.fanciapi.fanci.api.BanApi
+import com.cmoney.fanciapi.fanci.api.BuffInformationApi
+import com.cmoney.fanciapi.fanci.api.BulletinBoardApi
+import com.cmoney.fanciapi.fanci.api.CategoryApi
+import com.cmoney.fanciapi.fanci.api.ChannelApi
+import com.cmoney.fanciapi.fanci.api.ChannelTabApi
+import com.cmoney.fanciapi.fanci.api.ChatRoomApi
+import com.cmoney.fanciapi.fanci.api.DefaultImageApi
+import com.cmoney.fanciapi.fanci.api.GroupApi
+import com.cmoney.fanciapi.fanci.api.GroupApplyApi
+import com.cmoney.fanciapi.fanci.api.GroupMemberApi
+import com.cmoney.fanciapi.fanci.api.GroupRequirementApi
+import com.cmoney.fanciapi.fanci.api.MessageApi
+import com.cmoney.fanciapi.fanci.api.OrderApi
+import com.cmoney.fanciapi.fanci.api.PermissionApi
+import com.cmoney.fanciapi.fanci.api.PushNotificationApi
+import com.cmoney.fanciapi.fanci.api.RelationApi
+import com.cmoney.fanciapi.fanci.api.RoleUserApi
+import com.cmoney.fanciapi.fanci.api.ThemeColorApi
+import com.cmoney.fanciapi.fanci.api.UserApi
+import com.cmoney.fanciapi.fanci.api.UserReportApi
+import com.cmoney.fanciapi.fanci.api.VipApi
 import com.cmoney.fanciapi.infrastructure.ApiClient
+import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.remoteconfig.BaseDomainKey
+import com.cmoney.kolfanci.repository.Network
+import com.cmoney.kolfanci.repository.NetworkImpl
+import com.cmoney.kolfanci.repository.NotificationService
+import com.cmoney.kolfanci.repository.interceptor.AddBearerTokenInterceptor
 import com.cmoney.remoteconfig_library.extension.getKeyValue
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.GsonBuilder
@@ -21,6 +45,8 @@ import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
 val APP_GSON = named("app_gson")
+val NOTIFICATION = named("notification")
+
 val networkBaseModule = module {
 
     single(APP_GSON) {
@@ -38,6 +64,23 @@ val networkBaseModule = module {
         ).apply {
             addAuthorization("Bearer", AddBearerTokenInterceptor())
         }
+    }
+
+    single(NOTIFICATION) {
+        ApiClient(
+            baseUrl = BuildConfig.CM_SERVER_URL,
+            okHttpClientBuilder = createOkHttpClient(androidApplication()).newBuilder(),
+        ).apply {
+            addAuthorization("Bearer", AddBearerTokenInterceptor())
+        }
+    }
+
+    single {
+        get<ApiClient>(NOTIFICATION).createService(NotificationService::class.java)
+    }
+
+    single<Network> {
+        NetworkImpl(get())
     }
 
     single {
@@ -122,6 +165,10 @@ val networkBaseModule = module {
 
     single {
         get<ApiClient>().createService(VipApi::class.java)
+    }
+
+    single {
+        get<ApiClient>().createService(PushNotificationApi::class.java)
     }
 }
 

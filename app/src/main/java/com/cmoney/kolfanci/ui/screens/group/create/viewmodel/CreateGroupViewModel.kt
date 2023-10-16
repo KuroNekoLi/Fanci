@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -32,7 +34,8 @@ class CreateGroupViewModel(
     val context: Application,
     val groupUseCase: GroupUseCase,
     private val themeUseCase: ThemeUseCase,
-    val uploadImageUseCase: UploadImageUseCase
+    val uploadImageUseCase: UploadImageUseCase,
+    val settingsDataStore: SettingsDataStore
 ) : AndroidViewModel(context) {
 
     private val TAG = CreateGroupViewModel::class.java.simpleName
@@ -43,10 +46,16 @@ class CreateGroupViewModel(
     private val _currentStep = MutableStateFlow(1)  //目前步驟
     val currentStep = _currentStep.asStateFlow()
 
-    private val _group = MutableStateFlow(Group())     //要建立的社團
+    private val _group = MutableStateFlow(
+        //要建立的社團
+        Group()
+    )
     val group = _group.asStateFlow()
 
-    private val _fanciColor = MutableStateFlow<FanciColor?>(null)   //選擇的Theme Color
+    /**
+     * 選擇的Theme Color
+     */
+    private val _fanciColor = MutableStateFlow<FanciColor?>(null)
     val fanciColor = _fanciColor.asStateFlow()
 
     var uiState by mutableStateOf(UiState())
@@ -83,10 +92,16 @@ class CreateGroupViewModel(
      */
     fun nextStep() {
         //step1 to next, check group name
-        if (_currentStep.value == 1) {
-            if (_group.value.name.isNullOrEmpty()) {
-                sendErrorMsg("請輸入社團名稱")
-                return
+        val currentStepValue = _currentStep.value
+        when(currentStepValue) {
+            1 -> {
+                if (_group.value.name.isNullOrEmpty()) {
+                    sendErrorMsg("請輸入社團名稱")
+                    return
+                }
+            }
+            2 -> {
+                prepareDefaultAvatarAndCoverAndTheme()
             }
         }
 
@@ -101,6 +116,23 @@ class CreateGroupViewModel(
         _group.value = _group.value.copy(
             name = name
         )
+    }
+
+    private fun prepareDefaultAvatarAndCoverAndTheme() {
+        viewModelScope.launch {
+            // 預設第一個 avatar, cover
+            val thumbnailImageUrl = groupUseCase.fetchGroupAvatarLib()
+                .getOrNull()
+                ?.firstOrNull()
+            val coverImageUrl = groupUseCase.fetchGroupCoverLib()
+                .getOrNull()
+                ?.firstOrNull()
+            _group.update { old ->
+                old.copy(coverImageUrl = coverImageUrl, thumbnailImageUrl = thumbnailImageUrl)
+            }
+            // 預設 theme 為 ColorTheme.themeFanciBlue
+            setGroupTheme(ColorTheme.themeFanciBlue.value)
+        }
     }
 
     /**
@@ -159,10 +191,11 @@ class CreateGroupViewModel(
                         KLog.e(TAG, it)
                     }
             }
-
-            _group.value = _group.value.copy(
-                colorSchemeGroupKey = ColorTheme.decode(groupThemeId)
-            )
+            _group.update { oldGroup ->
+                oldGroup.copy(
+                    colorSchemeGroupKey = ColorTheme.decode(groupThemeId)
+                )
+            }
         }
     }
 
@@ -205,7 +238,8 @@ class CreateGroupViewModel(
                     createdGroup = createdGroup,
                     createComplete = true
                 )
-                // _group.value = it
+
+                settingsDataStore.setHomeBubbleShow()
             }, {
             })
         }
