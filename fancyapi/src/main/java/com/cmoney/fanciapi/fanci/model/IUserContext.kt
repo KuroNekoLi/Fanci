@@ -23,15 +23,15 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param unReadCount 
+ * @param unreadCount 
  */
 @Parcelize
 
 
 data class IUserContext (
 
-    @Json(name = "unReadCount")
-    val unReadCount: kotlin.Long? = null
+    @Json(name = "unreadCount")
+    val unreadCount: kotlin.Long? = null
 
 ) : Parcelable
 

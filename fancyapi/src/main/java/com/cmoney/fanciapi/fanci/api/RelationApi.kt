@@ -12,7 +12,7 @@ import com.cmoney.fanciapi.fanci.model.UserPaging
 
 interface RelationApi {
     /**
-     * 解除與用戶的關係 __________🔒 已註冊的fanci使用者
+     * 解除與用戶的關係
      * 
      * Responses:
      *  - 200: Success
@@ -27,7 +27,7 @@ interface RelationApi {
     suspend fun apiV1RelationRelationMeBlockUserIdDelete(@Path("relation") relation: Relation, @Path("blockUserId") blockUserId: kotlin.String): Response<Unit>
 
     /**
-     * 增加與用戶的關係 __________🔒 已註冊的fanci使用者
+     * 增加與用戶的關係
      * 
      * Responses:
      *  - 200: Success
@@ -42,7 +42,7 @@ interface RelationApi {
     suspend fun apiV1RelationRelationMeBlockUserIdPut(@Path("relation") relation: Relation, @Path("blockUserId") blockUserId: kotlin.String): Response<User>
 
     /**
-     * 取得有此關係的用戶清單 __________🔒 已註冊的fanci使用者
+     * 取得有此關係的用戶清單
      * 
      * Responses:
      *  - 200: Success

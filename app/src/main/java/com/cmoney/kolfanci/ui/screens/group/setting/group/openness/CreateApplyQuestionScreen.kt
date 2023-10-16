@@ -21,15 +21,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
+import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -54,7 +58,7 @@ fun CreateApplyQuestionScreen(
     from: From
 ) {
     val TAG = "CreateApplyQuestionScreen"
-    var showEmptyTipDialog by remember {
+    var showEmptyTip by remember {
         mutableStateOf(false)
     }
 
@@ -66,7 +70,7 @@ fun CreateApplyQuestionScreen(
             KLog.i(TAG, "onAdd click.")
             AppUserLogger.getInstance().log(Clicked.Confirm, from)
             if (it.isEmpty()) {
-                showEmptyTipDialog = true
+                showEmptyTip = true
             } else {
                 resultBackNavigator.navigateBack(it)
             }
@@ -80,22 +84,15 @@ fun CreateApplyQuestionScreen(
         }
     )
 
-    if (showEmptyTipDialog) {
-        DialogScreen(
-            title = "審核題目空白",
-            subTitle = "審核題目不可以是空白的唷！",
-            onDismiss = { showEmptyTipDialog = false }
+    if (showEmptyTip) {
+        FanciSnackBarScreen(
+            modifier = Modifier.padding(bottom = 70.dp),
+            message = CustomMessage(
+                textString = stringResource(id = R.string.input_approve_question),
+                textColor = LocalColor.current.text.default_100
+            )
         ) {
-            BlueButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                text = "修改",
-            ) {
-                run {
-                    showEmptyTipDialog = false
-                }
-            }
+            showEmptyTip = false
         }
     }
 

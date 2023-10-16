@@ -54,14 +54,14 @@ class ChannelViewModel(
                 when (tabType.type) {
                     //貼文
                     ChannelTabType.bulletinboard -> {
-                        tabType.userContext?.unReadCount?.let { unReadCount ->
-                            postRedDotCount = unReadCount
+                        tabType.userContext?.unreadCount?.let { unreadCount ->
+                            postRedDotCount = unreadCount
                         }
                     }
                     //聊天
                     ChannelTabType.chatRoom -> {
-                        tabType.userContext?.unReadCount?.let { unReadCount ->
-                            chatRedDotCount = unReadCount
+                        tabType.userContext?.unreadCount?.let { unreadCount ->
+                            chatRedDotCount = unreadCount
                         }
                     }
 

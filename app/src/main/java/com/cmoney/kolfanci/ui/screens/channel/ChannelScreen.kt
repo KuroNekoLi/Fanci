@@ -137,12 +137,12 @@ private fun ChannelScreenView(
     ) { innerPadding ->
         val pages = mutableListOf<String>()
 
-        if (channelTabStatus.chatRoom == true) {
-            pages.add(stringResource(id = R.string.chat))
-        }
-
         if (channelTabStatus.bulletinboard == true) {
             pages.add(stringResource(id = R.string.post))
+        }
+
+        if (channelTabStatus.chatRoom == true) {
+            pages.add(stringResource(id = R.string.chat))
         }
 
         val pagerState = rememberPagerState()
@@ -188,7 +188,7 @@ private fun ChannelScreenView(
                                         if (readCount > 0) {
                                             RedDotItemScreen(
                                                 modifier = Modifier.align(Alignment.CenterEnd),
-                                                unReadCount = readCount
+                                                unreadCount = readCount
                                             )
                                         }
                                     }
@@ -208,22 +208,8 @@ private fun ChannelScreenView(
                     count = pages.size,
                     state = pagerState,
                 ) { page ->
-                    //TODO: 紅點消失
                     when (page) {
                         0 -> {
-                            //聊天室 Tab
-                            ChatRoomScreen(
-                                channelId = channel.id.orEmpty(),
-                                navController = navController,
-                                resultRecipient = announcementResultRecipient,
-                                jumpChatMessage = jumpChatMessage
-                            )
-                            LaunchedEffect(key1 = Unit) {
-                                onChatPageSelected.invoke()
-                            }
-                        }
-
-                        else -> {
                             //貼文 Tab
                             PostScreen(
                                 channel = channel,
@@ -238,6 +224,19 @@ private fun ChannelScreenView(
 
                             LaunchedEffect(key1 = page) {
                                 AppUserLogger.getInstance().log(Page.PostWall)
+                            }
+                        }
+
+                        else -> {
+                            //聊天室 Tab
+                            ChatRoomScreen(
+                                channelId = channel.id.orEmpty(),
+                                navController = navController,
+                                resultRecipient = announcementResultRecipient,
+                                jumpChatMessage = jumpChatMessage
+                            )
+                            LaunchedEffect(key1 = Unit) {
+                                onChatPageSelected.invoke()
                             }
                         }
                     }

@@ -15,6 +15,8 @@ interface GroupRequirementApi {
      * 
      * Responses:
      *  - 200: 成功
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *  - 404: 找不到社團
      *
      * @param groupId 社團id

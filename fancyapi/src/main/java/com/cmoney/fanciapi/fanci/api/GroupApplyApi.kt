@@ -15,7 +15,7 @@ import com.cmoney.fanciapi.fanci.model.GroupRequirementApplyPaging
 
 interface GroupApplyApi {
     /**
-     * 取得我的所有社團申請 __________🔒 已註冊的fanci使用者
+     * 取得我的所有社團申請
      * 
      * Responses:
      *  - 200: 成功
@@ -80,7 +80,7 @@ interface GroupApplyApi {
     suspend fun apiV1GroupApplyGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("applyStatus") applyStatus: ApplyStatus? = null, @Query("startWeight") startWeight: kotlin.Long? = 0L, @Query("pageSize") pageSize: kotlin.Int? = 20): Response<GroupRequirementApplyPaging>
 
     /**
-     * 取得我的社團申請 __________🔒 已註冊的fanci使用者
+     * 取得我的社團申請
      * 
      * Responses:
      *  - 200: 成功
@@ -95,7 +95,7 @@ interface GroupApplyApi {
     suspend fun apiV1GroupApplyGroupGroupIdMeGet(@Path("groupId") groupId: kotlin.String): Response<GroupRequirementApplyInfo>
 
     /**
-     * 新增社團申請 __________🔒 已註冊的fanci使用者
+     * 新增社團申請
      * 
      * Responses:
      *  - 409: Conflict

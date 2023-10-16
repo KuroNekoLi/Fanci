@@ -29,7 +29,7 @@ interface UserReportApi {
     suspend fun apiV1UserReportChannelChannelIdIdPut(@Path("channelId") channelId: kotlin.String, @Path("id") id: kotlin.String, @Body reportStatusUpdateParam: ReportStatusUpdateParam? = null): Response<Unit>
 
     /**
-     * 檢舉某頻道的內容 __________🔒 已註冊的fanci使用者
+     * 檢舉某頻道的內容
      * 
      * Responses:
      *  - 200: Success

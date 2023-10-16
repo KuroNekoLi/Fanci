@@ -865,9 +865,9 @@ class GroupViewModel(
     private suspend fun fetchNotificationCenterCount() {
         KLog.i(TAG, "fetchNotificationCenterCount")
         notificationUseCase.getNotificationUnReadCount()
-            .onSuccess { unReadCount ->
-                KLog.i(TAG, "NotificationUnReadCount:$unReadCount")
-                _notificationUnreadCount.value = unReadCount
+            .onSuccess { unreadCount ->
+                KLog.i(TAG, "NotificationUnReadCount:$unreadCount")
+                _notificationUnreadCount.value = unreadCount
             }
     }
 }

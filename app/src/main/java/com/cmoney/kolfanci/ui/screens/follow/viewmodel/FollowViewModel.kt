@@ -197,10 +197,11 @@ class FollowViewModel(
         _refreshMyGroup.value = false
     }
 
-    fun onMoreClick() {
+    fun disableBubbleTip() {
         KLog.i(TAG, "onMoreClick")
         viewModelScope.launch {
             dataStore.alreadyShowHomeBubble()
+            uiState = uiState.copy(isShowBubbleTip = false)
         }
     }
 

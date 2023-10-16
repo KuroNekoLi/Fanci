@@ -14,7 +14,7 @@ import com.cmoney.fanciapi.fanci.model.PermissionCategory
 
 interface PermissionApi {
     /**
-     * 取得user在此頻道擁有的權限 __________🔒 已註冊的fanci使用者
+     * 取得user在此頻道擁有的權限
      * 
      * Responses:
      *  - 200: 成功
@@ -33,6 +33,8 @@ interface PermissionApi {
      * 
      * Responses:
      *  - 200: 成功
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @return [kotlin.collections.List<PermissionCategory>]
      */
@@ -40,7 +42,7 @@ interface PermissionApi {
     suspend fun apiV1PermissionGet(): Response<kotlin.collections.List<PermissionCategory>>
 
     /**
-     * 取得user在此社團擁有的權限 __________🔒 已註冊的fanci使用者
+     * 取得user在此社團擁有的權限
      * 
      * Responses:
      *  - 200: 成功
@@ -59,6 +61,8 @@ interface PermissionApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param id 
      * @return [Permission]
@@ -72,6 +76,8 @@ interface PermissionApi {
      * 
      * Responses:
      *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
      *
      * @param id 
      * @param passCode  (optional)

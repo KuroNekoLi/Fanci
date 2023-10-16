@@ -20,6 +20,7 @@ import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.remoteconfig.PollingFrequencyKey
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
@@ -30,7 +31,9 @@ import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.MessageUtils
 import com.cmoney.kolfanci.utils.Utils
+import com.cmoney.remoteconfig_library.extension.getKeyValue
 import com.cmoney.xlogin.XLoginHelper
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -111,7 +114,10 @@ class MessageViewModel(
 
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
 
-    private val pollingInterval = 3000L
+    private val pollingInterval: Long
+        get() {
+            return FirebaseRemoteConfig.getInstance().getKeyValue(PollingFrequencyKey).times(1000)
+        }
 
     /**
      * 圖片上傳 callback

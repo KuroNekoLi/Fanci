@@ -15,7 +15,7 @@ import com.cmoney.fanciapi.fanci.model.UseridsParam
 
 interface RoleUserApi {
     /**
-     * 取得頻道中具有Vip角色身分的用戶清單 (任一種VIP) __________🔒 已註冊的fanci使用者
+     * 取得頻道中具有Vip角色身分的用戶清單 (任一種VIP)
      * 
      * Responses:
      *  - 200: 成功
@@ -32,7 +32,7 @@ interface RoleUserApi {
     suspend fun apiV1RoleUserChannelChannelIdVipRoleGet(@Path("groupId") groupId: kotlin.String, @Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<GroupMember>>
 
     /**
-     * 判斷用戶是否擁有社團的Vip角色 __________🔒 已註冊的fanci使用者
+     * 判斷用戶是否擁有社團的Vip角色
      * 
      * Responses:
      *  - 200: 成功
@@ -49,7 +49,7 @@ interface RoleUserApi {
     suspend fun apiV1RoleUserGroupGroupIdCheckVipRoleUserIdGet(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String): Response<kotlin.Boolean>
 
     /**
-     * 取得用戶ID清單的角色列表 __________🔒 已註冊的fanci使用者
+     * 取得用戶ID清單的角色列表
      * 
      * Responses:
      *  - 200: Success
@@ -100,7 +100,7 @@ interface RoleUserApi {
     suspend fun apiV1RoleUserGroupGroupIdMemberUserIdPut(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**
-     * 取得社團中\&quot;不\&quot;具有此角色身分的用戶清單 (可搜尋) __________🔒 已註冊的fanci使用者
+     * 取得社團中\&quot;不\&quot;具有此角色身分的用戶清單 (可搜尋)
      * 
      * Responses:
      *  - 200: 成功
@@ -136,7 +136,7 @@ interface RoleUserApi {
     suspend fun apiV1RoleUserGroupGroupIdRoleRoleIdDelete(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String, @Body useridsParam: UseridsParam? = null): Response<Unit>
 
     /**
-     * 取得社團中具有此角色身分的用戶清單 __________🔒 已註冊的fanci使用者
+     * 取得社團中具有此角色身分的用戶清單
      * 
      * Responses:
      *  - 200: 成功
@@ -171,7 +171,7 @@ interface RoleUserApi {
     suspend fun apiV1RoleUserGroupGroupIdRoleRoleIdPut(@Path("groupId") groupId: kotlin.String, @Path("roleId") roleId: kotlin.String, @Body useridsParam: UseridsParam? = null): Response<Unit>
 
     /**
-     * 取得用戶於社團中所擁有的角色清單 (不含Vip) __________🔒 已註冊的fanci使用者
+     * 取得用戶於社團中所擁有的角色清單 (不含Vip)
      * 
      * Responses:
      *  - 200: 成功
@@ -188,7 +188,7 @@ interface RoleUserApi {
     suspend fun apiV1RoleUserGroupGroupIdUserIdRoleGet(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String): Response<kotlin.collections.List<FanciRole>>
 
     /**
-     * 取得用戶所擁有的社團Vip角色清單 __________🔒 已註冊的fanci使用者
+     * 取得用戶所擁有的社團Vip角色清單
      * 
      * Responses:
      *  - 200: 成功
@@ -205,7 +205,7 @@ interface RoleUserApi {
     suspend fun apiV1RoleUserGroupGroupIdUserIdVipRoleGet(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String): Response<kotlin.collections.List<PurchasedRole>>
 
     /**
-     * 取得社團中具有Vip角色身分的用戶清單 (任一種VIP) __________🔒 已註冊的fanci使用者
+     * 取得社團中具有Vip角色身分的用戶清單 (任一種VIP)
      * 
      * Responses:
      *  - 200: 成功
