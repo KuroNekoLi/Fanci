@@ -8,13 +8,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +37,7 @@ import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
-import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -41,6 +45,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -49,6 +54,7 @@ import org.koin.androidx.compose.koinViewModel
  * @param channelId 目前頻道id
  * @param jumpChatMessage 指定前往的message
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatRoomScreen(
     channelId: String,
@@ -73,6 +79,10 @@ fun ChatRoomScreen(
     val replyMessage by messageViewModel.replyMessage.collectAsState()
 
     KLog.i(TAG, "open ChatRoomScreen channelId:$channelId")
+
+    //控制 BottomSheet
+    val state = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val coroutineScope = rememberCoroutineScope()
 
     //是否有讀的權限
     if (Constant.canReadMessage()) {
@@ -149,7 +159,10 @@ fun ChatRoomScreen(
         },
         onAttachClick = {
             AppUserLogger.getInstance().log(Clicked.MessageInsertImage)
-            openImagePickDialog = true
+//            openImagePickDialog = true
+            coroutineScope.launch {
+                state.show()
+            }
         },
         showOnlyBasicPermissionTip = {
             messageViewModel.showPermissionTip()
@@ -224,17 +237,28 @@ fun ChatRoomScreen(
     }
 
     //圖片選擇
-    if (openImagePickDialog) {
-        PhotoPickDialogScreen(
-            onDismiss = {
-                openImagePickDialog = false
-            },
-            onAttach = {
-                openImagePickDialog = false
-                messageViewModel.attachImage(it)
-            }
-        )
-    }
+//    if (openImagePickDialog) {
+//        PhotoPickDialogScreen(
+//            onDismiss = {
+//                openImagePickDialog = false
+//            },
+//            onAttach = {
+//                openImagePickDialog = false
+//                messageViewModel.attachImage(it)
+//            }
+//        )
+//    }
+
+    //多媒體檔案選擇
+    MediaPickerBottomSheet(
+        state = state,
+        onAttach = {
+            messageViewModel.attachImage(it)
+        },
+        onFileClick = {
+
+        }
+    )
 }
 
 @Composable

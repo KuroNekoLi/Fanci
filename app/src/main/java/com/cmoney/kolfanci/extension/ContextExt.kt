@@ -12,12 +12,20 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
-import com.cmoney.kolfanci.ui.main.MainActivity
 import java.io.File
 
+/**
+ * 取得檔案類型
+ */
+fun Context.getFileType(uri: Uri): String? {
+    val r = contentResolver
+    val mimeTypeMap = MimeTypeMap.getSingleton()
+    return mimeTypeMap.getExtensionFromMimeType(r.getType(uri))
+}
 
 fun Context.copyToClipboard(text: String) {
     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
