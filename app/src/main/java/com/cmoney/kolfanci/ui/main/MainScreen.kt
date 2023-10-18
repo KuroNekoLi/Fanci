@@ -34,6 +34,7 @@ import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
+import com.cmoney.kolfanci.ui.screens.channel.ResetRedDot
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
@@ -48,6 +49,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 @RootNavGraph(start = true)
@@ -57,7 +59,8 @@ fun MainScreen(
     navigator: DestinationsNavigator,
     leaveGroupResultRecipient: ResultRecipient<GroupSettingScreenDestination, String>,
     chatRoomViewModel: ChatRoomViewModel = koinViewModel(),
-    followViewModel: FollowViewModel = koinViewModel()
+    followViewModel: FollowViewModel = koinViewModel(),
+    resetRedDotResultRecipient: ResultRecipient<ChannelScreenDestination, ResetRedDot>
 ) {
     val TAG = "MainScreen"
     val context = LocalContext.current
@@ -154,6 +157,19 @@ fun MainScreen(
 
         notificationViewModel.finishJumpToChannelDest()
         chatRoomViewModel.afterUpdatePermissionDone()
+    }
+
+    //Reset redDot
+    resetRedDotResultRecipient.onNavResult { navResult ->
+        when (navResult) {
+            NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                val resetRedDot = navResult.value
+                globalGroupViewModel.resetRedDot(resetRedDot)
+            }
+        }
     }
 
     FollowScreen(
@@ -288,7 +304,8 @@ fun HomeScreenPreview() {
     FanciTheme {
         MainScreen(
             navigator = EmptyDestinationsNavigator,
-            leaveGroupResultRecipient = EmptyResultRecipient()
+            leaveGroupResultRecipient = EmptyResultRecipient(),
+            resetRedDotResultRecipient = EmptyResultRecipient()
         )
     }
 }
