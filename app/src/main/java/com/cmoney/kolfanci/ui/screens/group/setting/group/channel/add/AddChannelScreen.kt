@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,6 +53,7 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.ChannelTabSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditChannelOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MemberAndRoleManageScreenDestination
@@ -61,6 +63,8 @@ import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
+import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
@@ -120,7 +124,9 @@ fun AddChannelScreen(
             it.id == category.id
         }
         // 當頻道的數量有變化時
-        if (targetCategory != null && ((targetCategory.channels?.size ?: 0) != originChannelsSize)) {
+        if (targetCategory != null && ((targetCategory.channels?.size
+                ?: 0) != originChannelsSize)
+        ) {
             navigator.popBackStack()
         }
     }
@@ -397,7 +403,12 @@ fun AddChannelScreenView(
                                     )
                                 )
                             },
-                            onDeleteClick = onDeleteClick
+                            onDeleteClick = onDeleteClick,
+                            onChangeBoardClick = {
+                                navigator.navigate(
+                                    ChannelTabSettingScreenDestination
+                                )
+                            }
                         )
                     }
                     //權限
@@ -454,59 +465,68 @@ private fun StyleTabScreen(
     textState: String,
     withDelete: Boolean,
     onChannelNameClick: (String) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onChangeBoardClick: () -> Unit
 ) {
-    Text(
-        modifier = Modifier.padding(
-            top = 20.dp,
-            start = 24.dp,
-            end = 24.dp,
-            bottom = 20.dp
-        ),
-        text = stringResource(id = R.string.channel_name),
-        fontSize = 14.sp,
-        color = LocalColor.current.text.default_100
-    )
+    Column {
+        Text(
+            modifier = Modifier.padding(
+                top = 20.dp,
+                start = 24.dp,
+                end = 24.dp,
+                bottom = 20.dp
+            ),
+            text = stringResource(id = R.string.channel_name),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
+        )
 
-    Row(
-        modifier = Modifier
-            .background(LocalColor.current.background)
-            .clickable {
+        NarrowItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = LocalColor.current.background)
+                .padding(NarrowItemDefaults.paddingValues),
+            title = textState.ifEmpty {
+                "輸入頻道名稱"
+            },
+            titleFontWeight = FontWeight.Normal,
+            titleColor = (if (textState.isEmpty()) {
+                LocalColor.current.text.default_30
+            } else {
+                LocalColor.current.text.default_100
+            }),
+            actionContent = NarrowItemDefaults.nextIcon(),
+            onClick = {
                 onChannelNameClick.invoke(textState)
             }
-            .padding(
-                top = 10.dp,
-                bottom = 10.dp,
-                start = 25.dp,
-                end = 10.dp
-            )
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (textState.isEmpty()) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "輸入頻道名稱",
-                fontSize = 17.sp,
-                color = LocalColor.current.text.default_30
-            )
-        } else {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = textState,
-                fontSize = 17.sp,
-                color = LocalColor.current.text.default_100
-            )
-        }
+        )
 
-        Spacer(modifier = Modifier.width(5.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.next),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
+        Text(
+            modifier = Modifier.padding(
+                top = 20.dp,
+                start = 24.dp,
+                end = 24.dp,
+                bottom = 20.dp
+            ),
+            text = stringResource(id = R.string.channel_board),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
+        )
+
+        NarrowItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = LocalColor.current.background)
+                .padding(NarrowItemDefaults.paddingValues),
+            title = stringResource(id = R.string.channel_board_chat_tab),
+            titleFontWeight = FontWeight.Normal,
+            actionContent = NarrowItemDefaults.nextIcon(),
+            onClick = onChangeBoardClick
         )
     }
+
 
     if (withDelete && Constant.isCanDeleteChannel()) {
         Spacer(modifier = Modifier.height(35.dp))
@@ -755,7 +775,7 @@ private fun getFromByIsEditChannel(isEditChannel: Boolean): From {
 
 
 //==================== Preview ====================
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun StyleTabScreenPreview() {
     FanciTheme {
@@ -763,7 +783,8 @@ fun StyleTabScreenPreview() {
             "",
             true,
             onChannelNameClick = {},
-            onDeleteClick = {}
+            onDeleteClick = {},
+            onChangeBoardClick = {}
         )
     }
 }

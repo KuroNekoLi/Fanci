@@ -255,4 +255,12 @@
 
     <string name="input_approve_question">請輸入審核題目</string>
 
+    <string name="channel_board">頻道版面</string>
+
+    <string name="channel_board_chat_tab">聊天區優先</string>
+    <string name="channel_board_chat_tab_desc">點擊頻道後，優先顯示的是聊天區。</string>
+
+    <string name="channel_board_post_tab">貼文區優先</string>
+    <string name="channel_board_post_tab_desc">點擊頻道後，優先顯示的是貼文區。</string>
+
 </resources>
