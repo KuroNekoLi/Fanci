@@ -17,6 +17,7 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.copyToClipboard
+import com.cmoney.kolfanci.extension.getFileType
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -50,6 +51,21 @@ data class ImageAttachState(
     val isUploadComplete: Boolean = false,
     val serverUrl: String = ""
 )
+
+/**
+ * 附加檔案 fanci 支援類型
+ */
+sealed class AttachmentType {
+    object Picture : AttachmentType()
+
+    object Music : AttachmentType()
+
+    object Txt : AttachmentType()
+
+    object Pdf : AttachmentType()
+
+    object Unknown : AttachmentType()
+}
 
 /**
  * 處理聊天室 相關訊息
@@ -103,6 +119,10 @@ class MessageViewModel(
     //附加圖片
     private val _imageAttach = MutableStateFlow<List<Uri>>(emptyList())
     val imageAttach = _imageAttach.asStateFlow()
+
+    //附加檔案
+    private val _attachment = MutableStateFlow<Map<AttachmentType, List<Uri>>>(emptyMap())
+    val attachment = _attachment.asStateFlow()
 
     //聊天訊息
     private val _message = MutableStateFlow<List<ChatMessageWrapper>>(emptyList())
@@ -279,10 +299,71 @@ class MessageViewModel(
     }
 
     /**
+     * 附加檔案, 區分 類型
+     */
+    fun attachment(uris: List<Uri>) {
+        val attachmentMap = uris.map { uri ->
+            val attachmentType = getAttachmentType(uri)
+            attachmentType to uri
+        }.groupBy {
+            it.first
+        }.mapValues { entry ->
+            entry.value.map { it.second }
+        }
+
+        //圖片需要累加
+
+        _attachment.value = attachmentMap
+
+//        val images = attachmentMap[AttachmentType.Picture].orEmpty()
+//        if (images.isNotEmpty()) {
+//            attachImage(images)
+//        }
+//
+//        val music = attachmentMap[AttachmentType.Music].orEmpty()
+//        if (music.isNotEmpty()) {
+//            attachMusic(music)
+//        }
+//
+//        val txt = attachmentMap[AttachmentType.Txt].orEmpty()
+//        if (txt.isNotEmpty()) {
+//            //TODO
+//        }
+//
+//        val pdf = attachmentMap[AttachmentType.Pdf].orEmpty()
+//        if (pdf.isNotEmpty()) {
+//            //TODO
+//        }
+    }
+
+    /**
+     * 根據 Uri 區分檔案類型
+     */
+    private fun getAttachmentType(uri: Uri): AttachmentType {
+        val mimeType = context.getFileType(uri)
+        val lowMimeType = mimeType.lowercase()
+        return if (lowMimeType.startsWith("image")) {
+            AttachmentType.Picture
+        } else if (lowMimeType.startsWith("application")) {
+            if (lowMimeType.contains("txt")) {
+                AttachmentType.Txt
+            } else if (lowMimeType.contains("pdf")) {
+                AttachmentType.Pdf
+            } else {
+                AttachmentType.Unknown
+            }
+        } else if (lowMimeType.startsWith("audio")) {
+            AttachmentType.Music
+        } else {
+            AttachmentType.Unknown
+        }
+    }
+
+    /**
      * 附加 圖片
      * @param uris 圖片 uri集合
      */
-    fun attachImage(uris: List<Uri>) {
+    private fun attachImage(uris: List<Uri>) {
         KLog.i(TAG, "attachImage:${uris.joinToString { it.toString() }}")
         val imageList = _imageAttach.value.toMutableList()
         imageList.addAll(uris)
@@ -300,6 +381,21 @@ class MessageViewModel(
             it != uri
         }
     }
+
+//    /**
+//     * 附加 音檔
+//     */
+//    private fun attachMusic(uris: List<Uri>) {
+//        KLog.i(TAG, "attachMusic:$uris")
+//        _musicAttach.value = uris
+//    }
+//
+//    /**
+//     * 移除 附加檔案 音檔
+//     */
+//    private fun removeAttachMusic() {
+//        _musicAttach.value = emptyList()
+//    }
 
     /**
      * 對外 發送訊息 接口

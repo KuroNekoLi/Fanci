@@ -31,10 +31,12 @@ import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MediaPickerBottomSheet
@@ -88,8 +90,7 @@ fun ChatRoomScreen(
     if (Constant.canReadMessage()) {
         if (jumpChatMessage != null) {
             messageViewModel.forwardToMessage(channelId, jumpChatMessage)
-        }
-        else {
+        } else {
             messageViewModel.chatRoomFirstFetch(channelId)
         }
     }
@@ -139,6 +140,9 @@ fun ChatRoomScreen(
     //附加圖片
     val imageAttach by messageViewModel.imageAttach.collectAsState()
 
+    //附加檔案
+    val attachment by messageViewModel.attachment.collectAsState()
+
     ChatRoomScreenView(
         channelId = channelId,
         announceMessage = announceMessage,
@@ -150,6 +154,7 @@ fun ChatRoomScreen(
             messageViewModel.removeReply(it)
         },
         imageAttach = imageAttach,
+        attachment = attachment,
         onDeleteAttach = {
             messageViewModel.removeAttach(it)
         },
@@ -236,29 +241,12 @@ fun ChatRoomScreen(
         messageViewModel.announceRouteDone()
     }
 
-    //圖片選擇
-//    if (openImagePickDialog) {
-//        PhotoPickDialogScreen(
-//            onDismiss = {
-//                openImagePickDialog = false
-//            },
-//            onAttach = {
-//                openImagePickDialog = false
-//                messageViewModel.attachImage(it)
-//            }
-//        )
-//    }
-
     //多媒體檔案選擇
     MediaPickerBottomSheet(
-        state = state,
-        onAttach = {
-            messageViewModel.attachImage(it)
-        },
-        onFileClick = {
-
-        }
-    )
+        state = state
+    ) {
+        messageViewModel.attachment(it)
+    }
 }
 
 @Composable
@@ -273,6 +261,7 @@ private fun ChatRoomScreenView(
     onMessageSend: (text: String) -> Unit,
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
+    attachment: Map<AttachmentType, List<Uri>>
 ) {
     Column(
         modifier = Modifier
@@ -321,6 +310,21 @@ private fun ChatRoomScreenView(
             }
         )
 
+        //附加檔案
+        ChatRoomAttachmentScreen(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primary),
+            attachment = attachment,
+            onDelete = {
+                onDeleteAttach.invoke(it)
+            },
+            onAdd = {
+                //TODO, 新增圖片
+                onAttachClick.invoke()
+            }
+        )
+
         //輸入匡
         MessageInput(
             onMessageSend = {
@@ -349,6 +353,7 @@ fun ChatRoomScreenPreview() {
             onMessageSend = {},
             onAttachClick = {},
             showOnlyBasicPermissionTip = {},
+            attachment = emptyMap(),
         )
     }
 }

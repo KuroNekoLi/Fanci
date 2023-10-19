@@ -21,10 +21,11 @@ import java.io.File
 /**
  * 取得檔案類型
  */
-fun Context.getFileType(uri: Uri): String? {
-    val r = contentResolver
-    val mimeTypeMap = MimeTypeMap.getSingleton()
-    return mimeTypeMap.getExtensionFromMimeType(r.getType(uri))
+fun Context.getFileType(uri: Uri): String {
+    val cr = contentResolver
+    return cr.getType(uri).orEmpty()
+    //    val mimeTypeMap = MimeTypeMap.getSingleton()
+    //    return mimeTypeMap.getExtensionFromMimeType(r.getType(uri))
 }
 
 fun Context.copyToClipboard(text: String) {

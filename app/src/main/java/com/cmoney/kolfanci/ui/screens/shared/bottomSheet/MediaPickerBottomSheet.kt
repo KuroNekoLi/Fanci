@@ -48,7 +48,6 @@ fun MediaPickerBottomSheet(
     modifier: Modifier = Modifier,
     state: ModalBottomSheetState,
     quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
-    onFileClick: () -> Unit,
     onAttach: (List<Uri>) -> Unit
 ) {
     val TAG = "MediaPickerBottomSheet"
@@ -129,7 +128,7 @@ fun MediaPickerBottomSheet(
         intent.type = "*/*"
         intent.putExtra(
             Intent.EXTRA_MIME_TYPES,
-            arrayOf("image/*", "application/pdf", "application/txt")
+            arrayOf("image/*", "application/pdf", "application/txt", "audio/*")
         )
 
         intent.action = Intent.ACTION_GET_CONTENT
