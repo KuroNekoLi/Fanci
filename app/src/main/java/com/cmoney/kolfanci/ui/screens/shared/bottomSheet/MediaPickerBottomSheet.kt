@@ -57,12 +57,6 @@ fun MediaPickerBottomSheet(
     val TAG = "MediaPickerBottomSheet"
     val coroutineScope = rememberCoroutineScope()
 
-    fun hideBottomSheet() {
-        coroutineScope.launch {
-            state.hide()
-        }
-    }
-
     var showPhotoPicker by remember {
         mutableStateOf(false)
     }
@@ -73,6 +67,12 @@ fun MediaPickerBottomSheet(
 
     var showFilePicker by remember {
         mutableStateOf(false)
+    }
+
+    fun hideBottomSheet() {
+        coroutineScope.launch {
+            state.hide()
+        }
     }
 
     ModalBottomSheetLayout(
@@ -96,11 +96,14 @@ fun MediaPickerBottomSheet(
 
     //TODO: 驗證
     if (showPhotoPicker) {
-        showPhotoPicker = false
         PicturePicker(
             onAttach = {
                 onAttach.invoke(it)
+                showPhotoPicker = false
                 hideBottomSheet()
+            },
+            onNothing = {
+                showPhotoPicker = false
             }
         )
     }
@@ -109,20 +112,26 @@ fun MediaPickerBottomSheet(
         TakePhoto(
             onAttach = {
                 onAttach.invoke(it)
+                showTakePhoto = false
                 hideBottomSheet()
+            },
+            onNothing = {
+                showTakePhoto = false
             }
         )
-        showTakePhoto = false
     }
 
     if (showFilePicker) {
         FilePicker(
             onAttach = {
                 onAttach.invoke(it)
+                showFilePicker = false
                 hideBottomSheet()
+            },
+            onNothing = {
+                showFilePicker = false
             }
         )
-        showFilePicker = false
     }
 }
 
@@ -242,7 +251,8 @@ fun MediaPickerBottomSheetView(
 @Composable
 fun PicturePicker(
     quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
-    onAttach: (List<Uri>) -> Unit
+    onAttach: (List<Uri>) -> Unit,
+    onNothing: () -> Unit
 ) {
     val TAG = "PicturePicker"
     val choosePhotoLauncher = if (quantityLimit == 1) {
@@ -250,6 +260,8 @@ fun PicturePicker(
             KLog.i(TAG, "get uri: $photoUri")
             if (photoUri != null) {
                 onAttach.invoke(listOf(photoUri))
+            } else {
+                onNothing.invoke()
             }
         }
     } else {
@@ -257,6 +269,8 @@ fun PicturePicker(
             KLog.i(TAG, "get uris:${photoUris.joinToString { it.toString() }}")
             if (photoUris.isNotEmpty()) {
                 onAttach.invoke(photoUris)
+            } else {
+                onNothing.invoke()
             }
         }
     }
@@ -271,7 +285,8 @@ fun PicturePicker(
  */
 @Composable
 fun TakePhoto(
-    onAttach: (List<Uri>) -> Unit
+    onAttach: (List<Uri>) -> Unit,
+    onNothing: () -> Unit
 ) {
     val TAG = "TakePhoto"
     val context = LocalContext.current
@@ -282,7 +297,9 @@ fun TakePhoto(
                 captureUri?.let { uri ->
                     KLog.i(TAG, "get uri:$uri")
                     onAttach.invoke(listOf(uri))
-                }
+                } ?: run { onNothing.invoke() }
+            } else {
+                onNothing.invoke()
             }
         }
 
@@ -302,14 +319,17 @@ fun TakePhoto(
  */
 @Composable
 fun FilePicker(
-    onAttach: (List<Uri>) -> Unit
+    onAttach: (List<Uri>) -> Unit,
+    onNothing: () -> Unit
 ) {
     val filePickerLaunch =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
                 it.data?.data?.let { uri ->
                     onAttach.invoke(listOf(uri))
-                }
+                } ?: run { onNothing.invoke() }
+            } else {
+                onNothing.invoke()
             }
         }
 
