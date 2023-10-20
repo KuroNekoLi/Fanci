@@ -7,7 +7,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.cmoney.kolfanci.ui.screens.chat.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 
 //TODO
@@ -24,7 +23,7 @@ fun ChatRoomAttachmentScreen(
     attachment.forEach { (attachmentType, uris) ->
         when (attachmentType) {
             AttachmentType.Picture -> ChatRoomAttachImageScreen(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary),
                 imageAttach = uris,

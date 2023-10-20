@@ -24,7 +24,12 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getCaptureUri
-import com.cmoney.kolfanci.ui.screens.chat.AttachImageDefault
+import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.socks.library.KLog
@@ -47,12 +52,9 @@ import kotlinx.coroutines.launch
 fun MediaPickerBottomSheet(
     modifier: Modifier = Modifier,
     state: ModalBottomSheetState,
-    quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onAttach: (List<Uri>) -> Unit
 ) {
     val TAG = "MediaPickerBottomSheet"
-    val context = LocalContext.current
-    var captureUri: Uri? = null //Camera result callback
     val coroutineScope = rememberCoroutineScope()
 
     fun hideBottomSheet() {
@@ -61,78 +63,16 @@ fun MediaPickerBottomSheet(
         }
     }
 
-    val captureResult =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                captureUri?.let { uri ->
-                    KLog.i(TAG, "get uri:$uri")
-                    onAttach.invoke(listOf(uri))
-                    hideBottomSheet()
-                }
-            }
-        }
-
-    /**
-     * 啟動相機頁面
-     */
-    fun startCameraPicker() {
-        captureUri = context.getCaptureUri()
-        val captureIntent =
-            Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
-                MediaStore.EXTRA_OUTPUT,
-                captureUri
-            )
-        captureResult.launch(captureIntent)
+    var showPhotoPicker by remember {
+        mutableStateOf(false)
     }
 
-    val choosePhotoLauncher = if (quantityLimit == 1) {
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { photoUri ->
-            KLog.i(TAG, "get uri: $photoUri")
-            if (photoUri != null) {
-                onAttach.invoke(listOf(photoUri))
-                hideBottomSheet()
-            }
-        }
-    } else {
-        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(maxItems = quantityLimit)) { photoUris ->
-            KLog.i(TAG, "get uris:${photoUris.joinToString { it.toString() }}")
-            if (photoUris.isNotEmpty()) {
-                onAttach.invoke(photoUris)
-                hideBottomSheet()
-            }
-        }
+    var showTakePhoto by remember {
+        mutableStateOf(false)
     }
 
-    /**
-     * 啟動相簿選相片
-     */
-    fun startImagePicker() {
-        choosePhotoLauncher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
-    }
-
-    val filePickerLaunch =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                it.data?.data?.let { uri ->
-                    onAttach.invoke(listOf(uri))
-                    hideBottomSheet()
-                }
-            }
-        }
-
-    /**
-     * 啟動檔案選擇企
-     */
-    fun startFilePicker() {
-        val intent = Intent()
-        intent.type = "*/*"
-        intent.putExtra(
-            Intent.EXTRA_MIME_TYPES,
-            arrayOf("image/*", "application/pdf", "application/txt", "audio/*")
-        )
-
-        intent.action = Intent.ACTION_GET_CONTENT
-        filePickerLaunch.launch(intent)
+    var showFilePicker by remember {
+        mutableStateOf(false)
     }
 
     ModalBottomSheetLayout(
@@ -142,17 +82,48 @@ fun MediaPickerBottomSheet(
             MediaPickerBottomSheetView(
                 modifier = modifier,
                 onImageClick = {
-                    startImagePicker()
+                    showPhotoPicker = true
                 },
                 onCameraClick = {
-                    startCameraPicker()
+                    showTakePhoto = true
                 },
                 onFileClick = {
-                    startFilePicker()
+                    showFilePicker = true
                 }
             )
         }
     ) {}
+
+    //TODO: 驗證
+    if (showPhotoPicker) {
+        showPhotoPicker = false
+        PicturePicker(
+            onAttach = {
+                onAttach.invoke(it)
+                hideBottomSheet()
+            }
+        )
+    }
+
+    if (showTakePhoto) {
+        TakePhoto(
+            onAttach = {
+                onAttach.invoke(it)
+                hideBottomSheet()
+            }
+        )
+        showTakePhoto = false
+    }
+
+    if (showFilePicker) {
+        FilePicker(
+            onAttach = {
+                onAttach.invoke(it)
+                hideBottomSheet()
+            }
+        )
+        showFilePicker = false
+    }
 }
 
 @Composable
@@ -262,6 +233,96 @@ fun MediaPickerBottomSheetView(
                 style = TextStyle(fontSize = 17.sp, color = LocalColor.current.text.default_100)
             )
         }
+    }
+}
+
+/**
+ * 啟動 圖片 選擇器
+ */
+@Composable
+fun PicturePicker(
+    quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
+    onAttach: (List<Uri>) -> Unit
+) {
+    val TAG = "PicturePicker"
+    val choosePhotoLauncher = if (quantityLimit == 1) {
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { photoUri ->
+            KLog.i(TAG, "get uri: $photoUri")
+            if (photoUri != null) {
+                onAttach.invoke(listOf(photoUri))
+            }
+        }
+    } else {
+        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(maxItems = quantityLimit)) { photoUris ->
+            KLog.i(TAG, "get uris:${photoUris.joinToString { it.toString() }}")
+            if (photoUris.isNotEmpty()) {
+                onAttach.invoke(photoUris)
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        choosePhotoLauncher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+    }
+}
+
+/**
+ * 拍照
+ */
+@Composable
+fun TakePhoto(
+    onAttach: (List<Uri>) -> Unit
+) {
+    val TAG = "TakePhoto"
+    val context = LocalContext.current
+    var captureUri: Uri? = null //Camera result callback
+    val captureResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                captureUri?.let { uri ->
+                    KLog.i(TAG, "get uri:$uri")
+                    onAttach.invoke(listOf(uri))
+                }
+            }
+        }
+
+    LaunchedEffect(key1 = Unit) {
+        captureUri = context.getCaptureUri()
+        val captureIntent =
+            Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
+                MediaStore.EXTRA_OUTPUT,
+                captureUri
+            )
+        captureResult.launch(captureIntent)
+    }
+}
+
+/**
+ * 選擇檔案
+ */
+@Composable
+fun FilePicker(
+    onAttach: (List<Uri>) -> Unit
+) {
+    val filePickerLaunch =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                it.data?.data?.let { uri ->
+                    onAttach.invoke(listOf(uri))
+                }
+            }
+        }
+
+    LaunchedEffect(key1 = Unit) {
+        val intent = Intent()
+        intent.type = "*/*"
+        intent.putExtra(
+            Intent.EXTRA_MIME_TYPES,
+            arrayOf("image/*", "application/pdf", "application/txt", "audio/*")
+        )
+
+        intent.action = Intent.ACTION_GET_CONTENT
+        filePickerLaunch.launch(intent)
     }
 }
 

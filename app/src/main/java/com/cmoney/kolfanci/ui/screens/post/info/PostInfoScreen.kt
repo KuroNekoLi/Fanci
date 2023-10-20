@@ -69,7 +69,7 @@ import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
 import com.cmoney.kolfanci.ui.destinations.BaseEditMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
-import com.cmoney.kolfanci.ui.screens.chat.ChatRoomAttachImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
 import com.cmoney.kolfanci.ui.screens.post.BaseDeletedContentScreen
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen

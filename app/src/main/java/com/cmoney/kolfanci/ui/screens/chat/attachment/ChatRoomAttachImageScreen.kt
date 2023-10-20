@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.chat
+package com.cmoney.kolfanci.ui.screens.chat.attachment
 
 import android.net.Uri
 import android.os.Build
