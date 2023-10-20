@@ -17,7 +17,7 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.copyToClipboard
-import com.cmoney.kolfanci.extension.getFileType
+import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -303,7 +303,7 @@ class MessageViewModel(
      */
     fun attachment(uris: List<Uri>) {
         val attachmentMap = uris.map { uri ->
-            val attachmentType = getAttachmentType(uri)
+            val attachmentType = context.getAttachmentType(uri)
             attachmentType to uri
         }.groupBy {
             it.first
@@ -311,91 +311,31 @@ class MessageViewModel(
             entry.value.map { it.second }
         }
 
-        //圖片需要累加
-
-        _attachment.value = attachmentMap
-
-//        val images = attachmentMap[AttachmentType.Picture].orEmpty()
-//        if (images.isNotEmpty()) {
-//            attachImage(images)
-//        }
-//
-//        val music = attachmentMap[AttachmentType.Music].orEmpty()
-//        if (music.isNotEmpty()) {
-//            attachMusic(music)
-//        }
-//
-//        val txt = attachmentMap[AttachmentType.Txt].orEmpty()
-//        if (txt.isNotEmpty()) {
-//            //TODO
-//        }
-//
-//        val pdf = attachmentMap[AttachmentType.Pdf].orEmpty()
-//        if (pdf.isNotEmpty()) {
-//            //TODO
-//        }
-    }
-
-    /**
-     * 根據 Uri 區分檔案類型
-     */
-    private fun getAttachmentType(uri: Uri): AttachmentType {
-        val mimeType = context.getFileType(uri)
-        val lowMimeType = mimeType.lowercase()
-        return if (lowMimeType.startsWith("image")) {
-            AttachmentType.Picture
-        } else if (lowMimeType.startsWith("application")) {
-            if (lowMimeType.contains("txt")) {
-                AttachmentType.Txt
-            } else if (lowMimeType.contains("pdf")) {
-                AttachmentType.Pdf
-            } else {
-                AttachmentType.Unknown
+        val unionList = (_attachment.value.asSequence() + attachmentMap.asSequence())
+            .distinct()
+            .groupBy({ it.key }, { it.value })
+            .mapValues { entry ->
+                entry.value.flatten()
             }
-        } else if (lowMimeType.startsWith("audio")) {
-            AttachmentType.Music
-        } else {
-            AttachmentType.Unknown
-        }
+
+        _attachment.value = unionList
     }
 
     /**
-     * 附加 圖片
-     * @param uris 圖片 uri集合
-     */
-    private fun attachImage(uris: List<Uri>) {
-        KLog.i(TAG, "attachImage:${uris.joinToString { it.toString() }}")
-        val imageList = _imageAttach.value.toMutableList()
-        imageList.addAll(uris)
-        _imageAttach.value = imageList
-    }
-
-    /**
-     * 移除 附加 圖片
-     * @param uri 圖片 uri.
+     * 移除 附加 檔案
+     * @param uri
      */
     fun removeAttach(uri: Uri) {
         KLog.i(TAG, "removeAttach:$uri")
-        val imageList = _imageAttach.value.toMutableList()
-        _imageAttach.value = imageList.filter {
-            it != uri
+        val attachmentType = context.getAttachmentType(uri)
+        val newAttachment = _attachment.value[attachmentType]?.filter { existsUri ->
+            existsUri != uri
+        }
+
+        _attachment.value = _attachment.value.toMutableMap().apply {
+            set(attachmentType, newAttachment.orEmpty())
         }
     }
-
-//    /**
-//     * 附加 音檔
-//     */
-//    private fun attachMusic(uris: List<Uri>) {
-//        KLog.i(TAG, "attachMusic:$uris")
-//        _musicAttach.value = uris
-//    }
-//
-//    /**
-//     * 移除 附加檔案 音檔
-//     */
-//    private fun removeAttachMusic() {
-//        _musicAttach.value = emptyList()
-//    }
 
     /**
      * 對外 發送訊息 接口

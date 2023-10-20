@@ -3,10 +3,14 @@ package com.cmoney.kolfanci.ui.screens.chat.attachment
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 
 //TODO
@@ -32,15 +36,27 @@ fun ChatRoomAttachmentScreen(
             )
 
             AttachmentType.Music -> {
-                //TODO
+                AttachmentAudioScreen(
+                    audioList = listOf(Uri.EMPTY),
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(15.dp)
+                        .background(MaterialTheme.colors.primary),
+                    itemModifier = Modifier
+                        .width(270.dp)
+                        .height(75.dp)
+                )
 
             }
+
             AttachmentType.Pdf -> {
                 //TODO
             }
+
             AttachmentType.Txt -> {
                 //TODO
             }
+
             AttachmentType.Unknown -> {
                 //TODO
             }

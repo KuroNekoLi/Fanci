@@ -16,7 +16,32 @@ import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import java.io.File
+
+/**
+ * 根據 Uri 區分檔案類型
+ */
+fun Context.getAttachmentType(uri: Uri): AttachmentType {
+    val mimeType = getFileType(uri)
+    val lowMimeType = mimeType.lowercase()
+    return if (lowMimeType.startsWith("image")) {
+        AttachmentType.Picture
+    } else if (lowMimeType.startsWith("application")) {
+        if (lowMimeType.contains("txt")) {
+            AttachmentType.Txt
+        } else if (lowMimeType.contains("pdf")) {
+            AttachmentType.Pdf
+        } else {
+            AttachmentType.Unknown
+        }
+    } else if (lowMimeType.startsWith("audio")) {
+        AttachmentType.Music
+    } else {
+        AttachmentType.Unknown
+    }
+}
+
 
 /**
  * 取得檔案類型

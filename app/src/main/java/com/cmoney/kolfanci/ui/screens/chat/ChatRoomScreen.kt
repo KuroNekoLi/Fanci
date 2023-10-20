@@ -298,18 +298,18 @@ private fun ChatRoomScreenView(
         }
 
         //附加圖片
-        ChatRoomAttachImageScreen(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colors.primary),
-            imageAttach = imageAttach,
-            onDelete = {
-                onDeleteAttach.invoke(it)
-            },
-            onAdd = {
-                onAttachClick.invoke()
-            }
-        )
+//        ChatRoomAttachImageScreen(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .background(MaterialTheme.colors.primary),
+//            imageAttach = imageAttach,
+//            onDelete = {
+//                onDeleteAttach.invoke(it)
+//            },
+//            onAdd = {
+//                onAttachClick.invoke()
+//            }
+//        )
 
         //附加檔案
         ChatRoomAttachmentScreen(
