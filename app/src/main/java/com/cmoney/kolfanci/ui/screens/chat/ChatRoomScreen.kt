@@ -47,8 +47,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -142,6 +140,9 @@ fun ChatRoomScreen(
     //附加檔案
     val attachment by messageViewModel.attachment.collectAsState()
 
+    //是否只有圖片選擇
+    val isOnlyPhotoSelector by messageViewModel.isOnlyPhotoSelector.collectAsState()
+
     ChatRoomScreenView(
         channelId = channelId,
         announceMessage = announceMessage,
@@ -161,13 +162,19 @@ fun ChatRoomScreen(
         },
         onAttachClick = {
             AppUserLogger.getInstance().log(Clicked.MessageInsertImage)
-//            openImagePickDialog = true
+            messageViewModel.onAttachClick()
             coroutineScope.launch {
                 state.show()
             }
         },
         showOnlyBasicPermissionTip = {
             messageViewModel.showPermissionTip()
+        },
+        onAttachImageAddClick = {
+            messageViewModel.onAttachImageAddClick()
+            coroutineScope.launch {
+                state.show()
+            }
         },
         attachment = attachment
     )
@@ -242,7 +249,8 @@ fun ChatRoomScreen(
     //多媒體檔案選擇
     MediaPickerBottomSheet(
         state = state,
-        selectedAttachment = attachment
+        selectedAttachment = attachment,
+        isOnlyPhotoSelector = isOnlyPhotoSelector
     ) {
         messageViewModel.attachment(it)
     }
@@ -259,6 +267,7 @@ private fun ChatRoomScreenView(
     onMessageSend: (text: String) -> Unit,
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
+    onAttachImageAddClick: () -> Unit,
     attachment: Map<AttachmentType, List<Uri>>
 ) {
     Column(
@@ -304,7 +313,7 @@ private fun ChatRoomScreenView(
                 onDeleteAttach.invoke(it)
             },
             onAdd = {
-                onAttachClick.invoke()
+                onAttachImageAddClick.invoke()
             }
         )
 
@@ -335,6 +344,7 @@ fun ChatRoomScreenPreview() {
             onMessageSend = {},
             onAttachClick = {},
             showOnlyBasicPermissionTip = {},
+            onAttachImageAddClick = {},
             attachment = emptyMap(),
         )
     }

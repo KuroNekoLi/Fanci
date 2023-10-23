@@ -72,6 +72,7 @@ sealed class AttachmentEnv {
  *  附加檔案 底部選單
  *  @param state 控制 bottom 是否出現
  *  @param attachmentEnv 使用附加檔案環境 (ex: 在聊天下使用 / 在貼文下使用)
+ *  @param isOnlyPhotoSelector 是否只有圖片,相機 選擇功能
  *  @param selectedAttachment 已經選擇的檔案
  *  @param onAttach callback
  */
@@ -81,6 +82,7 @@ fun MediaPickerBottomSheet(
     modifier: Modifier = Modifier,
     state: ModalBottomSheetState,
     attachmentEnv: AttachmentEnv = AttachmentEnv.Chat,
+    isOnlyPhotoSelector: Boolean = false,
     selectedAttachment: Map<AttachmentType, List<Uri>>,
     viewModel: MediaPickerBottomSheetViewModel = koinViewModel(),
     onAttach: (List<Uri>) -> Unit
@@ -117,6 +119,7 @@ fun MediaPickerBottomSheet(
         sheetContent = {
             MediaPickerBottomSheetView(
                 modifier = modifier,
+                isOnlyPhotoSelector = isOnlyPhotoSelector,
                 onImageClick = {
                     viewModel.photoPickCheck(
                         selectedAttachment = selectedAttachment,
@@ -230,6 +233,7 @@ fun MediaPickerBottomSheet(
 @Composable
 fun MediaPickerBottomSheetView(
     modifier: Modifier = Modifier,
+    isOnlyPhotoSelector: Boolean = false,
     onImageClick: () -> Unit,
     onCameraClick: () -> Unit,
     onFileClick: () -> Unit
@@ -301,38 +305,40 @@ fun MediaPickerBottomSheetView(
             )
         }
 
-        Divider(
-            color = colorResource(id = R.color.color_0DFFFFFF),
-            thickness = 1.dp
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    onFileClick.invoke()
-                }
-                .padding(
-                    top = 10.dp,
-                    bottom = 30.dp,
-                    start = 24.dp,
-                    end = 24.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(20.dp),
-                painter = painterResource(id = R.drawable.file),
-                contentDescription = "file",
-                tint = LocalColor.current.text.default_100
+        if (!isOnlyPhotoSelector) {
+            Divider(
+                color = colorResource(id = R.color.color_0DFFFFFF),
+                thickness = 1.dp
             )
 
-            Spacer(modifier = Modifier.width(15.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onFileClick.invoke()
+                    }
+                    .padding(
+                        top = 10.dp,
+                        bottom = 30.dp,
+                        start = 24.dp,
+                        end = 24.dp
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.file),
+                    contentDescription = "file",
+                    tint = LocalColor.current.text.default_100
+                )
 
-            Text(
-                text = "上傳檔案",
-                style = TextStyle(fontSize = 17.sp, color = LocalColor.current.text.default_100)
-            )
+                Spacer(modifier = Modifier.width(15.dp))
+
+                Text(
+                    text = "上傳檔案",
+                    style = TextStyle(fontSize = 17.sp, color = LocalColor.current.text.default_100)
+                )
+            }
         }
     }
 }

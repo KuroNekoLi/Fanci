@@ -124,6 +124,10 @@ class MessageViewModel(
     private val _attachment = MutableStateFlow<Map<AttachmentType, List<Uri>>>(emptyMap())
     val attachment = _attachment.asStateFlow()
 
+    //附加檔案,只有image類型
+    private val _isOnlyPhotoSelector = MutableStateFlow<Boolean>(false)
+    val isOnlyPhotoSelector = _isOnlyPhotoSelector.asStateFlow()
+
     //聊天訊息
     private val _message = MutableStateFlow<List<ChatMessageWrapper>>(emptyList())
     val message = _message.asStateFlow()
@@ -334,8 +338,7 @@ class MessageViewModel(
 
         if (newAttachment.isNullOrEmpty()) {
             _attachment.value = emptyMap()
-        }
-        else {
+        } else {
             _attachment.value = _attachment.value.toMutableMap().apply {
                 set(attachmentType, newAttachment)
             }
@@ -1046,6 +1049,22 @@ class MessageViewModel(
                 }
             }
         }
+    }
+
+    /**
+     * 點擊 附加功能
+     */
+    fun onAttachClick() {
+        KLog.i(TAG, "onAttachClick")
+        _isOnlyPhotoSelector.value = false
+    }
+
+    /**
+     * 附加圖片 點擊更多圖片
+     */
+    fun onAttachImageAddClick() {
+        KLog.i(TAG, "onImageAddClick")
+        _isOnlyPhotoSelector.value = true
     }
 
 }
