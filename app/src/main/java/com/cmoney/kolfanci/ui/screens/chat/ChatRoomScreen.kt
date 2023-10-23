@@ -39,7 +39,7 @@ import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
-import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MediaPickerBottomSheet
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor

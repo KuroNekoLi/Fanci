@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.shared.bottomSheet
+package com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker
 
 import android.app.Activity
 import android.content.Intent
@@ -51,6 +51,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 使用附加檔案的環境
@@ -73,7 +74,6 @@ sealed class AttachmentEnv {
  *  @param attachmentEnv 使用附加檔案環境 (ex: 在聊天下使用 / 在貼文下使用)
  *  @param selectedAttachment 已經選擇的檔案
  *  @param onAttach callback
- *  @param onError 錯誤 callback , (title, description)
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -82,6 +82,7 @@ fun MediaPickerBottomSheet(
     state: ModalBottomSheetState,
     attachmentEnv: AttachmentEnv = AttachmentEnv.Chat,
     selectedAttachment: Map<AttachmentType, List<Uri>>,
+    viewModel: MediaPickerBottomSheetViewModel = koinViewModel(),
     onAttach: (List<Uri>) -> Unit
 ) {
     val TAG = "MediaPickerBottomSheet"
@@ -112,48 +113,6 @@ fun MediaPickerBottomSheet(
         }
     }
 
-    /**
-     * 檢查 上傳圖片 資格
-     * 聊天室, 最多上傳10張, 只能上傳一種類型附加檔案
-     *
-     * @param onOpen 檢查通過
-     * @param onError 檢查失敗, 並回傳錯誤訊息 (title, description)
-     */
-    fun photoPickCheck(
-        onOpen: () -> Unit,
-        onError: (String, String) -> Unit
-    ) {
-        val attachmentTypes = selectedAttachment.keys
-        when (attachmentEnv) {
-            AttachmentEnv.Chat -> {
-                if (!attachmentTypes.contains(AttachmentType.Picture) && attachmentTypes.isNotEmpty()) {
-                    onError.invoke(
-                        context.getString(R.string.chat_attachment_limit_title),
-                        context.getString(R.string.chat_attachment_limit_desc)
-                    )
-                } else if (attachmentTypes.contains(AttachmentType.Picture) && (selectedAttachment[AttachmentType.Picture]?.size
-                        ?: 0) >= AttachImageDefault.DEFAULT_QUANTITY_LIMIT
-                ) {
-                    onError.invoke(
-                        context.getString(R.string.chat_attachment_image_limit_title)
-                            .format(AttachImageDefault.DEFAULT_QUANTITY_LIMIT),
-                        context.getString(R.string.chat_attachment_image_limit_desc).format(
-                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT,
-                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT
-                        )
-                    )
-                } else {
-                    //pass
-                    onOpen.invoke()
-                }
-            }
-
-            AttachmentEnv.Post -> {
-
-            }
-        }
-    }
-
     ModalBottomSheetLayout(
         sheetState = state,
         sheetShape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
@@ -161,7 +120,9 @@ fun MediaPickerBottomSheet(
             MediaPickerBottomSheetView(
                 modifier = modifier,
                 onImageClick = {
-                    photoPickCheck(
+                    viewModel.photoPickCheck(
+                        selectedAttachment = selectedAttachment,
+                        attachmentEnv = attachmentEnv,
                         onOpen = {
                             showPhotoPicker = true
                         },
@@ -171,7 +132,9 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onCameraClick = {
-                    photoPickCheck(
+                    viewModel.photoPickCheck(
+                        selectedAttachment = selectedAttachment,
+                        attachmentEnv = attachmentEnv,
                         onOpen = {
                             showTakePhoto = true
                         },
@@ -187,6 +150,7 @@ fun MediaPickerBottomSheet(
         }
     ) {}
 
+    //顯示錯誤彈窗
     showAlertDialog?.let {
         val title = it.first
         val desc = it.second
