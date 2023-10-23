@@ -31,7 +31,6 @@ import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
-import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
@@ -154,8 +153,6 @@ fun ChatRoomScreen(
         onDeleteReply = {
             messageViewModel.removeReply(it)
         },
-        imageAttach = imageAttach,
-        attachment = attachment,
         onDeleteAttach = {
             messageViewModel.removeAttach(it)
         },
@@ -172,7 +169,8 @@ fun ChatRoomScreen(
         },
         showOnlyBasicPermissionTip = {
             messageViewModel.showPermissionTip()
-        }
+        },
+        attachment = attachment
     )
 
     //SnackBar 通知訊息
@@ -244,7 +242,8 @@ fun ChatRoomScreen(
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
-        state = state
+        state = state,
+        selectedAttachment = attachment
     ) {
         messageViewModel.attachment(it)
     }
@@ -257,7 +256,6 @@ private fun ChatRoomScreenView(
     onMsgDismissHide: (ChatMessage) -> Unit,
     replyMessage: IReplyMessage?,
     onDeleteReply: (IReplyMessage) -> Unit,
-    imageAttach: List<Uri>,
     onDeleteAttach: (Uri) -> Unit,
     onMessageSend: (text: String) -> Unit,
     onAttachClick: () -> Unit,
@@ -297,20 +295,6 @@ private fun ChatRoomScreenView(
             }
         }
 
-        //附加圖片
-//        ChatRoomAttachImageScreen(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .background(MaterialTheme.colors.primary),
-//            imageAttach = imageAttach,
-//            onDelete = {
-//                onDeleteAttach.invoke(it)
-//            },
-//            onAdd = {
-//                onAttachClick.invoke()
-//            }
-//        )
-
         //附加檔案
         ChatRoomAttachmentScreen(
             modifier = Modifier
@@ -321,7 +305,6 @@ private fun ChatRoomScreenView(
                 onDeleteAttach.invoke(it)
             },
             onAdd = {
-                //TODO, 新增圖片
                 onAttachClick.invoke()
             }
         )
@@ -349,7 +332,6 @@ fun ChatRoomScreenPreview() {
             onMsgDismissHide = {},
             replyMessage = IReplyMessage(),
             onDeleteReply = {},
-            imageAttach = emptyList(),
             onDeleteAttach = {},
             onMessageSend = {},
             onAttachClick = {},

@@ -128,7 +128,7 @@ object AttachImageDefault {
     /**
      * 預設附加圖片上限
      */
-    private const val DEFAULT_QUANTITY_LIMIT = 10
+    const val DEFAULT_QUANTITY_LIMIT = 10
 
     /**
      * 附加圖片數量上限

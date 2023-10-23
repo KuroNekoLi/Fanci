@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,26 +36,58 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getCaptureUri
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
+/**
+ * 使用附加檔案的環境
+ */
+sealed class AttachmentEnv {
+    /**
+     * 聊天
+     */
+    object Chat : AttachmentEnv()
+
+    /**
+     * 貼文
+     */
+    object Post : AttachmentEnv()
+}
+
+/**
+ *  附加檔案 底部選單
+ *  @param state 控制 bottom 是否出現
+ *  @param attachmentEnv 使用附加檔案環境 (ex: 在聊天下使用 / 在貼文下使用)
+ *  @param selectedAttachment 已經選擇的檔案
+ *  @param onAttach callback
+ *  @param onError 錯誤 callback , (title, description)
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MediaPickerBottomSheet(
     modifier: Modifier = Modifier,
     state: ModalBottomSheetState,
+    attachmentEnv: AttachmentEnv = AttachmentEnv.Chat,
+    selectedAttachment: Map<AttachmentType, List<Uri>>,
     onAttach: (List<Uri>) -> Unit
 ) {
     val TAG = "MediaPickerBottomSheet"
+
+    val context = LocalContext.current
+
     val coroutineScope = rememberCoroutineScope()
 
     var showPhotoPicker by remember {
@@ -69,9 +102,55 @@ fun MediaPickerBottomSheet(
         mutableStateOf(false)
     }
 
+    var showAlertDialog: Pair<String, String>? by remember {
+        mutableStateOf(null)
+    }
+
     fun hideBottomSheet() {
         coroutineScope.launch {
             state.hide()
+        }
+    }
+
+    /**
+     * 檢查 上傳圖片 資格
+     * 聊天室, 最多上傳10張, 只能上傳一種類型附加檔案
+     *
+     * @param onOpen 檢查通過
+     * @param onError 檢查失敗, 並回傳錯誤訊息 (title, description)
+     */
+    fun photoPickCheck(
+        onOpen: () -> Unit,
+        onError: (String, String) -> Unit
+    ) {
+        val attachmentTypes = selectedAttachment.keys
+        when (attachmentEnv) {
+            AttachmentEnv.Chat -> {
+                if (!attachmentTypes.contains(AttachmentType.Picture) && attachmentTypes.isNotEmpty()) {
+                    onError.invoke(
+                        context.getString(R.string.chat_attachment_limit_title),
+                        context.getString(R.string.chat_attachment_limit_desc)
+                    )
+                } else if (attachmentTypes.contains(AttachmentType.Picture) && (selectedAttachment[AttachmentType.Picture]?.size
+                        ?: 0) >= AttachImageDefault.DEFAULT_QUANTITY_LIMIT
+                ) {
+                    onError.invoke(
+                        context.getString(R.string.chat_attachment_image_limit_title)
+                            .format(AttachImageDefault.DEFAULT_QUANTITY_LIMIT),
+                        context.getString(R.string.chat_attachment_image_limit_desc).format(
+                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT,
+                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT
+                        )
+                    )
+                } else {
+                    //pass
+                    onOpen.invoke()
+                }
+            }
+
+            AttachmentEnv.Post -> {
+
+            }
         }
     }
 
@@ -82,7 +161,14 @@ fun MediaPickerBottomSheet(
             MediaPickerBottomSheetView(
                 modifier = modifier,
                 onImageClick = {
-                    showPhotoPicker = true
+                    photoPickCheck(
+                        onOpen = {
+                            showPhotoPicker = true
+                        },
+                        onError = { title, desc ->
+                            showAlertDialog = Pair(title, desc)
+                        }
+                    )
                 },
                 onCameraClick = {
                     showTakePhoto = true
@@ -94,9 +180,36 @@ fun MediaPickerBottomSheet(
         }
     ) {}
 
-    //TODO: 驗證
+    showAlertDialog?.let {
+        val title = it.first
+        val desc = it.second
+
+        DialogScreen(
+            title = title,
+            subTitle = desc,
+            onDismiss = {
+                showAlertDialog = null
+            }
+        ) {
+            BlueButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                text = stringResource(id = R.string.back)
+            ) {
+                hideBottomSheet()
+                showAlertDialog = null
+            }
+        }
+    }
+
+    //========== show all picker start==========
     if (showPhotoPicker) {
+        val quantityLimit =
+            AttachImageDefault.DEFAULT_QUANTITY_LIMIT - (selectedAttachment[AttachmentType.Picture]?.size
+                ?: 0)
         PicturePicker(
+            quantityLimit = quantityLimit.coerceIn(1, AttachImageDefault.DEFAULT_QUANTITY_LIMIT),
             onAttach = {
                 onAttach.invoke(it)
                 showPhotoPicker = false
@@ -133,6 +246,7 @@ fun MediaPickerBottomSheet(
             }
         )
     }
+    //========== show all picker end==========
 }
 
 @Composable
