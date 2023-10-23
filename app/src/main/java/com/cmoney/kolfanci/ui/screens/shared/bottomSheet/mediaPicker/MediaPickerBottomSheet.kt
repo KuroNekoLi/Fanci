@@ -87,8 +87,6 @@ fun MediaPickerBottomSheet(
 ) {
     val TAG = "MediaPickerBottomSheet"
 
-    val context = LocalContext.current
-
     val coroutineScope = rememberCoroutineScope()
 
     var showPhotoPicker by remember {
@@ -144,7 +142,16 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onFileClick = {
-                    showFilePicker = true
+                    viewModel.filePickCheck(
+                        selectedAttachment = selectedAttachment,
+                        attachmentEnv = attachmentEnv,
+                        onOpen = {
+                            showFilePicker = true
+                        },
+                        onError = { title, desc ->
+                            showAlertDialog = Pair(title, desc)
+                        }
+                    )
                 }
             )
         }

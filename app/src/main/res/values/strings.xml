@@ -261,4 +261,7 @@
     <string name="chat_attachment_image_limit_title">無法上傳超過 %d 張圖片</string>
     <string name="chat_attachment_image_limit_desc">你上傳的照片超過 %d 張，請手動調整或系統只會上傳前%d張圖片</string>
 
+    <string name="chat_attachment_file_limit_title">無法同時上傳兩個檔案</string>
+    <string name="chat_attachment_file_limit_desc">無法同時上傳兩個檔案\n請分開訊息上傳</string>
+
 </resources>

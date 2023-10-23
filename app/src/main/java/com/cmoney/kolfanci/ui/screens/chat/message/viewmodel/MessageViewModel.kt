@@ -332,8 +332,13 @@ class MessageViewModel(
             existsUri != uri
         }
 
-        _attachment.value = _attachment.value.toMutableMap().apply {
-            set(attachmentType, newAttachment.orEmpty())
+        if (newAttachment.isNullOrEmpty()) {
+            _attachment.value = emptyMap()
+        }
+        else {
+            _attachment.value = _attachment.value.toMutableMap().apply {
+                set(attachmentType, newAttachment)
+            }
         }
     }
 

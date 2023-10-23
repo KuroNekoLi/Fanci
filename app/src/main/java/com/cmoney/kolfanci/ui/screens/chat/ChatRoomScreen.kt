@@ -47,6 +47,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -136,9 +138,6 @@ fun ChatRoomScreen(
         messageViewModel.copyMessage(it)
         messageViewModel.copyDone()
     }
-
-    //附加圖片
-    val imageAttach by messageViewModel.imageAttach.collectAsState()
 
     //附加檔案
     val attachment by messageViewModel.attachment.collectAsState()
