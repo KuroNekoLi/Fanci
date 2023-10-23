@@ -171,7 +171,14 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onCameraClick = {
-                    showTakePhoto = true
+                    photoPickCheck(
+                        onOpen = {
+                            showTakePhoto = true
+                        },
+                        onError = { title, desc ->
+                            showAlertDialog = Pair(title, desc)
+                        }
+                    )
                 },
                 onFileClick = {
                     showFilePicker = true
