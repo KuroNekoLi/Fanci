@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.chat
+package com.cmoney.kolfanci.ui.screens.chat.attachment
 
 import android.net.Uri
 import android.os.Build
@@ -73,7 +73,7 @@ fun ChatRoomAttachImageScreen(
                                 onAdd.invoke()
                             },
                             modifier = Modifier
-                                .size(108.dp, 135.dp)
+                                .size(108.dp, 120.dp)
                                 .padding(top = 10.dp, bottom = 10.dp),
                             border = BorderStroke(0.5.dp, LocalColor.current.text.default_100),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
@@ -101,7 +101,7 @@ private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit) {
 
     Box(
         modifier = Modifier
-            .height(135.dp)
+            .height(120.dp)
             .padding(top = 10.dp, bottom = 10.dp),
         contentAlignment = Alignment.TopEnd
     ) {
@@ -128,7 +128,7 @@ object AttachImageDefault {
     /**
      * 預設附加圖片上限
      */
-    private const val DEFAULT_QUANTITY_LIMIT = 10
+    const val DEFAULT_QUANTITY_LIMIT = 10
 
     /**
      * 附加圖片數量上限

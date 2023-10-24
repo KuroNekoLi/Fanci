@@ -28,6 +28,7 @@ import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.search.viewmodel.SearchViewModel
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheetViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
 import com.cmoney.kolfanci.ui.screens.shared.vip.viewmodel.VipPlanViewModel
@@ -150,5 +151,10 @@ val viewModule = module {
     }
     viewModel {
         NotificationViewModel(get(), get(), get(), get())
+    }
+    viewModel {
+        MediaPickerBottomSheetViewModel(
+            context = androidApplication()
+        )
     }
 }

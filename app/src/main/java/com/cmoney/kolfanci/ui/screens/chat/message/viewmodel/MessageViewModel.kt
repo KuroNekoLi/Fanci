@@ -17,6 +17,7 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.copyToClipboard
+import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -50,6 +52,21 @@ data class ImageAttachState(
     val isUploadComplete: Boolean = false,
     val serverUrl: String = ""
 )
+
+/**
+ * 附加檔案 fanci 支援類型
+ */
+sealed class AttachmentType {
+    object Picture : AttachmentType()
+
+    object Music : AttachmentType()
+
+    object Txt : AttachmentType()
+
+    object Pdf : AttachmentType()
+
+    object Unknown : AttachmentType()
+}
 
 /**
  * 處理聊天室 相關訊息
@@ -103,6 +120,14 @@ class MessageViewModel(
     //附加圖片
     private val _imageAttach = MutableStateFlow<List<Uri>>(emptyList())
     val imageAttach = _imageAttach.asStateFlow()
+
+    //附加檔案
+    private val _attachment = MutableStateFlow<Map<AttachmentType, List<Uri>>>(emptyMap())
+    val attachment = _attachment.asStateFlow()
+
+    //附加檔案,只有image類型
+    private val _isOnlyPhotoSelector = MutableStateFlow<Boolean>(false)
+    val isOnlyPhotoSelector = _isOnlyPhotoSelector.asStateFlow()
 
     //聊天訊息
     private val _message = MutableStateFlow<List<ChatMessageWrapper>>(emptyList())
@@ -279,25 +304,51 @@ class MessageViewModel(
     }
 
     /**
-     * 附加 圖片
-     * @param uris 圖片 uri集合
+     * 附加檔案, 區分 類型
      */
-    fun attachImage(uris: List<Uri>) {
-        KLog.i(TAG, "attachImage:${uris.joinToString { it.toString() }}")
-        val imageList = _imageAttach.value.toMutableList()
-        imageList.addAll(uris)
-        _imageAttach.value = imageList
+    fun attachment(uris: List<Uri>) {
+        val attachmentMap = uris.map { uri ->
+            val attachmentType = context.getAttachmentType(uri)
+            attachmentType to uri
+        }.groupBy {
+            it.first
+        }.mapValues { entry ->
+            entry.value.map { it.second }
+        }
+
+        val unionList = (_attachment.value.asSequence() + attachmentMap.asSequence())
+            .distinct()
+            .groupBy({ it.key }, { it.value })
+            .mapValues { entry ->
+                entry.value.flatten()
+            }
+
+        _attachment.update {
+            unionList
+        }
     }
 
     /**
-     * 移除 附加 圖片
-     * @param uri 圖片 uri.
+     * 移除 附加 檔案
+     * @param uri
      */
     fun removeAttach(uri: Uri) {
         KLog.i(TAG, "removeAttach:$uri")
-        val imageList = _imageAttach.value.toMutableList()
-        _imageAttach.value = imageList.filter {
-            it != uri
+        val attachmentType = context.getAttachmentType(uri)
+        val newAttachment = _attachment.value[attachmentType]?.filter { existsUri ->
+            existsUri != uri
+        }
+
+        if (newAttachment.isNullOrEmpty()) {
+            _attachment.update {
+                emptyMap()
+            }
+        } else {
+            _attachment.update { oldAttachment ->
+                oldAttachment.toMutableMap().apply {
+                    set(attachmentType, newAttachment)
+                }
+            }
         }
     }
 
@@ -1004,6 +1055,26 @@ class MessageViewModel(
                     KLog.e(TAG, e)
                 }
             }
+        }
+    }
+
+    /**
+     * 點擊 附加功能
+     */
+    fun onAttachClick() {
+        KLog.i(TAG, "onAttachClick")
+        _isOnlyPhotoSelector.update {
+            false
+        }
+    }
+
+    /**
+     * 附加圖片 點擊更多圖片
+     */
+    fun onAttachImageAddClick() {
+        KLog.i(TAG, "onImageAddClick")
+        _isOnlyPhotoSelector.update {
+            true
         }
     }
 

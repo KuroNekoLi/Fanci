@@ -8,13 +8,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,13 +31,15 @@ import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
-import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -41,6 +47,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -49,6 +56,7 @@ import org.koin.androidx.compose.koinViewModel
  * @param channelId 目前頻道id
  * @param jumpChatMessage 指定前往的message
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatRoomScreen(
     channelId: String,
@@ -74,12 +82,15 @@ fun ChatRoomScreen(
 
     KLog.i(TAG, "open ChatRoomScreen channelId:$channelId")
 
+    //控制 BottomSheet
+    val state = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val coroutineScope = rememberCoroutineScope()
+
     //是否有讀的權限
     if (Constant.canReadMessage()) {
         if (jumpChatMessage != null) {
             messageViewModel.forwardToMessage(channelId, jumpChatMessage)
-        }
-        else {
+        } else {
             messageViewModel.chatRoomFirstFetch(channelId)
         }
     }
@@ -126,8 +137,11 @@ fun ChatRoomScreen(
         messageViewModel.copyDone()
     }
 
-    //附加圖片
-    val imageAttach by messageViewModel.imageAttach.collectAsState()
+    //附加檔案
+    val attachment by messageViewModel.attachment.collectAsState()
+
+    //是否只有圖片選擇
+    val isOnlyPhotoSelector by messageViewModel.isOnlyPhotoSelector.collectAsState()
 
     ChatRoomScreenView(
         channelId = channelId,
@@ -139,7 +153,6 @@ fun ChatRoomScreen(
         onDeleteReply = {
             messageViewModel.removeReply(it)
         },
-        imageAttach = imageAttach,
         onDeleteAttach = {
             messageViewModel.removeAttach(it)
         },
@@ -149,11 +162,21 @@ fun ChatRoomScreen(
         },
         onAttachClick = {
             AppUserLogger.getInstance().log(Clicked.MessageInsertImage)
-            openImagePickDialog = true
+            messageViewModel.onAttachClick()
+            coroutineScope.launch {
+                state.show()
+            }
         },
         showOnlyBasicPermissionTip = {
             messageViewModel.showPermissionTip()
-        }
+        },
+        onAttachImageAddClick = {
+            messageViewModel.onAttachImageAddClick()
+            coroutineScope.launch {
+                state.show()
+            }
+        },
+        attachment = attachment
     )
 
     //SnackBar 通知訊息
@@ -223,17 +246,13 @@ fun ChatRoomScreen(
         messageViewModel.announceRouteDone()
     }
 
-    //圖片選擇
-    if (openImagePickDialog) {
-        PhotoPickDialogScreen(
-            onDismiss = {
-                openImagePickDialog = false
-            },
-            onAttach = {
-                openImagePickDialog = false
-                messageViewModel.attachImage(it)
-            }
-        )
+    //多媒體檔案選擇
+    MediaPickerBottomSheet(
+        state = state,
+        selectedAttachment = attachment,
+        isOnlyPhotoSelector = isOnlyPhotoSelector
+    ) {
+        messageViewModel.attachment(it)
     }
 }
 
@@ -244,11 +263,12 @@ private fun ChatRoomScreenView(
     onMsgDismissHide: (ChatMessage) -> Unit,
     replyMessage: IReplyMessage?,
     onDeleteReply: (IReplyMessage) -> Unit,
-    imageAttach: List<Uri>,
     onDeleteAttach: (Uri) -> Unit,
     onMessageSend: (text: String) -> Unit,
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
+    onAttachImageAddClick: () -> Unit,
+    attachment: Map<AttachmentType, List<Uri>>
 ) {
     Column(
         modifier = Modifier
@@ -283,17 +303,17 @@ private fun ChatRoomScreenView(
             }
         }
 
-        //附加圖片
-        ChatRoomAttachImageScreen(
+        //附加檔案
+        ChatRoomAttachmentScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colors.primary),
-            imageAttach = imageAttach,
+            attachment = attachment,
             onDelete = {
                 onDeleteAttach.invoke(it)
             },
             onAdd = {
-                onAttachClick.invoke()
+                onAttachImageAddClick.invoke()
             }
         )
 
@@ -320,11 +340,12 @@ fun ChatRoomScreenPreview() {
             onMsgDismissHide = {},
             replyMessage = IReplyMessage(),
             onDeleteReply = {},
-            imageAttach = emptyList(),
             onDeleteAttach = {},
             onMessageSend = {},
             onAttachClick = {},
             showOnlyBasicPermissionTip = {},
+            onAttachImageAddClick = {},
+            attachment = emptyMap(),
         )
     }
 }

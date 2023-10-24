@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.utils
 
+import android.net.Uri
 import android.util.Patterns
+import android.webkit.MimeTypeMap
 import androidx.annotation.DrawableRes
 import com.cmoney.kolfanci.R
 import com.cmoney.fanciapi.fanci.model.Emojis
