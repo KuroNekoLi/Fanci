@@ -217,6 +217,11 @@ sealed class Page(val eventName: String) {
     object GroupSettingsChannelManagementStyleChannelName : Page(eventName = "Group.Settings.ChannelManagement.Style.ChannelName")
 
     /**
+     * 社團.設定.頻道管理.樣式.頻道版面_觀看
+     */
+    object GroupSettingsChannelManagementStyleLayoutSetting : Page(eventName = "Group.Settings.ChannelManagement.Style.LayoutSetting")
+
+    /**
      * 社團.設定.頻道管理.權限_觀看
      */
     object GroupSettingsChannelManagementPermissions : Page(eventName = "Group.Settings.ChannelManagement.Permissions")

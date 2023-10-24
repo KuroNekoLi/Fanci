@@ -242,6 +242,12 @@ sealed class From(val parameterName: String) : Parcelable {
     object ChannelName : From(parameterName = "ChannelName")
 
     /**
+     * 頻道版面
+     */
+    @Parcelize
+    object ChannelLayout : From(parameterName = "ChannelLayout")
+
+    /**
      * 頻道公開度
      */
     @Parcelize
