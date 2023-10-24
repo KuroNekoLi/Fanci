@@ -272,7 +272,7 @@ fun MediaPickerBottomSheetView(
         }
 
         Divider(
-            color = colorResource(id = R.color.color_0DFFFFFF),
+            color = LocalColor.current.background,
             thickness = 1.dp
         )
 
@@ -307,7 +307,7 @@ fun MediaPickerBottomSheetView(
 
         if (!isOnlyPhotoSelector) {
             Divider(
-                color = colorResource(id = R.color.color_0DFFFFFF),
+                color = LocalColor.current.background,
                 thickness = 1.dp
             )
 
