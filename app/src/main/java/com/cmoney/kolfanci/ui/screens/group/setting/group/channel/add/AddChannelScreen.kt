@@ -405,8 +405,12 @@ fun AddChannelScreenView(
                             },
                             onDeleteClick = onDeleteClick,
                             onChangeBoardClick = {
+                                with(AppUserLogger.getInstance()) {
+                                    log(Page.GroupSettingsChannelManagementStyleLayoutSetting, from)
+                                    log(Clicked.StyleLayout, from)
+                                }
                                 navigator.navigate(
-                                    ChannelTabSettingScreenDestination
+                                    ChannelTabSettingScreenDestination(from = from)
                                 )
                             }
                         )

@@ -26,7 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -45,6 +48,7 @@ import com.ramcosta.composedestinations.scope.resultBackNavigator
 fun ChannelTabSettingScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
+    from: From,
     resultNavigator: ResultBackNavigator<Boolean>
 ) {
     var isChatTab by remember {
@@ -61,6 +65,9 @@ fun ChannelTabSettingScreen(
                     navigator.popBackStack()
                 },
                 saveClick = {
+                    with(AppUserLogger.getInstance()) {
+                        log(Clicked.Confirm, From.ChannelLayout)
+                    }
                     resultNavigator.navigateBack(result = isChatTab)
                 }
             )
@@ -80,6 +87,9 @@ fun ChannelTabSettingScreen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                         .clickable {
+                            with(AppUserLogger.getInstance()) {
+                                log(Clicked.StyleLayoutChatFirst, from)
+                            }
                             isChatTab = true
                         }
                         .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
@@ -123,6 +133,9 @@ fun ChannelTabSettingScreen(
                         .fillMaxWidth()
                         .background(LocalColor.current.background)
                         .clickable {
+                            with(AppUserLogger.getInstance()) {
+                                log(Clicked.StyleLayoutPostFirst, from)
+                            }
                             isChatTab = false
                         }
                         .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
@@ -172,6 +185,7 @@ fun ChannelTabSettingScreenPreview() {
         ChannelTabSettingScreen(
             modifier = Modifier,
             navigator = EmptyDestinationsNavigator,
+            from = From.Create,
             resultNavigator = EmptyResultBackNavigator()
         )
     }
