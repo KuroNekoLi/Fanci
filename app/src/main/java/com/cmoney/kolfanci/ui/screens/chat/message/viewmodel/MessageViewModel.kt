@@ -340,10 +340,14 @@ class MessageViewModel(
         }
 
         if (newAttachment.isNullOrEmpty()) {
-            _attachment.value = emptyMap()
+            _attachment.update {
+                emptyMap()
+            }
         } else {
-            _attachment.value = _attachment.value.toMutableMap().apply {
-                set(attachmentType, newAttachment)
+            _attachment.update { oldAttachment ->
+                oldAttachment.toMutableMap().apply {
+                    set(attachmentType, newAttachment)
+                }
             }
         }
     }
@@ -1059,7 +1063,9 @@ class MessageViewModel(
      */
     fun onAttachClick() {
         KLog.i(TAG, "onAttachClick")
-        _isOnlyPhotoSelector.value = false
+        _isOnlyPhotoSelector.update {
+            false
+        }
     }
 
     /**
@@ -1067,7 +1073,9 @@ class MessageViewModel(
      */
     fun onAttachImageAddClick() {
         KLog.i(TAG, "onImageAddClick")
-        _isOnlyPhotoSelector.value = true
+        _isOnlyPhotoSelector.update {
+            true
+        }
     }
 
 }
