@@ -48,7 +48,16 @@ val viewModule = module {
         )
     }
     viewModel { ChatRoomViewModel(get(), get(), get(), get()) }
-    viewModel { MessageViewModel(androidApplication(), get(), get(), get(), get()) }
+    viewModel {
+        MessageViewModel(
+            androidApplication(),
+            get(),
+            get(),
+            get(),
+            get(),
+            musicServiceConnection = get()
+        )
+    }
     viewModel { DiscoverViewModel(get()) }
     viewModel {
         GroupSettingViewModel(

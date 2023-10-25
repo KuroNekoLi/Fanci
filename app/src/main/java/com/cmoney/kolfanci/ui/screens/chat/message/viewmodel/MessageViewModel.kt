@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.chat.message.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import android.os.Bundle
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,6 +27,11 @@ import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
+import com.cmoney.kolfanci.service.media.BUNDLE_START_PLAY_POSITION
+import com.cmoney.kolfanci.service.media.BUNDLE_STORIES
+import com.cmoney.kolfanci.service.media.MusicServiceConnection
+import com.cmoney.kolfanci.service.media.id
+import com.cmoney.kolfanci.service.media.isPrepared
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
@@ -76,7 +82,8 @@ class MessageViewModel(
     private val chatRoomUseCase: ChatRoomUseCase,
     private val chatRoomPollUseCase: ChatRoomPollUseCase,
     private val permissionUseCase: PermissionUseCase,
-    private val uploadImageUseCase: UploadImageUseCase
+    private val uploadImageUseCase: UploadImageUseCase,
+    private val musicServiceConnection: MusicServiceConnection
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
@@ -1078,4 +1085,41 @@ class MessageViewModel(
         }
     }
 
+    //========== Media Player ==========
+    //TODO: test
+    fun playMedia(uri: Uri) {
+        KLog.i(TAG, "playMedia")
+
+        if (musicServiceConnection.isConnected.value == true) {
+            //正在播的歌曲
+            val nowPlaying = musicServiceConnection.nowPlaying.value
+            //取得控制器
+            val transportControls = musicServiceConnection.transportControls
+
+//            val isPrepared = musicServiceConnection.playbackState.value?.isPrepared ?: false
+
+            //已經播放
+//            if (isPrepared && storyId == nowPlaying?.id) {
+//
+//            }
+//            //全新清單
+//            else {
+//                val bundle = Bundle()
+//                bundle.putString("", uri.toString())
+//                bundle.putBinder(
+//                    BUNDLE_STORIES,
+//                    WrapperForBinder(playList)
+//                )
+//                bundle.putInt(BUNDLE_START_PLAY_POSITION, startPosition)
+
+            if (uri.toString().isNotEmpty()) {
+                transportControls.playFromMediaId(
+                    uri.toString(),
+                    null
+                )
+            }
+
+//            }
+        }
+    }
 }

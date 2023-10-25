@@ -176,6 +176,10 @@ fun ChatRoomScreen(
                 state.show()
             }
         },
+        onPreviewAttachmentClick = {
+            //TODO: test play music
+            messageViewModel.playMedia(it)
+        },
         attachment = attachment
     )
 
@@ -268,7 +272,8 @@ private fun ChatRoomScreenView(
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
     onAttachImageAddClick: () -> Unit,
-    attachment: Map<AttachmentType, List<Uri>>
+    attachment: Map<AttachmentType, List<Uri>>,
+    onPreviewAttachmentClick: (Uri) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -312,9 +317,8 @@ private fun ChatRoomScreenView(
             onDelete = {
                 onDeleteAttach.invoke(it)
             },
-            onAdd = {
-                onAttachImageAddClick.invoke()
-            }
+            onAdd = onAttachImageAddClick,
+            onClick = onPreviewAttachmentClick
         )
 
         //輸入匡
@@ -346,6 +350,7 @@ fun ChatRoomScreenPreview() {
             showOnlyBasicPermissionTip = {},
             onAttachImageAddClick = {},
             attachment = emptyMap(),
+            onPreviewAttachmentClick = {}
         )
     }
 }

@@ -33,7 +33,8 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun AttachmentAudioScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    audioList: List<Uri>
+    audioList: List<Uri>,
+    onClick: (Uri) -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -42,17 +43,28 @@ fun AttachmentAudioScreen(
         state = listState, horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(audioList) { audio ->
-            AttachmentAudioItem(modifier = itemModifier)
+            AttachmentAudioItem(
+                modifier = itemModifier,
+                audio = audio,
+                onClick = onClick
+            )
         }
     }
 }
 
 @Composable
-fun AttachmentAudioItem(modifier: Modifier = Modifier) {
+fun AttachmentAudioItem(
+    modifier: Modifier = Modifier,
+    audio: Uri,
+    onClick: (Uri) -> Unit
+) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(LocalColor.current.background),
+            .background(LocalColor.current.background)
+            .clickable {
+                onClick.invoke(audio)
+            },
         contentAlignment = Alignment.CenterStart
     ) {
         Row(
@@ -108,7 +120,9 @@ fun AttachmentAudioItemPreview() {
         AttachmentAudioItem(
             modifier = Modifier
                 .width(270.dp)
-                .height(75.dp)
+                .height(75.dp),
+            audio = Uri.EMPTY,
+            onClick = {}
         )
     }
 }
@@ -125,7 +139,8 @@ fun AttachmentAudioScreenPreview() {
                 Uri.EMPTY,
                 Uri.EMPTY,
                 Uri.EMPTY
-            )
+            ),
+            onClick = {}
         )
     }
 }

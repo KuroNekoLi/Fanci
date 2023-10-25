@@ -22,7 +22,8 @@ fun ChatRoomAttachmentScreen(
     modifier: Modifier = Modifier,
     attachment: Map<AttachmentType, List<Uri>>,
     onDelete: (Uri) -> Unit,
-    onAdd: () -> Unit
+    onAdd: () -> Unit,
+    onClick: (Uri) -> Unit
 ) {
     attachment.forEach { (attachmentType, uris) ->
         when (attachmentType) {
@@ -37,16 +38,16 @@ fun ChatRoomAttachmentScreen(
 
             AttachmentType.Music -> {
                 AttachmentAudioScreen(
-                    audioList = listOf(Uri.EMPTY),
+                    audioList = uris,
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(15.dp)
                         .background(MaterialTheme.colors.primary),
                     itemModifier = Modifier
                         .width(270.dp)
-                        .height(75.dp)
+                        .height(75.dp),
+                    onClick = onClick
                 )
-
             }
 
             AttachmentType.Pdf -> {
@@ -70,6 +71,7 @@ fun ChatRoomAttachmentScreenPreview() {
     ChatRoomAttachmentScreen(
         attachment = emptyMap(),
         onDelete = {},
-        onAdd = {}
+        onAdd = {},
+        onClick = {}
     )
 }
