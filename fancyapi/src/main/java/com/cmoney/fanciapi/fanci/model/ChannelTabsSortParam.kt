@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 
 import com.squareup.moshi.Json
@@ -23,25 +22,16 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 新增頻道參數
+ * 設定頻道功能區排序物件
  *
- * @param name 頻道名稱
- * @param privacy 
- * @param tabs 頻道開啟類別(順序依照提供的順序排序)
+ * @param tabs 頻道功能區排序
  */
 @Parcelize
 
 
-data class ChannelParam (
+data class ChannelTabsSortParam (
 
-    /* 頻道名稱 */
-    @Json(name = "name")
-    val name: kotlin.String? = null,
-
-    @Json(name = "privacy")
-    val privacy: ChannelPrivacy? = null,
-
-    /* 頻道開啟類別(順序依照提供的順序排序) */
+    /* 頻道功能區排序 */
     @Json(name = "tabs")
     val tabs: kotlin.collections.List<ChannelTabType>? = null
 
