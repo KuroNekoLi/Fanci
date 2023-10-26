@@ -48,11 +48,12 @@ import com.ramcosta.composedestinations.scope.resultBackNavigator
 fun ChannelTabSettingScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
+    isChatTabFirst: Boolean,
     from: From,
     resultNavigator: ResultBackNavigator<Boolean>
 ) {
     var isChatTab by remember {
-        mutableStateOf(true)
+        mutableStateOf(isChatTabFirst)
     }
 
     Scaffold(
@@ -186,7 +187,8 @@ fun ChannelTabSettingScreenPreview() {
             modifier = Modifier,
             navigator = EmptyDestinationsNavigator,
             from = From.Create,
-            resultNavigator = EmptyResultBackNavigator()
+            resultNavigator = EmptyResultBackNavigator(),
+            isChatTabFirst = false
         )
     }
 }

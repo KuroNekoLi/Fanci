@@ -10,6 +10,7 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionV2
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
@@ -20,6 +21,9 @@ import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.sort.MoveItem
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.google.gson.Gson
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class UiState(
@@ -60,6 +64,10 @@ class ChannelSettingViewModel(
     private val _listPermissionSelected: MutableMap<ChannelAuthType, SelectedModel> = mutableMapOf()
     val listPermissionSelected: Map<ChannelAuthType, SelectedModel> = _listPermissionSelected
 
+    //頻道 tab 是否為聊天優先
+    private val _isChatTabFirst = MutableStateFlow(false)
+    val isChatTabFirst = _isChatTabFirst.asStateFlow()
+
     //預編輯的頻道
     var channel: Channel? = null
 
@@ -83,6 +91,25 @@ class ChannelSettingViewModel(
         channel.privacy?.let { privacy ->
             if (privacy == ChannelPrivacy.private) {
                 getPrivateChannelMember(channel.id.orEmpty())
+            }
+        }
+
+        //tab order
+        getChannelOrder(channel.id.orEmpty())
+    }
+
+    /**
+     * 取得 tab 順序
+     */
+    private fun getChannelOrder(channelId: String) {
+        KLog.i(TAG, "getChannelOrder")
+        viewModelScope.launch {
+            channelUseCase.getChannelTabOrder(
+                channelId = channelId
+            ).onSuccess { channelTabsSortParam ->
+                if (channelTabsSortParam.tabs?.firstOrNull() == ChannelTabType.chatRoom) {
+                    _isChatTabFirst.value = true
+                }
             }
         }
     }
@@ -118,7 +145,7 @@ class ChannelSettingViewModel(
     /**
      * 取得 頻道角色清單
      */
-    fun getChannelRole(channelId: String) {
+    private fun getChannelRole(channelId: String) {
         uiState = uiState.copy(isLoading = true)
         viewModelScope.launch {
             channelUseCase.getChannelRole(channelId).fold({
@@ -384,5 +411,15 @@ class ChannelSettingViewModel(
      */
     fun onTabSelected(position: Int) {
         uiState = uiState.copy(tabSelected = position)
+    }
+
+    /**
+     * 設定 聊天 tab 是否優先
+     */
+    fun setChannelTabChatFirst(isChatFirst: Boolean) {
+        KLog.i(TAG, "setChannelTabChatFirst")
+        _isChatTabFirst.update {
+            isChatFirst
+        }
     }
 }
