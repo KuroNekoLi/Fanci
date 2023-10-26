@@ -23,20 +23,29 @@ import kotlinx.parcelize.Parcelize
 /**
  * 頻道的權限列表
  *
+ * @param canRead 
+ * @param canPost 
+ * @param canReply 
  * @param canEmoji 
  * @param canManage 
  * @param canCopy 
  * @param canBlock 
  * @param canReport 
  * @param canTakeback 
- * @param canRead 
- * @param canReply 
- * @param canPost 
  */
 @Parcelize
 
 
 data class ChannelPermission (
+
+    @Json(name = "canRead")
+    val canRead: kotlin.Boolean? = null,
+
+    @Json(name = "canPost")
+    val canPost: kotlin.Boolean? = null,
+
+    @Json(name = "canReply")
+    val canReply: kotlin.Boolean? = null,
 
     @Json(name = "canEmoji")
     val canEmoji: kotlin.Boolean? = null,
@@ -54,16 +63,7 @@ data class ChannelPermission (
     val canReport: kotlin.Boolean? = null,
 
     @Json(name = "canTakeback")
-    val canTakeback: kotlin.Boolean? = null,
-
-    @Json(name = "canRead")
-    val canRead: kotlin.Boolean? = null,
-
-    @Json(name = "canReply")
-    val canReply: kotlin.Boolean? = null,
-
-    @Json(name = "canPost")
-    val canPost: kotlin.Boolean? = null
+    val canTakeback: kotlin.Boolean? = null
 
 ) : Parcelable
 
