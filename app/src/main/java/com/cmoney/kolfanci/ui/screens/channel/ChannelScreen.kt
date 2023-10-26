@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
-import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Page
@@ -65,7 +65,7 @@ data class ResetRedDot(
     val channelId: String,
     val isResetPost: Boolean,
     val isResetChat: Boolean
-): Parcelable
+) : Parcelable
 
 /**
  * 頻道主頁面
@@ -90,12 +90,6 @@ fun ChannelScreen(
     val group by globalGroupViewModel().currentGroup.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewMode.fetchChannelTabStatus(channel.id.orEmpty())
-    }
-
-    val channelTabStatus by viewMode.channelTabStatus.collectAsState()
-
-    LaunchedEffect(Unit) {
         viewMode.fetchAllUnreadCount(channel)
     }
 
@@ -114,7 +108,6 @@ fun ChannelScreen(
         unreadCount = unreadCount,
         navController = navController,
         jumpChatMessage = jumpChatMessage,
-        channelTabStatus = channelTabStatus,
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
         postInfoResultRecipient = postInfoResultRecipient,
@@ -154,7 +147,6 @@ private fun ChannelScreenView(
     group: Group?,
     channel: Channel,
     jumpChatMessage: ChatMessage? = null,
-    channelTabStatus: ChannelTabsStatus,
     unreadCount: Pair<Long, Long>?,
     navController: DestinationsNavigator,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
@@ -178,12 +170,16 @@ private fun ChannelScreenView(
     ) { innerPadding ->
         val pages = mutableListOf<String>()
 
-        if (channelTabStatus.bulletinboard == true) {
-            pages.add(stringResource(id = R.string.post))
-        }
-
-        if (channelTabStatus.chatRoom == true) {
-            pages.add(stringResource(id = R.string.chat))
+        channel.tabs?.map { it.type }?.forEach { type ->
+            when (type) {
+                ChannelTabType.chatRoom -> {
+                    pages.add(stringResource(id = R.string.chat))
+                }
+                ChannelTabType.bulletinboard -> {
+                    pages.add(stringResource(id = R.string.post))
+                }
+                null -> {}
+            }
         }
 
         val tabIndex = pagerState.currentPage
@@ -298,7 +294,7 @@ fun ChannelScreenPreview() {
             channel = Channel(
                 name = "\uD83D\uDC57｜金針菇穿什麼"
             ),
-            channelTabStatus = ChannelTabsStatus(),
+//            channelTabStatus = ChannelTabsStatus(),
             unreadCount = Pair(10, 20),
             navController = EmptyDestinationsNavigator,
             announcementResultRecipient = EmptyResultRecipient(),

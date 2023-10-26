@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
-import com.cmoney.fanciapi.fanci.model.ChannelTabsStatus
 import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.socks.library.KLog
@@ -19,28 +18,9 @@ class ChannelViewModel(
 ) : ViewModel() {
     private val TAG = ChannelViewModel::class.java.simpleName
 
-    private val _channelTabStatus: MutableStateFlow<ChannelTabsStatus> = MutableStateFlow(
-        ChannelTabsStatus(
-            chatRoom = false,
-            bulletinboard = false
-        )
-    )
-    val channelTabStatus = _channelTabStatus.asStateFlow()
-
     //未讀數量 (1.聊天室 2.文章)
     private val _unreadCount: MutableStateFlow<Pair<Long, Long>?> = MutableStateFlow(null)
     val unreadCount = _unreadCount.asStateFlow()
-
-    fun fetchChannelTabStatus(channelId: String) {
-        KLog.i(TAG, "fetchChannelTabStatus:$channelId")
-        viewModelScope.launch {
-            channelUseCase.fetchChannelTabStatus(channelId).fold({
-                _channelTabStatus.value = it
-            }, {
-                KLog.e(TAG, it)
-            })
-        }
-    }
 
     /**
      * 抓取未讀取數量 (聊天室/貼文)
