@@ -1113,10 +1113,12 @@ class MessageViewModel(
 //                bundle.putInt(BUNDLE_START_PLAY_POSITION, startPosition)
 
             if (uri.toString().isNotEmpty()) {
-                transportControls.playFromMediaId(
-                    uri.toString(),
-                    null
-                )
+                transportControls.playFromUri(uri, Bundle())
+
+//                transportControls.playFromMediaId(
+//                    uri.toString(),
+//                    null
+//                )
             }
 
 //            }

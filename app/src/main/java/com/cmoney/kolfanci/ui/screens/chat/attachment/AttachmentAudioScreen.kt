@@ -20,12 +20,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -34,9 +37,11 @@ fun AttachmentAudioScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
     audioList: List<Uri>,
-    onClick: (Uri) -> Unit
+    onClick: (Uri) -> Unit,
+    onDelete: (Uri) -> Unit
 ) {
     val listState = rememberLazyListState()
+    val context = LocalContext.current
 
     LazyRow(
         modifier = modifier.padding(start = 10.dp, end = 10.dp),
@@ -46,7 +51,9 @@ fun AttachmentAudioScreen(
             AttachmentAudioItem(
                 modifier = itemModifier,
                 audio = audio,
-                onClick = onClick
+                displayName = context.getFileName(audio).orEmpty(),
+                onClick = onClick,
+                onDelete = onDelete
             )
         }
     }
@@ -56,7 +63,9 @@ fun AttachmentAudioScreen(
 fun AttachmentAudioItem(
     modifier: Modifier = Modifier,
     audio: Uri,
-    onClick: (Uri) -> Unit
+    displayName: String,
+    onClick: (Uri) -> Unit,
+    onDelete: (Uri) -> Unit
 ) {
     Box(
         modifier = modifier
@@ -81,17 +90,15 @@ fun AttachmentAudioItem(
             ) {
 
                 Image(
-                    modifier = Modifier
-                        .clickable {
-
-                        }
-                        .padding(15.dp),
+                    modifier = Modifier.padding(15.dp),
                     painter = painterResource(id = R.drawable.play),
                     contentDescription = "play"
                 )
 
                 Text(
-                    text = "上課教材 001.mp3",
+                    text = displayName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
                         fontSize = 16.sp,
                         lineHeight = 24.sp,
@@ -105,7 +112,7 @@ fun AttachmentAudioItem(
                 modifier = Modifier
                     .padding(10.dp)
                     .clickable {
-
+                        onDelete.invoke(audio)
                     },
                 painter = painterResource(id = R.drawable.close), contentDescription = null
             )
@@ -122,7 +129,9 @@ fun AttachmentAudioItemPreview() {
                 .width(270.dp)
                 .height(75.dp),
             audio = Uri.EMPTY,
-            onClick = {}
+            displayName = "上課教材.mp3",
+            onClick = {},
+            onDelete = {}
         )
     }
 }
@@ -140,7 +149,8 @@ fun AttachmentAudioScreenPreview() {
                 Uri.EMPTY,
                 Uri.EMPTY
             ),
-            onClick = {}
+            onClick = {},
+            onDelete = {}
         )
     }
 }

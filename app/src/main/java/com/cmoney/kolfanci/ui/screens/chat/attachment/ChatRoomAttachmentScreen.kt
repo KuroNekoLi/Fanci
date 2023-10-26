@@ -46,7 +46,8 @@ fun ChatRoomAttachmentScreen(
                     itemModifier = Modifier
                         .width(270.dp)
                         .height(75.dp),
-                    onClick = onClick
+                    onClick = onClick,
+                    onDelete = onDelete
                 )
             }
 

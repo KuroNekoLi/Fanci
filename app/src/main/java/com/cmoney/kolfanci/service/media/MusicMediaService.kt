@@ -216,8 +216,8 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
 //            val mediaSource = metadataList.toMediaSource(getDataSourceFactor())
 //            exoPlayer.setMediaSource(mediaSource)
 
-
             exoPlayer.setMediaItem(MediaItem.fromUri(itemToPlay!!.mediaUri))
+
             exoPlayer.prepare()
             exoPlayer.seekTo(initialWindowIndex, playbackStartPositionMs)
         }
@@ -302,34 +302,6 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
             Log.i(TAG, "onPrepareFromMediaId:$mediaId")
 
             //TODO: 需要改寫資料源
-
-            if (mediaId.isNotEmpty()) {
-                val uri = Uri.parse(mediaId)
-                val playItem = MediaMetadataCompat.Builder().also {
-                    it.mediaUri = mediaId
-//                    it.mediaUri =
-//                        "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_5MB_MP3.mp3"
-                    it.title = "Title"
-                    it.albumArtUri =
-                        "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"
-
-                    it.displayTitle = "displayTitle"
-                    it.displaySubtitle = "displaySubtitle"
-                    it.displayDescription = "displayDescription"
-                    it.displayIconUri =
-                        "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"
-                }.build()
-                val metadataList = listOf(playItem)
-
-                preparePlaylist(
-                    metadataList = metadataList,
-                    itemToPlay = playItem,
-                    playWhenReady = true,
-                    playbackStartPositionMs = 0L
-                )
-
-            }
-
             extras?.let {
                 it.getBinder(BUNDLE_STORIES)?.let { binder ->
                     try {
@@ -383,6 +355,27 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
         }
 
         override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle?) {
+
+            val playItem = MediaMetadataCompat.Builder().also {
+                it.mediaUri = uri.toString()
+                it.title = "Title"
+//                it.albumArtUri =
+//                    "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"
+//
+//                it.displayTitle = "displayTitle"
+//                it.displaySubtitle = "displaySubtitle"
+//                it.displayDescription = "displayDescription"
+//                it.displayIconUri =
+//                    "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"
+            }.build()
+            val metadataList = listOf(playItem)
+
+            preparePlaylist(
+                metadataList = metadataList,
+                itemToPlay = playItem,
+                playWhenReady = true,
+                playbackStartPositionMs = 0L
+            )
         }
     }
 
