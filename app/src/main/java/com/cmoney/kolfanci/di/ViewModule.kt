@@ -22,6 +22,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleMa
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
+import com.cmoney.kolfanci.ui.screens.media.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.my.MyScreenViewModel
 import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
@@ -164,6 +165,13 @@ val viewModule = module {
     viewModel {
         MediaPickerBottomSheetViewModel(
             context = androidApplication()
+        )
+    }
+    viewModel { params ->
+        AudioViewModel(
+            context = androidApplication(),
+            musicServiceConnection = get(),
+            uri = params.get()
         )
     }
 }

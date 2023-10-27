@@ -27,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.kolfanci.extension.getFileType
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
@@ -176,9 +178,17 @@ fun ChatRoomScreen(
                 state.show()
             }
         },
-        onPreviewAttachmentClick = {
-            //TODO: test play music
-            messageViewModel.playMedia(it)
+        onPreviewAttachmentClick = { uri ->
+            //TODO 區分類型
+            val mimeType = context.getFileType(uri)
+            val lowMimeType = mimeType.lowercase()
+            if (lowMimeType.startsWith("audio")) {
+                navController.navigate(
+                    AudioPreviewScreenDestination(
+                        uri = uri
+                    )
+                )
+            }
         },
         attachment = attachment
     )

@@ -30,6 +30,7 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
@@ -216,6 +217,10 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
 //            val mediaSource = metadataList.toMediaSource(getDataSourceFactor())
 //            exoPlayer.setMediaSource(mediaSource)
 
+//            val mediaSource = ProgressiveMediaSource.Factory(FileDataSource.Factory())
+//                .createMediaSource(MediaItem.fromUri(itemToPlay!!.mediaUri))
+//            exoPlayer.setMediaSource(mediaSource)
+
             exoPlayer.setMediaItem(MediaItem.fromUri(itemToPlay!!.mediaUri))
 
             exoPlayer.prepare()
@@ -357,13 +362,14 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
         override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle?) {
 
             val playItem = MediaMetadataCompat.Builder().also {
+                it.id = uri.toString()
                 it.mediaUri = uri.toString()
-                it.title = "Title"
+                it.title = " "
 //                it.albumArtUri =
 //                    "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"
 //
-//                it.displayTitle = "displayTitle"
-//                it.displaySubtitle = "displaySubtitle"
+                it.displayTitle = " "
+                it.displaySubtitle = " "
 //                it.displayDescription = "displayDescription"
 //                it.displayIconUri =
 //                    "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"

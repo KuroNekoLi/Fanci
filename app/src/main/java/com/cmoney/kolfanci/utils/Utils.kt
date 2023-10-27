@@ -168,5 +168,11 @@ class Utils {
                 }
             }
         }
+
+        fun timeMillisToMinutesSeconds(timestamp: Long): String {
+            val minutes = timestamp / 1000 / 60
+            val seconds = (timestamp - (1000 * 60 * minutes)) / 1000
+            return String.format("%02d:%02d", minutes, seconds)
+        }
     }
 }

@@ -28,7 +28,7 @@ class ChannelViewModel(
     val channelTabStatus = _channelTabStatus.asStateFlow()
 
     //未讀數量 (1.聊天室 2.文章)
-    val _unreadCount: MutableStateFlow<Pair<Long, Long>?> = MutableStateFlow(null)
+    private val _unreadCount: MutableStateFlow<Pair<Long, Long>?> = MutableStateFlow(null)
     val unreadCount = _unreadCount.asStateFlow()
 
     fun fetchChannelTabStatus(channelId: String) {
