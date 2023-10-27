@@ -175,9 +175,11 @@ private fun ChannelScreenView(
                 ChannelTabType.chatRoom -> {
                     pages.add(stringResource(id = R.string.chat))
                 }
+
                 ChannelTabType.bulletinboard -> {
                     pages.add(stringResource(id = R.string.post))
                 }
+
                 null -> {}
             }
         }
@@ -243,36 +245,33 @@ private fun ChannelScreenView(
                     count = pages.size,
                     state = pagerState,
                 ) { page ->
-                    when (page) {
-                        0 -> {
-                            //貼文 Tab
-                            PostScreen(
-                                channel = channel,
-                                navController = navController,
-                                resultRecipient = editPostResultRecipient,
-                                postInfoResultRecipient = postInfoResultRecipient
-                            )
+                    //聊天 Tab
+                    if (pages[page] == stringResource(id = R.string.chat)) {
+                        ChatRoomScreen(
+                            channelId = channel.id.orEmpty(),
+                            navController = navController,
+                            resultRecipient = announcementResultRecipient,
+                            jumpChatMessage = jumpChatMessage
+                        )
+                        LaunchedEffect(key1 = Unit) {
+                            onChatPageSelected.invoke()
+                        }
+                    }
+                    //貼文 Tab
+                    else {
+                        PostScreen(
+                            channel = channel,
+                            navController = navController,
+                            resultRecipient = editPostResultRecipient,
+                            postInfoResultRecipient = postInfoResultRecipient
+                        )
 
-                            LaunchedEffect(key1 = Unit) {
-                                onPostPageSelected.invoke()
-                            }
-
-                            LaunchedEffect(key1 = page) {
-                                AppUserLogger.getInstance().log(Page.PostWall)
-                            }
+                        LaunchedEffect(key1 = Unit) {
+                            onPostPageSelected.invoke()
                         }
 
-                        else -> {
-                            //聊天室 Tab
-                            ChatRoomScreen(
-                                channelId = channel.id.orEmpty(),
-                                navController = navController,
-                                resultRecipient = announcementResultRecipient,
-                                jumpChatMessage = jumpChatMessage
-                            )
-                            LaunchedEffect(key1 = Unit) {
-                                onChatPageSelected.invoke()
-                            }
+                        LaunchedEffect(key1 = page) {
+                            AppUserLogger.getInstance().log(Page.PostWall)
                         }
                     }
                 }
