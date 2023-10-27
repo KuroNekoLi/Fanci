@@ -122,7 +122,7 @@ fun AudioPreviewScreenView(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopBarScreen(
-                title = "音檔",
+                title = audioTitle.orEmpty(),
                 backClick = onBack
             )
         },
