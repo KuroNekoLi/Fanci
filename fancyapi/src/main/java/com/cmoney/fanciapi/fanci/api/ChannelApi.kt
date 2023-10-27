@@ -1,5 +1,11 @@
 package com.cmoney.fanciapi.fanci.api
 
+import com.cmoney.fanciapi.infrastructure.CollectionFormats.*
+import retrofit2.http.*
+import retrofit2.Response
+import okhttp3.RequestBody
+import com.squareup.moshi.Json
+
 import com.cmoney.fanciapi.fanci.model.AccessorTypes
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAccessOptionModel
@@ -13,9 +19,6 @@ import com.cmoney.fanciapi.fanci.model.PutAuthTypeRequest
 import com.cmoney.fanciapi.fanci.model.PutWhiteListRequest
 import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 import com.cmoney.fanciapi.fanci.model.WhiteListCount
-import com.cmoney.fanciapi.infrastructure.CollectionFormats.*
-import retrofit2.Response
-import retrofit2.http.*
 
 interface ChannelApi {
     /**
@@ -96,7 +99,7 @@ interface ChannelApi {
     suspend fun apiV1ChannelChannelIdRoleDelete(@Path("channelId") channelId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**
-     * 取得角色清單 (不包含VIP)
+     * 取得頻道管理員(被設定為管理員權限的角色)清單
      * 
      * Responses:
      *  - 200: 成功
@@ -126,22 +129,6 @@ interface ChannelApi {
      */
     @PUT("api/v1/Channel/{channelId}/Role")
     suspend fun apiV1ChannelChannelIdRolePut(@Path("channelId") channelId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
-
-    /**
-     * 取得VIP角色清單
-     * 
-     * Responses:
-     *  - 204: No Content
-     *  - 401: 未驗證
-     *  - 403: 沒有權限
-     *  - 200: 成功
-     *  - 404: 找不到該頻道
-     *
-     * @param channelId 頻道Id
-     * @return [Unit]
-     */
-    @GET("api/v1/Channel/{channelId}/VipRole")
-    suspend fun apiV1ChannelChannelIdVipRoleGet(@Path("channelId") channelId: kotlin.String): Response<Unit>
 
     /**
      * 編輯指定使用者/角色 於頻道中的權限AuthType   使用此方法移動該角色權限後 會將該角色從其他權限清單中移除 __________🔒 管理VIP方案

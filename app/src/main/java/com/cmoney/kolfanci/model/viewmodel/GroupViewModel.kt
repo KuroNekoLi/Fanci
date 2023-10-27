@@ -8,6 +8,7 @@ import com.cmoney.fanciapi.fanci.model.Category
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelAuthType
 import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ColorTheme
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
@@ -497,7 +498,8 @@ class GroupViewModel(
         isNeedApproval: Boolean,
         listPermissionSelected: Map<ChannelAuthType, SelectedModel>,
         orgChannelRoleList: List<FanciRole>,
-        channelRole: List<FanciRole>? = null
+        channelRole: List<FanciRole>? = null,
+        isChatTabFirst: Boolean
     ) {
         val group = _currentGroup.value ?: return
         KLog.i(TAG, "addChannel: $categoryId, $name")
@@ -509,10 +511,17 @@ class GroupViewModel(
                 ChannelPrivacy.public
             }
 
+            val tabOrder = if (isChatTabFirst) {
+                listOf(ChannelTabType.chatRoom, ChannelTabType.bulletinboard)
+            } else {
+                listOf(ChannelTabType.bulletinboard, ChannelTabType.chatRoom)
+            }
+
             channelUseCase.addChannel(
                 categoryId = categoryId,
                 name = name,
-                privacy = privacy
+                privacy = privacy,
+                tabs = tabOrder
             ).fold({ channel ->
                 //新增管理員
                 if (channelRole?.isNotEmpty() == true) {
@@ -548,10 +557,12 @@ class GroupViewModel(
         isNeedApproval: Boolean,
         listPermissionSelected: Map<ChannelAuthType, SelectedModel>,
         orgChannelRoleList: List<FanciRole>,
-        channelRole: List<FanciRole>? = null
+        channelRole: List<FanciRole>? = null,
+        isChatTabFirst: Boolean
     ) {
         val group = _currentGroup.value ?: return
         KLog.i(TAG, "editChannel")
+
         viewModelScope.launch {
             channel?.let { channel ->
                 // 私密頻道處理
@@ -574,7 +585,32 @@ class GroupViewModel(
                     name = name,
                     isNeedApproval = isNeedApproval
                 )
+
+                //編輯tab 順序
+                editTabOrder(
+                    channel = channel,
+                    isChatTabFirst
+                )
+
             }
+        }
+    }
+
+    /**
+     * 編輯 頻道 tab 順序
+     */
+    private fun editTabOrder(channel: Channel, isChatTabFirst: Boolean) {
+        KLog.i(TAG, "editTabOrder:$isChatTabFirst")
+        val tabOrder = if (isChatTabFirst) {
+            listOf(ChannelTabType.chatRoom, ChannelTabType.bulletinboard)
+        } else {
+            listOf(ChannelTabType.bulletinboard, ChannelTabType.chatRoom)
+        }
+        viewModelScope.launch {
+            channelUseCase.setChannelTabOrder(
+                channelId = channel.id.orEmpty(),
+                tabs = tabOrder
+            )
         }
     }
 

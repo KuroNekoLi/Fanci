@@ -5,7 +5,17 @@ import com.cmoney.fanciapi.fanci.api.CategoryApi
 import com.cmoney.fanciapi.fanci.api.ChannelApi
 import com.cmoney.fanciapi.fanci.api.ChannelTabApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.AccessorParam
+import com.cmoney.fanciapi.fanci.model.CategoryParam
+import com.cmoney.fanciapi.fanci.model.ChannelAuthType
+import com.cmoney.fanciapi.fanci.model.ChannelParam
+import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
+import com.cmoney.fanciapi.fanci.model.ChannelTabsSortParam
+import com.cmoney.fanciapi.fanci.model.EditChannelParam
+import com.cmoney.fanciapi.fanci.model.GetWhiteListCountParam
+import com.cmoney.fanciapi.fanci.model.PutWhiteListRequest
+import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 import com.cmoney.kolfanci.extension.checkResponseBody
 
 class ChannelUseCase(
@@ -15,6 +25,33 @@ class ChannelUseCase(
     private val buffInformationApi: BuffInformationApi,
     private val channelTabApi: ChannelTabApi
 ) {
+
+    /**
+     * 取得頻道 tab order
+     */
+    suspend fun getChannelTabOrder(channelId: String) = kotlin.runCatching {
+        channelTabApi.apiV1ChannelTabChannelIdTabsGet(
+            channelId = channelId
+        ).checkResponseBody()
+    }
+
+    /**
+     * 設定 tab 順序
+     *
+     * @param channelId 頻道id
+     * @param tabs tab 順序
+     */
+    suspend fun setChannelTabOrder(channelId: String, tabs: List<ChannelTabType>) =
+        kotlin.runCatching {
+            val channelTabsSortParam = ChannelTabsSortParam(
+                tabs = tabs
+            )
+
+            channelTabApi.apiV1ChannelTabChannelIdTabsSortPut(
+                channelId = channelId,
+                channelTabsSortParam = channelTabsSortParam
+            )
+        }
 
     /**
      * 取得User在此頻道 的狀態
@@ -167,13 +204,19 @@ class ChannelUseCase(
      * @param categoryId 分類id, 在此分類下建立
      * @param name 頻道名稱
      * @param privacy 公開/私密
+     * @param tabs tab 排序
      */
-    suspend fun addChannel(categoryId: String, name: String, privacy: ChannelPrivacy) =
+    suspend fun addChannel(
+        categoryId: String,
+        name: String,
+        privacy: ChannelPrivacy,
+        tabs: List<ChannelTabType>
+    ) =
         kotlin.runCatching {
             categoryApi.apiV1CategoryCategoryIdChannelPost(
                 categoryId = categoryId,
                 channelParam = ChannelParam(
-                    channelType = ChannelTabType.chatRoom,
+                    tabs = tabs,
                     name = name,
                     privacy = privacy
                 )

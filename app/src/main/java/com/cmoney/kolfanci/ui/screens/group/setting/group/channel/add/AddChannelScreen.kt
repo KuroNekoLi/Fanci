@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
@@ -30,11 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,6 +51,7 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
+import com.cmoney.kolfanci.ui.destinations.ChannelTabSettingScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditChannelOpennessScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MemberAndRoleManageScreenDestination
@@ -61,6 +61,8 @@ import com.cmoney.kolfanci.ui.screens.shared.TabScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteAlertDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
+import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.SelectedModel
 import com.cmoney.kolfanci.ui.screens.shared.role.RoleItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
@@ -90,7 +92,8 @@ fun AddChannelScreen(
     approvalResult: ResultRecipient<EditChannelOpennessScreenDestination, Boolean>,
     addRoleResult: ResultRecipient<ShareAddRoleScreenDestination, String>,
     permissionMemberResult: ResultRecipient<MemberAndRoleManageScreenDestination, SelectedModel>,
-    setChannelNameResult: ResultRecipient<EditInputScreenDestination, String>
+    setChannelNameResult: ResultRecipient<EditInputScreenDestination, String>,
+    tabOrderSettingResult: ResultRecipient<ChannelTabSettingScreenDestination, Boolean>
 ) {
     val TAG = "AddChannelScreen"
     val uiState = viewModel.uiState
@@ -120,11 +123,16 @@ fun AddChannelScreen(
             it.id == category.id
         }
         // 當頻道的數量有變化時
-        if (targetCategory != null && ((targetCategory.channels?.size ?: 0) != originChannelsSize)) {
+        if (targetCategory != null && ((targetCategory.channels?.size
+                ?: 0) != originChannelsSize)
+        ) {
             navigator.popBackStack()
         }
     }
     val from = getFromByIsEditChannel(isEditChannel = isEditChannel)
+
+    val isChatTabFirst by viewModel.isChatTabFirst.collectAsState()
+
     AddChannelScreenView(
         modifier = modifier,
         navigator = navigator,
@@ -138,6 +146,7 @@ fun AddChannelScreen(
         isEditChannel = isEditChannel,
         uniqueUserCount = uiState.uniqueUserCount,
         from = from,
+        isChatTabFirst = isChatTabFirst,
         onConfirm = {
             if (channel == null) {
                 groupViewModel.addChannel(
@@ -146,7 +155,8 @@ fun AddChannelScreen(
                     isNeedApproval = uiState.isNeedApproval,
                     listPermissionSelected = viewModel.listPermissionSelected,
                     orgChannelRoleList = viewModel.orgChannelRoleList,
-                    channelRole = uiState.channelRole
+                    channelRole = uiState.channelRole,
+                    isChatTabFirst = isChatTabFirst
                 )
             } else {
                 groupViewModel.editChannel(
@@ -155,7 +165,8 @@ fun AddChannelScreen(
                     isNeedApproval = uiState.isNeedApproval,
                     listPermissionSelected = viewModel.listPermissionSelected,
                     orgChannelRoleList = viewModel.orgChannelRoleList,
-                    channelRole = uiState.channelRole
+                    channelRole = uiState.channelRole,
+                    isChatTabFirst = isChatTabFirst
                 )
                 // TODO 未等結果回傳即返回上一頁(可能需要改善)
                 navigator.popBackStack()
@@ -269,6 +280,19 @@ fun AddChannelScreen(
             }
         }
     }
+
+    //頻道面板 設定順序
+    tabOrderSettingResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                viewModel.setChannelTabChatFirst(result.value)
+            }
+        }
+    }
+
     //========== Result callback End ==========
 
     if (isEditChannel) {
@@ -296,6 +320,7 @@ fun AddChannelScreenView(
     isEditChannel: Boolean,
     uniqueUserCount: Int,
     from: From,
+    isChatTabFirst: Boolean,
     onConfirm: (String) -> Unit,
     onTabClick: (Int) -> Unit,
     onRemoveRole: (FanciRole) -> Unit,
@@ -375,6 +400,7 @@ fun AddChannelScreenView(
                         StyleTabScreen(
                             textState = channelName,
                             withDelete = isEditChannel,
+                            isChatTabFirst = isChatTabFirst,
                             onChannelNameClick = {
                                 with(AppUserLogger.getInstance()) {
                                     log(Page.GroupSettingsChannelManagementStyleChannelName, from)
@@ -397,7 +423,19 @@ fun AddChannelScreenView(
                                     )
                                 )
                             },
-                            onDeleteClick = onDeleteClick
+                            onDeleteClick = onDeleteClick,
+                            onChangeBoardClick = {
+                                with(AppUserLogger.getInstance()) {
+                                    log(Page.GroupSettingsChannelManagementStyleLayoutSetting, from)
+                                    log(Clicked.StyleLayout, from)
+                                }
+                                navigator.navigate(
+                                    ChannelTabSettingScreenDestination(
+                                        isChatTabFirst = isChatTabFirst,
+                                        from = from
+                                    )
+                                )
+                            }
                         )
                     }
                     //權限
@@ -448,63 +486,75 @@ fun AddChannelScreenView(
  * 樣式 Tab Screen
  *
  * @param withDelete 是否具有移除頻道按鈕
+ * @param isChatTabFirst 是否為聊天Tab優先
  */
 @Composable
 private fun StyleTabScreen(
     textState: String,
     withDelete: Boolean,
+    isChatTabFirst: Boolean,
     onChannelNameClick: (String) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onChangeBoardClick: () -> Unit
 ) {
-    Text(
-        modifier = Modifier.padding(
-            top = 20.dp,
-            start = 24.dp,
-            end = 24.dp,
-            bottom = 20.dp
-        ),
-        text = stringResource(id = R.string.channel_name),
-        fontSize = 14.sp,
-        color = LocalColor.current.text.default_100
-    )
+    Column {
+        Text(
+            modifier = Modifier.padding(
+                top = 20.dp,
+                start = 24.dp,
+                end = 24.dp,
+                bottom = 20.dp
+            ),
+            text = stringResource(id = R.string.channel_name),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
+        )
 
-    Row(
-        modifier = Modifier
-            .background(LocalColor.current.background)
-            .clickable {
+        NarrowItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = LocalColor.current.background)
+                .padding(NarrowItemDefaults.paddingValues),
+            title = textState.ifEmpty {
+                "輸入頻道名稱"
+            },
+            titleFontWeight = FontWeight.Normal,
+            titleColor = (if (textState.isEmpty()) {
+                LocalColor.current.text.default_30
+            } else {
+                LocalColor.current.text.default_100
+            }),
+            actionContent = NarrowItemDefaults.nextIcon(),
+            onClick = {
                 onChannelNameClick.invoke(textState)
             }
-            .padding(
-                top = 10.dp,
-                bottom = 10.dp,
-                start = 25.dp,
-                end = 10.dp
-            )
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (textState.isEmpty()) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "輸入頻道名稱",
-                fontSize = 17.sp,
-                color = LocalColor.current.text.default_30
-            )
-        } else {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = textState,
-                fontSize = 17.sp,
-                color = LocalColor.current.text.default_100
-            )
-        }
+        )
 
-        Spacer(modifier = Modifier.width(5.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.next),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(color = LocalColor.current.text.default_80)
+        Text(
+            modifier = Modifier.padding(
+                top = 20.dp,
+                start = 24.dp,
+                end = 24.dp,
+                bottom = 20.dp
+            ),
+            text = stringResource(id = R.string.channel_board),
+            fontSize = 14.sp,
+            color = LocalColor.current.text.default_100
+        )
+
+        NarrowItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = LocalColor.current.background)
+                .padding(NarrowItemDefaults.paddingValues),
+            title = if (isChatTabFirst) stringResource(id = R.string.channel_board_chat_tab) else stringResource(
+                id = R.string.channel_board_post_tab
+            ),
+            titleFontWeight = FontWeight.Normal,
+            actionContent = NarrowItemDefaults.nextIcon(),
+            onClick = onChangeBoardClick
         )
     }
 
@@ -755,15 +805,17 @@ private fun getFromByIsEditChannel(isEditChannel: Boolean): From {
 
 
 //==================== Preview ====================
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun StyleTabScreenPreview() {
     FanciTheme {
         StyleTabScreen(
             "",
             true,
+            isChatTabFirst = false,
             onChannelNameClick = {},
-            onDeleteClick = {}
+            onDeleteClick = {},
+            onChangeBoardClick = {}
         )
     }
 }
@@ -790,6 +842,7 @@ fun AddChannelScreenPreview() {
             isLoading = true,
             isEditChannel = true,
             uniqueUserCount = 0,
+            isChatTabFirst = false,
             from = From.Create,
             onConfirm = {},
             onTabClick = {},

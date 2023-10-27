@@ -898,6 +898,24 @@ sealed class Clicked(val eventName: String) : Parcelable {
     object StyleChannelNameKeyIn : Clicked(eventName = "Style_ChannelNameKeyIn")
 
     /**
+     * 樣式_頻道版面_點擊
+     */
+    @Parcelize
+    object StyleLayout : Clicked(eventName = "Style_Layout")
+
+    /**
+     * 樣式_頻道版面聊天區優先_點擊
+     */
+    @Parcelize
+    object StyleLayoutChatFirst : Clicked(eventName = "Style_LayoutChatFirst")
+
+    /**
+     * 樣式_頻道版面貼文區優先_點擊
+     */
+    @Parcelize
+    object StyleLayoutPostFirst : Clicked(eventName = "Style_LayoutPostFirst")
+
+    /**
      * 頻道管理_權限_點擊
      */
     @Parcelize
