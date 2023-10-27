@@ -32,13 +32,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.bumptech.glide.Glide
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.stfalcon.imageviewer.StfalconImageViewer
 
 /**
  * 聊天室 附加圖片
- * 
+ *
  * @param quantityLimit 附加圖片數量上限
  */
 @Composable
@@ -102,7 +104,19 @@ private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit) {
     Box(
         modifier = Modifier
             .height(120.dp)
-            .padding(top = 10.dp, bottom = 10.dp),
+            .padding(top = 10.dp, bottom = 10.dp)
+            .clickable {
+                StfalconImageViewer
+                    .Builder(
+                        context, listOf(uri)
+                    ) { imageView, image ->
+                        Glide
+                            .with(context)
+                            .load(image)
+                            .into(imageView)
+                    }
+                    .show()
+            },
         contentAlignment = Alignment.TopEnd
     ) {
         AsyncImage(
