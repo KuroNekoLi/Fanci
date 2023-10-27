@@ -13,12 +13,45 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.provider.Settings
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
+import com.socks.library.KLog
 import java.io.File
+
+/**
+ *  取得 顯示檔案大小 format
+ */
+fun Context.getDisplayFileSize(uri: Uri): String {
+    val fileSize = getFileSize(this, uri) ?: 0
+
+    val sizeInKB = fileSize.toDouble() / 1024.0
+    val sizeInMB = sizeInKB / 1024.0
+    val sizeInGB = sizeInMB / 1024.0
+
+    return when {
+        fileSize < 1024 -> "$fileSize bytes"
+        sizeInKB < 1024 -> String.format("%.2f KB", sizeInKB)
+        sizeInMB < 1024 -> String.format("%.2f MB", sizeInMB)
+        else -> String.format("%.2f GB", sizeInGB)
+    }
+}
+
+private fun getFileSize(context: Context, uri: Uri): Long? {
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+    val filePath = cursor?.use {
+        if (it.moveToFirst()) {
+            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+            it.getLong(sizeIndex)
+        } else {
+            null
+        }
+    }
+    return filePath
+}
 
 /**
  * 取得 Uri file name

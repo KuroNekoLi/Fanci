@@ -51,14 +51,21 @@ fun ChatRoomAttachmentScreen(
                 )
             }
 
-            AttachmentType.Pdf -> {
-                //TODO
+            AttachmentType.Pdf, AttachmentType.Txt -> {
+                AttachmentFileScreen(
+                    fileList = uris,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(15.dp)
+                        .background(MaterialTheme.colors.primary),
+                    itemModifier = Modifier
+                        .width(270.dp)
+                        .height(75.dp),
+                    onClick = onClick,
+                    onDelete = onDelete
+                )
             }
-
-            AttachmentType.Txt -> {
-                //TODO
-            }
-
+            
             AttachmentType.Unknown -> {
                 //TODO
             }
