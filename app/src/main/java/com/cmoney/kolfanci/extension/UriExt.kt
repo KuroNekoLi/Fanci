@@ -2,10 +2,13 @@ package com.cmoney.kolfanci.extension
 
 import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import androidx.loader.content.CursorLoader
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
+import java.io.File
 
 /**
  *  取得 顯示檔案大小 format
@@ -36,6 +39,21 @@ private fun getFileSize(context: Context, uri: Uri): Long? {
         }
     }
     return filePath
+}
+
+fun Uri.uriToFile(context: Context): File {
+    val projection = arrayOf(MediaStore.Images.Media.DATA)
+    val cursorLoader = CursorLoader(context, this, projection, null, null, null)
+    val cursor: Cursor? = cursorLoader.loadInBackground()
+
+    cursor?.use {
+        val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+        it.moveToFirst()
+        val filePath = it.getString(columnIndex)
+        return File(filePath)
+    }
+
+    throw IllegalArgumentException("Failed to convert URI to File")
 }
 
 /**
@@ -72,13 +90,13 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
     return if (lowMimeType.startsWith("image")) {
         AttachmentType.Picture
     } else if (lowMimeType.startsWith("application")) {
-        if (lowMimeType.contains("txt")) {
-            AttachmentType.Txt
-        } else if (lowMimeType.contains("pdf")) {
+        if (lowMimeType.contains("pdf")) {
             AttachmentType.Pdf
         } else {
             AttachmentType.Unknown
         }
+    } else if (lowMimeType.startsWith("text")) {
+        AttachmentType.Txt
     } else if (lowMimeType.startsWith("audio")) {
         AttachmentType.Music
     } else {

@@ -24,7 +24,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 fun PdfPreviewScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    uri: Uri,
+    uri: Uri
 ) {
     val fileTitle = uri.getFileName(LocalContext.current)
 

@@ -436,7 +436,7 @@ fun FilePicker(
         intent.type = "*/*"
         intent.putExtra(
             Intent.EXTRA_MIME_TYPES,
-            arrayOf("image/*", "application/pdf", "application/txt", "audio/*")
+            arrayOf("image/*", "application/pdf", "application/txt", "audio/*", "text/plain")
         )
 
         intent.action = Intent.ACTION_GET_CONTENT
