@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.media
+package com.cmoney.kolfanci.ui.screens.media.audio
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler

@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.media
+package com.cmoney.kolfanci.ui.screens.media.audio
 
 import android.app.Application
 import android.media.MediaMetadataRetriever

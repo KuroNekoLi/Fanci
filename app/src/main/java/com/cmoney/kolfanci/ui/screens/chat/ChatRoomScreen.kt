@@ -32,6 +32,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
+import com.cmoney.kolfanci.ui.destinations.PdfPreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
@@ -168,7 +169,15 @@ fun ChatRoomScreen(
                     }
                     .show()
             }
-            AttachmentType.Pdf -> TODO()
+
+            AttachmentType.Pdf -> {
+                navController.navigate(
+                    PdfPreviewScreenDestination(
+                        uri = uri
+                    )
+                )
+            }
+
             AttachmentType.Txt -> TODO()
             AttachmentType.Unknown -> TODO()
         }
