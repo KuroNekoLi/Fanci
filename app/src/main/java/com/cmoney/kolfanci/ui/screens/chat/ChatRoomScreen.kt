@@ -180,7 +180,7 @@ fun ChatRoomScreen(
         },
         onPreviewAttachmentClick = { uri ->
             //TODO 區分類型
-            val mimeType = context.getFileType(uri)
+            val mimeType = uri.getFileType(context)
             val lowMimeType = mimeType.lowercase()
             if (lowMimeType.startsWith("audio")) {
                 navController.navigate(

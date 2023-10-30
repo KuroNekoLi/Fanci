@@ -54,7 +54,7 @@ fun AttachmentFileScreen(
             AttachmentFileItem(
                 modifier = itemModifier,
                 file = file,
-                displayName = context.getFileName(file).orEmpty(),
+                displayName = file.getFileName(context).orEmpty(),
                 onClick = onClick,
                 onDelete = onDelete
             )
@@ -89,10 +89,11 @@ fun AttachmentFileItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight()
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
             ) {
                 Row(
-                    modifier = Modifier.padding(start = 15.dp, top = 15.dp),
+                    modifier = Modifier.padding(start = 15.dp, top = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
@@ -100,7 +101,7 @@ fun AttachmentFileItem(
                         contentDescription = "attachment_file"
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
 
                     Text(
                         text = displayName,
@@ -116,8 +117,8 @@ fun AttachmentFileItem(
 
                 //File size
                 Text(
-                    modifier = Modifier.padding(top = 5.dp, start = 15.dp, bottom = 10.dp),
-                    text = context.getDisplayFileSize(file),
+                    modifier = Modifier.padding(top = 5.dp, start = 15.dp, bottom = 5.dp),
+                    text = file.getDisplayFileSize(context),
                     style = TextStyle(
                         fontSize = 14.sp,
                         color = LocalColor.current.text.default_50
@@ -147,7 +148,7 @@ fun AttachmentFileItemPreview() {
                 .width(270.dp)
                 .height(75.dp),
             file = Uri.EMPTY,
-            displayName = "上課教材.mp3",
+            displayName = "上課教材.pdf",
             onClick = {},
             onDelete = {}
         )

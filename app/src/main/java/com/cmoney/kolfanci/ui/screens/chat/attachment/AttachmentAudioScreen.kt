@@ -51,7 +51,7 @@ fun AttachmentAudioScreen(
             AttachmentAudioItem(
                 modifier = itemModifier,
                 audio = audio,
-                displayName = context.getFileName(audio).orEmpty(),
+                displayName = audio.getFileName(context).orEmpty(),
                 onClick = onClick,
                 onDelete = onDelete
             )

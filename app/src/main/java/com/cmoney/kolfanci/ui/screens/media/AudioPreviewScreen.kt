@@ -116,7 +116,7 @@ fun AudioPreviewScreenView(
     onBack: () -> Unit,
     onStopUpdatePosition: () -> Unit
 ) {
-    val audioTitle = LocalContext.current.getFileName(uri)
+    val audioTitle = uri.getFileName(LocalContext.current)
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

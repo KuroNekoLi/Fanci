@@ -315,7 +315,7 @@ class MessageViewModel(
      */
     fun attachment(uris: List<Uri>) {
         val attachmentMap = uris.map { uri ->
-            val attachmentType = context.getAttachmentType(uri)
+            val attachmentType = uri.getAttachmentType(context)
             attachmentType to uri
         }.groupBy {
             it.first
@@ -341,7 +341,7 @@ class MessageViewModel(
      */
     fun removeAttach(uri: Uri) {
         KLog.i(TAG, "removeAttach:$uri")
-        val attachmentType = context.getAttachmentType(uri)
+        val attachmentType = uri.getAttachmentType(context)
         val newAttachment = _attachment.value[attachmentType]?.filter { existsUri ->
             existsUri != uri
         }
