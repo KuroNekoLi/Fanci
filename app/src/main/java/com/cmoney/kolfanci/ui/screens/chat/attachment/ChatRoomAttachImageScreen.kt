@@ -32,11 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.bumptech.glide.Glide
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import com.stfalcon.imageviewer.StfalconImageViewer
 
 /**
  * 聊天室 附加圖片
@@ -49,7 +47,8 @@ fun ChatRoomAttachImageScreen(
     imageAttach: List<Uri>,
     quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDelete: (Uri) -> Unit,
-    onAdd: () -> Unit
+    onAdd: () -> Unit,
+    onClick: (Uri) -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -64,9 +63,13 @@ fun ChatRoomAttachImageScreen(
         ) {
             if (imageAttach.isNotEmpty()) {
                 items(imageAttach) { attach ->
-                    AttachImage(attach) {
-                        onDelete.invoke(attach)
-                    }
+                    AttachImage(
+                        uri = attach,
+                        onClick = onClick,
+                        onDelete = {
+                            onDelete.invoke(it)
+                        }
+                    )
                 }
                 if (imageAttach.size < quantityLimit) {
                     item {
@@ -94,7 +97,7 @@ fun ChatRoomAttachImageScreen(
 }
 
 @Composable
-private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit) {
+private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit, onClick: (Uri) -> Unit) {
     val context = LocalContext.current
 
     val request = ImageRequest.Builder(context)
@@ -106,16 +109,7 @@ private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit) {
             .height(120.dp)
             .padding(top = 10.dp, bottom = 10.dp)
             .clickable {
-                StfalconImageViewer
-                    .Builder(
-                        context, listOf(uri)
-                    ) { imageView, image ->
-                        Glide
-                            .with(context)
-                            .load(image)
-                            .into(imageView)
-                    }
-                    .show()
+                onClick.invoke(uri)
             },
         contentAlignment = Alignment.TopEnd
     ) {
@@ -171,7 +165,8 @@ fun ChatRoomAttachImageScreenPreview() {
             modifier = Modifier,
             imageAttach = listOf(Uri.EMPTY, Uri.EMPTY, Uri.EMPTY),
             onDelete = {},
-            onAdd = {}
+            onAdd = {},
+            onClick = {}
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.media
+package com.cmoney.kolfanci.ui.screens.media.audio
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -116,7 +116,7 @@ fun AudioPreviewScreenView(
     onBack: () -> Unit,
     onStopUpdatePosition: () -> Unit
 ) {
-    val audioTitle = LocalContext.current.getFileName(uri)
+    val audioTitle = uri.getFileName(LocalContext.current)
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

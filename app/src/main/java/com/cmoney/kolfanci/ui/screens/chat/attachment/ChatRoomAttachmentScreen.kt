@@ -33,7 +33,8 @@ fun ChatRoomAttachmentScreen(
                     .background(MaterialTheme.colors.primary),
                 imageAttach = uris,
                 onDelete = onDelete,
-                onAdd = onAdd
+                onAdd = onAdd,
+                onClick = onClick
             )
 
             AttachmentType.Music -> {
@@ -51,12 +52,19 @@ fun ChatRoomAttachmentScreen(
                 )
             }
 
-            AttachmentType.Pdf -> {
-                //TODO
-            }
-
-            AttachmentType.Txt -> {
-                //TODO
+            AttachmentType.Pdf, AttachmentType.Txt -> {
+                AttachmentFileScreen(
+                    fileList = uris,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(15.dp)
+                        .background(MaterialTheme.colors.primary),
+                    itemModifier = Modifier
+                        .width(270.dp)
+                        .height(75.dp),
+                    onClick = onClick,
+                    onDelete = onDelete
+                )
             }
 
             AttachmentType.Unknown -> {

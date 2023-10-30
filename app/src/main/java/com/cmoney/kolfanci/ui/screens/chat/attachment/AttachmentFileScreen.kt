@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -31,16 +30,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.getAudioDuration
+import com.cmoney.kolfanci.extension.getDisplayFileSize
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
+/**
+ * 附加檔案 item
+ */
 @Composable
-fun AttachmentAudioScreen(
+fun AttachmentFileScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    audioList: List<Uri>,
+    fileList: List<Uri>,
     onClick: (Uri) -> Unit,
     onDelete: (Uri) -> Unit
 ) {
@@ -51,11 +53,11 @@ fun AttachmentAudioScreen(
         modifier = modifier.padding(start = 10.dp, end = 10.dp),
         state = listState, horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(audioList) { audio ->
-            AttachmentAudioItem(
+        items(fileList) { file ->
+            AttachmentFileItem(
                 modifier = itemModifier,
-                audio = audio,
-                displayName = audio.getFileName(context).orEmpty(),
+                file = file,
+                displayName = file.getFileName(context).orEmpty(),
                 onClick = onClick,
                 onDelete = onDelete
             )
@@ -64,9 +66,9 @@ fun AttachmentAudioScreen(
 }
 
 @Composable
-fun AttachmentAudioItem(
+fun AttachmentFileItem(
     modifier: Modifier = Modifier,
-    audio: Uri,
+    file: Uri,
     displayName: String,
     onClick: (Uri) -> Unit,
     onDelete: (Uri) -> Unit
@@ -78,7 +80,7 @@ fun AttachmentAudioItem(
             .clip(RoundedCornerShape(8.dp))
             .background(LocalColor.current.background)
             .clickable {
-                onClick.invoke(audio)
+                onClick.invoke(file)
             },
         contentAlignment = Alignment.CenterStart
     ) {
@@ -87,21 +89,19 @@ fun AttachmentAudioItem(
                 .fillMaxHeight()
                 .align(Alignment.TopEnd)
         ) {
-
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center
             ) {
-
                 Row(
-                    modifier = Modifier.padding(start = 15.dp, top = 5.dp),
+                    modifier = Modifier.padding(start = 15.dp, top = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.audio_icon),
-                        contentDescription = null
+                        painter = painterResource(id = R.drawable.attachment_file),
+                        contentDescription = "attachment_file"
                     )
 
                     Spacer(modifier = Modifier.width(5.dp))
@@ -118,24 +118,15 @@ fun AttachmentAudioItem(
                     )
                 }
 
-                Row(
-                    modifier = Modifier.padding(start = 15.dp, top = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = audio.getAudioDuration(context),
+                //File size
+                Text(
+                    modifier = Modifier.padding(top = 5.dp, start = 15.dp, bottom = 5.dp),
+                    text = file.getDisplayFileSize(context),
+                    style = TextStyle(
                         fontSize = 14.sp,
                         color = LocalColor.current.text.default_50
                     )
-
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    Image(
-                        modifier = Modifier.size(14.dp),
-                        painter = painterResource(id = R.drawable.small_play),
-                        contentDescription = null
-                    )
-                }
+                )
             }
 
             //Close btn
@@ -143,7 +134,7 @@ fun AttachmentAudioItem(
                 modifier = Modifier
                     .padding(10.dp)
                     .clickable {
-                        onDelete.invoke(audio)
+                        onDelete.invoke(file)
                     },
                 painter = painterResource(id = R.drawable.close), contentDescription = null
             )
@@ -153,14 +144,14 @@ fun AttachmentAudioItem(
 
 @Preview
 @Composable
-fun AttachmentAudioItemPreview() {
+fun AttachmentFileItemPreview() {
     FanciTheme {
-        AttachmentAudioItem(
+        AttachmentFileItem(
             modifier = Modifier
                 .width(270.dp)
                 .height(75.dp),
-            audio = Uri.EMPTY,
-            displayName = "上課教材.mp3",
+            file = Uri.EMPTY,
+            displayName = "上課教材.pdf",
             onClick = {},
             onDelete = {}
         )
@@ -169,13 +160,13 @@ fun AttachmentAudioItemPreview() {
 
 @Preview
 @Composable
-fun AttachmentAudioScreenPreview() {
+fun AttachmentFileScreenPreview() {
     FanciTheme {
-        AttachmentAudioScreen(
+        AttachmentFileScreen(
             itemModifier = Modifier
                 .width(270.dp)
                 .height(75.dp),
-            audioList = listOf(
+            fileList = listOf(
                 Uri.EMPTY,
                 Uri.EMPTY,
                 Uri.EMPTY
