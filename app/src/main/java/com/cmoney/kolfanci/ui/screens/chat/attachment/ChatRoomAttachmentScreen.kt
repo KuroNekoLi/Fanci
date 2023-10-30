@@ -33,7 +33,8 @@ fun ChatRoomAttachmentScreen(
                     .background(MaterialTheme.colors.primary),
                 imageAttach = uris,
                 onDelete = onDelete,
-                onAdd = onAdd
+                onAdd = onAdd,
+                onClick = onClick
             )
 
             AttachmentType.Music -> {
@@ -65,7 +66,7 @@ fun ChatRoomAttachmentScreen(
                     onDelete = onDelete
                 )
             }
-            
+
             AttachmentType.Unknown -> {
                 //TODO
             }

@@ -47,6 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.bumptech.glide.Glide
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
@@ -95,6 +96,7 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -639,6 +641,7 @@ private fun PostInfoScreenView(
     inputText: String
 ) {
     val listState = rememberLazyListState()
+    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier
@@ -824,6 +827,18 @@ private fun PostInfoScreenView(
                     },
                     onAdd = {
                         postInfoListener.onAttachClick()
+                    },
+                    onClick = { uri ->
+                        StfalconImageViewer
+                            .Builder(
+                                context, listOf(uri)
+                            ) { imageView, image ->
+                                Glide
+                                    .with(context)
+                                    .load(image)
+                                    .into(imageView)
+                            }
+                            .show()
                     }
                 )
 

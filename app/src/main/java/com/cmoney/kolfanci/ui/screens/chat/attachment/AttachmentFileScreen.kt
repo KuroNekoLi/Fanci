@@ -35,6 +35,9 @@ import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
+/**
+ * 附加檔案 item
+ */
 @Composable
 fun AttachmentFileScreen(
     modifier: Modifier = Modifier,

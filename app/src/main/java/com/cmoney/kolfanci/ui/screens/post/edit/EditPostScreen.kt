@@ -35,12 +35,14 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.Glide
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
@@ -63,6 +65,7 @@ import com.facebook.bolts.Task.Companion.delay
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.stfalcon.imageviewer.StfalconImageViewer
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -209,6 +212,7 @@ private fun EditPostScreenView(
     val focusRequester = remember { FocusRequester() }
     val showKeyboard = remember { mutableStateOf(true) }
     val keyboard = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -285,6 +289,18 @@ private fun EditPostScreenView(
                         },
                         onAdd = {
                             onShowImagePicker.invoke()
+                        },
+                        onClick = { uri ->
+                            StfalconImageViewer
+                                .Builder(
+                                    context, listOf(uri)
+                                ) { imageView, image ->
+                                    Glide
+                                        .with(context)
+                                        .load(image)
+                                        .into(imageView)
+                                }
+                                .show()
                         }
                     )
                 }

@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.chat
 
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -16,18 +17,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.bumptech.glide.Glide
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fancylog.model.data.Clicked
-import com.cmoney.kolfanci.extension.getFileType
+import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -49,6 +48,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
+import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -69,9 +69,6 @@ fun ChatRoomScreen(
     resultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>
 ) {
     val TAG = "ChatRoomScreen"
-
-    //打開圖片選擇
-    var openImagePickDialog by remember { mutableStateOf(false) }
 
     //公告訊息
     val announceMessage by viewModel.announceMessage.collectAsState()
@@ -145,6 +142,39 @@ fun ChatRoomScreen(
     //是否只有圖片選擇
     val isOnlyPhotoSelector by messageViewModel.isOnlyPhotoSelector.collectAsState()
 
+    /**
+     * 點擊附加檔案預覽
+     */
+    fun onAttachmentClick(uri: Uri, context: Context) {
+        KLog.i(TAG, "onAttachmentClick:$uri")
+        when (uri.getAttachmentType(context)) {
+            AttachmentType.Music -> {
+                navController.navigate(
+                    AudioPreviewScreenDestination(
+                        uri = uri
+                    )
+                )
+            }
+
+            AttachmentType.Picture -> {
+                StfalconImageViewer
+                    .Builder(
+                        context, listOf(uri)
+                    ) { imageView, image ->
+                        Glide
+                            .with(context)
+                            .load(image)
+                            .into(imageView)
+                    }
+                    .show()
+            }
+            AttachmentType.Pdf -> TODO()
+            AttachmentType.Txt -> TODO()
+            AttachmentType.Unknown -> TODO()
+        }
+    }
+
+    //主畫面
     ChatRoomScreenView(
         channelId = channelId,
         announceMessage = announceMessage,
@@ -179,16 +209,10 @@ fun ChatRoomScreen(
             }
         },
         onPreviewAttachmentClick = { uri ->
-            //TODO 區分類型
-            val mimeType = uri.getFileType(context)
-            val lowMimeType = mimeType.lowercase()
-            if (lowMimeType.startsWith("audio")) {
-                navController.navigate(
-                    AudioPreviewScreenDestination(
-                        uri = uri
-                    )
-                )
-            }
+            onAttachmentClick(
+                uri = uri,
+                context = context
+            )
         },
         attachment = attachment
     )
@@ -201,7 +225,6 @@ fun ChatRoomScreen(
         ) {
         }
     }
-
 
     //==================== Alert Dialog ====================
     //檢舉用戶 彈窗
