@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.extension
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
@@ -113,4 +114,33 @@ fun Uri.getFileType(context: Context): String {
     return cr.getType(this).orEmpty()
     //    val mimeTypeMap = MimeTypeMap.getSingleton()
     //    return mimeTypeMap.getExtensionFromMimeType(r.getType(uri))
+}
+
+/**
+ * 取得音檔長度 字串
+ *
+ * @param context
+ * @return 字串 -> 00:00:00
+ */
+fun Uri.getAudioDuration(context: Context): String {
+    val retriever = MediaMetadataRetriever()
+    try {
+        retriever.setDataSource(context, this)
+        val durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        val durationMillis = durationStr?.toLong() ?: 0L
+        return formatDuration(durationMillis)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    } finally {
+        retriever.release()
+    }
+    return "00:00:00"
+}
+
+private fun formatDuration(milliseconds: Long): String {
+    val hours = (milliseconds / 3600000).toInt()
+    val minutes = ((milliseconds % 3600000) / 60000).toInt()
+    val seconds = ((milliseconds % 60000) / 1000).toInt()
+
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }

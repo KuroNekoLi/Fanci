@@ -6,10 +6,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -28,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.getAudioDuration
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -67,6 +71,8 @@ fun AttachmentAudioItem(
     onClick: (Uri) -> Unit,
     onDelete: (Uri) -> Unit
 ) {
+    val context = LocalContext.current
+
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -82,29 +88,54 @@ fun AttachmentAudioItem(
                 .align(Alignment.TopEnd)
         ) {
 
-            Row(
+            Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.Center
             ) {
 
-                Image(
-                    modifier = Modifier.padding(15.dp),
-                    painter = painterResource(id = R.drawable.play),
-                    contentDescription = "play"
-                )
-
-                Text(
-                    text = displayName,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        color = LocalColor.current.text.default_100,
+                Row(
+                    modifier = Modifier.padding(start = 15.dp, top = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.audio_icon),
+                        contentDescription = null
                     )
-                )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        text = displayName,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp,
+                            color = LocalColor.current.text.default_100,
+                        )
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.padding(start = 15.dp, top = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = audio.getAudioDuration(context),
+                        fontSize = 14.sp,
+                        color = LocalColor.current.text.default_50
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Image(
+                        modifier = Modifier.size(14.dp),
+                        painter = painterResource(id = R.drawable.small_play),
+                        contentDescription = null
+                    )
+                }
             }
 
             //Close btn
