@@ -48,6 +48,7 @@ import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -125,7 +126,7 @@ fun FollowScreen(
                 viewModel.closeGroupItemDialog()
                 onDismissInvite.invoke()
             },
-            onConfirm = { group, joinStatus  ->
+            onConfirm = { group, joinStatus ->
                 //via invite link
                 if (inviteGroup != null) {
                     if (group.isNeedApproval == true) {
@@ -263,7 +264,7 @@ fun FollowScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun FollowScreenView(
     modifier: Modifier = Modifier,
@@ -290,6 +291,9 @@ fun FollowScreenView(
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState: ScaffoldState =
         rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+
+    //控制 audio BottomSheet
+    val audioPlayerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
     Scaffold(
         modifier = modifier
@@ -439,7 +443,8 @@ fun FollowScreenView(
                                     .background(LocalColor.current.env_80)
                                     .clickable {
                                         //Open Drawer
-                                        AppUserLogger.getInstance()
+                                        AppUserLogger
+                                            .getInstance()
                                             .log("Home_SideBar_show")
                                         coroutineScope.launch {
                                             scaffoldState.drawerState.open()
@@ -533,6 +538,30 @@ fun FollowScreenView(
                                 }
                             }
                         }
+
+                        //mini player trigger icon
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(bottom = 60.dp)
+                                .size(width = 61.dp, height = 50.dp)
+                                .clip(RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp))
+                                .background(
+                                    Color.Red
+                                )
+                                .clickable {
+                                    coroutineScope.launch {
+                                        audioPlayerState.show()
+                                    }
+                                }
+                        ) {
+
+                        }
+
+                        //mini player
+                        AudioBottomPlayerScreen(
+                            state = audioPlayerState
+                        )
                     }
                 }
             }

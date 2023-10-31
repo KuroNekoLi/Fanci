@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.media.MediaBrowserServiceCompat
+import com.cmoney.kolfanci.extension.getFileName
 import com.google.android.exoplayer2.BuildConfig
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -364,11 +365,13 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
             val playItem = MediaMetadataCompat.Builder().also {
                 it.id = uri.toString()
                 it.mediaUri = uri.toString()
-                it.title = " "
+//                it.title = uri.getFileName(applicationContext)
+                it.displayTitle = uri.getFileName(applicationContext)
+
 //                it.albumArtUri =
 //                    "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"
 //
-                it.displayTitle = " "
+
                 it.displaySubtitle = " "
 //                it.displayDescription = "displayDescription"
 //                it.displayIconUri =

@@ -266,4 +266,15 @@
 
     <string name="channel_media">播放頻道</string>
     <string name="channel_media_description"></string>
+
+    <string name="play_speed">播放速度</string>
+    <string name="play_speed_desc">調整播放速度</string>
+
+    <string name="audio_speed_0.25">0.25x</string>
+    <string name="audio_speed_0.5">0.5x</string>
+    <string name="audio_speed_0.75">0.75x</string>
+    <string name="audio_speed_1">1x</string>
+    <string name="audio_speed_1.25">1.25x</string>
+    <string name="audio_speed_1.5">1.5x</string>
+    <string name="audio_speed_1.75">1.75x</string>
 </resources>
