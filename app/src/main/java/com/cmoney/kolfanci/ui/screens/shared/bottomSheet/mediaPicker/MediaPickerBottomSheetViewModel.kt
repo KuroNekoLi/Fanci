@@ -28,12 +28,12 @@ class MediaPickerBottomSheetViewModel(
         val attachmentTypes = selectedAttachment.keys
         when (attachmentEnv) {
             AttachmentEnv.Chat -> {
-                if (!attachmentTypes.contains(AttachmentType.Picture) && attachmentTypes.isNotEmpty()) {
+                if (!attachmentTypes.contains(AttachmentType.Image) && attachmentTypes.isNotEmpty()) {
                     onError.invoke(
                         context.getString(R.string.chat_attachment_limit_title),
                         context.getString(R.string.chat_attachment_limit_desc)
                     )
-                } else if (attachmentTypes.contains(AttachmentType.Picture) && (selectedAttachment[AttachmentType.Picture]?.size
+                } else if (attachmentTypes.contains(AttachmentType.Image) && (selectedAttachment[AttachmentType.Image]?.size
                         ?: 0) >= AttachImageDefault.DEFAULT_QUANTITY_LIMIT
                 ) {
                     onError.invoke(
@@ -70,7 +70,7 @@ class MediaPickerBottomSheetViewModel(
         val attachmentTypes = selectedAttachment.keys
         when (attachmentEnv) {
             AttachmentEnv.Chat -> {
-                if (attachmentTypes.contains(AttachmentType.Picture)) {
+                if (attachmentTypes.contains(AttachmentType.Image)) {
                     onError.invoke(
                         context.getString(R.string.chat_attachment_limit_title),
                         context.getString(R.string.chat_attachment_limit_desc)

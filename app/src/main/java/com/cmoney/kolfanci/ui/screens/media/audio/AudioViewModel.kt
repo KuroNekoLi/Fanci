@@ -58,6 +58,10 @@ class AudioViewModel(
     private val _speedTitle = MutableStateFlow<String>("1x")
     val speedTitle = _speedTitle.asStateFlow()
 
+    //是否要顯示mini play icon
+    private val _isShowMiniIcon = MutableStateFlow(false)
+    val isShowMiniIcon = _isShowMiniIcon.asStateFlow()
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
     private val playbackStateObserver = Observer<PlaybackStateCompat> {
         playbackState = it
@@ -80,7 +84,13 @@ class AudioViewModel(
             checkPlaybackPosition()
         }
 
-//        musicServiceConnection.nowPlaying.value.title
+        fetchIsShowMiniIcon()
+    }
+
+    fun fetchIsShowMiniIcon() {
+        val playState = musicServiceConnection.playbackState.value?.state
+        _isShowMiniIcon.value = (musicServiceConnection.isConnected.value == true
+                && (playState != PlaybackStateCompat.STATE_STOPPED && playState != PlaybackStateCompat.STATE_NONE))
     }
 
     /**
@@ -141,6 +151,8 @@ class AudioViewModel(
                 _mediaPosition.update {
                     currPosition
                 }
+
+                fetchIsShowMiniIcon()
             }
         }
 

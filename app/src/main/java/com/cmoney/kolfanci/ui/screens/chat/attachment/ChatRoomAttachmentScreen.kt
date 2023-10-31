@@ -27,7 +27,7 @@ fun ChatRoomAttachmentScreen(
 ) {
     attachment.forEach { (attachmentType, uris) ->
         when (attachmentType) {
-            AttachmentType.Picture -> ChatRoomAttachImageScreen(
+            AttachmentType.Image -> ChatRoomAttachImageScreen(
                 modifier = modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary),
@@ -37,7 +37,7 @@ fun ChatRoomAttachmentScreen(
                 onClick = onClick
             )
 
-            AttachmentType.Music -> {
+            AttachmentType.Audio -> {
                 AttachmentAudioScreen(
                     audioList = uris,
                     modifier = modifier
