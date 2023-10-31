@@ -89,7 +89,7 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
     val mimeType = getFileType(context)
     val lowMimeType = mimeType.lowercase()
     return if (lowMimeType.startsWith("image")) {
-        AttachmentType.Picture
+        AttachmentType.Image
     } else if (lowMimeType.startsWith("application")) {
         if (lowMimeType.contains("pdf")) {
             AttachmentType.Pdf
@@ -99,7 +99,7 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
     } else if (lowMimeType.startsWith("text")) {
         AttachmentType.Txt
     } else if (lowMimeType.startsWith("audio")) {
-        AttachmentType.Music
+        AttachmentType.Audio
     } else {
         AttachmentType.Unknown
     }

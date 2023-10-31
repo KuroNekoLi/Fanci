@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -187,7 +186,7 @@ fun MediaPickerBottomSheet(
     //========== show all picker start==========
     if (showPhotoPicker) {
         val quantityLimit =
-            AttachImageDefault.DEFAULT_QUANTITY_LIMIT - (selectedAttachment[AttachmentType.Picture]?.size
+            AttachImageDefault.DEFAULT_QUANTITY_LIMIT - (selectedAttachment[AttachmentType.Image]?.size
                 ?: 0)
         PicturePicker(
             quantityLimit = quantityLimit.coerceIn(1, AttachImageDefault.DEFAULT_QUANTITY_LIMIT),

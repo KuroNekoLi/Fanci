@@ -16,8 +16,10 @@ import com.cmoney.kolfanci.service.media.EMPTY_PLAYBACK_STATE
 import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.service.media.NOTHING_PLAYING
 import com.cmoney.kolfanci.service.media.currentPlayBackPosition
+import com.cmoney.kolfanci.service.media.duration
 import com.cmoney.kolfanci.service.media.isPlayEnabled
 import com.cmoney.kolfanci.service.media.isPlaying
+import com.cmoney.kolfanci.service.media.title
 import com.cmoney.kolfanci.service.media.toUri
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +50,18 @@ class AudioViewModel(
     private val _mediaPosition = MutableStateFlow<Long>(0)
     val mediaPosition = _mediaPosition.asStateFlow()
 
+    //Title
+    private val _title = MutableStateFlow<String>("")
+    val title = _title.asStateFlow()
+
+    //Speed display
+    private val _speedTitle = MutableStateFlow<String>("1x")
+    val speedTitle = _speedTitle.asStateFlow()
+
+    //是否要顯示mini play icon
+    private val _isShowMiniIcon = MutableStateFlow(false)
+    val isShowMiniIcon = _isShowMiniIcon.asStateFlow()
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
     private val playbackStateObserver = Observer<PlaybackStateCompat> {
         playbackState = it
@@ -61,11 +75,39 @@ class AudioViewModel(
     private var isStopUpdatePosition = false
 
     init {
-        getAudioFileDuration(uri)
+        if (uri != Uri.EMPTY) {
+            getAudioFileDuration(uri)
+        }
 
         musicServiceConnection.also {
             it.playbackState.observeForever(playbackStateObserver)
             checkPlaybackPosition()
+        }
+
+        fetchIsShowMiniIcon()
+    }
+
+    fun fetchIsShowMiniIcon() {
+        val playState = musicServiceConnection.playbackState.value?.state
+        _isShowMiniIcon.value = (musicServiceConnection.isConnected.value == true
+                && (playState != PlaybackStateCompat.STATE_STOPPED && playState != PlaybackStateCompat.STATE_NONE))
+    }
+
+    /**
+     * 取得 正在播放中的音樂資訊
+     * title, length
+     */
+    fun fetchCurrentPlayInfo() {
+        KLog.i(TAG, "fetchCurrentPlayInfo")
+        if (musicServiceConnection.isConnected.value == true) {
+            KLog.i(TAG, "fetchCurrentPlayInfo isConnected")
+            //正在播的歌曲
+            val nowPlaying = musicServiceConnection.nowPlaying.value
+
+            _title.value = nowPlaying?.title.orEmpty()
+
+            val duration = nowPlaying?.duration ?: 0L
+            _audioDuration.value = duration
         }
     }
 
@@ -109,6 +151,8 @@ class AudioViewModel(
                 _mediaPosition.update {
                     currPosition
                 }
+
+                fetchIsShowMiniIcon()
             }
         }
 
@@ -136,19 +180,7 @@ class AudioViewModel(
             //目前背景正在播放的音檔是否一樣
             if (uri == nowPlayUri) {
                 KLog.i(TAG, "play the same file.")
-                musicServiceConnection.playbackState.value?.let { playbackState ->
-                    when {
-                        playbackState.isPlaying -> transportControls.pause()
-                        playbackState.isPlayEnabled -> transportControls.play()
-                        else -> {
-                            KLog.w(
-                                TAG,
-                                "Playable item clicked but neither play nor pause are enabled!" +
-                                        " (mediaId=$uri)"
-                            )
-                        }
-                    }
-                }
+                pauseOrPlay()
             }
             //開啟新播放
             else {
@@ -194,5 +226,40 @@ class AudioViewModel(
     fun stopUpdatePosition() {
         KLog.i(TAG, "stopUpdatePosition")
         isStopUpdatePosition = true
+    }
+
+    /**
+     * 暫停 或是 繼續播放
+     */
+    fun pauseOrPlay() {
+        KLog.i(TAG, "pauseOrPlay")
+        if (musicServiceConnection.isConnected.value == true) {
+            val transportControls = musicServiceConnection.transportControls
+            musicServiceConnection.playbackState.value?.let { playbackState ->
+                when {
+                    playbackState.isPlaying -> transportControls.pause()
+                    playbackState.isPlayEnabled -> transportControls.play()
+                    else -> {
+                        KLog.w(
+                            TAG,
+                            "Playable item clicked but neither play nor pause are enabled!" +
+                                    " (mediaId=$uri)"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 更換 逼放速度
+     */
+    fun changeSpeed(speed: Float) {
+        KLog.i(TAG, "changeSpeed:$speed")
+        if (musicServiceConnection.isConnected.value == true) {
+            val transportControls = musicServiceConnection.transportControls
+            transportControls.setPlaybackSpeed(speed)
+            _speedTitle.value = speed.toString() + "x"
+        }
     }
 }

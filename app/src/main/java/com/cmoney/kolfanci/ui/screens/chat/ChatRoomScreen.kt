@@ -150,7 +150,7 @@ fun ChatRoomScreen(
     fun onAttachmentClick(uri: Uri, context: Context) {
         KLog.i(TAG, "onAttachmentClick:$uri")
         when (uri.getAttachmentType(context)) {
-            AttachmentType.Music -> {
+            AttachmentType.Audio -> {
                 navController.navigate(
                     AudioPreviewScreenDestination(
                         uri = uri
@@ -158,7 +158,7 @@ fun ChatRoomScreen(
                 )
             }
 
-            AttachmentType.Picture -> {
+            AttachmentType.Image -> {
                 StfalconImageViewer
                     .Builder(
                         context, listOf(uri)

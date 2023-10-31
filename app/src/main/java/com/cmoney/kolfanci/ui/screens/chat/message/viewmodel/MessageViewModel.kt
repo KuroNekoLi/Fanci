@@ -27,11 +27,7 @@ import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
-import com.cmoney.kolfanci.service.media.BUNDLE_START_PLAY_POSITION
-import com.cmoney.kolfanci.service.media.BUNDLE_STORIES
 import com.cmoney.kolfanci.service.media.MusicServiceConnection
-import com.cmoney.kolfanci.service.media.id
-import com.cmoney.kolfanci.service.media.isPrepared
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
@@ -63,9 +59,9 @@ data class ImageAttachState(
  * 附加檔案 fanci 支援類型
  */
 sealed class AttachmentType {
-    object Picture : AttachmentType()
+    object Image : AttachmentType()
 
-    object Music : AttachmentType()
+    object Audio : AttachmentType()
 
     object Txt : AttachmentType()
 

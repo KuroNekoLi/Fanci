@@ -3,22 +3,56 @@ package com.cmoney.kolfanci.ui.screens.follow
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
+import androidx.compose.material.rememberDrawerState
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,11 +77,17 @@ import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.GroupJoinStatus
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.ui.destinations.*
+import com.cmoney.kolfanci.ui.destinations.ApplyForGroupScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateGroupScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
+import com.cmoney.kolfanci.ui.destinations.MyScreenDestination
+import com.cmoney.kolfanci.ui.destinations.NotificationCenterScreenDestination
 import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -60,6 +100,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun FollowScreen(
@@ -76,6 +117,11 @@ fun FollowScreen(
     onDismissInvite: () -> Unit,
     onChannelClick: (Channel) -> Unit,
     onChangeGroup: (Group) -> Unit,
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
+        }
+    )
 ) {
     val uiState = viewModel.uiState
 
@@ -125,7 +171,7 @@ fun FollowScreen(
                 viewModel.closeGroupItemDialog()
                 onDismissInvite.invoke()
             },
-            onConfirm = { group, joinStatus  ->
+            onConfirm = { group, joinStatus ->
                 //via invite link
                 if (inviteGroup != null) {
                     if (group.isNeedApproval == true) {
@@ -219,12 +265,13 @@ fun FollowScreen(
         viewModel.alreadyNotifyAllowNotificationPermission()
     }
 
+    val isAudioPlaying by audioViewModel.isShowMiniIcon.collectAsState()
+
     FollowScreenView(
         modifier = modifier,
         navigator = navigator,
         groupList = myGroupList,
         group = group,
-        notificationUnReadCount = notificationUnReadCount,
         imageOffset = uiState.imageOffset,
         spaceHeight = uiState.spaceHeight,
         scrollableState = scrollableState,
@@ -246,7 +293,6 @@ fun FollowScreen(
                 viewModel.showLoginDialog()
             }
         },
-        onRefreshMyGroupList = onRefreshMyGroupList,
         isShowBubbleTip = uiState.isShowBubbleTip,
         onMoreClick = {
             viewModel.disableBubbleTip()
@@ -255,15 +301,19 @@ fun FollowScreen(
             navigator.navigate(
                 GroupSettingScreenDestination
             )
-        }
+        },
+        notificationUnReadCount = notificationUnReadCount,
+        isAudioPlaying = isAudioPlaying
     )
 
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchSetting()
+
+        audioViewModel.fetchIsShowMiniIcon()
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun FollowScreenView(
     modifier: Modifier = Modifier,
@@ -280,16 +330,19 @@ fun FollowScreenView(
     isLoading: Boolean,
     onChannelClick: (Channel) -> Unit,
     onGoToMy: () -> Unit,
-    onRefreshMyGroupList: (isSilent: Boolean) -> Unit,
     isShowBubbleTip: Boolean,
     onMoreClick: (Group) -> Unit,
-    notificationUnReadCount: Long
+    notificationUnReadCount: Long,
+    isAudioPlaying: Boolean
 ) {
     val TAG = "FollowScreenView"
 
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState: ScaffoldState =
         rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+
+    //控制 audio BottomSheet
+    val audioPlayerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
     Scaffold(
         modifier = modifier
@@ -439,7 +492,8 @@ fun FollowScreenView(
                                     .background(LocalColor.current.env_80)
                                     .clickable {
                                         //Open Drawer
-                                        AppUserLogger.getInstance()
+                                        AppUserLogger
+                                            .getInstance()
                                             .log("Home_SideBar_show")
                                         coroutineScope.launch {
                                             scaffoldState.drawerState.open()
@@ -532,6 +586,30 @@ fun FollowScreenView(
                                     }
                                 }
                             }
+                        }
+
+                        //是否有音樂播放中
+                        if (isAudioPlaying) {
+                            //mini player trigger icon
+                            Image(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(bottom = 60.dp)
+                                    .size(width = 61.dp, height = 50.dp)
+                                    .clip(RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp))
+                                    .clickable {
+                                        coroutineScope.launch {
+                                            audioPlayerState.show()
+                                        }
+                                    },
+                                painter = painterResource(id = R.drawable.mini_play_icon),
+                                contentDescription = null
+                            )
+
+                            //mini player
+                            AudioBottomPlayerScreen(
+                                state = audioPlayerState
+                            )
                         }
                     }
                 }
@@ -652,10 +730,10 @@ fun FollowScreenPreview() {
             isLoading = true,
             onChannelClick = {},
             onGoToMy = {},
-            onRefreshMyGroupList = {},
             isShowBubbleTip = false,
             onMoreClick = {},
-            notificationUnReadCount = 99
+            notificationUnReadCount = 99,
+            isAudioPlaying = true
         )
     }
 }
