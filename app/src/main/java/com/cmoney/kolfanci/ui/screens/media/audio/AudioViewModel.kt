@@ -217,8 +217,7 @@ class AudioViewModel(
      */
     fun stopPlay() {
         KLog.i(TAG, "stopPlay")
-        //TODO: test
-//        musicServiceConnection.transportControls.stop()
+        musicServiceConnection.transportControls.stop()
     }
 
     /**
