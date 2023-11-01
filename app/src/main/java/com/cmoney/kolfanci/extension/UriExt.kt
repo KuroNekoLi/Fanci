@@ -2,14 +2,15 @@ package com.cmoney.kolfanci.extension
 
 import android.content.ContentResolver
 import android.content.Context
-import android.database.Cursor
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import androidx.loader.content.CursorLoader
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 
 /**
  *  取得 顯示檔案大小 format
@@ -43,16 +44,53 @@ private fun getFileSize(context: Context, uri: Uri): Long? {
 }
 
 fun Uri.uriToFile(context: Context): File {
-    val projection = arrayOf(MediaStore.Images.Media.DATA)
-    val cursorLoader = CursorLoader(context, this, projection, null, null, null)
-    val cursor: Cursor? = cursorLoader.loadInBackground()
+    if (this.scheme.equals(ContentResolver.SCHEME_FILE)) {
+        return File(this.path.orEmpty())
+    } else if (this.scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+        val contentResolver = context.contentResolver
+        val displayName = getFileName(context).orEmpty()
 
-    cursor?.use {
-        val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-        it.moveToFirst()
-        val filePath = it.getString(columnIndex)
-        return File(filePath)
+        var inputStream: InputStream? = null
+        var outputStream: FileOutputStream? = null
+
+        try {
+            inputStream = contentResolver.openInputStream(this)
+            val cache = File(context.cacheDir.absolutePath, displayName)
+            outputStream = FileOutputStream(cache)
+
+            val buffer = ByteArray(4 * 1024)
+            var read: Int
+
+            while (inputStream!!.read(buffer).also { read = it } != -1) {
+                outputStream.write(buffer, 0, read)
+            }
+            outputStream.flush()
+
+            return cache
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            try {
+                inputStream?.close()
+                outputStream?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
     }
+
+
+//    val projection = arrayOf(MediaStore.Images.Media.DATA)
+//    val cursorLoader = CursorLoader(context, this, projection, null, null, null)
+//    val cursor: Cursor? = cursorLoader.loadInBackground()
+//
+//    cursor?.use {
+//        val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+//        it.moveToFirst()
+//        val filePath = it.getString(columnIndex)
+//        return File(filePath)
+//    }
 
     throw IllegalArgumentException("Failed to convert URI to File")
 }
@@ -102,6 +140,21 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
         AttachmentType.Audio
     } else {
         AttachmentType.Unknown
+    }
+}
+
+/**
+ * 檔案 上傳時 要傳類型給後端知道
+ */
+fun Uri.getUploadFileType(context: Context): String {
+    val mimeType = getFileType(context)
+    val lowMimeType = mimeType.lowercase()
+    return if (lowMimeType.startsWith("audio")) {
+        "audio"
+    } else if (lowMimeType.startsWith("video")) {
+        "video"
+    } else {
+        "document"
     }
 }
 

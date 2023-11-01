@@ -1,15 +1,29 @@
 package com.cmoney.kolfanci.repository
 
+import android.app.Application
+import android.net.Uri
 import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.extension.getFileType
+import com.cmoney.kolfanci.extension.getUploadFileType
+import com.cmoney.kolfanci.extension.uriToFile
 import com.cmoney.kolfanci.model.notification.NotificationHistory
 import com.cmoney.kolfanci.repository.request.NotificationClick
 import com.cmoney.kolfanci.repository.request.NotificationSeen
+import com.cmoney.kolfanci.repository.response.FileUploadResponse
+import com.cmoney.kolfanci.repository.response.FileUploadStatusResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class NetworkImpl(
+    private val context: Application,
     private val notificationService: NotificationService,
+    private val centralFileService: CentralFileService,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : Network {
 
@@ -48,4 +62,31 @@ class NetworkImpl(
                 notificationService.setNotificationSeen(NotificationSeen()).checkResponseBody()
             }
         }
+
+    override suspend fun uploadFile(uri: Uri): Result<FileUploadResponse> =
+        withContext(dispatcher) {
+            kotlin.runCatching {
+                val mimeType = uri.getFileType(context)
+                val file = uri.uriToFile(context)
+
+                val requestBody = file.asRequestBody(
+                    contentType = mimeType.toMediaType()
+                )
+
+                val filePart = MultipartBody.Part.createFormData("File", file.name, requestBody)
+                val fileType = uri.getUploadFileType(context)
+
+                centralFileService.uploadFile(
+                    file = filePart,
+                    fileType = fileType.toRequestBody()
+                ).checkResponseBody()
+            }
+        }
+
+    override suspend fun checkUploadFileStatus(
+        externalId: String,
+        fileType: String
+    ): Result<FileUploadStatusResponse> {
+        TODO("Not yet implemented")
+    }
 }

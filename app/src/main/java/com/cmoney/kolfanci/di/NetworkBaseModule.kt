@@ -28,6 +28,7 @@ import com.cmoney.fanciapi.fanci.api.VipApi
 import com.cmoney.fanciapi.infrastructure.ApiClient
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.remoteconfig.BaseDomainKey
+import com.cmoney.kolfanci.repository.CentralFileService
 import com.cmoney.kolfanci.repository.Network
 import com.cmoney.kolfanci.repository.NetworkImpl
 import com.cmoney.kolfanci.repository.NotificationService
@@ -45,7 +46,7 @@ import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
 val APP_GSON = named("app_gson")
-val NOTIFICATION = named("notification")
+val CM_COMMON_CLIENT = named("notification")
 
 val networkBaseModule = module {
 
@@ -66,7 +67,7 @@ val networkBaseModule = module {
         }
     }
 
-    single(NOTIFICATION) {
+    single(CM_COMMON_CLIENT) {
         ApiClient(
             baseUrl = BuildConfig.CM_SERVER_URL,
             okHttpClientBuilder = createOkHttpClient(androidApplication()).newBuilder(),
@@ -76,11 +77,19 @@ val networkBaseModule = module {
     }
 
     single {
-        get<ApiClient>(NOTIFICATION).createService(NotificationService::class.java)
+        get<ApiClient>(CM_COMMON_CLIENT).createService(NotificationService::class.java)
+    }
+
+    single {
+        get<ApiClient>(CM_COMMON_CLIENT).createService(CentralFileService::class.java)
     }
 
     single<Network> {
-        NetworkImpl(get())
+        NetworkImpl(
+            context = androidApplication(),
+            notificationService = get(),
+            centralFileService = get()
+        )
     }
 
     single {

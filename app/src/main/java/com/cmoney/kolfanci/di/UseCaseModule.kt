@@ -43,4 +43,5 @@ val useCaseModule = module {
             pushNotificationApi = get()
         )
     }
+    factory { AttachmentUseCase(get()) }
 }

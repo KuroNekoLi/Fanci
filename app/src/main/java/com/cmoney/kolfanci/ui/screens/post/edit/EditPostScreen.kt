@@ -140,6 +140,10 @@ fun EditPostScreen(
             } else {
                 viewModel.onPost(text)
             }
+
+            //TODO: upload test
+            viewModel.uploadTest(attachment)
+
         },
         onBack = {
             showSaveTip = true

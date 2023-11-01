@@ -8,9 +8,11 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +34,8 @@ class EditPostViewModel(
     private val postUseCase: PostUseCase,
     private val chatRoomUseCase: ChatRoomUseCase,
     val channelId: String,
-    private val uploadImageUseCase: UploadImageUseCase
+    private val uploadImageUseCase: UploadImageUseCase,
+    private val attachmentUseCase: AttachmentUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = EditPostViewModel::class.java.simpleName
@@ -264,5 +267,27 @@ class EditPostViewModel(
 
 
         }
+    }
+
+    //todo: test upload file
+    fun uploadTest(attachment: List<Pair<AttachmentType, Uri>>) {
+        val filesUri = attachment.filter {
+            it.first != AttachmentType.Image
+        }.map {
+            it.second
+        }
+
+        val testUri = filesUri.first()
+
+        viewModelScope.launch {
+            attachmentUseCase.uploadFile(testUri)
+                .onSuccess {
+                    KLog.e("Warren", "onSuccess:$it")
+                }
+                .onFailure {
+                    KLog.e("Warren", "onFailure:$it")
+                }
+        }
+
     }
 }
