@@ -120,10 +120,6 @@ class MessageViewModel(
     private val _isSendComplete = MutableStateFlow<Boolean>(false)
     val isSendComplete = _isSendComplete.asStateFlow()
 
-    //附加圖片
-    private val _imageAttach = MutableStateFlow<List<Uri>>(emptyList())
-    val imageAttach = _imageAttach.asStateFlow()
-
     //附加檔案 (有分類聚合)
     private val _attachment = MutableStateFlow<Map<AttachmentType, List<Uri>>>(emptyMap())
     val attachment = _attachment.asStateFlow()
@@ -388,8 +384,10 @@ class MessageViewModel(
             generatePreviewBeforeSend(text)
 
             //附加圖片, 獲取圖片 Url
-            if (_imageAttach.value.isNotEmpty()) {
-                uploadImages(_imageAttach.value, object : ImageUploadCallback {
+            val imageList = _attachment.value[AttachmentType.Image].orEmpty()
+
+            if (imageList.isNotEmpty()) {
+                uploadImages(imageList, object : ImageUploadCallback {
                     override fun complete(images: List<String>) {
                         KLog.i(TAG, "all image upload complete:" + images.size)
                         send(channelId, text, images)
@@ -415,7 +413,7 @@ class MessageViewModel(
                                         createUnixTime = System.currentTimeMillis() / 1000,
                                         replyMessage = _replyMessage.value
                                     ),
-                                    uploadAttachPreview = _imageAttach.value.map {
+                                    uploadAttachPreview = imageList.map {
                                         ImageAttachState(
                                             uri = it,
                                             isUploadComplete = true
@@ -427,7 +425,12 @@ class MessageViewModel(
                         }
                     }
                 })
-                _imageAttach.value = emptyList()
+
+                _attachment.update {
+                    val filterMap = _attachment.value.toMutableMap()
+                    filterMap.remove(AttachmentType.Image)
+                    filterMap
+                }
             }
             //Only text
             else {
@@ -478,14 +481,11 @@ class MessageViewModel(
     private suspend fun uploadImages(uriLis: List<Uri>, imageUploadCallback: ImageUploadCallback) {
         KLog.i(TAG, "uploadImages:" + uriLis.size)
 
-        _imageAttach.value = emptyList()
-
         val completeImageUrl = mutableListOf<String>()
 
         withContext(Dispatchers.IO) {
             uploadImageUseCase.uploadImage(uriLis).catch { e ->
                 KLog.e(TAG, e)
-                _imageAttach.value = uriLis
                 imageUploadCallback.onFailure(e)
             }.collect {
                 KLog.i(TAG, "uploadImage:$it")
