@@ -63,9 +63,9 @@ fun MessageInput(
         mutableStateOf(false)
     }
 
-    val imageAttach by viewModel.imageAttach.collectAsState()
+    val attachment by viewModel.attachmentList.collectAsState()
 
-    isShowSend = imageAttach.isNotEmpty() || textState.isNotEmpty()
+    isShowSend = attachment.isNotEmpty() || textState.isNotEmpty()
 
     Row(
         modifier = Modifier
