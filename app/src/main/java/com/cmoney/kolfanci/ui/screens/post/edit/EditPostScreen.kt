@@ -1,7 +1,9 @@
 package com.cmoney.kolfanci.ui.screens.post.edit
 
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -34,9 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,23 +55,28 @@ import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.ui.screens.chat.AttachmentController
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
+import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.CenterTopAppBar
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.FilePicker
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.xlogin.XLoginHelper
-import com.facebook.bolts.Task.Companion.delay
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.stfalcon.imageviewer.StfalconImageViewer
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -81,9 +92,12 @@ fun EditPostScreen(
             parametersOf(channelId)
         }
     ),
+    messageViewModel: MessageViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<PostViewModel.BulletinboardMessageWrapper>
 ) {
     var showImagePick by remember { mutableStateOf(false) }
+
+    var showFilePicker by remember { mutableStateOf(false) }
 
     val attachImages by viewModel.attachImages.collectAsState()
 
@@ -94,6 +108,11 @@ fun EditPostScreen(
     var showSaveTip by remember {
         mutableStateOf(false)
     }
+
+    val context = LocalContext.current
+
+    //附加檔案
+    val attachment by messageViewModel.attachmentList.collectAsState()
 
     //編輯貼文, 設定初始化資料
     LaunchedEffect(Unit) {
@@ -115,18 +134,31 @@ fun EditPostScreen(
         },
         onPostClick = { text ->
             AppUserLogger.getInstance().log(Clicked.PostPublish)
-            
+
             if (editPost != null) {
                 viewModel.onUpdatePostClick(editPost, text)
-            }
-            else {
+            } else {
                 viewModel.onPost(text)
             }
         },
         onBack = {
             showSaveTip = true
         },
-        showLoading = (uiState == UiState.ShowLoading)
+        showLoading = (uiState == UiState.ShowLoading),
+        onAttachmentFilePicker = {
+            showFilePicker = true
+        },
+        attachment = attachment,
+        onDeleteAttach = {
+            messageViewModel.removeAttach(it)
+        },
+        onPreviewAttachmentClick = { uri ->
+            AttachmentController.onAttachmentClick(
+                navController = navController,
+                uri = uri,
+                context = context
+            )
+        }
     )
 
     //Show image picker
@@ -138,6 +170,18 @@ fun EditPostScreen(
             onAttach = {
                 showImagePick = false
                 viewModel.addAttachImage(it)
+            }
+        )
+    }
+
+    if (showFilePicker) {
+        FilePicker(
+            onAttach = {
+                messageViewModel.attachment(it)
+                showFilePicker = false
+            },
+            onNothing = {
+                showFilePicker = false
             }
         )
     }
@@ -200,11 +244,15 @@ private fun EditPostScreenView(
     modifier: Modifier = Modifier,
     editPost: BulletinboardMessage? = null,
     onShowImagePicker: () -> Unit,
+    onAttachmentFilePicker: () -> Unit,
     attachImages: List<Uri>,
     onDeleteImage: (Uri) -> Unit,
     onPostClick: (String) -> Unit,
     onBack: () -> Unit,
-    showLoading: Boolean
+    showLoading: Boolean,
+    attachment: List<Pair<AttachmentType, Uri>>,
+    onDeleteAttach: (Uri) -> Unit,
+    onPreviewAttachmentClick: (Uri) -> Unit
 ) {
     val defaultContent = editPost?.content?.text.orEmpty() ?: ""
 
@@ -287,9 +335,7 @@ private fun EditPostScreenView(
                         onDelete = {
                             onDeleteImage.invoke(it)
                         },
-                        onAdd = {
-                            onShowImagePicker.invoke()
-                        },
+                        onAdd = onShowImagePicker,
                         onClick = { uri ->
                             StfalconImageViewer
                                 .Builder(
@@ -305,6 +351,18 @@ private fun EditPostScreenView(
                     )
                 }
 
+                //附加檔案
+                PostAttachmentScreen(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(top = 1.dp)
+                        .background(MaterialTheme.colors.primary),
+                    attachment = attachment,
+                    onDelete = onDeleteAttach,
+                    onClick = onPreviewAttachmentClick,
+                    onAddImage = onShowImagePicker
+                )
+
                 //Bottom
                 Row(
                     modifier = Modifier
@@ -315,15 +373,57 @@ private fun EditPostScreenView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    IconButton(
-                        modifier = Modifier.size(25.dp),
-                        onClick = {
+                    //Image picker
+                    Row(
+                        modifier.clickable {
                             onShowImagePicker.invoke()
-                        }) {
-                        Icon(
-                            ImageVector.vectorResource(id = R.drawable.gallery),
-                            null,
-                            tint = LocalColor.current.text.default_100
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = Modifier.size(25.dp),
+                            painter = painterResource(id = R.drawable.gallery),
+                            colorFilter = ColorFilter.tint(LocalColor.current.text.default_100),
+                            contentDescription = null
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = "圖片",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                lineHeight = 21.sp,
+                                color = LocalColor.current.text.default_80
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(15.dp))
+
+                    //File picker
+                    Row(
+                        modifier.clickable {
+                            onAttachmentFilePicker.invoke()
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = Modifier.size(25.dp),
+                            painter = painterResource(id = R.drawable.file),
+                            colorFilter = ColorFilter.tint(LocalColor.current.text.default_100),
+                            contentDescription = null
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = "檔案",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                lineHeight = 21.sp,
+                                color = LocalColor.current.text.default_80
+                            )
                         )
                     }
 
@@ -423,11 +523,15 @@ fun EditPostScreenPreview() {
     FanciTheme {
         EditPostScreenView(
             onShowImagePicker = {},
+            onAttachmentFilePicker = {},
             attachImages = emptyList(),
             onDeleteImage = {},
             onPostClick = {},
             onBack = {},
-            showLoading = false
+            showLoading = false,
+            attachment = emptyList(),
+            onDeleteAttach = {},
+            onPreviewAttachmentClick = {}
         )
     }
 }

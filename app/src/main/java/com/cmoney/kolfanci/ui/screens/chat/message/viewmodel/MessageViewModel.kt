@@ -124,9 +124,13 @@ class MessageViewModel(
     private val _imageAttach = MutableStateFlow<List<Uri>>(emptyList())
     val imageAttach = _imageAttach.asStateFlow()
 
-    //附加檔案
+    //附加檔案 (有分類聚合)
     private val _attachment = MutableStateFlow<Map<AttachmentType, List<Uri>>>(emptyMap())
     val attachment = _attachment.asStateFlow()
+
+    //附加檔案 (依照加入順序)
+    private val _attachmentList = MutableStateFlow<List<Pair<AttachmentType, Uri>>>(emptyList())
+    val attachmentList = _attachmentList.asStateFlow()
 
     //附加檔案,只有image類型
     private val _isOnlyPhotoSelector = MutableStateFlow<Boolean>(false)
@@ -310,6 +314,17 @@ class MessageViewModel(
      * 附加檔案, 區分 類型
      */
     fun attachment(uris: List<Uri>) {
+        val oldList = _attachmentList.value.toMutableList()
+        oldList.addAll(
+            uris.map { uri ->
+                uri.getAttachmentType(context) to uri
+            }
+        )
+
+        _attachmentList.update {
+            oldList
+        }
+
         val attachmentMap = uris.map { uri ->
             val attachmentType = uri.getAttachmentType(context)
             attachmentType to uri
@@ -338,6 +353,13 @@ class MessageViewModel(
     fun removeAttach(uri: Uri) {
         KLog.i(TAG, "removeAttach:$uri")
         val attachmentType = uri.getAttachmentType(context)
+
+        _attachmentList.update {
+            _attachmentList.value.filter {
+                it.second != uri
+            }
+        }
+
         val newAttachment = _attachment.value[attachmentType]?.filter { existsUri ->
             existsUri != uri
         }

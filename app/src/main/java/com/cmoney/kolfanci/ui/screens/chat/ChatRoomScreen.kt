@@ -144,53 +144,6 @@ fun ChatRoomScreen(
     //是否只有圖片選擇
     val isOnlyPhotoSelector by messageViewModel.isOnlyPhotoSelector.collectAsState()
 
-    /**
-     * 點擊附加檔案預覽
-     */
-    fun onAttachmentClick(uri: Uri, context: Context) {
-        KLog.i(TAG, "onAttachmentClick:$uri")
-        when (uri.getAttachmentType(context)) {
-            AttachmentType.Audio -> {
-                navController.navigate(
-                    AudioPreviewScreenDestination(
-                        uri = uri
-                    )
-                )
-            }
-
-            AttachmentType.Image -> {
-                StfalconImageViewer
-                    .Builder(
-                        context, listOf(uri)
-                    ) { imageView, image ->
-                        Glide
-                            .with(context)
-                            .load(image)
-                            .into(imageView)
-                    }
-                    .show()
-            }
-
-            AttachmentType.Pdf -> {
-                navController.navigate(
-                    PdfPreviewScreenDestination(
-                        uri = uri
-                    )
-                )
-            }
-
-            AttachmentType.Txt -> {
-                navController.navigate(
-                    TextPreviewScreenDestination(
-                        uri = uri
-                    )
-                )
-            }
-
-            AttachmentType.Unknown -> TODO()
-        }
-    }
-
     //主畫面
     ChatRoomScreenView(
         channelId = channelId,
@@ -226,7 +179,8 @@ fun ChatRoomScreen(
             }
         },
         onPreviewAttachmentClick = { uri ->
-            onAttachmentClick(
+            AttachmentController.onAttachmentClick(
+                navController = navController,
                 uri = uri,
                 context = context
             )
@@ -381,6 +335,56 @@ private fun ChatRoomScreenView(
             },
             showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
         )
+    }
+}
+
+object AttachmentController {
+    private val TAG = "AttachmentController"
+    /**
+     * 點擊附加檔案預覽
+     */
+    fun onAttachmentClick(navController: DestinationsNavigator,uri: Uri, context: Context) {
+        KLog.i(TAG, "onAttachmentClick:$uri")
+        when (uri.getAttachmentType(context)) {
+            AttachmentType.Audio -> {
+                navController.navigate(
+                    AudioPreviewScreenDestination(
+                        uri = uri
+                    )
+                )
+            }
+
+            AttachmentType.Image -> {
+                StfalconImageViewer
+                    .Builder(
+                        context, listOf(uri)
+                    ) { imageView, image ->
+                        Glide
+                            .with(context)
+                            .load(image)
+                            .into(imageView)
+                    }
+                    .show()
+            }
+
+            AttachmentType.Pdf -> {
+                navController.navigate(
+                    PdfPreviewScreenDestination(
+                        uri = uri
+                    )
+                )
+            }
+
+            AttachmentType.Txt -> {
+                navController.navigate(
+                    TextPreviewScreenDestination(
+                        uri = uri
+                    )
+                )
+            }
+
+            AttachmentType.Unknown -> TODO()
+        }
     }
 }
 
