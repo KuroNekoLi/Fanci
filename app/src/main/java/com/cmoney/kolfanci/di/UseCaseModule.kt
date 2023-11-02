@@ -43,5 +43,10 @@ val useCaseModule = module {
             pushNotificationApi = get()
         )
     }
-    factory { AttachmentUseCase(get()) }
+    factory {
+        AttachmentUseCase(
+            context = androidApplication(),
+            network = get()
+        )
+    }
 }

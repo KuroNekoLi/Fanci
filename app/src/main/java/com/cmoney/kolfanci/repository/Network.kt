@@ -39,7 +39,7 @@ interface Network {
     suspend fun uploadFile(uri: Uri): Result<FileUploadResponse>
 
     /**
-     * 上傳檔案 狀態檢查, 確認有上傳 s完成
+     * 上傳檔案 狀態檢查, 確認有上傳 完成
      */
     suspend fun checkUploadFileStatus(externalId: String, fileType: String): Result<FileUploadStatusResponse>
 }
