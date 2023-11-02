@@ -30,6 +30,8 @@ import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
+import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PdfPreviewScreenDestination
@@ -67,6 +69,7 @@ fun ChatRoomScreen(
     jumpChatMessage: ChatMessage? = null,
     navController: DestinationsNavigator,
     messageViewModel: MessageViewModel = koinViewModel(),
+    attachmentViewModel: AttachmentViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>
 ) {
@@ -139,7 +142,7 @@ fun ChatRoomScreen(
     }
 
     //附加檔案
-    val attachment by messageViewModel.attachment.collectAsState()
+    val attachment by attachmentViewModel.attachment.collectAsState()
 
     //是否只有圖片選擇
     val isOnlyPhotoSelector by messageViewModel.isOnlyPhotoSelector.collectAsState()
@@ -156,7 +159,7 @@ fun ChatRoomScreen(
             messageViewModel.removeReply(it)
         },
         onDeleteAttach = {
-            messageViewModel.removeAttach(it)
+            attachmentViewModel.removeAttach(it)
         },
         onMessageSend = {
             AppUserLogger.getInstance().log(Clicked.MessageSendButton)
@@ -260,7 +263,7 @@ fun ChatRoomScreen(
         selectedAttachment = attachment,
         isOnlyPhotoSelector = isOnlyPhotoSelector
     ) {
-        messageViewModel.attachment(it)
+        attachmentViewModel.attachment(it)
     }
 }
 
@@ -276,7 +279,7 @@ private fun ChatRoomScreenView(
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
     onAttachImageAddClick: () -> Unit,
-    attachment: Map<AttachmentType, List<Uri>>,
+    attachment: Map<AttachmentType, List<UploadFileItem>>,
     onPreviewAttachmentClick: (Uri) -> Unit
 ) {
     Column(
@@ -330,11 +333,10 @@ private fun ChatRoomScreenView(
             onMessageSend = {
                 onMessageSend.invoke(it)
             },
-            onAttachClick = {
-                onAttachClick.invoke()
-            },
             showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
-        )
+        ) {
+            onAttachClick.invoke()
+        }
     }
 }
 

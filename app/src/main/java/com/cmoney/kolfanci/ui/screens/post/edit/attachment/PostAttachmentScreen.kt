@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 
@@ -22,7 +23,7 @@ import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 @Composable
 fun PostAttachmentScreen(
     modifier: Modifier = Modifier,
-    attachment: List<Pair<AttachmentType, Uri>>,
+    attachment: List<Pair<AttachmentType, UploadFileItem>>,
     onDelete: (Uri) -> Unit,
     onClick: (Uri) -> Unit,
     onAddImage: () -> Unit
@@ -48,7 +49,7 @@ fun PostAttachmentScreen(
                 modifier = modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary),
-                imageAttach = imageAttachment,
+                imageAttach = imageAttachment.map { it.uri },
                 onDelete = onDelete,
                 onAdd = onAddImage,
                 onClick = onClick

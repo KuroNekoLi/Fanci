@@ -850,12 +850,11 @@ private fun PostInfoScreenView(
                         onMessageSend = {
                             postInfoListener.onCommentSend(it)
                         },
-                        onAttachClick = {
-                            postInfoListener.onAttachClick()
-                        },
                         showOnlyBasicPermissionTip = {
                         }
-                    )
+                    ) {
+                        postInfoListener.onAttachClick()
+                    }
                 }
             }
 

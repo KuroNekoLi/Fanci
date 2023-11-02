@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.di
 
+import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
@@ -173,6 +174,12 @@ val viewModule = module {
             context = androidApplication(),
             musicServiceConnection = get(),
             uri = params.get()
+        )
+    }
+    viewModel {
+        AttachmentViewModel(
+            context = androidApplication(),
+            attachmentUseCase = get()
         )
     }
 }

@@ -11,16 +11,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 
-//TODO
 /**
  * 附加檔案 preview 呈現畫面
  */
 @Composable
 fun ChatRoomAttachmentScreen(
     modifier: Modifier = Modifier,
-    attachment: Map<AttachmentType, List<Uri>>,
+    attachment: Map<AttachmentType, List<UploadFileItem>>,
     onDelete: (Uri) -> Unit,
     onAdd: () -> Unit,
     onClick: (Uri) -> Unit
@@ -31,7 +31,7 @@ fun ChatRoomAttachmentScreen(
                 modifier = modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary),
-                imageAttach = uris,
+                imageAttach = uris.map { it.uri },
                 onDelete = onDelete,
                 onAdd = onAdd,
                 onClick = onClick
@@ -39,7 +39,7 @@ fun ChatRoomAttachmentScreen(
 
             AttachmentType.Audio -> {
                 AttachmentAudioScreen(
-                    audioList = uris,
+                    audioList = uris.map { it.uri },
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(15.dp)
@@ -54,7 +54,7 @@ fun ChatRoomAttachmentScreen(
 
             AttachmentType.Pdf, AttachmentType.Txt -> {
                 AttachmentFileScreen(
-                    fileList = uris,
+                    fileList = uris.map { it.uri },
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(15.dp)

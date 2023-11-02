@@ -120,13 +120,13 @@ class MessageViewModel(
     private val _isSendComplete = MutableStateFlow<Boolean>(false)
     val isSendComplete = _isSendComplete.asStateFlow()
 
-    //附加檔案 (有分類聚合)
-    private val _attachment = MutableStateFlow<Map<AttachmentType, List<Uri>>>(emptyMap())
-    val attachment = _attachment.asStateFlow()
-
-    //附加檔案 (依照加入順序)
-    private val _attachmentList = MutableStateFlow<List<Pair<AttachmentType, Uri>>>(emptyList())
-    val attachmentList = _attachmentList.asStateFlow()
+//    //附加檔案 (有分類聚合)
+//    private val _attachment = MutableStateFlow<Map<AttachmentType, List<Uri>>>(emptyMap())
+//    val attachment = _attachment.asStateFlow()
+//
+//    //附加檔案 (依照加入順序)
+//    private val _attachmentList = MutableStateFlow<List<Pair<AttachmentType, Uri>>>(emptyList())
+//    val attachmentList = _attachmentList.asStateFlow()
 
     //附加檔案,只有image類型
     private val _isOnlyPhotoSelector = MutableStateFlow<Boolean>(false)
@@ -306,72 +306,72 @@ class MessageViewModel(
         }
     }
 
-    /**
-     * 附加檔案, 區分 類型
-     */
-    fun attachment(uris: List<Uri>) {
-        val oldList = _attachmentList.value.toMutableList()
-        oldList.addAll(
-            uris.map { uri ->
-                uri.getAttachmentType(context) to uri
-            }
-        )
-
-        _attachmentList.update {
-            oldList
-        }
-
-        val attachmentMap = uris.map { uri ->
-            val attachmentType = uri.getAttachmentType(context)
-            attachmentType to uri
-        }.groupBy {
-            it.first
-        }.mapValues { entry ->
-            entry.value.map { it.second }
-        }
-
-        val unionList = (_attachment.value.asSequence() + attachmentMap.asSequence())
-            .distinct()
-            .groupBy({ it.key }, { it.value })
-            .mapValues { entry ->
-                entry.value.flatten()
-            }
-
-        _attachment.update {
-            unionList
-        }
-    }
-
-    /**
-     * 移除 附加 檔案
-     * @param uri
-     */
-    fun removeAttach(uri: Uri) {
-        KLog.i(TAG, "removeAttach:$uri")
-        val attachmentType = uri.getAttachmentType(context)
-
-        _attachmentList.update {
-            _attachmentList.value.filter {
-                it.second != uri
-            }
-        }
-
-        val newAttachment = _attachment.value[attachmentType]?.filter { existsUri ->
-            existsUri != uri
-        }
-
-        if (newAttachment.isNullOrEmpty()) {
-            _attachment.update {
-                emptyMap()
-            }
-        } else {
-            _attachment.update { oldAttachment ->
-                oldAttachment.toMutableMap().apply {
-                    set(attachmentType, newAttachment)
-                }
-            }
-        }
-    }
+//    /**
+//     * 附加檔案, 區分 類型
+//     */
+//    fun attachment(uris: List<Uri>) {
+//        val oldList = _attachmentList.value.toMutableList()
+//        oldList.addAll(
+//            uris.map { uri ->
+//                uri.getAttachmentType(context) to uri
+//            }
+//        )
+//
+//        _attachmentList.update {
+//            oldList
+//        }
+//
+//        val attachmentMap = uris.map { uri ->
+//            val attachmentType = uri.getAttachmentType(context)
+//            attachmentType to uri
+//        }.groupBy {
+//            it.first
+//        }.mapValues { entry ->
+//            entry.value.map { it.second }
+//        }
+//
+//        val unionList = (_attachment.value.asSequence() + attachmentMap.asSequence())
+//            .distinct()
+//            .groupBy({ it.key }, { it.value })
+//            .mapValues { entry ->
+//                entry.value.flatten()
+//            }
+//
+//        _attachment.update {
+//            unionList
+//        }
+//    }
+//
+//    /**
+//     * 移除 附加 檔案
+//     * @param uri
+//     */
+//    fun removeAttach(uri: Uri) {
+//        KLog.i(TAG, "removeAttach:$uri")
+//        val attachmentType = uri.getAttachmentType(context)
+//
+//        _attachmentList.update {
+//            _attachmentList.value.filter {
+//                it.second != uri
+//            }
+//        }
+//
+//        val newAttachment = _attachment.value[attachmentType]?.filter { existsUri ->
+//            existsUri != uri
+//        }
+//
+//        if (newAttachment.isNullOrEmpty()) {
+//            _attachment.update {
+//                emptyMap()
+//            }
+//        } else {
+//            _attachment.update { oldAttachment ->
+//                oldAttachment.toMutableMap().apply {
+//                    set(attachmentType, newAttachment)
+//                }
+//            }
+//        }
+//    }
 
     /**
      * 對外 發送訊息 接口
@@ -383,8 +383,12 @@ class MessageViewModel(
         viewModelScope.launch {
             generatePreviewBeforeSend(text)
 
+            //TODO; fix it
+
             //附加圖片, 獲取圖片 Url
-            val imageList = _attachment.value[AttachmentType.Image].orEmpty()
+//            val imageList = _attachment.value[AttachmentType.Image].orEmpty()
+
+            val imageList = emptyList<Uri>()
 
             if (imageList.isNotEmpty()) {
                 uploadImages(imageList, object : ImageUploadCallback {
@@ -426,11 +430,11 @@ class MessageViewModel(
                     }
                 })
 
-                _attachment.update {
-                    val filterMap = _attachment.value.toMutableMap()
-                    filterMap.remove(AttachmentType.Image)
-                    filterMap
-                }
+//                _attachment.update {
+//                    val filterMap = _attachment.value.toMutableMap()
+//                    filterMap.remove(AttachmentType.Image)
+//                    filterMap
+//                }
             }
             //Only text
             else {

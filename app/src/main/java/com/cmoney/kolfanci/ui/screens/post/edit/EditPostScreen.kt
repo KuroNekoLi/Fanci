@@ -54,6 +54,8 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
+import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.AttachmentController
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
@@ -92,7 +94,7 @@ fun EditPostScreen(
             parametersOf(channelId)
         }
     ),
-    messageViewModel: MessageViewModel = koinViewModel(),
+    attachmentViewModel: AttachmentViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<PostViewModel.BulletinboardMessageWrapper>
 ) {
     var showImagePick by remember { mutableStateOf(false) }
@@ -112,7 +114,7 @@ fun EditPostScreen(
     val context = LocalContext.current
 
     //附加檔案
-    val attachment by messageViewModel.attachmentList.collectAsState()
+    val attachment by attachmentViewModel.attachmentList.collectAsState()
 
     //編輯貼文, 設定初始化資料
     LaunchedEffect(Unit) {
@@ -140,10 +142,6 @@ fun EditPostScreen(
             } else {
                 viewModel.onPost(text)
             }
-
-            //TODO: upload test
-            viewModel.uploadTest(attachment)
-
         },
         onBack = {
             showSaveTip = true
@@ -154,7 +152,7 @@ fun EditPostScreen(
         },
         attachment = attachment,
         onDeleteAttach = {
-            messageViewModel.removeAttach(it)
+            attachmentViewModel.removeAttach(it)
         },
         onPreviewAttachmentClick = { uri ->
             AttachmentController.onAttachmentClick(
@@ -181,7 +179,7 @@ fun EditPostScreen(
     if (showFilePicker) {
         FilePicker(
             onAttach = {
-                messageViewModel.attachment(it)
+                attachmentViewModel.attachment(it)
                 showFilePicker = false
             },
             onNothing = {
@@ -254,7 +252,7 @@ private fun EditPostScreenView(
     onPostClick: (String) -> Unit,
     onBack: () -> Unit,
     showLoading: Boolean,
-    attachment: List<Pair<AttachmentType, Uri>>,
+    attachment: List<Pair<AttachmentType, UploadFileItem>>,
     onDeleteAttach: (Uri) -> Unit,
     onPreviewAttachmentClick: (Uri) -> Unit
 ) {

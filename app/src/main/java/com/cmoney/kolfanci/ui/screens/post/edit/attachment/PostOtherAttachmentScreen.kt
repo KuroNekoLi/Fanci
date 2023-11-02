@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
@@ -20,7 +21,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 fun PostOtherAttachmentScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    attachment: List<Pair<AttachmentType, Uri>>,
+    attachment: List<Pair<AttachmentType, UploadFileItem>>,
     onClick: (Uri) -> Unit,
     onDelete: (Uri) -> Unit
 ) {
@@ -33,14 +34,14 @@ fun PostOtherAttachmentScreen(
         state = listState, horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
-        attachment.forEach { (attachmentType, uri) ->
+        attachment.forEach { (attachmentType, item) ->
             when (attachmentType) {
                 AttachmentType.Audio -> {
                     item {
                         AttachmentAudioItem(
                             modifier = itemModifier,
-                            audio = uri,
-                            displayName = uri.getFileName(context).orEmpty(),
+                            audio = item.uri,
+                            displayName = item.uri.getFileName(context).orEmpty(),
                             onClick = onClick,
                             onDelete = onDelete
                         )
@@ -51,8 +52,8 @@ fun PostOtherAttachmentScreen(
                     item {
                         AttachmentFileItem(
                             modifier = itemModifier,
-                            file = uri,
-                            displayName = uri.getFileName(context).orEmpty(),
+                            file = item.uri,
+                            displayName = item.uri.getFileName(context).orEmpty(),
                             onClick = onClick,
                             onDelete = onDelete
                         )

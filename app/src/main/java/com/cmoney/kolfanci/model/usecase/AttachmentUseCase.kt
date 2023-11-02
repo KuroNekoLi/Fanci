@@ -18,7 +18,7 @@ class AttachmentUseCase(
 
     suspend fun uploadFile(uri: Uri) = network.uploadFile(uri)
 
-    suspend fun uploadFile(uris: List<Uri>): Flow<UploadStatus> = flow {
+    suspend fun uploadFile(uris: List<Uri>): Flow<UploadFileItem> = flow {
         KLog.i(TAG, "uploadFile")
 
         uris.forEachIndexed { index, uri ->
@@ -39,10 +39,9 @@ class AttachmentUseCase(
                 .onFailure {
                     KLog.e(TAG, "uploadFile step1 fail:$it")
                     emit(
-                        UploadStatus(
-                            id = index.toString(),
+                        UploadFileItem(
                             uri = uri,
-                            status = UploadStatus.Status.Failed("upload step1 failed.")
+                            status = UploadFileItem.Status.Failed("upload step1 failed.")
                         )
                     )
                 }
@@ -53,12 +52,12 @@ class AttachmentUseCase(
     /**
      * 檢查 檔案上傳 狀態
      */
-    private suspend fun checkFileStatus(externalId: String, uri: Uri, index: Int): UploadStatus {
+    private suspend fun checkFileStatus(externalId: String, uri: Uri, index: Int): UploadFileItem {
         val uploadFileType = uri.getUploadFileType(context)
 
         val whileLimit = 10
         var whileCount = 0
-        var delayTime = 0L
+        var delayTime: Long
         var pre = 0L
         var current = 1L
 
@@ -79,21 +78,20 @@ class AttachmentUseCase(
             fileUploadStatusResponse?.let { statusResponse ->
                 val status = when (statusResponse.status) {
                     "uploading" -> {
-                        UploadStatus.Status.Uploading
+                        UploadFileItem.Status.Uploading
                     }
 
                     "success" -> {
-                        UploadStatus.Status.Success
+                        UploadFileItem.Status.Success
                     }
 
                     else -> {
-                        UploadStatus.Status.Failed("checkFileStatus fail")
+                        UploadFileItem.Status.Failed("checkFileStatus fail")
                     }
                 }
 
-                if (whileCount > whileLimit || status == UploadStatus.Status.Success) {
-                    return UploadStatus(
-                        id = index.toString(),
+                if (whileCount > whileLimit || status == UploadFileItem.Status.Success) {
+                    return UploadFileItem(
                         uri = uri,
                         status = status
                     )
@@ -102,10 +100,9 @@ class AttachmentUseCase(
             } ?: kotlin.run {
 
                 if (whileCount > whileLimit) {
-                    return UploadStatus(
-                        id = index.toString(),
+                    return UploadFileItem(
                         uri = uri,
-                        status = UploadStatus.Status.Failed("checkFileStatus fail, is null response.")
+                        status = UploadFileItem.Status.Failed("checkFileStatus fail, is null response.")
                     )
                 }
             }
@@ -113,10 +110,9 @@ class AttachmentUseCase(
             delay(delayTime * 1000)
         }
 
-        return UploadStatus(
-            id = "",
+        return UploadFileItem(
             uri = uri,
-            status = UploadStatus.Status.Failed("upload failed.")
+            status = UploadFileItem.Status.Failed("upload failed.")
         )
     }
 }
@@ -124,20 +120,20 @@ class AttachmentUseCase(
 /**
  * 檔案 上傳狀態
  *
- * @param id 唯一識別碼
  * @param uri 上傳的檔案
  * @param status 上傳狀態
  */
-data class UploadStatus(
-    val id: String,
+data class UploadFileItem(
     val uri: Uri,
-    val status: Status
+    val status: Status = Status.Pending
 ) {
     /**
      * 檔案上傳狀態
      * @param description 說明
      */
     sealed class Status(description: String = "") {
+        object Pending: Status()
+
         object Success : Status()
 
         object Uploading : Status()
