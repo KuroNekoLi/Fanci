@@ -39,7 +39,7 @@ fun ChatRoomAttachmentScreen(
 
             AttachmentType.Audio -> {
                 AttachmentAudioScreen(
-                    audioList = uris.map { it.uri },
+                    audioList = uris,
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(15.dp)

@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.model.usecase
 
 import android.app.Application
 import android.net.Uri
+import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.extension.getUploadFileType
 import com.cmoney.kolfanci.repository.Network
 import com.socks.library.KLog
@@ -21,7 +22,14 @@ class AttachmentUseCase(
     suspend fun uploadFile(uris: List<Uri>): Flow<UploadFileItem> = flow {
         KLog.i(TAG, "uploadFile")
 
-        uris.forEachIndexed { index, uri ->
+        uris.forEach { uri ->
+            emit(
+                UploadFileItem(
+                    uri = uri,
+                    status = UploadFileItem.Status.Uploading
+                )
+            )
+
             network.uploadFile(uri)
                 .onSuccess { fileUploadResponse ->
                     val externalId = fileUploadResponse.externalId
@@ -31,8 +39,7 @@ class AttachmentUseCase(
                     emit(
                         checkFileStatus(
                             externalId = externalId,
-                            uri = uri,
-                            index = index
+                            uri = uri
                         )
                     )
                 }
@@ -52,7 +59,7 @@ class AttachmentUseCase(
     /**
      * 檢查 檔案上傳 狀態
      */
-    private suspend fun checkFileStatus(externalId: String, uri: Uri, index: Int): UploadFileItem {
+    private suspend fun checkFileStatus(externalId: String, uri: Uri): UploadFileItem {
         val uploadFileType = uri.getUploadFileType(context)
 
         val whileLimit = 10
@@ -93,7 +100,15 @@ class AttachmentUseCase(
                 if (whileCount > whileLimit || status == UploadFileItem.Status.Success) {
                     return UploadFileItem(
                         uri = uri,
-                        status = status
+                        status = status,
+                        serverUrl = if (status == UploadFileItem.Status.Success) {
+                            BuildConfig.CM_SERVER_URL + "centralfileservice/files/%s/%s".format(
+                                uploadFileType,
+                                externalId
+                            )
+                        } else {
+                            ""
+                        }
                     )
                 }
 
@@ -122,22 +137,31 @@ class AttachmentUseCase(
  *
  * @param uri 上傳的檔案
  * @param status 上傳狀態
+ * @param serverUrl 上傳成功後 拿到的 url
  */
 data class UploadFileItem(
     val uri: Uri,
-    val status: Status = Status.Pending
+    val status: Status = Status.Undefined,
+    val serverUrl: String = ""
 ) {
     /**
      * 檔案上傳狀態
      * @param description 說明
      */
     sealed class Status(description: String = "") {
-        object Pending: Status()
+        //還未確定要上傳
+        object Undefined : Status()
 
+        //等待上傳中
+        object Pending : Status()
+
+        //上傳成功
         object Success : Status()
 
+        //上傳中
         object Uploading : Status()
 
+        //上傳失敗
         data class Failed(val reason: String) : Status(reason)
     }
 }

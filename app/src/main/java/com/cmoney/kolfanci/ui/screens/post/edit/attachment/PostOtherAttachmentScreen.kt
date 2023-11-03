@@ -16,6 +16,7 @@ import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.socks.library.KLog
 
 @Composable
 fun PostOtherAttachmentScreen(
@@ -35,12 +36,13 @@ fun PostOtherAttachmentScreen(
     ) {
 
         attachment.forEach { (attachmentType, item) ->
+
             when (attachmentType) {
                 AttachmentType.Audio -> {
                     item {
                         AttachmentAudioItem(
                             modifier = itemModifier,
-                            audio = item.uri,
+                            audio = item,
                             displayName = item.uri.getFileName(context).orEmpty(),
                             onClick = onClick,
                             onDelete = onDelete

@@ -277,4 +277,7 @@
     <string name="audio_speed_1.25">1.25x</string>
     <string name="audio_speed_1.5">1.5x</string>
     <string name="audio_speed_1.75">1.75x</string>
+    
+    <string name="post_fail_title">貼文發表失敗</string>
+    <string name="post_fail_desc">圖片或檔案上傳失敗\n為了確保貼文完整，快去檢查吧！</string>
 </resources>

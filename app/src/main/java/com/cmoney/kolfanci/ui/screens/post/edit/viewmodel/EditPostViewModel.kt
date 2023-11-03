@@ -11,6 +11,7 @@ import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
@@ -64,12 +65,13 @@ class EditPostViewModel(
     }
 
     /**
-     * 按下 發文,
-     * 沒文案, 沒附加圖片 -> 跳提示彈窗
+     * 按下 發文
      *
+     * @param text 內文
+     * @param attachment 附加檔案
      */
-    fun onPost(text: String) {
-        KLog.i(TAG, "onPost:$text")
+    fun onPost(text: String, attachment: List<Pair<AttachmentType, UploadFileItem>>) {
+        KLog.i(TAG, "onPost:$text, attachment:$attachment")
         viewModelScope.launch {
             if (text.isEmpty() && _attachImages.value.isEmpty()) {
                 showEditTip()

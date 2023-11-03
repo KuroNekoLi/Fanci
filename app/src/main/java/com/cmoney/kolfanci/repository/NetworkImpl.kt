@@ -86,7 +86,14 @@ class NetworkImpl(
     override suspend fun checkUploadFileStatus(
         externalId: String,
         fileType: String
-    ): Result<FileUploadStatusResponse> {
-        TODO("Not yet implemented")
-    }
+    ): Result<FileUploadStatusResponse> =
+        withContext(dispatcher) {
+            kotlin.runCatching {
+                centralFileService.checkUploadFileStatus(
+                    fileType = fileType,
+                    externalId = externalId
+                ).checkResponseBody()
+            }
+        }
+
 }

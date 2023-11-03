@@ -23,6 +23,29 @@ class UploadImageUseCase(
 ) {
     private val TAG = UploadImageUseCase::class.java.simpleName
 
+    suspend fun uploadImage2(uriLis: List<Uri>) = flow {
+        uriLis.forEach { uri ->
+            val uploadResponseBody = fetchImageUrl(uri)
+            uploadResponseBody?.let { uploadResponse ->
+                KLog.i(TAG, "uploadImage success:$uploadResponse")
+                emit(
+                    UploadFileItem(
+                        uri = uri,
+                        status = UploadFileItem.Status.Success,
+                        serverUrl = uploadResponse.url.orEmpty()
+                    )
+                )
+            } ?: kotlin.run {
+                emit(
+                    UploadFileItem(
+                        uri = uri,
+                        status = UploadFileItem.Status.Failed("uploadImage failed.")
+                    )
+                )
+            }
+        }
+    }
+
     suspend fun uploadImage(uriLis: List<Uri>) = flow {
         uriLis.forEach { uri ->
             val uploadResponseBody = fetchImageUrl(uri)

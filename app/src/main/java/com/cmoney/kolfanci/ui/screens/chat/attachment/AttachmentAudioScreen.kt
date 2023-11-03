@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getAudioDuration
 import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -40,7 +41,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun AttachmentAudioScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    audioList: List<Uri>,
+    audioList: List<UploadFileItem>,
     onClick: (Uri) -> Unit,
     onDelete: (Uri) -> Unit
 ) {
@@ -55,7 +56,7 @@ fun AttachmentAudioScreen(
             AttachmentAudioItem(
                 modifier = itemModifier,
                 audio = audio,
-                displayName = audio.getFileName(context).orEmpty(),
+                displayName = audio.uri.getFileName(context).orEmpty(),
                 onClick = onClick,
                 onDelete = onDelete
             )
@@ -66,7 +67,7 @@ fun AttachmentAudioScreen(
 @Composable
 fun AttachmentAudioItem(
     modifier: Modifier = Modifier,
-    audio: Uri,
+    audio: UploadFileItem,
     displayName: String,
     onClick: (Uri) -> Unit,
     onDelete: (Uri) -> Unit
@@ -77,8 +78,10 @@ fun AttachmentAudioItem(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(LocalColor.current.background)
-            .clickable {
-                onClick.invoke(audio)
+            .clickable(
+                enabled = audio.status == UploadFileItem.Status.Undefined
+            ) {
+                onClick.invoke(audio.uri)
             },
         contentAlignment = Alignment.CenterStart
     ) {
@@ -87,7 +90,6 @@ fun AttachmentAudioItem(
                 .fillMaxHeight()
                 .align(Alignment.TopEnd)
         ) {
-
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -123,7 +125,7 @@ fun AttachmentAudioItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = audio.getAudioDuration(context),
+                        text = audio.uri.getAudioDuration(context),
                         fontSize = 14.sp,
                         color = LocalColor.current.text.default_50
                     )
@@ -143,7 +145,7 @@ fun AttachmentAudioItem(
                 modifier = Modifier
                     .padding(10.dp)
                     .clickable {
-                        onDelete.invoke(audio)
+                        onDelete.invoke(audio.uri)
                     },
                 painter = painterResource(id = R.drawable.close), contentDescription = null
             )
@@ -159,7 +161,7 @@ fun AttachmentAudioItemPreview() {
             modifier = Modifier
                 .width(270.dp)
                 .height(75.dp),
-            audio = Uri.EMPTY,
+            audio = UploadFileItem(uri = Uri.EMPTY),
             displayName = "上課教材.mp3",
             onClick = {},
             onDelete = {}
@@ -176,9 +178,9 @@ fun AttachmentAudioScreenPreview() {
                 .width(270.dp)
                 .height(75.dp),
             audioList = listOf(
-                Uri.EMPTY,
-                Uri.EMPTY,
-                Uri.EMPTY
+                UploadFileItem(uri = Uri.EMPTY),
+                UploadFileItem(uri = Uri.EMPTY),
+                UploadFileItem(uri = Uri.EMPTY)
             ),
             onClick = {},
             onDelete = {}

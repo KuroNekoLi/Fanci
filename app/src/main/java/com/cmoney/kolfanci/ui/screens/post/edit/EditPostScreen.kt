@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +43,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,7 +63,6 @@ import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.AttachmentController
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
@@ -116,11 +118,36 @@ fun EditPostScreen(
     //附加檔案
     val attachment by attachmentViewModel.attachmentList.collectAsState()
 
+    //是否呈現上傳中畫面
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+
     //編輯貼文, 設定初始化資料
     LaunchedEffect(Unit) {
         if (editPost != null) {
             viewModel.editPost(editPost)
         }
+    }
+
+    //是否全部File上傳完成
+    val attachmentUploadFinish by attachmentViewModel.uploadComplete.collectAsState()
+
+    //有上傳失敗的檔案
+    val hasUploadFailedFile by attachmentViewModel.uploadFailed.collectAsState()
+
+    if (attachmentUploadFinish.first) {
+        isLoading = false
+        val text = attachmentUploadFinish.second?.toString().orEmpty()
+
+        //todo
+        if (editPost != null) {
+            viewModel.onUpdatePostClick(editPost, text)
+        } else {
+            viewModel.onPost(text, attachment)
+        }
+
+        attachmentViewModel.finishPost()
     }
 
     EditPostScreenView(
@@ -136,17 +163,16 @@ fun EditPostScreen(
         },
         onPostClick = { text ->
             AppUserLogger.getInstance().log(Clicked.PostPublish)
-
-            if (editPost != null) {
-                viewModel.onUpdatePostClick(editPost, text)
-            } else {
-                viewModel.onPost(text)
-            }
+            isLoading = true
+            attachmentViewModel.upload(
+                other = text
+            )
         },
         onBack = {
             showSaveTip = true
         },
-        showLoading = (uiState == UiState.ShowLoading),
+//        showLoading = (uiState == UiState.ShowLoading),
+        showLoading = isLoading,
         onAttachmentFilePicker = {
             showFilePicker = true
         },
@@ -171,7 +197,7 @@ fun EditPostScreen(
             },
             onAttach = {
                 showImagePick = false
-                viewModel.addAttachImage(it)
+                attachmentViewModel.attachment(it)
             }
         )
     }
@@ -221,6 +247,27 @@ fun EditPostScreen(
                 message = this,
                 isPin = editPost != null
             )
+        )
+    }
+
+    if (hasUploadFailedFile) {
+        isLoading = false
+        DialogScreen(
+            title = stringResource(id = R.string.post_fail_title),
+            subTitle = stringResource(id = R.string.post_fail_desc),
+            onDismiss = {
+                attachmentViewModel.clearUploadFailed()
+            },
+            content = {
+                BlueButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.back)
+                ) {
+                    attachmentViewModel.clearUploadFailed()
+                }
+            }
         )
     }
 
@@ -450,11 +497,22 @@ private fun EditPostScreenView(
             }
 
             if (showLoading) {
-                CircularProgressIndicator(
+                Box(
                     modifier = Modifier
-                        .size(45.dp),
-                    color = LocalColor.current.primary
-                )
+                        .fillMaxSize()
+                        .background(color = colorResource(id = R.color.color_9920262F))
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) { },
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(45.dp),
+                        color = LocalColor.current.primary
+                    )
+                }
             }
         }
     }
