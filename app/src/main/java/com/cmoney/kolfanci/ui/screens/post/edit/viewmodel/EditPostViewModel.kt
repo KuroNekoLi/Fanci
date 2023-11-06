@@ -78,32 +78,7 @@ class EditPostViewModel(
                 return@launch
             }
 
-//            loading()
-
-//            //附加圖片, 獲取圖片 Url
-//            //TODO: 先處理圖片, 之後會改新 api
-//            val imagesUrl = attachment.filter {
-//                it.first == AttachmentType.Image
-//            }.map { it.second.serverUrl }
-
             sendPost(text, attachment)
-
-//            if (_attachImages.value.isNotEmpty()) {
-//                uploadImages(_attachImages.value, object : MessageViewModel.ImageUploadCallback {
-//                    override fun complete(images: List<String>) {
-//                        KLog.i(TAG, "all image upload complete:" + images.size)
-//                        sendPost(text, images)
-//                    }
-//
-//                    override fun onFailure(e: Throwable) {
-//                        KLog.e(TAG, "onFailure:$e")
-//                        dismissLoading()
-//                    }
-//                })
-//                _attachImages.value = emptyList()
-//            } else {
-//                sendPost(text, emptyList())
-//            }
         }
     }
 
