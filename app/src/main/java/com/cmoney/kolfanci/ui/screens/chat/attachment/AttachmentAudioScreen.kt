@@ -32,11 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.getAudioDuration
+import com.cmoney.kolfanci.extension.getAudioDisplayDuration
 import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.model.usecase.ReSendFile
-import com.cmoney.kolfanci.model.usecase.UploadFileItem
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -135,7 +135,7 @@ fun AttachmentAudioItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = audio.uri.getAudioDuration(context),
+                            text = audio.uri.getAudioDisplayDuration(context),
                             fontSize = 14.sp,
                             color = LocalColor.current.text.default_50
                         )

@@ -5,11 +5,11 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.extension.getAttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
-import com.cmoney.kolfanci.model.usecase.ReSendFile
-import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -8,12 +8,12 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
-import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
@@ -78,15 +78,15 @@ class EditPostViewModel(
                 return@launch
             }
 
-            loading()
+//            loading()
 
-            //附加圖片, 獲取圖片 Url
-            //TODO: 先處理圖片, 之後會改新 api
-            val imagesUrl = attachment.filter {
-                it.first == AttachmentType.Image
-            }.map { it.second.serverUrl }
+//            //附加圖片, 獲取圖片 Url
+//            //TODO: 先處理圖片, 之後會改新 api
+//            val imagesUrl = attachment.filter {
+//                it.first == AttachmentType.Image
+//            }.map { it.second.serverUrl }
 
-            sendPost(text, imagesUrl)
+            sendPost(text, attachment)
 
 //            if (_attachImages.value.isNotEmpty()) {
 //                uploadImages(_attachImages.value, object : MessageViewModel.ImageUploadCallback {
@@ -107,14 +107,20 @@ class EditPostViewModel(
         }
     }
 
-    private fun sendPost(text: String, images: List<String>) {
+    /**
+     * 發送貼文
+     *
+     * @param text 內文
+     * @param attachment 附加檔案
+     */
+    private fun sendPost(text: String, attachment: List<Pair<AttachmentType, UploadFileItem>>) {
         KLog.i(TAG, "sendPost")
         viewModelScope.launch {
             loading()
             postUseCase.writePost(
                 channelId = channelId,
                 text = text,
-                images = images
+                attachment = attachment
             ).fold({
                 dismissLoading()
                 KLog.i(TAG, "sendPost complete.")

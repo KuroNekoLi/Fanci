@@ -11,11 +11,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.model.usecase.ReSendFile
-import com.cmoney.kolfanci.model.usecase.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentFileItem
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
 @Composable

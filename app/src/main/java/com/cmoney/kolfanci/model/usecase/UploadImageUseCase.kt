@@ -8,6 +8,7 @@ import com.cmoney.backend2.centralizedimage.service.api.upload.GenreAndSubGenre
 import com.cmoney.backend2.centralizedimage.service.api.upload.UploadResponseBody
 import com.cmoney.compress_image.CompressSetting
 import com.cmoney.compress_image.resizeAndCompressAndRotateImage
+import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.flow
 import java.io.File

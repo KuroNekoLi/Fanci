@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getDisplayFileSize
 import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.model.usecase.ReSendFile
-import com.cmoney.kolfanci.model.usecase.UploadFileItem
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 

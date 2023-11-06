@@ -56,21 +56,6 @@ data class ImageAttachState(
 )
 
 /**
- * 附加檔案 fanci 支援類型
- */
-sealed class AttachmentType {
-    object Image : AttachmentType()
-
-    object Audio : AttachmentType()
-
-    object Txt : AttachmentType()
-
-    object Pdf : AttachmentType()
-
-    object Unknown : AttachmentType()
-}
-
-/**
  * 處理聊天室 相關訊息
  */
 class MessageViewModel(

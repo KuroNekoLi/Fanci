@@ -6,7 +6,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -16,7 +16,7 @@ import java.io.InputStream
  *  取得 顯示檔案大小 format
  */
 fun Uri.getDisplayFileSize(context: Context): String {
-    val fileSize = getFileSize(context, this) ?: 0
+    val fileSize = getFileSize(context) ?: 0
 
     val sizeInKB = fileSize.toDouble() / 1024.0
     val sizeInMB = sizeInKB / 1024.0
@@ -30,8 +30,8 @@ fun Uri.getDisplayFileSize(context: Context): String {
     }
 }
 
-private fun getFileSize(context: Context, uri: Uri): Long? {
-    val cursor = context.contentResolver.query(uri, null, null, null, null)
+fun Uri.getFileSize(context: Context): Long? {
+    val cursor = context.contentResolver.query(this, null, null, null, null)
     val filePath = cursor?.use {
         if (it.moveToFirst()) {
             val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
@@ -175,19 +175,31 @@ fun Uri.getFileType(context: Context): String {
  * @param context
  * @return 字串 -> 00:00:00
  */
-fun Uri.getAudioDuration(context: Context): String {
+fun Uri.getAudioDisplayDuration(context: Context): String {
+    try {
+        val durationMillis = getAudioDuration(context)
+        return formatDuration(durationMillis)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return "00:00:00"
+}
+
+/**
+ * 取得音檔長度
+ */
+fun Uri.getAudioDuration(context: Context): Long {
     val retriever = MediaMetadataRetriever()
     try {
         retriever.setDataSource(context, this)
         val durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        val durationMillis = durationStr?.toLong() ?: 0L
-        return formatDuration(durationMillis)
+        return durationStr?.toLong() ?: 0L
     } catch (e: Exception) {
         e.printStackTrace()
     } finally {
         retriever.release()
     }
-    return "00:00:00"
+    return 0L
 }
 
 private fun formatDuration(milliseconds: Long): String {

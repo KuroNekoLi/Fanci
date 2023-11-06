@@ -1,12 +1,11 @@
 package com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker
 
 import android.app.Application
-import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.model.usecase.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 
 class MediaPickerBottomSheetViewModel(
     val context: Application
