@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.MediaType
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -24,23 +23,19 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param resourceLink 
- * @param type 
- * @param isNeedAuthenticate 
+ * @param width 
+ * @param height 
  */
 @Parcelize
 
 
-data class IMedia (
+data class ImageContent (
 
-    @Json(name = "resourceLink")
-    val resourceLink: kotlin.String? = null,
+    @Json(name = "width")
+    val width: kotlin.Int? = null,
 
-    @Json(name = "type")
-    val type: MediaType? = null,
-
-    @Json(name = "isNeedAuthenticate")
-    val isNeedAuthenticate: kotlin.Boolean? = null
+    @Json(name = "height")
+    val height: kotlin.Int? = null
 
 ) : Parcelable
 

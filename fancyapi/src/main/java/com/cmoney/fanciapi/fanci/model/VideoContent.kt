@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.MediaType
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -24,23 +23,27 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param resourceLink 
- * @param type 
- * @param isNeedAuthenticate 
+ * @param fileName 
+ * @param fileSize 
+ * @param duration 
+ * @param thumbnailUrl 
  */
 @Parcelize
 
 
-data class IMedia (
+data class VideoContent (
 
-    @Json(name = "resourceLink")
-    val resourceLink: kotlin.String? = null,
+    @Json(name = "fileName")
+    val fileName: kotlin.String? = null,
 
-    @Json(name = "type")
-    val type: MediaType? = null,
+    @Json(name = "fileSize")
+    val fileSize: kotlin.Long? = null,
 
-    @Json(name = "isNeedAuthenticate")
-    val isNeedAuthenticate: kotlin.Boolean? = null
+    @Json(name = "duration")
+    val duration: kotlin.Long? = null,
+
+    @Json(name = "thumbnailUrl")
+    val thumbnailUrl: kotlin.String? = null
 
 ) : Parcelable
 

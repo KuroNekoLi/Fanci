@@ -15,7 +15,12 @@
 
 package com.cmoney.fanciapi.fanci.model
 
+import com.cmoney.fanciapi.fanci.model.AudioContent
+import com.cmoney.fanciapi.fanci.model.ImageContent
 import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.PdfContent
+import com.cmoney.fanciapi.fanci.model.TxtContent
+import com.cmoney.fanciapi.fanci.model.VideoContent
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -26,6 +31,12 @@ import kotlinx.parcelize.Parcelize
  *
  * @param resourceLink 
  * @param type 
+ * @param isNeedAuthenticate 
+ * @param image 
+ * @param audio 
+ * @param video 
+ * @param txt 
+ * @param pdf 
  */
 @Parcelize
 
@@ -36,7 +47,25 @@ data class Media (
     val resourceLink: kotlin.String? = null,
 
     @Json(name = "type")
-    val type: MediaType? = null
+    val type: MediaType? = null,
+
+    @Json(name = "isNeedAuthenticate")
+    val isNeedAuthenticate: kotlin.Boolean? = null,
+
+    @Json(name = "image")
+    val image: ImageContent? = null,
+
+    @Json(name = "audio")
+    val audio: AudioContent? = null,
+
+    @Json(name = "video")
+    val video: VideoContent? = null,
+
+    @Json(name = "txt")
+    val txt: TxtContent? = null,
+
+    @Json(name = "pdf")
+    val pdf: PdfContent? = null
 
 ) : Parcelable
 

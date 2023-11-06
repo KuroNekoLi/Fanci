@@ -1422,7 +1422,7 @@
         "tags": [
           "Channel"
         ],
-        "summary": "取得角色清單 (不包含VIP)",
+        "summary": "取得頻道管理員(被設定為管理員權限的角色)清單",
         "parameters": [
           {
             "name": "channelId",
@@ -1601,49 +1601,6 @@
           {
             "oauth2": [
               "PERMISSION_指派頻道管理員_0_channelId_channelGroupId",
-              "user"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/v1/Channel/{channelId}/VipRole": {
-      "get": {
-        "tags": [
-          "Channel"
-        ],
-        "summary": "取得VIP角色清單",
-        "parameters": [
-          {
-            "name": "channelId",
-            "in": "path",
-            "description": "頻道Id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "未驗證"
-          },
-          "403": {
-            "description": "沒有權限"
-          },
-          "200": {
-            "description": "成功"
-          },
-          "404": {
-            "description": "找不到該頻道"
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
               "user"
             ]
           }
@@ -2123,6 +2080,49 @@
         ]
       }
     },
+    "/api/v1/ChannelTab/All": {
+      "get": {
+        "tags": [
+          "ChannelTab"
+        ],
+        "summary": "取得所有種類頻道功能區",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelTabsSortParam"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelTabsSortParam"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelTabsSortParam"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/ChannelTab/{channelId}/Tab": {
       "get": {
         "tags": [
@@ -2168,9 +2168,127 @@
             "description": "Forbidden"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ChannelTab/{channelId}/Tabs": {
+      "get": {
+        "tags": [
+          "ChannelTab"
+        ],
+        "summary": "取得頻道功能區啟用狀態",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelTabsSortParam"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelTabsSortParam"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelTabsSortParam"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ChannelTab/{channelId}/Tabs/Sort": {
+      "put": {
+        "tags": [
+          "ChannelTab"
+        ],
+        "summary": "編輯頻道功能區順序 __________🔒 編輯頻道",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "頻道Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelTabsSortParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelTabsSortParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelTabsSortParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "成功"
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "400": {
+            "description": "參數錯誤 功能區數量不符合"
+          },
+          "404": {
+            "description": "找不到該頻道"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "PERMISSION_編輯頻道_0_channelId_channelGroupId",
               "user"
             ]
           }
@@ -3519,6 +3637,43 @@
           {
             "oauth2": [
               "PERMISSION_刪除角色_0_groupId_none",
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Group/{groupID}/ResetUnreadCount": {
+      "put": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "清空使用者社團未讀數",
+        "parameters": [
+          {
+            "name": "groupID",
+            "in": "path",
+            "description": "頻道ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
               "user"
             ]
           }
@@ -7049,6 +7204,24 @@
         ],
         "type": "string"
       },
+      "AudioContent": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "AuthBulliten": {
         "type": "object",
         "properties": {
@@ -7351,9 +7524,6 @@
             "description": "頻道創立者",
             "nullable": true
           },
-          "channelType": {
-            "$ref": "#/components/schemas/ChannelTabType"
-          },
           "name": {
             "type": "string",
             "description": "頻道命名",
@@ -7392,6 +7562,9 @@
             },
             "description": "頻道有啟用的聊天室版面",
             "nullable": true
+          },
+          "channelType": {
+            "$ref": "#/components/schemas/ChannelTabType"
           }
         },
         "additionalProperties": false,
@@ -7453,9 +7626,6 @@
       "ChannelParam": {
         "type": "object",
         "properties": {
-          "channelType": {
-            "$ref": "#/components/schemas/ChannelTabType"
-          },
           "name": {
             "type": "string",
             "description": "頻道名稱",
@@ -7463,6 +7633,14 @@
           },
           "privacy": {
             "$ref": "#/components/schemas/ChannelPrivacy"
+          },
+          "tabs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChannelTabType"
+            },
+            "description": "頻道開啟類別(順序依照提供的順序排序)",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -7471,6 +7649,15 @@
       "ChannelPermission": {
         "type": "object",
         "properties": {
+          "canRead": {
+            "type": "boolean"
+          },
+          "canReply": {
+            "type": "boolean"
+          },
+          "canPost": {
+            "type": "boolean"
+          },
           "canEmoji": {
             "type": "boolean"
           },
@@ -7487,15 +7674,6 @@
             "type": "boolean"
           },
           "canTakeback": {
-            "type": "boolean"
-          },
-          "canRead": {
-            "type": "boolean"
-          },
-          "canReply": {
-            "type": "boolean"
-          },
-          "canPost": {
             "type": "boolean"
           }
         },
@@ -7515,6 +7693,21 @@
           "Bulletinboard"
         ],
         "type": "string"
+      },
+      "ChannelTabsSortParam": {
+        "type": "object",
+        "properties": {
+          "tabs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChannelTabType"
+            },
+            "description": "頻道功能區排序",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "設定頻道功能區排序物件"
       },
       "ChannelTabsStatus": {
         "type": "object",
@@ -8397,6 +8590,9 @@
           },
           "type": {
             "$ref": "#/components/schemas/MediaType"
+          },
+          "isNeedAuthenticate": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -8482,6 +8678,20 @@
         },
         "additionalProperties": false
       },
+      "ImageContent": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "Media": {
         "type": "object",
         "properties": {
@@ -8491,6 +8701,24 @@
           },
           "type": {
             "$ref": "#/components/schemas/MediaType"
+          },
+          "isNeedAuthenticate": {
+            "type": "boolean"
+          },
+          "image": {
+            "$ref": "#/components/schemas/ImageContent"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/AudioContent"
+          },
+          "video": {
+            "$ref": "#/components/schemas/VideoContent"
+          },
+          "txt": {
+            "$ref": "#/components/schemas/TxtContent"
+          },
+          "pdf": {
+            "$ref": "#/components/schemas/PdfContent"
           }
         },
         "additionalProperties": false
@@ -8515,7 +8743,10 @@
       "MediaType": {
         "enum": [
           "Image",
-          "Video"
+          "Video",
+          "Audio",
+          "Txt",
+          "Pdf"
         ],
         "type": "string"
       },
@@ -8598,6 +8829,24 @@
           },
           "isAdd": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PdfContent": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -9012,6 +9261,24 @@
         },
         "additionalProperties": false
       },
+      "TxtContent": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateIsNeedApprovalParam": {
         "type": "object",
         "properties": {
@@ -9161,6 +9428,28 @@
         },
         "additionalProperties": false,
         "description": "使用者陣列參數"
+      },
+      "VideoContent": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "VipSale": {
         "type": "object",

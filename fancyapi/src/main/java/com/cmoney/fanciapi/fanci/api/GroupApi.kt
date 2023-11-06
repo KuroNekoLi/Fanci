@@ -34,6 +34,20 @@ interface GroupApi {
     suspend fun apiV1GroupGet(@Query("startWeight") startWeight: kotlin.Long? = 2147483647L, @Query("pageSize") pageSize: kotlin.Int? = 100, @Query("orderType") orderType: OrderType? = null): Response<GroupPaging>
 
     /**
+     * 清空使用者社團未讀數
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param groupID 頻道ID
+     * @return [Unit]
+     */
+    @PUT("api/v1/Group/{groupID}/ResetUnreadCount")
+    suspend fun apiV1GroupGroupIDResetUnreadCountPut(@Path("groupID") groupID: kotlin.String): Response<Unit>
+
+    /**
      * 新增社團 頻道分類 __________🔒 建立分類
      * 
      * Responses:

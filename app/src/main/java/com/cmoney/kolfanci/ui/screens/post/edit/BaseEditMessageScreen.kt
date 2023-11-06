@@ -104,6 +104,7 @@ fun BaseEditMessageScreen(
 ) {
     var showImagePick by remember { mutableStateOf(false) }
 
+    //TODO, 改為統一上傳格式
     val attachImages by viewModel.attachImages.collectAsState()
 
     val uiState by viewModel.uiState.collectAsState()
@@ -130,7 +131,8 @@ fun BaseEditMessageScreen(
             viewModel.onDeleteImageClick(it)
         },
         onPostClick = { text ->
-            viewModel.onUpdatePostClick(editMessage, text)
+            //todo
+            viewModel.onUpdatePostClick(editMessage, text, emptyList())
         },
         onBack = {
             showSaveTip = true
