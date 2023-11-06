@@ -11,6 +11,7 @@ import com.cmoney.fanciapi.fanci.model.TxtContent
 import com.cmoney.kolfanci.extension.getAudioDuration
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.getFileSize
+import com.socks.library.KLog
 
 /**
  * 將附加檔案 List 轉為, 上傳用的 Media List
@@ -45,19 +46,21 @@ fun List<Pair<AttachmentType, UploadFileItem>>.toUploadMedia(context: Context): 
 
             AttachmentType.Pdf -> Media(
                 resourceLink = serverUrl,
-                type = MediaType.image,
+                type = MediaType.pdf,
                 pdf = PdfContent(
                     fileName = fileName,
-                    fileSize = fileSize
+                    fileSize = fileSize,
+                    thumbnailUrl = ""
                 )
             )
 
             AttachmentType.Txt -> Media(
                 resourceLink = serverUrl,
-                type = MediaType.image,
+                type = MediaType.txt,
                 txt = TxtContent(
                     fileName = fileName,
-                    fileSize = fileSize
+                    fileSize = fileSize,
+                    thumbnailUrl = ""
                 )
             )
 
@@ -124,13 +127,13 @@ data class UploadFileItem(
  * 重新上傳檔案 info
  *
  * @param type 檔案類型
- * @param file 檔案物件
+ * @param file 檔案
  * @param title dialog title
  * @param description dialog content
  */
 data class ReSendFile(
     val type: AttachmentType,
-    val file: UploadFileItem,
+    val file: Uri,
     val title: String,
     val description: String
 )

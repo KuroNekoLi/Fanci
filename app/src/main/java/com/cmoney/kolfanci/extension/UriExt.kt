@@ -17,17 +17,7 @@ import java.io.InputStream
  */
 fun Uri.getDisplayFileSize(context: Context): String {
     val fileSize = getFileSize(context) ?: 0
-
-    val sizeInKB = fileSize.toDouble() / 1024.0
-    val sizeInMB = sizeInKB / 1024.0
-    val sizeInGB = sizeInMB / 1024.0
-
-    return when {
-        fileSize < 1024 -> "$fileSize bytes"
-        sizeInKB < 1024 -> String.format("%.2f KB", sizeInKB)
-        sizeInMB < 1024 -> String.format("%.2f MB", sizeInMB)
-        else -> String.format("%.2f GB", sizeInGB)
-    }
+    return fileSize.getDisplayFileSize()
 }
 
 fun Uri.getFileSize(context: Context): Long? {
@@ -209,3 +199,8 @@ private fun formatDuration(milliseconds: Long): String {
 
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
+
+/**
+ * 判斷 Uri 是否為網址
+ */
+fun Uri.isURL(): Boolean = this.scheme?.startsWith("http") == true

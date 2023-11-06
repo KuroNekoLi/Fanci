@@ -93,6 +93,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
@@ -433,6 +434,7 @@ fun PostInfoScreen(
 
     PostInfoScreenView(
         modifier = modifier,
+        navController = navController,
         post = postData,
         isPinPost = isPinPost,
         imageAttachList = imageAttachList,
@@ -630,6 +632,7 @@ fun PostInfoScreen(
 @Composable
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
     post: BulletinboardMessage,
     isPinPost: Boolean,
     imageAttachList: List<Uri>,
@@ -668,6 +671,7 @@ private fun PostInfoScreenView(
                     //貼文
                     item {
                         BasePostContentScreen(
+                            navController = navController,
                             post = post,
                             defaultDisplayLine = Int.MAX_VALUE,
                             bottomContent = {
@@ -746,11 +750,13 @@ private fun PostInfoScreenView(
                                 )
                             } else {
                                 BasePostContentScreen(
+                                    navController = navController,
                                     post = comment,
                                     contentModifier = Modifier.padding(start = 40.dp),
                                     hasMoreAction = true,
                                     bottomContent = {
                                         CommentBottomContent(
+                                            navController = navController,
                                             comment = comment,
                                             reply = replyMapData[comment.id],
                                             listener = commentBottomContentListener
@@ -910,6 +916,7 @@ private fun EmptyCommentView() {
  */
 @Composable
 private fun CommentBottomContent(
+    navController: DestinationsNavigator,
     comment: BulletinboardMessage,
     reply: ReplyData?,
     listener: CommentBottomContentListener
@@ -966,6 +973,7 @@ private fun CommentBottomContent(
                     )
                 } else {
                     BasePostContentScreen(
+                        navController = navController,
                         post = reply,
                         defaultDisplayLine = Int.MAX_VALUE,
                         contentModifier = Modifier.padding(start = 40.dp),
@@ -1020,7 +1028,8 @@ private fun CommentBottomContent(
 fun CommentBottomContentPreview() {
     FanciTheme {
         CommentBottomContent(
-            BulletinboardMessage(),
+            navController = EmptyDestinationsNavigator,
+            comment = BulletinboardMessage(),
             reply = ReplyData(
                 emptyList(), false
             ),
@@ -1117,6 +1126,7 @@ fun CommentReplayScreenPreview() {
 fun PostInfoScreenPreview() {
     FanciTheme {
         PostInfoScreenView(
+            navController = EmptyDestinationsNavigator,
             post = PostViewModel.mockPost,
             imageAttachList = emptyList(),
             comments = emptyList(),

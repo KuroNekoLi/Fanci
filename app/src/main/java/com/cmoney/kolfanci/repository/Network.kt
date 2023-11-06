@@ -42,4 +42,9 @@ interface Network {
      * 上傳檔案 狀態檢查, 確認有上傳 完成
      */
     suspend fun checkUploadFileStatus(externalId: String, fileType: String): Result<FileUploadStatusResponse>
+
+    /**
+     * 取得 網址內容
+     */
+    suspend fun getContent(url: String): Result<String>
 }

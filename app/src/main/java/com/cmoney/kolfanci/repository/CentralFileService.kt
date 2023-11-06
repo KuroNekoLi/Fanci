@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.repository
 
-import android.net.Uri
 import com.cmoney.kolfanci.repository.response.FileUploadResponse
 import com.cmoney.kolfanci.repository.response.FileUploadStatusResponse
 import okhttp3.MultipartBody
@@ -11,6 +10,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Url
 
 interface CentralFileService {
 
@@ -35,4 +35,8 @@ interface CentralFileService {
         @Path("externalId") externalId: String
     ): Response<FileUploadStatusResponse>
 
+    @GET
+    suspend fun getContent(
+        @Url url: String
+    ): Response<String>
 }

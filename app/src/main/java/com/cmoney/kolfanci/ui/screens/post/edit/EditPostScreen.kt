@@ -280,7 +280,6 @@ fun EditPostScreen(
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->
         val file = reSendFile.file
-        val fileUri = file.uri
 
         DialogScreen(
             title = reSendFile.title,
@@ -297,7 +296,7 @@ fun EditPostScreen(
                         text = stringResource(id = R.string.remove),
                         borderColor = LocalColor.current.text.default_100
                     ) {
-                        attachmentViewModel.removeAttach(fileUri)
+                        attachmentViewModel.removeAttach(file)
                         reSendFileClick = null
                     }
 

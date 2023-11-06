@@ -131,4 +131,10 @@ class AttachmentUseCase(
             status = UploadFileItem.Status.Failed("upload failed.")
         )
     }
+
+
+    /**
+     * 取得 Url 內容
+     */
+    suspend fun getUrlContent(url: String) = network.getContent(url)
 }

@@ -1,8 +1,10 @@
 package com.cmoney.kolfanci.ui.screens.post
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -14,6 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -33,30 +39,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
-import com.cmoney.fancylog.model.data.Clicked
-import com.cmoney.fancylog.model.data.From
+import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.extension.getFleSize
+import com.cmoney.kolfanci.extension.toAttachmentType
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
-import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.AttachmentController
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreenV2
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
 import com.google.accompanist.flowlayout.FlowRow
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 
@@ -67,6 +79,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun BasePostContentScreen(
     modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
     post: BulletinboardMessage,
     defaultDisplayLine: Int = 4,
     contentModifier: Modifier = Modifier,
@@ -80,6 +93,8 @@ fun BasePostContentScreen(
     onTextExpandClick: (() -> Unit)? = null,
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
+    val context = LocalContext.current
+
     val scope = rememberCoroutineScope()
     //Popup emoji selector
     val tooltipStateRich = remember { RichTooltipState() }
@@ -187,21 +202,67 @@ fun BasePostContentScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            //Image attach
-            if (post.content?.medias?.isNotEmpty() == true) {
+            //附加檔案
+            post.content?.medias?.let { medias ->
+                //========= Image =========
+                val imageUrl = medias.filter {
+                    it.type == MediaType.image
+                }.map {
+                    it.resourceLink.orEmpty()
+                }
+
                 MessageImageScreenV2(
-                    images = post.content?.medias?.map {
-                        it.resourceLink.orEmpty()
-                    }.orEmpty(),
+                    images = imageUrl,
                     multiImageHeight = multiImageHeight,
                     onImageClick = {
                         onImageClick?.invoke()
                         AppUserLogger.getInstance().log(Page.PostImage)
                     }
                 )
-            }
 
-            Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(15.dp))
+
+                //========= Other File =========
+                val otherUrl = medias.filter {
+                    it.type != MediaType.image && it.type != MediaType.audio
+                }
+
+                LazyRow(
+                    modifier = modifier.padding(start = 10.dp, end = 10.dp),
+                    state = rememberLazyListState(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(otherUrl) { media ->
+                        val fileUrl = media.resourceLink
+                        val mediaType = media.type
+
+                        AttachmentFileItem(
+                            modifier = Modifier
+                                .width(270.dp)
+                                .height(75.dp),
+                            file = Uri.parse(fileUrl),
+                            fileSize = media.getFleSize(),
+                            isItemClickable = true,
+                            isItemCanDelete = false,
+                            isShowResend = false,
+                            displayName = media.getFileName(),
+                            onClick = {
+                                AttachmentController.onAttachmentClick(
+                                    navController = navController,
+                                    uri = Uri.parse(fileUrl),
+                                    context = context,
+                                    attachmentType = mediaType?.toAttachmentType(),
+                                    fileName = media.getFileName().orEmpty()
+                                )
+                            },
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                //========= Audio File =========
+            }
 
             //Emoji
             FlowRow(
@@ -320,7 +381,8 @@ fun PostContentScreenPreview() {
             },
             onMoreClick = {},
             onEmojiClick = {},
-            onAddNewEmojiClick = {}
+            onAddNewEmojiClick = {},
+            navController = EmptyDestinationsNavigator
         )
     }
 }

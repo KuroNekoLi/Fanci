@@ -149,7 +149,7 @@ private fun AttachImageItem(
                             onResend?.invoke(
                                 ReSendFile(
                                     type = AttachmentType.Image,
-                                    file = uploadFileItem,
+                                    file = uploadFileItem.uri,
                                     title = context.getString(R.string.image_upload_fail_title),
                                     description = context.getString(R.string.image_upload_fail_desc)
                                 )

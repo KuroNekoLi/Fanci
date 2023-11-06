@@ -14,10 +14,13 @@ import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.attachment.UploadFileItem
-import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentAudioItem
-import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentFileItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
+/**
+ * 發佈貼文 附加檔案 UI.
+ */
 @Composable
 fun PostOtherAttachmentScreen(
     modifier: Modifier = Modifier,
@@ -43,7 +46,10 @@ fun PostOtherAttachmentScreen(
                     item {
                         AttachmentAudioItem(
                             modifier = itemModifier,
-                            audio = item,
+                            file = item.uri,
+                            isItemClickable = (item.status == UploadFileItem.Status.Undefined),
+                            isItemCanDelete = (item.status !is UploadFileItem.Status.Failed),
+                            isShowResend = (item.status is UploadFileItem.Status.Failed),
                             displayName = item.uri.getFileName(context).orEmpty(),
                             onClick = onClick,
                             onDelete = onDelete,
@@ -56,7 +62,10 @@ fun PostOtherAttachmentScreen(
                     item {
                         AttachmentFileItem(
                             modifier = itemModifier,
-                            file = item,
+                            file = item.uri,
+                            isItemClickable = (item.status == UploadFileItem.Status.Undefined),
+                            isItemCanDelete = (item.status !is UploadFileItem.Status.Failed),
+                            isShowResend = (item.status is UploadFileItem.Status.Failed),
                             displayName = item.uri.getFileName(context).orEmpty(),
                             onClick = onClick,
                             onDelete = onDelete,

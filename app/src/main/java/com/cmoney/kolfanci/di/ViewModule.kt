@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.di
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
@@ -24,6 +25,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReport
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
+import com.cmoney.kolfanci.ui.screens.media.txt.TextPreviewViewModel
 import com.cmoney.kolfanci.ui.screens.my.MyScreenViewModel
 import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
@@ -35,6 +37,7 @@ import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
 import com.cmoney.kolfanci.ui.screens.shared.vip.viewmodel.VipPlanViewModel
 import org.koin.android.ext.koin.androidApplication
+import org.koin.androidx.compose.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -181,6 +184,11 @@ val viewModule = module {
             context = androidApplication(),
             attachmentUseCase = get(),
             uploadImageUseCase = get()
+        )
+    }
+    viewModel{
+        TextPreviewViewModel(
+            attachmentUseCase = get()
         )
     }
 }

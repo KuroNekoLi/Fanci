@@ -153,16 +153,18 @@ class AttachmentViewModel(
         otherFiles: List<UploadFileItem>,
         other: Any? = null
     ) {
+        val allItems = imageFiles.reversed().distinctBy {
+            it.uri
+        } + otherFiles.reversed().distinctBy {
+            it.uri
+        }
+
         val newList = _attachmentList.value.map {
             val key = it.first
             val oldItem = it.second
 
-            val newStatusItem = imageFiles.firstOrNull { newItem ->
+            val newStatusItem = allItems.firstOrNull { newItem ->
                 newItem.uri == oldItem.uri
-            } ?: kotlin.run {
-                otherFiles.firstOrNull { newItem ->
-                    newItem.uri == oldItem.uri
-                }
             }
 
             if (newStatusItem != null) {
@@ -235,14 +237,13 @@ class AttachmentViewModel(
         KLog.i(TAG, "onResend:$uploadFileItem")
         viewModelScope.launch {
             val file = uploadFileItem.file
-            val fileUri = file.uri
 
             var allImages = emptyList<UploadFileItem>()
             if (uploadFileItem.type == AttachmentType.Image) {
-                allImages = uploadImageUseCase.uploadImage2(listOf(fileUri)).toList()
+                allImages = uploadImageUseCase.uploadImage2(listOf(file)).toList()
             }
 
-            val allOtherFiles = attachmentUseCase.uploadFile(listOf(fileUri)).toList()
+            val allOtherFiles = attachmentUseCase.uploadFile(listOf(file)).toList()
 
             updateAttachmentList(
                 imageFiles = allImages,

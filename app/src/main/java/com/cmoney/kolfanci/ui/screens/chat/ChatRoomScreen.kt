@@ -342,12 +342,19 @@ private fun ChatRoomScreenView(
 
 object AttachmentController {
     private val TAG = "AttachmentController"
+
     /**
      * 點擊附加檔案預覽
      */
-    fun onAttachmentClick(navController: DestinationsNavigator,uri: Uri, context: Context) {
+    fun onAttachmentClick(
+        navController: DestinationsNavigator,
+        uri: Uri,
+        context: Context,
+        attachmentType: AttachmentType? = null,
+        fileName: String = ""
+    ) {
         KLog.i(TAG, "onAttachmentClick:$uri")
-        when (uri.getAttachmentType(context)) {
+        when (attachmentType ?: uri.getAttachmentType(context)) {
             AttachmentType.Audio -> {
                 navController.navigate(
                     AudioPreviewScreenDestination(
@@ -380,7 +387,8 @@ object AttachmentController {
             AttachmentType.Txt -> {
                 navController.navigate(
                     TextPreviewScreenDestination(
-                        uri = uri
+                        uri = uri,
+                        fileName = fileName
                     )
                 )
             }
