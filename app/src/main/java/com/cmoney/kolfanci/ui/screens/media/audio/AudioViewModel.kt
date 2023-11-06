@@ -12,6 +12,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.isURL
 import com.cmoney.kolfanci.service.media.EMPTY_PLAYBACK_STATE
 import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.service.media.NOTHING_PLAYING
@@ -75,7 +76,7 @@ class AudioViewModel(
     private var isStopUpdatePosition = false
 
     init {
-        if (uri != Uri.EMPTY) {
+        if (uri != Uri.EMPTY && !uri.isURL()) {
             getAudioFileDuration(uri)
         }
 
@@ -261,5 +262,13 @@ class AudioViewModel(
             transportControls.setPlaybackSpeed(speed)
             _speedTitle.value = speed.toString() + "x"
         }
+    }
+
+    /**
+     * 設定音檔長度
+     */
+    fun setDuration(duration: Long) {
+        KLog.i(TAG, "setDuration:$duration")
+        _audioDuration.value = duration
     }
 }

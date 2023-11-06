@@ -24,6 +24,7 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -64,7 +65,9 @@ fun AudioPreviewScreen(
         parameters = {
             parametersOf(uri)
         }
-    )
+    ),
+    duration: Long = 0L,
+    title: String = ""
 ) {
 
     //播放按鈕 顯示樣式(播放中, 暫停)
@@ -78,9 +81,16 @@ fun AudioPreviewScreen(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
         ?.onBackPressedDispatcher
 
+    LaunchedEffect(key1 = Unit) {
+        if (duration != 0L) {
+            viewModel.setDuration(duration)
+        }
+    }
+
     AudioPreviewScreenView(
         modifier = modifier,
         uri = uri,
+        audioTitle = title,
         playBtnResource = playBtnResource,
         audioDuration = audioDuration,
         mediaPosition = mediaPosition,
@@ -108,6 +118,7 @@ fun AudioPreviewScreen(
 fun AudioPreviewScreenView(
     modifier: Modifier = Modifier,
     uri: Uri,
+    audioTitle: String,
     onPlayClick: () -> Unit,
     playBtnResource: Int,
     audioDuration: Long,
@@ -116,13 +127,15 @@ fun AudioPreviewScreenView(
     onBack: () -> Unit,
     onStopUpdatePosition: () -> Unit
 ) {
-    val audioTitle = uri.getFileName(LocalContext.current)
+    val newAudioTitle = audioTitle.ifEmpty {
+        uri.getFileName(LocalContext.current)
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopBarScreen(
-                title = audioTitle.orEmpty(),
+                title = newAudioTitle.orEmpty(),
                 backClick = onBack
             )
         },
@@ -311,6 +324,7 @@ fun AudioPreviewScreenPreview() {
     FanciTheme {
         AudioPreviewScreenView(
             uri = Uri.EMPTY,
+            audioTitle = "",
             onPlayClick = {},
             playBtnResource = R.drawable.play,
             audioDuration = 100,

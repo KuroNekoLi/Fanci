@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.formatDuration
 import com.cmoney.kolfanci.extension.getAudioDisplayDuration
 import com.cmoney.kolfanci.extension.getDisplayFileSize
 import com.cmoney.kolfanci.model.attachment.AttachmentType
@@ -191,6 +192,7 @@ fun AttachmentFileItemPreview() {
  * 音檔附加檔案 item
  *
  * @param file 檔案
+ * @param duration 長度
  * @param displayName 檔名
  * @param isItemClickable 是否可以點擊
  * @param isItemCanDelete 是否可以刪除,是否呈現刪除按鈕
@@ -203,6 +205,7 @@ fun AttachmentFileItemPreview() {
 fun AttachmentAudioItem(
     modifier: Modifier = Modifier,
     file: Uri,
+    duration: Long = 0,
     displayName: String,
     isItemClickable: Boolean,
     isItemCanDelete: Boolean,
@@ -269,7 +272,11 @@ fun AttachmentAudioItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = file.getAudioDisplayDuration(context),
+                            text = if (duration == 0L) {
+                                file.getAudioDisplayDuration(context)
+                            } else {
+                                duration.formatDuration()
+                            },
                             fontSize = 14.sp,
                             color = LocalColor.current.text.default_50
                         )

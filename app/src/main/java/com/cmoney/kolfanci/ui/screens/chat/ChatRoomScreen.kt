@@ -351,14 +351,18 @@ object AttachmentController {
         uri: Uri,
         context: Context,
         attachmentType: AttachmentType? = null,
-        fileName: String = ""
+        fileName: String = "",
+        duration: Long = 0
     ) {
-        KLog.i(TAG, "onAttachmentClick:$uri")
-        when (attachmentType ?: uri.getAttachmentType(context)) {
+        val type = attachmentType ?: uri.getAttachmentType(context)
+        KLog.i(TAG, "onAttachmentClick:$uri type:$type")
+        when (type) {
             AttachmentType.Audio -> {
                 navController.navigate(
                     AudioPreviewScreenDestination(
-                        uri = uri
+                        uri = uri,
+                        duration = duration,
+                        title = fileName
                     )
                 )
             }

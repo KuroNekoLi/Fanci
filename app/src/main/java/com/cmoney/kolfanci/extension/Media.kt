@@ -33,6 +33,20 @@ fun Media.getFleSize(): Long {
 }
 
 /**
+ * 取得 音檔長度
+ */
+fun Media.getDuration(): Long {
+    return when (this.type) {
+        MediaType.image -> 0
+        MediaType.video -> 0
+        MediaType.audio -> audio?.duration ?: 0L
+        MediaType.txt -> 0L
+        MediaType.pdf -> 0L
+        null -> 0
+    }
+}
+
+/**
  * 轉換成app 在用的 type
  */
 fun MediaType.toAttachmentType(): AttachmentType =

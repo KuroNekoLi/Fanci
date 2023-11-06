@@ -12,3 +12,12 @@ fun Long.getDisplayFileSize(): String {
         else -> String.format("%.2f GB", sizeInGB)
     }
 }
+
+fun Long.formatDuration(): String {
+    val milliseconds = this
+    val hours = (milliseconds / 3600000).toInt()
+    val minutes = ((milliseconds % 3600000) / 60000).toInt()
+    val seconds = ((milliseconds % 60000) / 1000).toInt()
+
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}

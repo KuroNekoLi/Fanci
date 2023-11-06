@@ -168,7 +168,7 @@ fun Uri.getFileType(context: Context): String {
 fun Uri.getAudioDisplayDuration(context: Context): String {
     try {
         val durationMillis = getAudioDuration(context)
-        return formatDuration(durationMillis)
+        return durationMillis.formatDuration()
     } catch (e: Exception) {
         e.printStackTrace()
     }
@@ -190,14 +190,6 @@ fun Uri.getAudioDuration(context: Context): Long {
         retriever.release()
     }
     return 0L
-}
-
-private fun formatDuration(milliseconds: Long): String {
-    val hours = (milliseconds / 3600000).toInt()
-    val minutes = ((milliseconds % 3600000) / 60000).toInt()
-    val seconds = ((milliseconds % 60000) / 1000).toInt()
-
-    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
 
 /**

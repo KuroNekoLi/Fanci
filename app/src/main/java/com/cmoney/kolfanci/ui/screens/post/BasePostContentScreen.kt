@@ -49,6 +49,7 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.getDuration
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.getFleSize
 import com.cmoney.kolfanci.extension.toAttachmentType
@@ -62,6 +63,7 @@ import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -262,6 +264,45 @@ fun BasePostContentScreen(
                 Spacer(modifier = Modifier.height(15.dp))
 
                 //========= Audio File =========
+                val audioUrl = medias.filter {
+                    it.type == MediaType.audio
+                }
+
+                LazyRow(
+                    modifier = modifier.padding(start = 10.dp, end = 10.dp),
+                    state = rememberLazyListState(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(audioUrl) { media ->
+                        val fileUrl = media.resourceLink
+                        val mediaType = media.type
+
+                        AttachmentAudioItem(
+                            modifier = Modifier
+                                .width(270.dp)
+                                .height(75.dp),
+                            file = Uri.parse(fileUrl),
+                            duration = media.getDuration(),
+                            isItemClickable = true,
+                            isItemCanDelete = false,
+                            isShowResend = false,
+                            displayName = media.getFileName(),
+                            onClick = {
+                                AttachmentController.onAttachmentClick(
+                                    navController = navController,
+                                    uri = Uri.parse(fileUrl),
+                                    context = context,
+                                    attachmentType = mediaType?.toAttachmentType(),
+                                    fileName = media.getFileName(),
+                                    duration = media.getDuration()
+                                )
+                            },
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
             }
 
             //Emoji
