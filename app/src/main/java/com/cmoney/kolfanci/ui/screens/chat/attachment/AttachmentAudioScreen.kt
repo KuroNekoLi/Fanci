@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,7 +34,9 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getAudioDuration
 import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.model.usecase.ReSendFile
 import com.cmoney.kolfanci.model.usecase.UploadFileItem
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -70,9 +73,11 @@ fun AttachmentAudioItem(
     audio: UploadFileItem,
     displayName: String,
     onClick: (Uri) -> Unit,
-    onDelete: (Uri) -> Unit
+    onDelete: (Uri) -> Unit,
+    onResend: ((ReSendFile) -> Unit)? = null
 ) {
     val context = LocalContext.current
+    val status = audio.status
 
     Box(
         modifier = modifier
@@ -85,70 +90,98 @@ fun AttachmentAudioItem(
             },
         contentAlignment = Alignment.CenterStart
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxHeight()
-                .align(Alignment.TopEnd)
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
+
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.Center
+                    .fillMaxHeight()
+                    .align(Alignment.TopEnd)
             ) {
-
-                Row(
-                    modifier = Modifier.padding(start = 15.dp, top = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.audio_icon),
-                        contentDescription = null
-                    )
 
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    Text(
-                        text = displayName,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 24.sp,
-                            color = LocalColor.current.text.default_100,
+                    Row(
+                        modifier = Modifier.padding(start = 15.dp, top = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.audio_icon),
+                            contentDescription = null
                         )
-                    )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = displayName,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                color = LocalColor.current.text.default_100,
+                            )
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.padding(start = 15.dp, top = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = audio.uri.getAudioDuration(context),
+                            fontSize = 14.sp,
+                            color = LocalColor.current.text.default_50
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Image(
+                            modifier = Modifier.size(14.dp),
+                            painter = painterResource(id = R.drawable.small_play),
+                            contentDescription = null
+                        )
+                    }
                 }
 
-                Row(
-                    modifier = Modifier.padding(start = 15.dp, top = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = audio.uri.getAudioDuration(context),
-                        fontSize = 14.sp,
-                        color = LocalColor.current.text.default_50
-                    )
-
-                    Spacer(modifier = Modifier.width(5.dp))
-
+                if (status !is UploadFileItem.Status.Failed) {
+                    //Close btn
                     Image(
-                        modifier = Modifier.size(14.dp),
-                        painter = painterResource(id = R.drawable.small_play),
-                        contentDescription = null
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onDelete.invoke(audio.uri)
+                            },
+                        painter = painterResource(id = R.drawable.close), contentDescription = null
                     )
                 }
             }
 
-            //Close btn
-            Image(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable {
-                        onDelete.invoke(audio.uri)
-                    },
-                painter = painterResource(id = R.drawable.close), contentDescription = null
-            )
+            //上傳失敗
+            if (status is UploadFileItem.Status.Failed) {
+                Image(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable {
+                            onResend?.invoke(
+                                ReSendFile(
+                                    type = AttachmentType.Audio,
+                                    file = audio,
+                                    title = context.getString(R.string.file_upload_fail_title),
+                                    description = context.getString(R.string.file_upload_fail_desc)
+                                )
+                            )
+                        },
+                    painter = painterResource(id = R.drawable.upload_failed),
+                    contentDescription = null
+                )
+            }
         }
     }
 }

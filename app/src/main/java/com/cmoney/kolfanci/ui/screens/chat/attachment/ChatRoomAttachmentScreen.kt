@@ -31,7 +31,7 @@ fun ChatRoomAttachmentScreen(
                 modifier = modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary),
-                imageAttach = uris.map { it.uri },
+                imageAttach = uris,
                 onDelete = onDelete,
                 onAdd = onAdd,
                 onClick = onClick
@@ -54,7 +54,7 @@ fun ChatRoomAttachmentScreen(
 
             AttachmentType.Pdf, AttachmentType.Txt -> {
                 AttachmentFileScreen(
-                    fileList = uris.map { it.uri },
+                    fileList = uris,
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(15.dp)

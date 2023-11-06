@@ -81,22 +81,29 @@ class EditPostViewModel(
             loading()
 
             //附加圖片, 獲取圖片 Url
-            if (_attachImages.value.isNotEmpty()) {
-                uploadImages(_attachImages.value, object : MessageViewModel.ImageUploadCallback {
-                    override fun complete(images: List<String>) {
-                        KLog.i(TAG, "all image upload complete:" + images.size)
-                        sendPost(text, images)
-                    }
+            //TODO: 先處理圖片, 之後會改新 api
+            val imagesUrl = attachment.filter {
+                it.first == AttachmentType.Image
+            }.map { it.second.serverUrl }
 
-                    override fun onFailure(e: Throwable) {
-                        KLog.e(TAG, "onFailure:$e")
-                        dismissLoading()
-                    }
-                })
-                _attachImages.value = emptyList()
-            } else {
-                sendPost(text, emptyList())
-            }
+            sendPost(text, imagesUrl)
+
+//            if (_attachImages.value.isNotEmpty()) {
+//                uploadImages(_attachImages.value, object : MessageViewModel.ImageUploadCallback {
+//                    override fun complete(images: List<String>) {
+//                        KLog.i(TAG, "all image upload complete:" + images.size)
+//                        sendPost(text, images)
+//                    }
+//
+//                    override fun onFailure(e: Throwable) {
+//                        KLog.e(TAG, "onFailure:$e")
+//                        dismissLoading()
+//                    }
+//                })
+//                _attachImages.value = emptyList()
+//            } else {
+//                sendPost(text, emptyList())
+//            }
         }
     }
 
@@ -171,8 +178,10 @@ class EditPostViewModel(
 
     /**
      * 更新貼文
+     *
+     * @param attachment 附加檔案
      */
-    fun onUpdatePostClick(editPost: BulletinboardMessage, text: String) {
+    fun onUpdatePostClick(editPost: BulletinboardMessage, text: String, attachment: List<Pair<AttachmentType, UploadFileItem>>) {
         KLog.i(TAG, "onUpdatePost:$text")
         viewModelScope.launch {
             if (text.isEmpty() && _attachImages.value.isEmpty()) {

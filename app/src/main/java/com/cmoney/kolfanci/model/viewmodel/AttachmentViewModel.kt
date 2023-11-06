@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
+import com.cmoney.kolfanci.model.usecase.ReSendFile
 import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
@@ -110,7 +111,7 @@ class AttachmentViewModel(
     }
 
     /**
-     * 執行上傳動作
+     * 執行上傳動作, 將未處理檔案改為 pending, 並執行上傳
      *
      * @param other 檔案之外的東西, ex: text 內文
      */
@@ -123,76 +124,88 @@ class AttachmentViewModel(
 
             //圖片處理
             val imageFiles = uploadList.filter {
-                it.first == AttachmentType.Image
+                it.first == AttachmentType.Image && it.second.status == UploadFileItem.Status.Pending
             }.map { it.second.uri }
 
-            var allImages = uploadImageUseCase.uploadImage2(imageFiles).toList()
-
-            //todo ----- for test start -----
-            val testItem = allImages.first().copy(
-                status = UploadFileItem.Status.Failed("")
-            )
-            allImages.toMutableList().apply {
-                this[0] = testItem
-                allImages = this
-            }
-            //todo ----- for test end -----
+            val allImages = uploadImageUseCase.uploadImage2(imageFiles).toList()
 
             //圖片之外的檔案
             val otherFiles = uploadList.filter {
-                it.first != AttachmentType.Image
+                it.first != AttachmentType.Image && it.second.status == UploadFileItem.Status.Pending
             }.map { it.second.uri }
 
             val allOtherFiles = attachmentUseCase.uploadFile(otherFiles).toList()
 
-            val newList = _attachmentList.value.map {
-                val key = it.first
-                val oldItem = it.second
-
-                val newStatusItem = allImages.firstOrNull { newItem ->
-                    newItem.uri == oldItem.uri
-                } ?: kotlin.run {
-                    allOtherFiles.firstOrNull { newItem ->
-                        newItem.uri == oldItem.uri
-                    }
-                }
-
-                if (newStatusItem != null) {
-                    key to newStatusItem
-                } else {
-                    key to oldItem
-                }
-            }
-
-            _attachmentList.update {
-                newList
-            }
-
-            val hasFailed = _attachmentList.value.any { pairItem ->
-                val item = pairItem.second
-                item.status is UploadFileItem.Status.Failed
-            }
-
-            if (hasFailed) {
-                _uploadFailed.value = true
-            } else {
-                _uploadComplete.value = (true to other)
-            }
+            updateAttachmentList(
+                imageFiles = allImages,
+                otherFiles = allOtherFiles,
+                other = other
+            )
         }
     }
 
     /**
-     * 將所有檔案狀態改為 等待上傳中
+     * 更新 資料, 刷新附加檔案畫面
+     * 並檢查是否有失敗的
+     */
+    private fun updateAttachmentList(
+        imageFiles: List<UploadFileItem>,
+        otherFiles: List<UploadFileItem>,
+        other: Any? = null
+    ) {
+        val newList = _attachmentList.value.map {
+            val key = it.first
+            val oldItem = it.second
+
+            val newStatusItem = imageFiles.firstOrNull { newItem ->
+                newItem.uri == oldItem.uri
+            } ?: kotlin.run {
+                otherFiles.firstOrNull { newItem ->
+                    newItem.uri == oldItem.uri
+                }
+            }
+
+            if (newStatusItem != null) {
+                key to newStatusItem
+            } else {
+                key to oldItem
+            }
+        }
+
+        _attachmentList.update {
+            newList
+        }
+
+        val hasFailed = _attachmentList.value.any { pairItem ->
+            val item = pairItem.second
+            item.status is UploadFileItem.Status.Failed
+        }
+
+        if (hasFailed) {
+            _uploadFailed.value = true
+        } else {
+            _uploadComplete.value = (true to other)
+        }
+    }
+
+    /**
+     * 將檔案狀態 Undefine 改為 Pending
      */
     private fun statusToPending() {
         KLog.i(TAG, "statusToPending")
 
         val newList = _attachmentList.value.map {
             val key = it.first
-            val uploadItem = it.second.copy(
-                status = UploadFileItem.Status.Pending
+            val uploadItem = it.second
+
+            val newUploadItem = uploadItem.copy(
+                status = if (uploadItem.status == UploadFileItem.Status.Undefined) {
+                    UploadFileItem.Status.Pending
+                } else {
+                    uploadItem.status
+                }
             )
-            key to uploadItem
+            key to newUploadItem
         }
 
         _attachmentList.update {
@@ -209,6 +222,33 @@ class AttachmentViewModel(
     fun clearUploadFailed() {
         _uploadFailed.update {
             false
+        }
+    }
+
+    /**
+     * 重新再次上傳,針對單一檔案處理
+     *
+     * @param uploadFileItem 需要重新上傳的檔案
+     * @param other 檔案之外的東西, ex: text 內文
+     */
+    fun onResend(uploadFileItem: ReSendFile, other: Any? = null) {
+        KLog.i(TAG, "onResend:$uploadFileItem")
+        viewModelScope.launch {
+            val file = uploadFileItem.file
+            val fileUri = file.uri
+
+            var allImages = emptyList<UploadFileItem>()
+            if (uploadFileItem.type == AttachmentType.Image) {
+                allImages = uploadImageUseCase.uploadImage2(listOf(fileUri)).toList()
+            }
+
+            val allOtherFiles = attachmentUseCase.uploadFile(listOf(fileUri)).toList()
+
+            updateAttachmentList(
+                imageFiles = allImages,
+                otherFiles = allOtherFiles,
+                other = other
+            )
         }
     }
 }

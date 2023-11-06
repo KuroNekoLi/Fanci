@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,9 +34,13 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.usecase.ReSendFile
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
+//TODO: 搬移位置 至共用
 /**
  * 聊天室 附加圖片
  *
@@ -44,11 +49,12 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 @Composable
 fun ChatRoomAttachImageScreen(
     modifier: Modifier = Modifier,
-    imageAttach: List<Uri>,
+    imageAttach: List<UploadFileItem>,
     quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDelete: (Uri) -> Unit,
     onAdd: () -> Unit,
-    onClick: (Uri) -> Unit
+    onClick: (Uri) -> Unit,
+    onResend: ((ReSendFile) -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
 
@@ -63,12 +69,13 @@ fun ChatRoomAttachImageScreen(
         ) {
             if (imageAttach.isNotEmpty()) {
                 items(imageAttach) { attach ->
-                    AttachImage(
-                        uri = attach,
+                    AttachImageItem(
+                        uploadFileItem = attach,
                         onClick = onClick,
                         onDelete = {
                             onDelete.invoke(it)
-                        }
+                        },
+                        onResend = onResend
                     )
                 }
                 if (imageAttach.size < quantityLimit) {
@@ -97,9 +104,15 @@ fun ChatRoomAttachImageScreen(
 }
 
 @Composable
-private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit, onClick: (Uri) -> Unit) {
+private fun AttachImageItem(
+    uploadFileItem: UploadFileItem,
+    onDelete: (Uri) -> Unit,
+    onClick: (Uri) -> Unit,
+    onResend: ((ReSendFile) -> Unit)? = null
+) {
     val context = LocalContext.current
-
+    val uri = uploadFileItem.uri
+    val status = uploadFileItem.status
     val request = ImageRequest.Builder(context)
         .data(uri)
         .build()
@@ -108,27 +121,57 @@ private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit, onClick: (Uri) -> Uni
         modifier = Modifier
             .height(120.dp)
             .padding(top = 10.dp, bottom = 10.dp)
-            .clickable {
+            .clickable(
+                enabled = (status !is UploadFileItem.Status.Failed)
+            ) {
                 onClick.invoke(uri)
             },
         contentAlignment = Alignment.TopEnd
     ) {
-        AsyncImage(
-            model = request,
-            modifier = Modifier
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop,
-            contentDescription = null
-        )
-        Image(
-            modifier = Modifier
-                .padding(10.dp)
-                .clickable {
-                    onDelete.invoke(uri)
-                },
-            painter = painterResource(id = R.drawable.close), contentDescription = null
-        )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = request,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                contentDescription = null
+            )
+
+            if (status is UploadFileItem.Status.Failed) {
+                Image(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable {
+                            onResend?.invoke(
+                                ReSendFile(
+                                    type = AttachmentType.Image,
+                                    file = uploadFileItem,
+                                    title = context.getString(R.string.image_upload_fail_title),
+                                    description = context.getString(R.string.image_upload_fail_desc)
+                                )
+                            )
+                        },
+                    painter = painterResource(id = R.drawable.upload_failed),
+                    contentDescription = null
+                )
+            }
+        }
+
+        if (status !is UploadFileItem.Status.Failed) {
+            Image(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clickable {
+                        onDelete.invoke(uri)
+                    },
+                painter = painterResource(id = R.drawable.close), contentDescription = null
+            )
+        }
+
     }
 }
 
@@ -163,10 +206,15 @@ fun ChatRoomAttachImageScreenPreview() {
     FanciTheme {
         ChatRoomAttachImageScreen(
             modifier = Modifier,
-            imageAttach = listOf(Uri.EMPTY, Uri.EMPTY, Uri.EMPTY),
+            imageAttach = listOf(
+                UploadFileItem(),
+                UploadFileItem(),
+                UploadFileItem()
+            ),
             onDelete = {},
             onAdd = {},
-            onClick = {}
+            onClick = {},
+            onResend = {}
         )
     }
 }

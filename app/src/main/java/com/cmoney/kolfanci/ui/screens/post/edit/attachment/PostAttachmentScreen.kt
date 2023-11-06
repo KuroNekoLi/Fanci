@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.kolfanci.model.usecase.ReSendFile
 import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
@@ -26,7 +27,8 @@ fun PostAttachmentScreen(
     attachment: List<Pair<AttachmentType, UploadFileItem>>,
     onDelete: (Uri) -> Unit,
     onClick: (Uri) -> Unit,
-    onAddImage: () -> Unit
+    onAddImage: () -> Unit,
+    onResend: (ReSendFile) -> Unit
 ) {
     //圖片檔
     val imageAttachment = attachment.filter { item ->
@@ -49,10 +51,11 @@ fun PostAttachmentScreen(
                 modifier = modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary),
-                imageAttach = imageAttachment.map { it.uri },
+                imageAttach = imageAttachment,
                 onDelete = onDelete,
                 onAdd = onAddImage,
-                onClick = onClick
+                onClick = onClick,
+                onResend = onResend
             )
         }
 
@@ -69,7 +72,8 @@ fun PostAttachmentScreen(
                     .height(75.dp),
                 attachment = otherAttachment,
                 onDelete = onDelete,
-                onClick = onClick
+                onClick = onClick,
+                onResend = onResend
             )
         }
     }
@@ -83,6 +87,7 @@ fun PostAttachmentScreenPreview() {
         attachment = emptyList(),
         onDelete = {},
         onClick = {},
-        onAddImage = {}
+        onAddImage = {},
+        onResend = {}
     )
 }

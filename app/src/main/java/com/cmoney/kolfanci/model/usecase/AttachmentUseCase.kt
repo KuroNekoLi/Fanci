@@ -5,6 +5,7 @@ import android.net.Uri
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.extension.getUploadFileType
 import com.cmoney.kolfanci.repository.Network
+import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.socks.library.KLog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -140,7 +141,7 @@ class AttachmentUseCase(
  * @param serverUrl 上傳成功後 拿到的 url
  */
 data class UploadFileItem(
-    val uri: Uri,
+    val uri: Uri = Uri.EMPTY,
     val status: Status = Status.Undefined,
     val serverUrl: String = ""
 ) {
@@ -165,3 +166,18 @@ data class UploadFileItem(
         data class Failed(val reason: String) : Status(reason)
     }
 }
+
+/**
+ * 重新上傳檔案 info
+ *
+ * @param type 檔案類型
+ * @param file 檔案物件
+ * @param title dialog title
+ * @param description dialog content
+ */
+data class ReSendFile(
+    val type: AttachmentType,
+    val file: UploadFileItem,
+    val title: String,
+    val description: String
+)

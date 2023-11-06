@@ -11,12 +11,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.model.usecase.ReSendFile
 import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
 import com.cmoney.kolfanci.ui.theme.FanciTheme
-import com.socks.library.KLog
 
 @Composable
 fun PostOtherAttachmentScreen(
@@ -24,7 +24,8 @@ fun PostOtherAttachmentScreen(
     itemModifier: Modifier = Modifier,
     attachment: List<Pair<AttachmentType, UploadFileItem>>,
     onClick: (Uri) -> Unit,
-    onDelete: (Uri) -> Unit
+    onDelete: (Uri) -> Unit,
+    onResend: ((ReSendFile) -> Unit)? = null
 ) {
 
     val listState = rememberLazyListState()
@@ -45,7 +46,8 @@ fun PostOtherAttachmentScreen(
                             audio = item,
                             displayName = item.uri.getFileName(context).orEmpty(),
                             onClick = onClick,
-                            onDelete = onDelete
+                            onDelete = onDelete,
+                            onResend = onResend
                         )
                     }
                 }
@@ -54,10 +56,11 @@ fun PostOtherAttachmentScreen(
                     item {
                         AttachmentFileItem(
                             modifier = itemModifier,
-                            file = item.uri,
+                            file = item,
                             displayName = item.uri.getFileName(context).orEmpty(),
                             onClick = onClick,
-                            onDelete = onDelete
+                            onDelete = onDelete,
+                            onResend = onResend
                         )
                     }
                 }
@@ -78,7 +81,8 @@ fun PostOtherAttachmentScreenPreview() {
         PostOtherAttachmentScreen(
             attachment = emptyList(),
             onClick = {},
-            onDelete = {}
+            onDelete = {},
+            onResend = {}
         )
     }
 }

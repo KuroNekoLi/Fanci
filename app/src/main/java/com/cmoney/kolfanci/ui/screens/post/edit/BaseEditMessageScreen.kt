@@ -47,6 +47,7 @@ import com.bumptech.glide.Glide
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.usecase.UploadFileItem
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
@@ -287,12 +288,19 @@ private fun BaseEditMessageScreenView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(LocalColor.current.env_100),
-                        imageAttach = attachImages,
+                        imageAttach = attachImages.map {
+                            UploadFileItem(
+                                uri = it
+                            )
+                        },
                         onDelete = {
                             onDeleteImage.invoke(it)
                         },
                         onAdd = {
                             onShowImagePicker.invoke()
+                        },
+                        onResend = {
+                            //TODO
                         },
                         onClick = { uri ->
                             StfalconImageViewer
