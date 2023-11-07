@@ -166,8 +166,9 @@ class AudioViewModel(
      * 播放
      *
      * @param uri 檔案uri
+     * @param title 檔案 title
      */
-    fun play(uri: Uri) {
+    fun play(uri: Uri, title: String? = null) {
         KLog.i(TAG, "play:$uri")
         if (musicServiceConnection.isConnected.value == true) {
             //正在播的歌曲
@@ -186,7 +187,7 @@ class AudioViewModel(
             //開啟新播放
             else {
                 KLog.i(TAG, "playFromUri:$uri")
-                transportControls.playFromUri(uri, bundleOf())
+                transportControls.playFromUri(uri, bundleOf("title" to title))
             }
         } else {
             KLog.e(TAG, "musicServiceConnection is not connect.")

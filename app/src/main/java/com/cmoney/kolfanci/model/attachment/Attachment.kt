@@ -50,7 +50,6 @@ fun List<Pair<AttachmentType, UploadFileItem>>.toUploadMedia(context: Context): 
                 pdf = PdfContent(
                     fileName = fileName,
                     fileSize = fileSize,
-                    thumbnailUrl = ""
                 )
             )
 
@@ -60,7 +59,6 @@ fun List<Pair<AttachmentType, UploadFileItem>>.toUploadMedia(context: Context): 
                 txt = TxtContent(
                     fileName = fileName,
                     fileSize = fileSize,
-                    thumbnailUrl = ""
                 )
             )
 

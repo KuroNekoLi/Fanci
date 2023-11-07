@@ -17,6 +17,8 @@ import androidx.core.net.toUri
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.media.MediaBrowserServiceCompat
 import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.extension.isURL
+import com.cmoney.xlogin.XLoginHelper
 import com.google.android.exoplayer2.BuildConfig
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -31,7 +33,6 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
@@ -83,6 +84,11 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
             .setTransferListener(null)
             .setConnectTimeoutMs(30000)
             .setReadTimeoutMs(30000)
+            .setDefaultRequestProperties(HashMap<String, String>().apply {
+                if (XLoginHelper.isLogin) {
+                    put("Authorization", "Bearer ${XLoginHelper.accessToken}")
+                }
+            })
     }
 
     override fun onCreate() {
@@ -215,14 +221,14 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
         currentPlayer.playWhenReady = playWhenReady
         currentPlayer.stop(/* reset= */ true)
         if (currentPlayer == exoPlayer) {
-//            val mediaSource = metadataList.toMediaSource(getDataSourceFactor())
-//            exoPlayer.setMediaSource(mediaSource)
-
-//            val mediaSource = ProgressiveMediaSource.Factory(FileDataSource.Factory())
-//                .createMediaSource(MediaItem.fromUri(itemToPlay!!.mediaUri))
-//            exoPlayer.setMediaSource(mediaSource)
-
-            exoPlayer.setMediaItem(MediaItem.fromUri(itemToPlay!!.mediaUri))
+            itemToPlay?.mediaUri?.let { mediaUri ->
+                if (mediaUri.isURL()) {
+                    val mediaSource = metadataList.toMediaSource(getDataSourceFactor())
+                    exoPlayer.setMediaSource(mediaSource)
+                } else {
+                    exoPlayer.setMediaItem(MediaItem.fromUri(mediaUri))
+                }
+            }
 
             exoPlayer.prepare()
             exoPlayer.seekTo(initialWindowIndex, playbackStartPositionMs)
@@ -361,22 +367,19 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
         }
 
         override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle?) {
+            val playItem =
+                MediaMetadataCompat.Builder().also {
+                    it.id = uri.toString()
+                    it.mediaUri = uri.toString()
+                    it.displaySubtitle = " "
+                    if (uri.isURL()) {
+                        val title = extras?.getString("title").orEmpty()
+                        it.displayTitle = title
+                    } else {
+                        it.displayTitle = uri.getFileName(applicationContext)
+                    }
+                }.build()
 
-            val playItem = MediaMetadataCompat.Builder().also {
-                it.id = uri.toString()
-                it.mediaUri = uri.toString()
-//                it.title = uri.getFileName(applicationContext)
-                it.displayTitle = uri.getFileName(applicationContext)
-
-//                it.albumArtUri =
-//                    "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"
-//
-
-                it.displaySubtitle = " "
-//                it.displayDescription = "displayDescription"
-//                it.displayIconUri =
-//                    "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/3c/66/94/3c6694ad-b3dd-9e15-26cc-f3a7252b125c/20UMGIM86021.crop.jpg/1912x1072mv.jpg"
-            }.build()
             val metadataList = listOf(playItem)
 
             preparePlaylist(

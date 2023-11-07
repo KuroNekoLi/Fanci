@@ -95,7 +95,7 @@ fun AudioPreviewScreen(
         audioDuration = audioDuration,
         mediaPosition = mediaPosition,
         onPlayClick = {
-            viewModel.play(uri)
+            viewModel.play(uri, title)
         },
         onSeekTo = {
             viewModel.seekTo(it)
