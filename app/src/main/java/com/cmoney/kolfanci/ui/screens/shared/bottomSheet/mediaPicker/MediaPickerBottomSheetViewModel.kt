@@ -14,7 +14,7 @@ class MediaPickerBottomSheetViewModel(
     /**
      * 檢查 上傳圖片 資格
      * 聊天室: 最多上傳10張, 只能上傳一種類型附加檔案
-     * 貼文: (待補)
+     * 貼文: 最多上傳10張
      *
      * @param onOpen 檢查通過
      * @param onError 檢查失敗, 並回傳錯誤訊息 (title, description)
@@ -51,7 +51,18 @@ class MediaPickerBottomSheetViewModel(
             }
 
             AttachmentEnv.Post -> {
-                //TODO: 貼文判斷邏輯
+                if (attachmentTypes.contains(AttachmentType.Image) && (selectedAttachment[AttachmentType.Image]?.size
+                        ?: 0) >= AttachImageDefault.DEFAULT_QUANTITY_LIMIT
+                ) {
+                    onError.invoke(
+                        context.getString(R.string.chat_attachment_image_limit_title)
+                            .format(AttachImageDefault.DEFAULT_QUANTITY_LIMIT),
+                        context.getString(R.string.chat_attachment_image_limit_desc).format(
+                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT,
+                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT
+                        )
+                    )
+                }
             }
         }
     }
@@ -87,7 +98,21 @@ class MediaPickerBottomSheetViewModel(
             }
 
             AttachmentEnv.Post -> {
-                //TODO: 貼文判斷邏輯
+                val otherFilesCount = selectedAttachment.filter {
+                    it.key != AttachmentType.Image
+                }.size
+
+                if (otherFilesCount >= AttachImageDefault.DEFAULT_QUANTITY_LIMIT
+                ) {
+                    onError.invoke(
+                        context.getString(R.string.post_attachment_file_limit_title)
+                            .format(AttachImageDefault.DEFAULT_QUANTITY_LIMIT),
+                        context.getString(R.string.post_attachment_file_limit_desc).format(
+                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT,
+                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT
+                        )
+                    )
+                }
             }
         }
     }
