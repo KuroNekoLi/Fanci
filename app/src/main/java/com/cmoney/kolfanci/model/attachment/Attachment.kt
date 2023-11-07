@@ -11,7 +11,6 @@ import com.cmoney.fanciapi.fanci.model.TxtContent
 import com.cmoney.kolfanci.extension.getAudioDuration
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.getFileSize
-import com.socks.library.KLog
 
 /**
  * 將附加檔案 List 轉為, 上傳用的 Media List

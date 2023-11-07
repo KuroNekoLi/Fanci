@@ -57,3 +57,15 @@ fun MediaType.toAttachmentType(): AttachmentType =
         MediaType.txt -> AttachmentType.Txt
         MediaType.pdf -> AttachmentType.Pdf
     }
+
+/**
+ * 將 server 給的 List media 轉換成 map
+ */
+fun List<Media>.toAttachmentTypeMap() =
+    this.map {
+        (it.type?.toAttachmentType() ?: AttachmentType.Unknown) to it
+    }.groupBy({
+        it.first
+    }, {
+        it.second
+    })

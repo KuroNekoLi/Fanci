@@ -43,6 +43,8 @@ import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.dialog.MessageReSendDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +56,7 @@ import org.koin.androidx.compose.koinViewModel
  */
 @Composable
 fun MessageScreen(
+    navController: DestinationsNavigator,
     modifier: Modifier = Modifier.fillMaxSize(),
     listState: LazyListState = rememberLazyListState(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
@@ -61,7 +64,7 @@ fun MessageScreen(
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
-    onMsgDismissHide: (ChatMessage) -> Unit
+    onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
     val TAG = "MessageScreen"
 
@@ -85,6 +88,7 @@ fun MessageScreen(
 
     if (message.isNotEmpty()) {
         MessageScreenView(
+            navController = navController,
             modifier = modifier,
             message = message,
             blockingList = blockingList.map {
@@ -131,6 +135,7 @@ fun MessageScreen(
 
 @Composable
 private fun MessageScreenView(
+    navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
     message: List<ChatMessageWrapper>,
     blockingList: List<String>,
@@ -165,6 +170,7 @@ private fun MessageScreenView(
                     }
 
                     MessageContentScreen(
+                        navController = navController,
                         chatMessageWrapper = chatMessageWrapper.copy(
                             isBlocking = isBlocking,
                             isBlocker = isBlocker
@@ -299,7 +305,8 @@ fun MessageScreenPreview() {
             isScrollToBottom = false,
             onLoadMore = {},
             onReSendClick = {},
-            scrollToPosition = null
+            scrollToPosition = null,
+            navController = EmptyDestinationsNavigator
         )
     }
 }

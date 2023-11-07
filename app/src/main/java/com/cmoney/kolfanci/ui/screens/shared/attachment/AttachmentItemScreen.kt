@@ -346,7 +346,7 @@ fun AttachmentAudioItem(
                 ) {
 
                     Row(
-                        modifier = Modifier.padding(start = 15.dp, top = 5.dp),
+                        modifier = Modifier.padding(start = 15.dp, top = 5.dp, end = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(

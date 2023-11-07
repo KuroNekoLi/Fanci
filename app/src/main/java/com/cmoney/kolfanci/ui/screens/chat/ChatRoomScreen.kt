@@ -60,6 +60,7 @@ import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
@@ -195,6 +196,7 @@ fun ChatRoomScreen(
 
     //主畫面
     ChatRoomScreenView(
+        navController = navController,
         channelId = channelId,
         announceMessage = announceMessage,
         isShowLoading = isShowLoading,
@@ -407,6 +409,7 @@ fun ReSendFileDialog(
 
 @Composable
 private fun ChatRoomScreenView(
+    navController: DestinationsNavigator,
     channelId: String,
     announceMessage: ChatMessage?,
     onMsgDismissHide: (ChatMessage) -> Unit,
@@ -442,6 +445,7 @@ private fun ChatRoomScreenView(
                 .fillMaxWidth()
                 .padding(bottom = 5.dp)
                 .weight(1f),
+            navController = navController,
             channelId = channelId,
             onMsgDismissHide = {
                 onMsgDismissHide.invoke(it)
@@ -552,6 +556,7 @@ object AttachmentController {
 fun ChatRoomScreenPreview() {
     FanciTheme {
         ChatRoomScreenView(
+            navController = EmptyDestinationsNavigator,
             channelId = "",
             announceMessage = ChatMessage(),
             onMsgDismissHide = {},

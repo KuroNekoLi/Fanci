@@ -10,7 +10,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.model.ChatMessageWrapper
-import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageContentScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -61,7 +60,8 @@ fun AnnouncementScreen(
                 },
                 onReSendClick = {
 
-                }
+                },
+                navController = navigator
             )
             Box(
                 modifier = Modifier
