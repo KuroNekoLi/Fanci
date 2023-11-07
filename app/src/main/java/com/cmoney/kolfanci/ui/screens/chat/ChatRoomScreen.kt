@@ -152,10 +152,16 @@ fun ChatRoomScreen(
         messageViewModel.copyDone()
     }
 
-    //是否呈現上傳中畫面
-    var isShowLoading by remember {
-        mutableStateOf(false)
+    //是否訊息發送完成
+    val isSendComplete by messageViewModel.isSendComplete.collectAsState()
+
+    //發送完成, 清空附加檔案暫存
+    if (isSendComplete) {
+        attachmentViewModel.clear()
     }
+
+    //是否呈現上傳中畫面
+    var isShowLoading by remember { mutableStateOf(false) }
 
     //附加檔案
     val attachment by attachmentViewModel.attachment.collectAsState()
@@ -175,8 +181,7 @@ fun ChatRoomScreen(
         isShowLoading = false
         val text = attachmentUploadFinish.second?.toString().orEmpty()
 
-        //TODO
-//        messageViewModel.messageSend(channelId, it)
+        messageViewModel.messageSend(channelId, text, attachment)
 
         attachmentViewModel.finishPost()
     }

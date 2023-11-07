@@ -36,6 +36,7 @@ import com.cmoney.kolfanci.extension.showInteractDialogBottomSheet
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
@@ -59,6 +60,7 @@ fun MessageScreen(
     channelId: String,
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
+    attachmentViewModel: AttachmentViewModel = koinViewModel(),
     onMsgDismissHide: (ChatMessage) -> Unit
 ) {
     val TAG = "MessageScreen"
@@ -77,6 +79,9 @@ fun MessageScreen(
     val message by messageViewModel.message.collectAsState()
 
     val scrollToPosition by messageViewModel.scrollToPosition.collectAsState()
+
+    //附加檔案
+    val attachment by attachmentViewModel.attachment.collectAsState()
 
     if (message.isNotEmpty()) {
         MessageScreenView(
@@ -114,7 +119,7 @@ fun MessageScreen(
                 messageViewModel.onReSendDialogDismiss()
             },
             onReSend = {
-                messageViewModel.onResendMessage(channelId, it)
+                messageViewModel.onResendMessage(channelId, it, attachment = attachment)
             },
             onDelete = {
                 messageViewModel.onDeleteReSend(it)

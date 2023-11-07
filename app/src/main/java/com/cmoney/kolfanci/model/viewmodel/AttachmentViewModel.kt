@@ -127,16 +127,17 @@ class AttachmentViewModel(
                 it.first == AttachmentType.Image && it.second.status == UploadFileItem.Status.Pending
             }.map { it.second.uri }
 
-            var allImages = uploadImageUseCase.uploadImage2(imageFiles).toList()
+            val allImages = uploadImageUseCase.uploadImage2(imageFiles).toList()
 
             //todo ----- for test start -----
-            val testItem = allImages.first().copy(
-                status = UploadFileItem.Status.Failed("")
-            )
-            allImages.toMutableList().apply {
-                this[0] = testItem
-                allImages = this
-            }
+            //為了測試 上傳失敗
+//            val testItem = allImages.first().copy(
+//                status = UploadFileItem.Status.Failed("")
+//            )
+//            allImages.toMutableList().apply {
+//                this[0] = testItem
+//                allImages = this
+//            }
             //todo ----- for test end -----
 
             //圖片之外的檔案
@@ -275,5 +276,11 @@ class AttachmentViewModel(
                 other = other
             )
         }
+    }
+
+    fun clear() {
+        KLog.i(TAG, "clear")
+        _attachment.update { emptyMap() }
+        _attachmentList.update { emptyList() }
     }
 }

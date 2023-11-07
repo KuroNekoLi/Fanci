@@ -118,10 +118,6 @@ class MessageViewModel(
     private val _scrollToPosition = MutableStateFlow<Int?>(null)
     val scrollToPosition = _scrollToPosition.asStateFlow()
 
-    //發送中
-    private val _isShowLoading = MutableStateFlow<Boolean>(false)
-    val isShowLoading = _isShowLoading.asStateFlow()
-
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
 
     private val pollingInterval: Long
@@ -288,225 +284,32 @@ class MessageViewModel(
         }
     }
 
-//    /**
-//     * 附加檔案, 區分 類型
-//     */
-//    fun attachment(uris: List<Uri>) {
-//        val oldList = _attachmentList.value.toMutableList()
-//        oldList.addAll(
-//            uris.map { uri ->
-//                uri.getAttachmentType(context) to uri
-//            }
-//        )
-//
-//        _attachmentList.update {
-//            oldList
-//        }
-//
-//        val attachmentMap = uris.map { uri ->
-//            val attachmentType = uri.getAttachmentType(context)
-//            attachmentType to uri
-//        }.groupBy {
-//            it.first
-//        }.mapValues { entry ->
-//            entry.value.map { it.second }
-//        }
-//
-//        val unionList = (_attachment.value.asSequence() + attachmentMap.asSequence())
-//            .distinct()
-//            .groupBy({ it.key }, { it.value })
-//            .mapValues { entry ->
-//                entry.value.flatten()
-//            }
-//
-//        _attachment.update {
-//            unionList
-//        }
-//    }
-//
-//    /**
-//     * 移除 附加 檔案
-//     * @param uri
-//     */
-//    fun removeAttach(uri: Uri) {
-//        KLog.i(TAG, "removeAttach:$uri")
-//        val attachmentType = uri.getAttachmentType(context)
-//
-//        _attachmentList.update {
-//            _attachmentList.value.filter {
-//                it.second != uri
-//            }
-//        }
-//
-//        val newAttachment = _attachment.value[attachmentType]?.filter { existsUri ->
-//            existsUri != uri
-//        }
-//
-//        if (newAttachment.isNullOrEmpty()) {
-//            _attachment.update {
-//                emptyMap()
-//            }
-//        } else {
-//            _attachment.update { oldAttachment ->
-//                oldAttachment.toMutableMap().apply {
-//                    set(attachmentType, newAttachment)
-//                }
-//            }
-//        }
-//    }
-
     /**
      * 對外 發送訊息 接口
      * @param channelId 頻道id
      * @param text 內文
-     */
-    fun messageSend(channelId: String, text: String) {
-        KLog.i(TAG, "messageSend:$text")
-        viewModelScope.launch {
-            _isShowLoading.value = true
-
-//            generatePreviewBeforeSend(text)
-
-            //TODO; fix it
-
-            //附加圖片, 獲取圖片 Url
-//            val imageList = _attachment.value[AttachmentType.Image].orEmpty()
-
-            val imageList = emptyList<Uri>()
-
-            if (imageList.isNotEmpty()) {
-                uploadImages(imageList, object : ImageUploadCallback {
-                    override fun complete(images: List<String>) {
-                        KLog.i(TAG, "all image upload complete:" + images.size)
-//                        send(channelId, text, images)
-                    }
-
-                    override fun onFailure(e: Throwable) {
-                        KLog.e(TAG, "onFailure:$e")
-
-                        //Create pending message
-                        _message.value = _message.value.toMutableList().apply {
-                            add(
-                                0,
-                                ChatMessageWrapper(
-                                    message = ChatMessage(
-                                        id = System.currentTimeMillis().toString(),
-                                        author = GroupMember(
-                                            name = XLoginHelper.nickName,
-                                            thumbNail = XLoginHelper.headImagePath
-                                        ),
-                                        content = MediaIChatContent(
-                                            text = text
-                                        ),
-                                        createUnixTime = System.currentTimeMillis() / 1000,
-                                        replyMessage = _replyMessage.value
-                                    ),
-                                    uploadAttachPreview = imageList.map {
-                                        ImageAttachState(
-                                            uri = it,
-                                            isUploadComplete = true
-                                        )
-                                    },
-                                    isPendingSendMessage = true
-                                )
-                            )
-                        }
-                    }
-                })
-
-//                _attachment.update {
-//                    val filterMap = _attachment.value.toMutableMap()
-//                    filterMap.remove(AttachmentType.Image)
-//                    filterMap
-//                }
-            }
-            //Only text
-            else {
-                send(channelId, text)
-            }
-        }
-    }
-
-    /**
-     * 發送前 直接先貼上畫面 Preview
-     * @param text 發送文字
-     */
-    private fun generatePreviewBeforeSend(text: String) {
-        // TODO: TBD
-//        return
-//        uiState = uiState.copy(
-//            message = uiState.message.toMutableList().apply {
-//                add(0,
-//                    ChatMessageWrapper(
-//                        message = ChatMessage(
-//                            id = preSendChatId,
-//                            author = GroupMember(
-//                                name = XLoginHelper.nickName,
-//                                thumbNail = XLoginHelper.headImagePath
-//                            ),
-//                            content = MediaIChatContent(
-//                                text = text
-//                            ),
-//                            createUnixTime = System.currentTimeMillis() / 1000,
-//                            replyMessage = _replyMessage.value
-//                        ),
-//                        uploadAttachPreview = uiState.imageAttach.map { uri ->
-//                            MessageUiState.ImageAttachState(
-//                                uri = uri
-//                            )
-//                        }
-//                    )
-//                )
-//            }
-//        )
-    }
-
-    /**
-     * 上傳所有 附加圖片
-     * @param uriLis 圖片清單
-     * @param imageUploadCallback 圖片上傳 callback
-     */
-    private suspend fun uploadImages(uriLis: List<Uri>, imageUploadCallback: ImageUploadCallback) {
-        KLog.i(TAG, "uploadImages:" + uriLis.size)
-
-        val completeImageUrl = mutableListOf<String>()
-
-        withContext(Dispatchers.IO) {
-            uploadImageUseCase.uploadImage(uriLis).catch { e ->
-                KLog.e(TAG, e)
-                imageUploadCallback.onFailure(e)
-            }.collect {
-                KLog.i(TAG, "uploadImage:$it")
-                val uri = it.first         //之後如果要 mapping 可以用
-                val imageUrl = it.second
-                completeImageUrl.add(imageUrl)
-
-                if (completeImageUrl.size == uriLis.size) {
-                    imageUploadCallback.complete(completeImageUrl)
-                }
-            }
-        }
-    }
-
-    /**
-     * 對後端 Server 發送訊息
-     *
-     * @param channelId 頻道id
-     * @param text 發送內文
      * @param attachment 附加檔案
      */
-    private fun send(
+    fun messageSend(
         channelId: String,
         text: String,
-        attachment: List<Pair<AttachmentType, UploadFileItem>> = emptyList()
+        attachment: Map<AttachmentType, List<UploadFileItem>>
     ) {
         KLog.i(TAG, "send:" + text + " , media:" + attachment.size)
 
         viewModelScope.launch {
+            val listItem = attachment.flatMap { item ->
+                val key = item.key
+                val value = item.value
+                value.map {
+                    key to it
+                }
+            }
+
             chatRoomUseCase.sendMessage(
                 chatRoomChannelId = channelId,
                 text = text,
-                attachment = attachment,
+                attachment = listItem,
                 replyMessageId = _replyMessage.value?.id.orEmpty()
             ).onSuccess { chatMessage ->
                 //發送成功
@@ -531,35 +334,6 @@ class MessageViewModel(
                 if (it.message?.contains("403") == true) {
                     //檢查身上狀態
                     checkChannelPermission(channelId)
-                } else {
-                    //TODO
-                    //將發送失敗訊息 標註為Pending
-//                    _message.value = _message.value.toMutableList().apply {
-//                        add(
-//                            0,
-//                            ChatMessageWrapper(
-//                                message = ChatMessage(
-//                                    id = System.currentTimeMillis().toString(),
-//                                    author = GroupMember(
-//                                        name = XLoginHelper.nickName,
-//                                        thumbNail = XLoginHelper.headImagePath
-//                                    ),
-//                                    content = MediaIChatContent(
-//                                        text = text
-//                                    ),
-//                                    createUnixTime = System.currentTimeMillis() / 1000,
-//                                    replyMessage = _replyMessage.value
-//                                ),
-//                                uploadAttachPreview = images.map {
-//                                    ImageAttachState(
-//                                        uri = Uri.EMPTY,
-//                                        serverUrl = it
-//                                    )
-//                                },
-//                                isPendingSendMessage = true
-//                            )
-//                        )
-//                    }
                 }
             }
         }
@@ -944,10 +718,18 @@ class MessageViewModel(
     /**
      *  重新發送訊息
      */
-    fun onResendMessage(channelId: String, message: ChatMessageWrapper) {
+    fun onResendMessage(
+        channelId: String,
+        message: ChatMessageWrapper,
+        attachment: Map<AttachmentType, List<UploadFileItem>>
+    ) {
         KLog.i(TAG, "onResendMessage:$message")
         onDeleteReSend(message)
-        messageSend(channelId = channelId, text = message.message.content?.text.orEmpty())
+        messageSend(
+            channelId = channelId,
+            text = message.message.content?.text.orEmpty(),
+            attachment = attachment
+        )
         onReSendDialogDismiss()
     }
 
