@@ -22,7 +22,14 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
 val useCaseModule = module {
-    factory { ChatRoomUseCase(get(), get(), get()) }
+    factory {
+        ChatRoomUseCase(
+            context = androidApplication(),
+            chatRoomApi = get(),
+            messageApi = get(),
+            userReport = get()
+        )
+    }
     factory {
         GroupUseCase(
             androidApplication(),

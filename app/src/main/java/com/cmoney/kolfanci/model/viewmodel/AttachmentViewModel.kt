@@ -127,7 +127,17 @@ class AttachmentViewModel(
                 it.first == AttachmentType.Image && it.second.status == UploadFileItem.Status.Pending
             }.map { it.second.uri }
 
-            val allImages = uploadImageUseCase.uploadImage2(imageFiles).toList()
+            var allImages = uploadImageUseCase.uploadImage2(imageFiles).toList()
+
+            //todo ----- for test start -----
+            val testItem = allImages.first().copy(
+                status = UploadFileItem.Status.Failed("")
+            )
+            allImages.toMutableList().apply {
+                this[0] = testItem
+                allImages = this
+            }
+            //todo ----- for test end -----
 
             //圖片之外的檔案
             val otherFiles = uploadList.filter {
@@ -178,6 +188,14 @@ class AttachmentViewModel(
             newList
         }
 
+        val unionList = newList.groupBy(
+            {it.first}, {it.second}
+        )
+
+        _attachment.update {
+            unionList
+        }
+
         val hasFailed = _attachmentList.value.any { pairItem ->
             val item = pairItem.second
             item.status is UploadFileItem.Status.Failed
@@ -212,6 +230,12 @@ class AttachmentViewModel(
 
         _attachmentList.update {
             newList
+        }
+
+        _attachment.update {
+            newList.groupBy(
+                {it.first}, {it.second}
+            )
         }
     }
 

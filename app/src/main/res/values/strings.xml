@@ -281,9 +281,6 @@
     <string name="audio_speed_1.5">1.5x</string>
     <string name="audio_speed_1.75">1.75x</string>
     
-    <string name="post_fail_title">貼文發表失敗</string>
-    <string name="post_fail_desc">圖片或檔案上傳失敗\n為了確保貼文完整，快去檢查吧！</string>
-
     <string name="image_upload_fail_title">圖片上傳失敗</string>
     <string name="image_upload_fail_desc">容量過大或是網路不順\n圖片上傳失敗了嗚嗚</string>
 
@@ -291,4 +288,10 @@
     <string name="file_upload_fail_desc">容量過大或是網路不順\n圖片上傳失敗了嗚嗚</string>
 
     <string name="resend">重新上傳</string>
+
+    <string name="post_fail_title">貼文發表失敗</string>
+    <string name="post_fail_desc">圖片或檔案上傳失敗\n為了確保貼文完整，快去檢查吧！</string>
+
+    <string name="chat_fail_title">訊息傳送失敗</string>
+    <string name="chat_fail_desc">圖片或檔案上傳失敗\n為了確保訊息完整，快去檢查吧！</string>
 </resources>

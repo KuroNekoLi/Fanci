@@ -4,13 +4,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -22,25 +16,16 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachImageItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
-//TODO: 搬移位置 至共用
 /**
  * 聊天室 附加圖片
  *
@@ -70,7 +55,10 @@ fun ChatRoomAttachImageScreen(
             if (imageAttach.isNotEmpty()) {
                 items(imageAttach) { attach ->
                     AttachImageItem(
-                        uploadFileItem = attach,
+                        file = attach.uri,
+                        isItemClickable = true,
+                        isItemCanDelete = (attach.status == UploadFileItem.Status.Undefined),
+                        isShowResend = (attach.status is UploadFileItem.Status.Failed),
                         onClick = onClick,
                         onDelete = {
                             onDelete.invoke(it)
@@ -100,78 +88,6 @@ fun ChatRoomAttachImageScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun AttachImageItem(
-    uploadFileItem: UploadFileItem,
-    onDelete: (Uri) -> Unit,
-    onClick: (Uri) -> Unit,
-    onResend: ((ReSendFile) -> Unit)? = null
-) {
-    val context = LocalContext.current
-    val uri = uploadFileItem.uri
-    val status = uploadFileItem.status
-    val request = ImageRequest.Builder(context)
-        .data(uri)
-        .build()
-
-    Box(
-        modifier = Modifier
-            .height(120.dp)
-            .padding(top = 10.dp, bottom = 10.dp)
-            .clickable(
-                enabled = (status !is UploadFileItem.Status.Failed)
-            ) {
-                onClick.invoke(uri)
-            },
-        contentAlignment = Alignment.TopEnd
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            AsyncImage(
-                model = request,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
-            )
-
-            if (status is UploadFileItem.Status.Failed) {
-                Image(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clickable {
-                            onResend?.invoke(
-                                ReSendFile(
-                                    type = AttachmentType.Image,
-                                    file = uploadFileItem.uri,
-                                    title = context.getString(R.string.image_upload_fail_title),
-                                    description = context.getString(R.string.image_upload_fail_desc)
-                                )
-                            )
-                        },
-                    painter = painterResource(id = R.drawable.upload_failed),
-                    contentDescription = null
-                )
-            }
-        }
-
-        if (status !is UploadFileItem.Status.Failed) {
-            Image(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable {
-                        onDelete.invoke(uri)
-                    },
-                painter = painterResource(id = R.drawable.close), contentDescription = null
-            )
-        }
-
     }
 }
 

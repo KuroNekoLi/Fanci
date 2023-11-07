@@ -18,10 +18,11 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.copyToClipboard
-import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.model.remoteconfig.PollingFrequencyKey
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
@@ -105,14 +106,6 @@ class MessageViewModel(
     private val _isSendComplete = MutableStateFlow<Boolean>(false)
     val isSendComplete = _isSendComplete.asStateFlow()
 
-//    //附加檔案 (有分類聚合)
-//    private val _attachment = MutableStateFlow<Map<AttachmentType, List<Uri>>>(emptyMap())
-//    val attachment = _attachment.asStateFlow()
-//
-//    //附加檔案 (依照加入順序)
-//    private val _attachmentList = MutableStateFlow<List<Pair<AttachmentType, Uri>>>(emptyList())
-//    val attachmentList = _attachmentList.asStateFlow()
-
     //附加檔案,只有image類型
     private val _isOnlyPhotoSelector = MutableStateFlow<Boolean>(false)
     val isOnlyPhotoSelector = _isOnlyPhotoSelector.asStateFlow()
@@ -124,6 +117,10 @@ class MessageViewModel(
     //聊天室卷動至指定位置
     private val _scrollToPosition = MutableStateFlow<Int?>(null)
     val scrollToPosition = _scrollToPosition.asStateFlow()
+
+    //發送中
+    private val _isShowLoading = MutableStateFlow<Boolean>(false)
+    val isShowLoading = _isShowLoading.asStateFlow()
 
     private val preSendChatId = "Preview"       //發送前預覽的訊息id, 用來跟其他訊息區分
 
@@ -366,7 +363,9 @@ class MessageViewModel(
     fun messageSend(channelId: String, text: String) {
         KLog.i(TAG, "messageSend:$text")
         viewModelScope.launch {
-            generatePreviewBeforeSend(text)
+            _isShowLoading.value = true
+
+//            generatePreviewBeforeSend(text)
 
             //TODO; fix it
 
@@ -379,7 +378,7 @@ class MessageViewModel(
                 uploadImages(imageList, object : ImageUploadCallback {
                     override fun complete(images: List<String>) {
                         KLog.i(TAG, "all image upload complete:" + images.size)
-                        send(channelId, text, images)
+//                        send(channelId, text, images)
                     }
 
                     override fun onFailure(e: Throwable) {
@@ -491,19 +490,25 @@ class MessageViewModel(
 
     /**
      * 對後端 Server 發送訊息
+     *
      * @param channelId 頻道id
      * @param text 發送內文
-     * @param images 圖片清單
+     * @param attachment 附加檔案
      */
-    private fun send(channelId: String, text: String, images: List<String> = emptyList()) {
-        KLog.i(TAG, "send:" + text + " , media:" + images.size)
+    private fun send(
+        channelId: String,
+        text: String,
+        attachment: List<Pair<AttachmentType, UploadFileItem>> = emptyList()
+    ) {
+        KLog.i(TAG, "send:" + text + " , media:" + attachment.size)
+
         viewModelScope.launch {
             chatRoomUseCase.sendMessage(
                 chatRoomChannelId = channelId,
                 text = text,
-                images = images,
+                attachment = attachment,
                 replyMessageId = _replyMessage.value?.id.orEmpty()
-            ).fold({ chatMessage ->
+            ).onSuccess { chatMessage ->
                 //發送成功
                 KLog.i(TAG, "send success:$chatMessage")
                 _message.value = _message.value.map {
@@ -515,67 +520,48 @@ class MessageViewModel(
                 }
 
                 _isSendComplete.value = true
-
                 _replyMessage.value = null
-
                 //恢復聊天室內訊息,不會自動捲到最下面
                 delay(800)
                 _isSendComplete.value = false
-
-            }, {
+            }.onFailure {
+                //發送失敗
                 KLog.e(TAG, it)
 
                 if (it.message?.contains("403") == true) {
                     //檢查身上狀態
                     checkChannelPermission(channelId)
                 } else {
+                    //TODO
                     //將發送失敗訊息 標註為Pending
-                    _message.value = _message.value.toMutableList().apply {
-                        add(
-                            0,
-                            ChatMessageWrapper(
-                                message = ChatMessage(
-                                    id = System.currentTimeMillis().toString(),
-                                    author = GroupMember(
-                                        name = XLoginHelper.nickName,
-                                        thumbNail = XLoginHelper.headImagePath
-                                    ),
-                                    content = MediaIChatContent(
-                                        text = text
-                                    ),
-                                    createUnixTime = System.currentTimeMillis() / 1000,
-                                    replyMessage = _replyMessage.value
-                                ),
-                                uploadAttachPreview = images.map {
-                                    ImageAttachState(
-                                        uri = Uri.EMPTY,
-                                        serverUrl = it
-                                    )
-                                },
-                                isPendingSendMessage = true
-                            )
-                        )
-                    }
+//                    _message.value = _message.value.toMutableList().apply {
+//                        add(
+//                            0,
+//                            ChatMessageWrapper(
+//                                message = ChatMessage(
+//                                    id = System.currentTimeMillis().toString(),
+//                                    author = GroupMember(
+//                                        name = XLoginHelper.nickName,
+//                                        thumbNail = XLoginHelper.headImagePath
+//                                    ),
+//                                    content = MediaIChatContent(
+//                                        text = text
+//                                    ),
+//                                    createUnixTime = System.currentTimeMillis() / 1000,
+//                                    replyMessage = _replyMessage.value
+//                                ),
+//                                uploadAttachPreview = images.map {
+//                                    ImageAttachState(
+//                                        uri = Uri.EMPTY,
+//                                        serverUrl = it
+//                                    )
+//                                },
+//                                isPendingSendMessage = true
+//                            )
+//                        )
+//                    }
                 }
-
-
-//                //將發送失敗訊息放至Pending清單中
-//                val pendingMessage = uiState.pendingSendMessage.pendingSendMessage.toMutableList()
-//
-//                pendingMessage.add(
-//                    PendingSendMessage(
-//                        channelId = channelId,
-//                        text = text,
-//                        images = images
-//                    )
-//                )
-//
-//                uiState = uiState.copy(
-//                    pendingSendMessage = ChatMessageWrapper(
-//                        pendingSendMessage = pendingMessage
-//                    )
-//                )
-            })
+            }
         }
     }
 

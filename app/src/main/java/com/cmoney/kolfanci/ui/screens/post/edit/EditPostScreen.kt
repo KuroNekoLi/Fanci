@@ -61,8 +61,8 @@ import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.chat.AttachmentController
+import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
 import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
@@ -280,42 +280,21 @@ fun EditPostScreen(
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->
         val file = reSendFile.file
-
-        DialogScreen(
-            title = reSendFile.title,
-            subTitle = reSendFile.description,
+        ReSendFileDialog(
+            reSendFile = reSendFile,
             onDismiss = {
                 reSendFileClick = null
             },
-            content = {
-                Column {
-                    BorderButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        text = stringResource(id = R.string.remove),
-                        borderColor = LocalColor.current.text.default_100
-                    ) {
-                        attachmentViewModel.removeAttach(file)
-                        reSendFileClick = null
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    BorderButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        text = stringResource(id = R.string.resend),
-                        borderColor = LocalColor.current.text.default_100
-                    ) {
-                        attachmentViewModel.onResend(
-                            uploadFileItem = reSendFile,
-                            other = inputContent
-                        )
-                        reSendFileClick = null
-                    }
-                }
+            onRemove = {
+                attachmentViewModel.removeAttach(file)
+                reSendFileClick = null
+            },
+            onResend = {
+                attachmentViewModel.onResend(
+                    uploadFileItem = reSendFile,
+                    other = inputContent
+                )
+                reSendFileClick = null
             }
         )
     }

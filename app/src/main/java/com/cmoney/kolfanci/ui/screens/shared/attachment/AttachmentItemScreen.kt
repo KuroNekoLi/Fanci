@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -28,6 +29,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.formatDuration
 import com.cmoney.kolfanci.extension.getAudioDisplayDuration
@@ -37,6 +40,104 @@ import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
+/**
+ * 附加檔案 - 圖片 item
+ *
+ * @param file 檔案
+ * @param isItemClickable 是否可以點擊
+ * @param isItemCanDelete 是否可以刪除,是否呈現刪除按鈕
+ * @param isShowResend 是否呈現 重新發送 icon
+ * @param onClick 點擊 callback
+ * @param onDelete 刪除 callback
+ * @param onResend 重新發送 callback
+ */
+@Composable
+fun AttachImageItem(
+    file: Uri,
+    isItemClickable: Boolean,
+    isItemCanDelete: Boolean,
+    isShowResend: Boolean,
+    onDelete: (Uri) -> Unit,
+    onClick: (Uri) -> Unit,
+    onResend: ((ReSendFile) -> Unit)? = null
+) {
+    val context = LocalContext.current
+    val request = ImageRequest.Builder(context)
+        .data(file)
+        .build()
+
+    Box(
+        modifier = Modifier
+            .height(120.dp)
+            .padding(top = 10.dp, bottom = 10.dp)
+            .clickable(
+                enabled = isItemClickable
+            ) {
+                onClick.invoke(file)
+            },
+        contentAlignment = Alignment.TopEnd
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = request,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                contentDescription = null
+            )
+
+            if (isShowResend) {
+                Image(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable {
+                            onResend?.invoke(
+                                ReSendFile(
+                                    type = AttachmentType.Image,
+                                    file = file,
+                                    title = context.getString(R.string.image_upload_fail_title),
+                                    description = context.getString(R.string.image_upload_fail_desc)
+                                )
+                            )
+                        },
+                    painter = painterResource(id = R.drawable.upload_failed),
+                    contentDescription = null
+                )
+            }
+        }
+
+        if (isItemCanDelete) {
+            Image(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clickable {
+                        onDelete.invoke(file)
+                    },
+                painter = painterResource(id = R.drawable.close), contentDescription = null
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun AttachImageItemPreview() {
+    FanciTheme {
+        AttachImageItem(
+            file = Uri.EMPTY,
+            isItemClickable = true,
+            isItemCanDelete = true,
+            isShowResend = false,
+            onClick = {},
+            onDelete = {},
+            onResend = {}
+        )
+    }
+}
 
 /**
  * 附加檔案 item (ex:pdf, txt)

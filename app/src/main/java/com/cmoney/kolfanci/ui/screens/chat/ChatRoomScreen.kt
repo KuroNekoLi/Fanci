@@ -6,8 +6,10 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
@@ -17,22 +19,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.Glide
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fancylog.model.data.Clicked
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
+import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PdfPreviewScreenDestination
@@ -45,6 +55,7 @@ import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -141,8 +152,38 @@ fun ChatRoomScreen(
         messageViewModel.copyDone()
     }
 
+    //是否呈現上傳中畫面
+    var isShowLoading by remember {
+        mutableStateOf(false)
+    }
+
     //附加檔案
     val attachment by attachmentViewModel.attachment.collectAsState()
+
+    //是否全部File上傳完成
+    val attachmentUploadFinish by attachmentViewModel.uploadComplete.collectAsState()
+
+    //有上傳失敗的檔案
+    val hasUploadFailedFile by attachmentViewModel.uploadFailed.collectAsState()
+
+    //User 輸入內容
+    var inputContent by remember {
+        mutableStateOf("")
+    }
+
+    if (attachmentUploadFinish.first) {
+        isShowLoading = false
+        val text = attachmentUploadFinish.second?.toString().orEmpty()
+
+        //TODO
+//        messageViewModel.messageSend(channelId, it)
+
+        attachmentViewModel.finishPost()
+    }
+
+    var reSendFileClick by remember {
+        mutableStateOf<ReSendFile?>(null)
+    }
 
     //是否只有圖片選擇
     val isOnlyPhotoSelector by messageViewModel.isOnlyPhotoSelector.collectAsState()
@@ -151,6 +192,7 @@ fun ChatRoomScreen(
     ChatRoomScreenView(
         channelId = channelId,
         announceMessage = announceMessage,
+        isShowLoading = isShowLoading,
         onMsgDismissHide = {
             viewModel.onMsgDismissHide(it)
         },
@@ -161,9 +203,13 @@ fun ChatRoomScreen(
         onDeleteAttach = {
             attachmentViewModel.removeAttach(it)
         },
-        onMessageSend = {
+        onMessageSend = { text ->
+            inputContent = text
             AppUserLogger.getInstance().log(Clicked.MessageSendButton)
-            messageViewModel.messageSend(channelId, it)
+            isShowLoading = true
+            attachmentViewModel.upload(
+                other = text
+            )
         },
         onAttachClick = {
             AppUserLogger.getInstance().log(Clicked.MessageInsertImage)
@@ -188,7 +234,10 @@ fun ChatRoomScreen(
                 context = context
             )
         },
-        attachment = attachment
+        attachment = attachment,
+        onResend = {
+            reSendFileClick = it
+        }
     )
 
     //SnackBar 通知訊息
@@ -201,6 +250,50 @@ fun ChatRoomScreen(
     }
 
     //==================== Alert Dialog ====================
+    //上傳失敗 彈窗
+    if (hasUploadFailedFile) {
+        isShowLoading = false
+        DialogScreen(
+            title = stringResource(id = R.string.chat_fail_title),
+            subTitle = stringResource(id = R.string.chat_fail_desc),
+            onDismiss = {
+                attachmentViewModel.clearUploadFailed()
+            },
+            content = {
+                BlueButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.back)
+                ) {
+                    attachmentViewModel.clearUploadFailed()
+                }
+            }
+        )
+    }
+
+    //重新發送  彈窗
+    reSendFileClick?.let { reSendFile ->
+        val file = reSendFile.file
+        ReSendFileDialog(
+            reSendFile = reSendFile,
+            onDismiss = {
+                reSendFileClick = null
+            },
+            onRemove = {
+                attachmentViewModel.removeAttach(file)
+                reSendFileClick = null
+            },
+            onResend = {
+                attachmentViewModel.onResend(
+                    uploadFileItem = reSendFile,
+                    other = inputContent
+                )
+                reSendFileClick = null
+            }
+        )
+    }
+
     //檢舉用戶 彈窗
     val reportMessage by messageViewModel.reportMessage.collectAsState()
     reportMessage?.author?.apply {
@@ -267,6 +360,46 @@ fun ChatRoomScreen(
     }
 }
 
+/**
+ * 重新上傳 dialog
+ */
+@Composable
+fun ReSendFileDialog(
+    reSendFile: ReSendFile,
+    onDismiss: () -> Unit,
+    onRemove: () -> Unit,
+    onResend: () -> Unit
+) {
+    DialogScreen(
+        title = reSendFile.title,
+        subTitle = reSendFile.description,
+        onDismiss = onDismiss,
+        content = {
+            Column {
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.remove),
+                    borderColor = LocalColor.current.text.default_100,
+                    onClick = onRemove
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BorderButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.resend),
+                    borderColor = LocalColor.current.text.default_100,
+                    onClick = onResend
+                )
+            }
+        }
+    )
+}
+
 @Composable
 private fun ChatRoomScreenView(
     channelId: String,
@@ -280,7 +413,9 @@ private fun ChatRoomScreenView(
     showOnlyBasicPermissionTip: () -> Unit,
     onAttachImageAddClick: () -> Unit,
     attachment: Map<AttachmentType, List<UploadFileItem>>,
-    onPreviewAttachmentClick: (Uri) -> Unit
+    onPreviewAttachmentClick: (Uri) -> Unit,
+    isShowLoading: Boolean,
+    onResend: ((ReSendFile) -> Unit)
 ) {
     Column(
         modifier = Modifier
@@ -321,11 +456,13 @@ private fun ChatRoomScreenView(
                 .fillMaxWidth()
                 .background(MaterialTheme.colors.primary),
             attachment = attachment,
+            isShowLoading = isShowLoading,
             onDelete = {
                 onDeleteAttach.invoke(it)
             },
-            onAdd = onAttachImageAddClick,
-            onClick = onPreviewAttachmentClick
+            onAddImage = onAttachImageAddClick,
+            onClick = onPreviewAttachmentClick,
+            onResend = onResend
         )
 
         //輸入匡
@@ -421,7 +558,9 @@ fun ChatRoomScreenPreview() {
             showOnlyBasicPermissionTip = {},
             onAttachImageAddClick = {},
             attachment = emptyMap(),
-            onPreviewAttachmentClick = {}
+            onPreviewAttachmentClick = {},
+            isShowLoading = false,
+            onResend = {}
         )
     }
 }
