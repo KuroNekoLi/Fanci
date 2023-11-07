@@ -11,22 +11,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.extension.isURL
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
+import com.cmoney.xlogin.XLoginHelper
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import java.net.URL
+import java.util.concurrent.Executors
 
 @Destination
 @Composable
 fun PdfPreviewScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    uri: Uri
+    uri: Uri,
+    title: String = ""
 ) {
-    val fileTitle = uri.getFileName(LocalContext.current)
+    val fileTitle = if (uri.isURL()) {
+        title
+    } else {
+        uri.getFileName(LocalContext.current)
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -47,22 +56,31 @@ fun PdfPreviewScreen(
             factory = { context ->
                 val pdfView = PDFView(context, null)
 
-//                val executor = Executors.newSingleThreadExecutor()
-//                executor.execute {
-//                    val input = URL("https://www.africau.edu/images/default/sample.pdf").openStream()
-//                    pdfView.fromStream(input)
-//                        .enableAnnotationRendering(true)
-////                        .scrollHandle(DefaultScrollHandle(context))
-//                        .load()
-//                }
+                if (uri.isURL()) {
+                    val executor = Executors.newSingleThreadExecutor()
+                    executor.execute {
+                        val url = URL(uri.toString())
+                        val conn = url.openConnection()
+                        conn.setRequestProperty(
+                            "Authorization",
+                            "Bearer " + XLoginHelper.accessToken
+                        )
+                        val input = conn.getInputStream()
 
-                pdfView.apply {
-                    fromUri(uri)
-                        .defaultPage(0)
-                        .enableAnnotationRendering(true)
-                        .scrollHandle(DefaultScrollHandle(context))
-                        .spacing(10) // in dp
-                        .load()
+                        pdfView.fromStream(input)
+                            .enableAnnotationRendering(true)
+//                        .scrollHandle(DefaultScrollHandle(context))
+                            .load()
+                    }
+                } else {
+                    pdfView.apply {
+                        fromUri(uri)
+                            .defaultPage(0)
+                            .enableAnnotationRendering(true)
+                            .scrollHandle(DefaultScrollHandle(context))
+                            .spacing(10) // in dp
+                            .load()
+                    }
                 }
 
                 pdfView

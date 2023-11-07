@@ -383,7 +383,8 @@ object AttachmentController {
             AttachmentType.Pdf -> {
                 navController.navigate(
                     PdfPreviewScreenDestination(
-                        uri = uri
+                        uri = uri,
+                        title = fileName
                     )
                 )
             }
@@ -397,7 +398,9 @@ object AttachmentController {
                 )
             }
 
-            AttachmentType.Unknown -> TODO()
+            AttachmentType.Unknown -> {
+
+            }
         }
     }
 }
