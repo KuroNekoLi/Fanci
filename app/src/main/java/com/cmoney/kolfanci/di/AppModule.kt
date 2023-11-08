@@ -1,10 +1,13 @@
 package com.cmoney.kolfanci.di
 
+import android.content.ComponentName
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.notification.NotificationHelper
 import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.model.persistence.dataStore
+import com.cmoney.kolfanci.service.media.MusicMediaService
+import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.remoteconfig_library.IRemoteConfig
 import com.cmoney.remoteconfig_library.RemoteConfigImpl
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -39,4 +42,10 @@ val appModule = module {
         )
     }
 
+    single {
+        MusicServiceConnection.getInstance(
+            androidContext(),
+            ComponentName(androidContext(), MusicMediaService::class.java)
+        )
+    }
 }

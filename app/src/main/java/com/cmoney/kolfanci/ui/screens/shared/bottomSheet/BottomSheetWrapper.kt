@@ -3,10 +3,25 @@ package com.cmoney.kolfanci.ui.screens.shared.bottomSheet
 import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -22,10 +37,11 @@ fun BottomSheetWrapper(
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState =
         rememberModalBottomSheetState(
-            ModalBottomSheetValue.Hidden,
-            confirmStateChange = {
+            initialValue = ModalBottomSheetValue.Hidden,
+            confirmValueChange = {
                 it != ModalBottomSheetValue.HalfExpanded
-            }
+            },
+            skipHalfExpanded = true
         )
     var isSheetOpened by remember { mutableStateOf(false) }
 
@@ -39,9 +55,7 @@ fun BottomSheetWrapper(
                         animateHideBottomSheet(coroutineScope, modalBottomSheetState)
                     } }
                 }
-                else -> content {
-                    animateHideBottomSheet(coroutineScope, modalBottomSheetState)
-                }
+                else -> content
             }
         }
     ) {}

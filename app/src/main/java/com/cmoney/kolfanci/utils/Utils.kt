@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.utils
 
+import android.net.Uri
 import android.util.Patterns
+import android.webkit.MimeTypeMap
 import androidx.annotation.DrawableRes
 import com.cmoney.kolfanci.R
 import com.cmoney.fanciapi.fanci.model.Emojis
@@ -165,6 +167,12 @@ class Utils {
                     "剛剛"
                 }
             }
+        }
+
+        fun timeMillisToMinutesSeconds(timestamp: Long): String {
+            val minutes = timestamp / 1000 / 60
+            val seconds = (timestamp - (1000 * 60 * minutes)) / 1000
+            return String.format("%02d:%02d", minutes, seconds)
         }
     }
 }

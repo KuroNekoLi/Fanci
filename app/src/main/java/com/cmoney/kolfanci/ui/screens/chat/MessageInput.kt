@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
+import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import org.koin.androidx.compose.koinViewModel
@@ -54,7 +54,7 @@ fun MessageInput(
     defaultText: String = "",
     onMessageSend: (text: String) -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
-    viewModel: MessageViewModel = koinViewModel(),
+    attachmentViewModel: AttachmentViewModel = koinViewModel(),
     onAttachClick: () -> Unit
 ) {
     var textState by remember { mutableStateOf(defaultText) }
@@ -63,9 +63,9 @@ fun MessageInput(
         mutableStateOf(false)
     }
 
-    val imageAttach by viewModel.imageAttach.collectAsState()
+    val attachment by attachmentViewModel.attachmentList.collectAsState()
 
-    isShowSend = imageAttach.isNotEmpty() || textState.isNotEmpty()
+    isShowSend = attachment.isNotEmpty() || textState.isNotEmpty()
 
     Row(
         modifier = Modifier
@@ -213,9 +213,8 @@ fun MessageInput(
 fun MessageInputPreview() {
     FanciTheme {
         MessageInput(
-            onAttachClick = {},
             onMessageSend = {},
             showOnlyBasicPermissionTip = {}
-        )
+        ) {}
     }
 }

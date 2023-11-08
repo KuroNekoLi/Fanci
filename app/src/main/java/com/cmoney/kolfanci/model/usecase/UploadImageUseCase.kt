@@ -8,6 +8,8 @@ import com.cmoney.backend2.centralizedimage.service.api.upload.GenreAndSubGenre
 import com.cmoney.backend2.centralizedimage.service.api.upload.UploadResponseBody
 import com.cmoney.compress_image.CompressSetting
 import com.cmoney.compress_image.resizeAndCompressAndRotateImage
+import com.cmoney.kolfanci.extension.toUploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.flow
 import java.io.File
@@ -22,6 +24,29 @@ class UploadImageUseCase(
     val context: Context, private val centralizedImageWeb: CentralizedImageWeb
 ) {
     private val TAG = UploadImageUseCase::class.java.simpleName
+
+    suspend fun uploadImage2(uriLis: List<Uri>) = flow {
+        uriLis.forEach { uri ->
+            val uploadResponseBody = fetchImageUrl(uri)
+            uploadResponseBody?.let { uploadResponse ->
+                KLog.i(TAG, "uploadImage success:$uploadResponse")
+                emit(
+                    uri.toUploadFileItem(
+                        context = context,
+                        status = AttachmentInfoItem.Status.Success,
+                        serverUrl = uploadResponse.url.orEmpty()
+                    )
+                )
+            } ?: kotlin.run {
+                emit(
+                    AttachmentInfoItem(
+                        uri = uri,
+                        status = AttachmentInfoItem.Status.Failed("uploadImage failed.")
+                    )
+                )
+            }
+        }
+    }
 
     suspend fun uploadImage(uriLis: List<Uri>) = flow {
         uriLis.forEach { uri ->

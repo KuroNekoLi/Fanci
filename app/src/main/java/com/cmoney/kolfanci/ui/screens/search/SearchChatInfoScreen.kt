@@ -148,6 +148,7 @@ private fun SearchChatInfoViewScreen(
                 if (message.isNotEmpty()) {
                     itemsIndexed(message) { index, chatMessageWrapper ->
                         SearchChatMessageContent(
+                            navController = navController,
                             chatMessageWrapper = chatMessageWrapper
                         )
                     }
@@ -205,6 +206,7 @@ fun SearchChatInfoScreenPreview() {
 @Composable
 private fun SearchChatMessageContent(
     modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
     chatMessageWrapper: ChatMessageWrapper
 ) {
     val messageModel = chatMessageWrapper.message
@@ -290,7 +292,10 @@ private fun SearchChatMessageContent(
                 }
 
                 messageModel.content?.medias?.let {
-                    MediaContent(it, false)
+                    MediaContent(
+                        navController = navController,
+                        medias = it,
+                        isClickable = false)
                 }
 
                 //Emoji
@@ -327,6 +332,7 @@ private fun SearchChatMessageContent(
 fun SearchChatMessageContentPreview() {
     FanciTheme {
         SearchChatMessageContent(
+            navController = EmptyDestinationsNavigator,
             chatMessageWrapper = ChatMessageWrapper(
                 message = MockData.mockMessage,
                 uploadAttachPreview = listOf(

@@ -15,9 +15,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
-import com.cmoney.kolfanci.ui.main.MainActivity
 import java.io.File
-
 
 fun Context.copyToClipboard(text: String) {
     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

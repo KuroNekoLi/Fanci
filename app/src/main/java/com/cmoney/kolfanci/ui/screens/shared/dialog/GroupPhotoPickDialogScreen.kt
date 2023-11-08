@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.ui.common.GrayButton
-import com.cmoney.kolfanci.ui.screens.chat.AttachImageDefault
+import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.socks.library.KLog
 

@@ -176,7 +176,7 @@ fun MessageImageItem(
             val width = size.width
             val height = size.height
 
-            KLog.i(TAG, "size: width = $width, height = $height")
+//            KLog.i(TAG, "size: width = $width, height = $height")
 
             maxWidth = when {
                 (height == width) -> {

@@ -390,6 +390,7 @@ private fun PostScreenView(
                 pinPost?.let { pinPost ->
                     item {
                         BasePostContentScreen(
+                            navController = navController,
                             post = pinPost.message,
                             bottomContent = {
                                 CommentCount(
@@ -428,6 +429,7 @@ private fun PostScreenView(
                 items(items = filterPost) { post ->
                     val postMessage = post.message
                     BasePostContentScreen(
+                        navController = navController,
                         post = postMessage,
                         bottomContent = {
                             CommentCount(
