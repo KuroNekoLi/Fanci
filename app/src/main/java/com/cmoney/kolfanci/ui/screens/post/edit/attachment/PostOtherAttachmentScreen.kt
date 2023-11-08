@@ -10,10 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -25,7 +24,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 fun PostOtherAttachmentScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    attachment: List<Pair<AttachmentType, UploadFileItem>>,
+    attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
     onClick: (Uri) -> Unit,
     onDelete: (Uri) -> Unit,
     onResend: ((ReSendFile) -> Unit)? = null
@@ -47,10 +46,11 @@ fun PostOtherAttachmentScreen(
                         AttachmentAudioItem(
                             modifier = itemModifier,
                             file = item.uri,
-                            isItemClickable = (item.status == UploadFileItem.Status.Undefined),
-                            isItemCanDelete = (item.status !is UploadFileItem.Status.Failed),
-                            isShowResend = (item.status is UploadFileItem.Status.Failed),
-                            displayName = item.uri.getFileName(context).orEmpty(),
+                            duration = item.duration ?: 0,
+                            isItemClickable = (item.status == AttachmentInfoItem.Status.Undefined),
+                            isItemCanDelete = (item.status !is AttachmentInfoItem.Status.Failed),
+                            isShowResend = (item.status is AttachmentInfoItem.Status.Failed),
+                            displayName = item.filename,
                             onClick = onClick,
                             onDelete = onDelete,
                             onResend = onResend
@@ -63,10 +63,11 @@ fun PostOtherAttachmentScreen(
                         AttachmentFileItem(
                             modifier = itemModifier,
                             file = item.uri,
-                            isItemClickable = (item.status == UploadFileItem.Status.Undefined),
-                            isItemCanDelete = (item.status !is UploadFileItem.Status.Failed),
-                            isShowResend = (item.status is UploadFileItem.Status.Failed),
-                            displayName = item.uri.getFileName(context).orEmpty(),
+                            fileSize = item.fileSize,
+                            isItemClickable = (item.status == AttachmentInfoItem.Status.Undefined),
+                            isItemCanDelete = (item.status !is AttachmentInfoItem.Status.Failed),
+                            isShowResend = (item.status is AttachmentInfoItem.Status.Failed),
+                            displayName = item.filename,
                             onClick = onClick,
                             onDelete = onDelete,
                             onResend = onResend

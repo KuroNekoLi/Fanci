@@ -156,7 +156,7 @@ fun AttachImageItemPreview() {
 fun AttachmentFileItem(
     modifier: Modifier = Modifier,
     file: Uri,
-    fileSize: Long = 0,
+    fileSize: Long,
     displayName: String,
     isItemClickable: Boolean,
     isItemCanDelete: Boolean,
@@ -220,11 +220,7 @@ fun AttachmentFileItem(
                     //File size
                     Text(
                         modifier = Modifier.padding(top = 5.dp, start = 15.dp, bottom = 5.dp),
-                        text = if (fileSize == 0L) {
-                            file.getDisplayFileSize(context)
-                        } else {
-                            fileSize.getDisplayFileSize()
-                        },
+                        text = fileSize.getDisplayFileSize(),
                         style = TextStyle(
                             fontSize = 14.sp,
                             color = LocalColor.current.text.default_50
@@ -283,7 +279,8 @@ fun AttachmentFileItemPreview() {
             isShowResend = false,
             onClick = {},
             onDelete = {},
-            onResend = {}
+            onResend = {},
+            fileSize = 0
         )
     }
 }
@@ -306,7 +303,7 @@ fun AttachmentFileItemPreview() {
 fun AttachmentAudioItem(
     modifier: Modifier = Modifier,
     file: Uri,
-    duration: Long = 0,
+    duration: Long,
     displayName: String,
     isItemClickable: Boolean,
     isItemCanDelete: Boolean,
@@ -373,11 +370,7 @@ fun AttachmentAudioItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = if (duration == 0L) {
-                                file.getAudioDisplayDuration(context)
-                            } else {
-                                duration.formatDuration()
-                            },
+                            text = duration.formatDuration(),
                             fontSize = 14.sp,
                             color = LocalColor.current.text.default_50
                         )
@@ -438,6 +431,7 @@ fun AttachmentAudioItemPreview() {
                 .height(75.dp),
             displayName = "上課教材.mp3",
             file = Uri.EMPTY,
+            duration = 0,
             isItemClickable = true,
             isItemCanDelete = true,
             isShowResend = false,

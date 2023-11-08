@@ -1,8 +1,10 @@
 package com.cmoney.kolfanci.extension
 
+import android.net.Uri
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 
 /**
  * 取得 檔案名稱
@@ -64,6 +66,25 @@ fun MediaType.toAttachmentType(): AttachmentType =
 fun List<Media>.toAttachmentTypeMap() =
     this.map {
         (it.type?.toAttachmentType() ?: AttachmentType.Unknown) to it
+    }.groupBy({
+        it.first
+    }, {
+        it.second
+    })
+
+/**
+ * 將 server 給的 List media 轉換成 UploadFileItem map
+ */
+fun List<Media>.toUploadFileItemMap() =
+    this.map {
+        (it.type?.toAttachmentType() ?: AttachmentType.Unknown) to AttachmentInfoItem(
+            uri = Uri.parse(it.resourceLink),
+            status = AttachmentInfoItem.Status.Success,
+            serverUrl = it.resourceLink.orEmpty(),
+            filename = it.getFileName(),
+            fileSize = it.getFleSize(),
+            duration = it.getDuration()
+        )
     }.groupBy({
         it.first
     }, {

@@ -8,7 +8,8 @@ import com.cmoney.backend2.centralizedimage.service.api.upload.GenreAndSubGenre
 import com.cmoney.backend2.centralizedimage.service.api.upload.UploadResponseBody
 import com.cmoney.compress_image.CompressSetting
 import com.cmoney.compress_image.resizeAndCompressAndRotateImage
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.extension.toUploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.flow
 import java.io.File
@@ -30,17 +31,17 @@ class UploadImageUseCase(
             uploadResponseBody?.let { uploadResponse ->
                 KLog.i(TAG, "uploadImage success:$uploadResponse")
                 emit(
-                    UploadFileItem(
-                        uri = uri,
-                        status = UploadFileItem.Status.Success,
+                    uri.toUploadFileItem(
+                        context = context,
+                        status = AttachmentInfoItem.Status.Success,
                         serverUrl = uploadResponse.url.orEmpty()
                     )
                 )
             } ?: kotlin.run {
                 emit(
-                    UploadFileItem(
+                    AttachmentInfoItem(
                         uri = uri,
-                        status = UploadFileItem.Status.Failed("uploadImage failed.")
+                        status = AttachmentInfoItem.Status.Failed("uploadImage failed.")
                     )
                 )
             }

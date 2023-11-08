@@ -58,7 +58,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -83,6 +83,12 @@ import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/**
+ * 建立/編輯 貼文
+ *
+ * @param channelId 頻道id
+ * @param editPost 要編輯的貼文物件 (option)
+ */
 @Destination
 @Composable
 fun EditPostScreen(
@@ -127,8 +133,10 @@ fun EditPostScreen(
 
     //編輯貼文, 設定初始化資料
     LaunchedEffect(Unit) {
-        if (editPost != null) {
-            viewModel.editPost(editPost)
+        editPost?.let { post ->
+            post.content?.medias?.apply {
+                attachmentViewModel.addAttachment(this)
+            }
         }
     }
 
@@ -325,7 +333,7 @@ private fun EditPostScreenView(
     onPostClick: (String) -> Unit,
     onBack: () -> Unit,
     showLoading: Boolean,
-    attachment: List<Pair<AttachmentType, UploadFileItem>>,
+    attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
     onDeleteAttach: (Uri) -> Unit,
     onPreviewAttachmentClick: (Uri) -> Unit,
     onResend: (ReSendFile) -> Unit
@@ -579,7 +587,7 @@ private fun TopBarView(
 }
 
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun EditPostScreenPreview() {
     FanciTheme {

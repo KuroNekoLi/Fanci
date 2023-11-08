@@ -19,7 +19,7 @@ import com.cmoney.fanciapi.fanci.model.ReportParm
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.model.attachment.AttachmentType
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
 import com.socks.library.KLog
 
@@ -228,7 +228,7 @@ class ChatRoomUseCase(
     suspend fun sendMessage(
         chatRoomChannelId: String,
         text: String,
-        attachment: List<Pair<AttachmentType, UploadFileItem>>,
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
         replyMessageId: String = ""
     ) =
         kotlin.runCatching {

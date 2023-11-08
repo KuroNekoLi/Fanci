@@ -7,6 +7,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -196,3 +197,20 @@ fun Uri.getAudioDuration(context: Context): Long {
  * 判斷 Uri 是否為網址
  */
 fun Uri.isURL(): Boolean = this.scheme?.startsWith("http") == true
+
+/**
+ * 轉換成上傳物件
+ */
+fun Uri.toUploadFileItem(
+    context: Context,
+    status: AttachmentInfoItem.Status = AttachmentInfoItem.Status.Undefined,
+    serverUrl: String = ""
+): AttachmentInfoItem =
+    AttachmentInfoItem(
+        uri = this,
+        status = status,
+        serverUrl = serverUrl,
+        filename = this.getFileName(context).orEmpty(),
+        fileSize = this.getFileSize(context) ?: 0L,
+        duration = this.getAudioDuration(context)
+    )

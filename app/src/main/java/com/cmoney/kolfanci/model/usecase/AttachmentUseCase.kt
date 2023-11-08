@@ -6,9 +6,10 @@ import android.net.Uri
 import com.bumptech.glide.Glide
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.extension.getAttachmentType
+import com.cmoney.kolfanci.extension.toUploadFileItem
 import com.cmoney.kolfanci.extension.getUploadFileType
 import com.cmoney.kolfanci.model.attachment.AttachmentType
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.repository.Network
 import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PdfPreviewScreenDestination
@@ -30,14 +31,14 @@ class AttachmentUseCase(
 
     suspend fun uploadFile(uri: Uri) = network.uploadFile(uri)
 
-    suspend fun uploadFile(uris: List<Uri>): Flow<UploadFileItem> = flow {
+    suspend fun uploadFile(uris: List<Uri>): Flow<AttachmentInfoItem> = flow {
         KLog.i(TAG, "uploadFile")
 
         uris.forEach { uri ->
             emit(
-                UploadFileItem(
-                    uri = uri,
-                    status = UploadFileItem.Status.Uploading
+                uri.toUploadFileItem(
+                    context = context,
+                    status = AttachmentInfoItem.Status.Uploading
                 )
             )
 
@@ -57,9 +58,9 @@ class AttachmentUseCase(
                 .onFailure {
                     KLog.e(TAG, "uploadFile step1 fail:$it")
                     emit(
-                        UploadFileItem(
+                        AttachmentInfoItem(
                             uri = uri,
-                            status = UploadFileItem.Status.Failed("upload step1 failed.")
+                            status = AttachmentInfoItem.Status.Failed("upload step1 failed.")
                         )
                     )
                 }
@@ -70,7 +71,7 @@ class AttachmentUseCase(
     /**
      * 檢查 檔案上傳 狀態
      */
-    private suspend fun checkFileStatus(externalId: String, uri: Uri): UploadFileItem {
+    private suspend fun checkFileStatus(externalId: String, uri: Uri): AttachmentInfoItem {
         val uploadFileType = uri.getUploadFileType(context)
 
         val whileLimit = 10
@@ -96,23 +97,23 @@ class AttachmentUseCase(
             fileUploadStatusResponse?.let { statusResponse ->
                 val status = when (statusResponse.status) {
                     "uploading" -> {
-                        UploadFileItem.Status.Uploading
+                        AttachmentInfoItem.Status.Uploading
                     }
 
                     "success" -> {
-                        UploadFileItem.Status.Success
+                        AttachmentInfoItem.Status.Success
                     }
 
                     else -> {
-                        UploadFileItem.Status.Failed("checkFileStatus fail")
+                        AttachmentInfoItem.Status.Failed("checkFileStatus fail")
                     }
                 }
 
-                if (whileCount > whileLimit || status == UploadFileItem.Status.Success) {
-                    return UploadFileItem(
-                        uri = uri,
+                if (whileCount > whileLimit || status == AttachmentInfoItem.Status.Success) {
+                    return uri.toUploadFileItem(
+                        context = context,
                         status = status,
-                        serverUrl = if (status == UploadFileItem.Status.Success) {
+                        serverUrl = if (status == AttachmentInfoItem.Status.Success) {
                             BuildConfig.CM_SERVER_URL + "centralfileservice/files/%s/%s".format(
                                 uploadFileType,
                                 externalId
@@ -126,9 +127,9 @@ class AttachmentUseCase(
             } ?: kotlin.run {
 
                 if (whileCount > whileLimit) {
-                    return UploadFileItem(
+                    return AttachmentInfoItem(
                         uri = uri,
-                        status = UploadFileItem.Status.Failed("checkFileStatus fail, is null response.")
+                        status = AttachmentInfoItem.Status.Failed("checkFileStatus fail, is null response.")
                     )
                 }
             }
@@ -136,9 +137,9 @@ class AttachmentUseCase(
             delay(delayTime * 1000)
         }
 
-        return UploadFileItem(
+        return AttachmentInfoItem(
             uri = uri,
-            status = UploadFileItem.Status.Failed("upload failed.")
+            status = AttachmentInfoItem.Status.Failed("upload failed.")
         )
     }
 

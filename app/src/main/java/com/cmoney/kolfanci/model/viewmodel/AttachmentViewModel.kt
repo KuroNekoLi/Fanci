@@ -4,10 +4,13 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.kolfanci.extension.getAttachmentType
+import com.cmoney.kolfanci.extension.toUploadFileItem
+import com.cmoney.kolfanci.extension.toUploadFileItemMap
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.socks.library.KLog
@@ -24,15 +27,16 @@ class AttachmentViewModel(
 ) : AndroidViewModel(context) {
     private val TAG = AttachmentViewModel::class.java.simpleName
 
-    //附加檔案 (有分類聚合)
-    private val _attachment =
-        MutableStateFlow<Map<AttachmentType, List<UploadFileItem>>>(emptyMap())
-    val attachment = _attachment.asStateFlow()
-
     //附加檔案 (依照加入順序)
     private val _attachmentList =
-        MutableStateFlow<List<Pair<AttachmentType, UploadFileItem>>>(emptyList())
+        MutableStateFlow<List<Pair<AttachmentType, AttachmentInfoItem>>>(emptyList())
     val attachmentList = _attachmentList.asStateFlow()
+
+    //TODO: 統一一份資料
+    //附加檔案 (有分類聚合)
+    private val _attachment =
+        MutableStateFlow<Map<AttachmentType, List<AttachmentInfoItem>>>(emptyMap())
+    val attachment = _attachment.asStateFlow()
 
     //是否全部檔案 上傳完成
     private val _uploadComplete = MutableStateFlow<Pair<Boolean, Any?>>(false to null)
@@ -50,7 +54,7 @@ class AttachmentViewModel(
         oldList.addAll(
             uris.map { uri ->
                 val attachmentType = uri.getAttachmentType(context)
-                attachmentType to UploadFileItem(uri = uri)
+                attachmentType to uri.toUploadFileItem(context = context)
             }
         )
 
@@ -60,7 +64,7 @@ class AttachmentViewModel(
 
         val attachmentMap = uris.map { uri ->
             val attachmentType = uri.getAttachmentType(context)
-            attachmentType to UploadFileItem(uri = uri)
+            attachmentType to uri.toUploadFileItem(context = context)
         }.groupBy {
             it.first
         }.mapValues { entry ->
@@ -124,7 +128,7 @@ class AttachmentViewModel(
 
             //圖片處理
             val imageFiles = uploadList.filter {
-                it.first == AttachmentType.Image && it.second.status == UploadFileItem.Status.Pending
+                it.first == AttachmentType.Image && it.second.status == AttachmentInfoItem.Status.Pending
             }.map { it.second.uri }
 
             val allImages = uploadImageUseCase.uploadImage2(imageFiles).toList()
@@ -142,7 +146,7 @@ class AttachmentViewModel(
 
             //圖片之外的檔案
             val otherFiles = uploadList.filter {
-                it.first != AttachmentType.Image && it.second.status == UploadFileItem.Status.Pending
+                it.first != AttachmentType.Image && it.second.status == AttachmentInfoItem.Status.Pending
             }.map { it.second.uri }
 
             val allOtherFiles = attachmentUseCase.uploadFile(otherFiles).toList()
@@ -160,8 +164,8 @@ class AttachmentViewModel(
      * 並檢查是否有失敗的
      */
     private fun updateAttachmentList(
-        imageFiles: List<UploadFileItem>,
-        otherFiles: List<UploadFileItem>,
+        imageFiles: List<AttachmentInfoItem>,
+        otherFiles: List<AttachmentInfoItem>,
         other: Any? = null
     ) {
         val allItems = imageFiles.reversed().distinctBy {
@@ -190,7 +194,7 @@ class AttachmentViewModel(
         }
 
         val unionList = newList.groupBy(
-            {it.first}, {it.second}
+            { it.first }, { it.second }
         )
 
         _attachment.update {
@@ -199,7 +203,7 @@ class AttachmentViewModel(
 
         val hasFailed = _attachmentList.value.any { pairItem ->
             val item = pairItem.second
-            item.status is UploadFileItem.Status.Failed
+            item.status is AttachmentInfoItem.Status.Failed
         }
 
         if (hasFailed) {
@@ -220,8 +224,8 @@ class AttachmentViewModel(
             val uploadItem = it.second
 
             val newUploadItem = uploadItem.copy(
-                status = if (uploadItem.status == UploadFileItem.Status.Undefined) {
-                    UploadFileItem.Status.Pending
+                status = if (uploadItem.status == AttachmentInfoItem.Status.Undefined) {
+                    AttachmentInfoItem.Status.Pending
                 } else {
                     uploadItem.status
                 }
@@ -235,7 +239,7 @@ class AttachmentViewModel(
 
         _attachment.update {
             newList.groupBy(
-                {it.first}, {it.second}
+                { it.first }, { it.second }
             )
         }
     }
@@ -263,7 +267,7 @@ class AttachmentViewModel(
         viewModelScope.launch {
             val file = uploadFileItem.file
 
-            var allImages = emptyList<UploadFileItem>()
+            var allImages = emptyList<AttachmentInfoItem>()
             if (uploadFileItem.type == AttachmentType.Image) {
                 allImages = uploadImageUseCase.uploadImage2(listOf(file)).toList()
             }
@@ -282,5 +286,25 @@ class AttachmentViewModel(
         KLog.i(TAG, "clear")
         _attachment.update { emptyMap() }
         _attachmentList.update { emptyList() }
+    }
+
+    /**
+     * 將已經上傳的資料 加入清單
+     */
+    fun addAttachment(mediaList: List<Media>) {
+        KLog.i(TAG, "addAttachment:" + mediaList.size)
+        viewModelScope.launch {
+            val attachmentMap = mediaList.toUploadFileItemMap()
+            val attachmentList = attachmentMap.map { mapItem ->
+                val key = mapItem.key
+                val value = mapItem.value
+                value.map {
+                    key to it
+                }
+            }.flatten()
+
+            _attachment.update { attachmentMap }
+            _attachmentList.update { attachmentList }
+        }
     }
 }

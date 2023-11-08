@@ -117,8 +117,7 @@ val viewModule = module {
             get(),
             get(),
             params.get(),
-            get(),
-            attachmentUseCase = get()
+            get()
         )
     }
     viewModel {

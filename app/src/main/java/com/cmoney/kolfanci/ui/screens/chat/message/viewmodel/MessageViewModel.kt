@@ -8,10 +8,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Emojis
-import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
-import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.ReportReason
@@ -22,7 +20,7 @@ import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.remoteconfig.PollingFrequencyKey
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
@@ -36,19 +34,15 @@ import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.MessageUtils
 import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.remoteconfig_library.extension.getKeyValue
-import com.cmoney.xlogin.XLoginHelper
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.socks.library.KLog
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class ImageAttachState(
     val uri: Uri,
@@ -293,7 +287,7 @@ class MessageViewModel(
     fun messageSend(
         channelId: String,
         text: String,
-        attachment: Map<AttachmentType, List<UploadFileItem>>
+        attachment: Map<AttachmentType, List<AttachmentInfoItem>>
     ) {
         KLog.i(TAG, "send:" + text + " , media:" + attachment.size)
 
@@ -721,7 +715,7 @@ class MessageViewModel(
     fun onResendMessage(
         channelId: String,
         message: ChatMessageWrapper,
-        attachment: Map<AttachmentType, List<UploadFileItem>>
+        attachment: Map<AttachmentType, List<AttachmentInfoItem>>
     ) {
         KLog.i(TAG, "onResendMessage:$message")
         onDeleteReSend(message)

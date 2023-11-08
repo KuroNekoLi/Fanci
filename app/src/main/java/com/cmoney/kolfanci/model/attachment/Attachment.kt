@@ -15,7 +15,7 @@ import com.cmoney.kolfanci.extension.getFileSize
 /**
  * 將附加檔案 List 轉為, 上傳用的 Media List
  */
-fun List<Pair<AttachmentType, UploadFileItem>>.toUploadMedia(context: Context): List<Media> {
+fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Context): List<Media> {
     val medias = mutableListOf<Media>()
 
     //處理 附加檔案
@@ -92,11 +92,17 @@ sealed class AttachmentType {
  * @param uri 上傳的檔案
  * @param status 上傳狀態
  * @param serverUrl 上傳成功後 拿到的 url
+ * @param filename 檔案名稱
+ * @param fileSize 檔案大小
+ * @param duration 音檔長度 (option)
  */
-data class UploadFileItem(
+data class AttachmentInfoItem(
     val uri: Uri = Uri.EMPTY,
     val status: Status = Status.Undefined,
-    val serverUrl: String = ""
+    val serverUrl: String = "",
+    val filename: String = "",
+    val fileSize: Long = 0,
+    val duration: Long? = 0
 ) {
     /**
      * 檔案上傳狀態

@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.attachment.AttachmentType
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
 
 class MediaPickerBottomSheetViewModel(
@@ -20,7 +20,7 @@ class MediaPickerBottomSheetViewModel(
      * @param onError 檢查失敗, 並回傳錯誤訊息 (title, description)
      */
     fun photoPickCheck(
-        selectedAttachment: Map<AttachmentType, List<UploadFileItem>>,
+        selectedAttachment: Map<AttachmentType, List<AttachmentInfoItem>>,
         attachmentEnv: AttachmentEnv,
         onOpen: () -> Unit,
         onError: (String, String) -> Unit
@@ -73,7 +73,7 @@ class MediaPickerBottomSheetViewModel(
      * 貼文: (待補)
      */
     fun filePickCheck(
-        selectedAttachment: Map<AttachmentType, List<UploadFileItem>>,
+        selectedAttachment: Map<AttachmentType, List<AttachmentInfoItem>>,
         attachmentEnv: AttachmentEnv,
         onOpen: () -> Unit,
         onError: (String, String) -> Unit

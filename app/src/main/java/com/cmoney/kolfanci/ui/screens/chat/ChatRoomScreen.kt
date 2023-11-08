@@ -36,7 +36,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -414,7 +414,7 @@ private fun ChatRoomScreenView(
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
     onAttachImageAddClick: () -> Unit,
-    attachment: Map<AttachmentType, List<UploadFileItem>>,
+    attachment: Map<AttachmentType, List<AttachmentInfoItem>>,
     onPreviewAttachmentClick: (Uri) -> Unit,
     isShowLoading: Boolean,
     onResend: ((ReSendFile) -> Unit)

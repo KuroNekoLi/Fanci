@@ -11,7 +11,7 @@ import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.model.attachment.AttachmentType
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
 
 class PostUseCase(
@@ -57,7 +57,7 @@ class PostUseCase(
     suspend fun writePost(
         channelId: String,
         text: String,
-        attachment: List<Pair<AttachmentType, UploadFileItem>>
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>
     ): Result<BulletinboardMessage> {
         val medias = attachment.toUploadMedia(context)
 

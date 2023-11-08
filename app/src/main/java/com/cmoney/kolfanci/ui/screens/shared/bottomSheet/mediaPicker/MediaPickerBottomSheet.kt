@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.model.attachment.AttachmentType
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
@@ -83,7 +83,7 @@ fun MediaPickerBottomSheet(
     state: ModalBottomSheetState,
     attachmentEnv: AttachmentEnv = AttachmentEnv.Chat,
     isOnlyPhotoSelector: Boolean = false,
-    selectedAttachment: Map<AttachmentType, List<UploadFileItem>>,
+    selectedAttachment: Map<AttachmentType, List<AttachmentInfoItem>>,
     viewModel: MediaPickerBottomSheetViewModel = koinViewModel(),
     onAttach: (List<Uri>) -> Unit
 ) {

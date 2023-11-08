@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
@@ -36,7 +36,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 @Composable
 fun ChatRoomAttachmentScreen(
     modifier: Modifier = Modifier,
-    attachment: Map<AttachmentType, List<UploadFileItem>>,
+    attachment: Map<AttachmentType, List<AttachmentInfoItem>>,
     isShowLoading: Boolean,
     onDelete: (Uri) -> Unit,
     onAddImage: () -> Unit,

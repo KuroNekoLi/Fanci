@@ -9,8 +9,7 @@ import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.kolfanci.model.attachment.AttachmentType
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
-import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
@@ -35,8 +34,7 @@ class EditPostViewModel(
     private val postUseCase: PostUseCase,
     private val chatRoomUseCase: ChatRoomUseCase,
     val channelId: String,
-    private val uploadImageUseCase: UploadImageUseCase,
-    private val attachmentUseCase: AttachmentUseCase
+    private val uploadImageUseCase: UploadImageUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = EditPostViewModel::class.java.simpleName
@@ -70,7 +68,7 @@ class EditPostViewModel(
      * @param text 內文
      * @param attachment 附加檔案
      */
-    fun onPost(text: String, attachment: List<Pair<AttachmentType, UploadFileItem>>) {
+    fun onPost(text: String, attachment: List<Pair<AttachmentType, AttachmentInfoItem>>) {
         KLog.i(TAG, "onPost:$text, attachment:$attachment")
         viewModelScope.launch {
             if (text.isEmpty() && _attachImages.value.isEmpty()) {
@@ -88,7 +86,7 @@ class EditPostViewModel(
      * @param text 內文
      * @param attachment 附加檔案
      */
-    private fun sendPost(text: String, attachment: List<Pair<AttachmentType, UploadFileItem>>) {
+    private fun sendPost(text: String, attachment: List<Pair<AttachmentType, AttachmentInfoItem>>) {
         KLog.i(TAG, "sendPost")
         viewModelScope.launch {
             loading()
@@ -162,7 +160,7 @@ class EditPostViewModel(
      *
      * @param attachment 附加檔案
      */
-    fun onUpdatePostClick(editPost: BulletinboardMessage, text: String, attachment: List<Pair<AttachmentType, UploadFileItem>>) {
+    fun onUpdatePostClick(editPost: BulletinboardMessage, text: String, attachment: List<Pair<AttachmentType, AttachmentInfoItem>>) {
         KLog.i(TAG, "onUpdatePost:$text")
         viewModelScope.launch {
             if (text.isEmpty() && _attachImages.value.isEmpty()) {

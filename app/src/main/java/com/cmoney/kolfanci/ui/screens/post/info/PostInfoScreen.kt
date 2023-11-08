@@ -71,7 +71,7 @@ import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
@@ -863,7 +863,7 @@ private fun PostInfoScreenView(
                         .fillMaxWidth()
                         .background(MaterialTheme.colors.primary),
                     imageAttach = imageAttachList.map {
-                        UploadFileItem(uri = it)
+                        AttachmentInfoItem(uri = it)
                     },
                     onDelete = {
                         postInfoListener.onDeleteAttach(it)

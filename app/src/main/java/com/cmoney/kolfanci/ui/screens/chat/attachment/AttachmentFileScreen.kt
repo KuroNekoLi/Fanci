@@ -13,9 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
@@ -26,7 +25,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 fun AttachmentFileScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    fileList: List<UploadFileItem>,
+    fileList: List<AttachmentInfoItem>,
     onClick: (Uri) -> Unit,
     onDelete: (Uri) -> Unit,
     onResend: ((ReSendFile) -> Unit)? = null
@@ -42,10 +41,11 @@ fun AttachmentFileScreen(
             AttachmentFileItem(
                 modifier = itemModifier,
                 file = file.uri,
+                fileSize = file.fileSize,
                 isItemClickable = true,
-                isItemCanDelete = (file.status == UploadFileItem.Status.Undefined),
-                isShowResend = (file.status is UploadFileItem.Status.Failed),
-                displayName = file.uri.getFileName(context).orEmpty(),
+                isItemCanDelete = (file.status == AttachmentInfoItem.Status.Undefined),
+                isShowResend = (file.status is AttachmentInfoItem.Status.Failed),
+                displayName = file.filename,
                 onClick = onClick,
                 onDelete = onDelete,
                 onResend = onResend
@@ -63,9 +63,9 @@ fun AttachmentFileScreenPreview() {
                 .width(270.dp)
                 .height(75.dp),
             fileList = listOf(
-                UploadFileItem(uri = Uri.EMPTY),
-                UploadFileItem(uri = Uri.EMPTY),
-                UploadFileItem(uri = Uri.EMPTY)
+                AttachmentInfoItem(uri = Uri.EMPTY),
+                AttachmentInfoItem(uri = Uri.EMPTY),
+                AttachmentInfoItem(uri = Uri.EMPTY)
             ),
             onClick = {},
             onDelete = {}

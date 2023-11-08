@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachImageItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -34,7 +34,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 @Composable
 fun ChatRoomAttachImageScreen(
     modifier: Modifier = Modifier,
-    imageAttach: List<UploadFileItem>,
+    imageAttach: List<AttachmentInfoItem>,
     quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDelete: (Uri) -> Unit,
     onAdd: () -> Unit,
@@ -57,8 +57,8 @@ fun ChatRoomAttachImageScreen(
                     AttachImageItem(
                         file = attach.uri,
                         isItemClickable = true,
-                        isItemCanDelete = (attach.status == UploadFileItem.Status.Undefined),
-                        isShowResend = (attach.status is UploadFileItem.Status.Failed),
+                        isItemCanDelete = (attach.status == AttachmentInfoItem.Status.Undefined),
+                        isShowResend = (attach.status is AttachmentInfoItem.Status.Failed),
                         onClick = onClick,
                         onDelete = {
                             onDelete.invoke(it)
@@ -123,9 +123,9 @@ fun ChatRoomAttachImageScreenPreview() {
         ChatRoomAttachImageScreen(
             modifier = Modifier,
             imageAttach = listOf(
-                UploadFileItem(),
-                UploadFileItem(),
-                UploadFileItem()
+                AttachmentInfoItem(),
+                AttachmentInfoItem(),
+                AttachmentInfoItem()
             ),
             onDelete = {},
             onAdd = {},
