@@ -100,10 +100,6 @@ class MessageViewModel(
     private val _isSendComplete = MutableStateFlow<Boolean>(false)
     val isSendComplete = _isSendComplete.asStateFlow()
 
-    //附加檔案,只有image類型
-    private val _isOnlyPhotoSelector = MutableStateFlow<Boolean>(false)
-    val isOnlyPhotoSelector = _isOnlyPhotoSelector.asStateFlow()
-
     //聊天訊息
     private val _message = MutableStateFlow<List<ChatMessageWrapper>>(emptyList())
     val message = _message.asStateFlow()
@@ -831,26 +827,6 @@ class MessageViewModel(
                     KLog.e(TAG, e)
                 }
             }
-        }
-    }
-
-    /**
-     * 點擊 附加功能
-     */
-    fun onAttachClick() {
-        KLog.i(TAG, "onAttachClick")
-        _isOnlyPhotoSelector.update {
-            false
-        }
-    }
-
-    /**
-     * 附加圖片 點擊更多圖片
-     */
-    fun onAttachImageAddClick() {
-        KLog.i(TAG, "onImageAddClick")
-        _isOnlyPhotoSelector.update {
-            true
         }
     }
 

@@ -417,7 +417,8 @@ private fun EditPostScreenView(
                     onDelete = onDeleteAttach,
                     onClick = onPreviewAttachmentClick,
                     onAddImage = onShowImagePicker,
-                    onResend = onResend
+                    onResend = onResend,
+                    isShowLoading = false
                 )
 
                 //Bottom

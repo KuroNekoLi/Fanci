@@ -62,6 +62,8 @@ class MediaPickerBottomSheetViewModel(
                             AttachImageDefault.DEFAULT_QUANTITY_LIMIT
                         )
                     )
+                } else {
+                    onOpen.invoke()
                 }
             }
         }
@@ -112,6 +114,8 @@ class MediaPickerBottomSheetViewModel(
                             AttachImageDefault.DEFAULT_QUANTITY_LIMIT
                         )
                     )
+                } else {
+                    onOpen.invoke()
                 }
             }
         }

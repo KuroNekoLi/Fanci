@@ -149,22 +149,18 @@ class PostUseCase(
      *  @param channelId 頻道id
      *  @param messageId 原始貼文id
      *  @param text message
-     *  @param images attach
+     *  @param attachment attach
      */
     suspend fun writeComment(
         channelId: String,
         messageId: String,
         text: String,
-        images: List<String>
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>
     ): Result<BulletinboardMessage> {
+        val medias = attachment.toUploadMedia(context)
         val bulletingBoardMessageParam = BulletingBoardMessageParam(
             text = text,
-            medias = images.map {
-                Media(
-                    resourceLink = it,
-                    type = MediaType.image
-                )
-            }
+            medias = medias
         )
 
         return kotlin.runCatching {

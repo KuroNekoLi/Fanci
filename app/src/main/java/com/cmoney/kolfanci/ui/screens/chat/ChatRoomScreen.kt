@@ -186,7 +186,7 @@ fun ChatRoomScreen(
     }
 
     //是否只有圖片選擇
-    val isOnlyPhotoSelector by messageViewModel.isOnlyPhotoSelector.collectAsState()
+    val isOnlyPhotoSelector by attachmentViewModel.isOnlyPhotoSelector.collectAsState()
 
     //主畫面
     ChatRoomScreenView(
@@ -214,7 +214,7 @@ fun ChatRoomScreen(
         },
         onAttachClick = {
             AppUserLogger.getInstance().log(Clicked.MessageInsertImage)
-            messageViewModel.onAttachClick()
+            attachmentViewModel.onAttachClick()
             coroutineScope.launch {
                 state.show()
             }
@@ -223,7 +223,7 @@ fun ChatRoomScreen(
             messageViewModel.showPermissionTip()
         },
         onAttachImageAddClick = {
-            messageViewModel.onAttachImageAddClick()
+            attachmentViewModel.onAttachImageAddClick()
             coroutineScope.launch {
                 state.show()
             }
