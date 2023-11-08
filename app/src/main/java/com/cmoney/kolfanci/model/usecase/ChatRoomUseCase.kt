@@ -1,16 +1,32 @@
 package com.cmoney.kolfanci.model.usecase
 
+import android.content.Context
 import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.api.UserReportApi
-import com.cmoney.fanciapi.fanci.model.*
+import com.cmoney.fanciapi.fanci.model.BulletingBoardMessageParam
+import com.cmoney.fanciapi.fanci.model.ChannelTabType
+import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.ChatMessageParam
+import com.cmoney.fanciapi.fanci.model.EmojiParam
+import com.cmoney.fanciapi.fanci.model.Emojis
+import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.MediaType
+import com.cmoney.fanciapi.fanci.model.MessageIdParam
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.fanciapi.fanci.model.MessageType
+import com.cmoney.fanciapi.fanci.model.OrderType
+import com.cmoney.fanciapi.fanci.model.ReportParm
+import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.toUploadMedia
 import com.socks.library.KLog
-import org.apache.commons.lang3.RandomStringUtils
-import kotlin.random.Random
 
 
 class ChatRoomUseCase(
+    val context: Context,
     private val chatRoomApi: ChatRoomApi,
     private val messageApi: MessageApi,
     private val userReport: UserReportApi
@@ -30,23 +46,25 @@ class ChatRoomUseCase(
 
     /**
      * 更新訊息
+     *
+     * @param messageServiceType 更新訊息 or 貼文
+     * @param messageId 訊息 id
+     * @param text 內文
+     * @param attachment 附加檔案
      */
     suspend fun updateMessage(
         messageServiceType: MessageServiceType,
         messageId: String,
         text: String,
-        images: List<String> = emptyList()
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>
     ) = kotlin.runCatching {
+
+        val medias = attachment.toUploadMedia(context)
 
         val chatMessageParam = ChatMessageParam(
             text = text,
             messageType = MessageType.textMessage,
-            medias = images.map {
-                Media(
-                    resourceLink = it,
-                    type = MediaType.image
-                )
-            }
+            medias = medias
         )
         messageApi.apiV2MessageMessageTypeMessageIdPut(
             messageType = messageServiceType,
@@ -159,7 +177,12 @@ class ChatRoomUseCase(
     /**
      * 點擊 emoji
      */
-    suspend fun clickEmoji(messageServiceType: MessageServiceType, messageId: String, emojiCount: Int, clickEmoji: Emojis) =
+    suspend fun clickEmoji(
+        messageServiceType: MessageServiceType,
+        messageId: String,
+        emojiCount: Int,
+        clickEmoji: Emojis
+    ) =
         kotlin.runCatching {
             if (emojiCount == -1) {
                 //收回
@@ -184,7 +207,11 @@ class ChatRoomUseCase(
      * @param chatRoomChannelId 聊天室 id
      * @param fromSerialNumber 從哪一個序列號開始往回找 (若為Null 則從最新開始拿)
      */
-    suspend fun fetchMoreMessage(chatRoomChannelId: String, fromSerialNumber: Long?, order: OrderType = OrderType.latest) =
+    suspend fun fetchMoreMessage(
+        chatRoomChannelId: String,
+        fromSerialNumber: Long?,
+        order: OrderType = OrderType.latest
+    ) =
         kotlin.runCatching {
             chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
                 chatRoomChannelId = chatRoomChannelId,
@@ -195,15 +222,16 @@ class ChatRoomUseCase(
 
     /**
      * 發送訊息
+     *
      * @param chatRoomChannelId 聊天室 id
      * @param text 內文
-     * @param images 附加圖片
+     * @param attachment 附加檔案
      * @param replyMessageId 回覆訊息的id
      */
     suspend fun sendMessage(
         chatRoomChannelId: String,
         text: String,
-        images: List<String> = emptyList(),
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
         replyMessageId: String = ""
     ) =
         kotlin.runCatching {
@@ -212,12 +240,7 @@ class ChatRoomUseCase(
                 chatMessageParam = ChatMessageParam(
                     text = text,
                     messageType = MessageType.textMessage,
-                    medias = images.map {
-                        Media(
-                            resourceLink = it,
-                            type = MediaType.image
-                        )
-                    },
+                    medias = attachment.toUploadMedia(context),
                     replyMessageId = replyMessageId
                 )
             ).checkResponseBody()

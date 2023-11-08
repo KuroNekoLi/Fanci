@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.media
+package com.cmoney.kolfanci.ui.screens.media.txt
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,23 +26,38 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.extension.isURL
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.tools_android.extension.toFile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
 @Destination
 @Composable
 fun TextPreviewScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    uri: Uri
+    uri: Uri,
+    fileName: String = "",
+    viewModel: TextPreviewViewModel = koinViewModel()
 ) {
-    val fileTitle = uri.getFileName(LocalContext.current)
-    val file = uri.toFile(LocalContext.current)
     val context = LocalContext.current
+
+    var fileName = fileName
+    //網路
+    if (uri.isURL()) {
+        viewModel.show(uri)
+    }
+    else {
+        fileName = uri.getFileName(LocalContext.current).orEmpty()
+        val file = uri.toFile(LocalContext.current)
+        viewModel.show(file)
+    }
+
+    val textContent by viewModel.text.collectAsState()
 
     var showText by remember {
         mutableStateOf(false)
@@ -61,7 +77,7 @@ fun TextPreviewScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopBarScreen(
-                title = fileTitle.orEmpty(),
+                title = fileName,
                 backClick = {
                     navController.popBackStack()
                 }
@@ -86,7 +102,8 @@ fun TextPreviewScreen(
 
         if (showText) {
             TextShowScreen(
-                text = file?.readText().orEmpty()
+//                text = file?.readText().orEmpty()
+                text = textContent
             )
         }
     }

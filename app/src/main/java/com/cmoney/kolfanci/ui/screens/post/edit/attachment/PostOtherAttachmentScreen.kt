@@ -10,39 +10,46 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentAudioItem
-import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachmentFileItem
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
+/**
+ * 發佈貼文 附加檔案 UI.
+ */
 @Composable
 fun PostOtherAttachmentScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    attachment: List<Pair<AttachmentType, Uri>>,
+    attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
     onClick: (Uri) -> Unit,
-    onDelete: (Uri) -> Unit
+    onDelete: (Uri) -> Unit,
+    onResend: ((ReSendFile) -> Unit)? = null
 ) {
-
     val listState = rememberLazyListState()
-    val context = LocalContext.current
 
     LazyRow(
         modifier = modifier.padding(start = 10.dp, end = 10.dp),
         state = listState, horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-
-        attachment.forEach { (attachmentType, uri) ->
+        attachment.forEach { (attachmentType, item) ->
             when (attachmentType) {
                 AttachmentType.Audio -> {
                     item {
                         AttachmentAudioItem(
                             modifier = itemModifier,
-                            audio = uri,
-                            displayName = uri.getFileName(context).orEmpty(),
+                            file = item.uri,
+                            duration = item.duration ?: 0,
+                            isItemClickable = item.isAttachmentItemClickable(),
+                            isItemCanDelete = (item.status !is AttachmentInfoItem.Status.Failed),
+                            isShowResend = (item.status is AttachmentInfoItem.Status.Failed),
+                            displayName = item.filename,
                             onClick = onClick,
-                            onDelete = onDelete
+                            onDelete = onDelete,
+                            onResend = onResend
                         )
                     }
                 }
@@ -51,10 +58,15 @@ fun PostOtherAttachmentScreen(
                     item {
                         AttachmentFileItem(
                             modifier = itemModifier,
-                            file = uri,
-                            displayName = uri.getFileName(context).orEmpty(),
+                            file = item.uri,
+                            fileSize = item.fileSize,
+                            isItemClickable = item.isAttachmentItemClickable(),
+                            isItemCanDelete = (item.status !is AttachmentInfoItem.Status.Failed),
+                            isShowResend = (item.status is AttachmentInfoItem.Status.Failed),
+                            displayName = item.filename,
                             onClick = onClick,
-                            onDelete = onDelete
+                            onDelete = onDelete,
+                            onResend = onResend
                         )
                     }
                 }
@@ -75,7 +87,8 @@ fun PostOtherAttachmentScreenPreview() {
         PostOtherAttachmentScreen(
             attachment = emptyList(),
             onClick = {},
-            onDelete = {}
+            onDelete = {},
+            onResend = {}
         )
     }
 }

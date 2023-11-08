@@ -12,6 +12,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.isURL
 import com.cmoney.kolfanci.service.media.EMPTY_PLAYBACK_STATE
 import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.service.media.NOTHING_PLAYING
@@ -62,6 +63,10 @@ class AudioViewModel(
     private val _isShowMiniIcon = MutableStateFlow(false)
     val isShowMiniIcon = _isShowMiniIcon.asStateFlow()
 
+    //是否顯示 底部 播放器
+    private val _isShowBottomPlayer = MutableStateFlow(false)
+    val isShowBottomPlayer = _isShowBottomPlayer.asStateFlow()
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
     private val playbackStateObserver = Observer<PlaybackStateCompat> {
         playbackState = it
@@ -75,7 +80,7 @@ class AudioViewModel(
     private var isStopUpdatePosition = false
 
     init {
-        if (uri != Uri.EMPTY) {
+        if (uri != Uri.EMPTY && !uri.isURL()) {
             getAudioFileDuration(uri)
         }
 
@@ -107,7 +112,11 @@ class AudioViewModel(
             _title.value = nowPlaying?.title.orEmpty()
 
             val duration = nowPlaying?.duration ?: 0L
-            _audioDuration.value = duration
+            if (duration > 0) {
+                _audioDuration.update {
+                    duration
+                }
+            }
         }
     }
 
@@ -120,7 +129,9 @@ class AudioViewModel(
         mmr.setDataSource(context, uri)
         val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
         val millSecond = durationStr?.toLong() ?: 0L
-        _audioDuration.value = millSecond
+        _audioDuration.update {
+            millSecond
+        }
     }
 
     /**
@@ -165,8 +176,9 @@ class AudioViewModel(
      * 播放
      *
      * @param uri 檔案uri
+     * @param title 檔案 title
      */
-    fun play(uri: Uri) {
+    fun play(uri: Uri, title: String? = null) {
         KLog.i(TAG, "play:$uri")
         if (musicServiceConnection.isConnected.value == true) {
             //正在播的歌曲
@@ -185,7 +197,7 @@ class AudioViewModel(
             //開啟新播放
             else {
                 KLog.i(TAG, "playFromUri:$uri")
-                transportControls.playFromUri(uri, bundleOf())
+                transportControls.playFromUri(uri, bundleOf("title" to title))
             }
         } else {
             KLog.e(TAG, "musicServiceConnection is not connect.")
@@ -261,5 +273,46 @@ class AudioViewModel(
             transportControls.setPlaybackSpeed(speed)
             _speedTitle.value = speed.toString() + "x"
         }
+    }
+
+    /**
+     * 設定音檔長度
+     */
+    fun setDuration(duration: Long) {
+        KLog.i(TAG, "setDuration:$duration")
+        _audioDuration.update {
+            duration
+        }
+    }
+
+    /**
+     * 直接背景播放
+     */
+    fun playSilence(
+        uri: Uri,
+        duration: Long,
+        title: String? = null
+    ) {
+
+        KLog.i(TAG, "playSilence.")
+
+        if (uri != Uri.EMPTY && !uri.isURL()) {
+            getAudioFileDuration(uri)
+        } else {
+            setDuration(duration)
+        }
+
+        play(
+            uri = uri,
+            title = title
+        )
+    }
+
+    fun openBottomPlayer() {
+        _isShowBottomPlayer.update { true }
+    }
+
+    fun closeBottomPlayer() {
+        _isShowBottomPlayer.update { false }
     }
 }

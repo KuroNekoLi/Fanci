@@ -25,24 +25,25 @@ import kotlinx.parcelize.Parcelize
 /**
  * 新增頻道參數
  *
- * @param channelType 
  * @param name 頻道名稱
  * @param privacy 
+ * @param tabs 頻道開啟類別(順序依照提供的順序排序)
  */
 @Parcelize
 
 
 data class ChannelParam (
 
-    @Json(name = "channelType")
-    val channelType: ChannelTabType? = null,
-
     /* 頻道名稱 */
     @Json(name = "name")
     val name: kotlin.String? = null,
 
     @Json(name = "privacy")
-    val privacy: ChannelPrivacy? = null
+    val privacy: ChannelPrivacy? = null,
+
+    /* 頻道開啟類別(順序依照提供的順序排序) */
+    @Json(name = "tabs")
+    val tabs: kotlin.collections.List<ChannelTabType>? = null
 
 ) : Parcelable
 

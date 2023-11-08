@@ -36,12 +36,15 @@ import com.cmoney.kolfanci.extension.showInteractDialogBottomSheet
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.dialog.MessageReSendDialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,13 +56,15 @@ import org.koin.androidx.compose.koinViewModel
  */
 @Composable
 fun MessageScreen(
+    navController: DestinationsNavigator,
     modifier: Modifier = Modifier.fillMaxSize(),
     listState: LazyListState = rememberLazyListState(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     channelId: String,
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
-    onMsgDismissHide: (ChatMessage) -> Unit
+    attachmentViewModel: AttachmentViewModel = koinViewModel(),
+    onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
     val TAG = "MessageScreen"
 
@@ -78,8 +83,12 @@ fun MessageScreen(
 
     val scrollToPosition by messageViewModel.scrollToPosition.collectAsState()
 
+    //附加檔案
+    val attachment by attachmentViewModel.attachment.collectAsState()
+
     if (message.isNotEmpty()) {
         MessageScreenView(
+            navController = navController,
             modifier = modifier,
             message = message,
             blockingList = blockingList.map {
@@ -114,7 +123,7 @@ fun MessageScreen(
                 messageViewModel.onReSendDialogDismiss()
             },
             onReSend = {
-                messageViewModel.onResendMessage(channelId, it)
+                messageViewModel.onResendMessage(channelId, it, attachment = attachment)
             },
             onDelete = {
                 messageViewModel.onDeleteReSend(it)
@@ -126,6 +135,7 @@ fun MessageScreen(
 
 @Composable
 private fun MessageScreenView(
+    navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
     message: List<ChatMessageWrapper>,
     blockingList: List<String>,
@@ -160,6 +170,7 @@ private fun MessageScreenView(
                     }
 
                     MessageContentScreen(
+                        navController = navController,
                         chatMessageWrapper = chatMessageWrapper.copy(
                             isBlocking = isBlocking,
                             isBlocker = isBlocker
@@ -294,7 +305,8 @@ fun MessageScreenPreview() {
             isScrollToBottom = false,
             onLoadMore = {},
             onReSendClick = {},
-            scrollToPosition = null
+            scrollToPosition = null,
+            navController = EmptyDestinationsNavigator
         )
     }
 }

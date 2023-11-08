@@ -50,6 +50,7 @@ import com.cmoney.kolfanci.ui.screens.shared.dialog.item.AudioSpeedItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
+import com.socks.library.KLog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -218,7 +219,11 @@ private fun AudioBottomPlayerScreenView(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = speedTitle, fontSize = 16.sp, color = LocalColor.current.text.default_100)
+                Text(
+                    text = speedTitle,
+                    fontSize = 16.sp,
+                    color = LocalColor.current.text.default_100
+                )
             }
         }
 
@@ -231,7 +236,7 @@ private fun AudioBottomPlayerScreenView(
             } else {
                 mediaPosition.toFloat()
             },
-            valueRange = 0f..audioDuration.toFloat(),
+            valueRange = 0f..audioDuration.toFloat().coerceAtLeast(0f),
             colors = SliderDefaults.colors(
                 thumbColor = LocalColor.current.primary,
                 activeTrackColor = LocalColor.current.primary,

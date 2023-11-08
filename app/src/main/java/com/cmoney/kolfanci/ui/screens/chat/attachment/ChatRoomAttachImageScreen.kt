@@ -4,12 +4,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,18 +16,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachImageItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -44,11 +34,12 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 @Composable
 fun ChatRoomAttachImageScreen(
     modifier: Modifier = Modifier,
-    imageAttach: List<Uri>,
+    imageAttach: List<AttachmentInfoItem>,
     quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDelete: (Uri) -> Unit,
     onAdd: () -> Unit,
-    onClick: (Uri) -> Unit
+    onClick: (Uri) -> Unit,
+    onResend: ((ReSendFile) -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
 
@@ -63,12 +54,16 @@ fun ChatRoomAttachImageScreen(
         ) {
             if (imageAttach.isNotEmpty()) {
                 items(imageAttach) { attach ->
-                    AttachImage(
-                        uri = attach,
+                    AttachImageItem(
+                        file = attach.uri,
+                        isItemClickable = true,
+                        isItemCanDelete = (attach.status == AttachmentInfoItem.Status.Undefined),
+                        isShowResend = (attach.status is AttachmentInfoItem.Status.Failed),
                         onClick = onClick,
                         onDelete = {
                             onDelete.invoke(it)
-                        }
+                        },
+                        onResend = onResend
                     )
                 }
                 if (imageAttach.size < quantityLimit) {
@@ -93,42 +88,6 @@ fun ChatRoomAttachImageScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun AttachImage(uri: Uri, onDelete: (Uri) -> Unit, onClick: (Uri) -> Unit) {
-    val context = LocalContext.current
-
-    val request = ImageRequest.Builder(context)
-        .data(uri)
-        .build()
-
-    Box(
-        modifier = Modifier
-            .height(120.dp)
-            .padding(top = 10.dp, bottom = 10.dp)
-            .clickable {
-                onClick.invoke(uri)
-            },
-        contentAlignment = Alignment.TopEnd
-    ) {
-        AsyncImage(
-            model = request,
-            modifier = Modifier
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop,
-            contentDescription = null
-        )
-        Image(
-            modifier = Modifier
-                .padding(10.dp)
-                .clickable {
-                    onDelete.invoke(uri)
-                },
-            painter = painterResource(id = R.drawable.close), contentDescription = null
-        )
     }
 }
 
@@ -163,10 +122,15 @@ fun ChatRoomAttachImageScreenPreview() {
     FanciTheme {
         ChatRoomAttachImageScreen(
             modifier = Modifier,
-            imageAttach = listOf(Uri.EMPTY, Uri.EMPTY, Uri.EMPTY),
+            imageAttach = listOf(
+                AttachmentInfoItem(),
+                AttachmentInfoItem(),
+                AttachmentInfoItem()
+            ),
             onDelete = {},
             onAdd = {},
-            onClick = {}
+            onClick = {},
+            onResend = {}
         )
     }
 }

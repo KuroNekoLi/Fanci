@@ -26,6 +26,7 @@ import kotlinx.parcelize.Parcelize
  *
  * @param resourceLink 
  * @param type 
+ * @param isNeedAuthenticate 
  */
 @Parcelize
 
@@ -36,7 +37,10 @@ data class IMedia (
     val resourceLink: kotlin.String? = null,
 
     @Json(name = "type")
-    val type: MediaType? = null
+    val type: MediaType? = null,
+
+    @Json(name = "isNeedAuthenticate")
+    val isNeedAuthenticate: kotlin.Boolean? = null
 
 ) : Parcelable
 

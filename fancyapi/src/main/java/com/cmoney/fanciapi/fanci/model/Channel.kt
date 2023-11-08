@@ -29,7 +29,6 @@ import kotlinx.parcelize.Parcelize
  *
  * @param id 頻道Id
  * @param creatorId 頻道創立者
- * @param channelType 
  * @param name 頻道命名
  * @param createUnixTime 頻道建立時間
  * @param updateUnixTime 頻道更新時間
@@ -38,6 +37,7 @@ import kotlinx.parcelize.Parcelize
  * @param category 
  * @param privacy 
  * @param tabs 頻道有啟用的聊天室版面
+ * @param channelType 
  */
 @Parcelize
 
@@ -51,9 +51,6 @@ data class Channel (
     /* 頻道創立者 */
     @Json(name = "creatorId")
     val creatorId: kotlin.String? = null,
-
-    @Json(name = "channelType")
-    val channelType: ChannelTabType? = null,
 
     /* 頻道命名 */
     @Json(name = "name")
@@ -83,7 +80,10 @@ data class Channel (
 
     /* 頻道有啟用的聊天室版面 */
     @Json(name = "tabs")
-    val tabs: kotlin.collections.List<IChannelTab>? = null
+    val tabs: kotlin.collections.List<IChannelTab>? = null,
+
+    @Json(name = "channelType")
+    val channelType: ChannelTabType? = null
 
 ) : Parcelable
 

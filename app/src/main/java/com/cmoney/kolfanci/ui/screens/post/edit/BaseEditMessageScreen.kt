@@ -47,6 +47,7 @@ import com.bumptech.glide.Glide
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
@@ -103,6 +104,7 @@ fun BaseEditMessageScreen(
 ) {
     var showImagePick by remember { mutableStateOf(false) }
 
+    //TODO, 改為統一上傳格式
     val attachImages by viewModel.attachImages.collectAsState()
 
     val uiState by viewModel.uiState.collectAsState()
@@ -129,7 +131,8 @@ fun BaseEditMessageScreen(
             viewModel.onDeleteImageClick(it)
         },
         onPostClick = { text ->
-            viewModel.onUpdatePostClick(editMessage, text)
+            //todo
+            viewModel.onUpdatePostClick(editMessage, text, emptyList())
         },
         onBack = {
             showSaveTip = true
@@ -287,12 +290,19 @@ private fun BaseEditMessageScreenView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(LocalColor.current.env_100),
-                        imageAttach = attachImages,
+                        imageAttach = attachImages.map {
+                            AttachmentInfoItem(
+                                uri = it
+                            )
+                        },
                         onDelete = {
                             onDeleteImage.invoke(it)
                         },
                         onAdd = {
                             onShowImagePicker.invoke()
+                        },
+                        onResend = {
+                            //TODO
                         },
                         onClick = { uri ->
                             StfalconImageViewer
