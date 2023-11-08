@@ -106,6 +106,8 @@ fun ChannelScreen(
 
     val isAudioPlaying by audioViewModel.isShowMiniIcon.collectAsState()
 
+    val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
+
     ChannelScreenView(
         modifier = modifier,
         group = group,
@@ -127,7 +129,8 @@ fun ChannelScreen(
                 channelId = channel.id.orEmpty()
             )
         },
-        isAudioPlaying = isAudioPlaying
+        isAudioPlaying = isAudioPlaying,
+        isOpenBottomAudioPlayer = isOpenBottomAudioPlayer
     )
 }
 
@@ -146,11 +149,17 @@ private fun ChannelScreenView(
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
     onChatPageSelected: () -> Unit,
-    onPostPageSelected: () -> Unit
+    onPostPageSelected: () -> Unit,
+    isOpenBottomAudioPlayer: Boolean
 ) {
-    val coroutineScope = rememberCoroutineScope()
     //控制 audio BottomSheet
-    val audioPlayerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val audioPlayerState = rememberModalBottomSheetState(
+        if (isOpenBottomAudioPlayer) {
+            ModalBottomSheetValue.Expanded
+        } else {
+            ModalBottomSheetValue.Hidden
+        }
+    )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -181,7 +190,11 @@ private fun ChannelScreenView(
         val coroutineScope = rememberCoroutineScope()
 
         if (pages.isNotEmpty()) {
-            Box(modifier = Modifier.fillMaxWidth().padding(innerPadding)){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(innerPadding)
+            ) {
                 //Content
                 Column(modifier = Modifier.padding(innerPadding)) {
                     TabRow(
@@ -315,6 +328,7 @@ fun ChannelScreenPreview() {
             channelTabStatus = ChannelTabsStatus(),
             unreadCount = Pair(10, 20),
             navController = EmptyDestinationsNavigator,
+            isAudioPlaying = true,
             announcementResultRecipient = EmptyResultRecipient(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
@@ -324,7 +338,7 @@ fun ChannelScreenPreview() {
             onPostPageSelected = {
 
             },
-            isAudioPlaying = true
+            isOpenBottomAudioPlayer = false
         )
     }
 }

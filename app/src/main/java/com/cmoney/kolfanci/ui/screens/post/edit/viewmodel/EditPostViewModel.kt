@@ -260,26 +260,4 @@ class EditPostViewModel(
 
         }
     }
-
-    //todo: test upload file
-    fun uploadTest(attachment: List<Pair<AttachmentType, Uri>>) {
-        val filesUri = attachment.filter {
-            it.first != AttachmentType.Image
-        }.map {
-            it.second
-        }
-
-        val testUri = filesUri.first()
-
-        viewModelScope.launch {
-            attachmentUseCase.uploadFile(testUri)
-                .onSuccess {
-                    KLog.e("Warren", "onSuccess:$it")
-                }
-                .onFailure {
-                    KLog.e("Warren", "onFailure:$it")
-                }
-        }
-
-    }
 }

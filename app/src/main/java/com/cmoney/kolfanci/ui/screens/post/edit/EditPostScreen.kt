@@ -59,9 +59,9 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.screens.chat.AttachmentController
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
 import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel

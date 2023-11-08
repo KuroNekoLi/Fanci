@@ -21,11 +21,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,10 +37,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -73,6 +79,7 @@ import com.cmoney.kolfanci.ui.destinations.BaseEditMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.BaseDeletedContentScreen
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
@@ -85,6 +92,7 @@ import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
@@ -99,6 +107,7 @@ import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
 import com.stfalcon.imageviewer.StfalconImageViewer
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -131,6 +140,11 @@ fun PostInfoScreen(
     viewModel: PostInfoViewModel = koinViewModel(
         parameters = {
             parametersOf(post, channel)
+        }
+    ),
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
         }
     ),
     resultNavigator: ResultBackNavigator<PostInfoScreenResult>,
@@ -432,6 +446,10 @@ fun PostInfoScreen(
         }
     }
 
+    val isAudioPlaying by audioViewModel.isShowMiniIcon.collectAsState()
+
+    val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
+
     PostInfoScreenView(
         modifier = modifier,
         navController = navController,
@@ -444,7 +462,9 @@ fun PostInfoScreen(
         replyMapData = replyMapData.toMap(),
         postInfoListener = postInfoListener,
         commentBottomContentListener = commentBottomContentListener,
-        inputText = inputText
+        inputText = inputText,
+        isAudioPlaying = isAudioPlaying,
+        isOpenBottomAudioPlayer = isOpenBottomAudioPlayer
     )
 
     //圖片選擇
@@ -629,6 +649,7 @@ fun PostInfoScreen(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
@@ -642,10 +663,23 @@ private fun PostInfoScreenView(
     replyMapData: Map<String, ReplyData>,
     postInfoListener: PostInfoListener,
     commentBottomContentListener: CommentBottomContentListener,
-    inputText: String
+    inputText: String,
+    isAudioPlaying: Boolean,
+    isOpenBottomAudioPlayer: Boolean
 ) {
     val listState = rememberLazyListState()
     val context = LocalContext.current
+
+    //控制 audio BottomSheet
+    val audioPlayerState = rememberModalBottomSheetState(
+        if (isOpenBottomAudioPlayer) {
+            ModalBottomSheetValue.Expanded
+        } else {
+            ModalBottomSheetValue.Hidden
+        }
+    )
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier
@@ -872,6 +906,29 @@ private fun PostInfoScreenView(
                     modifier = Modifier
                         .size(45.dp),
                     color = LocalColor.current.primary
+                )
+            }
+
+            if (isAudioPlaying) {
+                //mini player trigger icon
+                Image(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 120.dp)
+                        .size(width = 61.dp, height = 50.dp)
+                        .clip(RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp))
+                        .clickable {
+                            coroutineScope.launch {
+                                audioPlayerState.show()
+                            }
+                        },
+                    painter = painterResource(id = R.drawable.mini_play_icon),
+                    contentDescription = null
+                )
+
+                //mini player
+                AudioBottomPlayerScreen(
+                    state = audioPlayerState
                 )
             }
         }
@@ -1136,7 +1193,9 @@ fun PostInfoScreenPreview() {
             postInfoListener = EmptyPostInfoListener,
             commentBottomContentListener = EmptyCommentBottomContentListener,
             inputText = "",
-            isPinPost = false
+            isPinPost = false,
+            isAudioPlaying = false,
+            isOpenBottomAudioPlayer = false
         )
     }
 }

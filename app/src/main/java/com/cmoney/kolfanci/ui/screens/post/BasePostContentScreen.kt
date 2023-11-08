@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RichTooltipBox
@@ -55,11 +56,12 @@ import com.cmoney.kolfanci.extension.getFleSize
 import com.cmoney.kolfanci.extension.toAttachmentType
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
-import com.cmoney.kolfanci.ui.screens.chat.AttachmentController
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreenV2
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
@@ -73,11 +75,13 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * 顯示 貼文/留言/回覆 內容
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun BasePostContentScreen(
     modifier: Modifier = Modifier,
@@ -93,6 +97,11 @@ fun BasePostContentScreen(
     onAddNewEmojiClick: (Int) -> Unit,
     onImageClick: (() -> Unit)? = null,
     onTextExpandClick: (() -> Unit)? = null,
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
+        }
+    ),
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
     val context = LocalContext.current
@@ -254,7 +263,8 @@ fun BasePostContentScreen(
                                     uri = Uri.parse(fileUrl),
                                     context = context,
                                     attachmentType = mediaType?.toAttachmentType(),
-                                    fileName = media.getFileName().orEmpty()
+                                    fileName = media.getFileName(),
+                                    audioViewModel = audioViewModel
                                 )
                             },
                         )
@@ -294,15 +304,14 @@ fun BasePostContentScreen(
                                     context = context,
                                     attachmentType = mediaType?.toAttachmentType(),
                                     fileName = media.getFileName(),
-                                    duration = media.getDuration()
+                                    duration = media.getDuration(),
+                                    audioViewModel = audioViewModel
                                 )
                             },
                         )
                     }
                 }
-
                 Spacer(modifier = Modifier.height(15.dp))
-
             }
 
             //Emoji
@@ -389,6 +398,7 @@ fun EmojiFeedback(
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun PostContentScreenPreview() {

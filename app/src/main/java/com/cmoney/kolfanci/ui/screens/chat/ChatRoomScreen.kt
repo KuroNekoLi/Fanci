@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.chat
 
-import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -28,25 +27,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.Glide
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.attachment.UploadFileItem
+import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
-import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
-import com.cmoney.kolfanci.ui.destinations.PdfPreviewScreenDestination
-import com.cmoney.kolfanci.ui.destinations.TextPreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
@@ -64,7 +59,6 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -482,71 +476,6 @@ private fun ChatRoomScreenView(
             showOnlyBasicPermissionTip = showOnlyBasicPermissionTip
         ) {
             onAttachClick.invoke()
-        }
-    }
-}
-
-object AttachmentController {
-    private val TAG = "AttachmentController"
-
-    /**
-     * 點擊附加檔案預覽
-     */
-    fun onAttachmentClick(
-        navController: DestinationsNavigator,
-        uri: Uri,
-        context: Context,
-        attachmentType: AttachmentType? = null,
-        fileName: String = "",
-        duration: Long = 0
-    ) {
-        val type = attachmentType ?: uri.getAttachmentType(context)
-        KLog.i(TAG, "onAttachmentClick:$uri type:$type")
-        when (type) {
-            AttachmentType.Audio -> {
-                navController.navigate(
-                    AudioPreviewScreenDestination(
-                        uri = uri,
-                        duration = duration,
-                        title = fileName
-                    )
-                )
-            }
-
-            AttachmentType.Image -> {
-                StfalconImageViewer
-                    .Builder(
-                        context, listOf(uri)
-                    ) { imageView, image ->
-                        Glide
-                            .with(context)
-                            .load(image)
-                            .into(imageView)
-                    }
-                    .show()
-            }
-
-            AttachmentType.Pdf -> {
-                navController.navigate(
-                    PdfPreviewScreenDestination(
-                        uri = uri,
-                        title = fileName
-                    )
-                )
-            }
-
-            AttachmentType.Txt -> {
-                navController.navigate(
-                    TextPreviewScreenDestination(
-                        uri = uri,
-                        fileName = fileName
-                    )
-                )
-            }
-
-            AttachmentType.Unknown -> {
-
-            }
         }
     }
 }

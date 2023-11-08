@@ -1,12 +1,22 @@
 package com.cmoney.kolfanci.model.usecase
 
 import android.app.Application
+import android.content.Context
 import android.net.Uri
+import com.bumptech.glide.Glide
 import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.getUploadFileType
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.UploadFileItem
 import com.cmoney.kolfanci.repository.Network
+import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
+import com.cmoney.kolfanci.ui.destinations.PdfPreviewScreenDestination
+import com.cmoney.kolfanci.ui.destinations.TextPreviewScreenDestination
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
+import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -137,4 +147,81 @@ class AttachmentUseCase(
      * 取得 Url 內容
      */
     suspend fun getUrlContent(url: String) = network.getContent(url)
+}
+
+object AttachmentController {
+    private val TAG = "AttachmentController"
+
+    /**
+     * 點擊附加檔案預覽
+     */
+    fun onAttachmentClick(
+        navController: DestinationsNavigator,
+        uri: Uri,
+        context: Context,
+        attachmentType: AttachmentType? = null,
+        fileName: String = "",
+        duration: Long = 0,
+        audioViewModel: AudioViewModel? = null
+    ) {
+        val type = attachmentType ?: uri.getAttachmentType(context)
+        KLog.i(TAG, "onAttachmentClick:$uri type:$type")
+
+        when (type) {
+            AttachmentType.Audio -> {
+                audioViewModel?.apply {
+                    playSilence(
+                        uri = uri,
+                        duration = duration,
+                        title = fileName
+                    )
+
+                    openBottomPlayer()
+                } ?: kotlin.run {
+                    navController.navigate(
+                        AudioPreviewScreenDestination(
+                            uri = uri,
+                            duration = duration,
+                            title = fileName
+                        )
+                    )
+                }
+            }
+
+            AttachmentType.Image -> {
+                StfalconImageViewer
+                    .Builder(
+                        context, listOf(uri)
+                    ) { imageView, image ->
+                        Glide
+                            .with(context)
+                            .load(image)
+                            .into(imageView)
+                    }
+                    .show()
+            }
+
+            AttachmentType.Pdf -> {
+                navController.navigate(
+                    PdfPreviewScreenDestination(
+                        uri = uri,
+                        title = fileName
+                    )
+                )
+            }
+
+            AttachmentType.Txt -> {
+                navController.navigate(
+                    TextPreviewScreenDestination(
+                        uri = uri,
+                        fileName = fileName
+                    )
+                )
+            }
+
+            AttachmentType.Unknown -> {
+
+            }
+        }
+    }
 }

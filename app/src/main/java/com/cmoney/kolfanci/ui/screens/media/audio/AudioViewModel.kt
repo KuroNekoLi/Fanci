@@ -63,6 +63,10 @@ class AudioViewModel(
     private val _isShowMiniIcon = MutableStateFlow(false)
     val isShowMiniIcon = _isShowMiniIcon.asStateFlow()
 
+    //是否顯示 底部 播放器
+    private val _isShowBottomPlayer = MutableStateFlow(false)
+    val isShowBottomPlayer = _isShowBottomPlayer.asStateFlow()
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
     private val playbackStateObserver = Observer<PlaybackStateCompat> {
         playbackState = it
@@ -108,7 +112,11 @@ class AudioViewModel(
             _title.value = nowPlaying?.title.orEmpty()
 
             val duration = nowPlaying?.duration ?: 0L
-            _audioDuration.value = duration
+            if (duration > 0) {
+                _audioDuration.update {
+                    duration
+                }
+            }
         }
     }
 
@@ -121,7 +129,9 @@ class AudioViewModel(
         mmr.setDataSource(context, uri)
         val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
         val millSecond = durationStr?.toLong() ?: 0L
-        _audioDuration.value = millSecond
+        _audioDuration.update {
+            millSecond
+        }
     }
 
     /**
@@ -270,6 +280,39 @@ class AudioViewModel(
      */
     fun setDuration(duration: Long) {
         KLog.i(TAG, "setDuration:$duration")
-        _audioDuration.value = duration
+        _audioDuration.update {
+            duration
+        }
+    }
+
+    /**
+     * 直接背景播放
+     */
+    fun playSilence(
+        uri: Uri,
+        duration: Long,
+        title: String? = null
+    ) {
+
+        KLog.i(TAG, "playSilence.")
+
+        if (uri != Uri.EMPTY && !uri.isURL()) {
+            getAudioFileDuration(uri)
+        } else {
+            setDuration(duration)
+        }
+
+        play(
+            uri = uri,
+            title = title
+        )
+    }
+
+    fun openBottomPlayer() {
+        _isShowBottomPlayer.update { true }
+    }
+
+    fun closeBottomPlayer() {
+        _isShowBottomPlayer.update { false }
     }
 }

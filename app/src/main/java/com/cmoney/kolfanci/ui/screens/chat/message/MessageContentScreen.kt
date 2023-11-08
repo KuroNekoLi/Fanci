@@ -5,17 +5,32 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RichTooltipBox
 import androidx.compose.material3.RichTooltipState
 import androidx.compose.material3.TooltipDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -41,10 +56,14 @@ import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
-import com.cmoney.kolfanci.ui.screens.chat.*
+import com.cmoney.kolfanci.ui.screens.chat.MessageHideUserScreen
+import com.cmoney.kolfanci.ui.screens.chat.MessageRecycleScreen
+import com.cmoney.kolfanci.ui.screens.chat.MessageRemoveScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.ImageAttachState
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.EmojiFeedback
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
@@ -60,6 +79,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 sealed class MessageContentCallback {
     data class LongClick(val message: ChatMessage) : MessageContentCallback()
@@ -71,7 +91,7 @@ sealed class MessageContentCallback {
 /**
  * 聊天內容 item
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun MessageContentScreen(
     navController: DestinationsNavigator,
@@ -390,7 +410,8 @@ fun MessageContentScreen(
 fun MediaContent(
     navController: DestinationsNavigator,
     medias: List<Media>,
-    isClickable: Boolean = true
+    isClickable: Boolean = true,
+    audioViewModel: AudioViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
     val mapList = medias.toAttachmentTypeMap()
@@ -425,7 +446,8 @@ fun MediaContent(
                                     context = context,
                                     attachmentType = AttachmentType.Audio,
                                     fileName = media.getFileName(),
-                                    duration = media.getDuration()
+                                    duration = media.getDuration(),
+                                    audioViewModel = audioViewModel
                                 )
                             }
                         )
@@ -480,6 +502,7 @@ fun MediaContent(
                     }
                 }
             }
+
             AttachmentType.Unknown -> {}
         }
     }
