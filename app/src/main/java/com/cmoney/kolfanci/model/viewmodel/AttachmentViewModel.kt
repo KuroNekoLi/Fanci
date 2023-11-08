@@ -8,9 +8,9 @@ import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.toUploadFileItem
 import com.cmoney.kolfanci.extension.toUploadFileItemMap
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.socks.library.KLog
@@ -307,4 +307,13 @@ class AttachmentViewModel(
             _attachmentList.update { attachmentList }
         }
     }
+
+    /**
+     * 取得 目前該 uri 所屬的類別
+     */
+    fun getAttachmentType(uri: Uri): AttachmentType? = _attachmentList.value.filter {
+        it.second.uri == uri
+    }.map {
+        it.first
+    }.firstOrNull()
 }

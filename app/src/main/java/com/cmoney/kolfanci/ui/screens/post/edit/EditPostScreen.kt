@@ -181,7 +181,6 @@ fun EditPostScreen(
         onBack = {
             showSaveTip = true
         },
-//        showLoading = (uiState == UiState.ShowLoading),
         showLoading = isLoading,
         onAttachmentFilePicker = {
             showFilePicker = true
@@ -197,7 +196,8 @@ fun EditPostScreen(
             AttachmentController.onAttachmentClick(
                 navController = navController,
                 uri = uri,
-                context = context
+                context = context,
+                attachmentType = attachmentViewModel.getAttachmentType(uri)
             )
         }
     )
@@ -338,13 +338,11 @@ private fun EditPostScreenView(
     onPreviewAttachmentClick: (Uri) -> Unit,
     onResend: (ReSendFile) -> Unit
 ) {
-    val defaultContent = editPost?.content?.text.orEmpty() ?: ""
-
+    val defaultContent = editPost?.content?.text.orEmpty()
     var textState by remember { mutableStateOf(defaultContent) }
     val focusRequester = remember { FocusRequester() }
     val showKeyboard = remember { mutableStateOf(true) }
     val keyboard = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

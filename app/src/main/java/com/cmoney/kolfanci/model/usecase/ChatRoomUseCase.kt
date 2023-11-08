@@ -4,6 +4,7 @@ import android.content.Context
 import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.api.UserReportApi
+import com.cmoney.fanciapi.fanci.model.BulletingBoardMessageParam
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessageParam
@@ -45,23 +46,25 @@ class ChatRoomUseCase(
 
     /**
      * 更新訊息
+     *
+     * @param messageServiceType 更新訊息 or 貼文
+     * @param messageId 訊息 id
+     * @param text 內文
+     * @param attachment 附加檔案
      */
     suspend fun updateMessage(
         messageServiceType: MessageServiceType,
         messageId: String,
         text: String,
-        images: List<String> = emptyList()
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>
     ) = kotlin.runCatching {
+
+        val medias = attachment.toUploadMedia(context)
 
         val chatMessageParam = ChatMessageParam(
             text = text,
             messageType = MessageType.textMessage,
-            medias = images.map {
-                Media(
-                    resourceLink = it,
-                    type = MediaType.image
-                )
-            }
+            medias = medias
         )
         messageApi.apiV2MessageMessageTypeMessageIdPut(
             messageType = messageServiceType,

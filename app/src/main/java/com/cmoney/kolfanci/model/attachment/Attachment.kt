@@ -21,10 +21,11 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
     //處理 附加檔案
     this.forEach { item ->
         val attachmentType = item.first
-        val file = item.second.uri
-        val serverUrl = item.second.serverUrl
-        val fileName = file.getFileName(context).orEmpty()
-        val fileSize = file.getFileSize(context) ?: 0L
+        val attachmentInfo = item.second
+        val file = attachmentInfo.uri
+        val serverUrl = attachmentInfo.serverUrl
+        val fileName = attachmentInfo.filename
+        val fileSize = attachmentInfo.fileSize
 
         when (attachmentType) {
             AttachmentType.Audio -> Media(
@@ -124,6 +125,12 @@ data class AttachmentInfoItem(
         //上傳失敗
         data class Failed(val reason: String) : Status(reason)
     }
+
+    /**
+     * 附加檔案 item, 是否可以點擊預覽
+     */
+    fun isAttachmentItemClickable(): Boolean =
+        (status == Status.Undefined || status == Status.Success)
 }
 
 /**

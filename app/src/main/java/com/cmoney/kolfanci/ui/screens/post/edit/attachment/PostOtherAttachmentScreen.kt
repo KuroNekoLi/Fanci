@@ -29,17 +29,13 @@ fun PostOtherAttachmentScreen(
     onDelete: (Uri) -> Unit,
     onResend: ((ReSendFile) -> Unit)? = null
 ) {
-
     val listState = rememberLazyListState()
-    val context = LocalContext.current
 
     LazyRow(
         modifier = modifier.padding(start = 10.dp, end = 10.dp),
         state = listState, horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-
         attachment.forEach { (attachmentType, item) ->
-
             when (attachmentType) {
                 AttachmentType.Audio -> {
                     item {
@@ -47,7 +43,7 @@ fun PostOtherAttachmentScreen(
                             modifier = itemModifier,
                             file = item.uri,
                             duration = item.duration ?: 0,
-                            isItemClickable = (item.status == AttachmentInfoItem.Status.Undefined),
+                            isItemClickable = item.isAttachmentItemClickable(),
                             isItemCanDelete = (item.status !is AttachmentInfoItem.Status.Failed),
                             isShowResend = (item.status is AttachmentInfoItem.Status.Failed),
                             displayName = item.filename,
@@ -64,7 +60,7 @@ fun PostOtherAttachmentScreen(
                             modifier = itemModifier,
                             file = item.uri,
                             fileSize = item.fileSize,
-                            isItemClickable = (item.status == AttachmentInfoItem.Status.Undefined),
+                            isItemClickable = item.isAttachmentItemClickable(),
                             isItemCanDelete = (item.status !is AttachmentInfoItem.Status.Failed),
                             isShowResend = (item.status is AttachmentInfoItem.Status.Failed),
                             displayName = item.filename,
