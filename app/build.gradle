@@ -203,6 +203,7 @@ dependencies {
 
     //=============== Lottie ===============
     implementation 'com.airbnb.android:lottie:6.1.0'
+    implementation "com.airbnb.android:lottie-compose:6.1.0"
 
     //=============== Pdf viewer ===============
     implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'

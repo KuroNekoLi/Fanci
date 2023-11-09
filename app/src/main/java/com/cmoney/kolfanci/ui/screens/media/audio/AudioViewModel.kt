@@ -67,6 +67,10 @@ class AudioViewModel(
     private val _isShowBottomPlayer = MutableStateFlow(false)
     val isShowBottomPlayer = _isShowBottomPlayer.asStateFlow()
 
+    //是否正在播放中
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
     private val playbackStateObserver = Observer<PlaybackStateCompat> {
         playbackState = it
@@ -96,6 +100,10 @@ class AudioViewModel(
         val playState = musicServiceConnection.playbackState.value?.state
         _isShowMiniIcon.value = (musicServiceConnection.isConnected.value == true
                 && (playState != PlaybackStateCompat.STATE_STOPPED && playState != PlaybackStateCompat.STATE_NONE))
+
+        _isPlaying.update {
+            (musicServiceConnection.isConnected.value == true && playState == PlaybackStateCompat.STATE_PLAYING)
+        }
     }
 
     /**
@@ -146,8 +154,16 @@ class AudioViewModel(
     ) {
         viewModelScope.launch {
             _playButtonRes.value = when (playbackState.isPlaying) {
-                true -> com.google.android.exoplayer2.R.drawable.exo_controls_pause //Set pause
-                else -> com.google.android.exoplayer2.ui.R.drawable.exo_controls_play  //Set play
+                //Set pause
+                true -> {
+                    _isPlaying.update { true }
+                    com.google.android.exoplayer2.R.drawable.exo_controls_pause
+                }
+                //Set play
+                else -> {
+                    _isPlaying.update { false }
+                    com.google.android.exoplayer2.ui.R.drawable.exo_controls_play
+                }
             }
         }
     }
