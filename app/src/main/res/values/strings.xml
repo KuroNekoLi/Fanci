@@ -302,4 +302,10 @@
 
     <string name="chat_fail_title">訊息傳送失敗</string>
     <string name="chat_fail_desc">圖片或檔案上傳失敗\n為了確保訊息完整，快去檢查吧！</string>
+
+    <string name="multiple_choice_question">選擇題</string>
+    <string name="upload_file">上傳檔案</string>
+    <string name="open_camera">打開相機</string>
+    <string name="upload_photo">上傳相片</string>
+
 </resources>
