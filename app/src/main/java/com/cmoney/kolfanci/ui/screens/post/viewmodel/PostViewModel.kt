@@ -21,7 +21,7 @@ import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
-import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
+import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F

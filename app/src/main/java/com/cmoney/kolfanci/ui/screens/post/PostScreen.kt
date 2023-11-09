@@ -59,7 +59,7 @@ import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import com.cmoney.kolfanci.ui.screens.post.dialog.ReportPostDialogScreenScreen
-import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
+import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen

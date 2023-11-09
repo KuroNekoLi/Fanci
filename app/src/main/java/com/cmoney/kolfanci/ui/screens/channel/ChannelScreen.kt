@@ -41,7 +41,7 @@ import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
-import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
+import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
