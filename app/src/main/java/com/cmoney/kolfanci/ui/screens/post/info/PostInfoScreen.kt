@@ -97,6 +97,7 @@ import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.AttachmentEnv
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
@@ -501,9 +502,11 @@ fun PostInfoScreen(
         }
     }
 
-    val isAudioPlaying by audioViewModel.isShowMiniIcon.collectAsState()
-
     val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
+
+    val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
+
+    val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
 
     PostInfoScreenView(
         modifier = modifier,
@@ -518,6 +521,7 @@ fun PostInfoScreen(
         postInfoListener = postInfoListener,
         commentBottomContentListener = commentBottomContentListener,
         inputText = inputText,
+        isShowAudioMiniIcon = isShowAudioMiniIcon,
         isAudioPlaying = isAudioPlaying,
         isOpenBottomAudioPlayer = isOpenBottomAudioPlayer,
         isShowLoading = isShowLoading,
@@ -573,19 +577,6 @@ fun PostInfoScreen(
     ) {
         attachmentViewModel.attachment(it)
     }
-
-    //圖片選擇
-//    if (openImagePickDialog) {
-//        PhotoPickDialogScreen(
-//            onDismiss = {
-//                openImagePickDialog = false
-//            },
-//            onAttach = {
-//                openImagePickDialog = false
-//                viewModel.attachImage(it)
-//            }
-//        )
-//    }
 
     //編輯貼文 callback
     editResultRecipient.onNavResult { result ->
@@ -799,7 +790,8 @@ private fun PostInfoScreenView(
     onDeleteAttach: (Uri) -> Unit,
     onAttachImageAddClick: () -> Unit,
     onPreviewAttachmentClick: (Uri) -> Unit,
-    onResend: ((ReSendFile) -> Unit)
+    onResend: (ReSendFile) -> Unit,
+    isShowAudioMiniIcon: Boolean
 ) {
     val listState = rememberLazyListState()
     val context = LocalContext.current
@@ -1005,34 +997,6 @@ private fun PostInfoScreenView(
                     onResend = onResend
                 )
 
-                //附加圖片
-//                ChatRoomAttachImageScreen(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .background(MaterialTheme.colors.primary),
-//                    imageAttach = imageAttachList.map {
-//                        AttachmentInfoItem(uri = it)
-//                    },
-//                    onDelete = {
-//                        postInfoListener.onDeleteAttach(it)
-//                    },
-//                    onAdd = {
-//                        postInfoListener.onAttachClick()
-//                    },
-//                    onClick = { uri ->
-//                        StfalconImageViewer
-//                            .Builder(
-//                                context, listOf(uri)
-//                            ) { imageView, image ->
-//                                Glide
-//                                    .with(context)
-//                                    .load(image)
-//                                    .into(imageView)
-//                            }
-//                            .show()
-//                    }
-//                )
-
                 //輸入匡
                 key(inputText) {
                     MessageInput(
@@ -1057,21 +1021,18 @@ private fun PostInfoScreenView(
                 )
             }
 
-            if (isAudioPlaying) {
-                //mini player trigger icon
-                Image(
+            //是否有音樂播放中
+            if (isShowAudioMiniIcon) {
+                AudioMiniPlayIconScreen(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(bottom = 120.dp)
-                        .size(width = 61.dp, height = 50.dp)
-                        .clip(RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp))
-                        .clickable {
-                            coroutineScope.launch {
-                                audioPlayerState.show()
-                            }
-                        },
-                    painter = painterResource(id = R.drawable.mini_play_icon),
-                    contentDescription = null
+                        .padding(bottom = 120.dp),
+                    isPlaying = isAudioPlaying,
+                    onClick = {
+                        coroutineScope.launch {
+                            audioPlayerState.show()
+                        }
+                    }
                 )
 
                 //mini player
@@ -1333,6 +1294,7 @@ fun PostInfoScreenPreview() {
         PostInfoScreenView(
             navController = EmptyDestinationsNavigator,
             post = PostViewModel.mockPost,
+            isPinPost = false,
             attachment = emptyList(),
             comments = emptyList(),
             commentReply = null,
@@ -1341,14 +1303,14 @@ fun PostInfoScreenPreview() {
             postInfoListener = EmptyPostInfoListener,
             commentBottomContentListener = EmptyCommentBottomContentListener,
             inputText = "",
-            isPinPost = false,
             isAudioPlaying = false,
             isOpenBottomAudioPlayer = false,
             isShowLoading = false,
             onDeleteAttach = {},
             onAttachImageAddClick = {},
             onPreviewAttachmentClick = {},
-            onResend = {}
+            onResend = {},
+            isShowAudioMiniIcon = false
         )
     }
 }
