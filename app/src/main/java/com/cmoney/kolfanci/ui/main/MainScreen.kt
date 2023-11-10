@@ -34,13 +34,11 @@ import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.ChannelScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupApplyScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingScreenDestination
-import com.cmoney.kolfanci.ui.destinations.MultipleChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.channel.ResetRedDot
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.follow.FollowScreen
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
-import com.cmoney.kolfanci.ui.screens.mcq.MultipleChoiceQuestionScreen
 import com.cmoney.kolfanci.ui.screens.notification.NoPermissionDialog
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -194,11 +192,8 @@ fun MainScreen(
             notificationViewModel.openedInviteGroup()
         },
         onChannelClick = {
-
-            navigator.navigate(MultipleChoiceQuestionScreenDestination)
-
-//            chatRoomViewModel.fetchChannelPermission(it)
-//            activity.intent?.replaceExtras(Bundle())
+            chatRoomViewModel.fetchChannelPermission(it)
+            activity.intent?.replaceExtras(Bundle())
         },
         onChangeGroup = {
             globalGroupViewModel.setCurrentGroup(it)
