@@ -515,7 +515,7 @@ fun CommentCount(
                     Modifier
                 }
             )
-            .padding(10.dp),
+            .padding(top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isPinPost) {

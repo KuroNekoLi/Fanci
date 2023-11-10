@@ -239,7 +239,7 @@ fun BasePostContentScreen(
                 }
 
                 LazyRow(
-                    modifier = modifier.padding(start = 10.dp, end = 10.dp),
+                    modifier = modifier,
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
