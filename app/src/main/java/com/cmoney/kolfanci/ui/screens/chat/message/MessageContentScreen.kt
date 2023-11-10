@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -69,6 +70,7 @@ import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
+import com.cmoney.kolfanci.ui.screens.shared.choice.SingleChoiceScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.ui.theme.White_767A7F
@@ -394,7 +396,25 @@ fun MessageContentScreen(
                         }
                     }
                 }
+
+                //選擇題
+                ChatMessageWrapper.MessageType.Choice -> {
+                    //TODO
+                }
             }
+
+            //TODO: test
+//            SingleChoiceScreen(
+//                modifier = Modifier.fillMaxWidth().padding(start = 40.dp),
+//                question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
+//                choices = listOf(
+//                    "1.日本 🗼" to 0.1f,
+//                    "2.紐約 🗽" to 0.25f,
+//                    "3.夏威夷 🏖️" to 0.65f,
+//                ),
+//                isCanChoice = false,
+//                onChoiceClick = {}
+//            )
         }
     }
 }
