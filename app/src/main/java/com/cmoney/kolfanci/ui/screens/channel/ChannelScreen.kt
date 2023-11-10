@@ -44,6 +44,7 @@ import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
+import com.cmoney.kolfanci.ui.destinations.MultipleChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
@@ -104,6 +105,7 @@ fun ChannelScreen(
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
+    choiceRecipient: ResultRecipient<MultipleChoiceQuestionScreenDestination, String>,
     redDotResultBackNavigator: ResultBackNavigator<ResetRedDot>
 ) {
     val group by globalGroupViewModel().currentGroup.collectAsState()
@@ -135,6 +137,7 @@ fun ChannelScreen(
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
         postInfoResultRecipient = postInfoResultRecipient,
+        choiceRecipient = choiceRecipient,
         onChatPageSelected = {
             viewMode.onChatRedDotClick(
                 channelId = channel.id.orEmpty()
@@ -179,6 +182,7 @@ private fun ChannelScreenView(
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
+    choiceRecipient: ResultRecipient<MultipleChoiceQuestionScreenDestination, String>,
     onChatPageSelected: () -> Unit,
     onPostPageSelected: () -> Unit,
     onBackClick: () -> Unit,
@@ -294,7 +298,8 @@ private fun ChannelScreenView(
                                 channelId = channel.id.orEmpty(),
                                 navController = navController,
                                 resultRecipient = announcementResultRecipient,
-                                jumpChatMessage = jumpChatMessage
+                                jumpChatMessage = jumpChatMessage,
+                                choiceRecipient = choiceRecipient
                             )
                             LaunchedEffect(key1 = Unit) {
                                 onChatPageSelected.invoke()
@@ -367,6 +372,7 @@ fun ChannelScreenPreview() {
             announcementResultRecipient = EmptyResultRecipient(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
+            choiceRecipient = EmptyResultRecipient(),
             onChatPageSelected = {
 
             },

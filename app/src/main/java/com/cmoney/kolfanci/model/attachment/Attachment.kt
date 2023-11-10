@@ -9,8 +9,6 @@ import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.PdfContent
 import com.cmoney.fanciapi.fanci.model.TxtContent
 import com.cmoney.kolfanci.extension.getAudioDuration
-import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.extension.getFileSize
 
 /**
  * 將附加檔案 List 轉為, 上傳用的 Media List
@@ -65,6 +63,10 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
             AttachmentType.Unknown -> {
                 null
             }
+
+            AttachmentType.Choice -> {
+                null
+            }
         }?.apply {
             medias.add(this)
         }
@@ -83,6 +85,11 @@ sealed class AttachmentType {
     object Txt : AttachmentType()
 
     object Pdf : AttachmentType()
+
+    /**
+     * 選擇題
+     */
+    object Choice : AttachmentType()
 
     object Unknown : AttachmentType()
 }

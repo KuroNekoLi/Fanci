@@ -21,6 +21,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentChoiceItem
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
@@ -44,8 +45,7 @@ fun ChatRoomAttachmentScreen(
     onResend: ((ReSendFile) -> Unit)
 ) {
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+        modifier = modifier
     ) {
         attachment.forEach { (attachmentType, uris) ->
             when (attachmentType) {
@@ -94,6 +94,22 @@ fun ChatRoomAttachmentScreen(
 
                 //其他
                 AttachmentType.Unknown -> {
+                }
+
+                //選擇題
+                AttachmentType.Choice -> {
+                    //TODO
+                    AttachmentChoiceItem(
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .width(270.dp)
+                            .height(75.dp),
+                        description = "Customer reviews indicate that many",
+                        isItemClickable = true,
+                        isItemCanDelete = true,
+                        onClick = {},
+                        onDelete = {}
+                    )
                 }
             }
         }

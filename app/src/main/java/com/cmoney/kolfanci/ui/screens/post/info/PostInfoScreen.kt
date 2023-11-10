@@ -566,6 +566,7 @@ fun PostInfoScreen(
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
+        navController = navController,
         state = state,
         attachmentEnv = AttachmentEnv.Post,
         selectedAttachment = attachment,

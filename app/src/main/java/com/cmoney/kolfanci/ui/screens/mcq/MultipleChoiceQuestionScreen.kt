@@ -33,6 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.DashPlusButton
 import com.cmoney.kolfanci.ui.screens.mcq.viewmodel.McqViewModel
@@ -41,6 +42,7 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -48,7 +50,8 @@ import org.koin.androidx.compose.koinViewModel
 fun MultipleChoiceQuestionScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    viewModel: McqViewModel = koinViewModel()
+    viewModel: McqViewModel = koinViewModel(),
+    resultBackNavigator: ResultBackNavigator<String>
 ) {
     val question by viewModel.question.collectAsState()
     val choice by viewModel.choice.collectAsState()
@@ -77,6 +80,13 @@ fun MultipleChoiceQuestionScreen(
             } else {
                 viewModel.onMultiChoiceClick()
             }
+        },
+        backClick = {
+            navController.popBackStack()
+        },
+        onConfirm = {
+            //TODO: 將建立好的 選擇題 model callback
+            resultBackNavigator.navigateBack("123")
         }
     )
 }
@@ -104,7 +114,8 @@ fun MultipleChoiceQuestionScreenView(
     backClick: (() -> Unit)? = null,
     onAddChoice: () -> Unit,
     onDeleteChoice: (Int) -> Unit,
-    onChoiceTypeClick: (Boolean) -> Unit
+    onChoiceTypeClick: (Boolean) -> Unit,
+    onConfirm: () -> Unit
 ) {
     //輸入限制, 250 bytes
     val maxTextLengthBytes = 250
@@ -115,8 +126,7 @@ fun MultipleChoiceQuestionScreenView(
         topBar = {
             EditToolbarScreen(
                 title = stringResource(id = R.string.create_choice),
-                saveClick = {
-                },
+                saveClick = onConfirm,
                 backClick = backClick
             )
         }
@@ -422,7 +432,8 @@ fun MultipleChoiceQuestionScreenPreview() {
             onAddChoice = {},
             onDeleteChoice = {},
             isSingleChoice = true,
-            onChoiceTypeClick = {}
+            onChoiceTypeClick = {},
+            onConfirm = {}
         )
     }
 }

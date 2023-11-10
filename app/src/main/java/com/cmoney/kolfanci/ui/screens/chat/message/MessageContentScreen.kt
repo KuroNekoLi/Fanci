@@ -503,6 +503,10 @@ fun MediaContent(
                 }
             }
 
+            AttachmentType.Choice -> {
+                //TODO: 附加檔案-選擇題
+            }
+
             AttachmentType.Unknown -> {}
         }
     }

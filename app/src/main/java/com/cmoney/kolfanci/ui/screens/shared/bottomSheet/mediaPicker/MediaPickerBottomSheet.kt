@@ -45,10 +45,12 @@ import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.ui.destinations.MultipleChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -80,6 +82,7 @@ sealed class AttachmentEnv {
 @Composable
 fun MediaPickerBottomSheet(
     modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
     state: ModalBottomSheetState,
     attachmentEnv: AttachmentEnv = AttachmentEnv.Chat,
     isOnlyPhotoSelector: Boolean = false,
@@ -157,7 +160,7 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onChoiceClick = {
-                    //TODO
+                    navController.navigate(MultipleChoiceQuestionScreenDestination)
                 }
             )
         }

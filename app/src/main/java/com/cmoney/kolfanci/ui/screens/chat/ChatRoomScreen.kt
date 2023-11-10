@@ -42,6 +42,7 @@ import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.destinations.MultipleChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
@@ -77,7 +78,8 @@ fun ChatRoomScreen(
     messageViewModel: MessageViewModel = koinViewModel(),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
-    resultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>
+    resultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
+    choiceRecipient: ResultRecipient<MultipleChoiceQuestionScreenDestination, String>
 ) {
     val TAG = "ChatRoomScreen"
 
@@ -136,6 +138,23 @@ fun ChatRoomScreen(
                     channelId,
                     announceMessage
                 )
+            }
+        }
+    }
+
+    //附加選擇題 callback
+    choiceRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                val announceMessage = result.value
+                attachmentViewModel.addChoiceAttachment(announceMessage)
+
+                coroutineScope.launch {
+                    state.hide()
+                }
             }
         }
     }
@@ -353,6 +372,7 @@ fun ChatRoomScreen(
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
+        navController = navController,
         state = state,
         selectedAttachment = attachment,
         isOnlyPhotoSelector = isOnlyPhotoSelector

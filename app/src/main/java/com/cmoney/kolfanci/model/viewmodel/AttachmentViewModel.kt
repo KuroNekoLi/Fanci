@@ -340,4 +340,20 @@ class AttachmentViewModel(
             true
         }
     }
+
+    /**
+     * 新增 選擇題
+     */
+    fun addChoiceAttachment(choice: String) {
+        KLog.i(TAG, "addChoiceAttachment")
+
+        //TODO
+        _attachment.update { oldMap ->
+            val newMap = oldMap.toMutableMap()
+            newMap[AttachmentType.Choice] = listOf(
+                AttachmentInfoItem()
+            )
+            newMap
+        }
+    }
 }

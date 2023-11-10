@@ -223,6 +223,10 @@ object AttachmentController {
             AttachmentType.Unknown -> {
 
             }
+
+            AttachmentType.Choice -> {
+                //TODO: 前往編輯選擇題
+            }
         }
     }
 }
