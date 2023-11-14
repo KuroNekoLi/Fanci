@@ -49,7 +49,7 @@ android {
             applicationIdSuffix = '.debug'
             versionNameSuffix '-debug'
             buildConfigField "String", "CM_SERVER_URL", '"https://outpost.cmoney.tw/"'
-            buildConfigField "String", "FANCI_SERVER_URL", '"https://outpost.cmoney.tw/fanci/"'
+            buildConfigField "String", "FANCI_SERVER_URL", '"https://dev-connect.cmoney.tw/Fanci"'
         }
     }
 
