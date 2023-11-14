@@ -21,7 +21,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 音檔內容
  *
  * @param fileName 
  * @param fileSize 

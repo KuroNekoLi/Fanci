@@ -22,19 +22,21 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 聊天訊息內容
  *
- * @param text 
- * @param medias 
+ * @param text 訊息
+ * @param medias 媒體
  */
 @Parcelize
 
 
 data class MediaIChatContent (
 
+    /* 訊息 */
     @Json(name = "text")
     val text: kotlin.String? = null,
 
+    /* 媒體 */
     @Json(name = "medias")
     val medias: kotlin.collections.List<Media>? = null
 

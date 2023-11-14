@@ -21,15 +21,15 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 使用者介面
  *
  * @param id 
- * @param cmoneyMemberId 
- * @param name 
- * @param thumbNail 
- * @param serialNumber 
- * @param createUnixTime 
- * @param updateUnixTime 
+ * @param cmoneyMemberId CMoney 會員編號
+ * @param name 使用者名稱(全域預設)
+ * @param thumbNail 使用者頭像(全域預設)
+ * @param serialNumber 流水號
+ * @param createUnixTime 資料建立時間
+ * @param updateUnixTime 資料更新時間
  */
 @Parcelize
 
@@ -39,21 +39,27 @@ data class IUser (
     @Json(name = "id")
     val id: kotlin.String? = null,
 
+    /* CMoney 會員編號 */
     @Json(name = "cmoneyMemberId")
     val cmoneyMemberId: kotlin.Int? = null,
 
+    /* 使用者名稱(全域預設) */
     @Json(name = "name")
     val name: kotlin.String? = null,
 
+    /* 使用者頭像(全域預設) */
     @Json(name = "thumbNail")
     val thumbNail: kotlin.String? = null,
 
+    /* 流水號 */
     @Json(name = "serialNumber")
     val serialNumber: kotlin.Long? = null,
 
+    /* 資料建立時間 */
     @Json(name = "createUnixTime")
     val createUnixTime: kotlin.Long? = null,
 
+    /* 資料更新時間 */
     @Json(name = "updateUnixTime")
     val updateUnixTime: kotlin.Long? = null
 

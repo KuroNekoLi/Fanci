@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 申請狀態
  *
  * Values: unConfirmed,confirmed,denied
  */

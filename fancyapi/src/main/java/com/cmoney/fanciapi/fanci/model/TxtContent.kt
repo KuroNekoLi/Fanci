@@ -21,7 +21,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * Txt檔內容
  *
  * @param fileName 
  * @param fileSize 

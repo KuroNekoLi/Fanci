@@ -21,19 +21,21 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 題組回應
  *
- * @param question 
- * @param answer 
+ * @param question 題目
+ * @param answer 回應
  */
 @Parcelize
 
 
 data class GroupRequirementAnswer (
 
+    /* 題目 */
     @Json(name = "question")
     val question: kotlin.String? = null,
 
+    /* 回應 */
     @Json(name = "answer")
     val answer: kotlin.String? = null
 

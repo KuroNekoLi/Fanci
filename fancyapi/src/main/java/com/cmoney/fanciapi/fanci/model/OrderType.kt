@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 排序類別
  *
  * Values: latest,oldest,popular
  */

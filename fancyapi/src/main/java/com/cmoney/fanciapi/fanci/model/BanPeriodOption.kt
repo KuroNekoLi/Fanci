@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 禁言時數分類
  *
  * Values: oneDay,threeDay,oneWeek,oneMonth,forever
  */
