@@ -15,7 +15,6 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.MediaType
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -37,7 +36,7 @@ data class IMedia (
     val resourceLink: kotlin.String? = null,
 
     @Json(name = "type")
-    val type: MediaType? = null,
+    val type: kotlin.String? = null,
 
     @Json(name = "isNeedAuthenticate")
     val isNeedAuthenticate: kotlin.Boolean? = null

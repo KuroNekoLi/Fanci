@@ -22,7 +22,6 @@ import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
-import com.cmoney.fanciapi.fanci.model.MessageType
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -40,7 +39,6 @@ import kotlinx.parcelize.Parcelize
  * @param createUnixTime 
  * @param updateUnixTime 
  * @param serialNumber 
- * @param messageType 
  * @param messageFromType 
  * @param messageReaction 
  * @param deleteStatus 
@@ -79,9 +77,6 @@ data class ChatMessage (
 
     @Json(name = "serialNumber")
     val serialNumber: kotlin.Long? = null,
-
-    @Json(name = "messageType")
-    val messageType: MessageType? = null,
 
     @Json(name = "messageFromType")
     val messageFromType: MessageServiceType? = null,

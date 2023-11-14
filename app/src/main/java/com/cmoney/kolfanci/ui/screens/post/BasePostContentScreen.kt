@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getDuration
@@ -56,6 +55,7 @@ import com.cmoney.kolfanci.extension.getFleSize
 import com.cmoney.kolfanci.extension.toAttachmentType
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
@@ -217,7 +217,7 @@ fun BasePostContentScreen(
             post.content?.medias?.let { medias ->
                 //========= Image =========
                 val imageUrl = medias.filter {
-                    it.type == MediaType.image
+                    it.type == AttachmentType.Image.name
                 }.map {
                     it.resourceLink.orEmpty()
                 }
@@ -235,7 +235,7 @@ fun BasePostContentScreen(
 
                 //========= Other File =========
                 val otherUrl = medias.filter {
-                    it.type != MediaType.image && it.type != MediaType.audio
+                    it.type != AttachmentType.Image.name && it.type != AttachmentType.Audio.name
                 }
 
                 LazyRow(
@@ -275,11 +275,11 @@ fun BasePostContentScreen(
 
                 //========= Audio File =========
                 val audioUrl = medias.filter {
-                    it.type == MediaType.audio
+                    it.type == AttachmentType.Audio.name
                 }
 
                 LazyRow(
-                    modifier = modifier.padding(start = 10.dp, end = 10.dp),
+                    modifier = modifier,
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {

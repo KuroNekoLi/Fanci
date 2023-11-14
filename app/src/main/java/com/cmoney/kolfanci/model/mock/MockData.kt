@@ -7,10 +7,10 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
 import com.cmoney.kolfanci.BuildConfig
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.PushNotificationSettingWrap
 import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterData
 import org.apache.commons.lang3.RandomStringUtils
@@ -241,7 +241,7 @@ object MockData {
                                         300
                                     )
                                 }/${Random.nextInt(100, 300)}",
-                                type = MediaType.image
+                                type = AttachmentType.Image.name
                             )
                         }
                     ),

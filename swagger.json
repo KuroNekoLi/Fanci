@@ -7204,6 +7204,24 @@
         ],
         "type": "string"
       },
+      "AudioContent": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "AuthBulliten": {
         "type": "object",
         "properties": {
@@ -7341,9 +7359,6 @@
           "serialNumber": {
             "type": "integer",
             "format": "int64"
-          },
-          "messageType": {
-            "$ref": "#/components/schemas/MessageType"
           },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
@@ -7506,9 +7521,6 @@
             "description": "頻道創立者",
             "nullable": true
           },
-          "channelType": {
-            "$ref": "#/components/schemas/ChannelTabType"
-          },
           "name": {
             "type": "string",
             "description": "頻道命名",
@@ -7547,6 +7559,9 @@
             },
             "description": "頻道有啟用的聊天室版面",
             "nullable": true
+          },
+          "channelType": {
+            "$ref": "#/components/schemas/ChannelTabType"
           }
         },
         "additionalProperties": false,
@@ -7634,10 +7649,10 @@
           "canRead": {
             "type": "boolean"
           },
-          "canPost": {
+          "canReply": {
             "type": "boolean"
           },
-          "canReply": {
+          "canPost": {
             "type": "boolean"
           },
           "canEmoji": {
@@ -7770,9 +7785,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "messageType": {
-            "$ref": "#/components/schemas/MessageType"
-          },
           "messageFromType": {
             "$ref": "#/components/schemas/MessageServiceType"
           },
@@ -7832,9 +7844,6 @@
             },
             "description": "附帶媒體內容",
             "nullable": true
-          },
-          "messageType": {
-            "$ref": "#/components/schemas/MessageType"
           }
         },
         "additionalProperties": false
@@ -8571,7 +8580,11 @@
             "nullable": true
           },
           "type": {
-            "$ref": "#/components/schemas/MediaType"
+            "type": "string",
+            "nullable": true
+          },
+          "isNeedAuthenticate": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -8657,6 +8670,20 @@
         },
         "additionalProperties": false
       },
+      "ImageContent": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "Media": {
         "type": "object",
         "properties": {
@@ -8665,7 +8692,26 @@
             "nullable": true
           },
           "type": {
-            "$ref": "#/components/schemas/MediaType"
+            "type": "string",
+            "nullable": true
+          },
+          "isNeedAuthenticate": {
+            "type": "boolean"
+          },
+          "image": {
+            "$ref": "#/components/schemas/ImageContent"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/AudioContent"
+          },
+          "video": {
+            "$ref": "#/components/schemas/VideoContent"
+          },
+          "txt": {
+            "$ref": "#/components/schemas/TxtContent"
+          },
+          "pdf": {
+            "$ref": "#/components/schemas/PdfContent"
           }
         },
         "additionalProperties": false
@@ -8687,13 +8733,6 @@
         },
         "additionalProperties": false
       },
-      "MediaType": {
-        "enum": [
-          "Image",
-          "Video"
-        ],
-        "type": "string"
-      },
       "MessageIdParam": {
         "required": [
           "messageId"
@@ -8713,12 +8752,6 @@
         "enum": [
           "Chatroom",
           "Bulletinboard"
-        ],
-        "type": "string"
-      },
-      "MessageType": {
-        "enum": [
-          "TextMessage"
         ],
         "type": "string"
       },
@@ -8773,6 +8806,24 @@
           },
           "isAdd": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PdfContent": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -9187,6 +9238,24 @@
         },
         "additionalProperties": false
       },
+      "TxtContent": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateIsNeedApprovalParam": {
         "type": "object",
         "properties": {
@@ -9336,6 +9405,28 @@
         },
         "additionalProperties": false,
         "description": "使用者陣列參數"
+      },
+      "VideoContent": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "VipSale": {
         "type": "object",

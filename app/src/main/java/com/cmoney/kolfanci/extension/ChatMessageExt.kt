@@ -18,7 +18,6 @@ fun ChatMessage.toBulletinboardMessage(): BulletinboardMessage = BulletinboardMe
     createUnixTime = createUnixTime,
     updateUnixTime = updateUnixTime,
     serialNumber = serialNumber,
-    messageType = messageType,
     messageReaction =  messageReaction,
     deleteStatus = deleteStatus,
     deleteFrom = deleteFrom,

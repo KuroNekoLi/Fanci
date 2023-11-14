@@ -17,7 +17,6 @@ package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.AudioContent
 import com.cmoney.fanciapi.fanci.model.ImageContent
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.PdfContent
 import com.cmoney.fanciapi.fanci.model.TxtContent
 import com.cmoney.fanciapi.fanci.model.VideoContent
@@ -47,7 +46,7 @@ data class Media (
     val resourceLink: kotlin.String? = null,
 
     @Json(name = "type")
-    val type: MediaType? = null,
+    val type: kotlin.String? = null,
 
     @Json(name = "isNeedAuthenticate")
     val isNeedAuthenticate: kotlin.Boolean? = null,
