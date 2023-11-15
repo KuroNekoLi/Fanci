@@ -17,7 +17,6 @@ package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.AudioContent
 import com.cmoney.fanciapi.fanci.model.ImageContent
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.PdfContent
 import com.cmoney.fanciapi.fanci.model.TxtContent
 import com.cmoney.fanciapi.fanci.model.VideoContent
@@ -27,11 +26,11 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 媒體
  *
- * @param resourceLink 
- * @param type 
- * @param isNeedAuthenticate 
+ * @param resourceLink 連結
+ * @param type 媒體類型 (原本是Enum 但因為新增前端就要做強更 所以改成string彈性較高)<br></br>  圖片 (Image), 影片 (Video), 音檔 (Audio), 文檔 (Txt), PDF檔 (Pdf)
+ * @param isNeedAuthenticate 媒體是否需要內部驗證
  * @param image 
  * @param audio 
  * @param video 
@@ -43,12 +42,15 @@ import kotlinx.parcelize.Parcelize
 
 data class Media (
 
+    /* 連結 */
     @Json(name = "resourceLink")
     val resourceLink: kotlin.String? = null,
 
+    /* 媒體類型 (原本是Enum 但因為新增前端就要做強更 所以改成string彈性較高)<br></br>  圖片 (Image), 影片 (Video), 音檔 (Audio), 文檔 (Txt), PDF檔 (Pdf) */
     @Json(name = "type")
-    val type: MediaType? = null,
+    val type: kotlin.String? = null,
 
+    /* 媒體是否需要內部驗證 */
     @Json(name = "isNeedAuthenticate")
     val isNeedAuthenticate: kotlin.Boolean? = null,
 

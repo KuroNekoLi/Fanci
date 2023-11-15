@@ -79,8 +79,7 @@ fun MessageImageScreenV2(
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(5.dp),
+                .wrapContentHeight(),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 

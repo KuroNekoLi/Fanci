@@ -23,9 +23,9 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * Channel功能區
  *
- * @param channelId 
+ * @param channelId 頻道ID
  * @param type 
  * @param userContext 
  */
@@ -34,6 +34,7 @@ import kotlinx.parcelize.Parcelize
 
 data class IChannelTab (
 
+    /* 頻道ID */
     @Json(name = "channelId")
     val channelId: kotlin.String? = null,
 

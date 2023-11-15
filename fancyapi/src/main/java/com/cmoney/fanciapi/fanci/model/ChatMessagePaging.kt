@@ -22,23 +22,26 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 分頁
  *
- * @param haveNextPage 
- * @param nextWeight 
- * @param items 
+ * @param haveNextPage 是否有下一頁
+ * @param nextWeight 下一個詢問權重
+ * @param items 結果清單
  */
 @Parcelize
 
 
 data class ChatMessagePaging (
 
+    /* 是否有下一頁 */
     @Json(name = "haveNextPage")
     val haveNextPage: kotlin.Boolean? = null,
 
+    /* 下一個詢問權重 */
     @Json(name = "nextWeight")
     val nextWeight: kotlin.Long? = null,
 
+    /* 結果清單 */
     @Json(name = "items")
     val items: kotlin.collections.List<ChatMessage>? = null
 

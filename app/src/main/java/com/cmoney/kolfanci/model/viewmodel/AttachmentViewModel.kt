@@ -32,8 +32,7 @@ class AttachmentViewModel(
         MutableStateFlow<List<Pair<AttachmentType, AttachmentInfoItem>>>(emptyList())
     val attachmentList = _attachmentList.asStateFlow()
 
-    //TODO: 統一一份資料
-    //附加檔案 (有分類聚合)
+    //附加檔案 (有分類聚合) - 來源 -> _attachmentList
     private val _attachment =
         MutableStateFlow<Map<AttachmentType, List<AttachmentInfoItem>>>(emptyMap())
     val attachment = _attachment.asStateFlow()
@@ -50,6 +49,22 @@ class AttachmentViewModel(
     private val _isOnlyPhotoSelector = MutableStateFlow<Boolean>(false)
     val isOnlyPhotoSelector = _isOnlyPhotoSelector.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            _attachmentList.collect { attachmentList ->
+                _attachment.update {
+                    attachmentList.groupBy {
+                        it.first
+                    }.mapValues { entry ->
+                        entry.value.map {
+                            it.second
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * 附加檔案, 區分 類型
      */
@@ -65,26 +80,6 @@ class AttachmentViewModel(
         _attachmentList.update {
             oldList
         }
-
-        val attachmentMap = uris.map { uri ->
-            val attachmentType = uri.getAttachmentType(context)
-            attachmentType to uri.toUploadFileItem(context = context)
-        }.groupBy {
-            it.first
-        }.mapValues { entry ->
-            entry.value.map { it.second }
-        }
-
-        val unionList = (_attachment.value.asSequence() + attachmentMap.asSequence())
-            .distinct()
-            .groupBy({ it.key }, { it.value })
-            .mapValues { entry ->
-                entry.value.flatten()
-            }
-
-        _attachment.update {
-            unionList
-        }
     }
 
     /**
@@ -98,22 +93,6 @@ class AttachmentViewModel(
         _attachmentList.update {
             _attachmentList.value.filter {
                 it.second.uri != uri
-            }
-        }
-
-        val newAttachment = _attachment.value[attachmentType]?.filter { existsItem ->
-            existsItem.uri != uri
-        }
-
-        if (newAttachment.isNullOrEmpty()) {
-            _attachment.update {
-                emptyMap()
-            }
-        } else {
-            _attachment.update { oldAttachment ->
-                oldAttachment.toMutableMap().apply {
-                    set(attachmentType, newAttachment)
-                }
             }
         }
     }
@@ -197,14 +176,6 @@ class AttachmentViewModel(
             newList
         }
 
-        val unionList = newList.groupBy(
-            { it.first }, { it.second }
-        )
-
-        _attachment.update {
-            unionList
-        }
-
         val hasFailed = _attachmentList.value.any { pairItem ->
             val item = pairItem.second
             item.status is AttachmentInfoItem.Status.Failed
@@ -239,12 +210,6 @@ class AttachmentViewModel(
 
         _attachmentList.update {
             newList
-        }
-
-        _attachment.update {
-            newList.groupBy(
-                { it.first }, { it.second }
-            )
         }
     }
 
@@ -288,7 +253,6 @@ class AttachmentViewModel(
 
     fun clear() {
         KLog.i(TAG, "clear")
-        _attachment.update { emptyMap() }
         _attachmentList.update { emptyList() }
     }
 
@@ -307,7 +271,6 @@ class AttachmentViewModel(
                 }
             }.flatten()
 
-            _attachment.update { attachmentMap }
             _attachmentList.update { attachmentList }
         }
     }

@@ -1,18 +1,14 @@
 package com.cmoney.kolfanci.ui.screens.channel
 
+import android.net.Uri
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
@@ -28,8 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ChatMessage
-import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
@@ -49,9 +42,10 @@ import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
-import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
+import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -122,18 +116,21 @@ fun ChannelScreen(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
         ?.onBackPressedDispatcher
 
-    val isAudioPlaying by audioViewModel.isShowMiniIcon.collectAsState()
+    val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
 
     val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
+
+    val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
 
     ChannelScreenView(
         modifier = modifier,
         pagerState = pagerState,
-        group = group,
         channel = channel,
+        jumpChatMessage = jumpChatMessage,
         unreadCount = unreadCount,
         navController = navController,
-        jumpChatMessage = jumpChatMessage,
+        isShowAudioMiniIcon = isShowAudioMiniIcon,
+        isAudioPlaying = isAudioPlaying,
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
         postInfoResultRecipient = postInfoResultRecipient,
@@ -151,7 +148,6 @@ fun ChannelScreen(
         onBackClick = {
             onBackPressedDispatcher?.onBackPressed()
         },
-        isAudioPlaying = isAudioPlaying,
         isOpenBottomAudioPlayer = isOpenBottomAudioPlayer
     )
 
@@ -173,12 +169,11 @@ fun ChannelScreen(
 private fun ChannelScreenView(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
-    group: Group?,
     channel: Channel,
     jumpChatMessage: ChatMessage? = null,
     unreadCount: Pair<Long, Long>?,
     navController: DestinationsNavigator,
-    isAudioPlaying: Boolean,
+    isShowAudioMiniIcon: Boolean,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
@@ -186,7 +181,8 @@ private fun ChannelScreenView(
     onChatPageSelected: () -> Unit,
     onPostPageSelected: () -> Unit,
     onBackClick: () -> Unit,
-    isOpenBottomAudioPlayer: Boolean
+    isOpenBottomAudioPlayer: Boolean,
+    isAudioPlaying: Boolean
 ) {
     //控制 audio BottomSheet
     val audioPlayerState = rememberModalBottomSheetState(
@@ -325,21 +321,17 @@ private fun ChannelScreenView(
                     }
                 }
 
-                if (isAudioPlaying) {
-                    //mini player trigger icon
-                    Image(
+                if (isShowAudioMiniIcon) {
+                    AudioMiniPlayIconScreen(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(bottom = 120.dp)
-                            .size(width = 61.dp, height = 50.dp)
-                            .clip(RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp))
-                            .clickable {
-                                coroutineScope.launch {
-                                    audioPlayerState.show()
-                                }
-                            },
-                        painter = painterResource(id = R.drawable.mini_play_icon),
-                        contentDescription = null
+                            .padding(bottom = 120.dp),
+                        isPlaying = isAudioPlaying,
+                        onClick = {
+                            coroutineScope.launch {
+                                audioPlayerState.show()
+                            }
+                        }
                     )
 
                     //mini player
@@ -361,14 +353,10 @@ fun ChannelScreenPreview() {
     FanciTheme {
         ChannelScreenView(
             pagerState = rememberPagerState(),
-            group = Group(),
-            channel = Channel(
-                name = "\uD83D\uDC57｜金針菇穿什麼"
-            ),
-//            channelTabStatus = ChannelTabsStatus(),
             unreadCount = Pair(10, 20),
+            channel = Channel(),
             navController = EmptyDestinationsNavigator,
-            isAudioPlaying = true,
+            isShowAudioMiniIcon = true,
             announcementResultRecipient = EmptyResultRecipient(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
@@ -380,7 +368,8 @@ fun ChannelScreenPreview() {
 
             },
             onBackClick = {},
-            isOpenBottomAudioPlayer = false
+            isOpenBottomAudioPlayer = false,
+            isAudioPlaying = false
         )
     }
 }

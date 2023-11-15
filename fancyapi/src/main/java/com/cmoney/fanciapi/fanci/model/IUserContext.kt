@@ -21,15 +21,16 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 使用者個人化關聯資訊 (若未帶使用者資訊則為null)
  *
- * @param unreadCount 
+ * @param unreadCount 使用者當前未讀數
  */
 @Parcelize
 
 
 data class IUserContext (
 
+    /* 使用者當前未讀數 */
     @Json(name = "unreadCount")
     val unreadCount: kotlin.Long? = null
 

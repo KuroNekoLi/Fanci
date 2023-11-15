@@ -87,6 +87,7 @@ import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
+import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
@@ -265,7 +266,9 @@ fun FollowScreen(
         viewModel.alreadyNotifyAllowNotificationPermission()
     }
 
-    val isAudioPlaying by audioViewModel.isShowMiniIcon.collectAsState()
+    val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
+
+    val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
 
     FollowScreenView(
         modifier = modifier,
@@ -303,6 +306,7 @@ fun FollowScreen(
             )
         },
         notificationUnReadCount = notificationUnReadCount,
+        isShowAudioMiniIcon = isShowAudioMiniIcon,
         isAudioPlaying = isAudioPlaying
     )
 
@@ -333,6 +337,7 @@ fun FollowScreenView(
     isShowBubbleTip: Boolean,
     onMoreClick: (Group) -> Unit,
     notificationUnReadCount: Long,
+    isShowAudioMiniIcon: Boolean,
     isAudioPlaying: Boolean
 ) {
     val TAG = "FollowScreenView"
@@ -589,21 +594,17 @@ fun FollowScreenView(
                         }
 
                         //是否有音樂播放中
-                        if (isAudioPlaying) {
-                            //mini player trigger icon
-                            Image(
+                        if (isShowAudioMiniIcon) {
+                            AudioMiniPlayIconScreen(
                                 modifier = Modifier
                                     .align(Alignment.BottomEnd)
-                                    .padding(bottom = 60.dp)
-                                    .size(width = 61.dp, height = 50.dp)
-                                    .clip(RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp))
-                                    .clickable {
-                                        coroutineScope.launch {
-                                            audioPlayerState.show()
-                                        }
-                                    },
-                                painter = painterResource(id = R.drawable.mini_play_icon),
-                                contentDescription = null
+                                    .padding(bottom = 60.dp),
+                                isPlaying = isAudioPlaying,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        audioPlayerState.show()
+                                    }
+                                }
                             )
 
                             //mini player
@@ -733,6 +734,7 @@ fun FollowScreenPreview() {
             isShowBubbleTip = false,
             onMoreClick = {},
             notificationUnReadCount = 99,
+            isShowAudioMiniIcon = false,
             isAudioPlaying = true
         )
     }
