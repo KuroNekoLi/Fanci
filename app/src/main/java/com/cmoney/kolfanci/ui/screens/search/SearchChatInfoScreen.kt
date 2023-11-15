@@ -48,7 +48,7 @@ import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.ImageAttachState
 import com.cmoney.kolfanci.ui.screens.search.viewmodel.SearchViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.ui.theme.White_767A7F

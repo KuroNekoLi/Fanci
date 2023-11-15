@@ -319,5 +319,9 @@
     <string name="multi_choice_desc">每個人可以投一個以上的選項</string>
     <string name="input_choice_question_placeholder">輸入選項文字</string>
 
+    <string name="answer_result">答題結果</string>
 
+    <string name="answer_result_count">%d人投給這個選項</string>
+
+    <string name="answerer">答題者</string>
 </resources>

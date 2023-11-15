@@ -42,7 +42,7 @@ import com.cmoney.kolfanci.ui.destinations.EditCategoryScreenDestination
 import com.cmoney.kolfanci.ui.destinations.SortCategoryScreenDestination
 import com.cmoney.kolfanci.ui.destinations.SortChannelScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.channel.ChannelEditScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor

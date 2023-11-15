@@ -54,7 +54,7 @@ import com.cmoney.kolfanci.ui.common.GrayButton
 import com.cmoney.kolfanci.ui.destinations.GroupReportMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupReporterScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.BanDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.KickOutDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.HorizontalMemberItemScreen

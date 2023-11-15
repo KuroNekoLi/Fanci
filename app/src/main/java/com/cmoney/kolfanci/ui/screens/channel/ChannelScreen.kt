@@ -51,7 +51,7 @@ import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme

@@ -23,7 +23,7 @@ import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination

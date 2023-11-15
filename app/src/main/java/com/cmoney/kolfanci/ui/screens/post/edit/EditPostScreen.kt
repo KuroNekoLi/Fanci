@@ -67,7 +67,7 @@ import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
-import com.cmoney.kolfanci.ui.screens.shared.CenterTopAppBar
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.CenterTopAppBar
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.FilePicker
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen

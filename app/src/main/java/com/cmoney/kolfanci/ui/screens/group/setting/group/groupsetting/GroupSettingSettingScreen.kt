@@ -32,7 +32,7 @@ import com.cmoney.kolfanci.ui.destinations.GroupSettingDescScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.item.WideItem

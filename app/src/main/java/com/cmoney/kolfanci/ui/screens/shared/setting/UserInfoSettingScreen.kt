@@ -36,7 +36,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.camera.ChooseImagePickDialog
 import com.cmoney.kolfanci.ui.theme.Black_202327
 import com.cmoney.kolfanci.ui.theme.FanciTheme
