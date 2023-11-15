@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.mcq.result
+package com.cmoney.kolfanci.ui.screens.vote.result
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

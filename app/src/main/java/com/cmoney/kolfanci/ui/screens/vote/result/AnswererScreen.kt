@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.mcq.result
+package com.cmoney.kolfanci.ui.screens.vote.result
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -23,7 +23,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleMa
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
-import com.cmoney.kolfanci.ui.screens.mcq.viewmodel.McqViewModel
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.McqViewModel
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.media.txt.TextPreviewViewModel
 import com.cmoney.kolfanci.ui.screens.my.MyScreenViewModel

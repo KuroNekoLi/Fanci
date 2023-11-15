@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.mcq
+package com.cmoney.kolfanci.ui.screens.vote
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,10 +33,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.DashPlusButton
-import com.cmoney.kolfanci.ui.screens.mcq.viewmodel.McqViewModel
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.McqViewModel
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor

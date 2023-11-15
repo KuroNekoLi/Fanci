@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.mcq.viewmodel
+package com.cmoney.kolfanci.ui.screens.vote.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.socks.library.KLog
