@@ -60,6 +60,7 @@ import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
+import com.cmoney.kolfanci.ui.destinations.AnswerResultScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.MessageHideUserScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageRecycleScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageRemoveScreen
@@ -70,6 +71,8 @@ import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
+import com.cmoney.kolfanci.ui.screens.shared.choice.ChoiceResultScreen
+import com.cmoney.kolfanci.ui.screens.shared.choice.MultiChoiceScreen
 import com.cmoney.kolfanci.ui.screens.shared.choice.SingleChoiceScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -83,6 +86,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * 訊息互動
+ */
 sealed class MessageContentCallback {
     data class LongClick(val message: ChatMessage) : MessageContentCallback()
     data class MsgDismissHideClick(val message: ChatMessage) : MessageContentCallback()
@@ -93,7 +99,7 @@ sealed class MessageContentCallback {
 /**
  * 聊天內容 item
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageContentScreen(
     navController: DestinationsNavigator,
@@ -112,6 +118,9 @@ fun MessageContentScreen(
     val scope = rememberCoroutineScope()
     //Popup emoji selector
     val tooltipStateRich = remember { RichTooltipState() }
+
+    //TODO: test vote result
+    var showVoteResult by remember { mutableStateOf(false) }
 
     //長案訊息
     val onLongPress = {
@@ -403,18 +412,65 @@ fun MessageContentScreen(
                 }
             }
 
-            //TODO: test
-//            SingleChoiceScreen(
-//                modifier = Modifier.fillMaxWidth().padding(start = 40.dp),
-//                question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-//                choices = listOf(
-//                    "1.日本 🗼" to 0.1f,
-//                    "2.紐約 🗽" to 0.25f,
-//                    "3.夏威夷 🏖️" to 0.65f,
-//                ),
-//                isCanChoice = false,
-//                onChoiceClick = {}
-//            )
+            //TODO: test vote
+            if (showVoteResult) {
+                ChoiceResultScreen(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 40.dp),
+                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
+                    choices = listOf(
+                        "1.日本 🗼" to 0.1f,
+                        "2.紐約 🗽" to 0.25f,
+                        "3.夏威夷 🏖️" to 0.65f,
+                    ),
+                    isShowResultText = true,
+                    onResultClick = {
+                        navController.navigate(AnswerResultScreenDestination)
+                    }
+                )
+            } else {
+                SingleChoiceScreen(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 40.dp),
+                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
+                    choices = listOf(
+                        "1.日本 🗼",
+                        "2.紐約 🗽",
+                        "3.夏威夷 🏖️",
+                    ),
+                    onChoiceClick = {
+                        showVoteResult = true
+                    },
+                    isShowResultText = true,
+                    onResultClick = {
+                        navController.navigate(AnswerResultScreenDestination)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                MultiChoiceScreen(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 40.dp),
+                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
+                    choices = listOf(
+                        "1.日本 🗼" to true,
+                        "2.紐約 🗽" to false,
+                        "3.夏威夷 🏖️" to true,
+                    ),
+                    onChoiceClick = {},
+                    isShowResultText = true,
+                    onConfirm = {
+                        showVoteResult = true
+                    },
+                    onResultClick = {
+                        navController.navigate(AnswerResultScreenDestination)
+                    }
+                )
+            }
         }
     }
 }

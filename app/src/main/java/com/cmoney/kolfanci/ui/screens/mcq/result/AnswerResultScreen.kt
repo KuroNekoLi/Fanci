@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.ui.destinations.AnswererScreenDestination
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -43,6 +44,9 @@ fun AnswerResultScreen(
         ),
         onBackClick = {
             navController.popBackStack()
+        },
+        onItemClick = {
+            navController.navigate(AnswererScreenDestination)
         }
     )
 }
@@ -58,7 +62,8 @@ private fun AnswerResultScreenView(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     question: String,
-    choiceItem: List<Pair<String, Int>>
+    choiceItem: List<Pair<String, Int>>,
+    onItemClick: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -112,7 +117,7 @@ private fun AnswerResultScreenView(
                         choice = item.first,
                         count = item.second,
                         onClick = {
-
+                            onItemClick.invoke()
                         }
                     )
                 }
@@ -218,7 +223,8 @@ fun AnswerResultScreenPreview() {
                 "夏威夷" to 65
             ),
             onBackClick = {
-            }
+            },
+            onItemClick = {}
         )
     }
 }

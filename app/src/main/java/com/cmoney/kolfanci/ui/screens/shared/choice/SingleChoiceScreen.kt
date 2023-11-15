@@ -10,14 +10,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,18 +37,19 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
  *
  * @param question 問題題目
  * @param choices 選項List
- * @param isCanChoice 是否可以勾選
- * @param onChoiceClick 點擊選項
+ * @param isShowResultText 是否呈現 查看結果 按鈕
+ * @param onChoiceClick 點擊第幾個選項
+ * @param onResultClick 點擊查看結果
  */
 @Composable
 fun SingleChoiceScreen(
     modifier: Modifier = Modifier,
     question: String,
-    choices: List<Pair<String, Float>>,
-    isCanChoice: Boolean,
-    onChoiceClick: (Pair<String, Float>) -> Unit
+    choices: List<String>,
+    isShowResultText: Boolean,
+    onChoiceClick: (Int) -> Unit,
+    onResultClick: (() -> Unit)? = null
 ) {
-
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -72,68 +78,74 @@ fun SingleChoiceScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            choices.forEach { choice ->
-                val question = choice.first
-                val percentage = choice.second
+            choices.forEachIndexed { index, choiceItem ->
                 ChoiceItem(
-                    question = question,
-                    percentage = percentage,
-                    isShowPercentage = !isCanChoice,
+                    question = choiceItem,
                     onChoiceClick = {
-                        onChoiceClick.invoke(choice)
+                        onChoiceClick.invoke(index)
                     }
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
-            Box(
-                modifier = Modifier
-                    .padding(top = 10.dp)
-                    .fillMaxWidth()
-                    .clickable {
-
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "查看結果",
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        color = LocalColor.current.primary
+            if (isShowResultText) {
+                Box(
+                    modifier = Modifier
+                        .height(45.dp)
+                        .fillMaxWidth()
+                        .clickable {
+                            onResultClick?.invoke()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "查看結果",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp,
+                            color = LocalColor.current.primary
+                        )
                     )
-                )
-
+                }
             }
         }
     }
 }
 
+/**
+ * 選項 item
+ */
 @Composable
 private fun ChoiceItem(
     question: String,
-    percentage: Float,
-    isShowPercentage: Boolean,
     onChoiceClick: () -> Unit
 ) {
+    val localDensity = LocalDensity.current
+
+    //內文選項高度
+    var textHeight by remember {
+        mutableStateOf(0.dp)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(45.dp)
-            .clickable(!isShowPercentage) {
+            .height(textHeight.coerceAtLeast(40.dp))
+            .clip(RoundedCornerShape(20.dp))
+            .background(LocalColor.current.background)
+            .clickable {
                 onChoiceClick.invoke()
             },
         contentAlignment = Alignment.CenterStart
     ) {
-        LinearProgressIndicator(
-            modifier = Modifier.fillMaxSize(),
-            color = LocalColor.current.primary,
-            progress = if (isShowPercentage) percentage else 0f,
-            strokeCap = StrokeCap.Round
-        )
-
-        Row(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
+        Row(modifier = Modifier
+            .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp)
+            .onGloballyPositioned { coordinates ->
+                textHeight = with(localDensity) { coordinates.size.height.toDp() }
+            },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 text = question,
                 // 主要內容/一般
@@ -143,25 +155,9 @@ private fun ChoiceItem(
                     color = LocalColor.current.text.default_100
                 )
             )
-
-            if (isShowPercentage) {
-                Spacer(modifier = Modifier.weight(1f))
-
-                Text(
-                    text = "%d".format((percentage * 100).toInt()) + "%",
-                    // 主要內容/一般
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        color = LocalColor.current.text.default_100
-                    )
-                )
-            }
         }
-
     }
 }
-
 
 @Preview
 @Composable
@@ -169,8 +165,6 @@ fun ChoiceItemPreview() {
     FanciTheme {
         ChoiceItem(
             question = "1.日本 🗼",
-            percentage = 0.1f,
-            isShowPercentage = true,
             onChoiceClick = {}
         )
     }
@@ -184,12 +178,12 @@ fun SingleChoiceScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choices = listOf(
-                "1.日本 🗼" to 0.1f,
-                "2.紐約 🗽" to 0.25f,
-                "3.夏威夷 🏖️" to 0.65f,
+                "1.日本 🗼",
+                "2.紐約 🗽",
+                "3.夏威夷 🏖️",
             ),
-            isCanChoice = true,
-            onChoiceClick = {}
+            onChoiceClick = {},
+            isShowResultText = true
         )
     }
 }

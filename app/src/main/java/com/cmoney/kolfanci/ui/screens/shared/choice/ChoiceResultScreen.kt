@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.shared.choice
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,36 +21,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
- * 多選題
+ * 選擇題 結果
  *
  * @param question 問題題目
- * @param choices 選項List, first -> question , second -> isChecked
- * @param onChoiceClick 點擊選項
- * @param onConfirm 確定送出
+ * @param choices 選項結果List
  * @param isShowResultText 是否呈現 查看結果 按鈕
  * @param onResultClick 點擊查看結果
  */
 @Composable
-fun MultiChoiceScreen(
+fun ChoiceResultScreen(
     modifier: Modifier = Modifier,
     question: String,
-    choices: List<Pair<String, Boolean>>,
-    onChoiceClick: (Int) -> Unit,
-    onConfirm: () -> Unit,
+    choices: List<Pair<String, Float>>,
     isShowResultText: Boolean,
     onResultClick: (() -> Unit)? = null
 ) {
@@ -58,11 +53,11 @@ fun MultiChoiceScreen(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(LocalColor.current.background)
-            .padding(20.dp)
+            .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)
     ) {
         Column {
             Text(
-                text = stringResource(id = R.string.multi_choice),
+                text = stringResource(id = R.string.single_choice),
                 style = TextStyle(
                     fontSize = 12.sp,
                     color = LocalColor.current.text.default_50
@@ -82,32 +77,17 @@ fun MultiChoiceScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            choices.forEachIndexed { index, choice ->
-                val question = choice.first
-                val isChecked = choice.second
+            choices.forEach { choiceItem ->
+                val question = choiceItem.first
+                val percentage = choiceItem.second
 
-                CheckBoxChoiceItem(
+                ChoiceResultItem(
                     question = question,
-                    isChecked = isChecked,
-                    onChoiceClick = {
-                        onChoiceClick.invoke(index)
-                    }
+                    percentage = percentage,
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
             }
-
-            BlueButton(
-                modifier = Modifier
-                    .height(45.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp)),
-                text = stringResource(id = R.string.confirm)
-            ) {
-                onConfirm.invoke()
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
 
             if (isShowResultText) {
                 Box(
@@ -134,17 +114,12 @@ fun MultiChoiceScreen(
 }
 
 /**
- * 帶有 checkbox 題目選單
- *
- * @param question 題目
- * @param isChecked 是否打勾
- *
+ * 選項結果 item
  */
 @Composable
-private fun CheckBoxChoiceItem(
+private fun ChoiceResultItem(
     question: String,
-    isChecked: Boolean,
-    onChoiceClick: () -> Unit
+    percentage: Float
 ) {
     val localDensity = LocalDensity.current
 
@@ -156,24 +131,26 @@ private fun CheckBoxChoiceItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(textHeight.coerceAtLeast(40.dp))
-            .clip(RoundedCornerShape(20.dp))
-            .background(LocalColor.current.background)
-            .clickable {
-                onChoiceClick.invoke()
-            },
+            .height(textHeight.coerceAtLeast(40.dp)),
         contentAlignment = Alignment.CenterStart
     ) {
-        Row(
+        LinearProgressIndicator(
             modifier = Modifier
-                .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp)
-                .onGloballyPositioned { coordinates ->
-                    textHeight = with(localDensity) { coordinates.size.height.toDp() }
-                },
+                .fillMaxSize()
+                .height(textHeight),
+            color = LocalColor.current.primary,
+            progress = percentage,
+            strokeCap = StrokeCap.Round
+        )
+
+        Row(modifier = Modifier
+            .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp)
+            .onGloballyPositioned { coordinates ->
+                textHeight = with(localDensity) { coordinates.size.height.toDp() }
+            },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                modifier = Modifier.weight(1f),
                 text = question,
                 // 主要內容/一般
                 style = TextStyle(
@@ -182,48 +159,34 @@ private fun CheckBoxChoiceItem(
                     color = LocalColor.current.text.default_100
                 )
             )
-
-            Image(
-                painter = if (isChecked) {
-                    painterResource(id = R.drawable.circle_checked)
-                } else {
-                    painterResource(id = R.drawable.circle_unchecked)
-                },
-                contentDescription = null
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "%d".format((percentage * 100).toInt()) + "%",
+                // 主要內容/一般
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    color = LocalColor.current.text.default_100
+                )
             )
         }
+
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-private fun CheckBoxChoiceItemPreview() {
+fun ChoiceResultScreenPreview() {
     FanciTheme {
-        CheckBoxChoiceItem(
-            question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-            isChecked = true,
-            onChoiceClick = {
-            }
-        )
-    }
-}
-
-
-@Preview
-@Composable
-fun MultipleChoiceScreenPreview() {
-    FanciTheme {
-        MultiChoiceScreen(
-            modifier = Modifier.fillMaxSize(),
+        ChoiceResultScreen(
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choices = listOf(
-                "1.日本 🗼" to true,
-                "2.紐約 🗽" to false,
-                "3.夏威夷 🏖️" to true,
+                "1.日本 🗼" to 0.1f,
+                "2.紐約 🗽" to 0.25f,
+                "3.夏威夷 🏖️" to 0.65f,
             ),
-            onChoiceClick = {},
             isShowResultText = true,
-            onConfirm = {}
+            onResultClick = {}
         )
     }
 }
