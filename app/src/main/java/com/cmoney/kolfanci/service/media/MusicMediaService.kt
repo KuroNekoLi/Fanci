@@ -27,6 +27,7 @@ import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector.ALL_PLAYBACK_ACTIONS
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -108,6 +109,7 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
                 mediaSessionConnector = MediaSessionConnector(this)
                 mediaSessionConnector.setPlaybackPreparer(MusicPlaybackPreparer())
                 mediaSessionConnector.setQueueNavigator(MusicQueueNavigator(this))
+                mediaSessionConnector.setEnabledPlaybackActions(ALL_PLAYBACK_ACTIONS)
             }
 
         switchToPlayer(previousPlayer = null, newPlayer = exoPlayer)
@@ -302,7 +304,6 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
         }
 
         /**
-         *
          * @param mediaId 準備要播放的id
          * @param extras binder List music 進來
          */
@@ -312,55 +313,6 @@ class MusicMediaService : MediaBrowserServiceCompat(), CoroutineScope by MainSco
             extras: Bundle?
         ) {
             Log.i(TAG, "onPrepareFromMediaId:$mediaId")
-
-            //TODO: 需要改寫資料源
-            extras?.let {
-                it.getBinder(BUNDLE_STORIES)?.let { binder ->
-                    try {
-                        launch {
-                            val startPosition = it.getInt(BUNDLE_START_PLAY_POSITION)
-//                            val listStory =
-//                                (binder as WrapperForBinder).getData() as List<StoryAudioSource>
-//
-//                            val itemToPlay = listStory.find { storyAudioSource ->
-//                                storyAudioSource.id == mediaId
-//                            }?.toMediaMetadataCompat()
-//
-//                            val playlist = listStory.toMediaMetadataCompat()
-
-//                            if (itemToPlay == null) {
-//                                KLog.w(TAG, "Content not found: MediaID=$mediaId")
-//                            } else {
-//                                preparePlaylist(
-//                                    playlist,
-//                                    itemToPlay,
-//                                    playWhenReady,
-//                                    startPosition.toLong()
-//                                )
-//
-//                                //record playlist in db
-//                                launch(Dispatchers.IO) {
-//                                    lastListenStoryDao.nukeTable()
-//                                    lastListenStoryDao.insertAll(
-//                                        listStory.mapIndexed { index, storyAudioSource ->
-//                                            LastListenStoryEntity.convertFromStoryAudioSource(
-//                                                storyAudioSource,
-//                                                index
-//                                            )
-//                                        }
-//                                    )
-//                                }
-//                            }
-                        }
-                    } catch (e: Exception) {
-                        KLog.e(TAG, e)
-                    }
-                } ?: kotlin.run {
-                    KLog.e(TAG, "onPrepareFromMediaId binder is null. plz put stories in binder.")
-                }
-            } ?: kotlin.run {
-                KLog.e(TAG, "onPrepareFromMediaId bundle is null. plz put series in bundle.")
-            }
         }
 
         override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle?) {
