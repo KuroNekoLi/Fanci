@@ -35,9 +35,10 @@ import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
-import com.cmoney.kolfanci.ui.destinations.MultipleChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
@@ -99,7 +100,7 @@ fun ChannelScreen(
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
-    choiceRecipient: ResultRecipient<MultipleChoiceQuestionScreenDestination, String>,
+    choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>,
     redDotResultBackNavigator: ResultBackNavigator<ResetRedDot>
 ) {
     val group by globalGroupViewModel().currentGroup.collectAsState()
@@ -177,7 +178,7 @@ private fun ChannelScreenView(
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
-    choiceRecipient: ResultRecipient<MultipleChoiceQuestionScreenDestination, String>,
+    choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>,
     onChatPageSelected: () -> Unit,
     onPostPageSelected: () -> Unit,
     onBackClick: () -> Unit,

@@ -34,9 +34,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.DashPlusButton
-import com.cmoney.kolfanci.ui.screens.vote.viewmodel.McqViewModel
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.McqViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -44,19 +45,25 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * 建立選擇題
+ *
+ * setResult
+ * @param resultBackNavigator result callback [VoteModel]
+ */
 @Destination
 @Composable
-fun MultipleChoiceQuestionScreen(
+fun CreateChoiceQuestionScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     viewModel: McqViewModel = koinViewModel(),
-    resultBackNavigator: ResultBackNavigator<String>
+    resultBackNavigator: ResultBackNavigator<VoteModel>
 ) {
     val question by viewModel.question.collectAsState()
     val choice by viewModel.choice.collectAsState()
     val isSingleChoice by viewModel.isSingleChoice.collectAsState()
 
-    MultipleChoiceQuestionScreenView(
+    CreateChoiceQuestionScreenView(
         modifier = modifier,
         question = question,
         choice = choice,
@@ -84,8 +91,13 @@ fun MultipleChoiceQuestionScreen(
             navController.popBackStack()
         },
         onConfirm = {
-            //TODO: 將建立好的 選擇題 model callback
-            resultBackNavigator.navigateBack("123")
+            resultBackNavigator.navigateBack(
+                VoteModel(
+                    question = question,
+                    choice = choice,
+                    isSingleChoice = isSingleChoice
+                )
+            )
         }
     )
 }
@@ -103,7 +115,7 @@ fun MultipleChoiceQuestionScreen(
  * @param onChoiceTypeClick 選項類型, true -> 單選題, false -> 多選題
  */
 @Composable
-fun MultipleChoiceQuestionScreenView(
+fun CreateChoiceQuestionScreenView(
     modifier: Modifier = Modifier,
     question: String,
     choice: List<String>,
@@ -405,7 +417,7 @@ fun QuestionTypeItemPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun ChoiceEditItemPreview() {
     FanciTheme {
@@ -422,7 +434,7 @@ fun ChoiceEditItemPreview() {
 @Composable
 fun MultipleChoiceQuestionScreenPreview() {
     FanciTheme {
-        MultipleChoiceQuestionScreenView(
+        CreateChoiceQuestionScreenView(
             question = "",
             choice = emptyList(),
             onQuestionValueChange = {},

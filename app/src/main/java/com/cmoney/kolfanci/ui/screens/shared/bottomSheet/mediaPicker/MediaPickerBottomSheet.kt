@@ -45,7 +45,7 @@ import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.destinations.MultipleChoiceQuestionScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -160,7 +160,7 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onChoiceClick = {
-                    navController.navigate(MultipleChoiceQuestionScreenDestination)
+                    navController.navigate(CreateChoiceQuestionScreenDestination)
                 }
             )
         }

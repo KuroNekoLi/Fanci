@@ -13,6 +13,7 @@ import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -307,7 +308,7 @@ class AttachmentViewModel(
     /**
      * 新增 選擇題
      */
-    fun addChoiceAttachment(choice: String) {
+    fun addChoiceAttachment(voteModel: VoteModel) {
         KLog.i(TAG, "addChoiceAttachment")
 
         //TODO

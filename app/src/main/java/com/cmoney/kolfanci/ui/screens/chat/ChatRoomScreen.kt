@@ -39,10 +39,11 @@ import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
-import com.cmoney.kolfanci.ui.destinations.MultipleChoiceQuestionScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen
@@ -79,7 +80,7 @@ fun ChatRoomScreen(
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
-    choiceRecipient: ResultRecipient<MultipleChoiceQuestionScreenDestination, String>
+    choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>
 ) {
     val TAG = "ChatRoomScreen"
 

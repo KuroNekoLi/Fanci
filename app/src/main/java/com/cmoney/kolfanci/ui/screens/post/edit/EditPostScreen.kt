@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -56,23 +57,24 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
 import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
-import com.cmoney.kolfanci.ui.screens.shared.toolbar.CenterTopAppBar
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.FilePicker
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.CenterTopAppBar
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.xlogin.XLoginHelper
@@ -199,6 +201,9 @@ fun EditPostScreen(
                 context = context,
                 attachmentType = attachmentViewModel.getAttachmentType(uri)
             )
+        },
+        onChoiceClick = {
+            navController.navigate(CreateChoiceQuestionScreenDestination)
         }
     )
 
@@ -336,7 +341,8 @@ private fun EditPostScreenView(
     attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
     onDeleteAttach: (Uri) -> Unit,
     onPreviewAttachmentClick: (Uri) -> Unit,
-    onResend: (ReSendFile) -> Unit
+    onResend: (ReSendFile) -> Unit,
+    onChoiceClick: () -> Unit
 ) {
     val defaultContent = editPost?.content?.text.orEmpty()
     var textState by remember { mutableStateOf(defaultContent) }
@@ -457,7 +463,16 @@ private fun EditPostScreenView(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(15.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(13.dp)
+                            .background(LocalColor.current.component.other)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
 
                     //File picker
                     Row(
@@ -477,6 +492,43 @@ private fun EditPostScreenView(
 
                         Text(
                             text = "檔案",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                lineHeight = 21.sp,
+                                color = LocalColor.current.text.default_80
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(13.dp)
+                            .background(LocalColor.current.component.other)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    //選擇題
+                    Row(
+                        modifier.clickable {
+                            onChoiceClick.invoke()
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = Modifier.size(25.dp),
+                            painter = painterResource(id = R.drawable.mcq_icon),
+                            colorFilter = ColorFilter.tint(LocalColor.current.text.default_100),
+                            contentDescription = null
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = stringResource(id = R.string.multiple_choice_question),
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 lineHeight = 21.sp,
@@ -599,7 +651,8 @@ fun EditPostScreenPreview() {
             attachment = emptyList(),
             onDeleteAttach = {},
             onPreviewAttachmentClick = {},
-            onResend = {}
+            onResend = {},
+            onChoiceClick = {}
         )
     }
 }
