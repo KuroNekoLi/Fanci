@@ -85,15 +85,13 @@ class AttachmentViewModel(
 
     /**
      * 移除 附加 檔案
-     * @param uri
+     * @param attachmentInfoItem
      */
-    fun removeAttach(uri: Uri) {
-        KLog.i(TAG, "removeAttach:$uri")
-        val attachmentType = uri.getAttachmentType(context)
-
+    fun removeAttach(attachmentInfoItem: AttachmentInfoItem) {
+        KLog.i(TAG, "removeAttach:$attachmentInfoItem")
         _attachmentList.update {
             _attachmentList.value.filter {
-                it.second.uri != uri
+                it.second != attachmentInfoItem
             }
         }
     }
@@ -235,7 +233,7 @@ class AttachmentViewModel(
     fun onResend(uploadFileItem: ReSendFile, other: Any? = null) {
         KLog.i(TAG, "onResend:$uploadFileItem")
         viewModelScope.launch {
-            val file = uploadFileItem.file
+            val file = uploadFileItem.attachmentInfoItem.uri
 
             var allImages = emptyList<AttachmentInfoItem>()
             if (uploadFileItem.type == AttachmentType.Image) {
@@ -311,13 +309,13 @@ class AttachmentViewModel(
     fun addChoiceAttachment(voteModel: VoteModel) {
         KLog.i(TAG, "addChoiceAttachment")
 
-        //TODO
-        _attachment.update { oldMap ->
-            val newMap = oldMap.toMutableMap()
-            newMap[AttachmentType.Choice] = listOf(
-                AttachmentInfoItem()
-            )
-            newMap
+        val oldList = _attachmentList.value.toMutableList()
+        oldList.add(AttachmentType.Choice to AttachmentInfoItem(
+            other = voteModel
+        ))
+
+        _attachmentList.update {
+            oldList
         }
     }
 }

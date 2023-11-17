@@ -122,6 +122,8 @@ sealed class AttachmentType {
  * @param filename 檔案名稱
  * @param fileSize 檔案大小
  * @param duration 音檔長度 (option)
+ * @param other 其他類型 model (option)
+ * @param attachmentType 檔案類型
  */
 data class AttachmentInfoItem(
     val uri: Uri = Uri.EMPTY,
@@ -129,7 +131,9 @@ data class AttachmentInfoItem(
     val serverUrl: String = "",
     val filename: String = "",
     val fileSize: Long = 0,
-    val duration: Long? = 0
+    val duration: Long? = 0,
+    val other: Any? = null,
+    val attachmentType: AttachmentType = AttachmentType.Unknown
 ) {
     /**
      * 檔案上傳狀態
@@ -163,13 +167,13 @@ data class AttachmentInfoItem(
  * 重新上傳檔案 info
  *
  * @param type 檔案類型
- * @param file 檔案
+ * @param attachmentInfoItem 附加檔案
  * @param title dialog title
  * @param description dialog content
  */
 data class ReSendFile(
     val type: AttachmentType,
-    val file: Uri,
+    val attachmentInfoItem: AttachmentInfoItem,
     val title: String,
     val description: String
 )

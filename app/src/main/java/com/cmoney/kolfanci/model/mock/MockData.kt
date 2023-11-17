@@ -11,12 +11,24 @@ import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.PushNotificationSettingWrap
 import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterData
 import org.apache.commons.lang3.RandomStringUtils
 import kotlin.random.Random
 
 object MockData {
+
+    val mockVote = VoteModel(
+        question = "What is indicated about advertising space on the Mooringtown Library notice board?",
+        choice = listOf(
+            "(A) complication",
+            "(B) complicates",
+            "(C) complicate",
+            "(D) complicated"
+        ),
+        isSingleChoice = true
+    )
 
     val mockGroup: Group = Group(
         id = "",

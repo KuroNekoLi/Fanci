@@ -296,7 +296,7 @@ private fun BaseEditMessageScreenView(
                             )
                         },
                         onDelete = {
-                            onDeleteImage.invoke(it)
+                            onDeleteImage.invoke(it.uri)
                         },
                         onAdd = {
                             onShowImagePicker.invoke()

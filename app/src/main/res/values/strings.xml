@@ -324,4 +324,8 @@
     <string name="answer_result_count">%d人投給這個選項</string>
 
     <string name="answerer">答題者</string>
+
+    <string name="vote_question_error">請輸入問題文字</string>
+    <string name="vote_choice_error">至少輸入二個選項</string>
+
 </resources>

@@ -62,6 +62,7 @@ import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
@@ -80,8 +81,11 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -104,7 +108,8 @@ fun EditPostScreen(
         }
     ),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<PostViewModel.BulletinboardMessageWrapper>
+    resultNavigator: ResultBackNavigator<PostViewModel.BulletinboardMessageWrapper>,
+    choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>
 ) {
     var showImagePick by remember { mutableStateOf(false) }
 
@@ -165,6 +170,19 @@ fun EditPostScreen(
         mutableStateOf<ReSendFile?>(null)
     }
 
+    //附加選擇題 callback
+    choiceRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                val announceMessage = result.value
+                attachmentViewModel.addChoiceAttachment(announceMessage)
+            }
+        }
+    }
+
     EditPostScreenView(
         modifier = modifier,
         editPost = editPost,
@@ -194,12 +212,11 @@ fun EditPostScreen(
         onResend = {
             reSendFileClick = it
         },
-        onPreviewAttachmentClick = { uri ->
+        onPreviewAttachmentClick = { attachmentInfoItem ->
             AttachmentController.onAttachmentClick(
                 navController = navController,
-                uri = uri,
-                context = context,
-                attachmentType = attachmentViewModel.getAttachmentType(uri)
+                attachmentInfoItem = attachmentInfoItem,
+                context = context
             )
         },
         onChoiceClick = {
@@ -292,7 +309,7 @@ fun EditPostScreen(
 
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->
-        val file = reSendFile.file
+        val file = reSendFile.attachmentInfoItem
         ReSendFileDialog(
             reSendFile = reSendFile,
             onDismiss = {
@@ -339,8 +356,8 @@ private fun EditPostScreenView(
     onBack: () -> Unit,
     showLoading: Boolean,
     attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
-    onDeleteAttach: (Uri) -> Unit,
-    onPreviewAttachmentClick: (Uri) -> Unit,
+    onDeleteAttach: (AttachmentInfoItem) -> Unit,
+    onPreviewAttachmentClick: (AttachmentInfoItem) -> Unit,
     onResend: (ReSendFile) -> Unit,
     onChoiceClick: () -> Unit
 ) {

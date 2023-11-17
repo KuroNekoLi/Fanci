@@ -21,12 +21,14 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -34,10 +36,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.DashPlusButton
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
-import com.cmoney.kolfanci.ui.screens.vote.viewmodel.McqViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -56,7 +58,7 @@ import org.koin.androidx.compose.koinViewModel
 fun CreateChoiceQuestionScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    viewModel: McqViewModel = koinViewModel(),
+    viewModel: com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel = koinViewModel(),
     resultBackNavigator: ResultBackNavigator<VoteModel>
 ) {
     val question by viewModel.question.collectAsState()
@@ -80,8 +82,8 @@ fun CreateChoiceQuestionScreen(
         onDeleteChoice = {
             viewModel.removeChoice(it)
         },
-        onChoiceTypeClick = { isSingleChoice ->
-            if (isSingleChoice) {
+        onChoiceTypeClick = {
+            if (it) {
                 viewModel.onSingleChoiceClick()
             } else {
                 viewModel.onMultiChoiceClick()
@@ -91,15 +93,29 @@ fun CreateChoiceQuestionScreen(
             navController.popBackStack()
         },
         onConfirm = {
-            resultBackNavigator.navigateBack(
-                VoteModel(
-                    question = question,
-                    choice = choice,
-                    isSingleChoice = isSingleChoice
-                )
+            viewModel.onConfirmClick(
+                question = question,
+                choice = choice,
+                isSingleChoice = isSingleChoice
             )
         }
     )
+
+    //建立投票
+    val voteModel by viewModel.voteModel.collectAsState()
+    voteModel?.let {
+        resultBackNavigator.navigateBack(it)
+    }
+
+    //錯誤訊息提示
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.toast.collect {
+            if (it.isNotEmpty()) {
+                context.showToast(it)
+            }
+        }
+    }
 }
 
 /**

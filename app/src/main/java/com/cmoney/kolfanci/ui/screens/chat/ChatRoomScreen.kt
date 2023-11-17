@@ -248,10 +248,10 @@ fun ChatRoomScreen(
                 state.show()
             }
         },
-        onPreviewAttachmentClick = { uri ->
+        onPreviewAttachmentClick = { attachmentInfoItem ->
             AttachmentController.onAttachmentClick(
                 navController = navController,
-                uri = uri,
+                attachmentInfoItem = attachmentInfoItem,
                 context = context
             )
         },
@@ -295,14 +295,13 @@ fun ChatRoomScreen(
 
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->
-        val file = reSendFile.file
         ReSendFileDialog(
             reSendFile = reSendFile,
             onDismiss = {
                 reSendFileClick = null
             },
             onRemove = {
-                attachmentViewModel.removeAttach(file)
+                attachmentViewModel.removeAttach(reSendFile.attachmentInfoItem)
                 reSendFileClick = null
             },
             onResend = {
@@ -430,13 +429,13 @@ private fun ChatRoomScreenView(
     onMsgDismissHide: (ChatMessage) -> Unit,
     replyMessage: IReplyMessage?,
     onDeleteReply: (IReplyMessage) -> Unit,
-    onDeleteAttach: (Uri) -> Unit,
+    onDeleteAttach: (AttachmentInfoItem) -> Unit,
     onMessageSend: (text: String) -> Unit,
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
     onAttachImageAddClick: () -> Unit,
     attachment: Map<AttachmentType, List<AttachmentInfoItem>>,
-    onPreviewAttachmentClick: (Uri) -> Unit,
+    onPreviewAttachmentClick: (AttachmentInfoItem) -> Unit,
     isShowLoading: Boolean,
     onResend: ((ReSendFile) -> Unit)
 ) {

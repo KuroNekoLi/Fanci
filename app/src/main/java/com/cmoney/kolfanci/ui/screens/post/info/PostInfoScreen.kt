@@ -522,10 +522,10 @@ fun PostInfoScreen(
                 state.show()
             }
         },
-        onPreviewAttachmentClick = { uri ->
+        onPreviewAttachmentClick = { attachmentInfoItem ->
             AttachmentController.onAttachmentClick(
                 navController = navController,
-                uri = uri,
+                attachmentInfoItem = attachmentInfoItem,
                 context = context
             )
         },
@@ -576,7 +576,7 @@ fun PostInfoScreen(
     //==================== 彈窗提示 ====================
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->
-        val file = reSendFile.file
+        val file = reSendFile.attachmentInfoItem
         ReSendFileDialog(
             reSendFile = reSendFile,
             onDismiss = {
@@ -776,9 +776,9 @@ private fun PostInfoScreenView(
     isAudioPlaying: Boolean,
     isOpenBottomAudioPlayer: Boolean,
     isShowLoading: Boolean,
-    onDeleteAttach: (Uri) -> Unit,
+    onDeleteAttach: (AttachmentInfoItem) -> Unit,
     onAttachImageAddClick: () -> Unit,
-    onPreviewAttachmentClick: (Uri) -> Unit,
+    onPreviewAttachmentClick: (AttachmentInfoItem) -> Unit,
     onResend: (ReSendFile) -> Unit,
     isShowAudioMiniIcon: Boolean
 ) {

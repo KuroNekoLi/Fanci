@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.chat.attachment
 
-import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.compose.foundation.BorderStroke
@@ -18,10 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachImageItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -36,12 +38,13 @@ fun ChatRoomAttachImageScreen(
     modifier: Modifier = Modifier,
     imageAttach: List<AttachmentInfoItem>,
     quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
-    onDelete: (Uri) -> Unit,
+    onDelete: (AttachmentInfoItem) -> Unit,
     onAdd: () -> Unit,
-    onClick: (Uri) -> Unit,
+    onClick: (AttachmentInfoItem) -> Unit,
     onResend: ((ReSendFile) -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
+    val context = LocalContext.current
 
     if (imageAttach.isNotEmpty()) {
         LaunchedEffect(imageAttach.size) {
@@ -59,11 +62,21 @@ fun ChatRoomAttachImageScreen(
                         isItemClickable = true,
                         isItemCanDelete = (attach.status == AttachmentInfoItem.Status.Undefined),
                         isShowResend = (attach.status is AttachmentInfoItem.Status.Failed),
-                        onClick = onClick,
-                        onDelete = {
-                            onDelete.invoke(it)
+                        onClick = {
+                            onClick.invoke(attach)
                         },
-                        onResend = onResend
+                        onDelete = {
+                            onDelete.invoke(attach)
+                        },
+                        onResend = {
+                            val file = ReSendFile(
+                                type = AttachmentType.Image,
+                                attachmentInfoItem = attach,
+                                title = context.getString(R.string.image_upload_fail_title),
+                                description = context.getString(R.string.image_upload_fail_desc)
+                            )
+                            onResend?.invoke(file)
+                        }
                     )
                 }
                 if (imageAttach.size < quantityLimit) {

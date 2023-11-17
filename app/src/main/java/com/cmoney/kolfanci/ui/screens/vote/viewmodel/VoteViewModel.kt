@@ -1,13 +1,20 @@
 package com.cmoney.kolfanci.ui.screens.vote.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class McqViewModel : ViewModel() {
-    private val TAG = McqViewModel::class.java.simpleName
+class VoteViewModel(val context: Application) : AndroidViewModel(context) {
+    private val TAG = VoteViewModel::class.java.simpleName
 
     //問題
     private val _question = MutableStateFlow("")
@@ -20,6 +27,14 @@ class McqViewModel : ViewModel() {
     //是否為單選題, 反之為多選
     private val _isSingleChoice = MutableStateFlow(true)
     val isSingleChoice = _isSingleChoice.asStateFlow()
+
+    //toast message
+    private val _toast = MutableSharedFlow<String>()
+    val toast = _toast.asSharedFlow()
+
+    //建立投票 model
+    private val _voteModel = MutableStateFlow<VoteModel?>(null)
+    val voteModel = _voteModel.asStateFlow()
 
     //最大選項數量
     private val MAX_COICE_COUNT = 5
@@ -88,5 +103,38 @@ class McqViewModel : ViewModel() {
     fun onMultiChoiceClick() {
         KLog.i(TAG, "onMultiChoiceClick")
         _isSingleChoice.value = false
+    }
+
+    /**
+     * 點擊建立 投票, 檢查輸入 是否符合規範
+     * 問題不為空
+     * 至少有二個項
+     *
+     * @param question 問題
+     * @param choice 選項
+     * @param isSingleChoice 是否為單選題
+     */
+    fun onConfirmClick(question: String, choice: List<String>, isSingleChoice: Boolean) {
+        viewModelScope.launch {
+            if (question.isEmpty()) {
+                _toast.emit(context.getString(R.string.vote_question_error))
+                return@launch
+            }
+
+            val choiceSize = choice.filter {
+                it.isNotEmpty()
+            }.size
+
+            if (choiceSize < 2) {
+                _toast.emit(context.getString(R.string.vote_choice_error))
+                return@launch
+            }
+
+            _voteModel.value = VoteModel(
+                question = question,
+                choice = choice,
+                isSingleChoice = isSingleChoice
+            )
+        }
     }
 }

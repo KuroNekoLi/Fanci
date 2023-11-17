@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -20,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RichTooltipBox
@@ -47,12 +45,13 @@ import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.getDuration
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.getFleSize
 import com.cmoney.kolfanci.extension.toAttachmentType
-import com.cmoney.kolfanci.extension.toAttachmentTypeMap
 import com.cmoney.kolfanci.extension.toColor
+import com.cmoney.kolfanci.extension.toUploadFileItemMap
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
@@ -490,11 +489,11 @@ fun MediaContent(
     audioViewModel: AudioViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val mapList = medias.toAttachmentTypeMap()
+    val mapList = medias.toUploadFileItemMap()
 
     mapList.forEach { entry ->
         val key = entry.key
-        val media = entry.value
+        val attachmentInfoItems = entry.value
 
         when (key) {
             AttachmentType.Audio -> {
@@ -503,26 +502,25 @@ fun MediaContent(
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(media) { media ->
-                        val fileUrl = media.resourceLink
+                    items(attachmentInfoItems) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
                         AttachmentAudioItem(
                             modifier = Modifier
                                 .width(270.dp)
                                 .height(75.dp),
                             file = Uri.parse(fileUrl),
-                            duration = media.getDuration(),
+                            duration = attachmentInfoItem.duration ?: 0L,
                             isItemClickable = true,
                             isItemCanDelete = false,
                             isShowResend = false,
-                            displayName = media.getFileName(),
+                            displayName = attachmentInfoItem.filename,
                             onClick = {
                                 AttachmentController.onAttachmentClick(
                                     navController = navController,
-                                    uri = Uri.parse(fileUrl),
+                                    attachmentInfoItem = attachmentInfoItem,
                                     context = context,
-                                    attachmentType = AttachmentType.Audio,
-                                    fileName = media.getFileName(),
-                                    duration = media.getDuration(),
+                                    fileName = attachmentInfoItem.filename,
+                                    duration = attachmentInfoItem.duration ?: 0L,
                                     audioViewModel = audioViewModel
                                 )
                             }
@@ -533,8 +531,8 @@ fun MediaContent(
 
             AttachmentType.Image -> {
                 MessageImageScreenV2(
-                    images = media.map {
-                        it.resourceLink.orEmpty()
+                    images = attachmentInfoItems.map {
+                        it.serverUrl
                     },
                     modifier = Modifier.padding(top = 10.dp, start = 40.dp),
                     otherItemModifier = Modifier.padding(top = 10.dp),
@@ -551,27 +549,25 @@ fun MediaContent(
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(media) { media ->
-                        val fileUrl = media.resourceLink
-                        val mediaType = media.type
+                    items(attachmentInfoItems) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
 
                         AttachmentFileItem(
                             modifier = Modifier
                                 .width(270.dp)
                                 .height(75.dp),
                             file = Uri.parse(fileUrl),
-                            fileSize = media.getFleSize(),
+                            fileSize = attachmentInfoItem.fileSize,
                             isItemClickable = true,
                             isItemCanDelete = false,
                             isShowResend = false,
-                            displayName = media.getFileName(),
+                            displayName = attachmentInfoItem.filename,
                             onClick = {
                                 AttachmentController.onAttachmentClick(
                                     navController = navController,
-                                    uri = Uri.parse(fileUrl),
+                                    attachmentInfoItem = attachmentInfoItem,
                                     context = context,
-                                    attachmentType = mediaType?.toAttachmentType(),
-                                    fileName = media.getFileName()
+                                    fileName = attachmentInfoItem.filename
                                 )
                             }
                         )

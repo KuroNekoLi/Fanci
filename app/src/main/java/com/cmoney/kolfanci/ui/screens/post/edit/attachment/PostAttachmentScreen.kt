@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.post.edit.attachment
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,9 +19,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -34,8 +33,8 @@ fun PostAttachmentScreen(
     modifier: Modifier = Modifier,
     attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
     isShowLoading: Boolean,
-    onDelete: (Uri) -> Unit,
-    onClick: (Uri) -> Unit,
+    onDelete: (AttachmentInfoItem) -> Unit,
+    onClick: (AttachmentInfoItem) -> Unit,
     onAddImage: () -> Unit,
     onResend: (ReSendFile) -> Unit
 ) {

@@ -49,10 +49,8 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.getDuration
-import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.extension.getFleSize
-import com.cmoney.kolfanci.extension.toAttachmentType
+import com.cmoney.kolfanci.extension.getAttachmentType
+import com.cmoney.kolfanci.extension.toAttachmentInfoItem
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
@@ -238,32 +236,32 @@ fun BasePostContentScreen(
                     it.type != AttachmentType.Image.name && it.type != AttachmentType.Audio.name
                 }
 
+                val attachmentInfoItemList = otherUrl.toAttachmentInfoItem()
+
                 LazyRow(
                     modifier = modifier,
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(otherUrl) { media ->
-                        val fileUrl = media.resourceLink
-                        val mediaType = media.type
+                    items(attachmentInfoItemList) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
 
                         AttachmentFileItem(
                             modifier = Modifier
                                 .width(270.dp)
                                 .height(75.dp),
                             file = Uri.parse(fileUrl),
-                            fileSize = media.getFleSize(),
+                            fileSize = attachmentInfoItem.fileSize,
                             isItemClickable = true,
                             isItemCanDelete = false,
                             isShowResend = false,
-                            displayName = media.getFileName(),
+                            displayName = attachmentInfoItem.filename,
                             onClick = {
                                 AttachmentController.onAttachmentClick(
                                     navController = navController,
-                                    uri = Uri.parse(fileUrl),
+                                    attachmentInfoItem = attachmentInfoItem,
                                     context = context,
-                                    attachmentType = mediaType?.toAttachmentType(),
-                                    fileName = media.getFileName(),
+                                    fileName = attachmentInfoItem.filename,
                                     audioViewModel = audioViewModel
                                 )
                             },
@@ -278,33 +276,33 @@ fun BasePostContentScreen(
                     it.type == AttachmentType.Audio.name
                 }
 
+                val audioUrlAttachmentInfoItemList = audioUrl.toAttachmentInfoItem()
+
                 LazyRow(
                     modifier = modifier,
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(audioUrl) { media ->
-                        val fileUrl = media.resourceLink
-                        val mediaType = media.type
+                    items(audioUrlAttachmentInfoItemList) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
 
                         AttachmentAudioItem(
                             modifier = Modifier
                                 .width(270.dp)
                                 .height(75.dp),
                             file = Uri.parse(fileUrl),
-                            duration = media.getDuration(),
+                            duration = attachmentInfoItem.duration ?: 0L,
                             isItemClickable = true,
                             isItemCanDelete = false,
                             isShowResend = false,
-                            displayName = media.getFileName(),
+                            displayName = attachmentInfoItem.filename,
                             onClick = {
                                 AttachmentController.onAttachmentClick(
                                     navController = navController,
-                                    uri = Uri.parse(fileUrl),
+                                    attachmentInfoItem = attachmentInfoItem,
                                     context = context,
-                                    attachmentType = mediaType?.toAttachmentType(),
-                                    fileName = media.getFileName(),
-                                    duration = media.getDuration(),
+                                    fileName = attachmentInfoItem.filename,
+                                    duration = attachmentInfoItem.duration ?: 0L,
                                     audioViewModel = audioViewModel
                                 )
                             },
