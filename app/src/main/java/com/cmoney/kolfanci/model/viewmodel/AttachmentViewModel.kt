@@ -304,18 +304,32 @@ class AttachmentViewModel(
     }
 
     /**
-     * 新增 選擇題
+     * 新增/更新 選擇題
+     * 檢查 id 是否存在 就更新 否則 新增
      */
     fun addChoiceAttachment(voteModel: VoteModel) {
         KLog.i(TAG, "addChoiceAttachment")
 
         val oldList = _attachmentList.value.toMutableList()
-        oldList.add(AttachmentType.Choice to AttachmentInfoItem(
-            other = voteModel
-        ))
+
+        oldList.add(
+            AttachmentType.Choice to AttachmentInfoItem(
+                other = voteModel,
+                attachmentType = AttachmentType.Choice
+            )
+        )
+
+        val distinctList = oldList.reversed().distinctBy { it ->
+            val other = it.second.other
+            if (other is VoteModel) {
+                other.id
+            } else {
+                it
+            }
+        }
 
         _attachmentList.update {
-            oldList
+            distinctList
         }
     }
 }

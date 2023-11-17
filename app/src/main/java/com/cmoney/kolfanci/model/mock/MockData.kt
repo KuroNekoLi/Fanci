@@ -20,6 +20,7 @@ import kotlin.random.Random
 object MockData {
 
     val mockVote = VoteModel(
+        id = System.currentTimeMillis().toString(),
         question = "What is indicated about advertising space on the Mooringtown Library notice board?",
         choice = listOf(
             "(A) complication",

@@ -113,8 +113,14 @@ class VoteViewModel(val context: Application) : AndroidViewModel(context) {
      * @param question 問題
      * @param choice 選項
      * @param isSingleChoice 是否為單選題
+     * @param id 識別是否為更新
      */
-    fun onConfirmClick(question: String, choice: List<String>, isSingleChoice: Boolean) {
+    fun onConfirmClick(
+        question: String,
+        choice: List<String>,
+        isSingleChoice: Boolean,
+        id: String? = null
+    ) {
         viewModelScope.launch {
             if (question.isEmpty()) {
                 _toast.emit(context.getString(R.string.vote_question_error))
@@ -131,10 +137,25 @@ class VoteViewModel(val context: Application) : AndroidViewModel(context) {
             }
 
             _voteModel.value = VoteModel(
+                id = (if (id.isNullOrEmpty()) {
+                    System.currentTimeMillis().toString()
+                } else id),
                 question = question,
                 choice = choice,
                 isSingleChoice = isSingleChoice
             )
+        }
+    }
+
+    /**
+     * 設定 初始化吃資料
+     */
+    fun setVoteModel(voteModel: VoteModel) {
+        KLog.i(TAG, "setVoteModel:$voteModel")
+        viewModelScope.launch {
+            _question.value = voteModel.question
+            _choice.value = voteModel.choice
+            _isSingleChoice.value = voteModel.isSingleChoice
         }
     }
 }

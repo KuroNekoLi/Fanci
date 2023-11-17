@@ -40,6 +40,7 @@ import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.DashPlusButton
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.EditToolbarScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -58,12 +59,19 @@ import org.koin.androidx.compose.koinViewModel
 fun CreateChoiceQuestionScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    viewModel: com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel = koinViewModel(),
+    voteModel: VoteModel? = null,
+    viewModel: VoteViewModel = koinViewModel(),
     resultBackNavigator: ResultBackNavigator<VoteModel>
 ) {
     val question by viewModel.question.collectAsState()
     val choice by viewModel.choice.collectAsState()
     val isSingleChoice by viewModel.isSingleChoice.collectAsState()
+
+    LaunchedEffect(key1 = voteModel) {
+        voteModel?.let {
+            viewModel.setVoteModel(it)
+        }
+    }
 
     CreateChoiceQuestionScreenView(
         modifier = modifier,
@@ -96,7 +104,8 @@ fun CreateChoiceQuestionScreen(
             viewModel.onConfirmClick(
                 question = question,
                 choice = choice,
-                isSingleChoice = isSingleChoice
+                isSingleChoice = isSingleChoice,
+                id = voteModel?.id
             )
         }
     )

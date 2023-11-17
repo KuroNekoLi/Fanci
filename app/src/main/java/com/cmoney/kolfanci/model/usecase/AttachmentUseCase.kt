@@ -5,13 +5,14 @@ import android.content.Context
 import android.net.Uri
 import com.bumptech.glide.Glide
 import com.cmoney.kolfanci.BuildConfig
-import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.getUploadFileType
 import com.cmoney.kolfanci.extension.toUploadFileItem
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.repository.Network
 import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PdfPreviewScreenDestination
 import com.cmoney.kolfanci.ui.destinations.TextPreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
@@ -228,7 +229,19 @@ object AttachmentController {
             }
 
             AttachmentType.Choice -> {
-                //TODO: 前往編輯選擇題
+                attachmentInfoItem.other?.let {
+                    if (it is VoteModel) {
+                        navController.navigate(
+                            CreateChoiceQuestionScreenDestination(
+                                voteModel = it
+                            )
+                        )
+                    }
+                }
+            }
+
+            else -> {
+
             }
         }
     }

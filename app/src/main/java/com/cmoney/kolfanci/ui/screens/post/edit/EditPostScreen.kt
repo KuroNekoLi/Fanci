@@ -220,7 +220,7 @@ fun EditPostScreen(
             )
         },
         onChoiceClick = {
-            navController.navigate(CreateChoiceQuestionScreenDestination)
+            navController.navigate(CreateChoiceQuestionScreenDestination())
         }
     )
 

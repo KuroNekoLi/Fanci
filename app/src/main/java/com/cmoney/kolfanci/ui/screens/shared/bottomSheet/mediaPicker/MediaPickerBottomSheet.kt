@@ -160,7 +160,7 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onChoiceClick = {
-                    navController.navigate(CreateChoiceQuestionScreenDestination)
+                    navController.navigate(CreateChoiceQuestionScreenDestination())
                 }
             )
         }
