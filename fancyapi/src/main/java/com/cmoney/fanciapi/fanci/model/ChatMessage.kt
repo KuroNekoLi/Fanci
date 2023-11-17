@@ -20,6 +20,7 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
+import com.cmoney.fanciapi.fanci.model.IVoting
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 
@@ -43,6 +44,7 @@ import kotlinx.parcelize.Parcelize
  * @param deleteFrom 
  * @param commentCount 
  * @param replyMessage 
+ * @param votings 
  * @param messageFromType 
  */
 @Parcelize
@@ -89,6 +91,9 @@ data class ChatMessage (
 
     @Json(name = "replyMessage")
     val replyMessage: IReplyMessage? = null,
+
+    @Json(name = "votings")
+    val votings: kotlin.collections.List<IVoting>? = null,
 
     @Json(name = "messageFromType")
     val messageFromType: MessageServiceType? = null
