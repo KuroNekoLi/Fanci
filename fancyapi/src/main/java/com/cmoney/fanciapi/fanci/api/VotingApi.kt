@@ -8,57 +8,73 @@ import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.CastVoteParam
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
+import com.cmoney.fanciapi.fanci.model.VotingIdParam
 import com.cmoney.fanciapi.fanci.model.VotingParam
 
 interface VotingApi {
     /**
-     *  __________🔒 可發文
+     * 刪除投票活動    非建立者不給刪 當有一個活動為非建立者 全部不動 然後回無權限
      * 
      * Responses:
      *  - 200: Success
      *  - 401: Unauthorized
      *  - 403: Forbidden
      *
-     * @param channelId 
-     * @param requestBody  (optional)
+     * @param channelId 頻道ID (驗證權限) (optional)
+     * @param requestBody 要刪除的投票活動 (optional)
      * @return [Unit]
      */
-    @DELETE("api/v1/Voting/ChannelId/{channelId}")
-    suspend fun apiV1VotingChannelIdChannelIdDelete(@Path("channelId") channelId: kotlin.String, @Body requestBody: kotlin.collections.List<kotlin.Long>? = null): Response<Unit>
+    @DELETE("api/v1/Voting")
+    suspend fun apiV1VotingDelete(@Query("channelId") channelId: kotlin.String? = null, @Body requestBody: kotlin.collections.List<kotlin.Long>? = null): Response<Unit>
 
     /**
-     * 頻道創建投票 __________🔒 可發文
+     * 頻道創建投票    要有canPost權限
      * 
      * Responses:
      *  - 200: Success
      *  - 401: Unauthorized
      *  - 403: Forbidden
      *
-     * @param channelId 頻道ID (驗證權限)
+     * @param channelId 頻道ID (驗證權限) (optional)
      * @param votingParam 投票資訊 (optional)
-     * @return [kotlin.Long]
+     * @return [VotingIdParam]
      */
-    @POST("api/v1/Voting/ChannelId/{channelId}")
-    suspend fun apiV1VotingChannelIdChannelIdPost(@Path("channelId") channelId: kotlin.String, @Body votingParam: VotingParam? = null): Response<kotlin.Long>
+    @POST("api/v1/Voting")
+    suspend fun apiV1VotingPost(@Query("channelId") channelId: kotlin.String? = null, @Body votingParam: VotingParam? = null): Response<VotingIdParam>
 
     /**
-     * 頻道投票 __________🔒 可看
+     * 頻道投票    要有canRead權限  投不存在的Option會直接失敗
      * 
      * Responses:
      *  - 200: Success
      *  - 401: Unauthorized
      *  - 403: Forbidden
      *
-     * @param channelId 頻道ID (驗證權限)
      * @param votingId 
-     * @param castVoteParam  (optional)
+     * @param channelId 頻道ID (驗證權限) (optional)
+     * @param castVoteParam 投票 (optional)
      * @return [Unit]
      */
-    @POST("api/v1/Voting/{VotingId}/ChannelId/{channelId}/CastVote")
-    suspend fun apiV1VotingVotingIdChannelIdChannelIdCastVotePost(@Path("channelId") channelId: kotlin.String, @Path("VotingId") votingId: kotlin.String, @Body castVoteParam: CastVoteParam? = null): Response<Unit>
+    @POST("api/v1/Voting/{votingId}/CastVote")
+    suspend fun apiV1VotingVotingIdCastVotePost(@Path("votingId") votingId: kotlin.Long, @Query("channelId") channelId: kotlin.String? = null, @Body castVoteParam: CastVoteParam? = null): Response<Unit>
 
     /**
-     *  __________🔒 可看
+     * 結束頻道投票  需要是創建者
+     * 
+     * Responses:
+     *  - 200: Success
+     *  - 401: Unauthorized
+     *  - 403: Forbidden
+     *
+     * @param votingId 投票ID
+     * @param channelId 頻道ID (驗證權限) (optional)
+     * @return [Unit]
+     */
+    @PUT("api/v1/Voting/{votingId}/End")
+    suspend fun apiV1VotingVotingIdEndPut(@Path("votingId") votingId: kotlin.Long, @Query("channelId") channelId: kotlin.String? = null): Response<Unit>
+
+    /**
+     * 取得投票活動數據    非建立者不給看
      * 
      * Responses:
      *  - 200: Success
@@ -66,10 +82,10 @@ interface VotingApi {
      *  - 403: Forbidden
      *
      * @param votingId 
-     * @param channelId 
+     * @param channelId  (optional)
      * @return [kotlin.collections.List<IVotingOptionStatisticsWithVoter>]
      */
-    @GET("api/v1/Voting/{votingId}/ChannelId/{channelId}/Statistics")
-    suspend fun apiV1VotingVotingIdChannelIdChannelIdStatisticsGet(@Path("votingId") votingId: kotlin.Long, @Path("channelId") channelId: kotlin.String): Response<kotlin.collections.List<IVotingOptionStatisticsWithVoter>>
+    @GET("api/v1/Voting/{votingId}/Statistics")
+    suspend fun apiV1VotingVotingIdStatisticsGet(@Path("votingId") votingId: kotlin.Long, @Query("channelId") channelId: kotlin.String? = null): Response<kotlin.collections.List<IVotingOptionStatisticsWithVoter>>
 
 }

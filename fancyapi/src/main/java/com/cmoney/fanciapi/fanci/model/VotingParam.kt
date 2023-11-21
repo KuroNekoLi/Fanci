@@ -15,7 +15,7 @@
 
 package com.cmoney.fanciapi.fanci.model
 
-import com.cmoney.fanciapi.fanci.model.IVotingOption
+import com.cmoney.fanciapi.fanci.model.VotingOption
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -40,7 +40,7 @@ data class VotingParam (
 
     /* 選項 */
     @Json(name = "votingOptions")
-    val votingOptions: kotlin.collections.List<IVotingOption>? = null,
+    val votingOptions: kotlin.collections.List<VotingOption>? = null,
 
     /* 是否能多選 */
     @Json(name = "isMultipleChoice")

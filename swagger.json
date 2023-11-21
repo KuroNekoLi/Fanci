@@ -4155,6 +4155,92 @@
         ]
       }
     },
+    "/api/v1/GroupMember/Group/{groupId}/Users": {
+      "get": {
+        "tags": [
+          "GroupMember"
+        ],
+        "summary": "取得特定社團會員清單",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "社團id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "會員ids",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseridsParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMember"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMember"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMember"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未驗證"
+          },
+          "403": {
+            "description": "沒有權限"
+          },
+          "404": {
+            "description": "找不到社團"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
     "/api/v1/GroupMember/group/{groupId}/me": {
       "put": {
         "tags": [
@@ -7167,18 +7253,17 @@
         ]
       }
     },
-    "/api/v1/Voting/ChannelId/{channelId}": {
+    "/api/v1/Voting": {
       "post": {
         "tags": [
           "Voting"
         ],
-        "summary": "頻道創建投票 __________🔒 可發文",
+        "summary": "頻道創建投票  \r\n要有canPost權限",
         "parameters": [
           {
             "name": "channelId",
-            "in": "path",
+            "in": "query",
             "description": "頻道ID (驗證權限)",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -7210,20 +7295,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int64"
+                  "$ref": "#/components/schemas/VotingIdParam"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int64"
+                  "$ref": "#/components/schemas/VotingIdParam"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int64"
+                  "$ref": "#/components/schemas/VotingIdParam"
                 }
               }
             }
@@ -7238,7 +7320,6 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_CanPost_1_channelId_none",
               "user"
             ]
           }
@@ -7248,18 +7329,19 @@
         "tags": [
           "Voting"
         ],
-        "summary": " __________🔒 可發文",
+        "summary": "刪除投票活動  \r\n非建立者不給刪 當有一個活動為非建立者 全部不動 然後回無權限",
         "parameters": [
           {
             "name": "channelId",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "description": "頻道ID (驗證權限)",
             "schema": {
               "type": "string"
             }
           }
         ],
         "requestBody": {
+          "description": "要刪除的投票活動",
           "content": {
             "application/json": {
               "schema": {
@@ -7304,84 +7386,18 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_CanPost_1_channelId_none",
               "user"
             ]
           }
         ]
       }
     },
-    "/api/v1/Voting/{VotingId}/ChannelId/{channelId}/CastVote": {
+    "/api/v1/Voting/{votingId}/CastVote": {
       "post": {
         "tags": [
           "Voting"
         ],
-        "summary": "頻道投票 __________🔒 可看",
-        "parameters": [
-          {
-            "name": "channelId",
-            "in": "path",
-            "description": "頻道ID (驗證權限)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "VotingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CastVoteParam"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CastVoteParam"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CastVoteParam"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "PERMISSION_CanRead_1_channelId_none",
-              "user"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/v1/Voting/{votingId}/ChannelId/{channelId}/Statistics": {
-      "get": {
-        "tags": [
-          "Voting"
-        ],
-        "summary": " __________🔒 可看",
+        "summary": "頻道投票  \r\n要有canRead權限\r\n投不存在的Option會直接失敗",
         "parameters": [
           {
             "name": "votingId",
@@ -7394,8 +7410,120 @@
           },
           {
             "name": "channelId",
+            "in": "query",
+            "description": "頻道ID (驗證權限)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "投票",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CastVoteParam"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CastVoteParam"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CastVoteParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Voting/{votingId}/End": {
+      "put": {
+        "tags": [
+          "Voting"
+        ],
+        "summary": "結束頻道投票\r\n需要是創建者",
+        "parameters": [
+          {
+            "name": "votingId",
             "in": "path",
+            "description": "投票ID",
             "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "channelId",
+            "in": "query",
+            "description": "頻道ID (驗證權限)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Voting/{votingId}/Statistics": {
+      "get": {
+        "tags": [
+          "Voting"
+        ],
+        "summary": "取得投票活動數據  \r\n非建立者不給看",
+        "parameters": [
+          {
+            "name": "votingId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "channelId",
+            "in": "query",
+            "description": "",
             "schema": {
               "type": "string"
             }
@@ -7441,7 +7569,6 @@
         "security": [
           {
             "oauth2": [
-              "PERMISSION_CanRead_1_channelId_none",
               "user"
             ]
           }
@@ -7615,7 +7742,7 @@
           "votings": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/IVoting"
+              "$ref": "#/components/schemas/Voting"
             },
             "nullable": true
           },
@@ -8125,7 +8252,7 @@
           "votings": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/IVoting"
+              "$ref": "#/components/schemas/Voting"
             },
             "nullable": true
           },
@@ -8133,7 +8260,8 @@
             "$ref": "#/components/schemas/MessageServiceType"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "訊息"
       },
       "ChatMessagePaging": {
         "type": "object",
@@ -9062,91 +9190,6 @@
         },
         "additionalProperties": false
       },
-      "IVoting": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "投票活動Id",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string",
-            "description": "標題",
-            "nullable": true
-          },
-          "votingOptionStatistics": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IVotingOptionStatistics"
-            },
-            "description": "選項",
-            "nullable": true
-          },
-          "startUnixTime": {
-            "type": "integer",
-            "description": "開始投票時間",
-            "format": "int64"
-          },
-          "endUnixTime": {
-            "type": "integer",
-            "description": "投票截止時間",
-            "format": "int64"
-          },
-          "isMultipleChoice": {
-            "type": "boolean",
-            "description": "是否能多選"
-          },
-          "maxChoiceCount": {
-            "type": "integer",
-            "description": "最大選擇數量",
-            "format": "int32"
-          },
-          "isAnonymous": {
-            "type": "boolean",
-            "description": "是否匿名投票"
-          },
-          "isEnded": {
-            "type": "boolean",
-            "description": "投票是否結束"
-          },
-          "votersCount": {
-            "type": "integer",
-            "description": "總投票人數",
-            "format": "int32"
-          },
-          "userVoteInfo": {
-            "$ref": "#/components/schemas/IUserVoteInfo"
-          },
-          "isDeleted": {
-            "type": "boolean",
-            "description": "是否已被刪除"
-          },
-          "createUnixTime": {
-            "type": "integer",
-            "description": "資料建立時間",
-            "format": "int64"
-          },
-          "updateUnixTime": {
-            "type": "integer",
-            "description": "資料更新時間",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
-      "IVotingOption": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "type": "string",
-            "description": "選項描述",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false,
-        "description": "投票選項"
-      },
       "IVotingOptionStatistics": {
         "type": "object",
         "properties": {
@@ -9996,6 +10039,74 @@
         },
         "additionalProperties": false
       },
+      "Voting": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "投票活動Id",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string",
+            "description": "標題",
+            "nullable": true
+          },
+          "votingOptionStatistics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IVotingOptionStatistics"
+            },
+            "description": "選項",
+            "nullable": true
+          },
+          "isMultipleChoice": {
+            "type": "boolean",
+            "description": "是否能多選"
+          },
+          "isAnonymous": {
+            "type": "boolean",
+            "description": "是否匿名投票"
+          },
+          "isEnded": {
+            "type": "boolean",
+            "description": "投票是否結束"
+          },
+          "votersCount": {
+            "type": "integer",
+            "description": "總投票人數",
+            "format": "int32"
+          },
+          "userVoteInfo": {
+            "$ref": "#/components/schemas/IUserVoteInfo"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VotingIdParam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "投票活動Id",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "投票活動"
+      },
+      "VotingOption": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "選項描述",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "投票選項"
+      },
       "VotingParam": {
         "type": "object",
         "properties": {
@@ -10007,7 +10118,7 @@
           "votingOptions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/IVotingOption"
+              "$ref": "#/components/schemas/VotingOption"
             },
             "description": "選項",
             "nullable": true

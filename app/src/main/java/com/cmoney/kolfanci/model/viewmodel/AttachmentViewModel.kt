@@ -147,7 +147,8 @@ class AttachmentViewModel(
             ).toList().map { vote ->
                 AttachmentInfoItem(
                     status = AttachmentInfoItem.Status.Success,
-                    other = vote
+                    other = vote,
+                    attachmentType = AttachmentType.Choice
                 )
             }
 
@@ -192,7 +193,11 @@ class AttachmentViewModel(
             val oldItem = it.second
 
             val newStatusItem = allItems.firstOrNull { newItem ->
-                newItem.uri == oldItem.uri || newItem.other == oldItem.other
+                if (key == AttachmentType.Choice) {
+                    newItem.other == oldItem.other
+                } else {
+                    newItem.uri == oldItem.uri
+                }
             }
 
             if (newStatusItem != null) {

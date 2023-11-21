@@ -20,16 +20,16 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
-import com.cmoney.fanciapi.fanci.model.IVoting
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.fanciapi.fanci.model.Voting
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 訊息
  *
  * @param author 
  * @param content 
@@ -93,7 +93,7 @@ data class ChatMessage (
     val replyMessage: IReplyMessage? = null,
 
     @Json(name = "votings")
-    val votings: kotlin.collections.List<IVoting>? = null,
+    val votings: kotlin.collections.List<Voting>? = null,
 
     @Json(name = "messageFromType")
     val messageFromType: MessageServiceType? = null

@@ -2,7 +2,8 @@ package com.cmoney.kolfanci.model.usecase
 
 import com.cmoney.fanciapi.fanci.api.VotingApi
 import com.cmoney.fanciapi.fanci.model.CastVoteParam
-import com.cmoney.fanciapi.fanci.model.IVotingOption
+import com.cmoney.fanciapi.fanci.model.VotingIdParam
+import com.cmoney.fanciapi.fanci.model.VotingOption
 import com.cmoney.fanciapi.fanci.model.VotingParam
 import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.model.vote.VoteModel
@@ -47,19 +48,19 @@ class VoteUseCase(
      * @param channelId 頻道id
      * @param voteModel 投票model
      */
-    private suspend fun createVote(channelId: String, voteModel: VoteModel): Long {
+    private suspend fun createVote(channelId: String, voteModel: VoteModel): VotingIdParam {
         KLog.i(TAG, "createVote:$voteModel")
 
         val votingParam = VotingParam(
             title = voteModel.question,
             votingOptions = voteModel.choice.map {
-                IVotingOption(text = it)
+                VotingOption(text = it)
             },
             isMultipleChoice = !voteModel.isSingleChoice,
             isAnonymous = false
         )
 
-        return votingApi.apiV1VotingChannelIdChannelIdPost(
+        return votingApi.apiV1VotingPost(
             channelId = channelId,
             votingParam = votingParam
         ).checkResponseBody()
@@ -71,7 +72,7 @@ class VoteUseCase(
      * @param voteId 投票id
      */
     suspend fun deleteVote(channelId: String, voteId: Long) =
-        votingApi.apiV1VotingChannelIdChannelIdDelete(
+        votingApi.apiV1VotingDelete(
             channelId = channelId,
             requestBody = listOf(voteId)
         ).checkResponseBody()
@@ -84,9 +85,9 @@ class VoteUseCase(
      * @param choice 所選擇的項目
      */
     suspend fun choiceVote(
-        channelId: String, votingId: String, choice: List<Int>
+        channelId: String, votingId: Long, choice: List<Int>
     ) =
-        votingApi.apiV1VotingVotingIdChannelIdChannelIdCastVotePost(
+        votingApi.apiV1VotingVotingIdCastVotePost(
             channelId = channelId,
             votingId = votingId,
             castVoteParam = CastVoteParam(
@@ -95,13 +96,23 @@ class VoteUseCase(
         ).checkResponseBody()
 
     /**
+     * 結束 投票
+     */
+    suspend fun closeVote(channelId: String, votingId: Long) =
+        votingApi.apiV1VotingVotingIdEndPut(
+            votingId = votingId,
+            channelId = channelId
+        ).checkResponseBody()
+
+
+    /**
      * 投票 統計
      *
      * @param channelId 頻道 id
      * @param votingId 投票 id
      */
     suspend fun summaryVote(channelId: String, votingId: Long) =
-        votingApi.apiV1VotingVotingIdChannelIdChannelIdStatisticsGet(
+        votingApi.apiV1VotingVotingIdStatisticsGet(
             channelId = channelId,
             votingId = votingId
         ).checkResponseBody()
