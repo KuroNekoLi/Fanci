@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -46,6 +47,15 @@ class EditPostViewModel(
 
     private val _postSuccess: MutableStateFlow<BulletinboardMessage?> = MutableStateFlow(null)
     val postSuccess = _postSuccess.asStateFlow()
+
+    private val _userInput: MutableStateFlow<String> = MutableStateFlow("")
+    val userInput = _userInput.asStateFlow()
+
+    fun setUserInput(text: String) {
+        _userInput.update {
+            text
+        }
+    }
 
     fun addAttachImage(uris: List<Uri>) {
         KLog.i(TAG, "addAttachImage")

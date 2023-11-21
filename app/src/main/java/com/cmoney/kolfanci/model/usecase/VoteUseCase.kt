@@ -7,6 +7,8 @@ import com.cmoney.fanciapi.fanci.model.VotingParam
 import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 /**
  * 投票相關
@@ -17,12 +19,35 @@ class VoteUseCase(
     private val TAG = VoteUseCase::class.java.simpleName
 
     /**
+     * 建立多筆 投票
+     *
+     * @param channelId 頻道 id
+     * @param voteModels 投票 modes
+     */
+    suspend fun createVotes(channelId: String, voteModels: List<VoteModel>): Flow<VoteModel> =
+        flow {
+            voteModels.forEach { voteModel ->
+                try {
+                    val votingId = createVote(
+                        channelId = channelId,
+                        voteModel = voteModel
+                    )
+                    emit(
+                        voteModel.copy(id = votingId.toString())
+                    )
+                } catch (e: Exception) {
+                    KLog.e(TAG, e)
+                }
+            }
+        }
+
+    /**
      * 建立投票
      *
      * @param channelId 頻道id
      * @param voteModel 投票model
      */
-    suspend fun createVote(channelId: String, voteModel: VoteModel): Long {
+    private suspend fun createVote(channelId: String, voteModel: VoteModel): Long {
         KLog.i(TAG, "createVote:$voteModel")
 
         val votingParam = VotingParam(

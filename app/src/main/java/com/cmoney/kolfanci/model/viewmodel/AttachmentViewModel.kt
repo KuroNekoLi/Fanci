@@ -13,6 +13,7 @@ import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.usecase.AttachmentUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
+import com.cmoney.kolfanci.model.usecase.VoteUseCase
 import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,8 @@ import kotlinx.coroutines.launch
 class AttachmentViewModel(
     val context: Application,
     val attachmentUseCase: AttachmentUseCase,
-    val uploadImageUseCase: UploadImageUseCase
+    val uploadImageUseCase: UploadImageUseCase,
+    val voteUseCase: VoteUseCase
 ) : AndroidViewModel(context) {
     private val TAG = AttachmentViewModel::class.java.simpleName
 
@@ -99,10 +101,14 @@ class AttachmentViewModel(
     /**
      * 執行上傳動作, 將未處理檔案改為 pending, 並執行上傳
      *
+     * @param channelId 頻道 id
      * @param other 檔案之外的東西, ex: text 內文
      */
-    fun upload(other: Any? = null) {
-        KLog.i(TAG, "upload")
+    fun upload(
+        channelId: String,
+        other: Any? = null
+    ) {
+        KLog.i(TAG, "upload file:$channelId")
         viewModelScope.launch {
             statusToPending()
 
@@ -126,15 +132,37 @@ class AttachmentViewModel(
 //            }
             //todo ----- for test end -----
 
-            //圖片之外的檔案
+            //投票
+            val voteModelList = uploadList.filter {
+                it.first == AttachmentType.Choice &&
+                        it.second.status == AttachmentInfoItem.Status.Pending &&
+                        it.second.other is VoteModel
+            }.map {
+                it.second.other as VoteModel
+            }
+
+            val voteFiles = voteUseCase.createVotes(
+                channelId = channelId,
+                voteModels = voteModelList
+            ).toList().map { vote ->
+                AttachmentInfoItem(
+                    status = AttachmentInfoItem.Status.Success,
+                    other = vote
+                )
+            }
+
+            //其他
             val otherFiles = uploadList.filter {
-                it.first != AttachmentType.Image && it.second.status == AttachmentInfoItem.Status.Pending
+                it.first != AttachmentType.Image &&
+                        it.first != AttachmentType.Choice &&
+                        it.second.status == AttachmentInfoItem.Status.Pending
             }.map { it.second.uri }
 
             val allOtherFiles = attachmentUseCase.uploadFile(otherFiles).toList()
 
             updateAttachmentList(
                 imageFiles = allImages,
+                voteFiles = voteFiles,
                 otherFiles = allOtherFiles,
                 other = other
             )
@@ -147,11 +175,14 @@ class AttachmentViewModel(
      */
     private fun updateAttachmentList(
         imageFiles: List<AttachmentInfoItem>,
+        voteFiles: List<AttachmentInfoItem>,
         otherFiles: List<AttachmentInfoItem>,
         other: Any? = null
     ) {
         val allItems = imageFiles.reversed().distinctBy {
             it.uri
+        } + voteFiles.reversed().distinctBy {
+            it.other
         } + otherFiles.reversed().distinctBy {
             it.uri
         }
@@ -161,7 +192,7 @@ class AttachmentViewModel(
             val oldItem = it.second
 
             val newStatusItem = allItems.firstOrNull { newItem ->
-                newItem.uri == oldItem.uri
+                newItem.uri == oldItem.uri || newItem.other == oldItem.other
             }
 
             if (newStatusItem != null) {
@@ -227,10 +258,15 @@ class AttachmentViewModel(
     /**
      * 重新再次上傳,針對單一檔案處理
      *
+     * @param channelId 頻道 id
      * @param uploadFileItem 需要重新上傳的檔案
      * @param other 檔案之外的東西, ex: text 內文
      */
-    fun onResend(uploadFileItem: ReSendFile, other: Any? = null) {
+    fun onResend(
+        channelId: String,
+        uploadFileItem: ReSendFile,
+        other: Any? = null
+    ) {
         KLog.i(TAG, "onResend:$uploadFileItem")
         viewModelScope.launch {
             val file = uploadFileItem.attachmentInfoItem.uri
@@ -240,10 +276,28 @@ class AttachmentViewModel(
                 allImages = uploadImageUseCase.uploadImage2(listOf(file)).toList()
             }
 
+            var allVotes = emptyList<AttachmentInfoItem>()
+            if (uploadFileItem.type == AttachmentType.Choice) {
+                uploadFileItem.attachmentInfoItem.other?.let { other ->
+                    if (other is VoteModel) {
+                        allVotes = voteUseCase.createVotes(
+                            channelId = channelId,
+                            voteModels = listOf(other)
+                        ).toList().map { vote ->
+                            AttachmentInfoItem(
+                                status = AttachmentInfoItem.Status.Success,
+                                other = vote
+                            )
+                        }
+                    }
+                }
+            }
+
             val allOtherFiles = attachmentUseCase.uploadFile(listOf(file)).toList()
 
             updateAttachmentList(
                 imageFiles = allImages,
+                voteFiles = allVotes,
                 otherFiles = allOtherFiles,
                 other = other
             )

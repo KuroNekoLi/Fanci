@@ -229,6 +229,7 @@ fun ChatRoomScreen(
             AppUserLogger.getInstance().log(Clicked.MessageSendButton)
             isShowLoading = true
             attachmentViewModel.upload(
+                channelId = channelId,
                 other = text
             )
         },
@@ -306,6 +307,7 @@ fun ChatRoomScreen(
             },
             onResend = {
                 attachmentViewModel.onResend(
+                    channelId = channelId,
                     uploadFileItem = reSendFile,
                     other = inputContent
                 )

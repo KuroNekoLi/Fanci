@@ -122,7 +122,7 @@ sealed class AttachmentType {
  * @param filename 檔案名稱
  * @param fileSize 檔案大小
  * @param duration 音檔長度 (option)
- * @param other 其他類型 model (option)
+ * @param other 其他類型 model (option) (目前有的Model: VoteModel)
  * @param attachmentType 檔案類型
  */
 data class AttachmentInfoItem(

@@ -286,6 +286,7 @@ fun PostInfoScreen(
                 isShowLoading = true
                 inputContent = text
                 attachmentViewModel.upload(
+                    channelId = channel.id.orEmpty(),
                     other = text
                 )
                 keyboard?.hide()
@@ -588,6 +589,7 @@ fun PostInfoScreen(
             },
             onResend = {
                 attachmentViewModel.onResend(
+                    channelId = channel.id.orEmpty(),
                     uploadFileItem = reSendFile,
                     other = inputContent
                 )

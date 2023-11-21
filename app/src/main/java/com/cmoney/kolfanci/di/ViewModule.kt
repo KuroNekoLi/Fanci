@@ -181,7 +181,8 @@ val viewModule = module {
         AttachmentViewModel(
             context = androidApplication(),
             attachmentUseCase = get(),
-            uploadImageUseCase = get()
+            uploadImageUseCase = get(),
+            voteUseCase = get()
         )
     }
     viewModel {

@@ -134,9 +134,7 @@ fun EditPostScreen(
     }
 
     //User 輸入內容
-    var inputContent by remember {
-        mutableStateOf("")
-    }
+    val inputContent by viewModel.userInput.collectAsState()
 
     //編輯貼文, 設定初始化資料
     LaunchedEffect(Unit) {
@@ -144,6 +142,10 @@ fun EditPostScreen(
             post.content?.medias?.apply {
                 attachmentViewModel.addAttachment(this)
             }
+
+            viewModel.setUserInput(
+                post.content?.text.orEmpty()
+            )
         }
     }
 
@@ -191,10 +193,10 @@ fun EditPostScreen(
             showImagePick = true
         },
         onPostClick = { text ->
-            inputContent = text
             AppUserLogger.getInstance().log(Clicked.PostPublish)
             isLoading = true
             attachmentViewModel.upload(
+                channelId = channelId,
                 other = text
             )
         },
@@ -221,7 +223,11 @@ fun EditPostScreen(
         },
         onChoiceClick = {
             navController.navigate(CreateChoiceQuestionScreenDestination())
-        }
+        },
+        onValueChange = {
+            viewModel.setUserInput(it)
+        },
+        defaultContent = inputContent
     )
 
     //Show image picker
@@ -321,6 +327,7 @@ fun EditPostScreen(
             },
             onResend = {
                 attachmentViewModel.onResend(
+                    channelId = channelId,
                     uploadFileItem = reSendFile,
                     other = inputContent
                 )
@@ -359,9 +366,10 @@ private fun EditPostScreenView(
     onDeleteAttach: (AttachmentInfoItem) -> Unit,
     onPreviewAttachmentClick: (AttachmentInfoItem) -> Unit,
     onResend: (ReSendFile) -> Unit,
-    onChoiceClick: () -> Unit
+    onChoiceClick: () -> Unit,
+    onValueChange: (String) -> Unit,
+    defaultContent: String
 ) {
-    val defaultContent = editPost?.content?.text.orEmpty()
     var textState by remember { mutableStateOf(defaultContent) }
     val focusRequester = remember { FocusRequester() }
     val showKeyboard = remember { mutableStateOf(true) }
@@ -418,6 +426,7 @@ private fun EditPostScreenView(
                     ),
                     onValueChange = {
                         textState = it
+                        onValueChange.invoke(it)
                     },
                     shape = RoundedCornerShape(4.dp),
                     textStyle = TextStyle.Default.copy(fontSize = 16.sp),
@@ -669,7 +678,9 @@ fun EditPostScreenPreview() {
             onDeleteAttach = {},
             onPreviewAttachmentClick = {},
             onResend = {},
-            onChoiceClick = {}
+            onChoiceClick = {},
+            onValueChange = {},
+            defaultContent = ""
         )
     }
 }
