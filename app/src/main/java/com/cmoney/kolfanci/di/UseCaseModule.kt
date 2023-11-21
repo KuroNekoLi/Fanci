@@ -18,6 +18,7 @@ import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.model.usecase.UserUseCase
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
+import com.cmoney.kolfanci.model.usecase.VoteUseCase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -76,6 +77,11 @@ val useCaseModule = module {
         AttachmentUseCase(
             context = androidApplication(),
             network = get()
+        )
+    }
+    factory {
+        VoteUseCase(
+            votingApi = get()
         )
     }
 }

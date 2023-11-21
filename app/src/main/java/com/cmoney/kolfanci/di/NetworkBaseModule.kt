@@ -25,6 +25,7 @@ import com.cmoney.fanciapi.fanci.api.ThemeColorApi
 import com.cmoney.fanciapi.fanci.api.UserApi
 import com.cmoney.fanciapi.fanci.api.UserReportApi
 import com.cmoney.fanciapi.fanci.api.VipApi
+import com.cmoney.fanciapi.fanci.api.VotingApi
 import com.cmoney.fanciapi.infrastructure.ApiClient
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.remoteconfig.BaseDomainKey
@@ -179,6 +180,11 @@ val networkBaseModule = module {
     single {
         get<ApiClient>().createService(PushNotificationApi::class.java)
     }
+
+    single {
+        get<ApiClient>().createService(VotingApi::class.java)
+    }
+
 }
 
 private fun getDomain(): String {
