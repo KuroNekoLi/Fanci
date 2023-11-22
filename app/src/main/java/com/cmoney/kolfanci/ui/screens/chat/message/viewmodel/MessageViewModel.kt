@@ -2,7 +2,6 @@ package com.cmoney.kolfanci.ui.screens.chat.message.viewmodel
 
 import android.app.Application
 import android.net.Uri
-import android.os.Bundle
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,13 +18,13 @@ import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.remoteconfig.PollingFrequencyKey
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
-import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
+import com.cmoney.kolfanci.model.usecase.VoteUseCase
 import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
@@ -41,7 +40,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ImageAttachState(
@@ -58,8 +56,8 @@ class MessageViewModel(
     private val chatRoomUseCase: ChatRoomUseCase,
     private val chatRoomPollUseCase: ChatRoomPollUseCase,
     private val permissionUseCase: PermissionUseCase,
-    private val uploadImageUseCase: UploadImageUseCase,
-    private val musicServiceConnection: MusicServiceConnection
+    private val musicServiceConnection: MusicServiceConnection,
+    private val voteUseCase: VoteUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
@@ -830,43 +828,27 @@ class MessageViewModel(
         }
     }
 
-    //========== Media Player ==========
-    //TODO: test
-    fun playMedia(uri: Uri) {
-        KLog.i(TAG, "playMedia")
-
-        if (musicServiceConnection.isConnected.value == true) {
-            //正在播的歌曲
-            val nowPlaying = musicServiceConnection.nowPlaying.value
-            //取得控制器
-            val transportControls = musicServiceConnection.transportControls
-
-//            val isPrepared = musicServiceConnection.playbackState.value?.isPrepared ?: false
-
-            //已經播放
-//            if (isPrepared && storyId == nowPlaying?.id) {
-//
-//            }
-//            //全新清單
-//            else {
-//                val bundle = Bundle()
-//                bundle.putString("", uri.toString())
-//                bundle.putBinder(
-//                    BUNDLE_STORIES,
-//                    WrapperForBinder(playList)
-//                )
-//                bundle.putInt(BUNDLE_START_PLAY_POSITION, startPosition)
-
-            if (uri.toString().isNotEmpty()) {
-                transportControls.playFromUri(uri, Bundle())
-
-//                transportControls.playFromMediaId(
-//                    uri.toString(),
-//                    null
-//                )
+    /**
+     * 選擇 投票
+     *
+     * @param channelId 頻道id
+     * @param votingId 投票id
+     * @param choice 所選擇的項目ids
+     */
+    fun voteQuestion(
+        channelId: String, votingId: Long, choice: List<Int>
+    ) {
+        KLog.i(TAG, "voteQuestion: channelId = $channelId, votingId = $votingId, choice = $choice")
+        viewModelScope.launch {
+            voteUseCase.choiceVote(
+                channelId = channelId,
+                votingId = votingId,
+                choice = choice
+            ).onSuccess {
+                KLog.i(TAG, "voteQuestion onSuccess")
+            }.onFailure {
+                KLog.e(TAG, it)
             }
-
-//            }
         }
     }
 }

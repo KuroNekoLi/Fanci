@@ -58,8 +58,8 @@ val viewModule = module {
             get(),
             get(),
             get(),
-            get(),
-            musicServiceConnection = get()
+            musicServiceConnection = get(),
+            voteUseCase = get()
         )
     }
     viewModel { DiscoverViewModel(get()) }

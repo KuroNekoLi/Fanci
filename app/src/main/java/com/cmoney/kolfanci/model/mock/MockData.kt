@@ -5,10 +5,12 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
+import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.vote.VoteModel
@@ -259,11 +261,43 @@ object MockData {
                         }
                     ),
                     createUnixTime = System.currentTimeMillis().div(1000),
-                    serialNumber = Random.nextLong(1, 65536)
+                    serialNumber = Random.nextLong(1, 65536),
+                    votings = listOf(
+                        mockVoting
+                    )
                 )
             } else {
                 ChatMessage()
             }
         }
+
+    val mockVoting: Voting
+        get() = Voting(
+            id = System.currentTimeMillis(),
+            title = RandomStringUtils.randomAlphabetic(10),
+            votingOptionStatistics = listOf(
+                IVotingOptionStatistics(
+                    optionId = System.currentTimeMillis().toInt(),
+                    voteCount = 2,
+                    text = RandomStringUtils.randomAlphabetic(10)
+                ),
+                IVotingOptionStatistics(
+                    optionId = System.currentTimeMillis().toInt(),
+                    voteCount = 3,
+                    text = RandomStringUtils.randomAlphabetic(10)
+                ),
+                IVotingOptionStatistics(
+                    optionId = System.currentTimeMillis().toInt(),
+                    voteCount = 1,
+                    text = RandomStringUtils.randomAlphabetic(10)
+                ),
+                IVotingOptionStatistics(
+                    optionId = System.currentTimeMillis().toInt(),
+                    voteCount = 4,
+                    text = RandomStringUtils.randomAlphabetic(10)
+                )
+            ),
+            isMultipleChoice = false,
+        )
 
 }

@@ -2,7 +2,6 @@ package com.cmoney.kolfanci.model.usecase
 
 import com.cmoney.fanciapi.fanci.api.VotingApi
 import com.cmoney.fanciapi.fanci.model.CastVoteParam
-import com.cmoney.fanciapi.fanci.model.VotingIdParam
 import com.cmoney.fanciapi.fanci.model.VotingOption
 import com.cmoney.fanciapi.fanci.model.VotingParam
 import com.cmoney.kolfanci.extension.checkResponseBody
@@ -32,7 +31,8 @@ class VoteUseCase(
                     val votingId = createVote(
                         channelId = channelId,
                         voteModel = voteModel
-                    )
+                    ).getOrNull()?.id ?: 0
+
                     emit(
                         voteModel.copy(id = votingId.toString())
                     )
@@ -48,7 +48,7 @@ class VoteUseCase(
      * @param channelId 頻道id
      * @param voteModel 投票model
      */
-    private suspend fun createVote(channelId: String, voteModel: VoteModel): VotingIdParam {
+    private suspend fun createVote(channelId: String, voteModel: VoteModel) = kotlin.runCatching {
         KLog.i(TAG, "createVote:$voteModel")
 
         val votingParam = VotingParam(
@@ -60,7 +60,7 @@ class VoteUseCase(
             isAnonymous = false
         )
 
-        return votingApi.apiV1VotingPost(
+        votingApi.apiV1VotingPost(
             channelId = channelId,
             votingParam = votingParam
         ).checkResponseBody()
@@ -71,11 +71,13 @@ class VoteUseCase(
      * @param channelId 頻道id
      * @param voteId 投票id
      */
-    suspend fun deleteVote(channelId: String, voteId: Long) =
+    suspend fun deleteVote(channelId: String, voteId: Long) = kotlin.runCatching {
         votingApi.apiV1VotingDelete(
             channelId = channelId,
             requestBody = listOf(voteId)
         ).checkResponseBody()
+    }
+
 
     /**
      * 頻道投票動作
@@ -86,7 +88,7 @@ class VoteUseCase(
      */
     suspend fun choiceVote(
         channelId: String, votingId: Long, choice: List<Int>
-    ) =
+    ) = kotlin.runCatching {
         votingApi.apiV1VotingVotingIdCastVotePost(
             channelId = channelId,
             votingId = votingId,
@@ -94,15 +96,18 @@ class VoteUseCase(
                 choice
             )
         ).checkResponseBody()
+    }
+
 
     /**
      * 結束 投票
      */
-    suspend fun closeVote(channelId: String, votingId: Long) =
+    suspend fun closeVote(channelId: String, votingId: Long) = kotlin.runCatching {
         votingApi.apiV1VotingVotingIdEndPut(
             votingId = votingId,
             channelId = channelId
         ).checkResponseBody()
+    }
 
 
     /**
@@ -111,9 +116,11 @@ class VoteUseCase(
      * @param channelId 頻道 id
      * @param votingId 投票 id
      */
-    suspend fun summaryVote(channelId: String, votingId: Long) =
+    suspend fun summaryVote(channelId: String, votingId: Long) = kotlin.runCatching {
         votingApi.apiV1VotingVotingIdStatisticsGet(
             channelId = channelId,
             votingId = votingId
         ).checkResponseBody()
+    }
+
 }

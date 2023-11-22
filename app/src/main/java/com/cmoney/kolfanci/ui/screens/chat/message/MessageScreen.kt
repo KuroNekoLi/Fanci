@@ -36,6 +36,7 @@ import com.cmoney.kolfanci.extension.showInteractDialogBottomSheet
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
@@ -109,6 +110,15 @@ fun MessageScreen(
             onReSendClick = {
                 AppUserLogger.getInstance().log(Clicked.MessageRetry)
                 messageViewModel.onReSendClick(it)
+            },
+            onVotingClick = { votingClick ->
+                messageViewModel.voteQuestion(
+                    channelId = channelId,
+                    votingId = votingClick.voting.id ?: 0,
+                    choice = votingClick.choices.map { choice ->
+                        choice.optionId ?: 0
+                    }
+                )
             }
         )
     } else {
@@ -147,7 +157,8 @@ private fun MessageScreenView(
     isScrollToBottom: Boolean,
     onLoadMore: () -> Unit,
     onReSendClick: (ChatMessageWrapper) -> Unit,
-    scrollToPosition: Int?
+    scrollToPosition: Int?,
+    onVotingClick: (MessageContentCallback.VotingClick) -> Unit
 ) {
     val TAG = "MessageScreenView"
 
@@ -171,10 +182,14 @@ private fun MessageScreenView(
 
                     MessageContentScreen(
                         navController = navController,
+                        //TODO: test data
                         chatMessageWrapper = chatMessageWrapper.copy(
-                            isBlocking = isBlocking,
-                            isBlocker = isBlocker
+                            message = MockData.mockMessage
                         ),
+//                        chatMessageWrapper = chatMessageWrapper.copy(
+//                            isBlocking = isBlocking,
+//                            isBlocker = isBlocker
+//                        ),
                         coroutineScope = coroutineScope,
                         onReSendClick = {
                             onReSendClick.invoke(it)
@@ -205,6 +220,10 @@ private fun MessageScreenView(
 
                                 is MessageContentCallback.MsgDismissHideClick -> {
                                     onMsgDismissHide.invoke(chatMessageWrapper.message)
+                                }
+
+                                is MessageContentCallback.VotingClick -> {
+                                    onVotingClick.invoke(it)
                                 }
                             }
                         }
@@ -306,7 +325,8 @@ fun MessageScreenPreview() {
             onLoadMore = {},
             onReSendClick = {},
             scrollToPosition = null,
-            navController = EmptyDestinationsNavigator
+            navController = EmptyDestinationsNavigator,
+            onVotingClick = {}
         )
     }
 }

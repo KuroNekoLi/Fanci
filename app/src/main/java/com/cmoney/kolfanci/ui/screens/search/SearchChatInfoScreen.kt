@@ -323,7 +323,6 @@ private fun SearchChatMessageContent(
             ChatMessageWrapper.MessageType.Blocking -> {}
             ChatMessageWrapper.MessageType.Delete -> {}
             ChatMessageWrapper.MessageType.RecycleMessage -> {}
-            ChatMessageWrapper.MessageType.Choice -> {}
         }
     }
 }

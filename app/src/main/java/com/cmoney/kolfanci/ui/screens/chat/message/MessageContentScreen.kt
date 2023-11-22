@@ -41,25 +41,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.getAttachmentType
-import com.cmoney.kolfanci.extension.getDuration
-import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.extension.getFleSize
-import com.cmoney.kolfanci.extension.toAttachmentType
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.extension.toUploadFileItemMap
 import com.cmoney.kolfanci.model.ChatMessageWrapper
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
-import com.cmoney.kolfanci.ui.destinations.AnswerResultScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.MessageHideUserScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageRecycleScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageRemoveScreen
@@ -70,9 +67,7 @@ import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
-import com.cmoney.kolfanci.ui.screens.shared.choice.ChoiceResultScreen
-import com.cmoney.kolfanci.ui.screens.shared.choice.MultiChoiceScreen
-import com.cmoney.kolfanci.ui.screens.shared.choice.SingleChoiceScreen
+import com.cmoney.kolfanci.ui.screens.shared.choice.ChoiceScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.ui.theme.White_767A7F
@@ -93,6 +88,19 @@ sealed class MessageContentCallback {
     data class MsgDismissHideClick(val message: ChatMessage) : MessageContentCallback()
     data class EmojiClick(val message: ChatMessage, val resourceId: Int) :
         MessageContentCallback()
+
+    /**
+     * 點擊投票
+     *
+     * @param message 訊息
+     * @param voting 投票 model
+     * @param choices 所選擇的項目
+     */
+    data class VotingClick(
+        val message: ChatMessage,
+        val voting: Voting,
+        val choices: List<IVotingOptionStatistics>
+    ) : MessageContentCallback()
 }
 
 /**
@@ -315,6 +323,25 @@ fun MessageContentScreen(
                         )
                     }
 
+                    //投票
+                    //TODO 是否投過票
+                    messageModel.votings?.let { votes ->
+                        ChoiceScreen(
+                            navController = navController,
+                            votings = votes,
+                            isMyPost = (messageModel.author?.id == Constant.MyInfo?.id),
+                            onVotingClick = { voting, choices ->
+                                onMessageContentCallback.invoke(
+                                    MessageContentCallback.VotingClick(
+                                        message = messageModel,
+                                        voting = voting,
+                                        choices = choices
+                                    )
+                                )
+                            }
+                        )
+                    }
+
                     //Emoji
                     messageModel.emojiCount?.apply {
                         FlowRow(
@@ -404,72 +431,67 @@ fun MessageContentScreen(
                         }
                     }
                 }
-
-                //選擇題
-                ChatMessageWrapper.MessageType.Choice -> {
-                    //TODO
-                }
             }
 
             //TODO: test vote
-            if (showVoteResult) {
-                ChoiceResultScreen(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 40.dp),
-                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-                    choices = listOf(
-                        "1.日本 🗼" to 0.1f,
-                        "2.紐約 🗽" to 0.25f,
-                        "3.夏威夷 🏖️" to 0.65f,
-                    ),
-                    isShowResultText = true,
-                    onResultClick = {
-                        navController.navigate(AnswerResultScreenDestination)
-                    }
-                )
-            } else {
-                SingleChoiceScreen(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 40.dp),
-                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-                    choices = listOf(
-                        "1.日本 🗼",
-                        "2.紐約 🗽",
-                        "3.夏威夷 🏖️",
-                    ),
-                    onChoiceClick = {
-                        showVoteResult = true
-                    },
-                    isShowResultText = true,
-                    onResultClick = {
-                        navController.navigate(AnswerResultScreenDestination)
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                MultiChoiceScreen(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 40.dp),
-                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-                    choices = listOf(
-                        "1.日本 🗼" to true,
-                        "2.紐約 🗽" to false,
-                        "3.夏威夷 🏖️" to true,
-                    ),
-                    onChoiceClick = {},
-                    isShowResultText = true,
-                    onConfirm = {
-                        showVoteResult = true
-                    },
-                    onResultClick = {
-                        navController.navigate(AnswerResultScreenDestination)
-                    }
-                )
-            }
+//            if (showVoteResult) {
+//                ChoiceResultScreen(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 40.dp),
+//                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
+//                    choices = listOf(
+//                        "1.日本 🗼" to 0.1f,
+//                        "2.紐約 🗽" to 0.25f,
+//                        "3.夏威夷 🏖️" to 0.65f,
+//                    ),
+//                    isShowResultText = true,
+//                    onResultClick = {
+//                        navController.navigate(AnswerResultScreenDestination)
+//                    }
+//                )
+//            } else {
+//                SingleChoiceScreen(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 40.dp),
+//                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
+//                    choices = listOf(
+//                        "1.日本 🗼",
+//                        "2.紐約 🗽",
+//                        "3.夏威夷 🏖️",
+//                    ),
+//                    onChoiceClick = {
+//                        showVoteResult = true
+//                    },
+//                    isShowResultText = true,
+//                    onResultClick = {
+//                        navController.navigate(AnswerResultScreenDestination)
+//                    }
+//                )
+//
+//                Spacer(modifier = Modifier.height(10.dp))
+//
+//                MultiChoiceScreen(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 40.dp),
+//                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
+//                    choices = listOf(
+//                        "1.日本 🗼" to true,
+//                        "2.紐約 🗽" to false,
+//                        "3.夏威夷 🏖️" to true,
+//                    ),
+//                    onChoiceClick = {},
+//                    isShowResultText = true,
+//                    onConfirm = {
+//                        showVoteResult = true
+//                    },
+//                    onResultClick = {
+//                        navController.navigate(AnswerResultScreenDestination)
+//                    }
+//                )
+//            }
         }
     }
 }

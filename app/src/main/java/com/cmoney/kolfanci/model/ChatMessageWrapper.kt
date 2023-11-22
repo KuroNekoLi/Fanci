@@ -22,7 +22,6 @@ data class ChatMessageWrapper(
         object Delete : MessageType()    //被刪除
         object RecycleMessage : MessageType()    //收回訊息
         object Default : MessageType()   //聊天室內文
-        object Choice: MessageType()    //選擇題
     }
 
 }

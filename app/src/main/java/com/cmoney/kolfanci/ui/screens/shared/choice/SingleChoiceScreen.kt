@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -38,16 +38,16 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
  * @param question 問題題目
  * @param choices 選項List
  * @param isShowResultText 是否呈現 查看結果 按鈕
- * @param onChoiceClick 點擊第幾個選項
+ * @param onChoiceClick 點擊投票 IVotingOptionStatistics id
  * @param onResultClick 點擊查看結果
  */
 @Composable
 fun SingleChoiceScreen(
     modifier: Modifier = Modifier,
     question: String,
-    choices: List<String>,
+    choices: List<IVotingOptionStatistics>,
     isShowResultText: Boolean,
-    onChoiceClick: (Int) -> Unit,
+    onChoiceClick: (IVotingOptionStatistics) -> Unit,
     onResultClick: (() -> Unit)? = null
 ) {
     Box(
@@ -80,9 +80,9 @@ fun SingleChoiceScreen(
 
             choices.forEachIndexed { index, choiceItem ->
                 ChoiceItem(
-                    question = choiceItem,
+                    question = choiceItem.text.orEmpty(),
                     onChoiceClick = {
-                        onChoiceClick.invoke(index)
+                        onChoiceClick.invoke(choiceItem)
                     }
                 )
 
@@ -139,11 +139,12 @@ private fun ChoiceItem(
             },
         contentAlignment = Alignment.CenterStart
     ) {
-        Row(modifier = Modifier
-            .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp)
-            .onGloballyPositioned { coordinates ->
-                textHeight = with(localDensity) { coordinates.size.height.toDp() }
-            },
+        Row(
+            modifier = Modifier
+                .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp)
+                .onGloballyPositioned { coordinates ->
+                    textHeight = with(localDensity) { coordinates.size.height.toDp() }
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -178,9 +179,9 @@ fun SingleChoiceScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choices = listOf(
-                "1.日本 🗼",
-                "2.紐約 🗽",
-                "3.夏威夷 🏖️",
+                IVotingOptionStatistics(text = "1.日本 🗼"),
+                IVotingOptionStatistics(text = "2.紐約 🗽"),
+                IVotingOptionStatistics(text = "3.夏威夷 🏖️")
             ),
             onChoiceClick = {},
             isShowResultText = true
