@@ -182,14 +182,10 @@ private fun MessageScreenView(
 
                     MessageContentScreen(
                         navController = navController,
-                        //TODO: test data
                         chatMessageWrapper = chatMessageWrapper.copy(
-                            message = MockData.mockMessage
+                            isBlocking = isBlocking,
+                            isBlocker = isBlocker
                         ),
-//                        chatMessageWrapper = chatMessageWrapper.copy(
-//                            isBlocking = isBlocking,
-//                            isBlocker = isBlocker
-//                        ),
                         coroutineScope = coroutineScope,
                         onReSendClick = {
                             onReSendClick.invoke(it)
