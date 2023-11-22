@@ -5,6 +5,7 @@ import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.IUserVoteInfo
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
@@ -297,7 +298,8 @@ object MockData {
                     text = RandomStringUtils.randomAlphabetic(10)
                 )
             ),
-            isMultipleChoice = false,
+            isMultipleChoice = true,
+            userVoteInfo = IUserVoteInfo()
         )
 
 }

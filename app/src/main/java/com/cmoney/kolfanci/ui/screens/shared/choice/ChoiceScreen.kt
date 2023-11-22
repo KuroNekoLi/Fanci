@@ -63,15 +63,11 @@ fun ChoiceScreen(
                         .fillMaxWidth()
                         .padding(start = 40.dp),
                     question = voting.title.orEmpty(),
-                    choices = listOf(
-                        "1.日本 🗼" to true,
-                        "2.紐約 🗽" to false,
-                        "3.夏威夷 🏖️" to true,
-                    ),
-                    onChoiceClick = {},
+                    choices = voting.votingOptionStatistics.orEmpty(),
                     isShowResultText = true,
                     onConfirm = {
-//                        showVoteResult = true
+                        showVoteResult = true
+                        onVotingClick.invoke(voting, it)
                     },
                     onResultClick = {
                         navController.navigate(AnswerResultScreenDestination)

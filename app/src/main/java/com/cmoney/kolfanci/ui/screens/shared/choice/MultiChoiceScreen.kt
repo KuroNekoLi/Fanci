@@ -29,6 +29,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -38,8 +39,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
  * 多選題
  *
  * @param question 問題題目
- * @param choices 選項List, first -> question , second -> isChecked
- * @param onChoiceClick 點擊選項
+ * @param choices 選項List
  * @param onConfirm 確定送出
  * @param isShowResultText 是否呈現 查看結果 按鈕
  * @param onResultClick 點擊查看結果
@@ -48,12 +48,18 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun MultiChoiceScreen(
     modifier: Modifier = Modifier,
     question: String,
-    choices: List<Pair<String, Boolean>>,
-    onChoiceClick: (Int) -> Unit,
-    onConfirm: () -> Unit,
+    choices: List<IVotingOptionStatistics>,
+    onConfirm: (List<IVotingOptionStatistics>) -> Unit,
     isShowResultText: Boolean,
     onResultClick: (() -> Unit)? = null
 ) {
+    //record item click
+    var onItemList by remember {
+        mutableStateOf(choices.map {
+            it to false
+        })
+    }
+
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -82,15 +88,17 @@ fun MultiChoiceScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            choices.forEachIndexed { index, choice ->
-                val question = choice.first
+            onItemList.forEachIndexed { index, choice ->
+                val item = choice.first
                 val isChecked = choice.second
 
                 CheckBoxChoiceItem(
-                    question = question,
+                    question = item,
                     isChecked = isChecked,
                     onChoiceClick = {
-                        onChoiceClick.invoke(index)
+                        val mutableList = onItemList.toMutableList()
+                        mutableList[index] = item to !isChecked
+                        onItemList = mutableList
                     }
                 )
 
@@ -104,7 +112,12 @@ fun MultiChoiceScreen(
                     .clip(RoundedCornerShape(20.dp)),
                 text = stringResource(id = R.string.confirm)
             ) {
-                onConfirm.invoke()
+                val checkItems = onItemList.filter {
+                    it.second
+                }.map {
+                    it.first
+                }
+                onConfirm.invoke(checkItems)
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -142,7 +155,7 @@ fun MultiChoiceScreen(
  */
 @Composable
 private fun CheckBoxChoiceItem(
-    question: String,
+    question: IVotingOptionStatistics,
     isChecked: Boolean,
     onChoiceClick: () -> Unit
 ) {
@@ -174,7 +187,7 @@ private fun CheckBoxChoiceItem(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = question,
+                text = question.text.orEmpty(),
                 // 主要內容/一般
                 style = TextStyle(
                     fontSize = 16.sp,
@@ -200,7 +213,9 @@ private fun CheckBoxChoiceItem(
 private fun CheckBoxChoiceItemPreview() {
     FanciTheme {
         CheckBoxChoiceItem(
-            question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
+            question = IVotingOptionStatistics(
+                text = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？"
+            ),
             isChecked = true,
             onChoiceClick = {
             }
@@ -217,11 +232,16 @@ fun MultipleChoiceScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choices = listOf(
-                "1.日本 🗼" to true,
-                "2.紐約 🗽" to false,
-                "3.夏威夷 🏖️" to true,
+                IVotingOptionStatistics(
+                    text = "1.日本 🗼"
+                ),
+                IVotingOptionStatistics(
+                    text = "2.紐約 🗽"
+                ),
+                IVotingOptionStatistics(
+                    text = "3.夏威夷 🏖️"
+                )
             ),
-            onChoiceClick = {},
             isShowResultText = true,
             onConfirm = {}
         )
