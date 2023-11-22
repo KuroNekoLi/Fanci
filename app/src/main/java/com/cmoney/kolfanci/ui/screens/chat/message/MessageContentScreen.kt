@@ -324,9 +324,11 @@ fun MessageContentScreen(
                     }
 
                     //投票
-                    //TODO 是否投過票
                     messageModel.votings?.let { votes ->
                         ChoiceScreen(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 40.dp),
                             navController = navController,
                             votings = votes,
                             isMyPost = (messageModel.author?.id == Constant.MyInfo?.id),

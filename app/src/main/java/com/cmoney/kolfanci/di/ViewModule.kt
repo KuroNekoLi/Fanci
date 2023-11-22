@@ -191,6 +191,7 @@ val viewModule = module {
         )
     }
     viewModel {
-        VoteViewModel(context = androidApplication())
+        VoteViewModel(context = androidApplication(),
+            voteUseCase = get())
     }
 }

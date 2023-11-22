@@ -36,12 +36,12 @@ import com.cmoney.kolfanci.extension.showInteractDialogBottomSheet
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.dialog.MessageReSendDialogScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -64,6 +64,7 @@ fun MessageScreen(
     channelId: String,
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
+    voteViewModel: VoteViewModel = koinViewModel(),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
     onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
@@ -112,7 +113,7 @@ fun MessageScreen(
                 messageViewModel.onReSendClick(it)
             },
             onVotingClick = { votingClick ->
-                messageViewModel.voteQuestion(
+                voteViewModel.voteQuestion(
                     channelId = channelId,
                     votingId = votingClick.voting.id ?: 0,
                     choice = votingClick.choices.map { choice ->
@@ -182,6 +183,10 @@ private fun MessageScreenView(
 
                     MessageContentScreen(
                         navController = navController,
+                        //TODO: test mock data
+//                        chatMessageWrapper = chatMessageWrapper.copy(
+//                            message = MockData.mockMessage
+//                        ),
                         chatMessageWrapper = chatMessageWrapper.copy(
                             isBlocking = isBlocking,
                             isBlocker = isBlocker

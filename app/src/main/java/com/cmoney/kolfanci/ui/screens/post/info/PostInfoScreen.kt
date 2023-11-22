@@ -499,6 +499,7 @@ fun PostInfoScreen(
 
     PostInfoScreenView(
         modifier = modifier,
+        channel = channel,
         navController = navController,
         post = postData,
         isPinPost = isPinPost,
@@ -764,6 +765,7 @@ fun PostInfoScreen(
 @Composable
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
+    channel: Channel,
     navController: DestinationsNavigator,
     post: BulletinboardMessage,
     isPinPost: Boolean,
@@ -821,6 +823,7 @@ private fun PostInfoScreenView(
                     //貼文
                     item {
                         BasePostContentScreen(
+                            channelId = channel.id.orEmpty(),
                             navController = navController,
                             post = post,
                             defaultDisplayLine = Int.MAX_VALUE,
@@ -901,12 +904,14 @@ private fun PostInfoScreenView(
                                 )
                             } else {
                                 BasePostContentScreen(
+                                    channelId = channel.id.orEmpty(),
                                     navController = navController,
                                     post = comment,
                                     contentModifier = Modifier.padding(start = 40.dp),
                                     hasMoreAction = true,
                                     bottomContent = {
                                         CommentBottomContent(
+                                            channel = channel,
                                             navController = navController,
                                             comment = comment,
                                             reply = replyMapData[comment.id],
@@ -1074,6 +1079,7 @@ private fun EmptyCommentView() {
 @Composable
 private fun CommentBottomContent(
     navController: DestinationsNavigator,
+    channel: Channel,
     comment: BulletinboardMessage,
     reply: ReplyData?,
     listener: CommentBottomContentListener
@@ -1130,6 +1136,7 @@ private fun CommentBottomContent(
                     )
                 } else {
                     BasePostContentScreen(
+                        channelId = channel.id.orEmpty(),
                         navController = navController,
                         post = reply,
                         defaultDisplayLine = Int.MAX_VALUE,
@@ -1190,7 +1197,8 @@ fun CommentBottomContentPreview() {
             reply = ReplyData(
                 emptyList(), false
             ),
-            listener = EmptyCommentBottomContentListener
+            listener = EmptyCommentBottomContentListener,
+            channel = Channel()
         )
     }
 }
@@ -1284,6 +1292,7 @@ fun PostInfoScreenPreview() {
     FanciTheme {
         PostInfoScreenView(
             navController = EmptyDestinationsNavigator,
+            channel = Channel(),
             post = PostViewModel.mockPost,
             isPinPost = false,
             attachment = emptyList(),

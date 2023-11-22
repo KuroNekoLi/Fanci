@@ -49,11 +49,11 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.toAttachmentInfoItem
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
@@ -65,6 +65,8 @@ import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
+import com.cmoney.kolfanci.ui.screens.shared.choice.ChoiceScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
@@ -79,10 +81,11 @@ import org.koin.core.parameter.parametersOf
 /**
  * 顯示 貼文/留言/回覆 內容
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BasePostContentScreen(
     modifier: Modifier = Modifier,
+    channelId: String,
     navController: DestinationsNavigator,
     post: BulletinboardMessage,
     defaultDisplayLine: Int = 4,
@@ -100,6 +103,7 @@ fun BasePostContentScreen(
             parametersOf(Uri.EMPTY)
         }
     ),
+    voteViewModel: VoteViewModel = koinViewModel(),
     bottomContent: @Composable ColumnScope.() -> Unit
 ) {
     val context = LocalContext.current
@@ -117,6 +121,9 @@ fun BasePostContentScreen(
     var showMoreLine by remember {
         mutableStateOf(false)
     }
+
+    //TODO: test data
+    val post = MockData.mockBulletinboardMessageWrapper.message
 
     Column(
         modifier = modifier
@@ -206,6 +213,25 @@ fun BasePostContentScreen(
                     text = "⋯⋯ 顯示更多",
                     fontSize = 17.sp,
                     color = LocalColor.current.text.default_100
+                )
+            }
+
+            post.votings?.let { votings ->
+                Spacer(modifier = Modifier.height(15.dp))
+
+                ChoiceScreen(
+                    navController = navController,
+                    votings = votings,
+                    isMyPost = (post.author?.id == Constant.MyInfo?.id),
+                    onVotingClick = { voting, choices ->
+                        voteViewModel.voteQuestion(
+                            channelId = channelId,
+                            votingId = voting.id ?: 0,
+                            choice = choices.map {
+                                it.optionId ?: 0
+                            }
+                        )
+                    }
                 )
             }
 
@@ -431,7 +457,8 @@ fun PostContentScreenPreview() {
             onMoreClick = {},
             onEmojiClick = {},
             onAddNewEmojiClick = {},
-            navController = EmptyDestinationsNavigator
+            navController = EmptyDestinationsNavigator,
+            channelId = ""
         )
     }
 }

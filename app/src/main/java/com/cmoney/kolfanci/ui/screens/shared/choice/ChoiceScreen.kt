@@ -31,6 +31,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
  */
 @Composable
 fun ChoiceScreen(
+    modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     votings: List<Voting>,
     isMyPost: Boolean,
@@ -45,9 +46,7 @@ fun ChoiceScreen(
         //已經 投過票
         if (showVoteResult) {
             ChoiceResultScreen(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 40.dp),
+                modifier = modifier,
                 question = voting.title.orEmpty(),
                 choices = voting.votingOptionStatistics?.toPercentageList() ?: emptyList(),
                 isShowResultText = isMyPost,
@@ -59,9 +58,7 @@ fun ChoiceScreen(
             //多選題
             if (voting.isMultipleChoice == true) {
                 MultiChoiceScreen(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 40.dp),
+                    modifier = modifier,
                     question = voting.title.orEmpty(),
                     choices = voting.votingOptionStatistics.orEmpty(),
                     isShowResultText = true,
@@ -76,9 +73,7 @@ fun ChoiceScreen(
             } else {
                 //單選題
                 SingleChoiceScreen(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 40.dp),
+                    modifier = modifier,
                     question = voting.title.orEmpty(),
                     choices = voting.votingOptionStatistics.orEmpty(),
                     onChoiceClick = {
@@ -101,7 +96,7 @@ fun ChoiceScreenPreview() {
     FanciTheme {
         ChoiceScreen(
             navController = EmptyDestinationsNavigator,
-            votings = listOf(MockData.mockVoting),
+            votings = listOf(MockData.mockSingleVoting),
             isMyPost = true,
             onVotingClick = { _, _ -> }
         )

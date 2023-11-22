@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.usecase.VoteUseCase
 import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class VoteViewModel(val context: Application) : AndroidViewModel(context) {
+class VoteViewModel(val context: Application, private val voteUseCase: VoteUseCase) : AndroidViewModel(context) {
     private val TAG = VoteViewModel::class.java.simpleName
 
     //問題
@@ -156,6 +157,30 @@ class VoteViewModel(val context: Application) : AndroidViewModel(context) {
             _question.value = voteModel.question
             _choice.value = voteModel.choice
             _isSingleChoice.value = voteModel.isSingleChoice
+        }
+    }
+
+    /**
+     * 選擇 投票
+     *
+     * @param channelId 頻道id
+     * @param votingId 投票id
+     * @param choice 所選擇的項目ids
+     */
+    fun voteQuestion(
+        channelId: String, votingId: Long, choice: List<Int>
+    ) {
+        KLog.i(TAG, "voteQuestion: channelId = $channelId, votingId = $votingId, choice = $choice")
+        viewModelScope.launch {
+            voteUseCase.choiceVote(
+                channelId = channelId,
+                votingId = votingId,
+                choice = choice
+            ).onSuccess {
+                KLog.i(TAG, "voteQuestion onSuccess")
+            }.onFailure {
+                KLog.e(TAG, it)
+            }
         }
     }
 }

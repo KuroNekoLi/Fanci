@@ -827,28 +827,4 @@ class MessageViewModel(
             }
         }
     }
-
-    /**
-     * 選擇 投票
-     *
-     * @param channelId 頻道id
-     * @param votingId 投票id
-     * @param choice 所選擇的項目ids
-     */
-    fun voteQuestion(
-        channelId: String, votingId: Long, choice: List<Int>
-    ) {
-        KLog.i(TAG, "voteQuestion: channelId = $channelId, votingId = $votingId, choice = $choice")
-        viewModelScope.launch {
-            voteUseCase.choiceVote(
-                channelId = channelId,
-                votingId = votingId,
-                choice = choice
-            ).onSuccess {
-                KLog.i(TAG, "voteQuestion onSuccess")
-            }.onFailure {
-                KLog.e(TAG, it)
-            }
-        }
-    }
 }

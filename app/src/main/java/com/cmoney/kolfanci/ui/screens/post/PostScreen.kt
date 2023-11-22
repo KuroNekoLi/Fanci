@@ -390,6 +390,7 @@ private fun PostScreenView(
                 pinPost?.let { pinPost ->
                     item {
                         BasePostContentScreen(
+                            channelId = channel.id.orEmpty(),
                             navController = navController,
                             post = pinPost.message,
                             bottomContent = {
@@ -429,6 +430,7 @@ private fun PostScreenView(
                 items(items = filterPost) { post ->
                     val postMessage = post.message
                     BasePostContentScreen(
+                        channelId = channel.id.orEmpty(),
                         navController = navController,
                         post = postMessage,
                         bottomContent = {

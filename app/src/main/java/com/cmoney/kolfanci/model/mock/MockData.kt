@@ -1,14 +1,18 @@
 package com.cmoney.kolfanci.model.mock
 
+import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.DeleteStatus
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserVoteInfo
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
+import com.cmoney.fanciapi.fanci.model.ImageContent
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.PushNotificationSetting
 import com.cmoney.fanciapi.fanci.model.PushNotificationSettingType
 import com.cmoney.fanciapi.fanci.model.Voting
@@ -17,6 +21,7 @@ import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.PushNotificationSettingWrap
 import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterData
+import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import org.apache.commons.lang3.RandomStringUtils
 import kotlin.random.Random
 
@@ -214,6 +219,7 @@ object MockData {
             }
         }
 
+    //聊天室訊息
     val mockMessage: ChatMessage
         get() {
             return if (BuildConfig.DEBUG) {
@@ -264,7 +270,7 @@ object MockData {
                     createUnixTime = System.currentTimeMillis().div(1000),
                     serialNumber = Random.nextLong(1, 65536),
                     votings = listOf(
-                        mockVoting
+                        mockSingleVoting
                     )
                 )
             } else {
@@ -272,7 +278,55 @@ object MockData {
             }
         }
 
-    val mockVoting: Voting
+    //貼文
+    val mockBulletinboardMessageWrapper: PostViewModel.BulletinboardMessageWrapper
+        get() = PostViewModel.BulletinboardMessageWrapper(
+            message = BulletinboardMessage(
+                replyMessage = null,
+                votings = listOf(
+                    mockSingleVoting,
+                    mockMultiVoting
+                ),
+                messageFromType = MessageServiceType.bulletinboard,
+                author = GroupMember(
+                    id = "637447",
+                    name = "Boring12",
+                    thumbNail = "https://cm-176-test.s3-ap-northeast-1.amazonaws.com/images/d230fca7-d202-4208-8547-2c20016ee99d.jpeg",
+                    serialNumber = 23122246, roleInfos = emptyList(), isGroupVip = false
+                ),
+                content = MediaIChatContent(
+                    text = "「 小説を音楽にするユニット 」 であるYOASOBIの結成以降初となるCD作品であり [12]、2019 年以降にリリースされた 「 夜に駆ける 」 から 「 群青 」 までのシングル5曲 [注1]と新曲が収録される[13]。7thシングル「怪物」と同時リリースされたが[12]、同曲は収録されていない。",
+                    medias = listOf(
+                        Media(
+                            resourceLink = "https://image.cmoney.tw/attachment/blog/1700150400/0d9e81d5-4870-4af9-be5a-8f6e6dd600b6.jpg",
+                            type = "Image",
+                            isNeedAuthenticate = false,
+                            image = ImageContent(width = 0, height = 0),
+                        )
+                    )
+                ),
+                emojiCount = IEmojiCount(
+                    like = 0,
+                    dislike = 0,
+                    laugh = 0,
+                    money = 0,
+                    shock = 0,
+                    cry = 0,
+                    think = 0,
+                    angry = 0
+                ),
+                id = "151628405",
+                isDeleted = false,
+                createUnixTime = 1700201671,
+                updateUnixTime = 1700201671,
+                serialNumber = 1300,
+                deleteStatus = DeleteStatus.none,
+                commentCount = 0
+            ), isPin = false
+        )
+
+    //單選題
+    val mockSingleVoting: Voting
         get() = Voting(
             id = System.currentTimeMillis(),
             title = RandomStringUtils.randomAlphabetic(10),
@@ -298,8 +352,11 @@ object MockData {
                     text = RandomStringUtils.randomAlphabetic(10)
                 )
             ),
-            isMultipleChoice = true,
+            isMultipleChoice = false,
             userVoteInfo = IUserVoteInfo()
         )
 
+    //多選題
+    val mockMultiVoting: Voting
+        get() = mockSingleVoting.copy(isMultipleChoice = true)
 }
