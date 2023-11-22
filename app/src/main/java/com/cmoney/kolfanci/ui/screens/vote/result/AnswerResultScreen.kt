@@ -21,6 +21,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
+import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.destinations.AnswererScreenDestination
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
@@ -33,15 +35,13 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun AnswerResultScreen(
     modifier: Modifier = Modifier,
-    navController: DestinationsNavigator
+    navController: DestinationsNavigator,
+    voting: Voting
 ) {
     AnswerResultScreenView(
-        question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-        choiceItem = listOf(
-            "日本" to 10,
-            "紐約" to 25,
-            "夏威夷" to 65
-        ),
+        modifier = modifier,
+        question = voting.title.orEmpty(),
+        choiceItem = voting.votingOptionStatistics.orEmpty(),
         onBackClick = {
             navController.popBackStack()
         },
@@ -55,14 +55,14 @@ fun AnswerResultScreen(
  *
  * @param onBackClick 返回callback
  * @param question 問題
- * @param choiceItem 題目清單, first -> 選項 title, second > 幾個人投
+ * @param choiceItem 題目清單
  */
 @Composable
 private fun AnswerResultScreenView(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     question: String,
-    choiceItem: List<Pair<String, Int>>,
+    choiceItem: List<IVotingOptionStatistics>,
     onItemClick: () -> Unit
 ) {
     Scaffold(
@@ -114,8 +114,8 @@ private fun AnswerResultScreenView(
                 items(choiceItem) { item ->
 
                     QuestionResultItem(
-                        choice = item.first,
-                        count = item.second,
+                        choice = item.text.orEmpty(),
+                        count = item.voteCount ?: 0,
                         onClick = {
                             onItemClick.invoke()
                         }
@@ -218,9 +218,18 @@ fun AnswerResultScreenPreview() {
         AnswerResultScreenView(
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choiceItem = listOf(
-                "日本" to 10,
-                "紐約" to 25,
-                "夏威夷" to 65
+                IVotingOptionStatistics(
+                    text = "日本",
+                    voteCount = 10
+                ),
+                IVotingOptionStatistics(
+                    text = "紐約",
+                    voteCount = 25
+                ),
+                IVotingOptionStatistics(
+                    text = "夏威夷",
+                    voteCount = 65
+                )
             ),
             onBackClick = {
             },

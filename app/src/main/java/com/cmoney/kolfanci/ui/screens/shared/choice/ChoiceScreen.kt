@@ -49,9 +49,13 @@ fun ChoiceScreen(
                 modifier = modifier,
                 question = voting.title.orEmpty(),
                 choices = voting.votingOptionStatistics?.toPercentageList() ?: emptyList(),
-                isShowResultText = isMyPost,
+                isShowResultText = true,
                 onResultClick = {
-                    navController.navigate(AnswerResultScreenDestination)
+                    navController.navigate(
+                        AnswerResultScreenDestination(
+                            voting
+                        )
+                    )
                 }
             )
         } else {
@@ -61,13 +65,17 @@ fun ChoiceScreen(
                     modifier = modifier,
                     question = voting.title.orEmpty(),
                     choices = voting.votingOptionStatistics.orEmpty(),
-                    isShowResultText = true,
+                    isShowResultText = isMyPost,
                     onConfirm = {
                         showVoteResult = true
                         onVotingClick.invoke(voting, it)
                     },
                     onResultClick = {
-                        navController.navigate(AnswerResultScreenDestination)
+                        navController.navigate(
+                            AnswerResultScreenDestination(
+                                voting
+                            )
+                        )
                     }
                 )
             } else {
@@ -82,7 +90,11 @@ fun ChoiceScreen(
                     },
                     isShowResultText = isMyPost,
                     onResultClick = {
-                        navController.navigate(AnswerResultScreenDestination)
+                        navController.navigate(
+                            AnswerResultScreenDestination(
+                                voting
+                            )
+                        )
                     }
                 )
             }
