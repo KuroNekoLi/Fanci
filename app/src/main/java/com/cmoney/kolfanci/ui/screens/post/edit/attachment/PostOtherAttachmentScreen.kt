@@ -110,7 +110,7 @@ fun PostOtherAttachmentScreen(
                                     .height(75.dp),
                                 voteModel = voteModel,
                                 isItemClickable = voteModel.id.isEmpty(),
-                                isItemCanDelete = voteModel.id.isEmpty(),
+                                isItemCanDelete = true,
                                 onClick = {
                                     onClick.invoke(attachmentInfoItem)
                                 },

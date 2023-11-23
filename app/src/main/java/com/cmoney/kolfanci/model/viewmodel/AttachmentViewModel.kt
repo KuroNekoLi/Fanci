@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.extension.getAttachmentType
 import com.cmoney.kolfanci.extension.toUploadFileItem
 import com.cmoney.kolfanci.extension.toUploadFileItemMap
@@ -406,5 +407,39 @@ class AttachmentViewModel(
 
     fun setDataInitFinish() {
         _setInitDataSuccess.update { true }
+    }
+
+    /**
+     * 刪除多餘的投票
+     *
+     * @param channelId 頻道 id
+     * @param oldVoting 原本的投票 List
+     */
+    fun deleteVotingCheck(
+        channelId: String,
+        oldVoting: List<Voting>
+    ) {
+        KLog.i(TAG, "deleteVotingCheck:$channelId")
+
+        viewModelScope.launch {
+            val newVoting = _attachmentList.value.filter {
+                it.first == AttachmentType.Choice && (it.second.other is VoteModel)
+            }.map {
+                (it.second.other as VoteModel).id
+            }
+
+            val deleteItem = oldVoting.filter {
+                !newVoting.contains(it.id.toString())
+            }
+
+            voteUseCase.deleteVote(
+                channelId = channelId,
+                voteIds = deleteItem.map { it.id ?: 0 }
+            ).onSuccess {
+                KLog.i(TAG, it)
+            }.onFailure {
+                KLog.e(TAG, it)
+            }
+        }
     }
 }

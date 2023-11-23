@@ -211,6 +211,12 @@ fun EditPostScreen(
         onPostClick = {
             AppUserLogger.getInstance().log(Clicked.PostPublish)
             isLoading = true
+
+            attachmentViewModel.deleteVotingCheck(
+                channelId,
+                editPost?.votings.orEmpty()
+            )
+
             attachmentViewModel.upload(
                 channelId = channelId,
                 other = inputContent
