@@ -106,6 +106,10 @@ fun MediaPickerBottomSheet(
         mutableStateOf(false)
     }
 
+    var showCreateVote by remember {
+        mutableStateOf(false)
+    }
+
     var showAlertDialog: Pair<String, String>? by remember {
         mutableStateOf(null)
     }
@@ -160,7 +164,16 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onChoiceClick = {
-                    navController.navigate(CreateChoiceQuestionScreenDestination())
+                    viewModel.choiceVoteCheck(
+                        selectedAttachment = selectedAttachment,
+                        attachmentEnv = attachmentEnv,
+                        onOpen = {
+                            showCreateVote = true
+                        },
+                        onError = { title, desc ->
+                            showAlertDialog = Pair(title, desc)
+                        }
+                    )
                 }
             )
         }
@@ -233,6 +246,12 @@ fun MediaPickerBottomSheet(
             }
         )
     }
+
+    if (showCreateVote) {
+        showCreateVote = false
+        navController.navigate(CreateChoiceQuestionScreenDestination())
+    }
+
     //========== show all picker end==========
 }
 

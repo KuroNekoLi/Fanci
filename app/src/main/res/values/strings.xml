@@ -328,4 +328,6 @@
     <string name="vote_question_error">請輸入問題文字</string>
     <string name="vote_choice_error">至少輸入二個選項</string>
 
+    <string name="chat_attachment_limit">無法同時上多種檔案</string>
+    <string name="chat_attachment_limit_text">若需要多種檔案\n請分成多則訊息</string>
 </resources>
