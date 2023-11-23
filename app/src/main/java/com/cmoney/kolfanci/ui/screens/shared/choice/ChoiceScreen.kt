@@ -25,12 +25,14 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 /**
  * 選擇題 呈現畫面, 單選題 or 多選題 or 已經投過票
  *
+ * @param channelId 頻道 id
  * @param votings 選擇題
  * @param isMyPost 是否為自己的發文
  * @param onVotingClick 點擊投票
  */
 @Composable
 fun ChoiceScreen(
+    channelId: String,
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     votings: List<Voting>,
@@ -53,7 +55,8 @@ fun ChoiceScreen(
                 onResultClick = {
                     navController.navigate(
                         AnswerResultScreenDestination(
-                            voting
+                            channelId = channelId,
+                            voting = voting
                         )
                     )
                 }
@@ -73,7 +76,8 @@ fun ChoiceScreen(
                     onResultClick = {
                         navController.navigate(
                             AnswerResultScreenDestination(
-                                voting
+                                channelId = channelId,
+                                voting = voting
                             )
                         )
                     }
@@ -92,7 +96,8 @@ fun ChoiceScreen(
                     onResultClick = {
                         navController.navigate(
                             AnswerResultScreenDestination(
-                                voting
+                                channelId = channelId,
+                                voting = voting
                             )
                         )
                     }
@@ -107,6 +112,7 @@ fun ChoiceScreen(
 fun ChoiceScreenPreview() {
     FanciTheme {
         ChoiceScreen(
+            channelId = "",
             navController = EmptyDestinationsNavigator,
             votings = listOf(MockData.mockSingleVoting),
             isMyPost = true,

@@ -122,9 +122,6 @@ fun BasePostContentScreen(
         mutableStateOf(false)
     }
 
-    //TODO: test data
-    val post = MockData.mockBulletinboardMessageWrapper.message
-
     Column(
         modifier = modifier
             .background(backgroundColor)
@@ -220,6 +217,7 @@ fun BasePostContentScreen(
                 Spacer(modifier = Modifier.height(15.dp))
 
                 ChoiceScreen(
+                    channelId = channelId,
                     navController = navController,
                     votings = votings,
                     isMyPost = (post.author?.id == Constant.MyInfo?.id),

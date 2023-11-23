@@ -7,6 +7,7 @@ import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.User
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.RelationUseCase
@@ -140,12 +141,17 @@ class ChatRoomViewModel(
     fun fetchChannelPermission(channel: Channel) {
         KLog.i(TAG, "fetchChannelPermission:" + channel.id)
         viewModelScope.launch {
-            permissionUseCase.updateChannelPermissionAndBuff(channelId = channel.id.orEmpty())
-                .fold({
-                    _updatePermissionDone.value = channel
-                }, {
-                    KLog.e(TAG, it)
-                })
+            if (Constant.isOpenMock) {
+                _updatePermissionDone.value = channel
+            }
+            else {
+                permissionUseCase.updateChannelPermissionAndBuff(channelId = channel.id.orEmpty())
+                    .fold({
+                        _updatePermissionDone.value = channel
+                    }, {
+                        KLog.e(TAG, it)
+                    })
+            }
         }
     }
 

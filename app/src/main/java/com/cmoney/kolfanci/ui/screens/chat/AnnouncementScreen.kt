@@ -30,6 +30,7 @@ const val AnnounceBundleKey = "AnnounceBundleKey"
 @Destination
 @Composable
 fun AnnouncementScreen(
+    channelId: String,
     navigator: DestinationsNavigator,
     message: ChatMessage,
     resultBackNavigator: ResultBackNavigator<ChatMessage>
@@ -52,6 +53,7 @@ fun AnnouncementScreen(
             verticalArrangement = Arrangement.Bottom
         ) {
             MessageContentScreen(
+                channelId = channelId,
                 chatMessageWrapper = ChatMessageWrapper(message),
                 modifier = Modifier
                     .weight(1f),
@@ -107,6 +109,7 @@ fun AnnouncementScreen(
 fun AnnouncementScreenPreview() {
     FanciTheme {
         AnnouncementScreen(
+            channelId = "",
             EmptyDestinationsNavigator,
             MockData.mockMessage,
             resultBackNavigator = EmptyResultBackNavigator())

@@ -366,7 +366,8 @@ fun ChatRoomScreen(
     routeAnnounceMessage?.apply {
         navController.navigate(
             AnnouncementScreenDestination(
-                this
+                message = this,
+                channelId = channelId
             )
         )
         messageViewModel.announceRouteDone()

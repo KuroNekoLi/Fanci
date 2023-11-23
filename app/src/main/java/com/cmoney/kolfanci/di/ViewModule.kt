@@ -57,9 +57,7 @@ val viewModule = module {
             androidApplication(),
             get(),
             get(),
-            get(),
-            musicServiceConnection = get(),
-            voteUseCase = get()
+            get()
         )
     }
     viewModel { DiscoverViewModel(get()) }
@@ -121,7 +119,6 @@ val viewModule = module {
     }
     viewModel {
         ChannelViewModel(
-            channelUseCase = get(),
             notificationUseCase = get()
         )
     }

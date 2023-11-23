@@ -111,6 +111,7 @@ sealed class MessageContentCallback {
 fun MessageContentScreen(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
+    channelId: String,
     chatMessageWrapper: ChatMessageWrapper,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onMessageContentCallback: (MessageContentCallback) -> Unit,
@@ -326,6 +327,7 @@ fun MessageContentScreen(
                     //投票
                     messageModel.votings?.let { votes ->
                         ChoiceScreen(
+                            channelId = channelId,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 40.dp),
@@ -613,6 +615,7 @@ fun MediaContent(
 fun MessageContentScreenPreview() {
     FanciTheme {
         MessageContentScreen(
+            channelId = "",
             chatMessageWrapper = ChatMessageWrapper(
                 message = MockData.mockMessage,
                 uploadAttachPreview = listOf(

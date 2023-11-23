@@ -92,6 +92,7 @@ fun MessageScreen(
         MessageScreenView(
             navController = navController,
             modifier = modifier,
+            channelId = channelId,
             message = message,
             blockingList = blockingList.map {
                 it.id.orEmpty()
@@ -148,6 +149,7 @@ fun MessageScreen(
 private fun MessageScreenView(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
+    channelId: String,
     message: List<ChatMessageWrapper>,
     blockingList: List<String>,
     blockerList: List<String>,
@@ -182,11 +184,8 @@ private fun MessageScreenView(
                     }
 
                     MessageContentScreen(
+                        channelId = channelId,
                         navController = navController,
-                        //TODO: test mock data
-//                        chatMessageWrapper = chatMessageWrapper.copy(
-//                            message = MockData.mockMessage
-//                        ),
                         chatMessageWrapper = chatMessageWrapper.copy(
                             isBlocking = isBlocking,
                             isBlocker = isBlocker
@@ -327,7 +326,8 @@ fun MessageScreenPreview() {
             onReSendClick = {},
             scrollToPosition = null,
             navController = EmptyDestinationsNavigator,
-            onVotingClick = {}
+            onVotingClick = {},
+            channelId = ""
         )
     }
 }

@@ -17,20 +17,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 選擇題 - 答題者 清單
+ *
+ * @param channelId 頻道id
+ * @param iVotingOptionStatisticsWithVoter 投票選項 model
  */
 @Destination
 @Composable
-fun AnswererScreen(modifier: Modifier = Modifier) {
+fun AnswererScreen(
+    modifier: Modifier = Modifier,
+    channelId: String,
+    iVotingOptionStatisticsWithVoter: IVotingOptionStatisticsWithVoter,
+    viewModel: VoteViewModel = koinViewModel()
+) {
     AnswererScreenView(
         modifier = modifier,
         questionItem = "日本 \uD83D\uDDFC （10票）",

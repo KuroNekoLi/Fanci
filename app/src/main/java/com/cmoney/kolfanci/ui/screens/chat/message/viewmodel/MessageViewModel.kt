@@ -24,8 +24,6 @@ import com.cmoney.kolfanci.model.remoteconfig.PollingFrequencyKey
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
-import com.cmoney.kolfanci.model.usecase.VoteUseCase
-import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
@@ -55,9 +53,7 @@ class MessageViewModel(
     val context: Application,
     private val chatRoomUseCase: ChatRoomUseCase,
     private val chatRoomPollUseCase: ChatRoomPollUseCase,
-    private val permissionUseCase: PermissionUseCase,
-    private val musicServiceConnection: MusicServiceConnection,
-    private val voteUseCase: VoteUseCase
+    private val permissionUseCase: PermissionUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
@@ -144,7 +140,9 @@ class MessageViewModel(
                         MessageUtils.defineMessageType(chatMessageWrapper)
                     })
 
-                    startPolling(channelId = channelId)
+                    if (!Constant.isOpenMock) {
+                        startPolling(channelId = channelId)
+                    }
 
                 }.onFailure { e ->
                     KLog.e(TAG, e)

@@ -14,6 +14,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,18 +29,29 @@ import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.destinations.AnswererScreenDestination
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
+/**
+ * 答題結果頁面
+ */
 @Destination
 @Composable
 fun AnswerResultScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    voting: Voting
+    channelId: String,
+    voting: Voting,
+    voteViewModel: VoteViewModel = koinViewModel()
 ) {
+    val voteResultInfo by voteViewModel.voteResultInfo.collectAsState()
+
+    val closeVoteSuccess by voteViewModel.closeVoteSuccess.collectAsState()
+
     AnswerResultScreenView(
         modifier = modifier,
         question = voting.title.orEmpty(),
@@ -45,10 +59,38 @@ fun AnswerResultScreen(
         onBackClick = {
             navController.popBackStack()
         },
-        onItemClick = {
-            navController.navigate(AnswererScreenDestination)
+        onItemClick = { clickItem ->
+            voteResultInfo.firstOrNull {
+                it.optionId == clickItem.optionId
+            }?.apply {
+                navController.navigate(
+                    AnswererScreenDestination(
+                        channelId = channelId,
+                        iVotingOptionStatisticsWithVoter = this
+                    )
+                )
+            }
+        },
+        onCloseVoteClick = {
+            voteViewModel.closeVote(
+                votingId = voting.id ?: 0,
+                channelId = channelId
+            )
         }
     )
+
+    LaunchedEffect(key1 = closeVoteSuccess) {
+        if (closeVoteSuccess) {
+            navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        voteViewModel.fetchVoteChoiceInfo(
+            votingId = voting.id ?: 0,
+            channelId = channelId
+        )
+    }
 }
 
 /**
@@ -63,7 +105,8 @@ private fun AnswerResultScreenView(
     onBackClick: () -> Unit,
     question: String,
     choiceItem: List<IVotingOptionStatistics>,
-    onItemClick: () -> Unit
+    onItemClick: (IVotingOptionStatistics) -> Unit,
+    onCloseVoteClick: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -110,14 +153,12 @@ private fun AnswerResultScreenView(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
-
                 items(choiceItem) { item ->
-
                     QuestionResultItem(
                         choice = item.text.orEmpty(),
                         count = item.voteCount ?: 0,
                         onClick = {
-                            onItemClick.invoke()
+                            onItemClick.invoke(item)
                         }
                     )
                 }
@@ -130,7 +171,7 @@ private fun AnswerResultScreenView(
                     .height(46.dp)
                     .background(LocalColor.current.background)
                     .clickable {
-
+                        onCloseVoteClick.invoke()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -231,9 +272,9 @@ fun AnswerResultScreenPreview() {
                     voteCount = 65
                 )
             ),
-            onBackClick = {
-            },
-            onItemClick = {}
+            onBackClick = {},
+            onItemClick = {},
+            onCloseVoteClick = {}
         )
     }
 }

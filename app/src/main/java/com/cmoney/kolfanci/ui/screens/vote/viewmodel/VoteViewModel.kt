@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.ui.screens.vote.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.usecase.VoteUseCase
 import com.cmoney.kolfanci.model.vote.VoteModel
@@ -14,7 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class VoteViewModel(val context: Application, private val voteUseCase: VoteUseCase) : AndroidViewModel(context) {
+class VoteViewModel(val context: Application, private val voteUseCase: VoteUseCase) :
+    AndroidViewModel(context) {
     private val TAG = VoteViewModel::class.java.simpleName
 
     //問題
@@ -36,6 +38,15 @@ class VoteViewModel(val context: Application, private val voteUseCase: VoteUseCa
     //建立投票 model
     private val _voteModel = MutableStateFlow<VoteModel?>(null)
     val voteModel = _voteModel.asStateFlow()
+
+    //投票結果
+    private val _voteResultInfo =
+        MutableStateFlow<List<IVotingOptionStatisticsWithVoter>>(emptyList())
+    val voteResultInfo = _voteResultInfo.asStateFlow()
+
+    //完成結束投票
+    private val _closeVoteSuccess = MutableStateFlow<Boolean>(false)
+    val closeVoteSuccess = _closeVoteSuccess.asStateFlow()
 
     //最大選項數量
     private val MAX_COICE_COUNT = 5
@@ -180,6 +191,47 @@ class VoteViewModel(val context: Application, private val voteUseCase: VoteUseCa
                 KLog.i(TAG, "voteQuestion onSuccess")
             }.onFailure {
                 KLog.e(TAG, it)
+            }
+        }
+    }
+
+    /**
+     * 取得 投票 目前結果
+     */
+    fun fetchVoteChoiceInfo(
+        votingId: Long,
+        channelId: String
+    ) {
+        KLog.i(TAG, "fetchVoteChoiceMember")
+        viewModelScope.launch {
+            voteUseCase.summaryVote(
+                channelId = channelId,
+                votingId = votingId
+            ).onSuccess {
+                _voteResultInfo.value = it
+            }.onFailure {
+                KLog.e(TAG, it)
+            }
+        }
+    }
+
+    /**
+     * 結束投票
+     *
+     * @param votingId 投票 id
+     * @param channelId 頻道 id
+     */
+    fun closeVote(
+        votingId: Long,
+        channelId: String
+    ) {
+        KLog.i(TAG, "closeVote")
+        viewModelScope.launch {
+            voteUseCase.closeVote(
+                votingId = votingId,
+                channelId = channelId
+            ).onSuccess {
+                _closeVoteSuccess.value = true
             }
         }
     }

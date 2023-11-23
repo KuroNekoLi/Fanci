@@ -26,6 +26,8 @@ import com.cmoney.fanciapi.fanci.model.RoleParam
 import com.cmoney.fanciapi.fanci.model.UpdateIsNeedApprovalParam
 import com.cmoney.fanciapi.fanci.model.UseridsParam
 import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -520,9 +522,19 @@ class GroupUseCase(
      */
     suspend fun groupToSelectGroupItem() =
         kotlin.runCatching {
-            getMyJoinGroup().getOrNull()?.items?.mapIndexed { index, group ->
-                GroupItem(group, index == 0)
-            }.orEmpty()
+            if (Constant.isOpenMock) {
+                listOf(
+                    MockData.mockGroup,
+                    MockData.mockGroup,
+                    MockData.mockGroup
+                ).mapIndexed { index, group ->
+                    GroupItem(group, index == 0)
+                }
+            } else {
+                getMyJoinGroup().getOrNull()?.items?.mapIndexed { index, group ->
+                    GroupItem(group, index == 0)
+                }.orEmpty()
+            }
         }
 
     /**

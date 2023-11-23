@@ -6,6 +6,7 @@ import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.api.UserReportApi
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.ChatMessagePaging
 import com.cmoney.fanciapi.fanci.model.ChatMessageParam
 import com.cmoney.fanciapi.fanci.model.EmojiParam
 import com.cmoney.fanciapi.fanci.model.Emojis
@@ -15,9 +16,11 @@ import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.ReportParm
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
+import com.cmoney.kolfanci.model.mock.MockData
 import com.socks.library.KLog
 
 
@@ -208,11 +211,17 @@ class ChatRoomUseCase(
         order: OrderType = OrderType.latest
     ) =
         kotlin.runCatching {
-            chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
-                chatRoomChannelId = chatRoomChannelId,
-                fromSerialNumber = fromSerialNumber,
-                order = order
-            ).checkResponseBody()
+            if (Constant.isOpenMock) {
+                ChatMessagePaging(
+                    items = MockData.mockListMessage
+                )
+            } else {
+                chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
+                    chatRoomChannelId = chatRoomChannelId,
+                    fromSerialNumber = fromSerialNumber,
+                    order = order
+                ).checkResponseBody()
+            }
         }
 
     /**

@@ -111,7 +111,7 @@ class VoteUseCase(
 
 
     /**
-     * 投票 統計
+     * 取得 投票 統計
      *
      * @param channelId 頻道 id
      * @param votingId 投票 id

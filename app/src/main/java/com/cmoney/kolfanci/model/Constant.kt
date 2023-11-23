@@ -5,12 +5,16 @@ import com.cmoney.fanciapi.fanci.model.ChannelPermission
 import com.cmoney.fanciapi.fanci.model.GroupPermission
 import com.cmoney.fanciapi.fanci.model.User
 import com.cmoney.fanciapi.fanci.model.UserBuffInformation
+import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.R
 import com.cmoney.remoteconfig_library.IRemoteConfig
 import com.cmoney.remoteconfig_library.model.config.AppStatus
 import org.koin.core.context.GlobalContext
 
 object Constant {
+
+    //是否開啟 Mock 模式 (ex: server 壞掉下還可以使用)
+    val isOpenMock = (true && BuildConfig.DEBUG)
 
     //我的個人資訊
     var MyInfo: User? = null
