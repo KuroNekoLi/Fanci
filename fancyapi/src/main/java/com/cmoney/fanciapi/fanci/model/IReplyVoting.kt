@@ -21,18 +21,23 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 投票選項
+ * 
  *
- * @param text 選項描述
+ * @param id 投票活動Id
+ * @param title 標題
  */
 @Parcelize
 
 
-data class IVotingOption (
+data class IReplyVoting (
 
-    /* 選項描述 */
-    @Json(name = "text")
-    val text: kotlin.String? = null
+    /* 投票活動Id */
+    @Json(name = "id")
+    val id: kotlin.Long? = null,
+
+    /* 標題 */
+    @Json(name = "title")
+    val title: kotlin.String? = null
 
 ) : Parcelable
 

@@ -16,6 +16,7 @@
 package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IReplyVoting
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 
 import com.squareup.moshi.Json
@@ -28,6 +29,7 @@ import kotlinx.parcelize.Parcelize
  * @param id 
  * @param author 
  * @param content 
+ * @param replyVotings 回復文章包含的投票活動
  * @param isDeleted 是否刪除
  */
 @Parcelize
@@ -43,6 +45,10 @@ data class IReplyMessage (
 
     @Json(name = "content")
     val content: MediaIChatContent? = null,
+
+    /* 回復文章包含的投票活動 */
+    @Json(name = "replyVotings")
+    val replyVotings: kotlin.collections.List<IReplyVoting>? = null,
 
     /* 是否刪除 */
     @Json(name = "isDeleted")

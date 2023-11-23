@@ -32,20 +32,20 @@ import kotlinx.parcelize.Parcelize
  * 訊息
  *
  * @param author 
+ * @param replyMessage 
  * @param content 
+ * @param votings 
  * @param emojiCount 
  * @param id 
  * @param isDeleted 是否刪除
  * @param createUnixTime 
  * @param updateUnixTime 
  * @param serialNumber 
+ * @param messageFromType 
  * @param messageReaction 
  * @param deleteStatus 
  * @param deleteFrom 
  * @param commentCount 
- * @param replyMessage 
- * @param votings 
- * @param messageFromType 
  */
 @Parcelize
 
@@ -55,8 +55,14 @@ data class ChatMessage (
     @Json(name = "author")
     val author: GroupMember? = null,
 
+    @Json(name = "replyMessage")
+    val replyMessage: IReplyMessage? = null,
+
     @Json(name = "content")
     val content: MediaIChatContent? = null,
+
+    @Json(name = "votings")
+    val votings: kotlin.collections.List<Voting>? = null,
 
     @Json(name = "emojiCount")
     val emojiCount: IEmojiCount? = null,
@@ -77,6 +83,9 @@ data class ChatMessage (
     @Json(name = "serialNumber")
     val serialNumber: kotlin.Long? = null,
 
+    @Json(name = "messageFromType")
+    val messageFromType: MessageServiceType? = null,
+
     @Json(name = "messageReaction")
     val messageReaction: IUserMessageReaction? = null,
 
@@ -87,16 +96,7 @@ data class ChatMessage (
     val deleteFrom: GroupMember? = null,
 
     @Json(name = "commentCount")
-    val commentCount: kotlin.Int? = null,
-
-    @Json(name = "replyMessage")
-    val replyMessage: IReplyMessage? = null,
-
-    @Json(name = "votings")
-    val votings: kotlin.collections.List<Voting>? = null,
-
-    @Json(name = "messageFromType")
-    val messageFromType: MessageServiceType? = null
+    val commentCount: kotlin.Int? = null
 
 ) : Parcelable
 

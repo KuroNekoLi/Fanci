@@ -8207,8 +8207,18 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
+          },
+          "votings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Voting"
+            },
+            "nullable": true
           },
           "emojiCount": {
             "$ref": "#/components/schemas/IEmojiCount"
@@ -8233,6 +8243,9 @@
             "type": "integer",
             "format": "int64"
           },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
+          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -8245,19 +8258,6 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
-          },
-          "replyMessage": {
-            "$ref": "#/components/schemas/IReplyMessage"
-          },
-          "votings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Voting"
-            },
-            "nullable": true
-          },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false,
@@ -9099,9 +9099,33 @@
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
           },
+          "replyVotings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IReplyVoting"
+            },
+            "description": "回復文章包含的投票活動",
+            "nullable": true
+          },
           "isDeleted": {
             "type": "boolean",
             "description": "是否刪除"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IReplyVoting": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "投票活動Id",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string",
+            "description": "標題",
+            "nullable": true
           }
         },
         "additionalProperties": false
