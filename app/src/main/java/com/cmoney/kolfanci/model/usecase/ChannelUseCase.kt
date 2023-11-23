@@ -5,17 +5,7 @@ import com.cmoney.fanciapi.fanci.api.CategoryApi
 import com.cmoney.fanciapi.fanci.api.ChannelApi
 import com.cmoney.fanciapi.fanci.api.ChannelTabApi
 import com.cmoney.fanciapi.fanci.api.GroupApi
-import com.cmoney.fanciapi.fanci.model.AccessorParam
-import com.cmoney.fanciapi.fanci.model.CategoryParam
-import com.cmoney.fanciapi.fanci.model.ChannelAuthType
-import com.cmoney.fanciapi.fanci.model.ChannelParam
-import com.cmoney.fanciapi.fanci.model.ChannelPrivacy
-import com.cmoney.fanciapi.fanci.model.ChannelTabType
-import com.cmoney.fanciapi.fanci.model.ChannelTabsSortParam
-import com.cmoney.fanciapi.fanci.model.EditChannelParam
-import com.cmoney.fanciapi.fanci.model.GetWhiteListCountParam
-import com.cmoney.fanciapi.fanci.model.PutWhiteListRequest
-import com.cmoney.fanciapi.fanci.model.RoleIdsParam
+import com.cmoney.fanciapi.fanci.model.*
 import com.cmoney.kolfanci.extension.checkResponseBody
 
 class ChannelUseCase(
@@ -25,6 +15,14 @@ class ChannelUseCase(
     private val buffInformationApi: BuffInformationApi,
     private val channelTabApi: ChannelTabApi
 ) {
+
+    /**
+     * 取得User在此頻道 的狀態
+     */
+    suspend fun getChannelBuffer(channelId: String) = kotlin.runCatching {
+        buffInformationApi.apiV1BuffInformationChannelChannelIdMeGet(channelId = channelId)
+            .checkResponseBody()
+    }
 
     /**
      * 取得頻道 tab order
@@ -52,14 +50,6 @@ class ChannelUseCase(
                 channelTabsSortParam = channelTabsSortParam
             )
         }
-
-    /**
-     * 取得User在此頻道 的狀態
-     */
-    suspend fun getChannelBuffer(channelId: String) = kotlin.runCatching {
-        buffInformationApi.apiV1BuffInformationChannelChannelIdMeGet(channelId = channelId)
-            .checkResponseBody()
-    }
 
     /**
      * 取得 私密頻道 不重複用戶總數

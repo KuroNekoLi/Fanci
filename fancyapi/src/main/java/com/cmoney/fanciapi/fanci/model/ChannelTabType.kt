@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 頻道類型列舉
  *
  * Values: chatRoom,bulletinboard
  */

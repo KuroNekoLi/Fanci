@@ -1,7 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.post.info
 
 import android.net.Uri
-import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,9 +22,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -64,13 +67,20 @@ import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.usecase.AttachmentController
+import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.ReplyText
 import com.cmoney.kolfanci.ui.common.ReplyTitleText
 import com.cmoney.kolfanci.ui.destinations.BaseEditMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
-import com.cmoney.kolfanci.ui.screens.chat.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
+import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.BaseDeletedContentScreen
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
@@ -78,44 +88,37 @@ import com.cmoney.kolfanci.ui.screens.post.dialog.PostInteract
 import com.cmoney.kolfanci.ui.screens.post.dialog.PostMoreActionType
 import com.cmoney.kolfanci.ui.screens.post.dialog.ReportPostDialogScreenScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.BaseEditMessageScreenResult
+import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
+import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.AttachmentEnv
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
-import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-import kotlinx.parcelize.Parcelize
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-
-@Parcelize
-data class PostInfoScreenResult(
-    val post: BulletinboardMessage,
-    val action: PostInfoAction = PostInfoAction.Default
-) : Parcelable {
-    @Parcelize
-    sealed class PostInfoAction : Parcelable {
-        object Default : PostInfoAction()
-        object Pin : PostInfoAction()
-        object Delete : PostInfoAction()
-    }
-}
 
 /**
  * 貼文 詳細資訊
  */
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Destination
 @Composable
 fun PostInfoScreen(
@@ -129,6 +132,12 @@ fun PostInfoScreen(
             parametersOf(post, channel)
         }
     ),
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
+        }
+    ),
+    attachmentViewModel: AttachmentViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<PostInfoScreenResult>,
     editResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     editCommentReplyRecipient: ResultRecipient<BaseEditMessageScreenDestination, BaseEditMessageScreenResult>
@@ -138,6 +147,54 @@ fun PostInfoScreen(
 
     LaunchedEffect(key1 = Unit) {
         AppUserLogger.getInstance().log(Page.PostInnerPage)
+    }
+
+    //附加檔案
+    val attachmentList by attachmentViewModel.attachmentList.collectAsState()
+    val attachment by attachmentViewModel.attachment.collectAsState()
+
+    //控制 BottomSheet 附加檔案
+    val state = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val coroutineScope = rememberCoroutineScope()
+
+    //是否只有圖片選擇
+    val isOnlyPhotoSelector by attachmentViewModel.isOnlyPhotoSelector.collectAsState()
+
+    //是否呈現上傳中畫面
+    var isShowLoading by remember { mutableStateOf(false) }
+
+    //是否全部File上傳完成
+    val attachmentUploadFinish by attachmentViewModel.uploadComplete.collectAsState()
+
+    //有上傳失敗的檔案
+    val hasUploadFailedFile by attachmentViewModel.uploadFailed.collectAsState()
+
+    //User 輸入內容
+    var inputContent by remember {
+        mutableStateOf("")
+    }
+
+    //resend file
+    var reSendFileClick by remember {
+        mutableStateOf<ReSendFile?>(null)
+    }
+
+    //附加檔案上傳完成
+    if (attachmentUploadFinish.first) {
+        isShowLoading = false
+        val text = attachmentUploadFinish.second?.toString().orEmpty()
+
+        viewModel.onCommentReplySend(text, attachmentList)
+
+        attachmentViewModel.finishPost()
+    }
+
+    //是否訊息發送完成
+    val isSendComplete by viewModel.isSendComplete.collectAsState()
+
+    //發送完成, 清空附加檔案暫存
+    if (isSendComplete) {
+        attachmentViewModel.clear()
     }
 
     var showPostDeleteTip by remember {
@@ -189,12 +246,6 @@ fun PostInfoScreen(
     //貼文資料
     val postData by viewModel.post.collectAsState()
 
-    //是否打開 圖片選擇
-    var openImagePickDialog by remember { mutableStateOf(false) }
-
-    //目前所選,附加圖片
-    val imageAttachList by viewModel.imageAttach.collectAsState()
-
     //留言資料
     val comments by viewModel.comment.collectAsState()
 
@@ -232,7 +283,11 @@ fun PostInfoScreen(
         override fun onCommentSend(text: String) {
             AppUserLogger.getInstance().log(Clicked.CommentSendButton)
             if (Constant.isCanReply()) {
-                viewModel.onCommentReplySend(text)
+                isShowLoading = true
+                inputContent = text
+                attachmentViewModel.upload(
+                    other = text
+                )
                 keyboard?.hide()
             }
         }
@@ -247,11 +302,9 @@ fun PostInfoScreen(
 
         override fun onAttachClick() {
             AppUserLogger.getInstance().log(Clicked.CommentInsertImage)
-            openImagePickDialog = true
-        }
-
-        override fun onDeleteAttach(uri: Uri) {
-            viewModel.onDeleteAttach(uri)
+            coroutineScope.launch {
+                state.show()
+            }
         }
 
         override fun onCommentEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
@@ -299,6 +352,8 @@ fun PostInfoScreen(
                             KLog.i(TAG, "PostInteract.Report click.")
                             showReportTip = Pair(true, post)
                         }
+
+                        else -> {}
                     }
                 }
             )
@@ -375,6 +430,8 @@ fun PostInfoScreen(
                             AppUserLogger.getInstance().log(Clicked.CommentReportComment)
                             showReportTip = Pair(true, comment)
                         }
+
+                        else -> {}
                     }
                 }
             )
@@ -422,37 +479,69 @@ fun PostInfoScreen(
                             AppUserLogger.getInstance().log(Clicked.CommentReportReply)
                             showReportTip = Pair(true, reply)
                         }
+
+                        else -> {}
                     }
                 }
             )
         }
     }
 
+    //是否開啟底部音樂播放器
+    val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
+
+    //是否show audio mini player icon
+    val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
+
+    //音樂是否正在播放中
+    val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
+
     PostInfoScreenView(
         modifier = modifier,
+        navController = navController,
         post = postData,
         isPinPost = isPinPost,
-        imageAttachList = imageAttachList,
+        attachment = attachmentList,
         comments = comments,
         commentReply = commentReply,
         showLoading = (uiState == UiState.ShowLoading),
         replyMapData = replyMapData.toMap(),
         postInfoListener = postInfoListener,
         commentBottomContentListener = commentBottomContentListener,
-        inputText = inputText
+        inputText = inputText,
+        isShowAudioMiniIcon = isShowAudioMiniIcon,
+        isAudioPlaying = isAudioPlaying,
+        isOpenBottomAudioPlayer = isOpenBottomAudioPlayer,
+        isShowLoading = isShowLoading,
+        onDeleteAttach = {
+            attachmentViewModel.removeAttach(it)
+        },
+        onAttachImageAddClick = {
+            attachmentViewModel.onAttachImageAddClick()
+            coroutineScope.launch {
+                state.show()
+            }
+        },
+        onPreviewAttachmentClick = { uri ->
+            AttachmentController.onAttachmentClick(
+                navController = navController,
+                uri = uri,
+                context = context
+            )
+        },
+        onResend = {
+            reSendFileClick = it
+        }
     )
 
-    //圖片選擇
-    if (openImagePickDialog) {
-        PhotoPickDialogScreen(
-            onDismiss = {
-                openImagePickDialog = false
-            },
-            onAttach = {
-                openImagePickDialog = false
-                viewModel.attachImage(it)
-            }
-        )
+    //多媒體檔案選擇
+    MediaPickerBottomSheet(
+        state = state,
+        attachmentEnv = AttachmentEnv.Post,
+        selectedAttachment = attachment,
+        isOnlyPhotoSelector = isOnlyPhotoSelector
+    ) {
+        attachmentViewModel.attachment(it)
     }
 
     //編輯貼文 callback
@@ -484,6 +573,50 @@ fun PostInfoScreen(
     }
 
     //==================== 彈窗提示 ====================
+    //重新發送  彈窗
+    reSendFileClick?.let { reSendFile ->
+        val file = reSendFile.file
+        ReSendFileDialog(
+            reSendFile = reSendFile,
+            onDismiss = {
+                reSendFileClick = null
+            },
+            onRemove = {
+                attachmentViewModel.removeAttach(file)
+                reSendFileClick = null
+            },
+            onResend = {
+                attachmentViewModel.onResend(
+                    uploadFileItem = reSendFile,
+                    other = inputContent
+                )
+                reSendFileClick = null
+            }
+        )
+    }
+
+    //上傳失敗 彈窗
+    if (hasUploadFailedFile) {
+        isShowLoading = false
+        DialogScreen(
+            title = stringResource(id = R.string.chat_fail_title),
+            subTitle = stringResource(id = R.string.chat_fail_desc),
+            onDismiss = {
+                attachmentViewModel.clearUploadFailed()
+            },
+            content = {
+                BlueButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    text = stringResource(id = R.string.back)
+                ) {
+                    attachmentViewModel.clearUploadFailed()
+                }
+            }
+        )
+    }
+
     //提示 Snackbar
     toastMessage?.let {
         FanciSnackBarScreen(
@@ -624,21 +757,42 @@ fun PostInfoScreen(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
     post: BulletinboardMessage,
     isPinPost: Boolean,
-    imageAttachList: List<Uri>,
+    attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
     comments: List<BulletinboardMessage>,
     commentReply: BulletinboardMessage?,
     showLoading: Boolean,
     replyMapData: Map<String, ReplyData>,
     postInfoListener: PostInfoListener,
     commentBottomContentListener: CommentBottomContentListener,
-    inputText: String
+    inputText: String,
+    isAudioPlaying: Boolean,
+    isOpenBottomAudioPlayer: Boolean,
+    isShowLoading: Boolean,
+    onDeleteAttach: (Uri) -> Unit,
+    onAttachImageAddClick: () -> Unit,
+    onPreviewAttachmentClick: (Uri) -> Unit,
+    onResend: (ReSendFile) -> Unit,
+    isShowAudioMiniIcon: Boolean
 ) {
     val listState = rememberLazyListState()
+
+    //控制 audio BottomSheet
+    val audioPlayerState = rememberModalBottomSheetState(
+        if (isOpenBottomAudioPlayer) {
+            ModalBottomSheetValue.Expanded
+        } else {
+            ModalBottomSheetValue.Hidden
+        }
+    )
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier
@@ -664,6 +818,7 @@ private fun PostInfoScreenView(
                     //貼文
                     item {
                         BasePostContentScreen(
+                            navController = navController,
                             post = post,
                             defaultDisplayLine = Int.MAX_VALUE,
                             bottomContent = {
@@ -690,6 +845,7 @@ private fun PostInfoScreenView(
                         )
                     }
 
+                    //留言區塊
                     if (comments.isNotEmpty()) {
                         item {
                             Spacer(
@@ -742,11 +898,13 @@ private fun PostInfoScreenView(
                                 )
                             } else {
                                 BasePostContentScreen(
+                                    navController = navController,
                                     post = comment,
                                     contentModifier = Modifier.padding(start = 40.dp),
                                     hasMoreAction = true,
                                     bottomContent = {
                                         CommentBottomContent(
+                                            navController = navController,
                                             comment = comment,
                                             reply = replyMapData[comment.id],
                                             listener = commentBottomContentListener
@@ -813,18 +971,18 @@ private fun PostInfoScreenView(
                     }
                 }
 
-                //附加圖片
-                ChatRoomAttachImageScreen(
-                    modifier = Modifier
+                //附加檔案
+                PostAttachmentScreen(
+                    modifier = modifier
                         .fillMaxWidth()
+                        .padding(top = 1.dp)
                         .background(MaterialTheme.colors.primary),
-                    imageAttach = imageAttachList,
-                    onDelete = {
-                        postInfoListener.onDeleteAttach(it)
-                    },
-                    onAdd = {
-                        postInfoListener.onAttachClick()
-                    }
+                    attachment = attachment,
+                    isShowLoading = isShowLoading,
+                    onDelete = onDeleteAttach,
+                    onClick = onPreviewAttachmentClick,
+                    onAddImage = onAttachImageAddClick,
+                    onResend = onResend
                 )
 
                 //輸入匡
@@ -835,12 +993,11 @@ private fun PostInfoScreenView(
                         onMessageSend = {
                             postInfoListener.onCommentSend(it)
                         },
-                        onAttachClick = {
-                            postInfoListener.onAttachClick()
-                        },
                         showOnlyBasicPermissionTip = {
                         }
-                    )
+                    ) {
+                        postInfoListener.onAttachClick()
+                    }
                 }
             }
 
@@ -849,6 +1006,26 @@ private fun PostInfoScreenView(
                     modifier = Modifier
                         .size(45.dp),
                     color = LocalColor.current.primary
+                )
+            }
+
+            //是否有音樂播放中
+            if (isShowAudioMiniIcon) {
+                AudioMiniPlayIconScreen(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 120.dp),
+                    isPlaying = isAudioPlaying,
+                    onClick = {
+                        coroutineScope.launch {
+                            audioPlayerState.show()
+                        }
+                    }
+                )
+
+                //mini player
+                AudioBottomPlayerScreen(
+                    state = audioPlayerState
                 )
             }
         }
@@ -893,6 +1070,7 @@ private fun EmptyCommentView() {
  */
 @Composable
 private fun CommentBottomContent(
+    navController: DestinationsNavigator,
     comment: BulletinboardMessage,
     reply: ReplyData?,
     listener: CommentBottomContentListener
@@ -949,6 +1127,7 @@ private fun CommentBottomContent(
                     )
                 } else {
                     BasePostContentScreen(
+                        navController = navController,
                         post = reply,
                         defaultDisplayLine = Int.MAX_VALUE,
                         contentModifier = Modifier.padding(start = 40.dp),
@@ -1003,7 +1182,8 @@ private fun CommentBottomContent(
 fun CommentBottomContentPreview() {
     FanciTheme {
         CommentBottomContent(
-            BulletinboardMessage(),
+            navController = EmptyDestinationsNavigator,
+            comment = BulletinboardMessage(),
             reply = ReplyData(
                 emptyList(), false
             ),
@@ -1100,8 +1280,10 @@ fun CommentReplayScreenPreview() {
 fun PostInfoScreenPreview() {
     FanciTheme {
         PostInfoScreenView(
+            navController = EmptyDestinationsNavigator,
             post = PostViewModel.mockPost,
-            imageAttachList = emptyList(),
+            isPinPost = false,
+            attachment = emptyList(),
             comments = emptyList(),
             commentReply = null,
             showLoading = false,
@@ -1109,116 +1291,14 @@ fun PostInfoScreenPreview() {
             postInfoListener = EmptyPostInfoListener,
             commentBottomContentListener = EmptyCommentBottomContentListener,
             inputText = "",
-            isPinPost = false
+            isAudioPlaying = false,
+            isOpenBottomAudioPlayer = false,
+            isShowLoading = false,
+            onDeleteAttach = {},
+            onAttachImageAddClick = {},
+            onPreviewAttachmentClick = {},
+            onResend = {},
+            isShowAudioMiniIcon = false
         )
-    }
-}
-
-//==================== Callback ====================
-interface PostInfoListener {
-    fun onEmojiClick(comment: BulletinboardMessage, resourceId: Int)
-
-    //送出留言
-    fun onCommentSend(text: String)
-
-    //點擊返回
-    fun onBackClick()
-
-    //點擊附加圖片
-    fun onAttachClick()
-
-    //刪除附加圖片
-    fun onDeleteAttach(uri: Uri)
-
-    //點擊留言的 Emoji
-    fun onCommentEmojiClick(comment: BulletinboardMessage, resourceId: Int)
-
-    //關閉回覆UI
-    fun onCommentReplyClose()
-
-    //讀取更多留言
-    fun onCommentLoadMore()
-
-    //文章點擊更多
-    fun onPostMoreClick(post: BulletinboardMessage)
-}
-
-interface CommentBottomContentListener {
-    //點擊 回覆按鈕
-    fun onCommentReplyClick(comment: BulletinboardMessage)
-
-    //點擊 展開/隱藏
-    fun onExpandClick(comment: BulletinboardMessage)
-
-    //點擊 讀取更多回覆
-    fun onLoadMoreReply(comment: BulletinboardMessage)
-
-    //點擊 Emoji
-    fun onReplyEmojiClick(
-        comment: BulletinboardMessage,
-        reply: BulletinboardMessage,
-        resourceId: Int
-    )
-
-    //點擊 留言的更多
-    fun onCommentMoreActionClick(comment: BulletinboardMessage)
-
-    //點擊 回覆的更多
-    fun onReplyMoreActionClick(comment: BulletinboardMessage, reply: BulletinboardMessage)
-}
-
-object EmptyPostInfoListener : PostInfoListener {
-    override fun onEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
-    }
-
-    override fun onCommentSend(text: String) {
-    }
-
-    override fun onBackClick() {
-    }
-
-    override fun onAttachClick() {
-    }
-
-    override fun onDeleteAttach(uri: Uri) {
-    }
-
-    override fun onCommentEmojiClick(comment: BulletinboardMessage, resourceId: Int) {
-    }
-
-    override fun onCommentReplyClose() {
-    }
-
-    override fun onCommentLoadMore() {
-    }
-
-    override fun onPostMoreClick(post: BulletinboardMessage) {
-    }
-}
-
-object EmptyCommentBottomContentListener : CommentBottomContentListener {
-    override fun onCommentReplyClick(comment: BulletinboardMessage) {
-    }
-
-    override fun onExpandClick(comment: BulletinboardMessage) {
-    }
-
-    override fun onLoadMoreReply(comment: BulletinboardMessage) {
-    }
-
-    override fun onReplyEmojiClick(
-        comment: BulletinboardMessage,
-        reply: BulletinboardMessage,
-        resourceId: Int
-    ) {
-    }
-
-    override fun onCommentMoreActionClick(comment: BulletinboardMessage) {
-    }
-
-    override fun onReplyMoreActionClick(
-        comment: BulletinboardMessage,
-        reply: BulletinboardMessage
-    ) {
     }
 }

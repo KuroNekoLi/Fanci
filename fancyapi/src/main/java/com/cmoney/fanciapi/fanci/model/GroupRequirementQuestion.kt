@@ -24,7 +24,7 @@ import kotlinx.parcelize.Parcelize
 /**
  * 
  *
- * @param question 
+ * @param question 題目
  * @param type 
  */
 @Parcelize
@@ -32,6 +32,7 @@ import kotlinx.parcelize.Parcelize
 
 data class GroupRequirementQuestion (
 
+    /* 題目 */
     @Json(name = "question")
     val question: kotlin.String? = null,
 

@@ -1,16 +1,21 @@
 package com.cmoney.kolfanci.model.usecase
 
+import android.content.Context
 import com.cmoney.fanciapi.fanci.api.BulletinBoardApi
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessagePaging
 import com.cmoney.fanciapi.fanci.model.BulletingBoardMessageParam
-import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.toUploadMedia
 
-class PostUseCase(private val bulletinBoardApi: BulletinBoardApi) {
+class PostUseCase(
+    private val context: Context,
+    private val bulletinBoardApi: BulletinBoardApi
+) {
 
     /**
      * 取得 置頂貼文
@@ -42,20 +47,21 @@ class PostUseCase(private val bulletinBoardApi: BulletinBoardApi) {
 
     /**
      * 撰寫po 文
+     *
+     * @param channelId 頻道 id
+     * @param text 內文
+     * @param attachment 附加檔案
      */
     suspend fun writePost(
         channelId: String,
         text: String,
-        images: List<String>
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>
     ): Result<BulletinboardMessage> {
+        val medias = attachment.toUploadMedia(context)
+
         val bulletingBoardMessageParam = BulletingBoardMessageParam(
             text = text,
-            medias = images.map {
-                Media(
-                    resourceLink = it,
-                    type = MediaType.image
-                )
-            }
+            medias = medias
         )
 
         return kotlin.runCatching {
@@ -141,22 +147,18 @@ class PostUseCase(private val bulletinBoardApi: BulletinBoardApi) {
      *  @param channelId 頻道id
      *  @param messageId 原始貼文id
      *  @param text message
-     *  @param images attach
+     *  @param attachment attach
      */
     suspend fun writeComment(
         channelId: String,
         messageId: String,
         text: String,
-        images: List<String>
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>
     ): Result<BulletinboardMessage> {
+        val medias = attachment.toUploadMedia(context)
         val bulletingBoardMessageParam = BulletingBoardMessageParam(
             text = text,
-            medias = images.map {
-                Media(
-                    resourceLink = it,
-                    type = MediaType.image
-                )
-            }
+            medias = medias
         )
 
         return kotlin.runCatching {

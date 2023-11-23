@@ -5,9 +5,10 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
-import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.toUploadMedia
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
@@ -61,48 +62,37 @@ class EditPostViewModel(
     }
 
     /**
-     * 按下 發文,
-     * 沒文案, 沒附加圖片 -> 跳提示彈窗
+     * 按下 發文
      *
+     * @param text 內文
+     * @param attachment 附加檔案
      */
-    fun onPost(text: String) {
-        KLog.i(TAG, "onPost:$text")
+    fun onPost(text: String, attachment: List<Pair<AttachmentType, AttachmentInfoItem>>) {
+        KLog.i(TAG, "onPost:$text, attachment:$attachment")
         viewModelScope.launch {
             if (text.isEmpty() && _attachImages.value.isEmpty()) {
                 showEditTip()
                 return@launch
             }
 
-            loading()
-
-            //附加圖片, 獲取圖片 Url
-            if (_attachImages.value.isNotEmpty()) {
-                uploadImages(_attachImages.value, object : MessageViewModel.ImageUploadCallback {
-                    override fun complete(images: List<String>) {
-                        KLog.i(TAG, "all image upload complete:" + images.size)
-                        sendPost(text, images)
-                    }
-
-                    override fun onFailure(e: Throwable) {
-                        KLog.e(TAG, "onFailure:$e")
-                        dismissLoading()
-                    }
-                })
-                _attachImages.value = emptyList()
-            } else {
-                sendPost(text, emptyList())
-            }
+            sendPost(text, attachment)
         }
     }
 
-    private fun sendPost(text: String, images: List<String>) {
+    /**
+     * 發送貼文
+     *
+     * @param text 內文
+     * @param attachment 附加檔案
+     */
+    private fun sendPost(text: String, attachment: List<Pair<AttachmentType, AttachmentInfoItem>>) {
         KLog.i(TAG, "sendPost")
         viewModelScope.launch {
             loading()
             postUseCase.writePost(
                 channelId = channelId,
                 text = text,
-                images = images
+                attachment = attachment
             ).fold({
                 dismissLoading()
                 KLog.i(TAG, "sendPost complete.")
@@ -166,86 +156,30 @@ class EditPostViewModel(
 
     /**
      * 更新貼文
+     *
+     * @param attachment 附加檔案
      */
-    fun onUpdatePostClick(editPost: BulletinboardMessage, text: String) {
+    fun onUpdatePostClick(
+        editPost: BulletinboardMessage,
+        text: String,
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>
+    ) {
         KLog.i(TAG, "onUpdatePost:$text")
         viewModelScope.launch {
             if (text.isEmpty() && _attachImages.value.isEmpty()) {
                 showEditTip()
                 return@launch
             }
-
-            loading()
-
-            //附加圖片, 獲取圖片 Url
-            val httpUrls = _attachImages.value.filter {
-                it.toString().startsWith("https")
-            }.map {
-                it.toString()
-            }.toMutableList()
-
-            val filesUri = _attachImages.value.filter {
-                !it.toString().startsWith("https")
-            }
-
-            if (filesUri.isNotEmpty()) {
-                uploadImages(filesUri, object : MessageViewModel.ImageUploadCallback {
-                    override fun complete(images: List<String>) {
-                        KLog.i(TAG, "all image upload complete:" + images.size)
-                        httpUrls.addAll(images)
-
-                        onSendUpdatePost(
-                            editPost = editPost,
-                            text = text,
-                            images = httpUrls
-                        )
-                    }
-
-                    override fun onFailure(e: Throwable) {
-                        KLog.e(TAG, "onFailure:$e")
-                        dismissLoading()
-                    }
-                })
-                _attachImages.value = emptyList()
-            } else {
-                onSendUpdatePost(
-                    editPost = editPost,
-                    text = text,
-                    images = httpUrls
-                )
-            }
-        }
-    }
-
-    /**
-     * 更新貼文
-     *
-     * @param editPost 被編輯的貼文
-     * @param text 內文
-     * @param images 附加圖片
-     */
-    private fun onSendUpdatePost(
-        editPost: BulletinboardMessage,
-        text: String,
-        images: List<String>
-    ) {
-        KLog.i(TAG, "onSendUpdatePost:$text")
-        viewModelScope.launch {
             chatRoomUseCase.updateMessage(
                 messageServiceType = MessageServiceType.bulletinboard,
                 messageId = editPost.id.orEmpty(),
                 text = text,
-                images = images
+                attachment = attachment
             ).fold({
                 _postSuccess.value = editPost.copy(
                     content = editPost.content?.copy(
                         text = text,
-                        medias = images.map { image ->
-                            Media(
-                                resourceLink = image,
-                                type = MediaType.image
-                            )
-                        }
+                        medias = attachment.toUploadMedia(context)
                     )
                 )
             }, {

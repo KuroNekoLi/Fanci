@@ -1,7 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.post.info.viewmodel
 
 import android.app.Application
-import android.net.Uri
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
@@ -15,11 +14,12 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
-import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
-import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
+import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
@@ -27,12 +27,11 @@ import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.Utils
 import com.socks.library.KLog
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class PostInfoViewModel(
     private val context: Application,
@@ -51,9 +50,6 @@ class PostInfoViewModel(
     //留言
     private val _comment = MutableStateFlow<List<BulletinboardMessage>>(emptyList())
     val comment = _comment.asStateFlow()
-
-    private val _imageAttach = MutableStateFlow<List<Uri>>(emptyList())
-    val imageAttach = _imageAttach.asStateFlow()
 
     private val _uiState: MutableStateFlow<UiState?> = MutableStateFlow(null)
     val uiState = _uiState.asStateFlow()
@@ -78,6 +74,10 @@ class PostInfoViewModel(
     //Toast message
     private val _toast = MutableStateFlow<CustomMessage?>(null)
     val toast = _toast.asStateFlow()
+
+    //訊息是否發送完成
+    private val _isSendComplete = MutableStateFlow<Boolean>(false)
+    val isSendComplete = _isSendComplete.asStateFlow()
 
     //紀錄是否有分頁
     private val haveNextPageMap = hashMapOf<String, Boolean>()
@@ -214,47 +214,11 @@ class PostInfoViewModel(
         }
     }
 
-    fun onCommentReplySend(text: String) {
+    fun onCommentReplySend(
+        text: String,
+        attachment: List<Pair<AttachmentType, AttachmentInfoItem>>
+    ) {
         KLog.i(TAG, "onCommentSend:$text")
-        viewModelScope.launch {
-            loading()
-
-            //附加圖片, 獲取圖片 Url
-            val httpUrls = _imageAttach.value.filter {
-                it.toString().startsWith("https")
-            }.map {
-                it.toString()
-            }.toMutableList()
-
-            val filesUri = _imageAttach.value.filter {
-                !it.toString().startsWith("https")
-            }
-
-            if (filesUri.isNotEmpty()) {
-                uploadImages(filesUri, object : MessageViewModel.ImageUploadCallback {
-                    override fun complete(images: List<String>) {
-                        KLog.i(TAG, "all image upload complete:" + images.size)
-                        httpUrls.addAll(images)
-                        sendCommentOrReply(text, httpUrls)
-                    }
-
-                    override fun onFailure(e: Throwable) {
-                        KLog.e(TAG, "onFailure:$e")
-                        dismissLoading()
-                    }
-                })
-                _imageAttach.value = emptyList()
-            } else {
-                sendCommentOrReply(text, emptyList())
-            }
-        }
-    }
-
-    /**
-     * 發送留言/回覆給後端
-     */
-    private fun sendCommentOrReply(text: String, images: List<String>) {
-        KLog.i(TAG, "sendComment")
         viewModelScope.launch {
             loading()
 
@@ -267,8 +231,10 @@ class PostInfoViewModel(
                 channelId = channel.id.orEmpty(),
                 messageId = message.id.orEmpty(),
                 text = text,
-                images = images
+                attachment = attachment
             ).fold({
+                _isSendComplete.update { true }
+
                 dismissLoading()
                 onCommentReplyClose()
 
@@ -279,7 +245,7 @@ class PostInfoViewModel(
                     val replyData = _replyMap.value[message.id.orEmpty()]
                     replyData?.let { replyNotNullData ->
                         val replyList = replyNotNullData.replyList.toMutableList()
-                        replyList.add(it)
+                        replyList.add(0, it)
                         _replyMap.value[message.id.orEmpty()] = replyNotNullData.copy(
                             replyList = replyList
                         )
@@ -302,9 +268,12 @@ class PostInfoViewModel(
                     }
                 } else {
                     val comments = _comment.value.toMutableList()
-                    comments.add(it)
+                    comments.add(0, it)
                     _comment.value = comments
                 }
+
+                delay(500)
+                _isSendComplete.update { false }
 
             }, {
                 dismissLoading()
@@ -322,50 +291,6 @@ class PostInfoViewModel(
 
     private fun dismissLoading() {
         _uiState.value = UiState.DismissLoading
-    }
-
-    private suspend fun uploadImages(
-        uriLis: List<Uri>,
-        imageUploadCallback: MessageViewModel.ImageUploadCallback
-    ) {
-        KLog.i(TAG, "uploadImages:" + uriLis.size)
-
-        val completeImageUrl = mutableListOf<String>()
-
-        withContext(Dispatchers.IO) {
-            uploadImageUseCase.uploadImage(uriLis).catch { e ->
-                KLog.e(TAG, e)
-                imageUploadCallback.onFailure(e)
-            }.collect {
-                KLog.i(TAG, "uploadImage:$it")
-                val uri = it.first
-                val imageUrl = it.second
-                completeImageUrl.add(imageUrl)
-                if (completeImageUrl.size == uriLis.size) {
-                    imageUploadCallback.complete(completeImageUrl)
-                }
-            }
-        }
-    }
-
-    /**
-     * 附加圖片
-     */
-    fun attachImage(uris: List<Uri>) {
-        KLog.i(TAG, "attachImage:${uris.joinToString { it.toString() }}")
-        val imageList = _imageAttach.value.toMutableList()
-        imageList.addAll(uris)
-        _imageAttach.value = imageList
-    }
-
-    /**
-     * 刪除選擇的 附加圖片
-     */
-    fun onDeleteAttach(uri: Uri) {
-        KLog.i(TAG, "onDeleteAttach:$uri")
-        _imageAttach.value = _imageAttach.value.filter {
-            it != uri
-        }
     }
 
     /**

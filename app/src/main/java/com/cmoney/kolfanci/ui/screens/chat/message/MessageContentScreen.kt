@@ -5,48 +5,81 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RichTooltipBox
 import androidx.compose.material3.RichTooltipState
 import androidx.compose.material3.TooltipDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.getDuration
+import com.cmoney.kolfanci.extension.getFileName
+import com.cmoney.kolfanci.extension.getFleSize
+import com.cmoney.kolfanci.extension.toAttachmentType
+import com.cmoney.kolfanci.extension.toAttachmentTypeMap
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.ui.common.AutoLinkText
 import com.cmoney.kolfanci.ui.common.ChatTimeText
-import com.cmoney.kolfanci.ui.screens.chat.*
+import com.cmoney.kolfanci.ui.screens.chat.MessageHideUserScreen
+import com.cmoney.kolfanci.ui.screens.chat.MessageRecycleScreen
+import com.cmoney.kolfanci.ui.screens.chat.MessageRemoveScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.ImageAttachState
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.EmojiFeedback
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.Utils
 import com.google.accompanist.flowlayout.FlowRow
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 sealed class MessageContentCallback {
     data class LongClick(val message: ChatMessage) : MessageContentCallback()
@@ -58,11 +91,12 @@ sealed class MessageContentCallback {
 /**
  * 聊天內容 item
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun MessageContentScreen(
-    chatMessageWrapper: ChatMessageWrapper,
+    navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
+    chatMessageWrapper: ChatMessageWrapper,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onMessageContentCallback: (MessageContentCallback) -> Unit,
     onReSendClick: (ChatMessageWrapper) -> Unit
@@ -244,8 +278,12 @@ fun MessageContentScreen(
                         }
                     }
 
+                    //附加檔案
                     messageModel.content?.medias?.let {
-                        MediaContent(it)
+                        MediaContent(
+                            navController = navController,
+                            medias = it
+                        )
                     }
 
                     //上傳圖片前預覽
@@ -364,27 +402,109 @@ fun MessageContentScreen(
 /**
  * 多媒體 型態
  *
- * @param medias 圖片清單
+ * @param navController 跳轉用 Controller
+ * @param medias 附加檔案
  * @param isClickable 是否可以點擊圖片,放大瀏覽
  */
 @Composable
-fun MediaContent(medias: List<Media>, isClickable: Boolean = true) {
-    val imageList = medias.filter {
-        it.type == MediaType.image
-    }
+fun MediaContent(
+    navController: DestinationsNavigator,
+    medias: List<Media>,
+    isClickable: Boolean = true,
+    audioViewModel: AudioViewModel = koinViewModel()
+) {
+    val context = LocalContext.current
+    val mapList = medias.toAttachmentTypeMap()
 
-    if (imageList.isNotEmpty()) {
-        MessageImageScreenV2(
-            images = imageList.map {
-                it.resourceLink.orEmpty()
-            },
-            modifier = Modifier.padding(top = 10.dp, start = 40.dp),
-            otherItemModifier = Modifier.padding(top = 10.dp),
-            isClickable = isClickable,
-            onImageClick = {
-                AppUserLogger.getInstance().log(Clicked.Image, From.Message)
+    mapList.forEach { entry ->
+        val key = entry.key
+        val media = entry.value
+
+        when (key) {
+            AttachmentType.Audio -> {
+                LazyRow(
+                    modifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp),
+                    state = rememberLazyListState(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(media) { media ->
+                        val fileUrl = media.resourceLink
+                        AttachmentAudioItem(
+                            modifier = Modifier
+                                .width(270.dp)
+                                .height(75.dp),
+                            file = Uri.parse(fileUrl),
+                            duration = media.getDuration(),
+                            isItemClickable = true,
+                            isItemCanDelete = false,
+                            isShowResend = false,
+                            displayName = media.getFileName(),
+                            onClick = {
+                                AttachmentController.onAttachmentClick(
+                                    navController = navController,
+                                    uri = Uri.parse(fileUrl),
+                                    context = context,
+                                    attachmentType = AttachmentType.Audio,
+                                    fileName = media.getFileName(),
+                                    duration = media.getDuration(),
+                                    audioViewModel = audioViewModel
+                                )
+                            }
+                        )
+                    }
+                }
             }
-        )
+
+            AttachmentType.Image -> {
+                MessageImageScreenV2(
+                    images = media.map {
+                        it.resourceLink.orEmpty()
+                    },
+                    modifier = Modifier.padding(top = 10.dp, start = 40.dp),
+                    otherItemModifier = Modifier.padding(top = 10.dp),
+                    isClickable = isClickable,
+                    onImageClick = {
+                        AppUserLogger.getInstance().log(Clicked.Image, From.Message)
+                    }
+                )
+            }
+
+            AttachmentType.Pdf, AttachmentType.Txt -> {
+                LazyRow(
+                    modifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp),
+                    state = rememberLazyListState(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(media) { media ->
+                        val fileUrl = media.resourceLink
+                        val mediaType = media.type
+
+                        AttachmentFileItem(
+                            modifier = Modifier
+                                .width(270.dp)
+                                .height(75.dp),
+                            file = Uri.parse(fileUrl),
+                            fileSize = media.getFleSize(),
+                            isItemClickable = true,
+                            isItemCanDelete = false,
+                            isShowResend = false,
+                            displayName = media.getFileName(),
+                            onClick = {
+                                AttachmentController.onAttachmentClick(
+                                    navController = navController,
+                                    uri = Uri.parse(fileUrl),
+                                    context = context,
+                                    attachmentType = mediaType?.toAttachmentType(),
+                                    fileName = media.getFileName()
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
+            AttachmentType.Unknown -> {}
+        }
     }
 }
 
@@ -404,7 +524,8 @@ fun MessageContentScreenPreview() {
             ),
             coroutineScope = rememberCoroutineScope(),
             onMessageContentCallback = {},
-            onReSendClick = {}
+            onReSendClick = {},
+            navController = EmptyDestinationsNavigator
         )
     }
 }

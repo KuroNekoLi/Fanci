@@ -2,15 +2,14 @@ package com.cmoney.kolfanci.ui.screens.chat.message.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import android.os.Bundle
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Emojis
-import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
-import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.ReportReason
@@ -20,11 +19,14 @@ import com.cmoney.kolfanci.extension.copyToClipboard
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.remoteconfig.PollingFrequencyKey
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
+import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
@@ -32,18 +34,15 @@ import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.MessageUtils
 import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.remoteconfig_library.extension.getKeyValue
-import com.cmoney.xlogin.XLoginHelper
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.socks.library.KLog
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class ImageAttachState(
     val uri: Uri,
@@ -59,7 +58,8 @@ class MessageViewModel(
     private val chatRoomUseCase: ChatRoomUseCase,
     private val chatRoomPollUseCase: ChatRoomPollUseCase,
     private val permissionUseCase: PermissionUseCase,
-    private val uploadImageUseCase: UploadImageUseCase
+    private val uploadImageUseCase: UploadImageUseCase,
+    private val musicServiceConnection: MusicServiceConnection
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
@@ -99,10 +99,6 @@ class MessageViewModel(
     //訊息是否發送完成
     private val _isSendComplete = MutableStateFlow<Boolean>(false)
     val isSendComplete = _isSendComplete.asStateFlow()
-
-    //附加圖片
-    private val _imageAttach = MutableStateFlow<List<Uri>>(emptyList())
-    val imageAttach = _imageAttach.asStateFlow()
 
     //聊天訊息
     private val _message = MutableStateFlow<List<ChatMessageWrapper>>(emptyList())
@@ -279,166 +275,33 @@ class MessageViewModel(
     }
 
     /**
-     * 附加 圖片
-     * @param uris 圖片 uri集合
-     */
-    fun attachImage(uris: List<Uri>) {
-        KLog.i(TAG, "attachImage:${uris.joinToString { it.toString() }}")
-        val imageList = _imageAttach.value.toMutableList()
-        imageList.addAll(uris)
-        _imageAttach.value = imageList
-    }
-
-    /**
-     * 移除 附加 圖片
-     * @param uri 圖片 uri.
-     */
-    fun removeAttach(uri: Uri) {
-        KLog.i(TAG, "removeAttach:$uri")
-        val imageList = _imageAttach.value.toMutableList()
-        _imageAttach.value = imageList.filter {
-            it != uri
-        }
-    }
-
-    /**
      * 對外 發送訊息 接口
      * @param channelId 頻道id
      * @param text 內文
+     * @param attachment 附加檔案
      */
-    fun messageSend(channelId: String, text: String) {
-        KLog.i(TAG, "messageSend:$text")
+    fun messageSend(
+        channelId: String,
+        text: String,
+        attachment: Map<AttachmentType, List<AttachmentInfoItem>>
+    ) {
+        KLog.i(TAG, "send:" + text + " , media:" + attachment.size)
+
         viewModelScope.launch {
-            generatePreviewBeforeSend(text)
-
-            //附加圖片, 獲取圖片 Url
-            if (_imageAttach.value.isNotEmpty()) {
-                uploadImages(_imageAttach.value, object : ImageUploadCallback {
-                    override fun complete(images: List<String>) {
-                        KLog.i(TAG, "all image upload complete:" + images.size)
-                        send(channelId, text, images)
-                    }
-
-                    override fun onFailure(e: Throwable) {
-                        KLog.e(TAG, "onFailure:$e")
-
-                        //Create pending message
-                        _message.value = _message.value.toMutableList().apply {
-                            add(
-                                0,
-                                ChatMessageWrapper(
-                                    message = ChatMessage(
-                                        id = System.currentTimeMillis().toString(),
-                                        author = GroupMember(
-                                            name = XLoginHelper.nickName,
-                                            thumbNail = XLoginHelper.headImagePath
-                                        ),
-                                        content = MediaIChatContent(
-                                            text = text
-                                        ),
-                                        createUnixTime = System.currentTimeMillis() / 1000,
-                                        replyMessage = _replyMessage.value
-                                    ),
-                                    uploadAttachPreview = _imageAttach.value.map {
-                                        ImageAttachState(
-                                            uri = it,
-                                            isUploadComplete = true
-                                        )
-                                    },
-                                    isPendingSendMessage = true
-                                )
-                            )
-                        }
-                    }
-                })
-                _imageAttach.value = emptyList()
-            }
-            //Only text
-            else {
-                send(channelId, text)
-            }
-        }
-    }
-
-    /**
-     * 發送前 直接先貼上畫面 Preview
-     * @param text 發送文字
-     */
-    private fun generatePreviewBeforeSend(text: String) {
-        // TODO: TBD
-//        return
-//        uiState = uiState.copy(
-//            message = uiState.message.toMutableList().apply {
-//                add(0,
-//                    ChatMessageWrapper(
-//                        message = ChatMessage(
-//                            id = preSendChatId,
-//                            author = GroupMember(
-//                                name = XLoginHelper.nickName,
-//                                thumbNail = XLoginHelper.headImagePath
-//                            ),
-//                            content = MediaIChatContent(
-//                                text = text
-//                            ),
-//                            createUnixTime = System.currentTimeMillis() / 1000,
-//                            replyMessage = _replyMessage.value
-//                        ),
-//                        uploadAttachPreview = uiState.imageAttach.map { uri ->
-//                            MessageUiState.ImageAttachState(
-//                                uri = uri
-//                            )
-//                        }
-//                    )
-//                )
-//            }
-//        )
-    }
-
-    /**
-     * 上傳所有 附加圖片
-     * @param uriLis 圖片清單
-     * @param imageUploadCallback 圖片上傳 callback
-     */
-    private suspend fun uploadImages(uriLis: List<Uri>, imageUploadCallback: ImageUploadCallback) {
-        KLog.i(TAG, "uploadImages:" + uriLis.size)
-
-        _imageAttach.value = emptyList()
-
-        val completeImageUrl = mutableListOf<String>()
-
-        withContext(Dispatchers.IO) {
-            uploadImageUseCase.uploadImage(uriLis).catch { e ->
-                KLog.e(TAG, e)
-                _imageAttach.value = uriLis
-                imageUploadCallback.onFailure(e)
-            }.collect {
-                KLog.i(TAG, "uploadImage:$it")
-                val uri = it.first         //之後如果要 mapping 可以用
-                val imageUrl = it.second
-                completeImageUrl.add(imageUrl)
-
-                if (completeImageUrl.size == uriLis.size) {
-                    imageUploadCallback.complete(completeImageUrl)
+            val listItem = attachment.flatMap { item ->
+                val key = item.key
+                val value = item.value
+                value.map {
+                    key to it
                 }
             }
-        }
-    }
 
-    /**
-     * 對後端 Server 發送訊息
-     * @param channelId 頻道id
-     * @param text 發送內文
-     * @param images 圖片清單
-     */
-    private fun send(channelId: String, text: String, images: List<String> = emptyList()) {
-        KLog.i(TAG, "send:" + text + " , media:" + images.size)
-        viewModelScope.launch {
             chatRoomUseCase.sendMessage(
                 chatRoomChannelId = channelId,
                 text = text,
-                images = images,
+                attachment = listItem,
                 replyMessageId = _replyMessage.value?.id.orEmpty()
-            ).fold({ chatMessage ->
+            ).onSuccess { chatMessage ->
                 //發送成功
                 KLog.i(TAG, "send success:$chatMessage")
                 _message.value = _message.value.map {
@@ -450,67 +313,19 @@ class MessageViewModel(
                 }
 
                 _isSendComplete.value = true
-
                 _replyMessage.value = null
-
                 //恢復聊天室內訊息,不會自動捲到最下面
                 delay(800)
                 _isSendComplete.value = false
-
-            }, {
+            }.onFailure {
+                //發送失敗
                 KLog.e(TAG, it)
 
                 if (it.message?.contains("403") == true) {
                     //檢查身上狀態
                     checkChannelPermission(channelId)
-                } else {
-                    //將發送失敗訊息 標註為Pending
-                    _message.value = _message.value.toMutableList().apply {
-                        add(
-                            0,
-                            ChatMessageWrapper(
-                                message = ChatMessage(
-                                    id = System.currentTimeMillis().toString(),
-                                    author = GroupMember(
-                                        name = XLoginHelper.nickName,
-                                        thumbNail = XLoginHelper.headImagePath
-                                    ),
-                                    content = MediaIChatContent(
-                                        text = text
-                                    ),
-                                    createUnixTime = System.currentTimeMillis() / 1000,
-                                    replyMessage = _replyMessage.value
-                                ),
-                                uploadAttachPreview = images.map {
-                                    ImageAttachState(
-                                        uri = Uri.EMPTY,
-                                        serverUrl = it
-                                    )
-                                },
-                                isPendingSendMessage = true
-                            )
-                        )
-                    }
                 }
-
-
-//                //將發送失敗訊息放至Pending清單中
-//                val pendingMessage = uiState.pendingSendMessage.pendingSendMessage.toMutableList()
-//
-//                pendingMessage.add(
-//                    PendingSendMessage(
-//                        channelId = channelId,
-//                        text = text,
-//                        images = images
-//                    )
-//                )
-//
-//                uiState = uiState.copy(
-//                    pendingSendMessage = ChatMessageWrapper(
-//                        pendingSendMessage = pendingMessage
-//                    )
-//                )
-            })
+            }
         }
     }
 
@@ -893,10 +708,18 @@ class MessageViewModel(
     /**
      *  重新發送訊息
      */
-    fun onResendMessage(channelId: String, message: ChatMessageWrapper) {
+    fun onResendMessage(
+        channelId: String,
+        message: ChatMessageWrapper,
+        attachment: Map<AttachmentType, List<AttachmentInfoItem>>
+    ) {
         KLog.i(TAG, "onResendMessage:$message")
         onDeleteReSend(message)
-        messageSend(channelId = channelId, text = message.message.content?.text.orEmpty())
+        messageSend(
+            channelId = channelId,
+            text = message.message.content?.text.orEmpty(),
+            attachment = attachment
+        )
         onReSendDialogDismiss()
     }
 
@@ -1007,4 +830,43 @@ class MessageViewModel(
         }
     }
 
+    //========== Media Player ==========
+    //TODO: test
+    fun playMedia(uri: Uri) {
+        KLog.i(TAG, "playMedia")
+
+        if (musicServiceConnection.isConnected.value == true) {
+            //正在播的歌曲
+            val nowPlaying = musicServiceConnection.nowPlaying.value
+            //取得控制器
+            val transportControls = musicServiceConnection.transportControls
+
+//            val isPrepared = musicServiceConnection.playbackState.value?.isPrepared ?: false
+
+            //已經播放
+//            if (isPrepared && storyId == nowPlaying?.id) {
+//
+//            }
+//            //全新清單
+//            else {
+//                val bundle = Bundle()
+//                bundle.putString("", uri.toString())
+//                bundle.putBinder(
+//                    BUNDLE_STORIES,
+//                    WrapperForBinder(playList)
+//                )
+//                bundle.putInt(BUNDLE_START_PLAY_POSITION, startPosition)
+
+            if (uri.toString().isNotEmpty()) {
+                transportControls.playFromUri(uri, Bundle())
+
+//                transportControls.playFromMediaId(
+//                    uri.toString(),
+//                    null
+//                )
+            }
+
+//            }
+        }
+    }
 }

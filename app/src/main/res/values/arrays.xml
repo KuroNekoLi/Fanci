@@ -7,4 +7,15 @@
         <item>@string/thirty_day</item>
         <item>@string/forever</item>
     </string-array>
+
+    <string-array name="audio_speed_options">
+        <item>@string/audio_speed_0.25</item>
+        <item>@string/audio_speed_0.5</item>
+        <item>@string/audio_speed_0.75</item>
+        <item>@string/audio_speed_1</item>
+        <item>@string/audio_speed_1.25</item>
+        <item>@string/audio_speed_1.5</item>
+        <item>@string/audio_speed_1.75</item>
+    </string-array>
+
 </resources>

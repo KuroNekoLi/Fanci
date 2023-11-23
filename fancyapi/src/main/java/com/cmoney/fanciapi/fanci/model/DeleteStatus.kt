@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 刪除類型列舉
  *
  * Values: none,deleted,takeBack
  */

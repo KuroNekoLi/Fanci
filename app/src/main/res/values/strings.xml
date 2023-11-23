@@ -263,4 +263,43 @@
     <string name="channel_board_post_tab">貼文區優先</string>
     <string name="channel_board_post_tab_desc">點擊頻道後，優先顯示的是貼文區。</string>
 
+    <string name="chat_attachment_limit_title">無法同時上圖片與檔案</string>
+    <string name="chat_attachment_limit_desc">圖片與檔案需要分開上傳\n請分兩則訊息上傳</string>
+
+    <string name="chat_attachment_image_limit_title">無法上傳超過 %d 張圖片</string>
+    <string name="chat_attachment_image_limit_desc">你上傳的照片超過 %d 張，請手動調整或系統只會上傳前%d張圖片</string>
+
+    <string name="chat_attachment_file_limit_title">無法同時上傳兩個檔案</string>
+    <string name="chat_attachment_file_limit_desc">無法同時上傳兩個檔案\n請分開訊息上傳</string>
+
+    <string name="post_attachment_file_limit_title">無法上傳超過 %d 個檔案</string>
+    <string name="post_attachment_file_limit_desc">你上傳的檔案超過 %d 個，請手動調整或系統只會上傳前%d個檔案</string>
+
+    <string name="channel_media">播放頻道</string>
+    <string name="channel_media_description"></string>
+
+    <string name="play_speed">播放速度</string>
+    <string name="play_speed_desc">調整播放速度</string>
+
+    <string name="audio_speed_0.25">0.25x</string>
+    <string name="audio_speed_0.5">0.5x</string>
+    <string name="audio_speed_0.75">0.75x</string>
+    <string name="audio_speed_1">1x</string>
+    <string name="audio_speed_1.25">1.25x</string>
+    <string name="audio_speed_1.5">1.5x</string>
+    <string name="audio_speed_1.75">1.75x</string>
+    
+    <string name="image_upload_fail_title">圖片上傳失敗</string>
+    <string name="image_upload_fail_desc">容量過大或是網路不順\n圖片上傳失敗了嗚嗚</string>
+
+    <string name="file_upload_fail_title">檔案上傳失敗</string>
+    <string name="file_upload_fail_desc">容量過大或是網路不順\n圖片上傳失敗了嗚嗚</string>
+
+    <string name="resend">重新上傳</string>
+
+    <string name="post_fail_title">貼文發表失敗</string>
+    <string name="post_fail_desc">圖片或檔案上傳失敗\n為了確保貼文完整，快去檢查吧！</string>
+
+    <string name="chat_fail_title">訊息傳送失敗</string>
+    <string name="chat_fail_desc">圖片或檔案上傳失敗\n為了確保訊息完整，快去檢查吧！</string>
 </resources>
