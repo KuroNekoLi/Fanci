@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 前端推播設定分類
  *
  * Values: silent,newPost,newStory
  */

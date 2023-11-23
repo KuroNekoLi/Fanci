@@ -23,7 +23,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 設定類型清單內容
  *
  * @param settingType 
  * @param shortTitle 

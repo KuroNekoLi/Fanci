@@ -38,10 +38,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getCaptureUri
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -305,7 +307,7 @@ fun MediaPickerBottomSheetView(
             )
         }
 
-        if (!isOnlyPhotoSelector) {
+        if (!isOnlyPhotoSelector && Constant.isShowUploadFile()) {
             Divider(
                 color = LocalColor.current.background,
                 thickness = 1.dp

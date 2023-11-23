@@ -2,7 +2,6 @@ package com.cmoney.kolfanci.extension
 
 import android.net.Uri
 import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 
@@ -10,13 +9,13 @@ import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
  * 取得 檔案名稱
  */
 fun Media.getFileName(): String {
-    return when (this.type) {
-        MediaType.image -> ""
-        MediaType.video -> ""
-        MediaType.audio -> audio?.fileName.orEmpty()
-        MediaType.txt -> txt?.fileName.orEmpty()
-        MediaType.pdf -> pdf?.fileName.orEmpty()
-        null -> ""
+    return when (this.type?.toAttachmentType()) {
+        AttachmentType.Audio -> audio?.fileName.orEmpty()
+        AttachmentType.Image -> ""
+        AttachmentType.Pdf -> pdf?.fileName.orEmpty()
+        AttachmentType.Txt -> txt?.fileName.orEmpty()
+        AttachmentType.Unknown -> ""
+        else -> ""
     }
 }
 
@@ -24,13 +23,13 @@ fun Media.getFileName(): String {
  * 取得 檔案大小
  */
 fun Media.getFleSize(): Long {
-    return when (this.type) {
-        MediaType.image -> 0
-        MediaType.video -> 0
-        MediaType.audio -> audio?.fileSize ?: 0L
-        MediaType.txt -> txt?.fileSize ?: 0L
-        MediaType.pdf -> pdf?.fileSize ?: 0L
-        null -> 0
+    return when (this.type?.toAttachmentType()) {
+        AttachmentType.Audio -> audio?.fileSize ?: 0L
+        AttachmentType.Image -> 0
+        AttachmentType.Pdf -> pdf?.fileSize ?: 0L
+        AttachmentType.Txt -> txt?.fileSize ?: 0L
+        AttachmentType.Unknown -> 0
+        else -> 0
     }
 }
 
@@ -38,27 +37,15 @@ fun Media.getFleSize(): Long {
  * 取得 音檔長度
  */
 fun Media.getDuration(): Long {
-    return when (this.type) {
-        MediaType.image -> 0
-        MediaType.video -> 0
-        MediaType.audio -> audio?.duration ?: 0L
-        MediaType.txt -> 0L
-        MediaType.pdf -> 0L
-        null -> 0
+    return when (this.type?.toAttachmentType()) {
+        AttachmentType.Audio -> audio?.duration ?: 0L
+        AttachmentType.Image -> 0L
+        AttachmentType.Pdf -> 0L
+        AttachmentType.Txt -> 0L
+        AttachmentType.Unknown -> 0L
+        else -> 0L
     }
 }
-
-/**
- * 轉換成app 在用的 type
- */
-fun MediaType.toAttachmentType(): AttachmentType =
-    when (this) {
-        MediaType.image -> AttachmentType.Image
-        MediaType.video -> AttachmentType.Unknown
-        MediaType.audio -> AttachmentType.Audio
-        MediaType.txt -> AttachmentType.Txt
-        MediaType.pdf -> AttachmentType.Pdf
-    }
 
 /**
  * 將 server 給的 List media 轉換成 map

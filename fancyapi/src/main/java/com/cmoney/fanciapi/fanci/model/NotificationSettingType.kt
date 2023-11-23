@@ -19,7 +19,7 @@ package com.cmoney.fanciapi.fanci.model
 import com.squareup.moshi.Json
 
 /**
- * 
+ * 通知與推播設定分類
  *
  * Values: fanciOfficial,fanciAgreeJoinGroup,fanciNewGroupApply,fanciGroupDelete,fanciNewBulletinMessage,fanciNewBulletinReplyMessage,fanciNewBulletinEmoji,fanciNewBulletinReplyMessageEmoji,fanciNewBulletinReplyMessageFollow,fanciNewChatMessage,fanciNewChatEmoji,fanciSendGroupApply
  */

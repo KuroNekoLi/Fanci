@@ -69,6 +69,17 @@ object Constant {
     }
 
     /**
+     * 是否出現 上傳檔案功能
+     */
+    fun isShowUploadFile() : Boolean {
+        val iRemoteConfig = GlobalContext.get().get<IRemoteConfig>()
+        return when (iRemoteConfig.getAppStatus()) {
+            is AppStatus.IsUnderReview -> false
+            else -> true
+        }
+    }
+
+    /**
      * 是否可以管理 vip 方案
      */
     fun isShowVipManager(): Boolean = (MyGroupPermission.editVipRole == true && isAppNotInReview())

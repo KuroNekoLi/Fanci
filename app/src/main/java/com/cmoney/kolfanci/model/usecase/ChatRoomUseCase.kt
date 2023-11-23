@@ -4,23 +4,19 @@ import android.content.Context
 import com.cmoney.fanciapi.fanci.api.ChatRoomApi
 import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.api.UserReportApi
-import com.cmoney.fanciapi.fanci.model.BulletingBoardMessageParam
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessageParam
 import com.cmoney.fanciapi.fanci.model.EmojiParam
 import com.cmoney.fanciapi.fanci.model.Emojis
-import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
-import com.cmoney.fanciapi.fanci.model.MessageType
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.ReportParm
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.extension.checkResponseBody
-import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
 import com.socks.library.KLog
 
@@ -63,7 +59,6 @@ class ChatRoomUseCase(
 
         val chatMessageParam = ChatMessageParam(
             text = text,
-            messageType = MessageType.textMessage,
             medias = medias
         )
         messageApi.apiV2MessageMessageTypeMessageIdPut(
@@ -239,7 +234,6 @@ class ChatRoomUseCase(
                 chatRoomChannelId = chatRoomChannelId,
                 chatMessageParam = ChatMessageParam(
                     text = text,
-                    messageType = MessageType.textMessage,
                     medias = attachment.toUploadMedia(context),
                     replyMessageId = replyMessageId
                 )

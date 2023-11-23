@@ -19,7 +19,7 @@ import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
-import com.cmoney.kolfanci.ui.screens.post.info.PostInfoScreenResult
+import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage

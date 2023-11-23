@@ -5,8 +5,6 @@ import com.cmoney.fanciapi.fanci.api.BulletinBoardApi
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessagePaging
 import com.cmoney.fanciapi.fanci.model.BulletingBoardMessageParam
-import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.kolfanci.extension.checkResponseBody

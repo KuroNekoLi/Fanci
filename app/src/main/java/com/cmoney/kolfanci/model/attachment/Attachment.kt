@@ -5,12 +5,9 @@ import android.net.Uri
 import com.cmoney.fanciapi.fanci.model.AudioContent
 import com.cmoney.fanciapi.fanci.model.ImageContent
 import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaType
 import com.cmoney.fanciapi.fanci.model.PdfContent
 import com.cmoney.fanciapi.fanci.model.TxtContent
 import com.cmoney.kolfanci.extension.getAudioDuration
-import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.extension.getFileSize
 
 /**
  * 將附加檔案 List 轉為, 上傳用的 Media List
@@ -30,7 +27,7 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
         when (attachmentType) {
             AttachmentType.Audio -> Media(
                 resourceLink = serverUrl,
-                type = MediaType.audio,
+                type = AttachmentType.Audio.name,
                 audio = AudioContent(
                     fileName = fileName,
                     fileSize = fileSize,
@@ -40,13 +37,13 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
 
             AttachmentType.Image -> Media(
                 resourceLink = serverUrl,
-                type = MediaType.image,
+                type = AttachmentType.Image.name,
                 image = ImageContent()
             )
 
             AttachmentType.Pdf -> Media(
                 resourceLink = serverUrl,
-                type = MediaType.pdf,
+                type = AttachmentType.Pdf.name,
                 pdf = PdfContent(
                     fileName = fileName,
                     fileSize = fileSize,
@@ -55,7 +52,7 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
 
             AttachmentType.Txt -> Media(
                 resourceLink = serverUrl,
-                type = MediaType.txt,
+                type = AttachmentType.Txt.name,
                 txt = TxtContent(
                     fileName = fileName,
                     fileSize = fileSize,
@@ -76,15 +73,32 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
  * 附加檔案 fanci 支援類型
  */
 sealed class AttachmentType {
-    object Image : AttachmentType()
+    abstract val name: String
 
-    object Audio : AttachmentType()
+    object Image : AttachmentType() {
+        override val name: String
+            get() = "Image"
+    }
 
-    object Txt : AttachmentType()
+    object Audio : AttachmentType() {
+        override val name: String
+            get() = "Audio"
+    }
 
-    object Pdf : AttachmentType()
+    object Txt : AttachmentType() {
+        override val name: String
+            get() = "Txt"
+    }
 
-    object Unknown : AttachmentType()
+    object Pdf : AttachmentType() {
+        override val name: String
+            get() = "Pdf"
+    }
+
+    object Unknown : AttachmentType() {
+        override val name: String
+            get() = ""
+    }
 }
 
 /**
