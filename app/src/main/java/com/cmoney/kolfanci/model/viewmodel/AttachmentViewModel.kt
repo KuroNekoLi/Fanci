@@ -52,6 +52,10 @@ class AttachmentViewModel(
     private val _isOnlyPhotoSelector = MutableStateFlow<Boolean>(false)
     val isOnlyPhotoSelector = _isOnlyPhotoSelector.asStateFlow()
 
+    //資料是否初始化完成
+    private val _setInitDataSuccess = MutableStateFlow(false)
+    val setInitDataSuccess = _setInitDataSuccess.asStateFlow()
+
     init {
         viewModelScope.launch {
             _attachmentList.collect { attachmentList ->
@@ -371,14 +375,22 @@ class AttachmentViewModel(
 
         val oldList = _attachmentList.value.toMutableList()
 
-        oldList.add(
+        val filterList = oldList.filter { pairItem ->
+            val otherModel = pairItem.second.other
+            if (otherModel is VoteModel) {
+                return@filter otherModel.id != voteModel.id
+            }
+            true
+        }.toMutableList()
+
+        filterList.add(
             AttachmentType.Choice to AttachmentInfoItem(
                 other = voteModel,
                 attachmentType = AttachmentType.Choice
             )
         )
 
-        val distinctList = oldList.reversed().distinctBy { it ->
+        val distinctList = filterList.distinctBy { it ->
             val other = it.second.other
             if (other is VoteModel) {
                 other.id
@@ -390,5 +402,9 @@ class AttachmentViewModel(
         _attachmentList.update {
             distinctList
         }
+    }
+
+    fun setDataInitFinish() {
+        _setInitDataSuccess.update { true }
     }
 }

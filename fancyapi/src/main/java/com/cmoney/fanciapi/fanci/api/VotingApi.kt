@@ -24,7 +24,7 @@ interface VotingApi {
      * @param requestBody 要刪除的投票活動 (optional)
      * @return [Unit]
      */
-    @DELETE("api/v1/Voting")
+    @HTTP(method = "DELETE", path = "api/v1/Voting", hasBody = true)
     suspend fun apiV1VotingDelete(@Query("channelId") channelId: kotlin.String? = null, @Body requestBody: kotlin.collections.List<kotlin.Long>? = null): Response<Unit>
 
     /**

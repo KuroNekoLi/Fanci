@@ -326,7 +326,7 @@ object MockData {
             ),
             messageFromType = MessageServiceType.bulletinboard,
             author = GroupMember(
-                id = "637447",
+                id = "637447b722171bd081b1521b",
                 name = "Boring12",
                 thumbNail = "https://cm-176-test.s3-ap-northeast-1.amazonaws.com/images/d230fca7-d202-4208-8547-2c20016ee99d.jpeg",
                 serialNumber = 23122246, roleInfos = emptyList(), isGroupVip = false
@@ -399,7 +399,9 @@ object MockData {
 
     //多選題
     val mockMultiVoting: Voting
-        get() = mockSingleVoting.copy(isMultipleChoice = true)
+        get() = mockSingleVoting.copy(
+            id = 123,
+            isMultipleChoice = true)
 
     val mockIVotingOptionStatisticsWithVoterList: List<IVotingOptionStatisticsWithVoter>
         get() = listOf(

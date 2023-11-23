@@ -101,15 +101,16 @@ fun PostOtherAttachmentScreen(
                 }
 
                 AttachmentType.Choice -> {
-                    if (attachmentInfoItem.other is VoteModel) {
+                    val voteModel = attachmentInfoItem.other
+                    if (voteModel is VoteModel) {
                         item {
                             AttachmentChoiceItem(
                                 modifier = Modifier
                                     .width(270.dp)
                                     .height(75.dp),
-                                voteModel = attachmentInfoItem.other,
-                                isItemClickable = true,
-                                isItemCanDelete = true,
+                                voteModel = voteModel,
+                                isItemClickable = voteModel.id.isEmpty(),
+                                isItemCanDelete = voteModel.id.isEmpty(),
                                 onClick = {
                                     onClick.invoke(attachmentInfoItem)
                                 },

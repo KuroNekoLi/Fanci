@@ -21,6 +21,7 @@ import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
 import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
 
 
@@ -60,10 +61,19 @@ class ChatRoomUseCase(
 
         val medias = attachment.toUploadMedia(context)
 
+        //投票 id
+        val votingIds = attachment.filter {
+            it.first == AttachmentType.Choice && it.second.other is VoteModel
+        }.map {
+            (it.second.other as VoteModel).id.toLong()
+        }
+
         val chatMessageParam = ChatMessageParam(
             text = text,
-            medias = medias
+            medias = medias,
+            votingIds = votingIds
         )
+        
         messageApi.apiV2MessageMessageTypeMessageIdPut(
             messageType = messageServiceType,
             messageId = messageId,

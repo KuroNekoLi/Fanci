@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.post.edit
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,6 +55,7 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.toVoteModelList
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
@@ -85,7 +85,6 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -136,16 +135,33 @@ fun EditPostScreen(
     //User 輸入內容
     val inputContent by viewModel.userInput.collectAsState()
 
+    val setInitDataSuccess by attachmentViewModel.setInitDataSuccess.collectAsState()
+
     //編輯貼文, 設定初始化資料
     LaunchedEffect(Unit) {
-        editPost?.let { post ->
-            post.content?.medias?.apply {
-                attachmentViewModel.addAttachment(this)
-            }
+        if (!setInitDataSuccess) {
+            editPost?.let { post ->
 
-            viewModel.setUserInput(
-                post.content?.text.orEmpty()
-            )
+                post.content?.medias?.apply {
+                    attachmentViewModel.addAttachment(this)
+                }
+
+                viewModel.setUserInput(
+                    post.content?.text.orEmpty()
+                )
+
+                //設定投票
+                if (post.votings?.isNotEmpty() == true) {
+                    post.votings?.let { votings ->
+                        val voteModelList = votings.toVoteModelList()
+                        voteModelList.forEach { voteModel ->
+                            attachmentViewModel.addChoiceAttachment(voteModel)
+                        }
+                    }
+                }
+
+                attachmentViewModel.setDataInitFinish()
+            }
         }
     }
 
@@ -192,12 +208,12 @@ fun EditPostScreen(
             AppUserLogger.getInstance().log(Clicked.PostSelectPhoto)
             showImagePick = true
         },
-        onPostClick = { text ->
+        onPostClick = {
             AppUserLogger.getInstance().log(Clicked.PostPublish)
             isLoading = true
             attachmentViewModel.upload(
                 channelId = channelId,
-                other = text
+                other = inputContent
             )
         },
         onBack = {
@@ -359,7 +375,7 @@ private fun EditPostScreenView(
     editPost: BulletinboardMessage? = null,
     onShowImagePicker: () -> Unit,
     onAttachmentFilePicker: () -> Unit,
-    onPostClick: (String) -> Unit,
+    onPostClick: () -> Unit,
     onBack: () -> Unit,
     showLoading: Boolean,
     attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
@@ -370,7 +386,6 @@ private fun EditPostScreenView(
     onValueChange: (String) -> Unit,
     defaultContent: String
 ) {
-    var textState by remember { mutableStateOf(defaultContent) }
     val focusRequester = remember { FocusRequester() }
     val showKeyboard = remember { mutableStateOf(true) }
     val keyboard = LocalSoftwareKeyboardController.current
@@ -384,7 +399,7 @@ private fun EditPostScreenView(
                     onBack.invoke()
                 },
                 postClick = {
-                    onPostClick.invoke(textState)
+                    onPostClick.invoke()
                 }
             )
         },
@@ -415,7 +430,7 @@ private fun EditPostScreenView(
                         .fillMaxWidth()
                         .weight(1f)
                         .focusRequester(focusRequester),
-                    value = textState,
+                    value = defaultContent,
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = LocalColor.current.text.default_100,
                         backgroundColor = LocalColor.current.background,
@@ -425,7 +440,7 @@ private fun EditPostScreenView(
                         unfocusedIndicatorColor = Color.Transparent
                     ),
                     onValueChange = {
-                        textState = it
+//                        textState = it
                         onValueChange.invoke(it)
                     },
                     shape = RoundedCornerShape(4.dp),

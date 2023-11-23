@@ -30,10 +30,14 @@ class VoteUseCase(
         flow {
             voteModels.forEach { voteModel ->
                 try {
-                    val votingId = createVote(
-                        channelId = channelId,
-                        voteModel = voteModel
-                    ).getOrNull()?.id ?: 0
+                    val votingId = if (voteModel.id.isEmpty()) {
+                        createVote(
+                            channelId = channelId,
+                            voteModel = voteModel
+                        ).getOrNull()?.id ?: 0
+                    } else {
+                        voteModel.id.toLong()
+                    }
 
                     emit(
                         voteModel.copy(id = votingId.toString())
@@ -71,13 +75,17 @@ class VoteUseCase(
     /**
      * 刪除投票
      * @param channelId 頻道id
-     * @param voteId 投票id
+     * @param voteIds 投票id
      */
-    suspend fun deleteVote(channelId: String, voteId: Long) = kotlin.runCatching {
-        votingApi.apiV1VotingDelete(
-            channelId = channelId,
-            requestBody = listOf(voteId)
-        ).checkResponseBody()
+    suspend fun deleteVote(channelId: String, voteIds: List<Long>): Result<Unit> {
+        KLog.i(TAG, "deleteVote:$channelId")
+
+        return kotlin.runCatching {
+            votingApi.apiV1VotingDelete(
+                channelId = channelId,
+                requestBody = voteIds
+            ).checkResponseBody()
+        }
     }
 
 

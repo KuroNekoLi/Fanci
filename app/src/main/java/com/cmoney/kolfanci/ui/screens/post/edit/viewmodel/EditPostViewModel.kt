@@ -6,12 +6,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.kolfanci.extension.toVotingList
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
@@ -186,11 +188,19 @@ class EditPostViewModel(
                 text = text,
                 attachment = attachment
             ).fold({
+                //選擇題 model
+                val votes = attachment.filter {
+                    it.first == AttachmentType.Choice && it.second.other is VoteModel
+                }.map {
+                    it.second.other as VoteModel
+                }
+
                 _postSuccess.value = editPost.copy(
                     content = editPost.content?.copy(
                         text = text,
                         medias = attachment.toUploadMedia(context)
-                    )
+                    ),
+                    votings = votes.toVotingList()
                 )
             }, {
                 it.printStackTrace()
