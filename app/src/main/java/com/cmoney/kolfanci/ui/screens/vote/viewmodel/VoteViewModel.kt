@@ -3,8 +3,10 @@ package com.cmoney.kolfanci.ui.screens.vote.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.VoteUseCase
 import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
@@ -15,7 +17,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class VoteViewModel(val context: Application, private val voteUseCase: VoteUseCase) :
+class VoteViewModel(
+    val context: Application,
+    private val voteUseCase: VoteUseCase,
+    private val groupUseCase: GroupUseCase
+) :
     AndroidViewModel(context) {
     private val TAG = VoteViewModel::class.java.simpleName
 
@@ -45,8 +51,12 @@ class VoteViewModel(val context: Application, private val voteUseCase: VoteUseCa
     val voteResultInfo = _voteResultInfo.asStateFlow()
 
     //完成結束投票
-    private val _closeVoteSuccess = MutableStateFlow<Boolean>(false)
+    private val _closeVoteSuccess = MutableStateFlow(false)
     val closeVoteSuccess = _closeVoteSuccess.asStateFlow()
+
+    //投票者
+    private val _voterGroupMember = MutableStateFlow<List<GroupMember>>(emptyList())
+    val voterGroupMember = _voterGroupMember.asStateFlow()
 
     //最大選項數量
     private val MAX_COICE_COUNT = 5
@@ -232,6 +242,26 @@ class VoteViewModel(val context: Application, private val voteUseCase: VoteUseCa
                 channelId = channelId
             ).onSuccess {
                 _closeVoteSuccess.value = true
+            }
+        }
+    }
+
+    /**
+     * 取得 投票選項的用戶清單
+     *
+     * @param groupId 社團 id
+     * @param voterIds 會員 id list
+     */
+    fun getChoiceGroupMember(groupId: String, voterIds: List<String>) {
+        KLog.i(TAG, "getChoiceGroupMember:$groupId")
+        viewModelScope.launch {
+            groupUseCase.getGroupMembers(
+                groupId = groupId,
+                userIds = voterIds
+            ).onSuccess {
+                _voterGroupMember.value = it
+            }.onFailure {
+                KLog.e(TAG, it)
             }
         }
     }

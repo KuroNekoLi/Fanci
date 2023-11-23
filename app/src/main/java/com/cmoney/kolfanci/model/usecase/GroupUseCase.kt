@@ -49,6 +49,31 @@ class GroupUseCase(
 ) {
 
     /**
+     * 取得會員資訊
+     *
+     * @param groupId 社團 id
+     * @param userIds 會員 ids
+     */
+    suspend fun getGroupMembers(groupId: String, userIds: List<String>) = kotlin.runCatching {
+        if (Constant.isOpenMock) {
+            listOf(
+                MockData.mockGroupMember,
+                MockData.mockGroupMember,
+                MockData.mockGroupMember,
+                MockData.mockGroupMember
+            )
+        }
+        else {
+            groupMemberApi.apiV1GroupMemberGroupGroupIdUsersGet(
+                groupId = groupId,
+                useridsParam = UseridsParam(
+                    userIds = userIds
+                )
+            ).checkResponseBody()
+        }
+    }
+
+    /**
      * 取得特定 group
      */
     suspend fun getGroupById(groupId: String) = kotlin.runCatching {

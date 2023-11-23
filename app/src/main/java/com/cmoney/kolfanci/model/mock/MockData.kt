@@ -14,6 +14,7 @@ import com.cmoney.fanciapi.fanci.model.IChannelTab
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserVoteInfo
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
 import com.cmoney.fanciapi.fanci.model.ImageContent
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.MediaIChatContent
@@ -372,22 +373,22 @@ object MockData {
             title = RandomStringUtils.randomAlphabetic(10),
             votingOptionStatistics = listOf(
                 IVotingOptionStatistics(
-                    optionId = System.currentTimeMillis().toInt(),
+                    optionId = 1,
                     voteCount = 2,
                     text = RandomStringUtils.randomAlphabetic(10)
                 ),
                 IVotingOptionStatistics(
-                    optionId = System.currentTimeMillis().toInt(),
+                    optionId = 2,
                     voteCount = 3,
                     text = RandomStringUtils.randomAlphabetic(10)
                 ),
                 IVotingOptionStatistics(
-                    optionId = System.currentTimeMillis().toInt(),
+                    optionId = 3,
                     voteCount = 1,
                     text = RandomStringUtils.randomAlphabetic(10)
                 ),
                 IVotingOptionStatistics(
-                    optionId = System.currentTimeMillis().toInt(),
+                    optionId = 4,
                     voteCount = 4,
                     text = RandomStringUtils.randomAlphabetic(10)
                 )
@@ -399,4 +400,28 @@ object MockData {
     //多選題
     val mockMultiVoting: Voting
         get() = mockSingleVoting.copy(isMultipleChoice = true)
+
+    val mockIVotingOptionStatisticsWithVoterList: List<IVotingOptionStatisticsWithVoter>
+        get() = listOf(
+            IVotingOptionStatisticsWithVoter(
+                voterIds = listOf("1", "2", "3"),
+                optionId = 1,
+                text = RandomStringUtils.randomAlphabetic(10)
+            ),
+            IVotingOptionStatisticsWithVoter(
+                voterIds = listOf("1", "2", "3"),
+                optionId = 2,
+                text = RandomStringUtils.randomAlphabetic(10)
+            ),
+            IVotingOptionStatisticsWithVoter(
+                voterIds = listOf("1", "2", "3"),
+                optionId = 3,
+                text = RandomStringUtils.randomAlphabetic(10)
+            ),
+            IVotingOptionStatisticsWithVoter(
+                voterIds = listOf("1", "2", "3"),
+                optionId = 4,
+                text = RandomStringUtils.randomAlphabetic(10)
+            )
+        )
 }

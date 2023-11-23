@@ -10,6 +10,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -17,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.shared.member.MemberItemScreen
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
@@ -27,6 +30,8 @@ import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.socks.library.KLog
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -39,22 +44,32 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AnswererScreen(
     modifier: Modifier = Modifier,
-    channelId: String,
+    navController: DestinationsNavigator,
     iVotingOptionStatisticsWithVoter: IVotingOptionStatisticsWithVoter,
     viewModel: VoteViewModel = koinViewModel()
 ) {
+    val currentGroup by globalGroupViewModel().currentGroup.collectAsState()
+
+    val groupMember by viewModel.voterGroupMember.collectAsState()
+
     AnswererScreenView(
         modifier = modifier,
-        questionItem = "日本 \uD83D\uDDFC （10票）",
-        members = listOf(
-            MockData.mockGroupMember,
-            MockData.mockGroupMember,
-            MockData.mockGroupMember,
-            MockData.mockGroupMember,
-            MockData.mockGroupMember
-        ),
-        onBackClick = {}
+        questionItem = iVotingOptionStatisticsWithVoter.text.orEmpty(),
+        members = groupMember,
+        onBackClick = {
+            navController.popBackStack()
+        }
     )
+
+    LaunchedEffect(key1 = currentGroup) {
+        currentGroup?.let {
+            viewModel.getChoiceGroupMember(
+                groupId = it.id.orEmpty(),
+                voterIds = iVotingOptionStatisticsWithVoter.voterIds.orEmpty()
+            )
+        }
+    }
+
 }
 
 @Composable

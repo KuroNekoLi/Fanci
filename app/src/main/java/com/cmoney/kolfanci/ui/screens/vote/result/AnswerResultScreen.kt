@@ -65,7 +65,6 @@ fun AnswerResultScreen(
             }?.apply {
                 navController.navigate(
                     AnswererScreenDestination(
-                        channelId = channelId,
                         iVotingOptionStatisticsWithVoter = this
                     )
                 )

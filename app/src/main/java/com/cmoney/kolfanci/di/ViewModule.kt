@@ -189,6 +189,8 @@ val viewModule = module {
     }
     viewModel {
         VoteViewModel(context = androidApplication(),
-            voteUseCase = get())
+            voteUseCase = get(),
+            groupUseCase = get()
+        )
     }
 }

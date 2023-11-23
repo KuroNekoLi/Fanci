@@ -5,6 +5,8 @@ import com.cmoney.fanciapi.fanci.model.CastVoteParam
 import com.cmoney.fanciapi.fanci.model.VotingOption
 import com.cmoney.fanciapi.fanci.model.VotingParam
 import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.Flow
@@ -117,10 +119,14 @@ class VoteUseCase(
      * @param votingId 投票 id
      */
     suspend fun summaryVote(channelId: String, votingId: Long) = kotlin.runCatching {
-        votingApi.apiV1VotingVotingIdStatisticsGet(
-            channelId = channelId,
-            votingId = votingId
-        ).checkResponseBody()
+        if (Constant.isOpenMock) {
+            MockData.mockIVotingOptionStatisticsWithVoterList
+        } else {
+            votingApi.apiV1VotingVotingIdStatisticsGet(
+                channelId = channelId,
+                votingId = votingId
+            ).checkResponseBody()
+        }
     }
 
 }
