@@ -15,6 +15,7 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.copyToClipboard
+import com.cmoney.kolfanci.extension.toIReplyVotingList
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -461,7 +462,8 @@ class MessageViewModel(
                         id = messageInteract.message.id,
                         author = messageInteract.message.author,
                         content = messageInteract.message.content,
-                        isDeleted = messageInteract.message.isDeleted
+                        isDeleted = messageInteract.message.isDeleted,
+                        replyVotings = messageInteract.message.votings?.toIReplyVotingList()
                     )
                 )
             }

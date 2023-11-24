@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.extension
 
+import com.cmoney.fanciapi.fanci.model.IReplyVoting
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.model.vote.VoteModel
@@ -47,4 +48,14 @@ fun List<VoteModel>.toVotingList(): List<Voting> {
             isMultipleChoice = !voteModel.isSingleChoice
         )
     }
+}
+
+/**
+ * 轉為 回復用 model
+ */
+fun List<Voting>.toIReplyVotingList(): List<IReplyVoting> = this.map {
+    IReplyVoting(
+        id = it.id,
+        title = it.title
+    )
 }
