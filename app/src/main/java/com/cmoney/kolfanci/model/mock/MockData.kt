@@ -252,10 +252,10 @@ object MockData {
         get() {
             return if (BuildConfig.DEBUG) {
                 (1..Random.nextInt(2, 10)).map {
-                    mockMessage
+                    mockReplyMessage
                 }.apply {
-                    val mutableList = this.toMutableList()
-                    mutableList.add(mockReplyMessage)
+//                    val mutableList = this.toMutableList()
+//                    mutableList.add(mockReplyMessage)
                 }
             } else {
                 emptyList()
