@@ -108,13 +108,10 @@ class SearchUseCase(
      * 取得單一貼文訊息
      */
     suspend fun getSinglePostMessage(messageId: String) = kotlin.runCatching {
-        //TODO
-//        messageApi.apiV2MessageMessageTypeMessageIdGet(
-//            messageType = MessageServiceType.bulletinboard,
-//            messageId = messageId
-//        ).checkResponseBody()
-
-        MockData.mockMessage
+        messageApi.apiV2MessageMessageTypeMessageIdGet(
+            messageType = MessageServiceType.bulletinboard,
+            messageId = messageId
+        ).checkResponseBody()
     }
 
     /**

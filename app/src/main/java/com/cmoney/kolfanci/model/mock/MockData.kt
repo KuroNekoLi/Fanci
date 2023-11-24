@@ -12,6 +12,8 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.IChannelTab
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
+import com.cmoney.fanciapi.fanci.model.IReplyMessage
+import com.cmoney.fanciapi.fanci.model.IReplyVoting
 import com.cmoney.fanciapi.fanci.model.IUserVoteInfo
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
@@ -251,6 +253,9 @@ object MockData {
             return if (BuildConfig.DEBUG) {
                 (1..Random.nextInt(2, 10)).map {
                     mockMessage
+                }.apply {
+                    val mutableList = this.toMutableList()
+                    mutableList.add(mockReplyMessage)
                 }
             } else {
                 emptyList()
@@ -262,6 +267,7 @@ object MockData {
         get() {
             return if (BuildConfig.DEBUG) {
                 ChatMessage(
+                    id = Random.nextInt(1, 999).toString(),
                     author = mockGroupMember,
                     emojiCount = IEmojiCount(
                         like = Random.nextInt(1, 999),
@@ -309,6 +315,56 @@ object MockData {
                     serialNumber = Random.nextLong(1, 65536),
                     votings = listOf(
                         mockSingleVoting
+                    )
+                )
+            } else {
+                ChatMessage()
+            }
+        }
+
+    val mockReplyMessage: ChatMessage
+        get() {
+            return if (BuildConfig.DEBUG) {
+                ChatMessage(
+                    author = mockGroupMember,
+                    emojiCount = IEmojiCount(
+                        like = Random.nextInt(1, 999),
+                        laugh = Random.nextInt(1, 999),
+                        money = Random.nextInt(1, 999),
+                        shock = Random.nextInt(1, 999),
+                        cry = Random.nextInt(1, 999),
+                        think = Random.nextInt(1, 999),
+                        angry = Random.nextInt(1, 999)
+                    ),
+                    content = MediaIChatContent(
+                        text = "回覆訊息",
+                        medias = (1..Random.nextInt(2, 10)).map {
+                            Media(
+                                resourceLink = "https://picsum.photos/${
+                                    Random.nextInt(
+                                        100,
+                                        300
+                                    )
+                                }/${Random.nextInt(100, 300)}",
+                                type = AttachmentType.Image.name
+                            )
+                        }
+                    ),
+                    createUnixTime = System.currentTimeMillis().div(1000),
+                    serialNumber = Random.nextLong(1, 65536),
+                    votings = listOf(
+                        mockSingleVoting
+                    ),
+                    replyMessage = IReplyMessage(
+                        author = mockGroupMember,
+                        content = MediaIChatContent(
+                            text = "訊息內文"
+                        ),
+                        replyVotings = listOf(
+                            IReplyVoting(
+                                title = "✈️ 投票決定我去哪裡玩！史丹利這"
+                            )
+                        )
                     )
                 )
             } else {
@@ -401,7 +457,8 @@ object MockData {
     val mockMultiVoting: Voting
         get() = mockSingleVoting.copy(
             id = 123,
-            isMultipleChoice = true)
+            isMultipleChoice = true
+        )
 
     val mockIVotingOptionStatisticsWithVoterList: List<IVotingOptionStatisticsWithVoter>
         get() = listOf(
