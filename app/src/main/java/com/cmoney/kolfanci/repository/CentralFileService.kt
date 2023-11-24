@@ -23,13 +23,13 @@ interface CentralFileService {
 //    ): Response<FileUploadResponse>
 
     @Multipart
-    @POST("centralfileservice/files")
+    @POST("files")
     suspend fun uploadFile(
         @Part file: MultipartBody.Part,
         @Part("FileType") fileType: RequestBody
     ): Response<FileUploadResponse>
 
-    @GET("centralfileservice/files/{fileType}/{externalId}/status")
+    @GET("files/{fileType}/{externalId}/status")
     suspend fun checkUploadFileStatus(
         @Path("fileType") fileType: String,
         @Path("externalId") externalId: String
