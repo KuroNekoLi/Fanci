@@ -16,8 +16,8 @@ android {
         applicationId "com.cmoney.kolfanci"
         minSdk 24
         targetSdk 34
-        versionCode 6
-        versionName "1.0.9.3"
+        versionCode 7
+        versionName "1.0.10"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -41,6 +41,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "CM_SERVER_URL", '"https://www.cmoney.tw/"'
             buildConfigField "String", "FANCI_SERVER_URL", '"https://fanci.cmoney.tw/fanci/"'
+            buildConfigField "String", "CM_COMMON_URL", '"https://common.cmoney.tw/CentralFileService"'
         }
 
         debug {
@@ -50,6 +51,7 @@ android {
             versionNameSuffix '-debug'
             buildConfigField "String", "CM_SERVER_URL", '"https://outpost.cmoney.tw/"'
             buildConfigField "String", "FANCI_SERVER_URL", '"https://dev-connect.cmoney.tw/Fanci"'
+            buildConfigField "String", "CM_COMMON_URL", '"https://outpost.cmoney.tw/CentralFileService"'
         }
     }
 

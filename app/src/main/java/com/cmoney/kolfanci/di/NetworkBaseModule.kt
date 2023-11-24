@@ -70,7 +70,7 @@ val networkBaseModule = module {
 
     single(CM_COMMON_CLIENT) {
         ApiClient(
-            baseUrl = BuildConfig.CM_SERVER_URL,
+            baseUrl = BuildConfig.CM_COMMON_URL,
             okHttpClientBuilder = createOkHttpClient(androidApplication()).newBuilder(),
         ).apply {
             addAuthorization("Bearer", AddBearerTokenInterceptor())

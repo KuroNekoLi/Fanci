@@ -115,7 +115,7 @@ class AttachmentUseCase(
                         context = context,
                         status = status,
                         serverUrl = if (status == AttachmentInfoItem.Status.Success) {
-                            BuildConfig.CM_SERVER_URL + "centralfileservice/files/%s/%s".format(
+                            BuildConfig.CM_COMMON_URL + "/files/%s/%s".format(
                                 uploadFileType,
                                 externalId
                             )

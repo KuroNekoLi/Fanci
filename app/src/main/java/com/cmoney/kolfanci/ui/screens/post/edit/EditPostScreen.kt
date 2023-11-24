@@ -56,6 +56,7 @@ import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.toVoteModelList
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
@@ -520,31 +521,34 @@ private fun EditPostScreenView(
                     )
 
                     Spacer(modifier = Modifier.width(10.dp))
+                    if(Constant.isShowUploadFile()) {
+                        Spacer(modifier = Modifier.width(15.dp))
 
-                    //File picker
-                    Row(
-                        modifier.clickable {
-                            onAttachmentFilePicker.invoke()
-                        },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            modifier = Modifier.size(25.dp),
-                            painter = painterResource(id = R.drawable.file),
-                            colorFilter = ColorFilter.tint(LocalColor.current.text.default_100),
-                            contentDescription = null
-                        )
-
-                        Spacer(modifier = Modifier.width(5.dp))
-
-                        Text(
-                            text = "檔案",
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                lineHeight = 21.sp,
-                                color = LocalColor.current.text.default_80
+                        //File picker
+                        Row(
+                            modifier.clickable {
+                                onAttachmentFilePicker.invoke()
+                            },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                modifier = Modifier.size(25.dp),
+                                painter = painterResource(id = R.drawable.file),
+                                colorFilter = ColorFilter.tint(LocalColor.current.text.default_100),
+                                contentDescription = null
                             )
-                        )
+
+                            Spacer(modifier = Modifier.width(5.dp))
+
+                            Text(
+                                text = "檔案",
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    lineHeight = 21.sp,
+                                    color = LocalColor.current.text.default_80
+                                )
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.width(10.dp))
