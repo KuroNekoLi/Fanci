@@ -80,6 +80,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 sealed class MessageContentCallback {
     data class LongClick(val message: ChatMessage) : MessageContentCallback()
@@ -411,7 +412,11 @@ fun MediaContent(
     navController: DestinationsNavigator,
     medias: List<Media>,
     isClickable: Boolean = true,
-    audioViewModel: AudioViewModel = koinViewModel()
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
+        }
+    )
 ) {
     val context = LocalContext.current
     val mapList = medias.toAttachmentTypeMap()
