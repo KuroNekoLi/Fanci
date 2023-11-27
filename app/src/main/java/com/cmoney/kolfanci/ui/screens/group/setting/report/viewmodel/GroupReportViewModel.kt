@@ -6,12 +6,17 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BanPeriodOption
+import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
+import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportInformation
 import com.cmoney.fanciapi.fanci.model.ReportProcessStatus
 import com.cmoney.kolfanci.model.usecase.BanUseCase
+import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.socks.library.KLog
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class UiState(
@@ -26,10 +31,15 @@ class GroupReportViewModel(
     val groupUseCase: GroupUseCase,
     val reportList: List<ReportInformation>,
     val group: Group,
-    private val banUseCase: BanUseCase
+    private val banUseCase: BanUseCase,
+    val chatRoomUseCase: ChatRoomUseCase
 ) : ViewModel() {
 
     private val TAG = GroupReportViewModel::class.java.simpleName
+
+    //完整訊息
+    private val _singleMessage = MutableStateFlow<ChatMessage?>(null)
+    val singleMessage = _singleMessage.asStateFlow()
 
     var uiState by mutableStateOf(UiState())
         private set
@@ -195,5 +205,19 @@ class GroupReportViewModel(
         }
     }
 
-
+    /**
+     * 取得 檢舉完整訊息
+     */
+    fun getReportMessageInfo(messageId: String, messageServiceType: MessageServiceType) {
+        viewModelScope.launch {
+            chatRoomUseCase.getSingleMessage(
+                messageId = messageId,
+                messageServiceType = messageServiceType
+            ).fold({
+                _singleMessage.value = it
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
 }
