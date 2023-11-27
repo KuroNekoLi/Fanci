@@ -1,6 +1,8 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.report
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,14 +28,12 @@ import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportInformation
-import com.cmoney.kolfanci.extension.getDuration
-import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
-import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.message.MediaContent
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -56,13 +56,21 @@ fun GroupReportMessageScreen(
             parametersOf(emptyList<ReportInformation>(), Group())
         }
     ),
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
+        }
+    )
 ) {
 
     val reportMessage by groupReportViewModel.singleMessage.collectAsState()
 
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
+        ?.onBackPressedDispatcher
+
     LaunchedEffect(key1 = Unit) {
         groupReportViewModel.getReportMessageInfo(
-            messageId = reportInformation.id.orEmpty(),
+            messageId = reportInformation.contentId.orEmpty(),
             messageServiceType = if (reportInformation.tabType == ChannelTabType.chatRoom) {
                 MessageServiceType.chatroom
             } else {
@@ -74,15 +82,24 @@ fun GroupReportMessageScreen(
     GroupReportMessageScreenView(
         modifier = modifier,
         navigator = navigator,
-        chatMessage = reportMessage ?: ChatMessage()
+        chatMessage = reportMessage ?: ChatMessage(),
+        onBackClick = {
+            onBackPressedDispatcher?.onBackPressed()
+        }
     )
+
+    BackHandler {
+        audioViewModel.stopPlay()
+        navigator.popBackStack()
+    }
 }
 
 @Composable
 private fun GroupReportMessageScreenView(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    chatMessage: ChatMessage
+    chatMessage: ChatMessage,
+    onBackClick: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -91,7 +108,7 @@ private fun GroupReportMessageScreenView(
             TopBarScreen(
                 title = "遭檢舉資訊",
                 backClick = {
-                    navigator.popBackStack()
+                    onBackClick.invoke()
                 }
             )
         }
@@ -141,16 +158,7 @@ private fun GroupReportMessageScreenView(
                     MediaContent(
                         modifier = Modifier,
                         navController = navigator,
-                        medias = chatMessage.content?.medias.orEmpty(),
-                        onAttachClick = { media ->
-                            navigator.navigate(
-                                AudioPreviewScreenDestination(
-                                    uri = Uri.parse(media.resourceLink),
-                                    duration = media.getDuration(),
-                                    title = media.getFileName()
-                                )
-                            )
-                        }
+                        medias = chatMessage.content?.medias.orEmpty()
                     )
                 }
             }
@@ -164,7 +172,8 @@ fun GroupReportMessageScreenPreview() {
     FanciTheme {
         GroupReportMessageScreenView(
             navigator = EmptyDestinationsNavigator,
-            chatMessage = MockData.mockMessage
+            chatMessage = MockData.mockMessage,
+            onBackClick = {}
         )
     }
 }
