@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.report
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,13 +20,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.ReportInformation
+import com.cmoney.kolfanci.extension.getDuration
+import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
+import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
+import com.cmoney.kolfanci.ui.screens.chat.message.MediaContent
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreen
+import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.kolfanci.utils.Utils
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -89,20 +97,41 @@ private fun GroupReportMessageScreenView(
                             fontSize = 17.sp,
                             color = LocalColor.current.text.default_100,
                         )
+
+                        Spacer(modifier = Modifier.height(5.dp))
+
+                        //OG
+                        Utils.extractLinks(this).forEach { url ->
+                            MessageOGScreen(url = url)
+                        }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                //Image attach
+                //attach
                 if (reportInformation.mediasSnapshot?.isNotEmpty() == true) {
-                    MessageImageScreen(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f),
-                        images = reportInformation.mediasSnapshot?.map {
-                            it.resourceLink.orEmpty()
-                        }.orEmpty()
+                    //附加檔案
+                    MediaContent(
+                        modifier = Modifier,
+                        navController = navigator,
+                        medias = reportInformation.mediasSnapshot?.map {
+                            Media(
+                                resourceLink = it.resourceLink,
+                                type = it.type,
+                                isNeedAuthenticate = it.isNeedAuthenticate
+                            )
+
+                        }.orEmpty(),
+                        onAttachClick = { media ->
+                            navigator.navigate(
+                                AudioPreviewScreenDestination(
+                                    uri = Uri.parse(media.resourceLink),
+                                    duration = media.getDuration(),
+                                    title = media.getFileName()
+                                )
+                            )
+                        }
                     )
                 }
             }

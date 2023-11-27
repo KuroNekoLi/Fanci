@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.extension
 
 import android.net.Uri
+import com.cmoney.fanciapi.fanci.model.IMedia
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
@@ -77,3 +78,22 @@ fun List<Media>.toUploadFileItemMap() =
     }, {
         it.second
     })
+
+fun Media.getDisplayType() = when (type?.toAttachmentType()) {
+    AttachmentType.Audio -> "(音檔)"
+    AttachmentType.Image -> "(圖片)"
+    AttachmentType.Pdf -> "(檔案)"
+    AttachmentType.Txt -> "(檔案)"
+    AttachmentType.Unknown -> "(未知)"
+    null -> ""
+}
+
+fun IMedia.getDisplayType() = when (type?.toAttachmentType()) {
+    AttachmentType.Audio -> "(音檔)"
+    AttachmentType.Image -> "(圖片)"
+    AttachmentType.Pdf -> "(檔案)"
+    AttachmentType.Txt -> "(檔案)"
+    AttachmentType.Unknown -> "(未知)"
+    null -> ""
+}
+

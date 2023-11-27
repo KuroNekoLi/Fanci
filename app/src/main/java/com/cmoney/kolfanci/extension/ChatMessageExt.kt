@@ -35,14 +35,7 @@ fun ChatMessage.getPinMessage(): String {
     val mediaContent = mutableListOf<String>()
 
     content?.medias?.forEach { media ->
-        val content = when (media.type?.toAttachmentType()) {
-            AttachmentType.Audio -> "(音檔)"
-            AttachmentType.Image -> "(圖片)"
-            AttachmentType.Pdf -> "(檔案)"
-            AttachmentType.Txt -> "(檔案)"
-            AttachmentType.Unknown -> "(未知)"
-            null -> ""
-        }
+        val content = media.getDisplayType()
         mediaContent.add(content)
     }
 
