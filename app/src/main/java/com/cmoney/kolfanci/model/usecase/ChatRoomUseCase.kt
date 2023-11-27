@@ -139,6 +139,16 @@ class ChatRoomUseCase(
         }
 
     /**
+     * 取消 聊天室 公告
+     */
+    suspend fun cancelAnnounceMessage(channelId: String) =
+        kotlin.runCatching {
+            chatRoomApi.apiV1ChatRoomChatRoomChannelIdPinnedMessageDelete(
+                chatRoomChannelId = channelId,
+            ).checkResponseBody()
+        }
+
+    /**
      * 針對指定訊息 發送 Emoji
      * @param messageId 針對的訊息Id
      * @param emoji 要發送的 Emoji

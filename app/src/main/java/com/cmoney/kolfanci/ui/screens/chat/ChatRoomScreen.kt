@@ -34,9 +34,9 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.showToast
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -77,7 +77,7 @@ fun ChatRoomScreen(
     messageViewModel: MessageViewModel = koinViewModel(),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
-    resultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>
+    resultRecipient: ResultRecipient<AnnouncementScreenDestination, AnnouncementResult>
 ) {
     val TAG = "ChatRoomScreen"
 
@@ -106,7 +106,9 @@ fun ChatRoomScreen(
     }
 
     //抓取 公告
-    viewModel.fetchAnnounceMessage(channelId)
+    LaunchedEffect(Unit) {
+        viewModel.fetchAnnounceMessage(channelId)
+    }
 
     //離開頁面處理
     BackHandler(enabled = false) {
@@ -124,15 +126,18 @@ fun ChatRoomScreen(
         }
     }
 
-    //設定公告 callback
+    //設定,取消 公告 callback
     resultRecipient.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
 
             is NavResult.Value -> {
-                val announceMessage = result.value
+                val value = result.value
+                val isSetting = value.isSetting
+                val announceMessage = value.message
                 viewModel.announceMessageToServer(
+                    settingOrCancel = isSetting,
                     channelId,
                     announceMessage
                 )
@@ -345,7 +350,8 @@ fun ChatRoomScreen(
     routeAnnounceMessage?.apply {
         navController.navigate(
             AnnouncementScreenDestination(
-                this
+                message = this,
+                isPinMessage = false
             )
         )
         messageViewModel.announceRouteDone()
@@ -419,6 +425,8 @@ private fun ChatRoomScreenView(
     isShowLoading: Boolean,
     onResend: ((ReSendFile) -> Unit)
 ) {
+    val TAG = "ChatRoomScreenView"
+
     Column(
         modifier = Modifier
             .background(LocalColor.current.env_80)
@@ -429,7 +437,16 @@ private fun ChatRoomScreenView(
         announceMessage?.let {
             ChatRoomAnnounceScreen(
                 it,
-                modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
+                modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp),
+                onClick = {
+                    KLog.i(TAG, "announceMessage click.")
+                    navController.navigate(
+                        AnnouncementScreenDestination(
+                            message = it,
+                            isPinMessage = true
+                        )
+                    )
+                }
             )
         }
 
