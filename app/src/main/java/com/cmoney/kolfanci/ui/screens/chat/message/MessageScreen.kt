@@ -133,12 +133,10 @@ fun MessageScreen(
     LaunchedEffect(listState) {
         snapshotFlow { listState.isScrollInProgress }
             .collect { isScrolling ->
-                KLog.i("Warren", "LazyColumn is scrolling:$isScrolling")
 
                 //滑動停止
                 if (!isScrolling) {
                     val firstItemIndex = listState.firstVisibleItemIndex
-                    KLog.i("Warren", "firstItemIndex:" + firstItemIndex)
                     messageViewModel.pollingScopeMessage(
                         channelId = channelId,
                         itemIndex = firstItemIndex)

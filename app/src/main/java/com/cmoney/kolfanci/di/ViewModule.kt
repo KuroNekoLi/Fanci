@@ -106,7 +106,7 @@ val viewModule = module {
         UserViewModel(androidApplication())
     }
     viewModel { params ->
-        PostViewModel(get(), params.get(), get())
+        PostViewModel(get(), params.get(), chatRoomUseCase = get(), postPollUseCase = get())
     }
     viewModel { params ->
         EditPostViewModel(
@@ -188,7 +188,8 @@ val viewModule = module {
         )
     }
     viewModel {
-        VoteViewModel(context = androidApplication(),
+        VoteViewModel(
+            context = androidApplication(),
             voteUseCase = get(),
             groupUseCase = get()
         )

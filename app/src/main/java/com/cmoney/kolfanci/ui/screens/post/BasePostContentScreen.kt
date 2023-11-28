@@ -420,13 +420,12 @@ fun EmojiFeedback(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun PostContentScreenPreview() {
     FanciTheme {
         BasePostContentScreen(
-            post = PostViewModel.mockPost,
+            post = MockData.mockBulletinboardMessage,
             bottomContent = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically

@@ -11,6 +11,7 @@ import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
+import com.cmoney.kolfanci.model.usecase.PostPollUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.RelationUseCase
 import com.cmoney.kolfanci.model.usecase.SearchUseCase
@@ -82,6 +83,12 @@ val useCaseModule = module {
     factory {
         VoteUseCase(
             votingApi = get()
+        )
+    }
+    factory {
+        PostPollUseCase(
+            bulletinBoardApi = get(),
+            messageApi = get()
         )
     }
 }

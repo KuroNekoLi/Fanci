@@ -417,6 +417,13 @@ object MockData {
             commentCount = 0
         )
 
+    val mockListBulletinboardMessage: List<BulletinboardMessage>
+        get() {
+            return (1..Random.nextInt(2, 10)).map {
+                mockBulletinboardMessage
+            }
+        }
+
     val mockBulletinboardMessageWrapper: PostViewModel.BulletinboardMessageWrapper
         get() = PostViewModel.BulletinboardMessageWrapper(
             message = mockBulletinboardMessage, isPin = false

@@ -7,19 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.Emojis
-import com.cmoney.fanciapi.fanci.model.GroupMember
-import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
-import com.cmoney.fanciapi.fanci.model.Media
-import com.cmoney.fanciapi.fanci.model.MediaIChatContent
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.toBulletinboardMessage
-import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
+import com.cmoney.kolfanci.model.usecase.PostPollUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
@@ -27,18 +23,26 @@ import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.Utils
 import com.socks.library.KLog
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import kotlin.random.Random
 
 class PostViewModel(
     private val postUseCase: PostUseCase,
     val channelId: String,
-    private val chatRoomUseCase: ChatRoomUseCase
+    private val chatRoomUseCase: ChatRoomUseCase,
+    private val postPollUseCase: PostPollUseCase
 ) : ViewModel() {
     private val TAG = PostViewModel::class.java.simpleName
+
+    //區塊刷新 間隔
+    private val scopePollingInterval: Long = 5000
+
+    //區塊刷新 抓取筆數
+    private val scopeFetchCount = 3
 
     /**
      * 顯示貼文model
@@ -90,6 +94,11 @@ class PostViewModel(
                 _post.value = postList
 
                 fetchPinPost()
+
+                pollingScopePost(
+                    channelId = channelId,
+                    itemIndex = 0
+                )
             }, {
                 KLog.e(TAG, it)
                 fetchPinPost()
@@ -410,61 +419,49 @@ class PostViewModel(
         }
     }
 
-    companion object {
-        val mockListMessage: List<BulletinboardMessage>
-            get() {
-                return (1..Random.nextInt(2, 10)).map {
-                    mockPost
+    private var pollingJob: Job? = null
+
+    /**
+     * Polling 範圍內的貼文
+     */
+    fun pollingScopePost(channelId: String, itemIndex: Int) {
+        KLog.i(TAG, "pollingScopePost:$channelId, $itemIndex")
+        pollingJob?.cancel()
+        pollingJob = viewModelScope.launch {
+            if (_post.value.size > itemIndex) {
+                val item = _post.value[itemIndex]
+                val message = item.message
+                val serialNumber = message.serialNumber
+
+                postPollUseCase.pollScope(
+                    delay = scopePollingInterval,
+                    channelId = channelId,
+                    fromSerialNumber = serialNumber,
+                    fetchCount = scopeFetchCount,
+                    messageId = message.id.orEmpty()
+                ).collect { emitPostPaging ->
+                    if (emitPostPaging.items?.isEmpty() == true) {
+                        return@collect
+                    }
+
+                    //Update data
+                    val updateMessageList = _post.value.map { post ->
+                        val filterMessage = emitPostPaging.items?.firstOrNull {
+                            it.id == post.message.id
+                        }
+
+                        if (filterMessage == null) {
+                            post
+                        } else {
+                            post.copy(message = filterMessage)
+                        }
+                    }
+
+                    _post.update {
+                        updateMessageList
+                    }
                 }
             }
-
-        val mockPost = BulletinboardMessage(
-            author = GroupMember(
-                name = "Groudon",
-                thumbNail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqi_eE11nxjmd9wkk0Q7IR_0anrm8Uf9DaQA&usqp=CAU"
-            ),
-            emojiCount = IEmojiCount(
-                like = Random.nextInt(1, 999),
-                laugh = Random.nextInt(1, 999),
-                money = Random.nextInt(1, 999),
-                shock = Random.nextInt(1, 999),
-                cry = Random.nextInt(1, 999),
-                think = Random.nextInt(1, 999),
-                angry = Random.nextInt(1, 999)
-            ),
-            content = MediaIChatContent(
-                text = "大學時期時想像的出社會的我\n" +
-                        "就是這個樣子吧！！\n" +
-                        "穿著西裝匆忙地走在大樓間\n" +
-                        "再來有一個幻想是：（這是真的哈哈哈）\n" +
-                        "因為我發現很多台灣人都有自己的水壺 （韓國以前沒有這個文化）\n" +
-                        "心裡想…我以後也要有一個哈哈哈哈在辦公室喝嘻嘻\n" +
-                        "最近水壺越來越厲害了也\n" +
-                        "WOKY的水壺也太好看了吧！！！\n" +
-                        "不僅有9個顏色 選項超多\n" +
-                        "它是770ML大大的容量\n" +
-                        "超適合外帶手搖飲在辦公喝哈哈\n" +
-                        "再來是我最重視的！\n" +
-                        "它的口很大\n" +
-                        "而且是鈦陶瓷的關係容易清潔\n" +
-                        "裝咖啡、果汁都不沾色不卡味\n" +
-                        "我命名為～Fancy Cutie 一波呦 渾圓杯\n" +
-                        "太好看了 我不會忘記帶它出門的^^\n" +
-                        "最近還有在持續執行多喝水計畫\n" +
-                        "大家如果也剛好有需要水壺\n" +
-                        "可以參考看看一起多喝水",
-                medias = (1..Random.nextInt(2, 10)).map {
-                    Media(
-                        resourceLink = "https://picsum.photos/${
-                            Random.nextInt(
-                                100,
-                                300
-                            )
-                        }/${Random.nextInt(100, 300)}",
-                        type = AttachmentType.Image.name
-                    )
-                }
-            )
-        )
+        }
     }
 }

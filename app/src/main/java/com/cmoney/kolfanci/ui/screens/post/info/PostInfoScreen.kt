@@ -70,6 +70,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -1293,7 +1294,7 @@ fun PostInfoScreenPreview() {
         PostInfoScreenView(
             navController = EmptyDestinationsNavigator,
             channel = Channel(),
-            post = PostViewModel.mockPost,
+            post = MockData.mockBulletinboardMessage,
             isPinPost = false,
             attachment = emptyList(),
             comments = emptyList(),

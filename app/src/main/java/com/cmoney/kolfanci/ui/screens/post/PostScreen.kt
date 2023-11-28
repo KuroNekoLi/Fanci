@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +54,7 @@ import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
@@ -210,6 +212,22 @@ fun PostScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchPost()
+    }
+
+    //監控滑動狀態, 停止的時候 polling 資料
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.isScrollInProgress }
+            .collect { isScrolling ->
+                //滑動停止
+                if (!isScrolling) {
+                    val firstItemIndex = listState.firstVisibleItemIndex
+
+                    viewModel.pollingScopePost(
+                        channelId = channel.id.orEmpty(),
+                        itemIndex = firstItemIndex
+                    )
+                }
+            }
     }
 
     listState.OnBottomReached {
@@ -407,7 +425,8 @@ private fun PostScreenView(
                             },
                             onEmojiClick = {
                                 if (Constant.isCanEmoji()) {
-                                    AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                    AppUserLogger.getInstance()
+                                        .log(Clicked.ExistingEmoji, From.PostList)
                                     onEmojiClick.invoke(pinPost, it)
                                 }
                             },
@@ -446,7 +465,8 @@ private fun PostScreenView(
                         },
                         onEmojiClick = {
                             if (Constant.isCanEmoji()) {
-                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.ExistingEmoji, From.PostList)
                                 onEmojiClick.invoke(post, it)
                             }
                         },
@@ -588,7 +608,7 @@ private fun EmptyPostContent(modifier: Modifier = Modifier) {
 fun PostScreenPreview() {
     FanciTheme {
         PostScreenView(
-            postList = PostViewModel.mockListMessage.map {
+            postList = MockData.mockListBulletinboardMessage.map {
                 PostViewModel.BulletinboardMessageWrapper(message = it)
             },
             pinPost = null,
