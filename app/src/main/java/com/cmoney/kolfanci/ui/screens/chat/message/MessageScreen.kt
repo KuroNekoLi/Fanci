@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -126,6 +127,23 @@ fun MessageScreen(
     } else {
         //Empty Message
         EmptyMessageContent(modifier = modifier)
+    }
+
+    //監控滑動狀態, 停止的時候 polling 資料
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.isScrollInProgress }
+            .collect { isScrolling ->
+                KLog.i("Warren", "LazyColumn is scrolling:$isScrolling")
+
+                //滑動停止
+                if (!isScrolling) {
+                    val firstItemIndex = listState.firstVisibleItemIndex
+                    KLog.i("Warren", "firstItemIndex:" + firstItemIndex)
+                    messageViewModel.pollingScopeMessage(
+                        channelId = channelId,
+                        itemIndex = firstItemIndex)
+                }
+            }
     }
 
     showReSendDialog?.let {

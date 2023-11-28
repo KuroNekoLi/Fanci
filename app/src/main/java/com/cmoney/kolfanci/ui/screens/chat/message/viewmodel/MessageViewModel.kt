@@ -34,11 +34,13 @@ import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.remoteconfig_library.extension.getKeyValue
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.socks.library.KLog
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ImageAttachState(
@@ -109,6 +111,12 @@ class MessageViewModel(
         get() {
             return FirebaseRemoteConfig.getInstance().getKeyValue(PollingFrequencyKey).times(1000)
         }
+
+    //區塊刷新 間隔
+    private val scopePollingInterval: Long = 5000
+
+    //區塊刷新 抓取筆數
+    private val scopeFetchCount = 3
 
     /**
      * 圖片上傳 callback
@@ -823,6 +831,52 @@ class MessageViewModel(
                     startPolling(channelId, allMessage.last().serialNumber)
                 }.onFailure { e ->
                     KLog.e(TAG, e)
+                }
+            }
+        }
+    }
+
+    private var pollingJob: Job? = null
+
+    /**
+     * Polling 範圍內的訊息
+     */
+    fun pollingScopeMessage(channelId: String, itemIndex: Int) {
+        KLog.i(TAG, "pollingScopeMessage:$itemIndex")
+        pollingJob?.cancel()
+        pollingJob = viewModelScope.launch {
+//            val messageList = _message.value
+            if (_message.value.size > itemIndex) {
+                val item = _message.value[itemIndex]
+                val message = item.message
+                //filter time bar
+                if (item.messageType != ChatMessageWrapper.MessageType.TimeBar) {
+                    chatRoomPollUseCase.pollScope(
+                        delay = scopePollingInterval,
+                        channelId = channelId,
+                        fromSerialNumber = message.serialNumber,
+                        fetchCount = scopeFetchCount
+                    ).collect { emitMessagePaging ->
+                        if (emitMessagePaging.items?.isEmpty() == true) {
+                            return@collect
+                        }
+
+                        //Update data
+                        val updateMessageList = _message.value.map { message ->
+                            val filterMessage = emitMessagePaging.items?.firstOrNull {
+                                it.id == message.message.id
+                            }
+                            if (filterMessage == null) {
+                                message
+                            } else {
+                                message.copy(message = filterMessage)
+                            }
+                        }
+
+                        _message.update {
+                            updateMessageList
+                        }
+                    }
                 }
             }
         }
