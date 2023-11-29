@@ -131,7 +131,6 @@ fun BaseEditMessageScreen(
             viewModel.onDeleteImageClick(it)
         },
         onPostClick = { text ->
-            //todo
             viewModel.onUpdatePostClick(editMessage, text, emptyList())
         },
         onBack = {
@@ -302,7 +301,6 @@ private fun BaseEditMessageScreenView(
                             onShowImagePicker.invoke()
                         },
                         onResend = {
-                            //TODO
                         },
                         onClick = { uri ->
                             StfalconImageViewer
