@@ -41,9 +41,6 @@ class PostViewModel(
     //區塊刷新 間隔
     private val scopePollingInterval: Long = 5000
 
-    //區塊刷新 抓取筆數
-    private val scopeFetchCount = 3
-
     /**
      * 顯示貼文model
      */
@@ -97,7 +94,8 @@ class PostViewModel(
 
                 pollingScopePost(
                     channelId = channelId,
-                    itemIndex = 0
+                    startItemIndex = 0,
+                    lastIndex = 0
                 )
             }, {
                 KLog.e(TAG, it)
@@ -423,15 +421,23 @@ class PostViewModel(
 
     /**
      * Polling 範圍內的貼文
+     *
+     * @param channelId 頻道 id
+     * @param startItemIndex 畫面第一個 item position
+     * @param lastIndex 畫面最後一個 item position
      */
-    fun pollingScopePost(channelId: String, itemIndex: Int) {
-        KLog.i(TAG, "pollingScopePost:$channelId, $itemIndex")
+    fun pollingScopePost(channelId: String,
+                         startItemIndex: Int,
+                         lastIndex: Int) {
+        KLog.i(TAG, "pollingScopePost:$channelId, startItemIndex:$startItemIndex, lastIndex:$lastIndex")
+
         pollingJob?.cancel()
         pollingJob = viewModelScope.launch {
-            if (_post.value.size > itemIndex) {
-                val item = _post.value[itemIndex]
+            if (_post.value.size > startItemIndex) {
+                val item = _post.value[startItemIndex]
                 val message = item.message
                 val serialNumber = message.serialNumber
+                val scopeFetchCount = (lastIndex - startItemIndex).plus(1)
 
                 postPollUseCase.pollScope(
                     delay = scopePollingInterval,

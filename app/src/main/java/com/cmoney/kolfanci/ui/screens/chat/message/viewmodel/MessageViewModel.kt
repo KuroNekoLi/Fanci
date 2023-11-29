@@ -115,9 +115,6 @@ class MessageViewModel(
     //區塊刷新 間隔
     private val scopePollingInterval: Long = 5000
 
-    //區塊刷新 抓取筆數
-    private val scopeFetchCount = 3
-
     /**
      * 圖片上傳 callback
      */
@@ -840,15 +837,23 @@ class MessageViewModel(
 
     /**
      * Polling 範圍內的訊息
+     *
+     * @param channelId 頻道 id
+     * @param startItemIndex 畫面第一個 item position
+     * @param lastIndex 畫面最後一個 item position
      */
-    fun pollingScopeMessage(channelId: String, itemIndex: Int) {
-        KLog.i(TAG, "pollingScopeMessage:$itemIndex")
+    fun pollingScopeMessage(channelId: String,
+                            startItemIndex: Int,
+                            lastIndex: Int) {
+        KLog.i(TAG, "pollingScopeMessage:$channelId, startItemIndex:$startItemIndex, lastIndex:$lastIndex")
+
         pollingJob?.cancel()
         pollingJob = viewModelScope.launch {
-//            val messageList = _message.value
-            if (_message.value.size > itemIndex) {
-                val item = _message.value[itemIndex]
+            if (_message.value.size > startItemIndex) {
+                val item = _message.value[startItemIndex]
                 val message = item.message
+                val scopeFetchCount = (lastIndex - startItemIndex).plus(1)
+
                 //filter time bar
                 if (item.messageType != ChatMessageWrapper.MessageType.TimeBar) {
                     chatRoomPollUseCase.pollScope(

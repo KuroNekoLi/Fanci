@@ -26,6 +26,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -214,6 +215,17 @@ fun PostScreen(
         viewModel.fetchPost()
     }
 
+    //目前畫面最後一個item index
+    val columnEndPosition by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            visibleItemsInfo.lastOrNull()?.let {
+                it.index
+            } ?: 0
+        }
+    }
+
     //監控滑動狀態, 停止的時候 polling 資料
     LaunchedEffect(listState) {
         snapshotFlow { listState.isScrollInProgress }
@@ -224,7 +236,8 @@ fun PostScreen(
 
                     viewModel.pollingScopePost(
                         channelId = channel.id.orEmpty(),
-                        itemIndex = firstItemIndex
+                        startItemIndex = firstItemIndex,
+                        lastIndex = columnEndPosition
                     )
                 }
             }
