@@ -72,11 +72,13 @@ object Constant {
      * 是否出現 上傳檔案功能
      */
     fun isShowUploadFile() : Boolean {
-        val iRemoteConfig = GlobalContext.get().get<IRemoteConfig>()
-        return when (iRemoteConfig.getAppStatus()) {
-            is AppStatus.IsUnderReview -> false
-            else -> true
-        }
+        //因為之前server 還未完成, app 先送審, 先隱藏起來
+//        val iRemoteConfig = GlobalContext.get().get<IRemoteConfig>()
+//        return when (iRemoteConfig.getAppStatus()) {
+//            is AppStatus.IsUnderReview -> false
+//            else -> true
+//        }
+        return true
     }
 
     /**
