@@ -80,6 +80,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 sealed class MessageContentCallback {
     data class LongClick(val message: ChatMessage) : MessageContentCallback()
@@ -405,13 +406,20 @@ fun MessageContentScreen(
  * @param navController 跳轉用 Controller
  * @param medias 附加檔案
  * @param isClickable 是否可以點擊圖片,放大瀏覽
+ * @param onAttachClick 自定義點擊處理
  */
 @Composable
 fun MediaContent(
+    modifier: Modifier = Modifier.padding(start = 40.dp),
     navController: DestinationsNavigator,
     medias: List<Media>,
     isClickable: Boolean = true,
-    audioViewModel: AudioViewModel = koinViewModel()
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
+        }
+    ),
+    onAttachClick: ((Media) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val mapList = medias.toAttachmentTypeMap()
@@ -423,7 +431,9 @@ fun MediaContent(
         when (key) {
             AttachmentType.Audio -> {
                 LazyRow(
-                    modifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp),
+                    modifier = modifier.then(
+                        Modifier.padding(top = 10.dp, end = 10.dp)
+                    ),
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
@@ -440,15 +450,19 @@ fun MediaContent(
                             isShowResend = false,
                             displayName = media.getFileName(),
                             onClick = {
-                                AttachmentController.onAttachmentClick(
-                                    navController = navController,
-                                    uri = Uri.parse(fileUrl),
-                                    context = context,
-                                    attachmentType = AttachmentType.Audio,
-                                    fileName = media.getFileName(),
-                                    duration = media.getDuration(),
-                                    audioViewModel = audioViewModel
-                                )
+                                onAttachClick?.let {
+                                    onAttachClick.invoke(media)
+                                } ?: kotlin.run {
+                                    AttachmentController.onAttachmentClick(
+                                        navController = navController,
+                                        uri = Uri.parse(fileUrl),
+                                        context = context,
+                                        attachmentType = AttachmentType.Audio,
+                                        fileName = media.getFileName(),
+                                        duration = media.getDuration(),
+                                        audioViewModel = audioViewModel
+                                    )
+                                }
                             }
                         )
                     }
@@ -460,7 +474,9 @@ fun MediaContent(
                     images = media.map {
                         it.resourceLink.orEmpty()
                     },
-                    modifier = Modifier.padding(top = 10.dp, start = 40.dp),
+                    modifier = modifier.then(
+                        Modifier.padding(top = 10.dp, end = 10.dp)
+                    ),
                     otherItemModifier = Modifier.padding(top = 10.dp),
                     isClickable = isClickable,
                     onImageClick = {
@@ -471,7 +487,9 @@ fun MediaContent(
 
             AttachmentType.Pdf, AttachmentType.Txt -> {
                 LazyRow(
-                    modifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp),
+                    modifier = modifier.then(
+                        Modifier.padding(top = 10.dp, end = 10.dp)
+                    ),
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
@@ -490,13 +508,17 @@ fun MediaContent(
                             isShowResend = false,
                             displayName = media.getFileName(),
                             onClick = {
-                                AttachmentController.onAttachmentClick(
-                                    navController = navController,
-                                    uri = Uri.parse(fileUrl),
-                                    context = context,
-                                    attachmentType = mediaType?.toAttachmentType(),
-                                    fileName = media.getFileName()
-                                )
+                                onAttachClick?.let {
+                                    onAttachClick.invoke(media)
+                                } ?: kotlin.run {
+                                    AttachmentController.onAttachmentClick(
+                                        navController = navController,
+                                        uri = Uri.parse(fileUrl),
+                                        context = context,
+                                        attachmentType = mediaType?.toAttachmentType(),
+                                        fileName = media.getFileName()
+                                    )
+                                }
                             }
                         )
                     }

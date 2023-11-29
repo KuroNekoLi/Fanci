@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
@@ -120,17 +121,32 @@ class ChatRoomViewModel(
 
     /**
      * 將訊息設定成公告
+     *
+     * @param settingOrCancel 設定/取消
      * @param channelId 頻道 ID
      * @param chatMessage 訊息
      */
-    fun announceMessageToServer(channelId: String, chatMessage: ChatMessage) {
+    fun announceMessageToServer(
+        settingOrCancel: Boolean,
+        channelId: String,
+        chatMessage: ChatMessage
+    ) {
         KLog.i(TAG, "announceMessageToServer:$chatMessage")
         viewModelScope.launch {
-            chatRoomUseCase.setAnnounceMessage(channelId, chatMessage).fold({
-                _announceMessage.value = chatMessage
-            }, {
-                _errorMessage.emit(it.toString())
-            })
+            if (settingOrCancel) {
+                chatRoomUseCase.setAnnounceMessage(channelId, chatMessage).fold({
+                    _announceMessage.value = chatMessage
+                }, {
+                    _errorMessage.emit(it.toString())
+                })
+            } else {
+                chatRoomUseCase.cancelAnnounceMessage(channelId).fold({
+                    _announceMessage.value = null
+                }, {
+                    KLog.e(TAG, it)
+                    _errorMessage.emit(it.toString())
+                })
+            }
         }
     }
 

@@ -38,6 +38,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
+import com.cmoney.kolfanci.ui.screens.chat.AnnouncementResult
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
@@ -95,7 +96,7 @@ fun ChannelScreen(
             parametersOf(Uri.EMPTY)
         }
     ),
-    announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
+    announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, AnnouncementResult>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
     redDotResultBackNavigator: ResultBackNavigator<ResetRedDot>
@@ -171,7 +172,7 @@ private fun ChannelScreenView(
     unreadCount: Pair<Long, Long>?,
     navController: DestinationsNavigator,
     isShowAudioMiniIcon: Boolean,
-    announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, ChatMessage>,
+    announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, AnnouncementResult>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
     onChatPageSelected: () -> Unit,
