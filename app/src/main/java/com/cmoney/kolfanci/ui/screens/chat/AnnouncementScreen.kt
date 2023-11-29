@@ -1,6 +1,9 @@
 package com.cmoney.kolfanci.ui.screens.chat
 
+import android.net.Uri
 import android.os.Parcelable
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +31,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageContentScreen
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -37,6 +41,8 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import kotlinx.parcelize.Parcelize
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Parcelize
 data class AnnouncementResult(
@@ -58,14 +64,23 @@ fun AnnouncementScreen(
     navigator: DestinationsNavigator,
     message: ChatMessage,
     isPinMessage: Boolean,
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
+        }
+    ),
     resultBackNavigator: ResultBackNavigator<AnnouncementResult>
 ) {
+
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
+        ?.onBackPressedDispatcher
+
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
             TopBarScreen(
                 title = "設定公告訊息",
                 backClick = {
-                    navigator.popBackStack()
+                    onBackPressedDispatcher?.onBackPressed()
                 }
             )
         }
@@ -160,6 +175,11 @@ fun AnnouncementScreen(
                 } 
             }
         }
+    }
+
+    BackHandler {
+        audioViewModel.stopPlay()
+        navigator.popBackStack()
     }
 }
 
