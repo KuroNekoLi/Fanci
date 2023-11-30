@@ -576,6 +576,11 @@ fun PostInfoScreen(
         }
     }
 
+    //定時刷新本文
+    LaunchedEffect(key1 = Unit) {
+        viewModel.pollingSinglePost()
+    }
+
     //==================== 彈窗提示 ====================
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->

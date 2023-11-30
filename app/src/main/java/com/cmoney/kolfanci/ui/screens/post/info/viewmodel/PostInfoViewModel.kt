@@ -17,8 +17,8 @@ import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
+import com.cmoney.kolfanci.model.usecase.PostPollUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
-import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
@@ -27,6 +27,7 @@ import com.cmoney.kolfanci.ui.theme.White_494D54
 import com.cmoney.kolfanci.ui.theme.White_767A7F
 import com.cmoney.kolfanci.utils.Utils
 import com.socks.library.KLog
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,7 +40,7 @@ class PostInfoViewModel(
     private val chatRoomUseCase: ChatRoomUseCase,
     private val bulletinboardMessage: BulletinboardMessage,
     private val channel: Channel,
-    private val uploadImageUseCase: UploadImageUseCase
+    private val postPollUseCase: PostPollUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = PostInfoViewModel::class.java.simpleName
@@ -90,6 +91,9 @@ class PostInfoViewModel(
 
     //紀錄目前展開狀態
     private val replyExpandState = hashMapOf<String, Boolean>()
+
+    //區塊刷新 間隔
+    private val scopePollingInterval: Long = 5000
 
     init {
         fetchComment(
@@ -607,7 +611,10 @@ class PostInfoViewModel(
      * 更新貼文
      */
     fun onUpdatePost(post: BulletinboardMessage) {
-        _post.value = post
+        KLog.i(TAG, "onUpdatePost")
+        _post.update {
+            post
+        }
     }
 
     /**
@@ -728,6 +735,38 @@ class PostInfoViewModel(
             _replyMap.value[commentId] = replyData.copy(
                 replyList = replyList
             )
+        }
+    }
+
+
+    private var pollingJob: Job? = null
+
+    fun pollingSinglePost() {
+        KLog.i(TAG, "pollingSinglePost")
+
+        pollingJob?.cancel()
+        pollingJob = viewModelScope.launch {
+            val message = _post.value
+            val serialNumber = message.serialNumber
+            val scopeFetchCount = 1
+
+            postPollUseCase.pollScope(
+                delay = scopePollingInterval,
+                channelId = channel.id.orEmpty(),
+                fromSerialNumber = serialNumber,
+                fetchCount = scopeFetchCount,
+                messageId = message.id.orEmpty()
+            ).collect { emitPostPaging ->
+                if (emitPostPaging.items?.isEmpty() == true) {
+                    return@collect
+                }
+
+                emitPostPaging.items?.firstOrNull { item ->
+                    item.id == message.id
+                }?.let { newMessage ->
+                    onUpdatePost(newMessage)
+                }
+            }
         }
     }
 }

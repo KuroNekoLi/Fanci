@@ -123,7 +123,14 @@ val viewModule = module {
         )
     }
     viewModel { params ->
-        PostInfoViewModel(androidApplication(), get(), get(), params.get(), params.get(), get())
+        PostInfoViewModel(
+            androidApplication(),
+            get(),
+            get(),
+            params.get(),
+            params.get(),
+            postPollUseCase = get()
+        )
     }
     viewModel {
         GroupViewModel(
