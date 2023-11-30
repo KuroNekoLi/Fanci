@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.chat
+package com.cmoney.kolfanci.ui.screens.chat.announcement
 
 import android.net.Uri
 import android.os.Parcelable
@@ -16,10 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +38,8 @@ import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageContentScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -40,6 +47,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -58,6 +66,7 @@ data class AnnouncementResult(
  * @param isPinMessage 是否為置頂貼文
  * @param resultBackNavigator 設定結果 callback, boolean:是否為設定or取消 公告 true:設定 false:取消
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Destination
 @Composable
 fun AnnouncementScreen(
@@ -72,6 +81,23 @@ fun AnnouncementScreen(
     resultBackNavigator: ResultBackNavigator<AnnouncementResult>
 ) {
 
+    val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
+
+    val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
+
+    val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
+
+    //控制 audio BottomSheet
+    val audioPlayerState = rememberModalBottomSheetState(
+        if (isOpenBottomAudioPlayer) {
+            ModalBottomSheetValue.Expanded
+        } else {
+            ModalBottomSheetValue.Hidden
+        }
+    )
+
+    val coroutineScope = rememberCoroutineScope()
+
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
         ?.onBackPressedDispatcher
 
@@ -83,18 +109,17 @@ fun AnnouncementScreen(
                     onBackPressedDispatcher?.onBackPressed()
                 }
             )
-        }
+        },
+        backgroundColor = LocalColor.current.env_80
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.Bottom
+                .padding(innerPadding)
         ) {
 
             LazyColumn(
                 modifier = Modifier
-                    .weight(1f)
                     .background(LocalColor.current.env_80)
             ) {
                 item {
@@ -111,9 +136,11 @@ fun AnnouncementScreen(
                 }
             }
 
+
             if (Constant.isCanManage()) {
                 Box(
                     modifier = Modifier
+                        .align(Alignment.BottomEnd)
                         .fillMaxWidth()
                         .background(LocalColor.current.env_100)
                         .padding(24.dp),
@@ -174,11 +201,29 @@ fun AnnouncementScreen(
                     }
                 } 
             }
+
+            if (isShowAudioMiniIcon) {
+                AudioMiniPlayIconScreen(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 120.dp),
+                    isPlaying = isAudioPlaying,
+                    onClick = {
+                        coroutineScope.launch {
+                            audioPlayerState.show()
+                        }
+                    }
+                )
+
+                //mini player
+                AudioBottomPlayerScreen(
+                    state = audioPlayerState
+                )
+            }
         }
     }
 
     BackHandler {
-        audioViewModel.stopPlay()
         navigator.popBackStack()
     }
 }

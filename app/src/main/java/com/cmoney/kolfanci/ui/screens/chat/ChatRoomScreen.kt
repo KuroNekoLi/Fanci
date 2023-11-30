@@ -42,6 +42,7 @@ import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.screens.chat.announcement.AnnouncementResult
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.HideUserDialogScreen

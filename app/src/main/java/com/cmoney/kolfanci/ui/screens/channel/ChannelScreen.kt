@@ -38,7 +38,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
-import com.cmoney.kolfanci.ui.screens.chat.AnnouncementResult
+import com.cmoney.kolfanci.ui.screens.chat.announcement.AnnouncementResult
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
