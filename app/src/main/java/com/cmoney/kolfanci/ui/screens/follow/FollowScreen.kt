@@ -39,12 +39,10 @@ import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberDrawerState
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -87,8 +85,6 @@ import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
-import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
-import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -266,10 +262,6 @@ fun FollowScreen(
         viewModel.alreadyNotifyAllowNotificationPermission()
     }
 
-    val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
-
-    val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
-
     FollowScreenView(
         modifier = modifier,
         navigator = navigator,
@@ -305,9 +297,7 @@ fun FollowScreen(
                 GroupSettingScreenDestination
             )
         },
-        notificationUnReadCount = notificationUnReadCount,
-        isShowAudioMiniIcon = isShowAudioMiniIcon,
-        isAudioPlaying = isAudioPlaying
+        notificationUnReadCount = notificationUnReadCount
     )
 
     LaunchedEffect(key1 = Unit) {
@@ -336,18 +326,13 @@ fun FollowScreenView(
     onGoToMy: () -> Unit,
     isShowBubbleTip: Boolean,
     onMoreClick: (Group) -> Unit,
-    notificationUnReadCount: Long,
-    isShowAudioMiniIcon: Boolean,
-    isAudioPlaying: Boolean
+    notificationUnReadCount: Long
 ) {
     val TAG = "FollowScreenView"
 
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState: ScaffoldState =
         rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
-
-    //控制 audio BottomSheet
-    val audioPlayerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
     Scaffold(
         modifier = modifier
@@ -592,26 +577,6 @@ fun FollowScreenView(
                                 }
                             }
                         }
-
-                        //是否有音樂播放中
-                        if (isShowAudioMiniIcon) {
-                            AudioMiniPlayIconScreen(
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(bottom = 60.dp),
-                                isPlaying = isAudioPlaying,
-                                onClick = {
-                                    coroutineScope.launch {
-                                        audioPlayerState.show()
-                                    }
-                                }
-                            )
-
-                            //mini player
-                            AudioBottomPlayerScreen(
-                                state = audioPlayerState
-                            )
-                        }
                     }
                 }
             }
@@ -733,9 +698,7 @@ fun FollowScreenPreview() {
             onGoToMy = {},
             isShowBubbleTip = false,
             onMoreClick = {},
-            notificationUnReadCount = 99,
-            isShowAudioMiniIcon = false,
-            isAudioPlaying = true
+            notificationUnReadCount = 99
         )
     }
 }

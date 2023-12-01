@@ -48,9 +48,7 @@ import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getDisplayType
 import com.cmoney.kolfanci.extension.isVip
-import com.cmoney.kolfanci.extension.toAttachmentType
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.common.GrayButton

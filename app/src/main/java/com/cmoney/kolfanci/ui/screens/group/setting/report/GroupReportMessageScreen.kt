@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.report
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
@@ -33,7 +32,6 @@ import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.screens.chat.message.MediaContent
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReportViewModel
-import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -54,11 +52,6 @@ fun GroupReportMessageScreen(
     groupReportViewModel: GroupReportViewModel = koinViewModel(
         parameters = {
             parametersOf(emptyList<ReportInformation>(), Group())
-        }
-    ),
-    audioViewModel: AudioViewModel = koinViewModel(
-        parameters = {
-            parametersOf(Uri.EMPTY)
         }
     )
 ) {
@@ -89,7 +82,6 @@ fun GroupReportMessageScreen(
     )
 
     BackHandler {
-        audioViewModel.stopPlay()
         navigator.popBackStack()
     }
 }
