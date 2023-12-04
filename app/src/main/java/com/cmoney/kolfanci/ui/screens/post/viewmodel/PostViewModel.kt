@@ -426,10 +426,15 @@ class PostViewModel(
      * @param startItemIndex 畫面第一個 item position
      * @param lastIndex 畫面最後一個 item position
      */
-    fun pollingScopePost(channelId: String,
-                         startItemIndex: Int,
-                         lastIndex: Int) {
-        KLog.i(TAG, "pollingScopePost:$channelId, startItemIndex:$startItemIndex, lastIndex:$lastIndex")
+    fun pollingScopePost(
+        channelId: String,
+        startItemIndex: Int,
+        lastIndex: Int
+    ) {
+        KLog.i(
+            TAG,
+            "pollingScopePost:$channelId, startItemIndex:$startItemIndex, lastIndex:$lastIndex"
+        )
 
         pollingJob?.cancel()
         pollingJob = viewModelScope.launch {
@@ -439,35 +444,65 @@ class PostViewModel(
                 val serialNumber = message.serialNumber
                 val scopeFetchCount = (lastIndex - startItemIndex).plus(1)
 
-                postPollUseCase.pollScope(
-                    delay = scopePollingInterval,
-                    channelId = channelId,
-                    fromSerialNumber = serialNumber,
-                    fetchCount = scopeFetchCount,
-                    messageId = message.id.orEmpty()
-                ).collect { emitPostPaging ->
-                    if (emitPostPaging.items?.isEmpty() == true) {
-                        return@collect
-                    }
+                if (isScopeHasVoteItem(
+                        startIndex = startItemIndex,
+                        count = scopeFetchCount
+                    )
+                ) {
 
-                    //Update data
-                    val updateMessageList = _post.value.map { post ->
-                        val filterMessage = emitPostPaging.items?.firstOrNull {
-                            it.id == post.message.id
+                    postPollUseCase.pollScope(
+                        delay = scopePollingInterval,
+                        channelId = channelId,
+                        fromSerialNumber = serialNumber,
+                        fetchCount = scopeFetchCount,
+                        messageId = message.id.orEmpty()
+                    ).collect { emitPostPaging ->
+                        if (emitPostPaging.items?.isEmpty() == true) {
+                            return@collect
                         }
 
-                        if (filterMessage == null) {
-                            post
-                        } else {
-                            post.copy(message = filterMessage)
+                        //Update data
+                        val updateMessageList = _post.value.map { post ->
+                            val filterMessage = emitPostPaging.items?.firstOrNull {
+                                it.id == post.message.id
+                            }
+
+                            if (filterMessage == null) {
+                                post
+                            } else {
+                                post.copy(message = filterMessage)
+                            }
+                        }
+
+                        _post.update {
+                            updateMessageList
                         }
                     }
 
-                    _post.update {
-                        updateMessageList
-                    }
                 }
             }
         }
     }
+
+    /**
+     * 範圍內 是否有投票文章
+     *
+     * @param startIndex 開始位置
+     * @param count 筆數
+     */
+    private fun isScopeHasVoteItem(
+        startIndex: Int,
+        count: Int
+    ): Boolean {
+        if (_post.value.size > (startIndex + count)) {
+            for (index in startIndex..(startIndex + count)) {
+                val item = _post.value[index]
+                if (item.message.votings?.isNotEmpty() == true) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
 }

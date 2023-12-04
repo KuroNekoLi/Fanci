@@ -31,6 +31,8 @@ class PostPollUseCase(
         fetchCount: Int,
         messageId: String,
     ): Flow<BulletinboardMessagePaging> {
+        KLog.i(TAG, "pollScope")
+
         isScopeClose = false
 
         return channelFlow {
