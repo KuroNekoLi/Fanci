@@ -2,21 +2,30 @@ package com.cmoney.kolfanci.ui.main
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.cmoney.fancylog.model.data.Clicked
@@ -29,6 +38,9 @@ import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
 import com.cmoney.kolfanci.ui.NavGraphs
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
+import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
 import com.cmoney.kolfanci.ui.screens.tutorial.TutorialScreen
@@ -40,7 +52,10 @@ import com.cmoney.xlogin.base.BaseWebLoginActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.socks.library.KLog
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 
 class MainActivity : BaseWebLoginActivity() {
@@ -270,15 +285,42 @@ class MainActivity : BaseWebLoginActivity() {
         notificationViewModel.setNotificationBundle(payload)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun MainScreen() {
+    fun MainScreen(
+        audioViewModel: AudioViewModel = koinViewModel(
+            parameters = {
+                parametersOf(Uri.EMPTY)
+            }
+        )
+    ) {
         StatusBarColorEffect()
+
+        //===== Audio Controller Start =====
+        val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
+
+        val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
+
+        val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
+
+        val coroutineScope = rememberCoroutineScope()
+
+        //控制 audio BottomSheet
+        val audioPlayerState = rememberModalBottomSheetState(
+            if (isOpenBottomAudioPlayer) {
+                ModalBottomSheetValue.Expanded
+            } else {
+                ModalBottomSheetValue.Hidden
+            }
+        )
+        //===== Audio Controller End =====
+
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .background(LocalColor.current.primary),
         ) { padding ->
-            Column(
+            Box(
                 modifier = Modifier
                     .padding(padding)
             ) {
@@ -288,6 +330,28 @@ class MainActivity : BaseWebLoginActivity() {
                         navGraph = NavGraphs.root,
                         startRoute = MainScreenDestination
                     )
+                }
+
+                //是否有音樂播放中
+                if (isShowAudioMiniIcon) {
+                    FanciTheme(fanciColor = theme) {
+                        AudioMiniPlayIconScreen(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(bottom = 120.dp),
+                            isPlaying = isAudioPlaying,
+                            onClick = {
+                                coroutineScope.launch {
+                                    audioPlayerState.show()
+                                }
+                            }
+                        )
+
+                        //mini player
+                        AudioBottomPlayerScreen(
+                            state = audioPlayerState
+                        )
+                    }
                 }
             }
         }

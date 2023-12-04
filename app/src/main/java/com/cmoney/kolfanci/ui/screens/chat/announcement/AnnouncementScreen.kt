@@ -1,6 +1,5 @@
-package com.cmoney.kolfanci.ui.screens.chat
+package com.cmoney.kolfanci.ui.screens.chat.announcement
 
-import android.net.Uri
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +29,6 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageContentScreen
-import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -41,8 +38,6 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import kotlinx.parcelize.Parcelize
-import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @Parcelize
 data class AnnouncementResult(
@@ -64,14 +59,8 @@ fun AnnouncementScreen(
     navigator: DestinationsNavigator,
     message: ChatMessage,
     isPinMessage: Boolean,
-    audioViewModel: AudioViewModel = koinViewModel(
-        parameters = {
-            parametersOf(Uri.EMPTY)
-        }
-    ),
     resultBackNavigator: ResultBackNavigator<AnnouncementResult>
 ) {
-
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
         ?.onBackPressedDispatcher
 
@@ -83,18 +72,17 @@ fun AnnouncementScreen(
                     onBackPressedDispatcher?.onBackPressed()
                 }
             )
-        }
+        },
+        backgroundColor = LocalColor.current.env_80
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.Bottom
+                .padding(innerPadding)
         ) {
 
             LazyColumn(
                 modifier = Modifier
-                    .weight(1f)
                     .background(LocalColor.current.env_80)
             ) {
                 item {
@@ -111,9 +99,11 @@ fun AnnouncementScreen(
                 }
             }
 
+
             if (Constant.isCanManage()) {
                 Box(
                     modifier = Modifier
+                        .align(Alignment.BottomEnd)
                         .fillMaxWidth()
                         .background(LocalColor.current.env_100)
                         .padding(24.dp),
@@ -178,7 +168,6 @@ fun AnnouncementScreen(
     }
 
     BackHandler {
-        audioViewModel.stopPlay()
         navigator.popBackStack()
     }
 }
@@ -190,8 +179,8 @@ fun AnnouncementScreenPreview() {
         AnnouncementScreen(
             EmptyDestinationsNavigator,
             MockData.mockMessage,
-            resultBackNavigator = EmptyResultBackNavigator(),
-            isPinMessage = true
+            isPinMessage = true,
+            resultBackNavigator = EmptyResultBackNavigator()
         )
     }
 }

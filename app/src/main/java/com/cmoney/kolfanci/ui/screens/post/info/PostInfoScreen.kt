@@ -80,7 +80,6 @@ import com.cmoney.kolfanci.ui.destinations.BaseEditMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
-import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.BaseDeletedContentScreen
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
@@ -95,8 +94,6 @@ import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
-import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.AttachmentEnv
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
@@ -130,11 +127,6 @@ fun PostInfoScreen(
     viewModel: PostInfoViewModel = koinViewModel(
         parameters = {
             parametersOf(post, channel)
-        }
-    ),
-    audioViewModel: AudioViewModel = koinViewModel(
-        parameters = {
-            parametersOf(Uri.EMPTY)
         }
     ),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
@@ -487,15 +479,6 @@ fun PostInfoScreen(
         }
     }
 
-    //是否開啟底部音樂播放器
-    val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
-
-    //是否show audio mini player icon
-    val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
-
-    //音樂是否正在播放中
-    val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
-
     PostInfoScreenView(
         modifier = modifier,
         navController = navController,
@@ -509,9 +492,6 @@ fun PostInfoScreen(
         postInfoListener = postInfoListener,
         commentBottomContentListener = commentBottomContentListener,
         inputText = inputText,
-        isShowAudioMiniIcon = isShowAudioMiniIcon,
-        isAudioPlaying = isAudioPlaying,
-        isOpenBottomAudioPlayer = isOpenBottomAudioPlayer,
         isShowLoading = isShowLoading,
         onDeleteAttach = {
             attachmentViewModel.removeAttach(it)
@@ -528,11 +508,10 @@ fun PostInfoScreen(
                 uri = uri,
                 context = context
             )
-        },
-        onResend = {
-            reSendFileClick = it
         }
-    )
+    ) {
+        reSendFileClick = it
+    }
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
@@ -757,7 +736,6 @@ fun PostInfoScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
@@ -772,27 +750,13 @@ private fun PostInfoScreenView(
     postInfoListener: PostInfoListener,
     commentBottomContentListener: CommentBottomContentListener,
     inputText: String,
-    isAudioPlaying: Boolean,
-    isOpenBottomAudioPlayer: Boolean,
     isShowLoading: Boolean,
     onDeleteAttach: (Uri) -> Unit,
     onAttachImageAddClick: () -> Unit,
     onPreviewAttachmentClick: (Uri) -> Unit,
-    onResend: (ReSendFile) -> Unit,
-    isShowAudioMiniIcon: Boolean
+    onResend: (ReSendFile) -> Unit
 ) {
     val listState = rememberLazyListState()
-
-    //控制 audio BottomSheet
-    val audioPlayerState = rememberModalBottomSheetState(
-        if (isOpenBottomAudioPlayer) {
-            ModalBottomSheetValue.Expanded
-        } else {
-            ModalBottomSheetValue.Hidden
-        }
-    )
-
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier
@@ -1006,26 +970,6 @@ private fun PostInfoScreenView(
                     modifier = Modifier
                         .size(45.dp),
                     color = LocalColor.current.primary
-                )
-            }
-
-            //是否有音樂播放中
-            if (isShowAudioMiniIcon) {
-                AudioMiniPlayIconScreen(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(bottom = 120.dp),
-                    isPlaying = isAudioPlaying,
-                    onClick = {
-                        coroutineScope.launch {
-                            audioPlayerState.show()
-                        }
-                    }
-                )
-
-                //mini player
-                AudioBottomPlayerScreen(
-                    state = audioPlayerState
                 )
             }
         }
@@ -1291,14 +1235,10 @@ fun PostInfoScreenPreview() {
             postInfoListener = EmptyPostInfoListener,
             commentBottomContentListener = EmptyCommentBottomContentListener,
             inputText = "",
-            isAudioPlaying = false,
-            isOpenBottomAudioPlayer = false,
             isShowLoading = false,
             onDeleteAttach = {},
             onAttachImageAddClick = {},
-            onPreviewAttachmentClick = {},
-            onResend = {},
-            isShowAudioMiniIcon = false
-        )
+            onPreviewAttachmentClick = {}
+        ) {}
     }
 }

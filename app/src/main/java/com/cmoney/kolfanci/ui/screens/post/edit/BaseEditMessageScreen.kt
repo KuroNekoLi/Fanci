@@ -131,7 +131,6 @@ fun BaseEditMessageScreen(
             viewModel.onDeleteImageClick(it)
         },
         onPostClick = { text ->
-            //todo
             viewModel.onUpdatePostClick(editMessage, text, emptyList())
         },
         onBack = {
@@ -302,7 +301,6 @@ private fun BaseEditMessageScreenView(
                             onShowImagePicker.invoke()
                         },
                         onResend = {
-                            //TODO
                         },
                         onClick = { uri ->
                             StfalconImageViewer
@@ -338,24 +336,6 @@ private fun BaseEditMessageScreenView(
                             ImageVector.vectorResource(id = R.drawable.gallery),
                             null,
                             tint = LocalColor.current.text.default_100
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    IconButton(
-                        modifier = Modifier.size(25.dp),
-                        onClick = {
-                            showKeyboard.value = !showKeyboard.value
-                        }) {
-                        Icon(
-                            ImageVector.vectorResource(id = R.drawable.keyboard),
-                            null,
-                            tint = if (showKeyboard.value) {
-                                LocalColor.current.text.default_100
-                            } else {
-                                LocalColor.current.text.default_50
-                            }
                         )
                     }
                 }

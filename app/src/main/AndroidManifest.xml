@@ -28,8 +28,7 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:screenOrientation="portrait"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:exported="false"/>
 
         <activity
             android:name=".ui.SplashActivity"

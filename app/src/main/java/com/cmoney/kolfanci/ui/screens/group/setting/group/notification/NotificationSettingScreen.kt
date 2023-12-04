@@ -45,8 +45,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
 
-//TODO
-
 @Destination
 @Composable
 fun NotificationSettingScreen(

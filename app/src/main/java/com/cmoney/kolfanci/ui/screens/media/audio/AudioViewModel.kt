@@ -111,9 +111,7 @@ class AudioViewModel(
      * title, length
      */
     fun fetchCurrentPlayInfo() {
-        KLog.i(TAG, "fetchCurrentPlayInfo")
         if (musicServiceConnection.isConnected.value == true) {
-            KLog.i(TAG, "fetchCurrentPlayInfo isConnected")
             //正在播的歌曲
             val nowPlaying = musicServiceConnection.nowPlaying.value
 
@@ -165,6 +163,8 @@ class AudioViewModel(
                     com.google.android.exoplayer2.ui.R.drawable.exo_controls_play
                 }
             }
+
+
         }
     }
 
@@ -173,13 +173,17 @@ class AudioViewModel(
      */
     private fun checkPlaybackPosition(): Boolean = handler.postDelayed({
         val currPosition = playbackState.currentPlayBackPosition
-        if (isStopUpdatePosition.not()) {
+        if (isStopUpdatePosition.not() && _isPlaying.value) {
             viewModelScope.launch {
                 _mediaPosition.update {
                     currPosition
                 }
 
                 fetchIsShowMiniIcon()
+
+                if (_audioDuration.value <= 0) {
+                    fetchCurrentPlayInfo()
+                }
             }
         }
 
@@ -246,6 +250,7 @@ class AudioViewModel(
     fun stopPlay() {
         KLog.i(TAG, "stopPlay")
         musicServiceConnection.transportControls.stop()
+        _isShowMiniIcon.value = false
     }
 
     /**

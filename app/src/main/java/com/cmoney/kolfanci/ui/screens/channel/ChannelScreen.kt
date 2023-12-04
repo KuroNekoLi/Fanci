@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
@@ -38,15 +35,13 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
-import com.cmoney.kolfanci.ui.screens.chat.AnnouncementResult
+import com.cmoney.kolfanci.ui.screens.chat.announcement.AnnouncementResult
 import com.cmoney.kolfanci.ui.screens.chat.ChatRoomScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
-import com.cmoney.kolfanci.ui.screens.shared.audio.AudioMiniPlayIconScreen
-import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioBottomPlayerScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -115,12 +110,6 @@ fun ChannelScreen(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current
         ?.onBackPressedDispatcher
 
-    val isShowAudioMiniIcon by audioViewModel.isShowMiniIcon.collectAsState()
-
-    val isOpenBottomAudioPlayer by audioViewModel.isShowBottomPlayer.collectAsState()
-
-    val isAudioPlaying by audioViewModel.isPlaying.collectAsState()
-
     ChannelScreenView(
         modifier = modifier,
         pagerState = pagerState,
@@ -128,8 +117,6 @@ fun ChannelScreen(
         jumpChatMessage = jumpChatMessage,
         unreadCount = unreadCount,
         navController = navController,
-        isShowAudioMiniIcon = isShowAudioMiniIcon,
-        isAudioPlaying = isAudioPlaying,
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
         postInfoResultRecipient = postInfoResultRecipient,
@@ -142,12 +129,10 @@ fun ChannelScreen(
             viewMode.onPostRedDotClick(
                 channelId = channel.id.orEmpty()
             )
-        },
-        onBackClick = {
-            onBackPressedDispatcher?.onBackPressed()
-        },
-        isOpenBottomAudioPlayer = isOpenBottomAudioPlayer
-    )
+        }
+    ) {
+        onBackPressedDispatcher?.onBackPressed()
+    }
 
     BackHandler {
         val currentPage = pagerState.currentPage
@@ -171,25 +156,13 @@ private fun ChannelScreenView(
     jumpChatMessage: ChatMessage? = null,
     unreadCount: Pair<Long, Long>?,
     navController: DestinationsNavigator,
-    isShowAudioMiniIcon: Boolean,
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, AnnouncementResult>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
     onChatPageSelected: () -> Unit,
     onPostPageSelected: () -> Unit,
-    onBackClick: () -> Unit,
-    isOpenBottomAudioPlayer: Boolean,
-    isAudioPlaying: Boolean
+    onBackClick: () -> Unit
 ) {
-    //控制 audio BottomSheet
-    val audioPlayerState = rememberModalBottomSheetState(
-        if (isOpenBottomAudioPlayer) {
-            ModalBottomSheetValue.Expanded
-        } else {
-            ModalBottomSheetValue.Hidden
-        }
-    )
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -316,25 +289,6 @@ private fun ChannelScreenView(
                         }
                     }
                 }
-
-                if (isShowAudioMiniIcon) {
-                    AudioMiniPlayIconScreen(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(bottom = 120.dp),
-                        isPlaying = isAudioPlaying,
-                        onClick = {
-                            coroutineScope.launch {
-                                audioPlayerState.show()
-                            }
-                        }
-                    )
-
-                    //mini player
-                    AudioBottomPlayerScreen(
-                        state = audioPlayerState
-                    )
-                }
             }
         } else {
 //            Text(text = "No Tab Display")
@@ -349,10 +303,9 @@ fun ChannelScreenPreview() {
     FanciTheme {
         ChannelScreenView(
             pagerState = rememberPagerState(),
-            unreadCount = Pair(10, 20),
             channel = Channel(),
+            unreadCount = Pair(10, 20),
             navController = EmptyDestinationsNavigator,
-            isShowAudioMiniIcon = true,
             announcementResultRecipient = EmptyResultRecipient(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
@@ -361,10 +314,7 @@ fun ChannelScreenPreview() {
             },
             onPostPageSelected = {
 
-            },
-            onBackClick = {},
-            isOpenBottomAudioPlayer = false,
-            isAudioPlaying = false
-        )
+            }
+        ) {}
     }
 }
