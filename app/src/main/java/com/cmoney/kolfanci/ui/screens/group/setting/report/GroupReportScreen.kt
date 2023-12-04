@@ -46,6 +46,7 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.getDisplayType
 import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -424,14 +425,17 @@ private fun ReportItem(
                 )
 
                 //如果有圖片附件,顯示
-                if (reportInformation.mediasSnapshot?.isNotEmpty() == true) {
-                    Spacer(modifier = Modifier.height(5.dp))
-                    Text(
-                        text = "(圖片)",
-                        fontSize = 14.sp,
-                        color = LocalColor.current.text.default_100,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                reportInformation.mediasSnapshot?.let { medias ->
+                    medias.forEach { media ->
+                        Spacer(modifier = Modifier.height(5.dp))
+                        val content = media.getDisplayType()
+                        Text(
+                            text = content,
+                            fontSize = 14.sp,
+                            color = LocalColor.current.text.default_100,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))

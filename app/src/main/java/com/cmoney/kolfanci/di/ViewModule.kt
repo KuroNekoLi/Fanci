@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.di
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.model.viewmodel.GroupViewModel
 import com.cmoney.kolfanci.model.viewmodel.NotificationViewModel
@@ -37,7 +36,6 @@ import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
 import com.cmoney.kolfanci.ui.screens.shared.vip.viewmodel.VipPlanViewModel
 import org.koin.android.ext.koin.androidApplication
-import org.koin.androidx.compose.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -56,7 +54,6 @@ val viewModule = module {
     viewModel {
         MessageViewModel(
             androidApplication(),
-            get(),
             get(),
             get(),
             get(),
@@ -96,7 +93,8 @@ val viewModule = module {
             get(),
             reportList = params.get(),
             group = params.get(),
-            banUseCase = get()
+            banUseCase = get(),
+            chatRoomUseCase = get()
         )
     }
     viewModel {

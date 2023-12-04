@@ -25,7 +25,6 @@ import com.cmoney.kolfanci.model.remoteconfig.PollingFrequencyKey
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
-import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
@@ -41,7 +40,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ImageAttachState(
@@ -58,7 +56,6 @@ class MessageViewModel(
     private val chatRoomUseCase: ChatRoomUseCase,
     private val chatRoomPollUseCase: ChatRoomPollUseCase,
     private val permissionUseCase: PermissionUseCase,
-    private val uploadImageUseCase: UploadImageUseCase,
     private val musicServiceConnection: MusicServiceConnection
 ) : AndroidViewModel(context) {
 
