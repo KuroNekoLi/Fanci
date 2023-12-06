@@ -46,6 +46,9 @@ import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
+ *
+ * 加入社團 Dialog
+ *
  * @param groupModel 社團model
  * @param onDismiss 取消 callback
  * @param onConfirm 確定按鈕 callback
