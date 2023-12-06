@@ -90,10 +90,10 @@ fun AllMemberScreen(
         AppUserLogger.getInstance().log(Page.GroupSettingsAllMembers)
     }
 
-    val shareText by viewModel.shareText.collectAsState()
+    val shareModel by viewModel.share.collectAsState()
 
-    if (shareText.isNotEmpty()) {
-        LocalContext.current.share(shareText)
+    shareModel?.let { shareText->
+        LocalContext.current.share(shareText.shareText)
         viewModel.resetShareText()
     }
 

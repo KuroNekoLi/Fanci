@@ -49,6 +49,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
  * 邀請加入社團 Dialog
  *
  * @param groupModel 社團model
+ * @param inviteCode 邀請碼
  * @param onDismiss 取消 callback
  * @param background 背景顏色
  * @param titleColor title 顏色
@@ -57,16 +58,13 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun InviteGroupDialogScreen(
     modifier: Modifier = Modifier,
     groupModel: Group,
+    inviteCode: String,
     onDismiss: () -> Unit,
+    onCopyInviteCodeClick: () -> Unit,
+    onShareClick: () -> Unit,
     background: Color = LocalColor.current.env_80,
     titleColor: Color = LocalColor.current.text.default_100
 ) {
-    val globalGroupViewModel = globalGroupViewModel()
-
-    val myGroupList by globalGroupViewModel.myGroupList.collectAsState()
-
-    val groupStatus by globalGroupViewModel.joinGroupStatus.collectAsState()
-
     val openDialog = remember { mutableStateOf(true) }
 
     if (openDialog.value) {
@@ -77,8 +75,11 @@ fun InviteGroupDialogScreen(
             InviteGroupDialogScreenView(
                 modifier = modifier,
                 groupModel = groupModel,
+                inviteCode = inviteCode,
                 background = background,
-                titleColor = titleColor
+                titleColor = titleColor,
+                onCopyInviteCodeClick = onCopyInviteCodeClick,
+                onShareClick = onShareClick
             )
         }
     }
@@ -87,18 +88,17 @@ fun InviteGroupDialogScreen(
         AppUserLogger.getInstance()
             .log(page = Page.Group)
     }
-
-    LaunchedEffect(key1 = groupStatus, key2 = myGroupList) {
-        globalGroupViewModel.getGroupJoinStatus(groupModel)
-    }
 }
 
 @Composable
 private fun InviteGroupDialogScreenView(
     modifier: Modifier = Modifier,
     groupModel: Group,
+    inviteCode: String,
     background: Color = LocalColor.current.env_80,
-    titleColor: Color = LocalColor.current.text.default_100
+    titleColor: Color = LocalColor.current.text.default_100,
+    onCopyInviteCodeClick: () -> Unit,
+    onShareClick: () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -150,8 +150,14 @@ private fun InviteGroupDialogScreenView(
                     .background(LocalColor.current.background),
                 contentAlignment = Alignment.Center
             ) {
+                var displayInviteCode = inviteCode
+                if (inviteCode.length == 8) {
+                    displayInviteCode =
+                        inviteCode.substring(0, 4) + " " + inviteCode.substring(4, 8)
+                }
+
                 Text(
-                    text = "522 180",
+                    text = displayInviteCode,
                     style = TextStyle(
                         fontSize = 20.sp,
                         lineHeight = 30.sp,
@@ -167,7 +173,7 @@ private fun InviteGroupDialogScreenView(
                     .height(50.dp),
                 text = "複製邀請碼",
                 onClick = {
-                    //TODO
+                    onCopyInviteCodeClick.invoke()
                 }
             )
 
@@ -210,7 +216,7 @@ private fun InviteGroupDialogScreenView(
                     .height(50.dp),
                 text = "分享",
                 onClick = {
-                    //TODO
+                    onShareClick.invoke()
                 }
             )
         }
@@ -240,7 +246,10 @@ private fun InviteGroupDialogScreenView(
 fun InviteGroupDialogScreenPreview() {
     FanciTheme {
         InviteGroupDialogScreenView(
-            groupModel = MockData.mockGroup
+            groupModel = MockData.mockGroup,
+            inviteCode = "9527",
+            onShareClick = {},
+            onCopyInviteCodeClick = {}
         )
     }
 }

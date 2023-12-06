@@ -288,7 +288,7 @@
     <string name="audio_speed_1.25">1.25x</string>
     <string name="audio_speed_1.5">1.5x</string>
     <string name="audio_speed_1.75">1.75x</string>
-    
+
     <string name="image_upload_fail_title">圖片上傳失敗</string>
     <string name="image_upload_fail_desc">容量過大或是網路不順\n圖片上傳失敗了嗚嗚</string>
 
@@ -302,4 +302,8 @@
 
     <string name="chat_fail_title">訊息傳送失敗</string>
     <string name="chat_fail_desc">圖片或檔案上傳失敗\n為了確保訊息完整，快去檢查吧！</string>
+
+    <string name="share_group">您已被邀請加入 「%s」!\n請點選以下連結加入社群!\n%s</string>
+    <string name="share_invite_group">您已被邀請加入 「%s」!\n請點選以下連結下載App後，輸入邀請碼加入社團\n邀請碼：%s\n下載Fanci：%s</string>
+
 </resources>

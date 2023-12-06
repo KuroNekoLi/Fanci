@@ -53,7 +53,6 @@ import com.cmoney.kolfanci.extension.lifecycleEventListener
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.Constant.isShowApproval
-import com.cmoney.kolfanci.model.Constant.isShowGroupManage
 import com.cmoney.kolfanci.model.Constant.isShowVipManager
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.mock.MockData
@@ -66,6 +65,7 @@ import com.cmoney.kolfanci.ui.main.MainActivity
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.AlertDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.InviteGroupDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.setting.SettingItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -102,10 +102,21 @@ fun GroupSettingScreen(
     val context = LocalContext.current
 
     //邀請加入社團連結
-    val shareText by memberViewModel.shareText.collectAsState()
-    if (shareText.isNotEmpty()) {
-        LocalContext.current.share(shareText)
-        memberViewModel.resetShareText()
+    val shareModel by memberViewModel.share.collectAsState()
+    shareModel?.let { shareModel ->
+        InviteGroupDialogScreen(
+            groupModel = nowGroup,
+            inviteCode = shareModel.inviteCode,
+            onDismiss = {
+                memberViewModel.resetShareText()
+            },
+            onCopyInviteCodeClick = {
+                context.share(shareModel.inviteCopyText)
+            },
+            onShareClick = {
+                context.share(shareModel.shareText)
+            }
+        )
     }
 
     //檢舉審核 清單
@@ -220,12 +231,12 @@ fun GroupSettingScreen(
                 if (context.isNotificationsEnabled()) {
                     //抓取推播通知設定
                     viewModel.fetchNotificationSetting(groupId = nowGroup.id.orEmpty())
-                }
-                else {
+                } else {
                     viewModel.clearNotificationSetting()
                 }
             }
-            else ->{
+
+            else -> {
             }
         }
     }
@@ -299,100 +310,100 @@ fun GroupSettingScreenView(
                         )
                     }
                 }
-            } else {
-                // 關於社團
-                item {
-                    GroupAboutScreen(
-                        modifier = Modifier.fillMaxWidth(),
-                        onInviteClick = onInviteClick
-                    )
-                }
+            }
 
-                //社團管理
-                item {
-                    GroupManageScreen(
-                        group = group,
-                        navController = navController,
-                        pushNotificationSetting = pushNotificationSetting
-                    )
-                }
+            // 關於社團
+            item {
+                GroupAboutScreen(
+                    modifier = Modifier.fillMaxWidth(),
+                    onInviteClick = onInviteClick
+                )
+            }
 
-                //成員管理
+            //社團管理
+            item {
+                GroupManageScreen(
+                    group = group,
+                    navController = navController,
+                    pushNotificationSetting = pushNotificationSetting
+                )
+            }
+
+            //成員管理
+            item {
+                GroupMemberManageScreen(
+                    group = group,
+                    navController = navController,
+                    unApplyCount = unApplyCount
+                )
+            }
+            //VIP 方案管理
+            if (isShowVipManager()) {
                 item {
-                    GroupMemberManageScreen(
-                        group = group,
-                        navController = navController,
-                        unApplyCount = unApplyCount
-                    )
-                }
-                //VIP 方案管理
-                if (isShowVipManager()) {
-                    item {
-                        VipPlanManager {
-                            KLog.i(TAG, "VipPlanManager click.")
-                            AppUserLogger.getInstance().log(Clicked.GroupSettingsVIPPlanManagement)
-                            navController.navigate(
-                                VipManagerScreenDestination(
-                                    group = group
-                                )
+                    VipPlanManager {
+                        KLog.i(TAG, "VipPlanManager click.")
+                        AppUserLogger.getInstance().log(Clicked.GroupSettingsVIPPlanManagement)
+                        navController.navigate(
+                            VipManagerScreenDestination(
+                                group = group
                             )
-                        }
-                    }
-                }
-                //秩序管理
-                if (isShowApproval()) {
-                    item {
-                        GroupRuleManageScreen(
-                            group = group,
-                            reportList = reportList,
-                            navController = navController
                         )
                     }
                 }
-                // 是否為社團建立者，true 解散社團，false 退出社團
-                val isCreator = group.creatorId == Constant.MyInfo?.id
+            }
+            //秩序管理
+            if (isShowApproval()) {
                 item {
-                    Spacer(modifier = Modifier.height(98.dp))
-                    if (!isCreator) {
-                        Box(
-                            modifier = Modifier
-                                .height(50.dp)
-                                .fillMaxWidth()
-                                .background(LocalColor.current.background)
-                                .clickable {
-                                    AppUserLogger
-                                        .getInstance()
-                                        .log(Clicked.GroupSettingsLeaveGroup)
-                                    showLeaveGroupDialog = true
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.leave_group),
-                                fontSize = 17.sp,
-                                color = LocalColor.current.specialColor.red
-                            )
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .height(50.dp)
-                                .fillMaxWidth()
-                                .background(LocalColor.current.background)
-                                .clickable {
-                                    AppUserLogger
-                                        .getInstance()
-                                        .log(Clicked.DissolveGroup)
-                                    showDisbandGroupDialog = true
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.disband_group),
-                                fontSize = 17.sp,
-                                color = LocalColor.current.specialColor.red
-                            )
-                        }
+                    GroupRuleManageScreen(
+                        group = group,
+                        reportList = reportList,
+                        navController = navController
+                    )
+                }
+            }
+            // 是否為社團建立者，true 解散社團，false 退出社團
+            val isCreator = group.creatorId == Constant.MyInfo?.id
+            item {
+                Spacer(modifier = Modifier.height(98.dp))
+                if (!isCreator) {
+                    Box(
+                        modifier = Modifier
+                            .height(50.dp)
+                            .fillMaxWidth()
+                            .background(LocalColor.current.background)
+                            .clickable {
+                                AppUserLogger
+                                    .getInstance()
+                                    .log(Clicked.GroupSettingsLeaveGroup)
+                                showLeaveGroupDialog = true
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.leave_group),
+                            fontSize = 17.sp,
+                            color = LocalColor.current.specialColor.red
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .height(50.dp)
+                            .fillMaxWidth()
+                            .background(LocalColor.current.background)
+                            .clickable {
+                                AppUserLogger
+                                    .getInstance()
+                                    .log(Clicked.DissolveGroup)
+                                showDisbandGroupDialog = true
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.disband_group),
+                            fontSize = 17.sp,
+                            color = LocalColor.current.specialColor.red
+                        )
                     }
                 }
             }
