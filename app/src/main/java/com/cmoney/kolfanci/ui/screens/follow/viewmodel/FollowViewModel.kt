@@ -14,6 +14,7 @@ import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.model.usecase.GroupApplyUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
+import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,6 +67,10 @@ class FollowViewModel(
     //我申請中的社團
     private val _allMyApplyGroup: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
     val allMyApplyGroup = _allMyApplyGroup.asStateFlow()
+
+    //是否出現 輸入邀請碼彈窗
+    private val _isShowInviteCodeDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isShowInviteCodeDialog = _isShowInviteCodeDialog.asStateFlow()
 
     var uiState by mutableStateOf(FollowUiState())
         private set
@@ -254,6 +259,48 @@ class FollowViewModel(
                 .onFailure { err ->
                     KLog.e(TAG, err)
                 }
+        }
+    }
+
+    /**
+     * 點擊 輸入邀請碼
+     */
+    fun onInputInviteCodeClick() {
+        KLog.i(TAG, "onInputInviteCodeClick")
+        if (XLoginHelper.isLogin) {
+            _isShowInviteCodeDialog.value = true
+        } else {
+            uiState = uiState.copy(
+                showLoginDialog = true
+            )
+        }
+    }
+
+    fun closeInviteCodeDialog() {
+        _isShowInviteCodeDialog.value = false
+    }
+
+    /**
+     * 輸入 邀請碼
+     */
+    fun onInputInviteCode(inviteCode: String) {
+        KLog.i(TAG, "onInputInviteCode:$inviteCode")
+        viewModelScope.launch {
+            val groupId = Utils.decryptInviteCode(
+                input = inviteCode
+            )
+            KLog.i(TAG, "onInputInviteCode groupId:$groupId")
+
+            groupId?.let {
+                groupUseCase.getGroupById(groupId.toString())
+                    .onSuccess { group ->
+                        closeInviteCodeDialog()
+                        openGroupItemDialog(group)
+                    }
+                    .onFailure {
+                        KLog.e(TAG, it)
+                    }
+            }
         }
     }
 }

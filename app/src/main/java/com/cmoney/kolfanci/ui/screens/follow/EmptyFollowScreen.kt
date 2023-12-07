@@ -56,9 +56,7 @@ fun EmptyFollowScreen(
 ) {
     val allMyApplyGroup by viewModel.allMyApplyGroup.collectAsState()
 
-    var showInviteCodeDialog by remember {
-        mutableStateOf(false)
-    }
+    val showInviteCodeDialog by viewModel.isShowInviteCodeDialog.collectAsState()
 
     EmptyFollowScreenView(
         modifier = modifier,
@@ -72,7 +70,7 @@ fun EmptyFollowScreen(
             viewModel.openGroupItemDialog(it)
         },
         onInputInviteCodeClick = {
-            showInviteCodeDialog = true
+            viewModel.onInputInviteCodeClick()
         }
     )
 
@@ -85,13 +83,15 @@ fun EmptyFollowScreen(
             title = "輸入邀請碼",
             subTitle = "透過邀請碼加入社團吧！",
             onDismiss = {
-                showInviteCodeDialog = false
+                viewModel.closeInviteCodeDialog()
             }
         ) {
             InputInviteCodeScreen(
-                onConfirm = {},
+                onConfirm = { inviteCode ->
+                    viewModel.onInputInviteCode(inviteCode)
+                },
                 onCancel = {
-                    showInviteCodeDialog = false
+                    viewModel.closeInviteCodeDialog()
                 }
             )
         }

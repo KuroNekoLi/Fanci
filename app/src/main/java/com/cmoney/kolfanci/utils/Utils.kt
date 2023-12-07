@@ -226,21 +226,27 @@ class Utils {
          *
          * @return groupId
          */
-        fun decryptInviteCode(input: String, key: Int = 1357, bits: Int = 32): Int {
-            val decimal = input.toInt(16)
-            val binaryString = Integer.toBinaryString(decimal)
-            val length = binaryString.length
+        fun decryptInviteCode(input: String, key: Int = 1357, bits: Int = 32): Int? {
+            try {
+                val decimal = input.toInt(16)
+                val binaryString = Integer.toBinaryString(decimal)
+                val length = binaryString.length
 
-            val finalString = if (length < bits) {
-                "0".repeat(bits - length) + binaryString
-            } else if (length > bits) {
-                binaryString.substring(length - bits)
-            } else {
-                binaryString
+                val finalString = if (length < bits) {
+                    "0".repeat(bits - length) + binaryString
+                } else if (length > bits) {
+                    binaryString.substring(length - bits)
+                } else {
+                    binaryString
+                }
+
+                val xorResult = performXOR(finalString, key)
+                return xorResult.toInt(2)
             }
-
-            val xorResult = performXOR(finalString, key)
-            return xorResult.toInt(2)
+            catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return null
         }
 
         private fun performXOR(binaryString: String, xorKey: Int): String {
