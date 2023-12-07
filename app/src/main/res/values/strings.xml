@@ -308,4 +308,5 @@
 
     <string name="input_invite_code">輸入邀請碼</string>
 
+    <string name="unknown_file_desc">噢不...你目前的版本\n不支援顯示這則內容型態</string>
 </resources>
