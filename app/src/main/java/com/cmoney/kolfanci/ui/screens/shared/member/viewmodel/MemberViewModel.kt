@@ -621,7 +621,8 @@ class MemberViewModel(
         viewModelScope.launch {
             showLoading()
             dynamicLinkUseCase.createInviteGroupLink(
-                groupId = group.id.orEmpty()
+                groupId = group.id.orEmpty(),
+                ogImage = group.coverImageUrl.orEmpty()
             )?.let { link ->
                 KLog.i(TAG, "created link:$link")
 
