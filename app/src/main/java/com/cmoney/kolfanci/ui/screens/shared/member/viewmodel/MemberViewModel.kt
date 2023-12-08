@@ -1,9 +1,12 @@
 package com.cmoney.kolfanci.ui.screens.shared.member.viewmodel
 
+import android.app.Application
+import android.content.Context
 import android.os.Parcelable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.AccessorParam
@@ -12,12 +15,14 @@ import com.cmoney.fanciapi.fanci.model.BanPeriodOption
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.fromJsonTypeToken
 import com.cmoney.kolfanci.model.usecase.BanUseCase
 import com.cmoney.kolfanci.model.usecase.DynamicLinkUseCase
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanUiModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.model.VipPlanModel
+import com.cmoney.kolfanci.utils.Utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.socks.library.KLog
@@ -25,6 +30,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.lang.reflect.Type
@@ -85,11 +91,25 @@ data class SelectedModel(
     }
 }
 
+/**
+ * 邀請相關
+ *
+ * @param shareText 分享文案
+ * @param inviteCopyText 複製邀請碼文案
+ * @param inviteCode 邀請碼
+ */
+data class InviteModel(
+    val shareText: String,
+    val inviteCopyText: String,
+    val inviteCode: String
+)
+
 class MemberViewModel(
+    private val context: Application,
     private val groupUseCase: GroupUseCase,
     private val banUseCase: BanUseCase,
     private val dynamicLinkUseCase: DynamicLinkUseCase
-) : ViewModel() {
+) : AndroidViewModel(context) {
 
     private val TAG = MemberViewModel::class.java.simpleName
 
@@ -116,9 +136,9 @@ class MemberViewModel(
     //目前輸入的 keyword
     private var currentKeyword: String = ""
 
-    //分享文案
-    private val _shareText = MutableStateFlow("")
-    val shareText = _shareText.asStateFlow()
+    //分享
+    private val _share = MutableStateFlow<InviteModel?>(null)
+    val share = _share.asStateFlow()
 
     //管理人員
     private val _managerMember = MutableStateFlow<GroupMember?>(null)
@@ -601,17 +621,29 @@ class MemberViewModel(
         viewModelScope.launch {
             showLoading()
             dynamicLinkUseCase.createInviteGroupLink(
-                groupId = group.id.orEmpty()
+                groupId = group.id.orEmpty(),
+                ogImage = group.coverImageUrl.orEmpty()
             )?.let { link ->
                 KLog.i(TAG, "created link:$link")
-                _shareText.value = "您已被邀請加入 「${group.name}」!\n請點選以下連結加入社群!\n$link"
+
+                val inviteCode = Utils.encryptInviteCode(input = group.id?.toInt() ?: 0)
+                val inviteModel = InviteModel(
+                    shareText = context.getString(R.string.share_group).format(group.name, link),
+                    inviteCopyText = context.getString(R.string.share_invite_group)
+                        .format(group.name, inviteCode, link),
+                    inviteCode = inviteCode
+                )
+
+                _share.update {
+                    inviteModel
+                }
             }
             dismissLoading()
         }
     }
 
     fun resetShareText() {
-        _shareText.value = ""
+        _share.update { null }
     }
 
     /**

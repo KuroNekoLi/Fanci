@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,8 +38,75 @@ import com.cmoney.kolfanci.extension.getAudioDisplayDuration
 import com.cmoney.kolfanci.extension.getDisplayFileSize
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+
+/**
+ *
+ */
+@Composable
+fun UnknownFileItem(
+    modifier: Modifier = Modifier,
+    file: Uri,
+    onClick: (Uri) -> Unit
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(LocalColor.current.background)
+            .clickable {
+                onClick.invoke(file)
+            },
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Row(
+            modifier = Modifier.padding(17.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.unknown_file_desc),
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 21.sp,
+                    color = LocalColor.current.text.default_50
+                )
+            )
+
+            Spacer(modifier = Modifier.width(22.dp))
+
+            Box(
+                modifier = Modifier
+                    .height(30.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(LocalColor.current.primary)
+                    .padding(top = 3.dp, bottom = 3.dp, start = 15.dp, end = 15.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "更新",
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                        color = LocalColor.current.component.other
+                    )
+                )
+            }
+
+        }
+    }
+}
+
+@Preview
+@Composable
+fun UnknownFileItemPreview() {
+    FanciTheme {
+        UnknownFileItem(
+            file = Uri.EMPTY,
+            onClick = {},
+        )
+    }
+}
 
 /**
  * 附加檔案 - 圖片 item

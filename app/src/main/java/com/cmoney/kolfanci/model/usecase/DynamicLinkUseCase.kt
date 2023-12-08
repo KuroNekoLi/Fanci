@@ -25,7 +25,7 @@ class DynamicLinkUseCase(
 ) {
     private val TAG = DynamicLinkUseCase::class.java.simpleName
 
-    suspend fun createInviteGroupLink(groupId: String): String? = suspendCoroutine { cont ->
+    suspend fun createInviteGroupLink(groupId: String, ogImage: String): String? = suspendCoroutine { cont ->
         val baseLink = context.getString(R.string.deeplink_baseLink).format(groupId)
         Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {
             link = Uri.parse(baseLink)
@@ -38,7 +38,7 @@ class DynamicLinkUseCase(
             socialMetaTagParameters {
                 title = context.getString(R.string.deeplink_title)
                 description = context.getString(R.string.deeplink_description)
-                imageUrl = Uri.parse(context.getString(R.string.deeplink_imageUrl))
+                imageUrl = Uri.parse(ogImage)
             }
         }.addOnSuccessListener {
             KLog.i(TAG, "createInviteTeamLink:" + it.shortLink)

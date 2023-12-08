@@ -17,15 +17,16 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,8 +39,12 @@ import com.cmoney.fanciapi.fanci.model.Group
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.CircleImage
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.item.BanDayItemScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.item.InputInviteCodeScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import org.koin.androidx.compose.koinViewModel
@@ -51,6 +56,8 @@ fun EmptyFollowScreen(
 ) {
     val allMyApplyGroup by viewModel.allMyApplyGroup.collectAsState()
 
+    val showInviteCodeDialog by viewModel.isShowInviteCodeDialog.collectAsState()
+
     EmptyFollowScreenView(
         modifier = modifier,
         allMyApplyGroup = allMyApplyGroup,
@@ -61,11 +68,33 @@ fun EmptyFollowScreen(
             AppUserLogger.getInstance()
                 .log(Clicked.HomeWaitToJoinGroup)
             viewModel.openGroupItemDialog(it)
+        },
+        onInputInviteCodeClick = {
+            viewModel.onInputInviteCodeClick()
         }
     )
 
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchAllMyGroupApplyUnConfirmed()
+    }
+
+    if (showInviteCodeDialog) {
+        DialogScreen(
+            title = "輸入邀請碼",
+            subTitle = "透過邀請碼加入社團吧！",
+            onDismiss = {
+                viewModel.closeInviteCodeDialog()
+            }
+        ) {
+            InputInviteCodeScreen(
+                onConfirm = { inviteCode ->
+                    viewModel.onInputInviteCode(inviteCode)
+                },
+                onCancel = {
+                    viewModel.closeInviteCodeDialog()
+                }
+            )
+        }
     }
 }
 
@@ -74,7 +103,8 @@ private fun EmptyFollowScreenView(
     modifier: Modifier = Modifier,
     onCreateClick: () -> Unit,
     allMyApplyGroup: List<Group>,
-    onApplyGroupClick: (Group) -> Unit
+    onApplyGroupClick: (Group) -> Unit,
+    onInputInviteCodeClick: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -115,26 +145,28 @@ private fun EmptyFollowScreenView(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Box(
+        BlueButton(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
                 .fillMaxWidth()
-                .height(40.dp)
-                .background(LocalColor.current.primary)
-                .clip(RoundedCornerShape(4.dp))
-                .clickable {
-                    onCreateClick.invoke()
-                },
-            contentAlignment = Alignment.Center
+                .height(50.dp),
+            text = stringResource(id = R.string.input_invite_code)
         ) {
-            Text(
-                text = stringResource(id = R.string.create_group),
-                fontSize = 16.sp,
-                color = LocalColor.current.text.other,
-                textAlign = TextAlign.Center
-            )
+            onInputInviteCodeClick.invoke()
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        BlueButton(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth()
+                .height(50.dp),
+            text = stringResource(id = R.string.create_group)
+        ) {
+            onCreateClick.invoke()
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -208,7 +240,8 @@ fun EmptyFollowScreenPreview() {
                 Group(),
                 Group()
             ),
-            onApplyGroupClick = {}
+            onApplyGroupClick = {},
+            onInputInviteCodeClick = {}
         )
     }
 }

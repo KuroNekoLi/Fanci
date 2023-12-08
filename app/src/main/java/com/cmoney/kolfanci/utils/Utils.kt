@@ -70,24 +70,31 @@ class Utils {
                 R.drawable.emoji_money -> {
                     Emojis.money
                 }
+
                 R.drawable.emoji_shock -> {
                     Emojis.shock
                 }
+
                 R.drawable.emoji_laugh -> {
                     Emojis.laugh
                 }
+
                 R.drawable.emoji_angry -> {
                     Emojis.angry
                 }
+
                 R.drawable.emoji_think -> {
                     Emojis.think
                 }
+
                 R.drawable.emoji_cry -> {
                     Emojis.cry
                 }
+
                 R.drawable.emoji_like -> {
                     Emojis.like
                 }
+
                 else -> Emojis.like
             }
         }
@@ -154,15 +161,20 @@ class Utils {
                 timePassed / (1000 * 60 * 60 * 24) >= 2 -> {
                     SimpleDateFormat("yyyy-MM-dd", Locale.TAIWAN).format(Date(timestamp))
                 }
+
                 timePassed / (1000 * 60 * 60 * 24) >= 1 -> {
                     "昨天"
                 }
+
                 timePassed / (1000 * 60 * 60) > 0 -> {
-                    StringBuilder().append(timePassed / (1000 * 60 * 60)).append("小時前").toString()
+                    StringBuilder().append(timePassed / (1000 * 60 * 60)).append("小時前")
+                        .toString()
                 }
+
                 timePassed / (1000 * 60) > 0 -> {
                     StringBuilder().append(timePassed / (1000 * 60)).append("分鐘前").toString()
                 }
+
                 else -> {
                     "剛剛"
                 }
@@ -173,6 +185,80 @@ class Utils {
             val minutes = timestamp / 1000 / 60
             val seconds = (timestamp - (1000 * 60 * minutes)) / 1000
             return String.format("%02d:%02d", minutes, seconds)
+        }
+
+        /**
+         * 加密 邀請碼
+         *
+         * @param input groupId
+         * @param key xor key(default: 1357)
+         * @param bits full bits count
+         *
+         * @return 加密過後字串 length = bits / 4
+         */
+        fun encryptInviteCode(input: Int, key: Int = 1357, bits: Int = 32): String {
+            val binaryString = Integer.toBinaryString(input)
+            val length = binaryString.length
+
+            val finalString = if (length < bits) {
+                "0".repeat(bits - length) + binaryString
+            } else if (length > bits) {
+                binaryString.substring(length - bits)
+            } else {
+                binaryString
+            }
+
+            val xorResult = performXOR(finalString, key)
+            val decimal = xorResult.toInt(2)
+            val output = Integer.toHexString(decimal)
+            val outputLen = output.length
+            val mustLen = bits / 4
+
+            return if (outputLen < mustLen) "0".repeat(mustLen - outputLen) + output else output
+        }
+
+        /**
+         * 解密 邀請碼
+         *
+         * @param input 加密字串
+         * @param key xor key(default: 1357)
+         * @param bits full bits count
+         *
+         * @return groupId
+         */
+        fun decryptInviteCode(input: String, key: Int = 1357, bits: Int = 32): Int? {
+            try {
+                val decimal = input.toInt(16)
+                val binaryString = Integer.toBinaryString(decimal)
+                val length = binaryString.length
+
+                val finalString = if (length < bits) {
+                    "0".repeat(bits - length) + binaryString
+                } else if (length > bits) {
+                    binaryString.substring(length - bits)
+                } else {
+                    binaryString
+                }
+
+                val xorResult = performXOR(finalString, key)
+                return xorResult.toInt(2)
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return null
+        }
+
+        private fun performXOR(binaryString: String, xorKey: Int): String {
+            val adjustedXORKey = Integer.toBinaryString(xorKey).padStart(binaryString.length, '0')
+
+            val result = StringBuilder()
+            for (i in binaryString.indices) {
+                val bit1 = binaryString[i]
+                val bit2 = adjustedXORKey[i]
+                result.append(if (bit1 == bit2) '0' else '1')
+            }
+            return result.toString()
         }
     }
 }
