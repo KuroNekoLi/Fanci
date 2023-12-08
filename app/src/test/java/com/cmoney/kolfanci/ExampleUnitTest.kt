@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci
 
+import com.cmoney.kolfanci.utils.Utils
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -10,7 +11,22 @@ import org.junit.Test
  */
 class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun encrypt_isCorrect() {
+        val input = 12345
+        val key = 1357
+
+        val encryptResult = Utils.encryptInviteCode(
+            input = input,
+            key = key
+        )
+
+        println("encryptResult:$encryptResult")
+
+        val decryptOpt = Utils.decryptInviteCode(
+            input = encryptResult,
+            key = key
+        )
+
+        assertEquals(input, decryptOpt)
     }
 }
