@@ -478,7 +478,9 @@ class PostViewModel(
                             updateMessageList
                         }
                     }
-
+                }
+                else {
+                    postPollUseCase.closeScope()
                 }
             }
         }

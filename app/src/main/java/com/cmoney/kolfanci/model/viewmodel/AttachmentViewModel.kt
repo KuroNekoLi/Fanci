@@ -198,8 +198,8 @@ class AttachmentViewModel(
             val oldItem = it.second
 
             val newStatusItem = allItems.firstOrNull { newItem ->
-                if (key == AttachmentType.Choice) {
-                    newItem.other == oldItem.other
+                if (newItem.attachmentType == AttachmentType.Choice) {
+                    (newItem.other as VoteModel).question == (oldItem.other as VoteModel).question
                 } else {
                     newItem.uri == oldItem.uri
                 }

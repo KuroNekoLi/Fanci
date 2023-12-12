@@ -21,5 +21,6 @@ fun ChatMessage.toBulletinboardMessage(): BulletinboardMessage = BulletinboardMe
     messageReaction =  messageReaction,
     deleteStatus = deleteStatus,
     deleteFrom = deleteFrom,
-    commentCount = commentCount
+    commentCount = commentCount,
+    votings = votings
 )

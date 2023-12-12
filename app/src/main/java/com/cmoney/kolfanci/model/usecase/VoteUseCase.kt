@@ -30,17 +30,15 @@ class VoteUseCase(
         flow {
             voteModels.forEach { voteModel ->
                 try {
-                    val votingId = if (voteModel.id.isEmpty()) {
+                    val votingId = voteModel.id.ifEmpty {
                         createVote(
                             channelId = channelId,
                             voteModel = voteModel
-                        ).getOrNull()?.id ?: 0
-                    } else {
-                        voteModel.id.toLong()
+                        ).getOrNull()?.id.orEmpty()
                     }
 
                     emit(
-                        voteModel.copy(id = votingId.toString())
+                        voteModel.copy(id = votingId)
                     )
                 } catch (e: Exception) {
                     KLog.e(TAG, e)

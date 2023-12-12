@@ -73,7 +73,7 @@ class ChatRoomUseCase(
             medias = medias,
             votingIds = votingIds
         )
-        
+
         messageApi.apiV2MessageMessageTypeMessageIdPut(
             messageType = messageServiceType,
             messageId = messageId,
@@ -249,12 +249,17 @@ class ChatRoomUseCase(
         replyMessageId: String = ""
     ) =
         kotlin.runCatching {
+            val votingIds = attachment.filter { it.first == AttachmentType.Choice }.mapNotNull {
+                (it.second.other as VoteModel).id
+            }
+
             chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessagePost(
                 chatRoomChannelId = chatRoomChannelId,
                 chatMessageParam = ChatMessageParam(
                     text = text,
                     medias = attachment.toUploadMedia(context),
-                    replyMessageId = replyMessageId
+                    replyMessageId = replyMessageId,
+                    votingIds = votingIds
                 )
             ).checkResponseBody()
         }

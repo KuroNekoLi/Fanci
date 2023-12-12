@@ -47,12 +47,12 @@ fun ChoiceScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         //已經 投過票
-        if (showVoteResult) {
+        if (showVoteResult || isMyPost) {
             ChoiceResultScreen(
                 modifier = modifier,
                 question = voting.title.orEmpty(),
                 choices = voting.votingOptionStatistics?.toPercentageList() ?: emptyList(),
-                isShowResultText = true,
+                isShowResultText = isMyPost,
                 onResultClick = {
                     navController.navigate(
                         AnswerResultScreenDestination(

@@ -161,7 +161,7 @@ class VoteViewModel(
 
             _voteModel.value = VoteModel(
                 id = (if (id.isNullOrEmpty()) {
-                    System.currentTimeMillis().toString()
+                    ""
                 } else id),
                 question = question,
                 choice = choice,
