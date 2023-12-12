@@ -128,9 +128,6 @@ fun MessageContentScreen(
     //Popup emoji selector
     val tooltipStateRich = remember { RichTooltipState() }
 
-    //TODO: test vote result
-    var showVoteResult by remember { mutableStateOf(false) }
-
     //長案訊息
     val onLongPress = {
         longTap = true
@@ -437,66 +434,6 @@ fun MessageContentScreen(
                     }
                 }
             }
-
-            //TODO: test vote
-//            if (showVoteResult) {
-//                ChoiceResultScreen(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(start = 40.dp),
-//                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-//                    choices = listOf(
-//                        "1.日本 🗼" to 0.1f,
-//                        "2.紐約 🗽" to 0.25f,
-//                        "3.夏威夷 🏖️" to 0.65f,
-//                    ),
-//                    isShowResultText = true,
-//                    onResultClick = {
-//                        navController.navigate(AnswerResultScreenDestination)
-//                    }
-//                )
-//            } else {
-//                SingleChoiceScreen(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(start = 40.dp),
-//                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-//                    choices = listOf(
-//                        "1.日本 🗼",
-//                        "2.紐約 🗽",
-//                        "3.夏威夷 🏖️",
-//                    ),
-//                    onChoiceClick = {
-//                        showVoteResult = true
-//                    },
-//                    isShowResultText = true,
-//                    onResultClick = {
-//                        navController.navigate(AnswerResultScreenDestination)
-//                    }
-//                )
-//
-//                Spacer(modifier = Modifier.height(10.dp))
-//
-//                MultiChoiceScreen(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(start = 40.dp),
-//                    question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-//                    choices = listOf(
-//                        "1.日本 🗼" to true,
-//                        "2.紐約 🗽" to false,
-//                        "3.夏威夷 🏖️" to true,
-//                    ),
-//                    onChoiceClick = {},
-//                    isShowResultText = true,
-//                    onConfirm = {
-//                        showVoteResult = true
-//                    },
-//                    onResultClick = {
-//                        navController.navigate(AnswerResultScreenDestination)
-//                    }
-//                )
-//            }
         }
     }
 }

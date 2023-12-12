@@ -1,9 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.shared.choice
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
-import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.extension.isVoted
 import com.cmoney.kolfanci.extension.toPercentageList
@@ -42,12 +39,12 @@ fun ChoiceScreen(
 ) {
     votings.forEach { voting ->
 
-        var showVoteResult by remember { mutableStateOf(voting.isVoted()) }
+        var showVoteResult by remember { mutableStateOf(voting.isVoted() || isMyPost || (voting.isEnded == true)) }
 
         Spacer(modifier = Modifier.height(10.dp))
 
         //已經 投過票
-        if (showVoteResult || isMyPost) {
+        if (showVoteResult) {
             ChoiceResultScreen(
                 modifier = modifier,
                 question = voting.title.orEmpty(),
