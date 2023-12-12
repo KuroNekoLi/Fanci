@@ -31,7 +31,7 @@ import kotlinx.parcelize.Parcelize
 data class CastVoteParam (
 
     @Json(name = "selectedOptions")
-    val selectedOptions: kotlin.collections.List<kotlin.Int>? = null
+    val selectedOptions: kotlin.collections.List<kotlin.String>? = null
 
 ) : Parcelable
 

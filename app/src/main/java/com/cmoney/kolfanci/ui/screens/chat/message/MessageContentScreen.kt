@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.Voting
@@ -99,7 +100,7 @@ sealed class MessageContentCallback {
     data class VotingClick(
         val message: ChatMessage,
         val voting: Voting,
-        val choices: List<IVotingOptionStatistics>
+        val choices: List<IVotingOptionStatistic>
     ) : MessageContentCallback()
 }
 

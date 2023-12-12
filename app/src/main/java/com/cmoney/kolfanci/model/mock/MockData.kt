@@ -15,6 +15,8 @@ import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.IReplyMessage
 import com.cmoney.fanciapi.fanci.model.IReplyVoting
 import com.cmoney.fanciapi.fanci.model.IUserVoteInfo
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticWithVoter
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
 import com.cmoney.fanciapi.fanci.model.ImageContent
@@ -432,61 +434,61 @@ object MockData {
     //單選題
     val mockSingleVoting: Voting
         get() = Voting(
-            id = System.currentTimeMillis(),
+            id = System.currentTimeMillis().toString(),
             title = RandomStringUtils.randomAlphabetic(10),
             votingOptionStatistics = listOf(
-                IVotingOptionStatistics(
-                    optionId = 1,
+                IVotingOptionStatistic(
+                    optionId = "1",
                     voteCount = 2,
                     text = RandomStringUtils.randomAlphabetic(10)
                 ),
-                IVotingOptionStatistics(
-                    optionId = 2,
+                IVotingOptionStatistic(
+                    optionId = "2",
                     voteCount = 3,
                     text = RandomStringUtils.randomAlphabetic(10)
                 ),
-                IVotingOptionStatistics(
-                    optionId = 3,
+                IVotingOptionStatistic(
+                    optionId = "3",
                     voteCount = 1,
                     text = RandomStringUtils.randomAlphabetic(10)
                 ),
-                IVotingOptionStatistics(
-                    optionId = 4,
+                IVotingOptionStatistic(
+                    optionId = "4",
                     voteCount = 4,
                     text = RandomStringUtils.randomAlphabetic(10)
                 )
             ),
             isMultipleChoice = false,
-            userVoteInfo = IUserVoteInfo()
+            userVote = IUserVoteInfo()
         )
 
     //多選題
     val mockMultiVoting: Voting
         get() = mockSingleVoting.copy(
-            id = 123,
+            id = "123",
             isMultipleChoice = true
         )
 
-    val mockIVotingOptionStatisticsWithVoterList: List<IVotingOptionStatisticsWithVoter>
+    val mockIVotingOptionStatisticsWithVoterList: List<IVotingOptionStatisticWithVoter>
         get() = listOf(
-            IVotingOptionStatisticsWithVoter(
+            IVotingOptionStatisticWithVoter(
                 voterIds = listOf("1", "2", "3"),
-                optionId = 1,
+                optionId = "1",
                 text = RandomStringUtils.randomAlphabetic(10)
             ),
-            IVotingOptionStatisticsWithVoter(
+            IVotingOptionStatisticWithVoter(
                 voterIds = listOf("1", "2", "3"),
-                optionId = 2,
+                optionId = "2",
                 text = RandomStringUtils.randomAlphabetic(10)
             ),
-            IVotingOptionStatisticsWithVoter(
+            IVotingOptionStatisticWithVoter(
                 voterIds = listOf("1", "2", "3"),
-                optionId = 3,
+                optionId = "3",
                 text = RandomStringUtils.randomAlphabetic(10)
             ),
-            IVotingOptionStatisticsWithVoter(
+            IVotingOptionStatisticWithVoter(
                 voterIds = listOf("1", "2", "3"),
-                optionId = 4,
+                optionId = "4",
                 text = RandomStringUtils.randomAlphabetic(10)
             )
         )

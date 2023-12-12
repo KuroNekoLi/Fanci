@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.extension.isVoted
@@ -37,7 +38,7 @@ fun ChoiceScreen(
     navController: DestinationsNavigator,
     votings: List<Voting>,
     isMyPost: Boolean,
-    onVotingClick: (Voting, List<IVotingOptionStatistics>) -> Unit
+    onVotingClick: (Voting, List<IVotingOptionStatistic>) -> Unit
 ) {
     votings.forEach { voting ->
 

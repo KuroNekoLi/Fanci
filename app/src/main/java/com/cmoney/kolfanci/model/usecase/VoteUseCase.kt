@@ -77,7 +77,7 @@ class VoteUseCase(
      * @param channelId 頻道id
      * @param voteIds 投票id
      */
-    suspend fun deleteVote(channelId: String, voteIds: List<Long>): Result<Unit> {
+    suspend fun deleteVote(channelId: String, voteIds: List<String>): Result<Unit> {
         KLog.i(TAG, "deleteVote:$channelId")
 
         return kotlin.runCatching {
@@ -97,7 +97,7 @@ class VoteUseCase(
      * @param choice 所選擇的項目
      */
     suspend fun choiceVote(
-        channelId: String, votingId: Long, choice: List<Int>
+        channelId: String, votingId: String, choice: List<String>
     ) = kotlin.runCatching {
         votingApi.apiV1VotingVotingIdCastVotePost(
             channelId = channelId,
@@ -112,7 +112,7 @@ class VoteUseCase(
     /**
      * 結束 投票
      */
-    suspend fun closeVote(channelId: String, votingId: Long) = kotlin.runCatching {
+    suspend fun closeVote(channelId: String, votingId: String) = kotlin.runCatching {
         votingApi.apiV1VotingVotingIdEndPut(
             votingId = votingId,
             channelId = channelId
@@ -126,7 +126,7 @@ class VoteUseCase(
      * @param channelId 頻道 id
      * @param votingId 投票 id
      */
-    suspend fun summaryVote(channelId: String, votingId: Long) = kotlin.runCatching {
+    suspend fun summaryVote(channelId: String, votingId: String) = kotlin.runCatching {
         if (Constant.isOpenMock) {
             MockData.mockIVotingOptionStatisticsWithVoterList
         } else {

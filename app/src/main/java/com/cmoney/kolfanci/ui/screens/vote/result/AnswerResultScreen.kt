@@ -24,6 +24,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.R
@@ -65,14 +66,14 @@ fun AnswerResultScreen(
             }?.apply {
                 navController.navigate(
                     AnswererScreenDestination(
-                        iVotingOptionStatisticsWithVoter = this
+                        iVotingOptionStatisticWithVoter = this
                     )
                 )
             }
         },
         onCloseVoteClick = {
             voteViewModel.closeVote(
-                votingId = voting.id ?: 0,
+                votingId = voting.id.orEmpty(),
                 channelId = channelId
             )
         }
@@ -86,7 +87,7 @@ fun AnswerResultScreen(
 
     LaunchedEffect(key1 = Unit) {
         voteViewModel.fetchVoteChoiceInfo(
-            votingId = voting.id ?: 0,
+            votingId = voting.id.orEmpty(),
             channelId = channelId
         )
     }
@@ -103,8 +104,8 @@ private fun AnswerResultScreenView(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     question: String,
-    choiceItem: List<IVotingOptionStatistics>,
-    onItemClick: (IVotingOptionStatistics) -> Unit,
+    choiceItem: List<IVotingOptionStatistic>,
+    onItemClick: (IVotingOptionStatistic) -> Unit,
     onCloseVoteClick: () -> Unit
 ) {
     Scaffold(
@@ -258,15 +259,15 @@ fun AnswerResultScreenPreview() {
         AnswerResultScreenView(
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choiceItem = listOf(
-                IVotingOptionStatistics(
+                IVotingOptionStatistic(
                     text = "日本",
                     voteCount = 10
                 ),
-                IVotingOptionStatistics(
+                IVotingOptionStatistic(
                     text = "紐約",
                     voteCount = 25
                 ),
-                IVotingOptionStatistics(
+                IVotingOptionStatistic(
                     text = "夏威夷",
                     voteCount = 65
                 )

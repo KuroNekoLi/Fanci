@@ -66,7 +66,7 @@ class PostUseCase(
         val votingIds = attachment.filter {
             it.first == AttachmentType.Choice && it.second.other is VoteModel
         }.map {
-            (it.second.other as VoteModel).id.toLong()
+            (it.second.other as VoteModel).id
         }
 
         val bulletingBoardMessageParam = BulletingBoardMessageParam(

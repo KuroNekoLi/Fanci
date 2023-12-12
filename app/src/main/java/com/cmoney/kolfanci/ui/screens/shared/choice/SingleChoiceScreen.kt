@@ -27,6 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.theme.FanciTheme
@@ -45,9 +46,9 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun SingleChoiceScreen(
     modifier: Modifier = Modifier,
     question: String,
-    choices: List<IVotingOptionStatistics>,
+    choices: List<IVotingOptionStatistic>,
     isShowResultText: Boolean,
-    onChoiceClick: (IVotingOptionStatistics) -> Unit,
+    onChoiceClick: (IVotingOptionStatistic) -> Unit,
     onResultClick: (() -> Unit)? = null
 ) {
     Box(
@@ -179,9 +180,9 @@ fun SingleChoiceScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choices = listOf(
-                IVotingOptionStatistics(text = "1.日本 🗼"),
-                IVotingOptionStatistics(text = "2.紐約 🗽"),
-                IVotingOptionStatistics(text = "3.夏威夷 🏖️")
+                IVotingOptionStatistic(text = "1.日本 🗼"),
+                IVotingOptionStatistic(text = "2.紐約 🗽"),
+                IVotingOptionStatistic(text = "3.夏威夷 🏖️")
             ),
             onChoiceClick = {},
             isShowResultText = true

@@ -21,18 +21,28 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 投票活動
+ * 包含投票數據的投票選項資料
  *
- * @param id 投票活動Id
+ * @param optionId 選項ID
+ * @param voteCount 得票數
+ * @param text 選項描述
  */
 @Parcelize
 
 
-data class VotingIdParam (
+data class IVotingOptionStatistic (
 
-    /* 投票活動Id */
-    @Json(name = "id")
-    val id: kotlin.String? = null
+    /* 選項ID */
+    @Json(name = "optionId")
+    val optionId: kotlin.String? = null,
+
+    /* 得票數 */
+    @Json(name = "voteCount")
+    val voteCount: kotlin.Int? = null,
+
+    /* 選項描述 */
+    @Json(name = "text")
+    val text: kotlin.String? = null
 
 ) : Parcelable
 

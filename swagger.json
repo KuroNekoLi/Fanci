@@ -7347,8 +7347,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "integer",
-                  "format": "int64"
+                  "type": "string"
                 }
               }
             },
@@ -7356,8 +7355,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "integer",
-                  "format": "int64"
+                  "type": "string"
                 }
               }
             },
@@ -7365,8 +7363,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "integer",
-                  "format": "int64"
+                  "type": "string"
                 }
               }
             }
@@ -7404,8 +7401,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           },
           {
@@ -7470,8 +7466,7 @@
             "description": "投票ID",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           },
           {
@@ -7516,8 +7511,7 @@
             "description": "",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           },
           {
@@ -7537,7 +7531,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/IVotingOptionStatisticsWithVoter"
+                    "$ref": "#/components/schemas/IVotingOptionStatisticWithVoter"
                   }
                 }
               },
@@ -7545,7 +7539,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/IVotingOptionStatisticsWithVoter"
+                    "$ref": "#/components/schemas/IVotingOptionStatisticWithVoter"
                   }
                 }
               },
@@ -7553,7 +7547,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/IVotingOptionStatisticsWithVoter"
+                    "$ref": "#/components/schemas/IVotingOptionStatisticWithVoter"
                   }
                 }
               }
@@ -7838,8 +7832,7 @@
           "votingIds": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             },
             "description": "投票活動",
             "nullable": true
@@ -7853,8 +7846,7 @@
           "selectedOptions": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
             "nullable": true
           }
@@ -8099,10 +8091,10 @@
           "canRead": {
             "type": "boolean"
           },
-          "canPost": {
+          "canReply": {
             "type": "boolean"
           },
-          "canReply": {
+          "canPost": {
             "type": "boolean"
           },
           "canEmoji": {
@@ -8311,8 +8303,7 @@
           "votingIds": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             },
             "description": "投票活動",
             "nullable": true
@@ -9105,7 +9096,8 @@
               "$ref": "#/components/schemas/IReplyVoting"
             },
             "description": "回復文章包含的投票活動",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "isDeleted": {
             "type": "boolean",
@@ -9118,9 +9110,9 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "description": "投票活動Id",
-            "format": "int64"
+            "nullable": true
           },
           "title": {
             "type": "string",
@@ -9128,7 +9120,8 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "回復訊息包含的投票活動"
       },
       "IUser": {
         "type": "object",
@@ -9206,21 +9199,20 @@
           "selectedOptions": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "IVotingOptionStatistics": {
+      "IVotingOptionStatistic": {
         "type": "object",
         "properties": {
           "optionId": {
-            "type": "integer",
+            "type": "string",
             "description": "選項ID",
-            "format": "int32"
+            "nullable": true
           },
           "voteCount": {
             "type": "integer",
@@ -9236,7 +9228,7 @@
         "additionalProperties": false,
         "description": "包含投票數據的投票選項資料"
       },
-      "IVotingOptionStatisticsWithVoter": {
+      "IVotingOptionStatisticWithVoter": {
         "type": "object",
         "properties": {
           "voterIds": {
@@ -9248,9 +9240,9 @@
             "nullable": true
           },
           "optionId": {
-            "type": "integer",
+            "type": "string",
             "description": "選項ID",
-            "format": "int32"
+            "nullable": true
           },
           "voteCount": {
             "type": "integer",
@@ -9651,6 +9643,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IMedia"
+            },
+            "nullable": true
+          },
+          "votingIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
             "nullable": true
           },
@@ -10067,9 +10066,9 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "description": "投票活動Id",
-            "format": "int64"
+            "nullable": true
           },
           "title": {
             "type": "string",
@@ -10079,29 +10078,32 @@
           "votingOptionStatistics": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/IVotingOptionStatistics"
+              "$ref": "#/components/schemas/IVotingOptionStatistic"
             },
             "description": "選項",
             "nullable": true
           },
           "isMultipleChoice": {
             "type": "boolean",
-            "description": "是否能多選"
+            "description": "是否能多選",
+            "readOnly": true
           },
           "isAnonymous": {
             "type": "boolean",
-            "description": "是否匿名投票"
+            "description": "是否匿名投票",
+            "readOnly": true
           },
           "isEnded": {
             "type": "boolean",
-            "description": "投票是否結束"
+            "description": "投票是否結束",
+            "readOnly": true
           },
           "votersCount": {
             "type": "integer",
             "description": "總投票人數",
             "format": "int32"
           },
-          "userVoteInfo": {
+          "userVote": {
             "$ref": "#/components/schemas/IUserVoteInfo"
           }
         },
@@ -10111,9 +10113,9 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "description": "投票活動Id",
-            "format": "int64"
+            "nullable": true
           }
         },
         "additionalProperties": false,

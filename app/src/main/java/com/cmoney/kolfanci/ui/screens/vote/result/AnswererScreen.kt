@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticWithVoter
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
@@ -37,15 +38,14 @@ import org.koin.androidx.compose.koinViewModel
 /**
  * 選擇題 - 答題者 清單
  *
- * @param channelId 頻道id
- * @param iVotingOptionStatisticsWithVoter 投票選項 model
+ * @param iVotingOptionStatisticWithVoter 投票選項 model
  */
 @Destination
 @Composable
 fun AnswererScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    iVotingOptionStatisticsWithVoter: IVotingOptionStatisticsWithVoter,
+    iVotingOptionStatisticWithVoter: IVotingOptionStatisticWithVoter,
     viewModel: VoteViewModel = koinViewModel()
 ) {
     val currentGroup by globalGroupViewModel().currentGroup.collectAsState()
@@ -54,7 +54,7 @@ fun AnswererScreen(
 
     AnswererScreenView(
         modifier = modifier,
-        questionItem = iVotingOptionStatisticsWithVoter.text.orEmpty(),
+        questionItem = iVotingOptionStatisticWithVoter.text.orEmpty(),
         members = groupMember,
         onBackClick = {
             navController.popBackStack()
@@ -65,7 +65,7 @@ fun AnswererScreen(
         currentGroup?.let {
             viewModel.getChoiceGroupMember(
                 groupId = it.id.orEmpty(),
-                voterIds = iVotingOptionStatisticsWithVoter.voterIds.orEmpty()
+                voterIds = iVotingOptionStatisticWithVoter.voterIds.orEmpty()
             )
         }
     }

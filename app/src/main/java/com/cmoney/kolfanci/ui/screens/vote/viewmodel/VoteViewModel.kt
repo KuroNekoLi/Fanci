@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticWithVoter
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
@@ -47,7 +48,7 @@ class VoteViewModel(
 
     //投票結果
     private val _voteResultInfo =
-        MutableStateFlow<List<IVotingOptionStatisticsWithVoter>>(emptyList())
+        MutableStateFlow<List<IVotingOptionStatisticWithVoter>>(emptyList())
     val voteResultInfo = _voteResultInfo.asStateFlow()
 
     //完成結束投票
@@ -189,7 +190,7 @@ class VoteViewModel(
      * @param choice 所選擇的項目ids
      */
     fun voteQuestion(
-        channelId: String, votingId: Long, choice: List<Int>
+        channelId: String, votingId: String, choice: List<String>
     ) {
         KLog.i(TAG, "voteQuestion: channelId = $channelId, votingId = $votingId, choice = $choice")
         viewModelScope.launch {
@@ -209,7 +210,7 @@ class VoteViewModel(
      * 取得 投票 目前結果
      */
     fun fetchVoteChoiceInfo(
-        votingId: Long,
+        votingId: String,
         channelId: String
     ) {
         KLog.i(TAG, "fetchVoteChoiceMember")
@@ -232,7 +233,7 @@ class VoteViewModel(
      * @param channelId 頻道 id
      */
     fun closeVote(
-        votingId: Long,
+        votingId: String,
         channelId: String
     ) {
         KLog.i(TAG, "closeVote")

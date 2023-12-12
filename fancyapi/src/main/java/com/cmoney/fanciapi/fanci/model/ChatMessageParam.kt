@@ -48,7 +48,7 @@ data class ChatMessageParam (
 
     /* 投票活動 */
     @Json(name = "votingIds")
-    val votingIds: kotlin.collections.List<kotlin.Long>? = null
+    val votingIds: kotlin.collections.List<kotlin.String>? = null
 
 ) : Parcelable
 

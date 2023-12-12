@@ -7,7 +7,7 @@ import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.CastVoteParam
-import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticWithVoter
 import com.cmoney.fanciapi.fanci.model.VotingIdParam
 import com.cmoney.fanciapi.fanci.model.VotingParam
 
@@ -25,7 +25,7 @@ interface VotingApi {
      * @return [Unit]
      */
     @HTTP(method = "DELETE", path = "api/v1/Voting", hasBody = true)
-    suspend fun apiV1VotingDelete(@Query("channelId") channelId: kotlin.String? = null, @Body requestBody: kotlin.collections.List<kotlin.Long>? = null): Response<Unit>
+    suspend fun apiV1VotingDelete(@Query("channelId") channelId: kotlin.String? = null, @Body requestBody: kotlin.collections.List<kotlin.String>? = null): Response<Unit>
 
     /**
      * 頻道創建投票    要有canPost權限
@@ -56,7 +56,7 @@ interface VotingApi {
      * @return [Unit]
      */
     @POST("api/v1/Voting/{votingId}/CastVote")
-    suspend fun apiV1VotingVotingIdCastVotePost(@Path("votingId") votingId: kotlin.Long, @Query("channelId") channelId: kotlin.String? = null, @Body castVoteParam: CastVoteParam? = null): Response<Unit>
+    suspend fun apiV1VotingVotingIdCastVotePost(@Path("votingId") votingId: kotlin.String, @Query("channelId") channelId: kotlin.String? = null, @Body castVoteParam: CastVoteParam? = null): Response<Unit>
 
     /**
      * 結束頻道投票  需要是創建者
@@ -71,7 +71,7 @@ interface VotingApi {
      * @return [Unit]
      */
     @PUT("api/v1/Voting/{votingId}/End")
-    suspend fun apiV1VotingVotingIdEndPut(@Path("votingId") votingId: kotlin.Long, @Query("channelId") channelId: kotlin.String? = null): Response<Unit>
+    suspend fun apiV1VotingVotingIdEndPut(@Path("votingId") votingId: kotlin.String, @Query("channelId") channelId: kotlin.String? = null): Response<Unit>
 
     /**
      * 取得投票活動數據    非建立者不給看
@@ -83,9 +83,9 @@ interface VotingApi {
      *
      * @param votingId 
      * @param channelId  (optional)
-     * @return [kotlin.collections.List<IVotingOptionStatisticsWithVoter>]
+     * @return [kotlin.collections.List<IVotingOptionStatisticWithVoter>]
      */
     @GET("api/v1/Voting/{votingId}/Statistics")
-    suspend fun apiV1VotingVotingIdStatisticsGet(@Path("votingId") votingId: kotlin.Long, @Query("channelId") channelId: kotlin.String? = null): Response<kotlin.collections.List<IVotingOptionStatisticsWithVoter>>
+    suspend fun apiV1VotingVotingIdStatisticsGet(@Path("votingId") votingId: kotlin.String, @Query("channelId") channelId: kotlin.String? = null): Response<kotlin.collections.List<IVotingOptionStatisticWithVoter>>
 
 }

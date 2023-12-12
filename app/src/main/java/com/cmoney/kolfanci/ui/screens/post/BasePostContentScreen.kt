@@ -224,9 +224,9 @@ fun BasePostContentScreen(
                     onVotingClick = { voting, choices ->
                         voteViewModel.voteQuestion(
                             channelId = channelId,
-                            votingId = voting.id ?: 0,
+                            votingId = voting.id ?: "",
                             choice = choices.map {
-                                it.optionId ?: 0
+                                it.optionId ?: ""
                             }
                         )
                     }

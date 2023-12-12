@@ -21,7 +21,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 
+ * 回復訊息包含的投票活動
  *
  * @param id 投票活動Id
  * @param title 標題
@@ -33,7 +33,7 @@ data class IReplyVoting (
 
     /* 投票活動Id */
     @Json(name = "id")
-    val id: kotlin.Long? = null,
+    val id: kotlin.String? = null,
 
     /* 標題 */
     @Json(name = "title")

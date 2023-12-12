@@ -1,19 +1,19 @@
 package com.cmoney.kolfanci.extension
 
 import com.cmoney.fanciapi.fanci.model.IReplyVoting
-import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
 import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.model.vote.VoteModel
 
 /**
  * 是否已經投過票
  */
-fun Voting.isVoted(): Boolean = this.userVoteInfo?.selectedOptions?.isEmpty() == false
+fun Voting.isVoted(): Boolean = this.userVote?.selectedOptions?.isEmpty() == false
 
 /**
  * 將 投票結果 轉換成 UI model
  */
-fun List<IVotingOptionStatistics>.toPercentageList(): List<Pair<String, Float>> {
+fun List<IVotingOptionStatistic>.toPercentageList(): List<Pair<String, Float>> {
     val totalCount = this.sumOf {
         it.voteCount ?: 0
     }
@@ -38,10 +38,10 @@ fun List<Voting>.toVoteModelList(): List<VoteModel> {
 fun List<VoteModel>.toVotingList(): List<Voting> {
     return this.map { voteModel ->
         Voting(
-            id = voteModel.id.toLong(),
+            id = voteModel.id,
             title = voteModel.question,
             votingOptionStatistics = voteModel.choice.map { choice ->
-                IVotingOptionStatistics(
+                IVotingOptionStatistic(
                     text = choice
                 )
             },

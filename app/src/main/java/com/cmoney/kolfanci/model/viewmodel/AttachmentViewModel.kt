@@ -434,7 +434,7 @@ class AttachmentViewModel(
 
             voteUseCase.deleteVote(
                 channelId = channelId,
-                voteIds = deleteItem.map { it.id ?: 0 }
+                voteIds = deleteItem.map { it.id ?: "" }
             ).onSuccess {
                 KLog.i(TAG, it)
             }.onFailure {

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -48,8 +49,8 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 fun MultiChoiceScreen(
     modifier: Modifier = Modifier,
     question: String,
-    choices: List<IVotingOptionStatistics>,
-    onConfirm: (List<IVotingOptionStatistics>) -> Unit,
+    choices: List<IVotingOptionStatistic>,
+    onConfirm: (List<IVotingOptionStatistic>) -> Unit,
     isShowResultText: Boolean,
     onResultClick: (() -> Unit)? = null
 ) {
@@ -155,7 +156,7 @@ fun MultiChoiceScreen(
  */
 @Composable
 private fun CheckBoxChoiceItem(
-    question: IVotingOptionStatistics,
+    question: IVotingOptionStatistic,
     isChecked: Boolean,
     onChoiceClick: () -> Unit
 ) {
@@ -213,7 +214,7 @@ private fun CheckBoxChoiceItem(
 private fun CheckBoxChoiceItemPreview() {
     FanciTheme {
         CheckBoxChoiceItem(
-            question = IVotingOptionStatistics(
+            question = IVotingOptionStatistic(
                 text = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？"
             ),
             isChecked = true,
@@ -232,13 +233,13 @@ fun MultipleChoiceScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choices = listOf(
-                IVotingOptionStatistics(
+                IVotingOptionStatistic(
                     text = "1.日本 🗼"
                 ),
-                IVotingOptionStatistics(
+                IVotingOptionStatistic(
                     text = "2.紐約 🗽"
                 ),
-                IVotingOptionStatistics(
+                IVotingOptionStatistic(
                     text = "3.夏威夷 🏖️"
                 )
             ),

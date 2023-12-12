@@ -16,7 +16,7 @@
 package com.cmoney.fanciapi.fanci.model
 
 import com.cmoney.fanciapi.fanci.model.IUserVoteInfo
-import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistics
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -32,7 +32,7 @@ import kotlinx.parcelize.Parcelize
  * @param isAnonymous 是否匿名投票
  * @param isEnded 投票是否結束
  * @param votersCount 總投票人數
- * @param userVoteInfo 
+ * @param userVote 
  */
 @Parcelize
 
@@ -41,7 +41,7 @@ data class Voting (
 
     /* 投票活動Id */
     @Json(name = "id")
-    val id: kotlin.Long? = null,
+    val id: kotlin.String? = null,
 
     /* 標題 */
     @Json(name = "title")
@@ -49,7 +49,7 @@ data class Voting (
 
     /* 選項 */
     @Json(name = "votingOptionStatistics")
-    val votingOptionStatistics: kotlin.collections.List<IVotingOptionStatistics>? = null,
+    val votingOptionStatistics: kotlin.collections.List<IVotingOptionStatistic>? = null,
 
     /* 是否能多選 */
     @Json(name = "isMultipleChoice")
@@ -67,8 +67,8 @@ data class Voting (
     @Json(name = "votersCount")
     val votersCount: kotlin.Int? = null,
 
-    @Json(name = "userVoteInfo")
-    val userVoteInfo: IUserVoteInfo? = null
+    @Json(name = "userVote")
+    val userVote: IUserVoteInfo? = null
 
 ) : Parcelable
 
