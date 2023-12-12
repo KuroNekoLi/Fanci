@@ -64,7 +64,7 @@ class GroupUseCase(
             )
         }
         else {
-            groupMemberApi.apiV1GroupMemberGroupGroupIdUsersGet(
+            groupMemberApi.apiV1GroupMemberGroupGroupIdUsersPost(
                 groupId = groupId,
                 useridsParam = UseridsParam(
                     userIds = userIds

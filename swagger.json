@@ -4156,7 +4156,7 @@
       }
     },
     "/api/v1/GroupMember/Group/{groupId}/Users": {
-      "get": {
+      "post": {
         "tags": [
           "GroupMember"
         ],
@@ -8091,10 +8091,10 @@
           "canRead": {
             "type": "boolean"
           },
-          "canReply": {
+          "canPost": {
             "type": "boolean"
           },
-          "canPost": {
+          "canReply": {
             "type": "boolean"
           },
           "canEmoji": {
@@ -8199,18 +8199,8 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
-          "replyMessage": {
-            "$ref": "#/components/schemas/IReplyMessage"
-          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
-          },
-          "votings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Voting"
-            },
-            "nullable": true
           },
           "emojiCount": {
             "$ref": "#/components/schemas/IEmojiCount"
@@ -8235,9 +8225,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
-          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -8250,6 +8237,19 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
+          "votings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Voting"
+            },
+            "nullable": true
+          },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false,

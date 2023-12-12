@@ -91,7 +91,7 @@ interface GroupMemberApi {
      * @param useridsParam 會員ids (optional)
      * @return [kotlin.collections.List<GroupMember>]
      */
-    @GET("api/v1/GroupMember/Group/{groupId}/Users")
-    suspend fun apiV1GroupMemberGroupGroupIdUsersGet(@Path("groupId") groupId: kotlin.String, @Body useridsParam: UseridsParam? = null): Response<kotlin.collections.List<GroupMember>>
+    @POST("api/v1/GroupMember/Group/{groupId}/Users")
+    suspend fun apiV1GroupMemberGroupGroupIdUsersPost(@Path("groupId") groupId: kotlin.String, @Body useridsParam: UseridsParam? = null): Response<kotlin.collections.List<GroupMember>>
 
 }
