@@ -76,7 +76,8 @@ fun AnswerResultScreen(
                 votingId = voting.id.orEmpty(),
                 channelId = channelId
             )
-        }
+        },
+        isEnd = (voting.isEnded == true)
     )
 
     LaunchedEffect(key1 = closeVoteSuccess) {
@@ -98,6 +99,7 @@ fun AnswerResultScreen(
  * @param onBackClick 返回callback
  * @param question 問題
  * @param choiceItem 題目清單
+ * @param isEnd 是否結束投票
  */
 @Composable
 private fun AnswerResultScreenView(
@@ -105,6 +107,7 @@ private fun AnswerResultScreenView(
     onBackClick: () -> Unit,
     question: String,
     choiceItem: List<IVotingOptionStatistic>,
+    isEnd: Boolean,
     onItemClick: (IVotingOptionStatistic) -> Unit,
     onCloseVoteClick: () -> Unit
 ) {
@@ -164,25 +167,27 @@ private fun AnswerResultScreenView(
                 }
             }
 
-            Box(
-                modifier = Modifier
-                    .padding(bottom = 44.dp)
-                    .fillMaxWidth()
-                    .height(46.dp)
-                    .background(LocalColor.current.background)
-                    .clickable {
-                        onCloseVoteClick.invoke()
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "結束答題",
-                    style = TextStyle(
-                        fontSize = 17.sp,
-                        lineHeight = 25.5.sp,
-                        color = LocalColor.current.specialColor.red
+            if (!isEnd) {
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 44.dp)
+                        .fillMaxWidth()
+                        .height(46.dp)
+                        .background(LocalColor.current.background)
+                        .clickable {
+                            onCloseVoteClick.invoke()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "結束答題",
+                        style = TextStyle(
+                            fontSize = 17.sp,
+                            lineHeight = 25.5.sp,
+                            color = LocalColor.current.specialColor.red
+                        )
                     )
-                )
+                }
             }
 
         }
@@ -274,7 +279,8 @@ fun AnswerResultScreenPreview() {
             ),
             onBackClick = {},
             onItemClick = {},
-            onCloseVoteClick = {}
+            onCloseVoteClick = {},
+            isEnd = false
         )
     }
 }
