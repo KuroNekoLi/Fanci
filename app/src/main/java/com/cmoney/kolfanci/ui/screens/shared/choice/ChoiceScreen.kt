@@ -44,11 +44,10 @@ fun ChoiceScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         //已經 投過票
-        if (showVoteResult || voting.isVoted() || isMyPost || (voting.isEnded == true)) {
+        if (showVoteResult || voting.isVoted() || (voting.isEnded == true)) {
             ChoiceResultScreen(
                 modifier = modifier,
-                question = voting.title.orEmpty(),
-                choices = voting.votingOptionStatistics?.toPercentageList() ?: emptyList(),
+                voting = voting,
                 isShowResultText = isMyPost,
                 onResultClick = {
                     navController.navigate(

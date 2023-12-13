@@ -29,26 +29,36 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.toPercentageList
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 /**
  * 選擇題 結果
  *
- * @param question 問題題目
- * @param choices 選項結果List
  * @param isShowResultText 是否呈現 查看結果 按鈕
  * @param onResultClick 點擊查看結果
  */
 @Composable
 fun ChoiceResultScreen(
     modifier: Modifier = Modifier,
-    question: String,
-    choices: List<Pair<String, Float>>,
+    voting: Voting,
     isShowResultText: Boolean,
     onResultClick: (() -> Unit)? = null
 ) {
+    val question = voting.title.orEmpty()
+    val choices = voting.votingOptionStatistics?.toPercentageList() ?: emptyList()
+    val title = if (voting.isEnded == true) {
+        stringResource(id = R.string.voting_end)
+    } else if (voting.isMultipleChoice == true) {
+        stringResource(id = R.string.multi_choice)
+    } else {
+        stringResource(id = R.string.single_choice)
+    }
+
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -57,7 +67,7 @@ fun ChoiceResultScreen(
     ) {
         Column {
             Text(
-                text = stringResource(id = R.string.single_choice),
+                text = title,
                 style = TextStyle(
                     fontSize = 12.sp,
                     color = LocalColor.current.text.default_50
@@ -143,11 +153,12 @@ private fun ChoiceResultItem(
             strokeCap = StrokeCap.Round
         )
 
-        Row(modifier = Modifier
-            .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp)
-            .onGloballyPositioned { coordinates ->
-                textHeight = with(localDensity) { coordinates.size.height.toDp() }
-            },
+        Row(
+            modifier = Modifier
+                .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp)
+                .onGloballyPositioned { coordinates ->
+                    textHeight = with(localDensity) { coordinates.size.height.toDp() }
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -179,12 +190,7 @@ private fun ChoiceResultItem(
 fun ChoiceResultScreenPreview() {
     FanciTheme {
         ChoiceResultScreen(
-            question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
-            choices = listOf(
-                "1.日本 🗼" to 0.1f,
-                "2.紐約 🗽" to 0.25f,
-                "3.夏威夷 🏖️" to 0.65f,
-            ),
+            voting = MockData.mockSingleVoting,
             isShowResultText = true,
             onResultClick = {}
         )

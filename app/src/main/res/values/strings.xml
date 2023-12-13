@@ -330,4 +330,7 @@
 
     <string name="chat_attachment_limit">無法同時上多種檔案</string>
     <string name="chat_attachment_limit_text">若需要多種檔案\n請分成多則訊息</string>
+
+    <string name="voting_end">投票已結束</string>
+
 </resources>
