@@ -39,12 +39,12 @@ fun ChoiceScreen(
 ) {
     votings.forEach { voting ->
 
-        var showVoteResult by remember { mutableStateOf(voting.isVoted() || isMyPost || (voting.isEnded == true)) }
+        var showVoteResult by remember { mutableStateOf(false) }
 
         Spacer(modifier = Modifier.height(10.dp))
 
         //已經 投過票
-        if (showVoteResult) {
+        if (showVoteResult || voting.isVoted() || isMyPost || (voting.isEnded == true)) {
             ChoiceResultScreen(
                 modifier = modifier,
                 question = voting.title.orEmpty(),
