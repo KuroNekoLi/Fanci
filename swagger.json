@@ -7341,30 +7341,21 @@
           }
         ],
         "requestBody": {
-          "description": "要刪除的投票活動",
+          "description": "刪除投票參數",
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
+                "$ref": "#/components/schemas/DeleteVotingsParam"
               }
             },
             "text/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
+                "$ref": "#/components/schemas/DeleteVotingsParam"
               }
             },
             "application/*+json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
+                "$ref": "#/components/schemas/DeleteVotingsParam"
               }
             }
           }
@@ -8091,10 +8082,10 @@
           "canRead": {
             "type": "boolean"
           },
-          "canPost": {
+          "canReply": {
             "type": "boolean"
           },
-          "canReply": {
+          "canPost": {
             "type": "boolean"
           },
           "canEmoji": {
@@ -8199,8 +8190,18 @@
           "author": {
             "$ref": "#/components/schemas/GroupMember"
           },
+          "replyMessage": {
+            "$ref": "#/components/schemas/IReplyMessage"
+          },
           "content": {
             "$ref": "#/components/schemas/MediaIChatContent"
+          },
+          "votings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Voting"
+            },
+            "nullable": true
           },
           "emojiCount": {
             "$ref": "#/components/schemas/IEmojiCount"
@@ -8225,6 +8226,9 @@
             "type": "integer",
             "format": "int64"
           },
+          "messageFromType": {
+            "$ref": "#/components/schemas/MessageServiceType"
+          },
           "messageReaction": {
             "$ref": "#/components/schemas/IUserMessageReaction"
           },
@@ -8237,19 +8241,6 @@
           "commentCount": {
             "type": "integer",
             "format": "int32"
-          },
-          "replyMessage": {
-            "$ref": "#/components/schemas/IReplyMessage"
-          },
-          "votings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Voting"
-            },
-            "nullable": true
-          },
-          "messageFromType": {
-            "$ref": "#/components/schemas/MessageServiceType"
           }
         },
         "additionalProperties": false,
@@ -8373,6 +8364,21 @@
         ],
         "type": "string",
         "description": "刪除類型列舉"
+      },
+      "DeleteVotingsParam": {
+        "type": "object",
+        "properties": {
+          "votingIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "投票 ID 陣列",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "刪除投票參數"
       },
       "EditChannelParam": {
         "type": "object",

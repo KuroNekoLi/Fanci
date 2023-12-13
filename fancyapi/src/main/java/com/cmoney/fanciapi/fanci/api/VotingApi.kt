@@ -7,6 +7,7 @@ import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
 import com.cmoney.fanciapi.fanci.model.CastVoteParam
+import com.cmoney.fanciapi.fanci.model.DeleteVotingsParam
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticWithVoter
 import com.cmoney.fanciapi.fanci.model.VotingIdParam
 import com.cmoney.fanciapi.fanci.model.VotingParam
@@ -21,11 +22,11 @@ interface VotingApi {
      *  - 403: Forbidden
      *
      * @param channelId 頻道ID (驗證權限) (optional)
-     * @param requestBody 要刪除的投票活動 (optional)
+     * @param deleteVotingsParam 刪除投票參數 (optional)
      * @return [Unit]
      */
     @HTTP(method = "DELETE", path = "api/v1/Voting", hasBody = true)
-    suspend fun apiV1VotingDelete(@Query("channelId") channelId: kotlin.String? = null, @Body requestBody: kotlin.collections.List<kotlin.String>? = null): Response<Unit>
+    suspend fun apiV1VotingDelete(@Query("channelId") channelId: kotlin.String? = null, @Body deleteVotingsParam: DeleteVotingsParam? = null): Response<Unit>
 
     /**
      * 頻道創建投票    要有canPost權限

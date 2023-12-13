@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.model.usecase
 
 import com.cmoney.fanciapi.fanci.api.VotingApi
 import com.cmoney.fanciapi.fanci.model.CastVoteParam
+import com.cmoney.fanciapi.fanci.model.DeleteVotingsParam
 import com.cmoney.fanciapi.fanci.model.VotingOption
 import com.cmoney.fanciapi.fanci.model.VotingParam
 import com.cmoney.kolfanci.extension.checkResponseBody
@@ -81,7 +82,9 @@ class VoteUseCase(
         return kotlin.runCatching {
             votingApi.apiV1VotingDelete(
                 channelId = channelId,
-                requestBody = voteIds
+                deleteVotingsParam = DeleteVotingsParam(
+                    votingIds = voteIds
+                )
             ).checkResponseBody()
         }
     }
