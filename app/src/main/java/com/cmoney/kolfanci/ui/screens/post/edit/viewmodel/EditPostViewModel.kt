@@ -132,30 +132,6 @@ class EditPostViewModel(
         _uiState.value = UiState.HideEditTip
     }
 
-    private suspend fun uploadImages(
-        uriLis: List<Uri>,
-        imageUploadCallback: MessageViewModel.ImageUploadCallback
-    ) {
-        KLog.i(TAG, "uploadImages:" + uriLis.size)
-
-        val completeImageUrl = mutableListOf<String>()
-
-        withContext(Dispatchers.IO) {
-            uploadImageUseCase.uploadImage(uriLis).catch { e ->
-                KLog.e(TAG, e)
-                imageUploadCallback.onFailure(e)
-            }.collect {
-                KLog.i(TAG, "uploadImage:$it")
-                val uri = it.first
-                val imageUrl = it.second
-                completeImageUrl.add(imageUrl)
-                if (completeImageUrl.size == uriLis.size) {
-                    imageUploadCallback.complete(completeImageUrl)
-                }
-            }
-        }
-    }
-
     /**
      * 編輯貼文,初始化資料至UI
      */

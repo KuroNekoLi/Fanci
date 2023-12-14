@@ -80,6 +80,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * 訊息互動
@@ -450,7 +451,11 @@ fun MediaContent(
     navController: DestinationsNavigator,
     medias: List<Media>,
     isClickable: Boolean = true,
-    audioViewModel: AudioViewModel = koinViewModel()
+    audioViewModel: AudioViewModel = koinViewModel(
+        parameters = {
+            parametersOf(Uri.EMPTY)
+        }
+    )
 ) {
     val context = LocalContext.current
     val mapList = medias.toUploadFileItemMap()
