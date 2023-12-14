@@ -3,10 +3,13 @@ package com.cmoney.kolfanci.ui.screens.vote.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
+import com.cmoney.fanciapi.fanci.model.IUserVoteInfo
 import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticWithVoter
-import com.cmoney.fanciapi.fanci.model.IVotingOptionStatisticsWithVoter
+import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.VoteUseCase
 import com.cmoney.kolfanci.model.vote.VoteModel
@@ -58,6 +61,14 @@ class VoteViewModel(
     //投票者
     private val _voterGroupMember = MutableStateFlow<List<GroupMember>>(emptyList())
     val voterGroupMember = _voterGroupMember.asStateFlow()
+
+    //貼文投票成功
+    private val _postVoteSuccess = MutableStateFlow<BulletinboardMessage?>(null)
+    val postVoteSuccess = _postVoteSuccess.asStateFlow()
+
+    //聊天訊息投票成功
+    private val _chatVoteSuccess = MutableStateFlow<ChatMessageWrapper?>(null)
+    val chatVoteSuccess = _chatVoteSuccess.asStateFlow()
 
     //最大選項數量
     private val MAX_COICE_COUNT = 5
@@ -185,12 +196,16 @@ class VoteViewModel(
     /**
      * 選擇 投票
      *
+     * @param content 文本 object, 可能是投票/聊天
      * @param channelId 頻道id
      * @param votingId 投票id
      * @param choice 所選擇的項目ids
      */
     fun voteQuestion(
-        channelId: String, votingId: String, choice: List<String>
+        content: Any?,
+        channelId: String,
+        votingId: String,
+        choice: List<String>
     ) {
         KLog.i(TAG, "voteQuestion: channelId = $channelId, votingId = $votingId, choice = $choice")
         viewModelScope.launch {
@@ -200,10 +215,92 @@ class VoteViewModel(
                 choice = choice
             ).onSuccess {
                 KLog.i(TAG, "voteQuestion onSuccess")
+
+                content?.let {
+                    //貼文
+                    if (content is BulletinboardMessage) {
+                        val newVoting = updateVotingModel(
+                            votings = content.votings.orEmpty(),
+                            votingId = votingId,
+                            choice = choice
+                        )
+
+                        val newContent = content.copy(
+                            votings = newVoting
+                        )
+
+                        _postVoteSuccess.update {
+                            newContent
+                        }
+
+                    } else if (content is ChatMessageWrapper) {
+                        val newVoting = updateVotingModel(
+                            votings = content.message.votings.orEmpty(),
+                            votingId = votingId,
+                            choice = choice
+                        )
+
+                        val newContent = content.copy(
+                            content.message.copy(
+                                votings = newVoting
+                            )
+                        )
+
+                        _chatVoteSuccess.update {
+                            newContent
+                        }
+                    }
+                }
             }.onFailure {
                 KLog.e(TAG, it)
             }
         }
+    }
+
+    /**
+     * 使用者投票之後,更新 Voting model 資料,
+     *
+     * @param votings 投票文
+     * @param votingId 投票id
+     * @param choice 所選擇的項目ids
+     */
+    private fun updateVotingModel(
+        votings: List<Voting>,
+        votingId: String,
+        choice: List<String>
+    ): List<Voting> {
+        val newVoting = votings.map { voting ->
+            //找出對應投票文
+            if (voting.id == votingId) {
+                //新的投票選項
+                val newVotingOptionStatistics =
+                    voting.votingOptionStatistics?.map { votingOptionStatistic ->
+                        //找出對應的選項
+                        if (choice.contains(votingOptionStatistic.optionId)) {
+                            votingOptionStatistic.copy(
+                                voteCount = votingOptionStatistic.voteCount?.plus(1)
+                            )
+                        } else {
+                            votingOptionStatistic
+                        }
+                    }
+
+                //新的總投票數
+                val newVotersCount = voting.votersCount?.plus(choice.size)
+
+                //已經投過
+                val newUserVote = IUserVoteInfo(selectedOptions = choice)
+
+                voting.copy(
+                    votingOptionStatistics = newVotingOptionStatistics,
+                    votersCount = newVotersCount,
+                    userVote = newUserVote
+                )
+            } else {
+                voting
+            }
+        }
+        return newVoting
     }
 
     /**
@@ -265,5 +362,15 @@ class VoteViewModel(
                 KLog.e(TAG, it)
             }
         }
+    }
+
+    fun postVoteSuccessDone() {
+        KLog.i(TAG, "postVoteSuccessDone")
+        _postVoteSuccess.update { null }
+    }
+
+    fun chatVoteSuccessDone() {
+        KLog.i(TAG, "postVoteSuccessDone")
+        _chatVoteSuccess.update { null }
     }
 }

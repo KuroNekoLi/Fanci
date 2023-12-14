@@ -10,6 +10,7 @@ import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.IUserMessageReaction
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
 import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.clickCount
 import com.cmoney.kolfanci.extension.isMyPost
@@ -449,7 +450,6 @@ class PostViewModel(
                         count = scopeFetchCount
                     )
                 ) {
-
                     postPollUseCase.pollScope(
                         delay = scopePollingInterval,
                         channelId = channelId,
@@ -470,7 +470,20 @@ class PostViewModel(
                             if (filterMessage == null) {
                                 post
                             } else {
-                                post.copy(message = filterMessage)
+                                //判斷 投票數量是否比原本大 以及 是否結束 才更新
+                                filterMessage.votings?.let { newVoting ->
+                                    val oldVoting = post.message.votings.orEmpty()
+
+                                    if (newVoting.size > oldVoting.size) { //新增投票
+                                        post.copy(message = filterMessage)
+                                    } else if (newVoting.firstOrNull { it.isEnded == true } != null) {  //有投票結束
+                                        post.copy(message = filterMessage)
+                                    } else if (isVoteCountMoreThanOld(newVoting, oldVoting)) {  //投票量變多
+                                        post.copy(message = filterMessage)
+                                    } else {
+                                        post
+                                    }
+                                } ?: post.copy(message = filterMessage)
                             }
                         }
 
@@ -478,12 +491,22 @@ class PostViewModel(
                             updateMessageList
                         }
                     }
-                }
-                else {
+                } else {
                     postPollUseCase.closeScope()
                 }
             }
         }
+    }
+
+    /**
+     * 檢查投票 數量 是否有變多
+     * @param newVoting 新的投票清單
+     * @param oldVoting 舊的投票清單
+     */
+    private fun isVoteCountMoreThanOld(newVoting: List<Voting>, oldVoting: List<Voting>): Boolean {
+        val newVoteCount = newVoting.sumOf { it.votersCount ?: 0 }
+        val oldVoteCount = oldVoting.sumOf { it.votersCount ?: 0 }
+        return newVoteCount > oldVoteCount
     }
 
     /**
@@ -505,6 +528,26 @@ class PostViewModel(
             }
         }
         return false
+    }
+
+    /**
+     * 強制更新指定訊息
+     */
+    fun forceUpdatePost(bulletinboardMessage: BulletinboardMessage) {
+        KLog.i(TAG, "forceUpdatePost")
+        val newPostList = _post.value.map { bulletinboardMessageWrapper ->
+            if (bulletinboardMessageWrapper.message.id == bulletinboardMessage.id) {
+                bulletinboardMessageWrapper.copy(
+                    message = bulletinboardMessage
+                )
+            } else {
+                bulletinboardMessageWrapper
+            }
+        }
+
+        _post.update {
+            newPostList
+        }
     }
 
 }

@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RichTooltipBox
@@ -60,7 +59,6 @@ import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreenV2
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
-import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
@@ -104,7 +102,7 @@ fun BasePostContentScreen(
         }
     ),
     voteViewModel: VoteViewModel = koinViewModel(),
-    bottomContent: @Composable ColumnScope.() -> Unit
+    bottomContent: @Composable ColumnScope.() -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -223,6 +221,7 @@ fun BasePostContentScreen(
                     isMyPost = (post.author?.id == Constant.MyInfo?.id),
                     onVotingClick = { voting, choices ->
                         voteViewModel.voteQuestion(
+                            content = post,
                             channelId = channelId,
                             votingId = voting.id ?: "",
                             choice = choices.map {

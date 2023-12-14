@@ -118,6 +118,7 @@ fun MessageScreen(
             },
             onVotingClick = { votingClick ->
                 voteViewModel.voteQuestion(
+                    content = message,
                     channelId = channelId,
                     votingId = votingClick.voting.id.orEmpty(),
                     choice = votingClick.choices.map { choice ->

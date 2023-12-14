@@ -67,6 +67,7 @@ import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -88,6 +89,7 @@ fun PostScreen(
             parametersOf(channel.id.orEmpty())
         }
     ),
+    voteViewModel: VoteViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
 ) {
@@ -129,6 +131,14 @@ fun PostScreen(
                 null
             )
         )
+    }
+
+    //投票成功
+    val voteSuccess by voteViewModel.postVoteSuccess.collectAsState()
+    voteSuccess?.let {
+        viewModel.forceUpdatePost(it)
+
+        voteViewModel.postVoteSuccessDone()
     }
 
     PostScreenView(
