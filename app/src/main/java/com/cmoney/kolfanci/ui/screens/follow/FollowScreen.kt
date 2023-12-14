@@ -48,8 +48,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,7 +87,10 @@ import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import com.cmoney.kolfanci.ui.screens.follow.viewmodel.FollowViewModel
 import com.cmoney.kolfanci.ui.screens.group.dialog.GroupItemDialogScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
+import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.JoinGroupDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.LoginDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.dialog.item.InputInviteCodeScreen
 import com.cmoney.kolfanci.ui.theme.Black_99000000
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -159,6 +164,14 @@ fun FollowScreen(
 
     //查看該社團info dialog
     val openGroupDialog by viewModel.openGroupDialog.collectAsState()
+
+    //是否出現 加入社團彈窗
+    var openJoinGroupDialog by remember {
+        mutableStateOf(false)
+    }
+
+    //輸入邀請碼彈窗
+    val showInviteCodeDialog by viewModel.isShowInviteCodeDialog.collectAsState()
 
     openGroupDialog?.let { targetGroup ->
         val context = LocalContext.current
@@ -262,6 +275,46 @@ fun FollowScreen(
         viewModel.alreadyNotifyAllowNotificationPermission()
     }
 
+    //加入社團彈窗
+    if (openJoinGroupDialog) {
+        JoinGroupDialogScreen(
+            onInviteCodeClick = {
+                openJoinGroupDialog = false
+                viewModel.onInputInviteCodeClick()
+            },
+            onCreateGroupClick = {
+                openJoinGroupDialog = false
+                navigator.navigate(
+                    CreateGroupScreenDestination
+                )
+            },
+            onDismiss = {
+                openJoinGroupDialog = false
+            }
+        )
+    }
+
+    //輸入邀請碼彈窗
+    if (showInviteCodeDialog) {
+        DialogScreen(
+            title = "輸入邀請碼",
+            subTitle = "透過邀請碼加入社團吧！",
+            onDismiss = {
+                viewModel.closeInviteCodeDialog()
+            }
+        ) {
+            InputInviteCodeScreen(
+                onConfirm = { inviteCode ->
+                    viewModel.onInputInviteCode(inviteCode)
+                },
+                onCancel = {
+                    viewModel.closeInviteCodeDialog()
+                }
+            )
+        }
+    }
+
+
     FollowScreenView(
         modifier = modifier,
         navigator = navigator,
@@ -297,7 +350,10 @@ fun FollowScreen(
                 GroupSettingScreenDestination
             )
         },
-        notificationUnReadCount = notificationUnReadCount
+        notificationUnReadCount = notificationUnReadCount,
+        onPlusClick = {
+            openJoinGroupDialog = true
+        }
     )
 
     LaunchedEffect(key1 = Unit) {
@@ -326,7 +382,8 @@ fun FollowScreenView(
     onGoToMy: () -> Unit,
     isShowBubbleTip: Boolean,
     onMoreClick: (Group) -> Unit,
-    notificationUnReadCount: Long
+    notificationUnReadCount: Long,
+    onPlusClick: () -> Unit
 ) {
     val TAG = "FollowScreenView"
 
@@ -371,9 +428,7 @@ fun FollowScreenView(
                             scaffoldState.drawerState.close()
                         }
 
-                        navigator.navigate(
-                            CreateGroupScreenDestination
-                        )
+                        onPlusClick.invoke()
                     },
                     onProfile = {
                         KLog.i(TAG, "onProfile click.")
@@ -698,7 +753,8 @@ fun FollowScreenPreview() {
             onGoToMy = {},
             isShowBubbleTip = false,
             onMoreClick = {},
-            notificationUnReadCount = 99
+            notificationUnReadCount = 99,
+            onPlusClick = {}
         )
     }
 }
