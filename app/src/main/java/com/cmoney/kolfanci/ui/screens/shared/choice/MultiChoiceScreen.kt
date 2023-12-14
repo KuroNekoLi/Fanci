@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -162,15 +164,11 @@ private fun CheckBoxChoiceItem(
 ) {
     val localDensity = LocalDensity.current
 
-    //內文選項高度
-    var textHeight by remember {
-        mutableStateOf(0.dp)
-    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(textHeight.coerceAtLeast(40.dp))
+            .defaultMinSize(minHeight = 40.dp)
             .clip(RoundedCornerShape(20.dp))
             .background(LocalColor.current.background)
             .clickable {
@@ -180,10 +178,7 @@ private fun CheckBoxChoiceItem(
     ) {
         Row(
             modifier = Modifier
-                .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp)
-                .onGloballyPositioned { coordinates ->
-                    textHeight = with(localDensity) { coordinates.size.height.toDp() }
-                },
+                .padding(start = 15.dp, end = 15.dp, top = 9.dp, bottom = 9.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -192,9 +187,8 @@ private fun CheckBoxChoiceItem(
                 // 主要內容/一般
                 style = TextStyle(
                     fontSize = 16.sp,
-                    lineHeight = 24.sp,
                     color = LocalColor.current.text.default_100
-                )
+                ),
             )
 
             Image(
@@ -234,13 +228,13 @@ fun MultipleChoiceScreenPreview() {
             question = "✈️ 投票決定我去哪裡玩！史丹利這次出國飛哪裡？",
             choices = listOf(
                 IVotingOptionStatistic(
-                    text = "1.日本 🗼"
+                    text = "1.日本"
                 ),
                 IVotingOptionStatistic(
-                    text = "2.紐約 🗽"
+                    text = "2.紐約 🗽選戰倒數一個月，長期被認為「藍大於綠」的花蓮，民進黨過去也曾由副總統候選人蕭美琴贏得花蓮唯一一席立委，花蓮政治版圖能否被副手人選翻轉？"
                 ),
                 IVotingOptionStatistic(
-                    text = "3.夏威夷 🏖️"
+                    text = "3.夏威夷 🏖️ 選戰倒數一個月，長期被認為「藍大於綠」的花蓮，民進黨過去也曾由副總統候選人蕭美琴贏得花蓮唯一一席立委，花蓮政治版圖能否被副手人選翻轉？"
                 )
             ),
             isShowResultText = true,
