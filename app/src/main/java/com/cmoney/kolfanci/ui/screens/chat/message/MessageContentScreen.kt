@@ -49,6 +49,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getDuration
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.getFleSize
+import com.cmoney.kolfanci.extension.goAppStore
 import com.cmoney.kolfanci.extension.toAttachmentType
 import com.cmoney.kolfanci.extension.toAttachmentTypeMap
 import com.cmoney.kolfanci.extension.toColor
@@ -69,6 +70,7 @@ import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.UnknownFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.ui.theme.White_767A7F
@@ -525,7 +527,26 @@ fun MediaContent(
                 }
             }
 
-            AttachmentType.Unknown -> {}
+            //未知檔案
+            AttachmentType.Unknown -> {
+                LazyRow(
+                    modifier = modifier.then(
+                        Modifier.padding(top = 10.dp, end = 10.dp)
+                    ),
+                    state = rememberLazyListState(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(media) { media ->
+                        val fileUrl = media.resourceLink
+                        UnknownFileItem(
+                            file = Uri.parse(fileUrl),
+                            onClick = {
+                                context.goAppStore()
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }

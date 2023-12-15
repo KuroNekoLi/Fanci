@@ -75,7 +75,9 @@ val viewModule = module {
     }
 
     viewModel { RoleManageViewModel(get(), get()) }
-    viewModel { MemberViewModel(get(), get(), get()) }
+    viewModel { MemberViewModel(
+        context = androidApplication(),
+        get(), get(), get()) }
     viewModel { BanListViewModel(get()) }
     viewModel { GroupApplyViewModel(get()) }
     viewModel { params ->

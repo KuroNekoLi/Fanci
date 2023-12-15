@@ -52,6 +52,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getDuration
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.getFleSize
+import com.cmoney.kolfanci.extension.goAppStore
 import com.cmoney.kolfanci.extension.toAttachmentType
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
@@ -67,6 +68,7 @@ import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
+import com.cmoney.kolfanci.ui.screens.shared.attachment.UnknownFileItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
@@ -307,7 +309,29 @@ fun BasePostContentScreen(
                                     duration = media.getDuration(),
                                     audioViewModel = audioViewModel
                                 )
-                            },
+                            }
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+
+                //========= Unknown File =========
+                val unknownFile = medias.filter {
+                    it.type?.toAttachmentType() == AttachmentType.Unknown
+                }
+
+                LazyRow(
+                    modifier = modifier,
+                    state = rememberLazyListState(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(unknownFile) { media ->
+                        val fileUrl = media.resourceLink
+                        UnknownFileItem(
+                            file = Uri.parse(fileUrl),
+                            onClick = {
+                                context.goAppStore()
+                            }
                         )
                     }
                 }
