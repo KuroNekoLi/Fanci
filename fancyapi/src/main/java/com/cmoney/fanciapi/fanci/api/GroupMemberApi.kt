@@ -6,7 +6,9 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.squareup.moshi.Json
 
+import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.GroupMemberPaging
+import com.cmoney.fanciapi.fanci.model.UseridsParam
 
 interface GroupMemberApi {
     /**
@@ -75,5 +77,21 @@ interface GroupMemberApi {
      */
     @DELETE("api/v1/GroupMember/group/{groupId}/{userId}")
     suspend fun apiV1GroupMemberGroupGroupIdUserIdDelete(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String): Response<Unit>
+
+    /**
+     * 取得特定社團會員清單
+     * 
+     * Responses:
+     *  - 200: 成功
+     *  - 401: 未驗證
+     *  - 403: 沒有權限
+     *  - 404: 找不到社團
+     *
+     * @param groupId 社團id
+     * @param useridsParam 會員ids (optional)
+     * @return [kotlin.collections.List<GroupMember>]
+     */
+    @POST("api/v1/GroupMember/Group/{groupId}/Users")
+    suspend fun apiV1GroupMemberGroupGroupIdUsersPost(@Path("groupId") groupId: kotlin.String, @Body useridsParam: UseridsParam? = null): Response<kotlin.collections.List<GroupMember>>
 
 }

@@ -18,7 +18,10 @@ class ChatRoomPollUseCase(
 ) :
     Poller {
     private val TAG = ChatRoomPollUseCase::class.java.simpleName
+
     private var isClose = false
+
+    private var isScopeClose = false
 
     private var index: Long? = null
 
@@ -56,13 +59,60 @@ class ChatRoomPollUseCase(
         }.flowOn(dispatcher)
     }
 
+    override fun pollScope(
+        delay: Long,
+        channelId: String,
+        fromSerialNumber: Long?,
+        fetchCount: Int
+    ): Flow<ChatMessagePaging> {
+        isScopeClose = false
+
+        return channelFlow {
+            while (!isScopeClose) {
+                kotlin.runCatching {
+                    chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
+                        chatRoomChannelId = channelId,
+                        fromSerialNumber = fromSerialNumber,
+                        order = OrderType.latest,
+                        take = fetchCount
+                    ).checkResponseBody()
+                }.onSuccess {
+                    send(it)
+                }.onFailure {
+                    KLog.e(TAG, it)
+                }
+                delay(delay)
+            }
+        }.flowOn(dispatcher)
+    }
+
     override fun close() {
         isClose = true
+        closeScope()
+    }
+
+    fun closeScope() {
+        isScopeClose = true
     }
 }
 
 interface Poller {
     fun poll(delay: Long, channelId: String, fromIndex: Long? = null): Flow<ChatMessagePaging>
+
+    /**
+     * 範圍內刷新
+     *
+     * @param delay 延遲多久 millisecond
+     * @param channelId 頻道id
+     * @param fromSerialNumber find index
+     * @param fetchCount 抓取筆數
+     */
+    fun pollScope(
+        delay: Long,
+        channelId: String,
+        fromSerialNumber: Long? = null,
+        fetchCount: Int
+    ): Flow<ChatMessagePaging>
 
     fun close()
 }

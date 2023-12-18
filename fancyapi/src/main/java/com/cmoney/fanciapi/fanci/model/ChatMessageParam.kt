@@ -27,6 +27,7 @@ import kotlinx.parcelize.Parcelize
  * @param replyMessageId 回覆的messageid
  * @param text 文字訊息內容
  * @param medias 附帶媒體內容
+ * @param votingIds 投票活動
  */
 @Parcelize
 
@@ -43,7 +44,11 @@ data class ChatMessageParam (
 
     /* 附帶媒體內容 */
     @Json(name = "medias")
-    val medias: kotlin.collections.List<Media>? = null
+    val medias: kotlin.collections.List<Media>? = null,
+
+    /* 投票活動 */
+    @Json(name = "votingIds")
+    val votingIds: kotlin.collections.List<kotlin.String>? = null
 
 ) : Parcelable
 

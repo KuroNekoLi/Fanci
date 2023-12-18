@@ -17,8 +17,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +44,7 @@ import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.dialog.MessageReSendDialogScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -63,6 +67,7 @@ fun MessageScreen(
     channelId: String,
     messageViewModel: MessageViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
+    voteViewModel: VoteViewModel = koinViewModel(),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
     onMsgDismissHide: (ChatMessage) -> Unit,
 ) {
@@ -90,6 +95,7 @@ fun MessageScreen(
         MessageScreenView(
             navController = navController,
             modifier = modifier,
+            channelId = channelId,
             message = message,
             blockingList = blockingList.map {
                 it.id.orEmpty()
@@ -109,11 +115,49 @@ fun MessageScreen(
             onReSendClick = {
                 AppUserLogger.getInstance().log(Clicked.MessageRetry)
                 messageViewModel.onReSendClick(it)
+            },
+            onVotingClick = { votingClick ->
+                voteViewModel.voteQuestion(
+                    content = message,
+                    channelId = channelId,
+                    votingId = votingClick.voting.id.orEmpty(),
+                    choice = votingClick.choices.map { choice ->
+                        choice.optionId.orEmpty()
+                    }
+                )
             }
         )
     } else {
         //Empty Message
         EmptyMessageContent(modifier = modifier)
+    }
+
+    //目前畫面最後一個item index
+    val columnEndPosition by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            visibleItemsInfo.lastOrNull()?.let {
+                it.index
+            } ?: 0
+        }
+    }
+
+    //監控滑動狀態, 停止的時候 polling 資料
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.isScrollInProgress }
+            .collect { isScrolling ->
+
+                //滑動停止
+                if (!isScrolling) {
+                    val firstItemIndex = listState.firstVisibleItemIndex
+
+                    messageViewModel.pollingScopeMessage(
+                        channelId = channelId,
+                        startItemIndex = firstItemIndex,
+                        lastIndex = columnEndPosition)
+                }
+            }
     }
 
     showReSendDialog?.let {
@@ -137,6 +181,7 @@ fun MessageScreen(
 private fun MessageScreenView(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
+    channelId: String,
     message: List<ChatMessageWrapper>,
     blockingList: List<String>,
     blockerList: List<String>,
@@ -147,7 +192,8 @@ private fun MessageScreenView(
     isScrollToBottom: Boolean,
     onLoadMore: () -> Unit,
     onReSendClick: (ChatMessageWrapper) -> Unit,
-    scrollToPosition: Int?
+    scrollToPosition: Int?,
+    onVotingClick: (MessageContentCallback.VotingClick) -> Unit
 ) {
     val TAG = "MessageScreenView"
 
@@ -170,6 +216,7 @@ private fun MessageScreenView(
                     }
 
                     MessageContentScreen(
+                        channelId = channelId,
                         navController = navController,
                         chatMessageWrapper = chatMessageWrapper.copy(
                             isBlocking = isBlocking,
@@ -205,6 +252,10 @@ private fun MessageScreenView(
 
                                 is MessageContentCallback.MsgDismissHideClick -> {
                                     onMsgDismissHide.invoke(chatMessageWrapper.message)
+                                }
+
+                                is MessageContentCallback.VotingClick -> {
+                                    onVotingClick.invoke(it)
                                 }
                             }
                         }
@@ -306,7 +357,9 @@ fun MessageScreenPreview() {
             onLoadMore = {},
             onReSendClick = {},
             scrollToPosition = null,
-            navController = EmptyDestinationsNavigator
+            navController = EmptyDestinationsNavigator,
+            onVotingClick = {},
+            channelId = ""
         )
     }
 }

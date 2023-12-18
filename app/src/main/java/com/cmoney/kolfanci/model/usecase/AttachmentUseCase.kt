@@ -5,13 +5,14 @@ import android.content.Context
 import android.net.Uri
 import com.bumptech.glide.Glide
 import com.cmoney.kolfanci.BuildConfig
-import com.cmoney.kolfanci.extension.getAttachmentType
-import com.cmoney.kolfanci.extension.toUploadFileItem
 import com.cmoney.kolfanci.extension.getUploadFileType
-import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.extension.toUploadFileItem
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.repository.Network
 import com.cmoney.kolfanci.ui.destinations.AudioPreviewScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PdfPreviewScreenDestination
 import com.cmoney.kolfanci.ui.destinations.TextPreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
@@ -158,18 +159,18 @@ object AttachmentController {
      */
     fun onAttachmentClick(
         navController: DestinationsNavigator,
-        uri: Uri,
+        attachmentInfoItem: AttachmentInfoItem,
         context: Context,
-        attachmentType: AttachmentType? = null,
         fileName: String = "",
         duration: Long = 0,
         audioViewModel: AudioViewModel? = null
     ) {
-        val type = attachmentType ?: uri.getAttachmentType(context)
-        KLog.i(TAG, "onAttachmentClick:$uri type:$type")
+        val type = attachmentInfoItem.attachmentType
+        KLog.i(TAG, "onAttachmentClick:$attachmentInfoItem type:$type")
 
         when (type) {
             AttachmentType.Audio -> {
+                val uri = attachmentInfoItem.uri
                 audioViewModel?.apply {
                     playSilence(
                         uri = uri,
@@ -190,6 +191,7 @@ object AttachmentController {
             }
 
             AttachmentType.Image -> {
+                val uri = attachmentInfoItem.uri
                 StfalconImageViewer
                     .Builder(
                         context, listOf(uri)
@@ -203,6 +205,7 @@ object AttachmentController {
             }
 
             AttachmentType.Pdf -> {
+                val uri = attachmentInfoItem.uri
                 navController.navigate(
                     PdfPreviewScreenDestination(
                         uri = uri,
@@ -212,6 +215,7 @@ object AttachmentController {
             }
 
             AttachmentType.Txt -> {
+                val uri = attachmentInfoItem.uri
                 navController.navigate(
                     TextPreviewScreenDestination(
                         uri = uri,
@@ -221,6 +225,22 @@ object AttachmentController {
             }
 
             AttachmentType.Unknown -> {
+
+            }
+
+            AttachmentType.Choice -> {
+                attachmentInfoItem.other?.let {
+                    if (it is VoteModel) {
+                        navController.navigate(
+                            CreateChoiceQuestionScreenDestination(
+                                voteModel = it
+                            )
+                        )
+                    }
+                }
+            }
+
+            else -> {
 
             }
         }

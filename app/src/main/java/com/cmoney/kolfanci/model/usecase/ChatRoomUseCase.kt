@@ -6,6 +6,7 @@ import com.cmoney.fanciapi.fanci.api.MessageApi
 import com.cmoney.fanciapi.fanci.api.UserReportApi
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.ChatMessagePaging
 import com.cmoney.fanciapi.fanci.model.ChatMessageParam
 import com.cmoney.fanciapi.fanci.model.EmojiParam
 import com.cmoney.fanciapi.fanci.model.Emojis
@@ -15,9 +16,12 @@ import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.fanciapi.fanci.model.ReportParm
 import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
+import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.socks.library.KLog
 
 
@@ -57,10 +61,19 @@ class ChatRoomUseCase(
 
         val medias = attachment.toUploadMedia(context)
 
+        //投票 id
+        val votingIds = attachment.filter {
+            it.first == AttachmentType.Choice && it.second.other is VoteModel
+        }.map {
+            (it.second.other as VoteModel).id
+        }
+
         val chatMessageParam = ChatMessageParam(
             text = text,
-            medias = medias
+            medias = medias,
+            votingIds = votingIds
         )
+
         messageApi.apiV2MessageMessageTypeMessageIdPut(
             messageType = messageServiceType,
             messageId = messageId,
@@ -218,11 +231,17 @@ class ChatRoomUseCase(
         order: OrderType = OrderType.latest
     ) =
         kotlin.runCatching {
-            chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
-                chatRoomChannelId = chatRoomChannelId,
-                fromSerialNumber = fromSerialNumber,
-                order = order
-            ).checkResponseBody()
+            if (Constant.isOpenMock) {
+                ChatMessagePaging(
+                    items = MockData.mockListMessage
+                )
+            } else {
+                chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessageGet(
+                    chatRoomChannelId = chatRoomChannelId,
+                    fromSerialNumber = fromSerialNumber,
+                    order = order
+                ).checkResponseBody()
+            }
         }
 
     /**
@@ -240,12 +259,17 @@ class ChatRoomUseCase(
         replyMessageId: String = ""
     ) =
         kotlin.runCatching {
+            val votingIds = attachment.filter { it.first == AttachmentType.Choice }.mapNotNull {
+                (it.second.other as VoteModel).id
+            }
+
             chatRoomApi.apiV1ChatRoomChatRoomChannelIdMessagePost(
                 chatRoomChannelId = chatRoomChannelId,
                 chatMessageParam = ChatMessageParam(
                     text = text,
                     medias = attachment.toUploadMedia(context),
-                    replyMessageId = replyMessageId
+                    replyMessageId = replyMessageId,
+                    votingIds = votingIds
                 )
             ).checkResponseBody()
         }

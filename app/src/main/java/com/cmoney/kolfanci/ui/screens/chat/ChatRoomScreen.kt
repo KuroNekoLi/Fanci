@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.chat
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,9 +38,11 @@ import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.announcement.AnnouncementResult
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.chat.dialog.DeleteMessageDialogScreen
@@ -78,7 +79,8 @@ fun ChatRoomScreen(
     messageViewModel: MessageViewModel = koinViewModel(),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
     viewModel: ChatRoomViewModel = koinViewModel(),
-    resultRecipient: ResultRecipient<AnnouncementScreenDestination, AnnouncementResult>
+    resultRecipient: ResultRecipient<AnnouncementScreenDestination, AnnouncementResult>,
+    choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>
 ) {
     val TAG = "ChatRoomScreen"
 
@@ -142,6 +144,23 @@ fun ChatRoomScreen(
                     channelId,
                     announceMessage
                 )
+            }
+        }
+    }
+
+    //附加選擇題 callback
+    choiceRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                val announceMessage = result.value
+                attachmentViewModel.addChoiceAttachment(announceMessage)
+
+                coroutineScope.launch {
+                    state.hide()
+                }
             }
         }
     }
@@ -215,6 +234,7 @@ fun ChatRoomScreen(
             AppUserLogger.getInstance().log(Clicked.MessageSendButton)
             isShowLoading = true
             attachmentViewModel.upload(
+                channelId = channelId,
                 other = text
             )
         },
@@ -234,10 +254,10 @@ fun ChatRoomScreen(
                 state.show()
             }
         },
-        onPreviewAttachmentClick = { uri ->
+        onPreviewAttachmentClick = { attachmentInfoItem ->
             AttachmentController.onAttachmentClick(
                 navController = navController,
-                uri = uri,
+                attachmentInfoItem = attachmentInfoItem,
                 context = context
             )
         },
@@ -281,18 +301,18 @@ fun ChatRoomScreen(
 
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->
-        val file = reSendFile.file
         ReSendFileDialog(
             reSendFile = reSendFile,
             onDismiss = {
                 reSendFileClick = null
             },
             onRemove = {
-                attachmentViewModel.removeAttach(file)
+                attachmentViewModel.removeAttach(reSendFile.attachmentInfoItem)
                 reSendFileClick = null
             },
             onResend = {
                 attachmentViewModel.onResend(
+                    channelId = channelId,
                     uploadFileItem = reSendFile,
                     other = inputContent
                 )
@@ -352,7 +372,8 @@ fun ChatRoomScreen(
         navController.navigate(
             AnnouncementScreenDestination(
                 message = this,
-                isPinMessage = false
+                isPinMessage = false,
+                channelId = channelId
             )
         )
         messageViewModel.announceRouteDone()
@@ -360,6 +381,7 @@ fun ChatRoomScreen(
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
+        navController = navController,
         state = state,
         selectedAttachment = attachment,
         isOnlyPhotoSelector = isOnlyPhotoSelector
@@ -416,13 +438,13 @@ private fun ChatRoomScreenView(
     onMsgDismissHide: (ChatMessage) -> Unit,
     replyMessage: IReplyMessage?,
     onDeleteReply: (IReplyMessage) -> Unit,
-    onDeleteAttach: (Uri) -> Unit,
+    onDeleteAttach: (AttachmentInfoItem) -> Unit,
     onMessageSend: (text: String) -> Unit,
     onAttachClick: () -> Unit,
     showOnlyBasicPermissionTip: () -> Unit,
     onAttachImageAddClick: () -> Unit,
     attachment: Map<AttachmentType, List<AttachmentInfoItem>>,
-    onPreviewAttachmentClick: (Uri) -> Unit,
+    onPreviewAttachmentClick: (AttachmentInfoItem) -> Unit,
     isShowLoading: Boolean,
     onResend: ((ReSendFile) -> Unit)
 ) {
@@ -443,6 +465,7 @@ private fun ChatRoomScreenView(
                     KLog.i(TAG, "announceMessage click.")
                     navController.navigate(
                         AnnouncementScreenDestination(
+                            channelId = channelId,
                             message = it,
                             isPinMessage = true
                         )

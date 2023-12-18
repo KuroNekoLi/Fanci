@@ -26,11 +26,13 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +55,7 @@ import com.cmoney.kolfanci.extension.isMyPost
 import com.cmoney.kolfanci.extension.showPostMoreActionDialogBottomSheet
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
@@ -64,6 +67,7 @@ import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -85,6 +89,7 @@ fun PostScreen(
             parametersOf(channel.id.orEmpty())
         }
     ),
+    voteViewModel: VoteViewModel = koinViewModel(),
     resultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>
 ) {
@@ -126,6 +131,14 @@ fun PostScreen(
                 null
             )
         )
+    }
+
+    //投票成功
+    val voteSuccess by voteViewModel.postVoteSuccess.collectAsState()
+    voteSuccess?.let {
+        viewModel.forceUpdatePost(it)
+
+        voteViewModel.postVoteSuccessDone()
     }
 
     PostScreenView(
@@ -210,6 +223,34 @@ fun PostScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchPost()
+    }
+
+    //目前畫面最後一個item index
+    val columnEndPosition by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            visibleItemsInfo.lastOrNull()?.let {
+                it.index
+            } ?: 0
+        }
+    }
+
+    //監控滑動狀態, 停止的時候 polling 資料
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.isScrollInProgress }
+            .collect { isScrolling ->
+                //滑動停止
+                if (!isScrolling) {
+                    val firstItemIndex = listState.firstVisibleItemIndex
+
+                    viewModel.pollingScopePost(
+                        channelId = channel.id.orEmpty(),
+                        startItemIndex = firstItemIndex,
+                        lastIndex = columnEndPosition
+                    )
+                }
+            }
     }
 
     listState.OnBottomReached {
@@ -390,6 +431,7 @@ private fun PostScreenView(
                 pinPost?.let { pinPost ->
                     item {
                         BasePostContentScreen(
+                            channelId = channel.id.orEmpty(),
                             navController = navController,
                             post = pinPost.message,
                             bottomContent = {
@@ -406,7 +448,8 @@ private fun PostScreenView(
                             },
                             onEmojiClick = {
                                 if (Constant.isCanEmoji()) {
-                                    AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                    AppUserLogger.getInstance()
+                                        .log(Clicked.ExistingEmoji, From.PostList)
                                     onEmojiClick.invoke(pinPost, it)
                                 }
                             },
@@ -429,6 +472,7 @@ private fun PostScreenView(
                 items(items = filterPost) { post ->
                     val postMessage = post.message
                     BasePostContentScreen(
+                        channelId = channel.id.orEmpty(),
                         navController = navController,
                         post = postMessage,
                         bottomContent = {
@@ -444,7 +488,8 @@ private fun PostScreenView(
                         },
                         onEmojiClick = {
                             if (Constant.isCanEmoji()) {
-                                AppUserLogger.getInstance().log(Clicked.ExistingEmoji, From.PostList)
+                                AppUserLogger.getInstance()
+                                    .log(Clicked.ExistingEmoji, From.PostList)
                                 onEmojiClick.invoke(post, it)
                             }
                         },
@@ -586,7 +631,7 @@ private fun EmptyPostContent(modifier: Modifier = Modifier) {
 fun PostScreenPreview() {
     FanciTheme {
         PostScreenView(
-            postList = PostViewModel.mockListMessage.map {
+            postList = MockData.mockListBulletinboardMessage.map {
                 PostViewModel.BulletinboardMessageWrapper(message = it)
             },
             pinPost = null,

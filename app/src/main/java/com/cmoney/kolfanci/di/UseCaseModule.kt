@@ -11,6 +11,7 @@ import com.cmoney.kolfanci.model.usecase.GroupUseCase
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.cmoney.kolfanci.model.usecase.OrderUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
+import com.cmoney.kolfanci.model.usecase.PostPollUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.RelationUseCase
 import com.cmoney.kolfanci.model.usecase.SearchUseCase
@@ -18,6 +19,7 @@ import com.cmoney.kolfanci.model.usecase.ThemeUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
 import com.cmoney.kolfanci.model.usecase.UserUseCase
 import com.cmoney.kolfanci.model.usecase.VipManagerUseCase
+import com.cmoney.kolfanci.model.usecase.VoteUseCase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -76,6 +78,17 @@ val useCaseModule = module {
         AttachmentUseCase(
             context = androidApplication(),
             network = get()
+        )
+    }
+    factory {
+        VoteUseCase(
+            votingApi = get()
+        )
+    }
+    factory {
+        PostPollUseCase(
+            bulletinBoardApi = get(),
+            messageApi = get()
         )
     }
 }

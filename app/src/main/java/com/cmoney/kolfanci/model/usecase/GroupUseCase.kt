@@ -26,6 +26,8 @@ import com.cmoney.fanciapi.fanci.model.RoleParam
 import com.cmoney.fanciapi.fanci.model.UpdateIsNeedApprovalParam
 import com.cmoney.fanciapi.fanci.model.UseridsParam
 import com.cmoney.kolfanci.extension.checkResponseBody
+import com.cmoney.kolfanci.model.Constant
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +47,31 @@ class GroupUseCase(
     private val userReport: UserReportApi,
     private val uploadImageUseCase: UploadImageUseCase
 ) {
+
+    /**
+     * 取得會員資訊
+     *
+     * @param groupId 社團 id
+     * @param userIds 會員 ids
+     */
+    suspend fun getGroupMembers(groupId: String, userIds: List<String>) = kotlin.runCatching {
+        if (Constant.isOpenMock) {
+            listOf(
+                MockData.mockGroupMember,
+                MockData.mockGroupMember,
+                MockData.mockGroupMember,
+                MockData.mockGroupMember
+            )
+        }
+        else {
+            groupMemberApi.apiV1GroupMemberGroupGroupIdUsersPost(
+                groupId = groupId,
+                useridsParam = UseridsParam(
+                    userIds = userIds
+                )
+            ).checkResponseBody()
+        }
+    }
 
     /**
      * 取得特定 group
@@ -520,9 +547,19 @@ class GroupUseCase(
      */
     suspend fun groupToSelectGroupItem() =
         kotlin.runCatching {
-            getMyJoinGroup().getOrNull()?.items?.mapIndexed { index, group ->
-                GroupItem(group, index == 0)
-            }.orEmpty()
+            if (Constant.isOpenMock) {
+                listOf(
+                    MockData.mockGroup,
+                    MockData.mockGroup,
+                    MockData.mockGroup
+                ).mapIndexed { index, group ->
+                    GroupItem(group, index == 0)
+                }
+            } else {
+                getMyJoinGroup().getOrNull()?.items?.mapIndexed { index, group ->
+                    GroupItem(group, index == 0)
+                }.orEmpty()
+            }
         }
 
     /**

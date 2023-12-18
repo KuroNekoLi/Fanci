@@ -38,19 +38,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getCaptureUri
 import com.cmoney.kolfanci.model.Constant
-import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.attachment.AttachImageDefault
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.socks.library.KLog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -82,6 +83,7 @@ sealed class AttachmentEnv {
 @Composable
 fun MediaPickerBottomSheet(
     modifier: Modifier = Modifier,
+    navController: DestinationsNavigator,
     state: ModalBottomSheetState,
     attachmentEnv: AttachmentEnv = AttachmentEnv.Chat,
     isOnlyPhotoSelector: Boolean = false,
@@ -102,6 +104,10 @@ fun MediaPickerBottomSheet(
     }
 
     var showFilePicker by remember {
+        mutableStateOf(false)
+    }
+
+    var showCreateVote by remember {
         mutableStateOf(false)
     }
 
@@ -152,6 +158,18 @@ fun MediaPickerBottomSheet(
                         attachmentEnv = attachmentEnv,
                         onOpen = {
                             showFilePicker = true
+                        },
+                        onError = { title, desc ->
+                            showAlertDialog = Pair(title, desc)
+                        }
+                    )
+                },
+                onChoiceClick = {
+                    viewModel.choiceVoteCheck(
+                        selectedAttachment = selectedAttachment,
+                        attachmentEnv = attachmentEnv,
+                        onOpen = {
+                            showCreateVote = true
                         },
                         onError = { title, desc ->
                             showAlertDialog = Pair(title, desc)
@@ -229,6 +247,12 @@ fun MediaPickerBottomSheet(
             }
         )
     }
+
+    if (showCreateVote) {
+        showCreateVote = false
+        navController.navigate(CreateChoiceQuestionScreenDestination())
+    }
+
     //========== show all picker end==========
 }
 
@@ -238,74 +262,41 @@ fun MediaPickerBottomSheetView(
     isOnlyPhotoSelector: Boolean = false,
     onImageClick: () -> Unit,
     onCameraClick: () -> Unit,
-    onFileClick: () -> Unit
+    onFileClick: () -> Unit,
+    onChoiceClick: () -> Unit
 ) {
     Column(
         modifier = modifier
             .background(color = LocalColor.current.env_80)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    onImageClick.invoke()
-                }
-                .padding(
-                    top = 30.dp,
-                    bottom = 10.dp,
-                    start = 24.dp,
-                    end = 24.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(20.dp),
-                painter = painterResource(id = R.drawable.gallery),
-                contentDescription = "gallery",
-                tint = LocalColor.current.text.default_100
-            )
-
-            Spacer(modifier = Modifier.width(15.dp))
-
-            Text(
-                text = "上傳相片",
-                style = TextStyle(fontSize = 17.sp, color = LocalColor.current.text.default_100)
-            )
-        }
+        MediaPickerItem(
+            modifier = Modifier.padding(
+                top = 10.dp,
+                bottom = 10.dp,
+                start = 24.dp,
+                end = 24.dp
+            ),
+            iconRes = R.drawable.gallery,
+            text = stringResource(id = R.string.upload_photo),
+            onClick = onImageClick
+        )
 
         Divider(
             color = LocalColor.current.background,
             thickness = 1.dp
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    onCameraClick.invoke()
-                }
-                .padding(
-                    top = 10.dp,
-                    bottom = 10.dp,
-                    start = 24.dp,
-                    end = 24.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(20.dp),
-                painter = painterResource(id = R.drawable.camera),
-                contentDescription = "camera",
-                tint = LocalColor.current.text.default_100
-            )
-
-            Spacer(modifier = Modifier.width(15.dp))
-
-            Text(
-                text = "打開相機",
-                style = TextStyle(fontSize = 17.sp, color = LocalColor.current.text.default_100)
-            )
-        }
+        MediaPickerItem(
+            modifier = Modifier.padding(
+                top = 10.dp,
+                bottom = 10.dp,
+                start = 24.dp,
+                end = 24.dp
+            ),
+            iconRes = R.drawable.camera,
+            text = stringResource(id = R.string.open_camera),
+            onClick = onCameraClick
+        )
 
         if (!isOnlyPhotoSelector && Constant.isShowUploadFile()) {
             Divider(
@@ -313,35 +304,74 @@ fun MediaPickerBottomSheetView(
                 thickness = 1.dp
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onFileClick.invoke()
-                    }
-                    .padding(
-                        top = 10.dp,
-                        bottom = 30.dp,
-                        start = 24.dp,
-                        end = 24.dp
-                    ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(id = R.drawable.file),
-                    contentDescription = "file",
-                    tint = LocalColor.current.text.default_100
-                )
+            MediaPickerItem(
+                modifier = Modifier.padding(
+                    top = 10.dp,
+                    bottom = 10.dp,
+                    start = 24.dp,
+                    end = 24.dp
+                ),
+                iconRes = R.drawable.file,
+                text = stringResource(id = R.string.upload_file),
+                onClick = onFileClick
+            )
 
-                Spacer(modifier = Modifier.width(15.dp))
+            Divider(
+                color = LocalColor.current.background,
+                thickness = 1.dp
+            )
 
-                Text(
-                    text = "上傳檔案",
-                    style = TextStyle(fontSize = 17.sp, color = LocalColor.current.text.default_100)
-                )
-            }
+            MediaPickerItem(
+                modifier = Modifier.padding(
+                    top = 10.dp,
+                    bottom = 30.dp,
+                    start = 24.dp,
+                    end = 24.dp
+                ),
+                iconRes = R.drawable.mcq_icon,
+                text = stringResource(id = R.string.multiple_choice_question),
+                onClick = onChoiceClick
+            )
         }
+    }
+}
+
+/**
+ * 附加檔案每個 item
+ *
+ * @param iconRes icon res
+ * @param text text
+ * @param onClick click callback
+ */
+@Composable
+private fun MediaPickerItem(
+    modifier: Modifier,
+    iconRes: Int,
+    text: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick.invoke()
+            }
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            modifier = Modifier.size(20.dp),
+            painter = painterResource(id = iconRes),
+            contentDescription = "",
+            tint = LocalColor.current.text.default_100
+        )
+
+        Spacer(modifier = Modifier.width(15.dp))
+
+        Text(
+            text = text,
+            style = TextStyle(fontSize = 17.sp, color = LocalColor.current.text.default_100)
+        )
     }
 }
 
@@ -453,7 +483,8 @@ fun MediaPickerBottomSheetPreview() {
         MediaPickerBottomSheetView(
             onImageClick = {},
             onCameraClick = {},
-            onFileClick = {}
+            onFileClick = {},
+            onChoiceClick = {}
         )
     }
 }

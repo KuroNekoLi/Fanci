@@ -312,4 +312,33 @@
 
     <string name="join_group_by_code">透過邀請碼加入社團</string>
 
+    <string name="multiple_choice_question">選擇題</string>
+    <string name="upload_file">上傳檔案</string>
+    <string name="open_camera">打開相機</string>
+    <string name="upload_photo">上傳相片</string>
+
+    <string name="create_choice">建立選擇題</string>
+    <string name="input_choice_question">請輸入選擇題的問題</string>
+    <string name="input_question_placeholder">輸入問題文字</string>
+    <string name="choice_title">選項 %d</string>
+    <string name="choice_count_limit">選項已達上限</string>
+    <string name="single_choice">單選題</string>
+    <string name="single_choice_desc">每個人只能選一個選項</string>
+    <string name="multi_choice">多選題</string>
+    <string name="multi_choice_desc">每個人可以投一個以上的選項</string>
+    <string name="input_choice_question_placeholder">輸入選項文字</string>
+
+    <string name="answer_result">答題結果</string>
+
+    <string name="answer_result_count">%d人投給這個選項</string>
+
+    <string name="answerer">答題者</string>
+
+    <string name="vote_question_error">請輸入問題文字</string>
+    <string name="vote_choice_error">至少輸入二個選項</string>
+
+    <string name="chat_attachment_limit">無法同時上多種檔案</string>
+    <string name="chat_attachment_limit_text">若需要多種檔案\n請分成多則訊息</string>
+
+    <string name="voting_end">投票已結束</string>
 </resources>

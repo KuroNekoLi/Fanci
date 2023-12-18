@@ -25,7 +25,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemePreviewScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.theme.model.GroupTheme
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeSettingItemScreen
 import com.cmoney.kolfanci.ui.theme.CoffeeThemeColor
 import com.cmoney.kolfanci.ui.theme.DefaultThemeColor

@@ -3,7 +3,6 @@ package com.cmoney.kolfanci.extension
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.ChatMessage
 import com.cmoney.fanciapi.fanci.model.User
-import com.cmoney.kolfanci.model.attachment.AttachmentType
 
 /**
  * 是否為自己的訊息
@@ -22,7 +21,8 @@ fun ChatMessage.toBulletinboardMessage(): BulletinboardMessage = BulletinboardMe
     messageReaction = messageReaction,
     deleteStatus = deleteStatus,
     deleteFrom = deleteFrom,
-    commentCount = commentCount
+    commentCount = commentCount,
+    votings = votings
 )
 
 /**

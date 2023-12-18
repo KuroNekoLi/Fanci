@@ -8,9 +8,12 @@ import com.cmoney.fanciapi.fanci.model.BulletingBoardMessageParam
 import com.cmoney.fanciapi.fanci.model.MessageIdParam
 import com.cmoney.fanciapi.fanci.model.OrderType
 import com.cmoney.kolfanci.extension.checkResponseBody
-import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
+import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.model.vote.VoteModel
 
 class PostUseCase(
     private val context: Context,
@@ -59,9 +62,17 @@ class PostUseCase(
     ): Result<BulletinboardMessage> {
         val medias = attachment.toUploadMedia(context)
 
+        //投票 id
+        val votingIds = attachment.filter {
+            it.first == AttachmentType.Choice && it.second.other is VoteModel
+        }.map {
+            (it.second.other as VoteModel).id
+        }
+
         val bulletingBoardMessageParam = BulletingBoardMessageParam(
             text = text,
-            medias = medias
+            medias = medias,
+            votingIds = votingIds
         )
 
         return kotlin.runCatching {
@@ -85,11 +96,17 @@ class PostUseCase(
         fromSerialNumber: Long? = null
     ): Result<BulletinboardMessagePaging> {
         return kotlin.runCatching {
-            bulletinBoardApi.apiV1BulletinBoardChannelIdMessageGet(
-                channelId = channelId,
-                order = order,
-                fromSerialNumber = fromSerialNumber
-            ).checkResponseBody()
+            if (Constant.isOpenMock) {
+                BulletinboardMessagePaging(
+                    items = listOf(MockData.mockBulletinboardMessage)
+                )
+            } else {
+                bulletinBoardApi.apiV1BulletinBoardChannelIdMessageGet(
+                    channelId = channelId,
+                    order = order,
+                    fromSerialNumber = fromSerialNumber
+                ).checkResponseBody()
+            }
         }
     }
 
