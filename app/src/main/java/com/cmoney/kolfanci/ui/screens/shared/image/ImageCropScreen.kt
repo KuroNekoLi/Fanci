@@ -174,6 +174,7 @@ fun ImageCropScreen(modifier: Modifier = Modifier) {
                         .background(colorResource(id = R.color.color_99000000))
                 )
 
+                //TODO: 將 bitmap 存起來, 之後上傳給 server 用
                 screenshot?.let { bitmap ->
 
                     StfalconImageViewer
