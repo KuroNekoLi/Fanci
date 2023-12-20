@@ -294,7 +294,13 @@ class MemberViewModel(
                             )
                         }
 
-                        val orgMemberList = uiState.groupMember.orEmpty().toMutableList()
+                        val orgMemberList = mutableListOf<GroupMemberSelect>()
+
+                        //如果不是搜尋,結果資料疊加
+                        if (searchKeyword.isNullOrEmpty()) {
+                            orgMemberList.addAll(uiState.groupMember.orEmpty())
+                        }
+
                         orgMemberList.addAll(wrapMember)
 
                         val filterMember = orgMemberList.filter {
@@ -309,8 +315,6 @@ class MemberViewModel(
                         uiState = uiState.copy(
                             groupMember = orgGroupMemberList
                         )
-
-                        KLog.i("Warren", "count:" + orgGroupMemberList.size)
 
                     } else {
                         //如果是搜尋, 搜尋不到資料
@@ -468,17 +472,11 @@ class MemberViewModel(
                 override fun run() {
                     //searching
                     KLog.i(TAG, "searching:$keyword")
-                    if (keyword.isEmpty()) {
-                        uiState = uiState.copy(
-                            groupMember = orgGroupMemberList
-                        )
-                    } else {
-                        fetchGroupMember(
-                            groupId = groupId,
-                            excludeMember = excludeMember,
-                            searchKeyword = keyword
-                        )
-                    }
+                    fetchGroupMember(
+                        groupId = groupId,
+                        excludeMember = excludeMember,
+                        searchKeyword = keyword
+                    )
 
                     //Local Searching, server api not ready use.
 //                    //return all
