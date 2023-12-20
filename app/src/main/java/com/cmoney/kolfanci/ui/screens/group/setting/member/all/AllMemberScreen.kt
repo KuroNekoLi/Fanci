@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
@@ -51,6 +53,7 @@ import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.OnBottomReached
 import com.cmoney.kolfanci.extension.isVip
 import com.cmoney.kolfanci.extension.share
 import com.cmoney.kolfanci.extension.toColor
@@ -92,7 +95,7 @@ fun AllMemberScreen(
 
     val shareModel by viewModel.share.collectAsState()
 
-    shareModel?.let { shareText->
+    shareModel?.let { shareText ->
         LocalContext.current.share(shareText.shareText)
         viewModel.resetShareText()
     }
@@ -136,6 +139,9 @@ fun AllMemberScreen(
         },
         onInviteClick = {
             viewModel.onInviteClick(group)
+        },
+        onLoadMore = {
+            viewModel.onLoadMoreGroupMember(group.id.orEmpty())
         }
     )
 }
@@ -148,11 +154,13 @@ fun AllMemberScreenView(
     groupMemberList: List<GroupMember>,
     isLoading: Boolean,
     onSearch: (String) -> Unit,
-    onInviteClick: () -> Unit
+    onInviteClick: () -> Unit,
+    onLoadMore: () -> Unit
 ) {
     val TAG = "AllMemberScreenView"
     var textState by remember { mutableStateOf("") }
     val maxLength = 20
+    val listState: LazyListState = rememberLazyListState()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -218,7 +226,10 @@ fun AllMemberScreenView(
                 }
             )
 
-            LazyColumn(modifier = Modifier.padding(innerPadding)) {
+            LazyColumn(
+                modifier = Modifier.padding(innerPadding),
+                state = listState
+            ) {
 
                 item {
                     if (groupMemberList.isEmpty()) {
@@ -263,6 +274,10 @@ fun AllMemberScreenView(
                         }
                     }
                 }
+            }
+
+            listState.OnBottomReached {
+                onLoadMore.invoke()
             }
         }
     }
@@ -477,7 +492,8 @@ fun AllMemberScreenPreview() {
             ),
             group = Group(),
             onSearch = {},
-            onInviteClick = {}
+            onInviteClick = {},
+            onLoadMore = {}
         )
     }
 }

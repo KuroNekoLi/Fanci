@@ -144,6 +144,9 @@ class MemberViewModel(
     private val _managerMember = MutableStateFlow<GroupMember?>(null)
     val managerMember = _managerMember.asStateFlow()
 
+    //社團成員 是否有下一頁
+    private var groupMemberPagingHaveNextPage = true
+
     private fun showLoading() {
         uiState = uiState.copy(
             loading = true
@@ -273,9 +276,12 @@ class MemberViewModel(
                 groupId = groupId,
                 skipCount = skip,
                 search = searchKeyword?.trim()
-            )
-                .fold({
-                    val responseMembers = it.items.orEmpty()
+            ).fold(
+                { groupMemberPaging ->
+
+                    groupMemberPagingHaveNextPage = (groupMemberPaging.haveNextPage == true)
+
+                    val responseMembers = groupMemberPaging.items.orEmpty()
                     if (responseMembers.isNotEmpty()) {
                         //轉換model, 並去除vip role
                         val wrapMember = responseMembers.map { member ->
@@ -295,20 +301,24 @@ class MemberViewModel(
                             excludeMember.find { exclude ->
                                 exclude.id == it.groupMember.id
                             } == null
-                        }
+                        }.distinct()
 
-                        orgGroupMemberList.addAll(filterMember)
-                        val distinct = orgGroupMemberList.distinct()
                         orgGroupMemberList.clear()
-                        orgGroupMemberList.addAll(distinct)
+                        orgGroupMemberList.addAll(filterMember)
 
                         uiState = uiState.copy(
                             groupMember = orgGroupMemberList
                         )
+
+                        KLog.i("Warren", "count:" + orgGroupMemberList.size)
+
                     } else {
-                        uiState = uiState.copy(
-                            groupMember = emptyList()
-                        )
+                        //如果是搜尋, 搜尋不到資料
+                        if (searchKeyword?.isNotEmpty() == true) {
+                            uiState = uiState.copy(
+                                groupMember = emptyList()
+                            )
+                        }
                     }
                     dismissLoading()
                 }, {
@@ -324,7 +334,7 @@ class MemberViewModel(
     fun onLoadMoreGroupMember(groupId: String) {
         KLog.i(TAG, "onLoadMoreGroupMember")
         val skip = uiState.groupMember.orEmpty().size
-        if (skip != 0) {
+        if (skip != 0 && groupMemberPagingHaveNextPage) {
             fetchGroupMember(groupId, skip, searchKeyword = currentKeyword)
         }
     }
