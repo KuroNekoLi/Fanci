@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.post.edit.attachment
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,9 +20,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.ui.screens.chat.attachment.ChatRoomAttachImageScreen
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -34,11 +34,16 @@ fun PostAttachmentScreen(
     modifier: Modifier = Modifier,
     attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
     isShowLoading: Boolean,
-    onDelete: (Uri) -> Unit,
-    onClick: (Uri) -> Unit,
+    onDelete: (AttachmentInfoItem) -> Unit,
+    onClick: (AttachmentInfoItem) -> Unit,
     onAddImage: () -> Unit,
     onResend: (ReSendFile) -> Unit
 ) {
+    //選擇題
+    val voteAttachment = attachment.filter { item ->
+        item.first == AttachmentType.Choice
+    }
+
     //圖片檔
     val imageAttachment = attachment.filter { item ->
         item.first == AttachmentType.Image
@@ -48,7 +53,7 @@ fun PostAttachmentScreen(
 
     //其餘檔案
     val otherAttachment = attachment.filter { item ->
-        item.first != AttachmentType.Image
+        item.first != AttachmentType.Image && item.first != AttachmentType.Choice
     }
 
     //ui
@@ -57,8 +62,26 @@ fun PostAttachmentScreen(
         contentAlignment = Alignment.Center
     ) {
         Column {
+            if (voteAttachment.isNotEmpty()) {
+                Divider(modifier = Modifier.height(2.dp).background(LocalColor.current.background))
+
+                PostOtherAttachmentScreen(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(15.dp)
+                        .background(MaterialTheme.colors.primary),
+                    itemModifier = Modifier
+                        .width(270.dp)
+                        .height(75.dp),
+                    attachment = voteAttachment,
+                    onDelete = onDelete,
+                    onClick = onClick,
+                    onResend = onResend
+                )
+            }
+
             if (imageAttachment.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(2.dp))
+                Divider(modifier = Modifier.height(2.dp).background(LocalColor.current.background))
 
                 ChatRoomAttachImageScreen(
                     modifier = modifier
@@ -73,7 +96,7 @@ fun PostAttachmentScreen(
             }
 
             if (otherAttachment.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(2.dp))
+                Divider(modifier = Modifier.height(2.dp).background(LocalColor.current.background))
 
                 PostOtherAttachmentScreen(
                     modifier = modifier

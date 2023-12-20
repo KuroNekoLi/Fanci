@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.post.edit
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -55,31 +55,36 @@ import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
+import com.cmoney.kolfanci.extension.toVoteModelList
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
 import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
-import com.cmoney.kolfanci.ui.screens.shared.CenterTopAppBar
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.FilePicker
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.CenterTopAppBar
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.xlogin.XLoginHelper
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -103,7 +108,8 @@ fun EditPostScreen(
         }
     ),
     attachmentViewModel: AttachmentViewModel = koinViewModel(),
-    resultNavigator: ResultBackNavigator<PostViewModel.BulletinboardMessageWrapper>
+    resultNavigator: ResultBackNavigator<PostViewModel.BulletinboardMessageWrapper>,
+    choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>
 ) {
     var showImagePick by remember { mutableStateOf(false) }
 
@@ -128,15 +134,34 @@ fun EditPostScreen(
     }
 
     //User 輸入內容
-    var inputContent by remember {
-        mutableStateOf("")
-    }
+    val inputContent by viewModel.userInput.collectAsState()
+
+    val setInitDataSuccess by attachmentViewModel.setInitDataSuccess.collectAsState()
 
     //編輯貼文, 設定初始化資料
     LaunchedEffect(Unit) {
-        editPost?.let { post ->
-            post.content?.medias?.apply {
-                attachmentViewModel.addAttachment(this)
+        if (!setInitDataSuccess) {
+            editPost?.let { post ->
+
+                post.content?.medias?.apply {
+                    attachmentViewModel.addAttachment(this)
+                }
+
+                viewModel.setUserInput(
+                    post.content?.text.orEmpty()
+                )
+
+                //設定投票
+                if (post.votings?.isNotEmpty() == true) {
+                    post.votings?.let { votings ->
+                        val voteModelList = votings.toVoteModelList()
+                        voteModelList.forEach { voteModel ->
+                            attachmentViewModel.addChoiceAttachment(voteModel)
+                        }
+                    }
+                }
+
+                attachmentViewModel.setDataInitFinish()
             }
         }
     }
@@ -164,6 +189,19 @@ fun EditPostScreen(
         mutableStateOf<ReSendFile?>(null)
     }
 
+    //附加選擇題 callback
+    choiceRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
+
+            is NavResult.Value -> {
+                val announceMessage = result.value
+                attachmentViewModel.addChoiceAttachment(announceMessage)
+            }
+        }
+    }
+
     EditPostScreenView(
         modifier = modifier,
         editPost = editPost,
@@ -171,12 +209,18 @@ fun EditPostScreen(
             AppUserLogger.getInstance().log(Clicked.PostSelectPhoto)
             showImagePick = true
         },
-        onPostClick = { text ->
-            inputContent = text
+        onPostClick = {
             AppUserLogger.getInstance().log(Clicked.PostPublish)
             isLoading = true
+
+            attachmentViewModel.deleteVotingCheck(
+                channelId,
+                editPost?.votings.orEmpty()
+            )
+
             attachmentViewModel.upload(
-                other = text
+                channelId = channelId,
+                other = inputContent
             )
         },
         onBack = {
@@ -193,14 +237,20 @@ fun EditPostScreen(
         onResend = {
             reSendFileClick = it
         },
-        onPreviewAttachmentClick = { uri ->
+        onPreviewAttachmentClick = { attachmentInfoItem ->
             AttachmentController.onAttachmentClick(
                 navController = navController,
-                uri = uri,
-                context = context,
-                attachmentType = attachmentViewModel.getAttachmentType(uri)
+                attachmentInfoItem = attachmentInfoItem,
+                context = context
             )
-        }
+        },
+        onChoiceClick = {
+            navController.navigate(CreateChoiceQuestionScreenDestination())
+        },
+        onValueChange = {
+            viewModel.setUserInput(it)
+        },
+        defaultContent = inputContent
     )
 
     //Show image picker
@@ -288,7 +338,7 @@ fun EditPostScreen(
 
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->
-        val file = reSendFile.file
+        val file = reSendFile.attachmentInfoItem
         ReSendFileDialog(
             reSendFile = reSendFile,
             onDismiss = {
@@ -300,6 +350,7 @@ fun EditPostScreen(
             },
             onResend = {
                 attachmentViewModel.onResend(
+                    channelId = channelId,
                     uploadFileItem = reSendFile,
                     other = inputContent
                 )
@@ -331,16 +382,17 @@ private fun EditPostScreenView(
     editPost: BulletinboardMessage? = null,
     onShowImagePicker: () -> Unit,
     onAttachmentFilePicker: () -> Unit,
-    onPostClick: (String) -> Unit,
+    onPostClick: () -> Unit,
     onBack: () -> Unit,
     showLoading: Boolean,
     attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
-    onDeleteAttach: (Uri) -> Unit,
-    onPreviewAttachmentClick: (Uri) -> Unit,
-    onResend: (ReSendFile) -> Unit
+    onDeleteAttach: (AttachmentInfoItem) -> Unit,
+    onPreviewAttachmentClick: (AttachmentInfoItem) -> Unit,
+    onResend: (ReSendFile) -> Unit,
+    onChoiceClick: () -> Unit,
+    onValueChange: (String) -> Unit,
+    defaultContent: String
 ) {
-    val defaultContent = editPost?.content?.text.orEmpty()
-    var textState by remember { mutableStateOf(defaultContent) }
     val focusRequester = remember { FocusRequester() }
     val showKeyboard = remember { mutableStateOf(true) }
     val keyboard = LocalSoftwareKeyboardController.current
@@ -354,7 +406,7 @@ private fun EditPostScreenView(
                     onBack.invoke()
                 },
                 postClick = {
-                    onPostClick.invoke(textState)
+                    onPostClick.invoke()
                 }
             )
         },
@@ -385,7 +437,7 @@ private fun EditPostScreenView(
                         .fillMaxWidth()
                         .weight(1f)
                         .focusRequester(focusRequester),
-                    value = textState,
+                    value = defaultContent,
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = LocalColor.current.text.default_100,
                         backgroundColor = LocalColor.current.background,
@@ -395,7 +447,8 @@ private fun EditPostScreenView(
                         unfocusedIndicatorColor = Color.Transparent
                     ),
                     onValueChange = {
-                        textState = it
+//                        textState = it
+                        onValueChange.invoke(it)
                     },
                     shape = RoundedCornerShape(4.dp),
                     textStyle = TextStyle.Default.copy(fontSize = 16.sp),
@@ -458,6 +511,16 @@ private fun EditPostScreenView(
                         )
                     }
 
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(13.dp)
+                            .background(LocalColor.current.component.other)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
                     if(Constant.isShowUploadFile()) {
                         Spacer(modifier = Modifier.width(15.dp))
 
@@ -486,6 +549,61 @@ private fun EditPostScreenView(
                                 )
                             )
                         }
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(13.dp)
+                            .background(LocalColor.current.component.other)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    //選擇題
+                    Row(
+                        modifier.clickable {
+                            onChoiceClick.invoke()
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = Modifier.size(25.dp),
+                            painter = painterResource(id = R.drawable.mcq_icon),
+                            colorFilter = ColorFilter.tint(LocalColor.current.text.default_100),
+                            contentDescription = null
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = stringResource(id = R.string.multiple_choice_question),
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                lineHeight = 21.sp,
+                                color = LocalColor.current.text.default_80
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    IconButton(
+                        modifier = Modifier.size(25.dp),
+                        onClick = {
+                            showKeyboard.value = !showKeyboard.value
+                        }) {
+                        Icon(
+                            ImageVector.vectorResource(id = R.drawable.keyboard),
+                            null,
+                            tint = if (showKeyboard.value) {
+                                LocalColor.current.text.default_100
+                            } else {
+                                LocalColor.current.text.default_50
+                            }
+                        )
                     }
                 }
             }
@@ -584,7 +702,10 @@ fun EditPostScreenPreview() {
             attachment = emptyList(),
             onDeleteAttach = {},
             onPreviewAttachmentClick = {},
-            onResend = {}
+            onResend = {},
+            onChoiceClick = {},
+            onValueChange = {},
+            defaultContent = ""
         )
     }
 }

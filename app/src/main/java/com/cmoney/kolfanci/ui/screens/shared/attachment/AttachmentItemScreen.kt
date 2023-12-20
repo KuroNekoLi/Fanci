@@ -34,11 +34,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.formatDuration
-import com.cmoney.kolfanci.extension.getAudioDisplayDuration
 import com.cmoney.kolfanci.extension.getDisplayFileSize
-import com.cmoney.kolfanci.model.attachment.AttachmentType
-import com.cmoney.kolfanci.model.attachment.ReSendFile
-import com.cmoney.kolfanci.ui.common.BlueButton
+import com.cmoney.kolfanci.model.mock.MockData
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
@@ -127,7 +125,7 @@ fun AttachImageItem(
     isShowResend: Boolean,
     onDelete: (Uri) -> Unit,
     onClick: (Uri) -> Unit,
-    onResend: ((ReSendFile) -> Unit)? = null
+    onResend: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val request = ImageRequest.Builder(context)
@@ -163,14 +161,7 @@ fun AttachImageItem(
                     modifier = Modifier
                         .size(40.dp)
                         .clickable {
-                            onResend?.invoke(
-                                ReSendFile(
-                                    type = AttachmentType.Image,
-                                    file = file,
-                                    title = context.getString(R.string.image_upload_fail_title),
-                                    description = context.getString(R.string.image_upload_fail_desc)
-                                )
-                            )
+                            onResend?.invoke()
                         },
                     painter = painterResource(id = R.drawable.upload_failed),
                     contentDescription = null
@@ -231,10 +222,8 @@ fun AttachmentFileItem(
     isShowResend: Boolean,
     onClick: (Uri) -> Unit,
     onDelete: ((Uri) -> Unit)? = null,
-    onResend: ((ReSendFile) -> Unit)? = null
+    onResend: (() -> Unit)? = null
 ) {
-    val context = LocalContext.current
-
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -315,14 +304,7 @@ fun AttachmentFileItem(
                     modifier = Modifier
                         .size(40.dp)
                         .clickable {
-                            onResend?.invoke(
-                                ReSendFile(
-                                    type = AttachmentType.Audio,
-                                    file = file,
-                                    title = context.getString(R.string.file_upload_fail_title),
-                                    description = context.getString(R.string.file_upload_fail_desc)
-                                )
-                            )
+                            onResend?.invoke()
                         },
                     painter = painterResource(id = R.drawable.upload_failed),
                     contentDescription = null
@@ -378,10 +360,8 @@ fun AttachmentAudioItem(
     isShowResend: Boolean,
     onClick: (Uri) -> Unit,
     onDelete: ((Uri) -> Unit)? = null,
-    onResend: ((ReSendFile) -> Unit)? = null
+    onResend: (() -> Unit)? = null
 ) {
-    val context = LocalContext.current
-
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -472,14 +452,7 @@ fun AttachmentAudioItem(
                     modifier = Modifier
                         .size(40.dp)
                         .clickable {
-                            onResend?.invoke(
-                                ReSendFile(
-                                    type = AttachmentType.Audio,
-                                    file = file,
-                                    title = context.getString(R.string.file_upload_fail_title),
-                                    description = context.getString(R.string.file_upload_fail_desc)
-                                )
-                            )
+                            onResend?.invoke()
                         },
                     painter = painterResource(id = R.drawable.upload_failed),
                     contentDescription = null
@@ -506,6 +479,115 @@ fun AttachmentAudioItemPreview() {
             onClick = {},
             onDelete = {},
             onResend = {}
+        )
+    }
+}
+
+/**
+ * 選擇題
+ *
+ */
+@Composable
+fun AttachmentChoiceItem(
+    modifier: Modifier = Modifier,
+    voteModel: VoteModel,
+    isItemClickable: Boolean,
+    isItemCanDelete: Boolean,
+    onClick: (VoteModel) -> Unit,
+    onDelete: ((VoteModel) -> Unit)? = null,
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(LocalColor.current.background)
+            .clickable(
+                enabled = isItemClickable
+            ) {
+                onClick.invoke(voteModel)
+            },
+        contentAlignment = Alignment.CenterStart
+    ) {
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .align(Alignment.TopEnd)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Row(
+                        modifier = Modifier.padding(start = 15.dp, top = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.attachment_file),
+                            contentDescription = "attachment_file"
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = "選擇題",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                color = LocalColor.current.text.default_100,
+                            )
+                        )
+                    }
+
+                    //選擇題描述
+                    Text(
+                        modifier = Modifier.padding(top = 5.dp, start = 15.dp, bottom = 5.dp),
+                        text = voteModel.question,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            color = LocalColor.current.text.default_50
+                        )
+                    )
+                }
+
+                if (isItemCanDelete) {
+                    //Close btn
+                    Image(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onDelete?.invoke(voteModel)
+                            },
+                        painter = painterResource(id = R.drawable.close), contentDescription = null
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun AttachmentChoicePreview() {
+    FanciTheme {
+        AttachmentChoiceItem(
+            modifier = Modifier
+                .width(270.dp)
+                .height(75.dp),
+            voteModel = MockData.mockVote,
+            isItemClickable = true,
+            isItemCanDelete = true,
+            onClick = {},
+            onDelete = {},
         )
     }
 }

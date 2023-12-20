@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.post.info
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -70,6 +69,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.model.viewmodel.AttachmentViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
@@ -93,12 +93,12 @@ import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.AttachmentEnv
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -278,6 +278,7 @@ fun PostInfoScreen(
                 isShowLoading = true
                 inputContent = text
                 attachmentViewModel.upload(
+                    channelId = channel.id.orEmpty(),
                     other = text
                 )
                 keyboard?.hide()
@@ -481,6 +482,7 @@ fun PostInfoScreen(
 
     PostInfoScreenView(
         modifier = modifier,
+        channel = channel,
         navController = navController,
         post = postData,
         isPinPost = isPinPost,
@@ -502,19 +504,21 @@ fun PostInfoScreen(
                 state.show()
             }
         },
-        onPreviewAttachmentClick = { uri ->
+        onPreviewAttachmentClick = { attachmentInfoItem ->
             AttachmentController.onAttachmentClick(
                 navController = navController,
-                uri = uri,
+                attachmentInfoItem = attachmentInfoItem,
                 context = context
             )
+        },
+        onResend = {
+            reSendFileClick = it
         }
-    ) {
-        reSendFileClick = it
-    }
+    )
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
+        navController = navController,
         state = state,
         attachmentEnv = AttachmentEnv.Post,
         selectedAttachment = attachment,
@@ -554,7 +558,7 @@ fun PostInfoScreen(
     //==================== 彈窗提示 ====================
     //重新發送  彈窗
     reSendFileClick?.let { reSendFile ->
-        val file = reSendFile.file
+        val file = reSendFile.attachmentInfoItem
         ReSendFileDialog(
             reSendFile = reSendFile,
             onDismiss = {
@@ -566,6 +570,7 @@ fun PostInfoScreen(
             },
             onResend = {
                 attachmentViewModel.onResend(
+                    channelId = channel.id.orEmpty(),
                     uploadFileItem = reSendFile,
                     other = inputContent
                 )
@@ -739,6 +744,7 @@ fun PostInfoScreen(
 @Composable
 private fun PostInfoScreenView(
     modifier: Modifier = Modifier,
+    channel: Channel,
     navController: DestinationsNavigator,
     post: BulletinboardMessage,
     isPinPost: Boolean,
@@ -751,10 +757,10 @@ private fun PostInfoScreenView(
     commentBottomContentListener: CommentBottomContentListener,
     inputText: String,
     isShowLoading: Boolean,
-    onDeleteAttach: (Uri) -> Unit,
+    onDeleteAttach: (AttachmentInfoItem) -> Unit,
     onAttachImageAddClick: () -> Unit,
-    onPreviewAttachmentClick: (Uri) -> Unit,
-    onResend: (ReSendFile) -> Unit
+    onPreviewAttachmentClick: (AttachmentInfoItem) -> Unit,
+    onResend: (ReSendFile) -> Unit,
 ) {
     val listState = rememberLazyListState()
 
@@ -782,6 +788,7 @@ private fun PostInfoScreenView(
                     //貼文
                     item {
                         BasePostContentScreen(
+                            channelId = channel.id.orEmpty(),
                             navController = navController,
                             post = post,
                             defaultDisplayLine = Int.MAX_VALUE,
@@ -862,12 +869,14 @@ private fun PostInfoScreenView(
                                 )
                             } else {
                                 BasePostContentScreen(
+                                    channelId = channel.id.orEmpty(),
                                     navController = navController,
                                     post = comment,
                                     contentModifier = Modifier.padding(start = 40.dp),
                                     hasMoreAction = true,
                                     bottomContent = {
                                         CommentBottomContent(
+                                            channel = channel,
                                             navController = navController,
                                             comment = comment,
                                             reply = replyMapData[comment.id],
@@ -1015,6 +1024,7 @@ private fun EmptyCommentView() {
 @Composable
 private fun CommentBottomContent(
     navController: DestinationsNavigator,
+    channel: Channel,
     comment: BulletinboardMessage,
     reply: ReplyData?,
     listener: CommentBottomContentListener
@@ -1071,6 +1081,7 @@ private fun CommentBottomContent(
                     )
                 } else {
                     BasePostContentScreen(
+                        channelId = channel.id.orEmpty(),
                         navController = navController,
                         post = reply,
                         defaultDisplayLine = Int.MAX_VALUE,
@@ -1131,7 +1142,8 @@ fun CommentBottomContentPreview() {
             reply = ReplyData(
                 emptyList(), false
             ),
-            listener = EmptyCommentBottomContentListener
+            listener = EmptyCommentBottomContentListener,
+            channel = Channel()
         )
     }
 }
@@ -1225,7 +1237,8 @@ fun PostInfoScreenPreview() {
     FanciTheme {
         PostInfoScreenView(
             navController = EmptyDestinationsNavigator,
-            post = PostViewModel.mockPost,
+            channel = Channel(),
+            post = MockData.mockBulletinboardMessage,
             isPinPost = false,
             attachment = emptyList(),
             comments = emptyList(),

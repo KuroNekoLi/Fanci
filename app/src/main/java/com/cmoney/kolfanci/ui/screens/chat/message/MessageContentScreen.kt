@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RichTooltipBox
@@ -42,18 +41,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.fanciapi.fanci.model.ChatMessage
+import com.cmoney.fanciapi.fanci.model.IVotingOptionStatistic
 import com.cmoney.fanciapi.fanci.model.Media
+import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.getDuration
 import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.extension.getFleSize
 import com.cmoney.kolfanci.extension.goAppStore
 import com.cmoney.kolfanci.extension.toAttachmentType
-import com.cmoney.kolfanci.extension.toAttachmentTypeMap
 import com.cmoney.kolfanci.extension.toColor
+import com.cmoney.kolfanci.extension.toUploadFileItemMap
 import com.cmoney.kolfanci.model.ChatMessageWrapper
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.mock.MockData
@@ -71,6 +72,7 @@ import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.UnknownFileItem
+import com.cmoney.kolfanci.ui.screens.shared.choice.ChoiceScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.ui.theme.White_767A7F
@@ -84,21 +86,38 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/**
+ * 訊息互動
+ */
 sealed class MessageContentCallback {
     data class LongClick(val message: ChatMessage) : MessageContentCallback()
     data class MsgDismissHideClick(val message: ChatMessage) : MessageContentCallback()
     data class EmojiClick(val message: ChatMessage, val resourceId: Int) :
         MessageContentCallback()
+
+    /**
+     * 點擊投票
+     *
+     * @param message 訊息
+     * @param voting 投票 model
+     * @param choices 所選擇的項目
+     */
+    data class VotingClick(
+        val message: ChatMessage,
+        val voting: Voting,
+        val choices: List<IVotingOptionStatistic>
+    ) : MessageContentCallback()
 }
 
 /**
  * 聊天內容 item
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageContentScreen(
     navController: DestinationsNavigator,
     modifier: Modifier = Modifier,
+    channelId: String,
     chatMessageWrapper: ChatMessageWrapper,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onMessageContentCallback: (MessageContentCallback) -> Unit,
@@ -308,6 +327,28 @@ fun MessageContentScreen(
                         )
                     }
 
+                    //投票
+                    messageModel.votings?.let { votes ->
+                        ChoiceScreen(
+                            channelId = channelId,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 40.dp),
+                            navController = navController,
+                            votings = votes,
+                            isMyPost = (messageModel.author?.id == Constant.MyInfo?.id),
+                            onVotingClick = { voting, choices ->
+                                onMessageContentCallback.invoke(
+                                    MessageContentCallback.VotingClick(
+                                        message = messageModel,
+                                        voting = voting,
+                                        choices = choices
+                                    )
+                                )
+                            }
+                        )
+                    }
+
                     //Emoji
                     messageModel.emojiCount?.apply {
                         FlowRow(
@@ -424,11 +465,11 @@ fun MediaContent(
     onAttachClick: ((Media) -> Unit)? = null
 ) {
     val context = LocalContext.current
-    val mapList = medias.toAttachmentTypeMap()
+    val mapList = medias.toUploadFileItemMap()
 
     mapList.forEach { entry ->
         val key = entry.key
-        val media = entry.value
+        val attachmentInfoItems = entry.value
 
         when (key) {
             AttachmentType.Audio -> {
@@ -439,32 +480,27 @@ fun MediaContent(
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(media) { media ->
-                        val fileUrl = media.resourceLink
+                    items(attachmentInfoItems) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
                         AttachmentAudioItem(
                             modifier = Modifier
                                 .width(270.dp)
                                 .height(75.dp),
                             file = Uri.parse(fileUrl),
-                            duration = media.getDuration(),
+                            duration = attachmentInfoItem.duration ?: 0L,
                             isItemClickable = true,
                             isItemCanDelete = false,
                             isShowResend = false,
-                            displayName = media.getFileName(),
+                            displayName = attachmentInfoItem.filename,
                             onClick = {
-                                onAttachClick?.let {
-                                    onAttachClick.invoke(media)
-                                } ?: kotlin.run {
-                                    AttachmentController.onAttachmentClick(
-                                        navController = navController,
-                                        uri = Uri.parse(fileUrl),
-                                        context = context,
-                                        attachmentType = AttachmentType.Audio,
-                                        fileName = media.getFileName(),
-                                        duration = media.getDuration(),
-                                        audioViewModel = audioViewModel
-                                    )
-                                }
+                                AttachmentController.onAttachmentClick(
+                                    navController = navController,
+                                    attachmentInfoItem = attachmentInfoItem,
+                                    context = context,
+                                    fileName = attachmentInfoItem.filename,
+                                    duration = attachmentInfoItem.duration ?: 0L,
+                                    audioViewModel = audioViewModel
+                                )
                             }
                         )
                     }
@@ -473,8 +509,8 @@ fun MediaContent(
 
             AttachmentType.Image -> {
                 MessageImageScreenV2(
-                    images = media.map {
-                        it.resourceLink.orEmpty()
+                    images = attachmentInfoItems.map {
+                        it.serverUrl
                     },
                     modifier = modifier.then(
                         Modifier.padding(top = 10.dp, end = 10.dp)
@@ -495,32 +531,26 @@ fun MediaContent(
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(media) { media ->
-                        val fileUrl = media.resourceLink
-                        val mediaType = media.type
+                    items(attachmentInfoItems) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
 
                         AttachmentFileItem(
                             modifier = Modifier
                                 .width(270.dp)
                                 .height(75.dp),
                             file = Uri.parse(fileUrl),
-                            fileSize = media.getFleSize(),
+                            fileSize = attachmentInfoItem.fileSize,
                             isItemClickable = true,
                             isItemCanDelete = false,
                             isShowResend = false,
-                            displayName = media.getFileName(),
+                            displayName = attachmentInfoItem.filename,
                             onClick = {
-                                onAttachClick?.let {
-                                    onAttachClick.invoke(media)
-                                } ?: kotlin.run {
-                                    AttachmentController.onAttachmentClick(
-                                        navController = navController,
-                                        uri = Uri.parse(fileUrl),
-                                        context = context,
-                                        attachmentType = mediaType?.toAttachmentType(),
-                                        fileName = media.getFileName()
-                                    )
-                                }
+                                AttachmentController.onAttachmentClick(
+                                    navController = navController,
+                                    attachmentInfoItem = attachmentInfoItem,
+                                    context = context,
+                                    fileName = attachmentInfoItem.filename
+                                )
                             }
                         )
                     }
@@ -536,8 +566,8 @@ fun MediaContent(
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(media) { media ->
-                        val fileUrl = media.resourceLink
+                    items(attachmentInfoItems) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
                         UnknownFileItem(
                             file = Uri.parse(fileUrl),
                             onClick = {
@@ -547,6 +577,12 @@ fun MediaContent(
                     }
                 }
             }
+
+            AttachmentType.Choice -> {
+                //TODO: 附加檔案-選擇題
+            }
+
+            AttachmentType.Unknown -> {}
         }
     }
 }
@@ -556,6 +592,7 @@ fun MediaContent(
 fun MessageContentScreenPreview() {
     FanciTheme {
         MessageContentScreen(
+            channelId = "",
             chatMessageWrapper = ChatMessageWrapper(
                 message = MockData.mockMessage,
                 uploadAttachPreview = listOf(

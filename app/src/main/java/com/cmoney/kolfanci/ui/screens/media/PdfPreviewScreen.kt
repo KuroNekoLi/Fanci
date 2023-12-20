@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.isURL
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.xlogin.XLoginHelper
 import com.github.barteksc.pdfviewer.PDFView

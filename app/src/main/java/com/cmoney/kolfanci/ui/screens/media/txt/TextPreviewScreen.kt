@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.isURL
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.tools_android.extension.toFile
 import com.ramcosta.composedestinations.annotation.Destination

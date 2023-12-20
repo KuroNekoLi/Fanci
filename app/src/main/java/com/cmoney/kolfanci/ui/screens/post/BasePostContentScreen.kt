@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RichTooltipBox
@@ -49,26 +48,26 @@ import coil.compose.AsyncImage
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.getDuration
-import com.cmoney.kolfanci.extension.getFileName
-import com.cmoney.kolfanci.extension.getFleSize
 import com.cmoney.kolfanci.extension.goAppStore
 import com.cmoney.kolfanci.extension.toAttachmentType
+import com.cmoney.kolfanci.extension.toAttachmentInfoItem
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.model.usecase.AttachmentController
 import com.cmoney.kolfanci.ui.common.AutoLinkPostText
 import com.cmoney.kolfanci.ui.common.CircleDot
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageImageScreenV2
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageOGScreen
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
-import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
 import com.cmoney.kolfanci.ui.screens.shared.EmojiCountScreen
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentFileItem
 import com.cmoney.kolfanci.ui.screens.shared.attachment.UnknownFileItem
+import com.cmoney.kolfanci.ui.screens.shared.choice.ChoiceScreen
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.cmoney.kolfanci.utils.Utils
@@ -83,10 +82,11 @@ import org.koin.core.parameter.parametersOf
 /**
  * 顯示 貼文/留言/回覆 內容
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BasePostContentScreen(
     modifier: Modifier = Modifier,
+    channelId: String,
     navController: DestinationsNavigator,
     post: BulletinboardMessage,
     defaultDisplayLine: Int = 4,
@@ -104,7 +104,8 @@ fun BasePostContentScreen(
             parametersOf(Uri.EMPTY)
         }
     ),
-    bottomContent: @Composable ColumnScope.() -> Unit
+    voteViewModel: VoteViewModel = koinViewModel(),
+    bottomContent: @Composable ColumnScope.() -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -213,6 +214,27 @@ fun BasePostContentScreen(
                 )
             }
 
+            post.votings?.let { votings ->
+                Spacer(modifier = Modifier.height(15.dp))
+
+                ChoiceScreen(
+                    channelId = channelId,
+                    navController = navController,
+                    votings = votings,
+                    isMyPost = (post.author?.id == Constant.MyInfo?.id),
+                    onVotingClick = { voting, choices ->
+                        voteViewModel.voteQuestion(
+                            content = post,
+                            channelId = channelId,
+                            votingId = voting.id ?: "",
+                            choice = choices.map {
+                                it.optionId ?: ""
+                            }
+                        )
+                    }
+                )
+            }
+
             Spacer(modifier = Modifier.height(15.dp))
 
             //附加檔案
@@ -240,32 +262,32 @@ fun BasePostContentScreen(
                     it.type != AttachmentType.Image.name && it.type != AttachmentType.Audio.name
                 }
 
+                val attachmentInfoItemList = otherUrl.toAttachmentInfoItem()
+
                 LazyRow(
                     modifier = modifier,
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(otherUrl) { media ->
-                        val fileUrl = media.resourceLink
-                        val mediaType = media.type
+                    items(attachmentInfoItemList) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
 
                         AttachmentFileItem(
                             modifier = Modifier
                                 .width(270.dp)
                                 .height(75.dp),
                             file = Uri.parse(fileUrl),
-                            fileSize = media.getFleSize(),
+                            fileSize = attachmentInfoItem.fileSize,
                             isItemClickable = true,
                             isItemCanDelete = false,
                             isShowResend = false,
-                            displayName = media.getFileName(),
+                            displayName = attachmentInfoItem.filename,
                             onClick = {
                                 AttachmentController.onAttachmentClick(
                                     navController = navController,
-                                    uri = Uri.parse(fileUrl),
+                                    attachmentInfoItem = attachmentInfoItem,
                                     context = context,
-                                    attachmentType = mediaType?.toAttachmentType(),
-                                    fileName = media.getFileName(),
+                                    fileName = attachmentInfoItem.filename,
                                     audioViewModel = audioViewModel
                                 )
                             },
@@ -280,33 +302,33 @@ fun BasePostContentScreen(
                     it.type == AttachmentType.Audio.name
                 }
 
+                val audioUrlAttachmentInfoItemList = audioUrl.toAttachmentInfoItem()
+
                 LazyRow(
                     modifier = modifier,
                     state = rememberLazyListState(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(audioUrl) { media ->
-                        val fileUrl = media.resourceLink
-                        val mediaType = media.type
+                    items(audioUrlAttachmentInfoItemList) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
 
                         AttachmentAudioItem(
                             modifier = Modifier
                                 .width(270.dp)
                                 .height(75.dp),
                             file = Uri.parse(fileUrl),
-                            duration = media.getDuration(),
+                            duration = attachmentInfoItem.duration ?: 0L,
                             isItemClickable = true,
                             isItemCanDelete = false,
                             isShowResend = false,
-                            displayName = media.getFileName(),
+                            displayName = attachmentInfoItem.filename,
                             onClick = {
                                 AttachmentController.onAttachmentClick(
                                     navController = navController,
-                                    uri = Uri.parse(fileUrl),
+                                    attachmentInfoItem = attachmentInfoItem,
                                     context = context,
-                                    attachmentType = mediaType?.toAttachmentType(),
-                                    fileName = media.getFileName(),
-                                    duration = media.getDuration(),
+                                    fileName = attachmentInfoItem.filename,
+                                    duration = attachmentInfoItem.duration ?: 0L,
                                     audioViewModel = audioViewModel
                                 )
                             }
@@ -422,13 +444,12 @@ fun EmojiFeedback(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun PostContentScreenPreview() {
     FanciTheme {
         BasePostContentScreen(
-            post = PostViewModel.mockPost,
+            post = MockData.mockBulletinboardMessage,
             bottomContent = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -457,7 +478,8 @@ fun PostContentScreenPreview() {
             onMoreClick = {},
             onEmojiClick = {},
             onAddNewEmojiClick = {},
-            navController = EmptyDestinationsNavigator
+            navController = EmptyDestinationsNavigator,
+            channelId = ""
         )
     }
 }

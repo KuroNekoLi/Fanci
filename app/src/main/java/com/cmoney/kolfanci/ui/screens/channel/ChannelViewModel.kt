@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.Channel
 import com.cmoney.fanciapi.fanci.model.ChannelTabType
-import com.cmoney.kolfanci.model.usecase.ChannelUseCase
 import com.cmoney.kolfanci.model.usecase.NotificationUseCase
 import com.socks.library.KLog
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +12,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ChannelViewModel(
-    private val channelUseCase: ChannelUseCase,
     private val notificationUseCase: NotificationUseCase
 ) : ViewModel() {
     private val TAG = ChannelViewModel::class.java.simpleName

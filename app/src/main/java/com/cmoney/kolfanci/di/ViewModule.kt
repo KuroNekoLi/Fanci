@@ -35,6 +35,7 @@ import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPicker
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.MemberViewModel
 import com.cmoney.kolfanci.ui.screens.shared.member.viewmodel.RoleViewModel
 import com.cmoney.kolfanci.ui.screens.shared.vip.viewmodel.VipPlanViewModel
+import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -56,8 +57,7 @@ val viewModule = module {
             androidApplication(),
             get(),
             get(),
-            get(),
-            musicServiceConnection = get()
+            get()
         )
     }
     viewModel { DiscoverViewModel(get()) }
@@ -109,7 +109,7 @@ val viewModule = module {
         UserViewModel(androidApplication())
     }
     viewModel { params ->
-        PostViewModel(get(), params.get(), get())
+        PostViewModel(get(), params.get(), chatRoomUseCase = get(), postPollUseCase = get())
     }
     viewModel { params ->
         EditPostViewModel(
@@ -122,12 +122,18 @@ val viewModule = module {
     }
     viewModel {
         ChannelViewModel(
-            channelUseCase = get(),
             notificationUseCase = get()
         )
     }
     viewModel { params ->
-        PostInfoViewModel(androidApplication(), get(), get(), params.get(), params.get(), get())
+        PostInfoViewModel(
+            androidApplication(),
+            get(),
+            get(),
+            params.get(),
+            params.get(),
+            postPollUseCase = get()
+        )
     }
     viewModel {
         GroupViewModel(
@@ -182,12 +188,20 @@ val viewModule = module {
         AttachmentViewModel(
             context = androidApplication(),
             attachmentUseCase = get(),
-            uploadImageUseCase = get()
+            uploadImageUseCase = get(),
+            voteUseCase = get()
         )
     }
-    viewModel{
+    viewModel {
         TextPreviewViewModel(
             attachmentUseCase = get()
+        )
+    }
+    viewModel {
+        VoteViewModel(
+            context = androidApplication(),
+            voteUseCase = get(),
+            groupUseCase = get()
         )
     }
 }

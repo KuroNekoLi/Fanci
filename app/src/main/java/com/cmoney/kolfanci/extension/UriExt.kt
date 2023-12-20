@@ -212,5 +212,6 @@ fun Uri.toUploadFileItem(
         serverUrl = serverUrl,
         filename = this.getFileName(context).orEmpty(),
         fileSize = this.getFileSize(context) ?: 0L,
-        duration = this.getAudioDuration(context)
+        duration = this.getAudioDuration(context),
+        attachmentType = this.getAttachmentType(context)
     )

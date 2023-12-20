@@ -2,7 +2,6 @@ package com.cmoney.kolfanci.ui.screens.chat.message.viewmodel
 
 import android.app.Application
 import android.net.Uri
-import android.os.Bundle
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,16 +15,16 @@ import com.cmoney.fanciapi.fanci.model.ReportReason
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.copyToClipboard
+import com.cmoney.kolfanci.extension.toIReplyVotingList
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
-import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.remoteconfig.PollingFrequencyKey
 import com.cmoney.kolfanci.model.usecase.ChatRoomPollUseCase
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PermissionUseCase
-import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.MessageInteract
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.CustomMessage
 import com.cmoney.kolfanci.ui.theme.White_494D54
@@ -35,11 +34,13 @@ import com.cmoney.kolfanci.utils.Utils
 import com.cmoney.remoteconfig_library.extension.getKeyValue
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.socks.library.KLog
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ImageAttachState(
@@ -55,8 +56,7 @@ class MessageViewModel(
     val context: Application,
     private val chatRoomUseCase: ChatRoomUseCase,
     private val chatRoomPollUseCase: ChatRoomPollUseCase,
-    private val permissionUseCase: PermissionUseCase,
-    private val musicServiceConnection: MusicServiceConnection
+    private val permissionUseCase: PermissionUseCase
 ) : AndroidViewModel(context) {
 
     private val TAG = MessageViewModel::class.java.simpleName
@@ -112,6 +112,9 @@ class MessageViewModel(
             return FirebaseRemoteConfig.getInstance().getKeyValue(PollingFrequencyKey).times(1000)
         }
 
+    //區塊刷新 間隔
+    private val scopePollingInterval: Long = 5000
+
     /**
      * 圖片上傳 callback
      */
@@ -143,7 +146,9 @@ class MessageViewModel(
                         MessageUtils.defineMessageType(chatMessageWrapper)
                     })
 
-                    startPolling(channelId = channelId)
+                    if (!Constant.isOpenMock) {
+                        startPolling(channelId = channelId)
+                    }
 
                 }.onFailure { e ->
                     KLog.e(TAG, e)
@@ -462,7 +467,8 @@ class MessageViewModel(
                         id = messageInteract.message.id,
                         author = messageInteract.message.author,
                         content = messageInteract.message.content,
-                        isDeleted = messageInteract.message.isDeleted
+                        isDeleted = messageInteract.message.isDeleted,
+                        replyVotings = messageInteract.message.votings?.toIReplyVotingList()
                     )
                 )
             }
@@ -827,43 +833,57 @@ class MessageViewModel(
         }
     }
 
-    //========== Media Player ==========
-    //TODO: test
-    fun playMedia(uri: Uri) {
-        KLog.i(TAG, "playMedia")
+    private var pollingJob: Job? = null
 
-        if (musicServiceConnection.isConnected.value == true) {
-            //正在播的歌曲
-            val nowPlaying = musicServiceConnection.nowPlaying.value
-            //取得控制器
-            val transportControls = musicServiceConnection.transportControls
+    /**
+     * Polling 範圍內的訊息
+     *
+     * @param channelId 頻道 id
+     * @param startItemIndex 畫面第一個 item position
+     * @param lastIndex 畫面最後一個 item position
+     */
+    fun pollingScopeMessage(channelId: String,
+                            startItemIndex: Int,
+                            lastIndex: Int) {
+        KLog.i(TAG, "pollingScopeMessage:$channelId, startItemIndex:$startItemIndex, lastIndex:$lastIndex")
 
-//            val isPrepared = musicServiceConnection.playbackState.value?.isPrepared ?: false
+        pollingJob?.cancel()
+        pollingJob = viewModelScope.launch {
+            if (_message.value.size > startItemIndex) {
+                val item = _message.value[startItemIndex]
+                val message = item.message
+                val scopeFetchCount = (lastIndex - startItemIndex).plus(1)
 
-            //已經播放
-//            if (isPrepared && storyId == nowPlaying?.id) {
-//
-//            }
-//            //全新清單
-//            else {
-//                val bundle = Bundle()
-//                bundle.putString("", uri.toString())
-//                bundle.putBinder(
-//                    BUNDLE_STORIES,
-//                    WrapperForBinder(playList)
-//                )
-//                bundle.putInt(BUNDLE_START_PLAY_POSITION, startPosition)
+                //filter time bar
+                if (item.messageType != ChatMessageWrapper.MessageType.TimeBar) {
+                    chatRoomPollUseCase.pollScope(
+                        delay = scopePollingInterval,
+                        channelId = channelId,
+                        fromSerialNumber = message.serialNumber,
+                        fetchCount = scopeFetchCount
+                    ).collect { emitMessagePaging ->
+                        if (emitMessagePaging.items?.isEmpty() == true) {
+                            return@collect
+                        }
 
-            if (uri.toString().isNotEmpty()) {
-                transportControls.playFromUri(uri, Bundle())
+                        //Update data
+                        val updateMessageList = _message.value.map { message ->
+                            val filterMessage = emitMessagePaging.items?.firstOrNull {
+                                it.id == message.message.id
+                            }
+                            if (filterMessage == null) {
+                                message
+                            } else {
+                                message.copy(message = filterMessage)
+                            }
+                        }
 
-//                transportControls.playFromMediaId(
-//                    uri.toString(),
-//                    null
-//                )
+                        _message.update {
+                            updateMessageList
+                        }
+                    }
+                }
             }
-
-//            }
         }
     }
 }

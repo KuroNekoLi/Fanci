@@ -55,7 +55,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.group.setting.apply.viewmodel.GroupApplyViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.apply.viewmodel.GroupRequirementApplySelected
-import com.cmoney.kolfanci.ui.screens.shared.CenterTopAppBar
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.CenterTopAppBar
 import com.cmoney.kolfanci.ui.screens.shared.CircleCheckedScreen
 import com.cmoney.kolfanci.ui.screens.shared.member.HorizontalMemberItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme

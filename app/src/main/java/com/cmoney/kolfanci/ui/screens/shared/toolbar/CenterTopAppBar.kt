@@ -1,4 +1,4 @@
-package com.cmoney.kolfanci.ui.screens.shared
+package com.cmoney.kolfanci.ui.screens.shared.toolbar
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*

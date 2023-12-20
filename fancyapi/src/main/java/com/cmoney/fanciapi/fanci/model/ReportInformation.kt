@@ -36,6 +36,7 @@ import kotlinx.parcelize.Parcelize
  * @param contentId 
  * @param contentSnapshot 
  * @param mediasSnapshot 
+ * @param votingIds 
  * @param processStatus 
  * @param mostReason 
  * @param reporters 
@@ -67,6 +68,9 @@ data class ReportInformation (
 
     @Json(name = "mediasSnapshot")
     val mediasSnapshot: kotlin.collections.List<IMedia>? = null,
+
+    @Json(name = "votingIds")
+    val votingIds: kotlin.collections.List<kotlin.String>? = null,
 
     @Json(name = "processStatus")
     val processStatus: ReportProcessStatus? = null,

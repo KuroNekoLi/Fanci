@@ -29,7 +29,7 @@ import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.common.BorderButton
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageContentScreen
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -49,6 +49,7 @@ data class AnnouncementResult(
  * 公告 訊息
  * 設定, 取消,  觀看
  *
+ * @param channelId
  * @param message 訊息文本
  * @param isPinMessage 是否為置頂貼文
  * @param resultBackNavigator 設定結果 callback, boolean:是否為設定or取消 公告 true:設定 false:取消
@@ -57,6 +58,7 @@ data class AnnouncementResult(
 @Composable
 fun AnnouncementScreen(
     navigator: DestinationsNavigator,
+    channelId: String,
     message: ChatMessage,
     isPinMessage: Boolean,
     resultBackNavigator: ResultBackNavigator<AnnouncementResult>
@@ -87,6 +89,7 @@ fun AnnouncementScreen(
             ) {
                 item {
                     MessageContentScreen(
+                        channelId = channelId,
                         chatMessageWrapper = ChatMessageWrapper(message),
                         onMessageContentCallback = {
 
@@ -177,8 +180,9 @@ fun AnnouncementScreen(
 fun AnnouncementScreenPreview() {
     FanciTheme {
         AnnouncementScreen(
-            EmptyDestinationsNavigator,
-            MockData.mockMessage,
+            channelId = "",
+            navigator = EmptyDestinationsNavigator,
+            message = MockData.mockMessage,
             isPinMessage = true,
             resultBackNavigator = EmptyResultBackNavigator()
         )

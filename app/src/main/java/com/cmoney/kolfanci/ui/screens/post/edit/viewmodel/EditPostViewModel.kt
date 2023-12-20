@@ -6,18 +6,21 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cmoney.fanciapi.fanci.model.BulletinboardMessage
 import com.cmoney.fanciapi.fanci.model.MessageServiceType
+import com.cmoney.kolfanci.extension.toVotingList
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import com.cmoney.kolfanci.model.attachment.toUploadMedia
 import com.cmoney.kolfanci.model.usecase.ChatRoomUseCase
 import com.cmoney.kolfanci.model.usecase.PostUseCase
 import com.cmoney.kolfanci.model.usecase.UploadImageUseCase
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -46,6 +49,15 @@ class EditPostViewModel(
 
     private val _postSuccess: MutableStateFlow<BulletinboardMessage?> = MutableStateFlow(null)
     val postSuccess = _postSuccess.asStateFlow()
+
+    private val _userInput: MutableStateFlow<String> = MutableStateFlow("")
+    val userInput = _userInput.asStateFlow()
+
+    fun setUserInput(text: String) {
+        _userInput.update {
+            text
+        }
+    }
 
     fun addAttachImage(uris: List<Uri>) {
         KLog.i(TAG, "addAttachImage")
@@ -120,30 +132,6 @@ class EditPostViewModel(
         _uiState.value = UiState.HideEditTip
     }
 
-    private suspend fun uploadImages(
-        uriLis: List<Uri>,
-        imageUploadCallback: MessageViewModel.ImageUploadCallback
-    ) {
-        KLog.i(TAG, "uploadImages:" + uriLis.size)
-
-        val completeImageUrl = mutableListOf<String>()
-
-        withContext(Dispatchers.IO) {
-            uploadImageUseCase.uploadImage(uriLis).catch { e ->
-                KLog.e(TAG, e)
-                imageUploadCallback.onFailure(e)
-            }.collect {
-                KLog.i(TAG, "uploadImage:$it")
-                val uri = it.first
-                val imageUrl = it.second
-                completeImageUrl.add(imageUrl)
-                if (completeImageUrl.size == uriLis.size) {
-                    imageUploadCallback.complete(completeImageUrl)
-                }
-            }
-        }
-    }
-
     /**
      * 編輯貼文,初始化資料至UI
      */
@@ -176,11 +164,19 @@ class EditPostViewModel(
                 text = text,
                 attachment = attachment
             ).fold({
+                //選擇題 model
+                val votes = attachment.filter {
+                    it.first == AttachmentType.Choice && it.second.other is VoteModel
+                }.map {
+                    it.second.other as VoteModel
+                }
+
                 _postSuccess.value = editPost.copy(
                     content = editPost.content?.copy(
                         text = text,
                         medias = attachment.toUploadMedia(context)
-                    )
+                    ),
+                    votings = votes.toVotingList()
                 )
             }, {
                 it.printStackTrace()

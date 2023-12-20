@@ -32,7 +32,9 @@ import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.extension.globalGroupViewModel
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
+import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.destinations.AnnouncementScreenDestination
+import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.destinations.PostInfoScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.announcement.AnnouncementResult
@@ -41,7 +43,7 @@ import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.post.PostScreen
 import com.cmoney.kolfanci.ui.screens.post.info.data.PostInfoScreenResult
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
-import com.cmoney.kolfanci.ui.screens.shared.TopBarScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.RedDotItemScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -94,6 +96,7 @@ fun ChannelScreen(
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, AnnouncementResult>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
+    choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>,
     redDotResultBackNavigator: ResultBackNavigator<ResetRedDot>
 ) {
     val group by globalGroupViewModel().currentGroup.collectAsState()
@@ -120,6 +123,7 @@ fun ChannelScreen(
         announcementResultRecipient = announcementResultRecipient,
         editPostResultRecipient = editPostResultRecipient,
         postInfoResultRecipient = postInfoResultRecipient,
+        choiceRecipient = choiceRecipient,
         onChatPageSelected = {
             viewMode.onChatRedDotClick(
                 channelId = channel.id.orEmpty()
@@ -159,6 +163,7 @@ private fun ChannelScreenView(
     announcementResultRecipient: ResultRecipient<AnnouncementScreenDestination, AnnouncementResult>,
     editPostResultRecipient: ResultRecipient<EditPostScreenDestination, PostViewModel.BulletinboardMessageWrapper>,
     postInfoResultRecipient: ResultRecipient<PostInfoScreenDestination, PostInfoScreenResult>,
+    choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>,
     onChatPageSelected: () -> Unit,
     onPostPageSelected: () -> Unit,
     onBackClick: () -> Unit
@@ -264,7 +269,8 @@ private fun ChannelScreenView(
                                 channelId = channel.id.orEmpty(),
                                 navController = navController,
                                 resultRecipient = announcementResultRecipient,
-                                jumpChatMessage = jumpChatMessage
+                                jumpChatMessage = jumpChatMessage,
+                                choiceRecipient = choiceRecipient
                             )
                             LaunchedEffect(key1 = Unit) {
                                 onChatPageSelected.invoke()
@@ -309,6 +315,7 @@ fun ChannelScreenPreview() {
             announcementResultRecipient = EmptyResultRecipient(),
             editPostResultRecipient = EmptyResultRecipient(),
             postInfoResultRecipient = EmptyResultRecipient(),
+            choiceRecipient = EmptyResultRecipient(),
             onChatPageSelected = {
 
             },

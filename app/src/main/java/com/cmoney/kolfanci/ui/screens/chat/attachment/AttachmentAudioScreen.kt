@@ -13,8 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cmoney.kolfanci.model.attachment.ReSendFile
+import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
+import com.cmoney.kolfanci.model.attachment.ReSendFile
 import com.cmoney.kolfanci.ui.screens.shared.attachment.AttachmentAudioItem
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 
@@ -23,8 +25,8 @@ fun AttachmentAudioScreen(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
     audioList: List<AttachmentInfoItem>,
-    onClick: (Uri) -> Unit,
-    onDelete: (Uri) -> Unit,
+    onClick: (AttachmentInfoItem) -> Unit,
+    onDelete: (AttachmentInfoItem) -> Unit,
     onResend: ((ReSendFile) -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
@@ -43,9 +45,21 @@ fun AttachmentAudioScreen(
                 isItemCanDelete = (file.status == AttachmentInfoItem.Status.Undefined),
                 isShowResend = (file.status is AttachmentInfoItem.Status.Failed),
                 displayName = file.filename,
-                onClick = onClick,
-                onDelete = onDelete,
-                onResend = onResend
+                onClick = {
+                    onClick.invoke(file)
+                },
+                onDelete = {
+                    onDelete.invoke(file)
+                },
+                onResend = {
+                    val file = ReSendFile(
+                        type = AttachmentType.Audio,
+                        attachmentInfoItem = file,
+                        title = context.getString(R.string.file_upload_fail_title),
+                        description = context.getString(R.string.file_upload_fail_desc)
+                    )
+                    onResend?.invoke(file)
+                }
             )
         }
     }

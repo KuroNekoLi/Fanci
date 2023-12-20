@@ -65,13 +65,15 @@ fun List<Media>.toAttachmentTypeMap() =
  */
 fun List<Media>.toUploadFileItemMap() =
     this.map {
-        (it.type?.toAttachmentType() ?: AttachmentType.Unknown) to AttachmentInfoItem(
+        val attachmentType = (it.type?.toAttachmentType() ?: AttachmentType.Unknown)
+        attachmentType to AttachmentInfoItem(
             uri = Uri.parse(it.resourceLink),
             status = AttachmentInfoItem.Status.Success,
             serverUrl = it.resourceLink.orEmpty(),
             filename = it.getFileName(),
             fileSize = it.getFleSize(),
-            duration = it.getDuration()
+            duration = it.getDuration(),
+            attachmentType = attachmentType
         )
     }.groupBy({
         it.first
@@ -85,6 +87,7 @@ fun Media.getDisplayType() = when (type?.toAttachmentType()) {
     AttachmentType.Pdf -> "(檔案)"
     AttachmentType.Txt -> "(檔案)"
     AttachmentType.Unknown -> "(未知)"
+    AttachmentType.Choice -> "(選擇題)"
     null -> ""
 }
 
@@ -94,6 +97,20 @@ fun IMedia.getDisplayType() = when (type?.toAttachmentType()) {
     AttachmentType.Pdf -> "(檔案)"
     AttachmentType.Txt -> "(檔案)"
     AttachmentType.Unknown -> "(未知)"
+    AttachmentType.Choice -> "(選擇題)"
     null -> ""
 }
 
+fun List<Media>.toAttachmentInfoItem() =
+    this.map {
+        val attachmentType = (it.type?.toAttachmentType() ?: AttachmentType.Unknown)
+        AttachmentInfoItem(
+            uri = Uri.parse(it.resourceLink),
+            status = AttachmentInfoItem.Status.Success,
+            serverUrl = it.resourceLink.orEmpty(),
+            filename = it.getFileName(),
+            fileSize = it.getFleSize(),
+            duration = it.getDuration(),
+            attachmentType = attachmentType
+        )
+    }

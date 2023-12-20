@@ -30,9 +30,18 @@ fun MessageReplayScreen(reply: IReplyMessage, modifier: Modifier = Modifier) {
                 end = 16.dp
             )
         ) {
+            val replyContent = if (reply.replyVotings?.isNotEmpty() == true) {
+                reply.replyVotings?.let { iReplyVoting ->
+                    val firstVote = iReplyVoting.first()
+                    firstVote.title
+                }
+            } else {
+                reply.content?.text
+            }
+
             ReplyTitleText(text = "回覆・" + reply.author?.name)
             Spacer(modifier = Modifier.height(10.dp))
-            ReplyText(text = reply.content?.text.orEmpty())
+            ReplyText(text = replyContent.orEmpty())
         }
     }
 }
