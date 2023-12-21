@@ -104,6 +104,7 @@ private fun SetCallbackHandle(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val changeName = result.value
                 groupViewModel.changeGroupName(name = changeName)
@@ -116,6 +117,7 @@ private fun SetCallbackHandle(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val desc = result.value
                 groupViewModel.changeGroupDesc(desc = desc)
@@ -128,6 +130,7 @@ private fun SetCallbackHandle(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val uri = result.value
                 groupViewModel.changeGroupAvatar(uri)
@@ -140,6 +143,7 @@ private fun SetCallbackHandle(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val uri = result.value
                 groupViewModel.changeGroupCover(uri)
@@ -235,7 +239,23 @@ fun GroupSettingSettingView(
                     }
                 )
             }
-
+            //========== 社團Logo ==========
+            item {
+                WideItem(
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .background(LocalColor.current.background)
+                        .padding(WideItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.group_logo),
+                    displayContent = WideItemDefaults.imageDisplay(model = group.thumbnailImageUrl), //TODO 需抽換為社團icon
+                    onClick = {
+                        KLog.i(TAG, "avatar image click")
+                        AppUserLogger.getInstance()
+                            .log(Clicked.GroupLogo)
+                        navController.navigate(GroupSettingAvatarScreenDestination(group = group)) //TODO 需導航至設定Logo頁
+                    }
+                )
+            }
             //========== 社團圖示 ==========
             item {
                 WideItem(

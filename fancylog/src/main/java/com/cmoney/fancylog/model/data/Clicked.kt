@@ -698,6 +698,11 @@ sealed class Clicked(val eventName: String) : Parcelable {
      */
     @Parcelize
     object GroupIcon : Clicked(eventName = "GroupIcon")
+    /**
+     * 社團Logo_點擊
+     */
+    @Parcelize
+    object GroupLogo : Clicked(eventName = "GroupLogo")
 
     /**
      * 社團圖示_更換圖片_點擊
@@ -1359,4 +1364,9 @@ sealed class Clicked(val eventName: String) : Parcelable {
     @Parcelize
     object SearchMember : Clicked(eventName = "SearchMember")
 
+    /**
+     * 建立社團_設定社團Logo_點擊
+     */
+    @Parcelize
+    object CreateGroupLogo : Clicked(eventName = "CreateGroupLogo")
 }
