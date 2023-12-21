@@ -72,11 +72,6 @@ fun Step3Screen(
         ) {
             Spacer(modifier = Modifier.height(1.dp))
             DescWithImage(desc = stringResource(id = R.string.group_logo), groupLogo) {
-                AppUserLogger.getInstance().log(Clicked.CreateGroupLogo)
-
-                AppUserLogger.getInstance()
-                    .log(Page.CreateGroupGroupArrangementGroupLogo)
-
                 onChangeLogo.invoke()
             }
             Spacer(modifier = Modifier.height(1.dp))

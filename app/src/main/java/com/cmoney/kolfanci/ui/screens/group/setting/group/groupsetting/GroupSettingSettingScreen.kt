@@ -249,9 +249,7 @@ fun GroupSettingSettingView(
                     title = stringResource(id = R.string.group_logo),
                     displayContent = WideItemDefaults.imageDisplay(model = group.thumbnailImageUrl), //TODO 需抽換為社團icon
                     onClick = {
-                        KLog.i(TAG, "avatar image click")
-                        AppUserLogger.getInstance()
-                            .log(Clicked.GroupLogo)
+                        KLog.i(TAG, "logo image click")
                         navController.navigate(GroupSettingAvatarScreenDestination(group = group)) //TODO 需導航至設定Logo頁
                     }
                 )

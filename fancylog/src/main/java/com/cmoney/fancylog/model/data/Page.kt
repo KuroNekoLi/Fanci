@@ -29,8 +29,7 @@ sealed class Page(val eventName: String) {
     /**
      * 建立社團.權限.新增審核題目_觀看
      */
-    object CreateGroupGroupOpennessAddReviewQuestion :
-        Page(eventName = "CreateGroup.GroupOpenness.AddReviewQuestion")
+    object CreateGroupGroupOpennessAddReviewQuestion : Page(eventName = "CreateGroup.GroupOpenness.AddReviewQuestion")
 
     /**
      * 建立社團.佈置_觀看
@@ -38,28 +37,19 @@ sealed class Page(val eventName: String) {
     object CreateGroupGroupArrangement : Page(eventName = "CreateGroup.GroupArrangement")
 
     /**
-     * 建立社團.佈置.社團Logo_觀看
-     */
-    object CreateGroupGroupArrangementGroupLogo :
-        Page(eventName = "CreateGroup.GroupArrangement.GroupLogo")
-
-    /**
      * 建立社團.佈置.社團圖示_觀看
      */
-    object CreateGroupGroupArrangementGroupIcon :
-        Page(eventName = "CreateGroup.GroupArrangement.GroupIcon")
+    object CreateGroupGroupArrangementGroupIcon : Page(eventName = "CreateGroup.GroupArrangement.GroupIcon")
 
     /**
      * 建立社團.佈置.首頁背景_觀看
      */
-    object CreateGroupGroupArrangementHomeBackground :
-        Page(eventName = "CreateGroup.GroupArrangement.HomeBackground")
+    object CreateGroupGroupArrangementHomeBackground : Page(eventName = "CreateGroup.GroupArrangement.HomeBackground")
 
     /**
      * 建立社團.佈置.主題色彩_觀看
      */
-    object CreateGroupGroupArrangementThemeColor :
-        Page(eventName = "CreateGroup.GroupArrangement.ThemeColor")
+    object CreateGroupGroupArrangementThemeColor : Page(eventName = "CreateGroup.GroupArrangement.ThemeColor")
 
     /**
      * 通知中心_觀看
@@ -144,50 +134,42 @@ sealed class Page(val eventName: String) {
     /**
      * 社團.設定.社團設定.社團名稱_觀看
      */
-    object GroupSettingsGroupSettingsGroupName :
-        Page(eventName = "Group.Settings.GroupSettings.GroupName")
+    object GroupSettingsGroupSettingsGroupName : Page(eventName = "Group.Settings.GroupSettings.GroupName")
 
     /**
      * 社團.設定.社團設定.社團簡介_觀看
      */
-    object GroupSettingsGroupSettingsGroupIntroduction :
-        Page(eventName = "Group.Settings.GroupSettings.GroupIntroduction")
+    object GroupSettingsGroupSettingsGroupIntroduction : Page(eventName = "Group.Settings.GroupSettings.GroupIntroduction")
 
     /**
      * 社團.設定.社團設定.社團圖示_觀看
      */
-    object GroupSettingsGroupSettingsGroupIcon :
-        Page(eventName = "Group.Settings.GroupSettings.GroupIcon")
+    object GroupSettingsGroupSettingsGroupIcon : Page(eventName = "Group.Settings.GroupSettings.GroupIcon")
 
     /**
      * 社團.設定.社團設定.首頁背景_觀看
      */
-    object GroupSettingsGroupSettingsHomeBackground :
-        Page(eventName = "Group.Settings.GroupSettings.HomeBackground")
+    object GroupSettingsGroupSettingsHomeBackground : Page(eventName = "Group.Settings.GroupSettings.HomeBackground")
 
     /**
      * 社團.設定.社團設定.主題色彩_觀看
      */
-    object GroupSettingsGroupSettingsThemeColor :
-        Page(eventName = "Group.Settings.GroupSettings.ThemeColor")
+    object GroupSettingsGroupSettingsThemeColor : Page(eventName = "Group.Settings.GroupSettings.ThemeColor")
 
     /**
      * 社團.設定.社團公開度.公開度_觀看
      */
-    object GroupSettingsGroupOpennessOpenness :
-        Page(eventName = "Group.Settings.GroupOpenness.Openness")
+    object GroupSettingsGroupOpennessOpenness : Page(eventName = "Group.Settings.GroupOpenness.Openness")
 
     /**
      * 社團.設定.社團公開度.不公開.審核題目.新增審核題目_觀看
      */
-    object GroupSettingsGroupOpennessNonPublicReviewQuestionAddReviewQuestion :
-        Page(eventName = "Group.Settings.GroupOpenness.NonPublic.ReviewQuestion.AddReviewQuestion")
+    object GroupSettingsGroupOpennessNonPublicReviewQuestionAddReviewQuestion : Page(eventName = "Group.Settings.GroupOpenness.NonPublic.ReviewQuestion.AddReviewQuestion")
 
     /**
      * 社團.設定.社團公開度.不公開.審核題目.編輯_觀看
      */
-    object GroupSettingsGroupOpennessNonPublicReviewQuestionEdit :
-        Page(eventName = "Group.Settings.GroupOpenness.NonPublic.ReviewQuestion.Edit")
+    object GroupSettingsGroupOpennessNonPublicReviewQuestionEdit : Page(eventName = "Group.Settings.GroupOpenness.NonPublic.ReviewQuestion.Edit")
 
     /**
      * 社團.設定.頻道管理_觀看
@@ -197,116 +179,97 @@ sealed class Page(val eventName: String) {
     /**
      * 社團.設定.頻道管理.新增分類_觀看
      */
-    object GroupSettingsChannelManagementAddCategory :
-        Page(eventName = "Group.Settings.ChannelManagement.AddCategory")
+    object GroupSettingsChannelManagementAddCategory : Page(eventName = "Group.Settings.ChannelManagement.AddCategory")
 
     /**
      * 社團.設定.頻道管理.新增分類.分類名稱_觀看
      */
-    object GroupSettingsChannelManagementAddCategoryCategoryName :
-        Page(eventName = "Group.Settings.ChannelManagement.AddCategory.CategoryName")
+    object GroupSettingsChannelManagementAddCategoryCategoryName : Page(eventName = "Group.Settings.ChannelManagement.AddCategory.CategoryName")
 
     /**
      * 社團.設定.頻道管理.編輯分類.分類名稱_觀看
      */
-    object GroupSettingsChannelManagementEditCategoryCategoryName :
-        Page(eventName = "Group.Settings.ChannelManagement.EditCategory.CategoryName")
+    object GroupSettingsChannelManagementEditCategoryCategoryName : Page(eventName = "Group.Settings.ChannelManagement.EditCategory.CategoryName")
 
     /**
      * 社團.設定.頻道管理.編輯分類_觀看
      */
-    object GroupSettingsChannelManagementEditCategory :
-        Page(eventName = "Group.Settings.ChannelManagement.EditCategory")
+    object GroupSettingsChannelManagementEditCategory : Page(eventName = "Group.Settings.ChannelManagement.EditCategory")
 
     /**
      * 社團.設定.頻道管理.新增頻道_觀看
      */
-    object GroupSettingsChannelManagementAddChannel :
-        Page(eventName = "Group.Settings.ChannelManagement.AddChannel")
+    object GroupSettingsChannelManagementAddChannel : Page(eventName = "Group.Settings.ChannelManagement.AddChannel")
 
     /**
      * 社團.設定.頻道管理.編輯頻道_觀看
      */
-    object GroupSettingsChannelManagementEditChannel :
-        Page(eventName = "Group.Settings.ChannelManagement.EditChannel")
+    object GroupSettingsChannelManagementEditChannel : Page(eventName = "Group.Settings.ChannelManagement.EditChannel")
 
     /**
      * 社團.設定.頻道管理.樣式_觀看
      */
-    object GroupSettingsChannelManagementStyle :
-        Page(eventName = "Group.Settings.ChannelManagement.Style")
+    object GroupSettingsChannelManagementStyle : Page(eventName = "Group.Settings.ChannelManagement.Style")
 
     /**
      * 社團.設定.頻道管理.樣式.頻道名稱_觀看
      */
-    object GroupSettingsChannelManagementStyleChannelName :
-        Page(eventName = "Group.Settings.ChannelManagement.Style.ChannelName")
+    object GroupSettingsChannelManagementStyleChannelName : Page(eventName = "Group.Settings.ChannelManagement.Style.ChannelName")
 
     /**
      * 社團.設定.頻道管理.樣式.頻道版面_觀看
      */
-    object GroupSettingsChannelManagementStyleLayoutSetting :
-        Page(eventName = "Group.Settings.ChannelManagement.Style.LayoutSetting")
+    object GroupSettingsChannelManagementStyleLayoutSetting : Page(eventName = "Group.Settings.ChannelManagement.Style.LayoutSetting")
 
     /**
      * 社團.設定.頻道管理.權限_觀看
      */
-    object GroupSettingsChannelManagementPermissions :
-        Page(eventName = "Group.Settings.ChannelManagement.Permissions")
+    object GroupSettingsChannelManagementPermissions : Page(eventName = "Group.Settings.ChannelManagement.Permissions")
 
     /**
      * 社團.設定.頻道管理.權限.公開度_觀看
      */
-    object GroupSettingsChannelManagementPermissionsOpenness :
-        Page(eventName = "Group.Settings.ChannelManagement.Permissions.Openness")
+    object GroupSettingsChannelManagementPermissionsOpenness : Page(eventName = "Group.Settings.ChannelManagement.Permissions.Openness")
 
     /**
      * 社團.設定.頻道管理.權限.不公開.成員_觀看
      */
-    object GroupSettingsChannelManagementPermissionsPrivateMembers :
-        Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.Members")
+    object GroupSettingsChannelManagementPermissionsPrivateMembers : Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.Members")
 
     /**
      * 社團.設定.頻道管理.權限.不公開.新增成員_觀看
      */
-    object GroupSettingsChannelManagementPermissionsPrivateAddMember :
-        Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.AddMember")
+    object GroupSettingsChannelManagementPermissionsPrivateAddMember : Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.AddMember")
 
     /**
      * 社團.設定.頻道管理.權限.不公開.角色_觀看
      */
-    object GroupSettingsChannelManagementPermissionsPrivateRoles :
-        Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.Roles")
+    object GroupSettingsChannelManagementPermissionsPrivateRoles : Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.Roles")
 
     /**
      * 社團.設定.頻道管理.權限.不公開.新增角色_觀看
      */
-    object GroupSettingsChannelManagementPermissionsPrivateAddRole :
-        Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.AddRole")
+    object GroupSettingsChannelManagementPermissionsPrivateAddRole : Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.AddRole")
 
     /**
      * 社團.設定.頻道管理.權限.不公開.VIP_觀看
      */
-    object GroupSettingsChannelManagementPermissionsPrivateVIP :
-        Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.VIP")
+    object GroupSettingsChannelManagementPermissionsPrivateVIP : Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.VIP")
 
     /**
      * 社團.設定.頻道管理.權限.不公開.新增方案_觀看
      */
-    object GroupSettingsChannelManagementPermissionsPrivateAddPlan :
-        Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.AddPlan")
+    object GroupSettingsChannelManagementPermissionsPrivateAddPlan : Page(eventName = "Group.Settings.ChannelManagement.Permissions.Private.AddPlan")
 
     /**
      * 社團.設定.頻道管理.管理員_觀看
      */
-    object GroupSettingsChannelManagementAdmin :
-        Page(eventName = "Group.Settings.ChannelManagement.Admin")
+    object GroupSettingsChannelManagementAdmin : Page(eventName = "Group.Settings.ChannelManagement.Admin")
 
     /**
      * 社團.設定.頻道管理.管理員.新增角色_觀看
      */
-    object GroupSettingsChannelManagementAdminAddRole :
-        Page(eventName = "Group.Settings.ChannelManagement.Admin.AddRole")
+    object GroupSettingsChannelManagementAdminAddRole : Page(eventName = "Group.Settings.ChannelManagement.Admin.AddRole")
 
     /**
      * 社團.設定.提醒設定_觀看
@@ -316,62 +279,52 @@ sealed class Page(val eventName: String) {
     /**
      * 社團.設定.角色管理.新增角色.樣式_觀看
      */
-    object GroupSettingsRoleManagementAddRoleStyle :
-        Page(eventName = "Group.Settings.RoleManagement.AddRole.Style")
+    object GroupSettingsRoleManagementAddRoleStyle : Page(eventName = "Group.Settings.RoleManagement.AddRole.Style")
 
     /**
      * 社團.設定.角色管理.新增角色.樣式.角色名稱_觀看
      */
-    object GroupSettingsRoleManagementAddRoleStyleRoleName :
-        Page(eventName = "Group.Settings.RoleManagement.AddRole.Style.RoleName")
+    object GroupSettingsRoleManagementAddRoleStyleRoleName : Page(eventName = "Group.Settings.RoleManagement.AddRole.Style.RoleName")
 
     /**
      * 社團.設定.角色管理.新增角色.權限_觀看
      */
-    object GroupSettingsRoleManagementAddRolePermissions :
-        Page(eventName = "Group.Settings.RoleManagement.AddRole.Permissions")
+    object GroupSettingsRoleManagementAddRolePermissions : Page(eventName = "Group.Settings.RoleManagement.AddRole.Permissions")
 
     /**
      * 社團.設定.角色管理.新增角色.成員_觀看
      */
-    object GroupSettingsRoleManagementAddRoleMembers :
-        Page(eventName = "Group.Settings.RoleManagement.AddRole.Members")
+    object GroupSettingsRoleManagementAddRoleMembers : Page(eventName = "Group.Settings.RoleManagement.AddRole.Members")
 
     /**
      * 社團.設定.角色管理.新增角色.成員列表_觀看
      */
-    object GroupSettingsRoleManagementAddRoleMembersList :
-        Page(eventName = "Group.Settings.RoleManagement.AddRole.MembersList")
+    object GroupSettingsRoleManagementAddRoleMembersList : Page(eventName = "Group.Settings.RoleManagement.AddRole.MembersList")
 
     /**
      * 社團.設定.角色管理.編輯角色.樣式_觀看
      */
-    object GroupSettingsRoleManagementEditRoleStyle :
-        Page(eventName = "Group.Settings.RoleManagement.EditRole.Style")
+    object GroupSettingsRoleManagementEditRoleStyle : Page(eventName = "Group.Settings.RoleManagement.EditRole.Style")
 
     /**
      * 社團.設定.角色管理.編輯角色.樣式.角色名稱_觀看
      */
-    object GroupSettingsRoleManagementEditRoleStyleRoleName :
-        Page(eventName = "Group.Settings.RoleManagement.EditRole.Style.RoleName")
+    object GroupSettingsRoleManagementEditRoleStyleRoleName : Page(eventName = "Group.Settings.RoleManagement.EditRole.Style.RoleName")
 
     /**
      * 社團.設定.角色管理.編輯角色.權限_觀看
      */
-    object GroupSettingsRoleManagementEditRolePermissions :
-        Page(eventName = "Group.Settings.RoleManagement.EditRole.Permissions")
+    object GroupSettingsRoleManagementEditRolePermissions : Page(eventName = "Group.Settings.RoleManagement.EditRole.Permissions")
 
     /**
      * 社團.設定.角色管理.編輯角色.成員_觀看
      */
-    object GroupSettingsRoleManagementEditRoleMembers :
-        Page(eventName = "Group.Settings.RoleManagement.EditRole.Members")
+    object GroupSettingsRoleManagementEditRoleMembers : Page(eventName = "Group.Settings.RoleManagement.EditRole.Members")
 
     /**
      * 社團.設定.角色管理.編輯角色.成員列表_觀看
      */
-    object GroupSettingsRoleManagementEditRoleMembersList :
-        Page(eventName = "Group.Settings.RoleManagement.EditRole.MembersList")
+    object GroupSettingsRoleManagementEditRoleMembersList : Page(eventName = "Group.Settings.RoleManagement.EditRole.MembersList")
 
     /**
      * 社團.設定.所有成員_觀看
@@ -426,8 +379,7 @@ sealed class Page(val eventName: String) {
     /**
      * 社團.設定.檢舉審核.踢除_觀看
      */
-    object GroupSettingsReportReviewKickOut :
-        Page(eventName = "Group.Settings.ReportReview.KickOut")
+    object GroupSettingsReportReviewKickOut : Page(eventName = "Group.Settings.ReportReview.KickOut")
 
     /**
      * 社團.設定.禁言列表_觀看
