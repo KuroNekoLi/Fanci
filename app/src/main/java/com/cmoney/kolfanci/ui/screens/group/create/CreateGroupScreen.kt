@@ -412,9 +412,11 @@ private fun CreateGroupScreenView(
                     //step 3.
                     3 -> {
                         Step3Screen(
+                            groupLogo = "", //TODO
                             groupIcon = settingGroup.thumbnailImageUrl.orEmpty(),
                             groupBackground = settingGroup.coverImageUrl.orEmpty(),
                             fanciColor = fanciColor,
+                            onChangeLogo = {}, //TODO
                             onChangeIcon = {
                                 navController.navigate(
                                     GroupSettingAvatarScreenDestination(

@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,9 +45,11 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
 @Composable
 fun Step3Screen(
     modifier: Modifier = Modifier,
+    groupLogo: String,
     groupIcon: String,
     groupBackground: String,
     fanciColor: FanciColor?,
+    onChangeLogo: () -> Unit,
     onChangeIcon: () -> Unit,
     onChangeBackground: () -> Unit,
     onThemeChange: () -> Unit,
@@ -67,7 +70,10 @@ fun Step3Screen(
                 .verticalScroll(rememberScrollState())
                 .weight(1f)
         ) {
-
+            Spacer(modifier = Modifier.height(1.dp))
+            DescWithImage(desc = stringResource(id = R.string.group_logo), groupLogo) {
+                onChangeLogo.invoke()
+            }
             Spacer(modifier = Modifier.height(1.dp))
             DescWithImage(desc = "社團圖示", groupIcon) {
                 AppUserLogger.getInstance().log(Clicked.CreateGroupGroupIcon)
@@ -91,7 +97,9 @@ fun Step3Screen(
                 modifier = Modifier
                     .background(LocalColor.current.background)
                     .clickable {
-                        AppUserLogger.getInstance().log(Clicked.CreateGroupThemeColor)
+                        AppUserLogger
+                            .getInstance()
+                            .log(Clicked.CreateGroupThemeColor)
 
                         AppUserLogger
                             .getInstance()
@@ -232,8 +240,10 @@ fun Step3ScreenPreview() {
     FanciTheme {
         Step3Screen(
             groupIcon = "",
+            groupLogo = "",
             groupBackground = "",
             fanciColor = null,
+            onChangeLogo = {},
             onChangeIcon = {},
             onChangeBackground = {},
             onThemeChange = {},
