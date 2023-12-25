@@ -32,6 +32,7 @@ import kotlinx.parcelize.Parcelize
  * @param isNeedApproval 加入是否需要審核
  * @param coverImageUrl 封面圖
  * @param thumbnailImageUrl 縮圖
+ * @param logoImageUrl 社團logo
  * @param categories 社團下的分類
  * @param weight 系統排序權重
  * @param creatorId 創立者
@@ -69,6 +70,10 @@ data class Group (
     /* 縮圖 */
     @Json(name = "thumbnailImageUrl")
     val thumbnailImageUrl: kotlin.String? = null,
+
+    /* 社團logo */
+    @Json(name = "logoImageUrl")
+    val logoImageUrl: kotlin.String? = null,
 
     /* 社團下的分類 */
     @Json(name = "categories")

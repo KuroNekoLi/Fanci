@@ -4095,16 +4095,6 @@
             }
           },
           {
-            "name": "skip",
-            "in": "query",
-            "description": "跳脫筆數",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
             "name": "take",
             "in": "query",
             "description": "取得筆數",
@@ -4112,6 +4102,26 @@
               "type": "integer",
               "format": "int32",
               "default": 20
+            }
+          },
+          {
+            "name": "startWeight",
+            "in": "query",
+            "description": "起始權重",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "跳脫筆數（已過時，請改用 startWeight，此參數未來將移除）",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
             }
           }
         ],
@@ -8418,6 +8428,11 @@
             "description": "社團縮圖",
             "nullable": true
           },
+          "logoImageUrl": {
+            "type": "string",
+            "description": "社團logo",
+            "nullable": true
+          },
           "colorSchemeGroupKey": {
             "$ref": "#/components/schemas/ColorTheme"
           }
@@ -8539,6 +8554,11 @@
           "thumbnailImageUrl": {
             "type": "string",
             "description": "縮圖",
+            "nullable": true
+          },
+          "logoImageUrl": {
+            "type": "string",
+            "description": "社團logo",
             "nullable": true
           },
           "categories": {
@@ -8752,6 +8772,11 @@
           "thumbnailImageUrl": {
             "type": "string",
             "description": "社團縮圖",
+            "nullable": true
+          },
+          "logoImageUrl": {
+            "type": "string",
+            "description": "社團logo",
             "nullable": true
           },
           "colorSchemeGroupKey": {

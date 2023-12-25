@@ -28,6 +28,7 @@ import kotlinx.parcelize.Parcelize
  * @param description 社團簡介
  * @param coverImageUrl 社團封面
  * @param thumbnailImageUrl 社團縮圖
+ * @param logoImageUrl 社團logo
  * @param colorSchemeGroupKey 
  */
 @Parcelize
@@ -50,6 +51,10 @@ data class EditGroupParam (
     /* 社團縮圖 */
     @Json(name = "thumbnailImageUrl")
     val thumbnailImageUrl: kotlin.String? = null,
+
+    /* 社團logo */
+    @Json(name = "logoImageUrl")
+    val logoImageUrl: kotlin.String? = null,
 
     @Json(name = "colorSchemeGroupKey")
     val colorSchemeGroupKey: ColorTheme? = null
