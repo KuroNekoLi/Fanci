@@ -6,11 +6,11 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
+import com.socks.library.KLog
 import okhttp3.internal.closeQuietly
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -155,9 +155,11 @@ object PhotoUtils {
                 ExifInterface.ORIENTATION_ROTATE_90 -> {
                     degree = 90
                 }
+
                 ExifInterface.ORIENTATION_ROTATE_180 -> {
                     degree = 180
                 }
+
                 ExifInterface.ORIENTATION_ROTATE_270 -> {
                     degree = 270
                 }
@@ -183,9 +185,13 @@ object PhotoUtils {
         return Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true)
     }
 
+    /**
+     * 將ImageBitmap寫入IO
+     * @param imageBitmap 圖片的ImageBitmap
+     * @return 檔案的Uri，可能為空
+     */
     fun saveBitmapAndGetUri(context: Context, imageBitmap: ImageBitmap): Uri? {
         val bitmap = imageBitmap.asAndroidBitmap()
-        // 在內部儲存空間中創建一個暫存文件夾
         val directory = context.cacheDir
         val fileName = System.currentTimeMillis().toString() + ".png"
         val file = File(directory, fileName)
@@ -196,29 +202,8 @@ object PhotoUtils {
             }
             FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         } catch (e: Exception) {
-            Log.i("LinLi", "saveBitmapAndGetUri: ${e.printStackTrace()}")
-            e.printStackTrace()
+            KLog.e("saveBitmapAndGetUri: ${e.printStackTrace()}", e)
             null
         }
-    }
-    fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
-        val contentResolver = context.contentResolver
-        var bitmap: Bitmap? = null
-        var inputStream: InputStream? = null
-
-        try {
-            inputStream = contentResolver.openInputStream(uri)
-            bitmap = BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            try {
-                inputStream?.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-
-        return bitmap
     }
 }
