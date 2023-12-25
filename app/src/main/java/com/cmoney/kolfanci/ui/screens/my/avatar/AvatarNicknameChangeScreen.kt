@@ -155,7 +155,7 @@ fun AvatarNicknameChangeScreen(
             },
             onAttach = { photoUris ->
                 photoUris.firstOrNull()?.let {
-                    viewModel.setAvatarImage(it)
+                    viewModel.setImage(it)
                 }
             },
             onFanciClick = {

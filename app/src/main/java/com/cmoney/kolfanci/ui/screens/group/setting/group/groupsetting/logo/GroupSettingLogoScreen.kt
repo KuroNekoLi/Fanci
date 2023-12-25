@@ -1,7 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.logo
 
 import android.net.Uri
-import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +42,7 @@ import com.cmoney.kolfanci.ui.common.TransparentButton
 import com.cmoney.kolfanci.ui.destinations.FanciDefaultLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.LogoCropperScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingImageViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
@@ -55,17 +55,11 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
-
-@Parcelize
-data class ImageChangeData(
-    val uri: Uri?,
-    val url: String?
-) : Parcelable
 
 /**
  * 設定社團logo頁
+ * @param fanciDefaultLogoResult 預設圖庫的回調
  */
 @Destination
 @Composable
@@ -79,6 +73,7 @@ fun GroupSettingLogoScreen(
     fanciDefaultLogoResult: ResultRecipient<FanciDefaultLogoScreenDestination, String>,
     fanciLogoResult: ResultRecipient<LogoCropperScreenDestination, Uri>
 ) {
+    val TAG = "GroupSettingLogoScreen"
     var settingGroup by remember {
         mutableStateOf(group)
     }
@@ -101,7 +96,7 @@ fun GroupSettingLogoScreen(
                 val fanciUrl = result.value
 
                 settingGroup = settingGroup.copy(
-                    thumbnailImageUrl = fanciUrl
+                    logoImageUrl = fanciUrl
                 )
                 groupSettingImageViewModel.resetCameraUri()
             }
@@ -114,12 +109,8 @@ fun GroupSettingLogoScreen(
 
             is NavResult.Value -> {
                 val resultUri = result.value
-                cropUri = resultUri
-                //TODO 需確認這邊能不能將uri直接toString
-//                settingGroup = settingGroup.copy(
-//                    logoImageUrl = cropUri.toString()
-//                )
-//                groupSettingAvatarViewModel.resetCameraUri()
+                groupSettingImageViewModel.setImage(resultUri)
+                KLog.i(TAG, "value: ${groupSettingImageViewModel.uiState.image}")
             }
         }
     }
@@ -137,7 +128,7 @@ fun GroupSettingLogoScreen(
                 result = it
             )
         },
-        avatarImage = cropUri,
+        image = uiState.image,
         openCameraDialog = {
             if (isFromCreate) {
                 AppUserLogger.getInstance().log(Clicked.CreateGroupChangeGroupIconPicture)
@@ -193,7 +184,7 @@ fun GroupSettingLogoView(
     group: Group,
     isLoading: Boolean,
     onImageChange: (ImageChangeData) -> Unit,
-    avatarImage: Uri?,
+    image: Uri?,
     openCameraDialog: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -206,7 +197,7 @@ fun GroupSettingLogoView(
                 title = stringResource(id = R.string.group_logo),
                 saveClick = {
                     KLog.i(TAG, "on logo save click.")
-                    avatarImage?.let {
+                    image?.let {
                         onImageChange.invoke(
                             ImageChangeData(
                                 uri = it,
@@ -217,7 +208,7 @@ fun GroupSettingLogoView(
                         onImageChange.invoke(
                             ImageChangeData(
                                 uri = null,
-                                url = group.thumbnailImageUrl.orEmpty()
+                                url = group.logoImageUrl.orEmpty()
                             )
                         )
                     }
@@ -242,7 +233,7 @@ fun GroupSettingLogoView(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val imageModel = avatarImage ?: group.thumbnailImageUrl
+                val imageModel = image ?: group.thumbnailImageUrl
 
                 imageModel?.let {
                     AsyncImage(
@@ -294,7 +285,7 @@ fun GroupSettingLogoScreenPreview() {
             group = Group(),
             isLoading = true,
             onImageChange = {},
-            avatarImage = null,
+            image = null,
             openCameraDialog = {}
         ) {}
     }

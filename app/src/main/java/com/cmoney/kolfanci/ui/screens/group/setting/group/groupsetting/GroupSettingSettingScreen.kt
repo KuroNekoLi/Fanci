@@ -128,7 +128,7 @@ private fun SetCallbackHandle(
             }
         }
     }
-    //更改頭貼
+    //更改Logo
     setLogoResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
@@ -136,7 +136,7 @@ private fun SetCallbackHandle(
 
             is NavResult.Value -> {
                 val uri = result.value
-                groupViewModel.changeGroupAvatar(uri)
+                groupViewModel.changeGroupLogo(uri)
             }
         }
     }

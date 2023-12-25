@@ -51,7 +51,7 @@ class GroupSettingImageViewModel : ViewModel() {
     /**
      * 設定照片
      */
-    fun setAvatarImage(uri: Uri) {
+    fun setImage(uri: Uri) {
         KLog.i(TAG, "setAvatarImage:$uri")
 //        uiState = uiState.copy(
 //            avatarImage = Uri.parse(uri.toString())
