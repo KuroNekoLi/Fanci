@@ -134,7 +134,7 @@ fun GroupSettingLogoScreen(
                 AppUserLogger.getInstance().log(Clicked.Confirm, From.EditGroupIcon)
             }
             resultNavigator.navigateBack(
-                it
+                result = it
             )
         },
         avatarImage = cropUri,
