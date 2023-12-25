@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -71,7 +70,7 @@ fun GroupSettingAvatarScreen(
     navController: DestinationsNavigator,
     group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
-    groupSettingAvatarViewModel: GroupSettingAvatarViewModel = koinViewModel(),
+    groupSettingImageViewModel: GroupSettingImageViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<ImageChangeData>,
     fanciAvatarResult: ResultRecipient<FanciDefaultAvatarScreenDestination, String>
 ) {
@@ -79,7 +78,7 @@ fun GroupSettingAvatarScreen(
         mutableStateOf(group)
     }
 
-    val uiState = groupSettingAvatarViewModel.uiState
+    val uiState = groupSettingImageViewModel.uiState
 
     var showSaveTip by remember {
         mutableStateOf(false)
@@ -99,7 +98,7 @@ fun GroupSettingAvatarScreen(
                 settingGroup = settingGroup.copy(
                     thumbnailImageUrl = fanciUrl
                 )
-                groupSettingAvatarViewModel.resetCameraUri()
+                groupSettingImageViewModel.resetCameraUri()
             }
         }
     }
@@ -118,14 +117,14 @@ fun GroupSettingAvatarScreen(
                 it
             )
         },
-        avatarImage = uiState.avatarImage,
+        avatarImage = uiState.image,
         openCameraDialog = {
             if (isFromCreate) {
                 AppUserLogger.getInstance().log(Clicked.CreateGroupChangeGroupIconPicture)
             } else {
                 AppUserLogger.getInstance().log(Clicked.GroupIconChangePicture)
             }
-            groupSettingAvatarViewModel.openCameraDialog()
+            groupSettingImageViewModel.openCameraDialog()
         }
     ) {
         showSaveTip = true
@@ -135,15 +134,15 @@ fun GroupSettingAvatarScreen(
         GroupPhotoPickDialogScreen(
             quantityLimit = 1,
             onDismiss = {
-                groupSettingAvatarViewModel.closeCameraDialog()
+                groupSettingImageViewModel.closeCameraDialog()
             },
             onAttach = { photoUris ->
                 photoUris.firstOrNull()?.let {
-                    groupSettingAvatarViewModel.setAvatarImage(it)
+                    groupSettingImageViewModel.setAvatarImage(it)
                 }
             },
             onFanciClick = {
-                groupSettingAvatarViewModel.closeCameraDialog()
+                groupSettingImageViewModel.closeCameraDialog()
                 navController.navigate(FanciDefaultAvatarScreenDestination)
             }
         )

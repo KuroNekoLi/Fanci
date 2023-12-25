@@ -29,6 +29,7 @@ import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingBackgroundScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingDescScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupSettingLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
@@ -247,10 +248,14 @@ fun GroupSettingSettingView(
                         .background(LocalColor.current.background)
                         .padding(WideItemDefaults.paddingValues),
                     title = stringResource(id = R.string.group_logo),
-                    displayContent = WideItemDefaults.imageDisplay(model = group.thumbnailImageUrl), //TODO 需抽換為社團icon
+                    displayContent = WideItemDefaults.imageDisplay(
+                        model = group.logoImageUrl,
+                        modifier = Modifier
+                            .size(width = 125.dp, height = 40.dp)
+                    ),
                     onClick = {
                         KLog.i(TAG, "logo image click")
-                        navController.navigate(GroupSettingAvatarScreenDestination(group = group)) //TODO 需導航至設定Logo頁
+                        navController.navigate(GroupSettingLogoScreenDestination(group = group))
                     }
                 )
             }

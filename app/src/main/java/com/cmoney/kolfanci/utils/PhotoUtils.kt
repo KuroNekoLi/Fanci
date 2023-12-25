@@ -6,9 +6,20 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
+import com.socks.library.KLog
 import okhttp3.internal.closeQuietly
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 object PhotoUtils {
     suspend fun createUploadImage(uri: Uri, context: Context): String? {
@@ -144,9 +155,11 @@ object PhotoUtils {
                 ExifInterface.ORIENTATION_ROTATE_90 -> {
                     degree = 90
                 }
+
                 ExifInterface.ORIENTATION_ROTATE_180 -> {
                     degree = 180
                 }
+
                 ExifInterface.ORIENTATION_ROTATE_270 -> {
                     degree = 270
                 }
@@ -170,5 +183,27 @@ object PhotoUtils {
         val matrix = Matrix()
         matrix.postRotate(rotate)
         return Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true)
+    }
+
+    /**
+     * 將ImageBitmap寫入IO
+     * @param imageBitmap 圖片的ImageBitmap
+     * @return 檔案的Uri，可能為空
+     */
+    fun saveBitmapAndGetUri(context: Context, imageBitmap: ImageBitmap): Uri? {
+        val bitmap = imageBitmap.asAndroidBitmap()
+        val directory = context.cacheDir
+        val fileName = System.currentTimeMillis().toString() + ".png"
+        val file = File(directory, fileName)
+
+        return try {
+            FileOutputStream(file).use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            }
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        } catch (e: Exception) {
+            KLog.e("saveBitmapAndGetUri: ${e.printStackTrace()}", e)
+            null
+        }
     }
 }

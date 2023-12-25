@@ -47,7 +47,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.model.viewmodel.UserViewModel
 import com.cmoney.kolfanci.ui.common.BlueButton
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingImageViewModel
 import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
@@ -69,7 +69,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AvatarNicknameChangeScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
-    viewModel: GroupSettingAvatarViewModel = koinViewModel(),
+    viewModel: GroupSettingImageViewModel = koinViewModel(),
     userViewModel: UserViewModel = koinViewModel()
 ) {
     val TAG = "AvatarNicknameChangeScreen"
@@ -93,7 +93,7 @@ fun AvatarNicknameChangeScreen(
         modifier = modifier,
         navController = navController,
         defaultText = textState,
-        avatarImage = viewModel.uiState.avatarImage,
+        avatarImage = viewModel.uiState.image,
         maxLength = maxNickNameSize,
         input = {
             textState = it
@@ -106,7 +106,7 @@ fun AvatarNicknameChangeScreen(
         onSave = {
             userViewModel.changeNicknameAndAvatar(
                 nickName = textState,
-                avatarUri = viewModel.uiState.avatarImage
+                avatarUri = viewModel.uiState.image
             )
         },
         onBack = {

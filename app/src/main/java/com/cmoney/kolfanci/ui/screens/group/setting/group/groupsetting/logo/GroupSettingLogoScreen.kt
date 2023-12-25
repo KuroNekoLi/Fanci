@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,7 +41,8 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.TransparentButton
 import com.cmoney.kolfanci.ui.destinations.FanciDefaultLogoScreenDestination
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
+import com.cmoney.kolfanci.ui.destinations.LogoCropperScreenDestination
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingImageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
@@ -62,6 +64,9 @@ data class ImageChangeData(
     val url: String?
 ) : Parcelable
 
+/**
+ * 設定社團logo頁
+ */
 @Destination
 @Composable
 fun GroupSettingLogoScreen(
@@ -69,24 +74,25 @@ fun GroupSettingLogoScreen(
     navController: DestinationsNavigator,
     group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
-    groupSettingAvatarViewModel: GroupSettingAvatarViewModel = koinViewModel(),
+    groupSettingImageViewModel: GroupSettingImageViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<ImageChangeData>,
-    fanciLogoResult: ResultRecipient<FanciDefaultLogoScreenDestination, String> //TODO
+    fanciDefaultLogoResult: ResultRecipient<FanciDefaultLogoScreenDestination, String>,
+    fanciLogoResult: ResultRecipient<LogoCropperScreenDestination, Uri>
 ) {
     var settingGroup by remember {
         mutableStateOf(group)
     }
-
-    val uiState = groupSettingAvatarViewModel.uiState
+    val uiState = groupSettingImageViewModel.uiState
 
     var showSaveTip by remember {
         mutableStateOf(false)
     }
+    var cropUri by remember { mutableStateOf<Uri?>(null) } //擷取後圖片的uri
 
     //是否為建立社團開啟
     val isFromCreate = group.id.isNullOrEmpty()
 
-    fanciLogoResult.onNavResult { result ->
+    fanciDefaultLogoResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
@@ -97,11 +103,26 @@ fun GroupSettingLogoScreen(
                 settingGroup = settingGroup.copy(
                     thumbnailImageUrl = fanciUrl
                 )
-                groupSettingAvatarViewModel.resetCameraUri()
+                groupSettingImageViewModel.resetCameraUri()
             }
         }
     }
+    fanciLogoResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
 
+            is NavResult.Value -> {
+                val resultUri = result.value
+                cropUri = resultUri
+                //TODO 需確認這邊能不能將uri直接toString
+//                settingGroup = settingGroup.copy(
+//                    logoImageUrl = cropUri.toString()
+//                )
+//                groupSettingAvatarViewModel.resetCameraUri()
+            }
+        }
+    }
     GroupSettingLogoView(
         modifier = modifier,
         group = settingGroup,
@@ -116,14 +137,14 @@ fun GroupSettingLogoScreen(
                 it
             )
         },
-        avatarImage = uiState.avatarImage,
+        avatarImage = cropUri,
         openCameraDialog = {
             if (isFromCreate) {
                 AppUserLogger.getInstance().log(Clicked.CreateGroupChangeGroupIconPicture)
             } else {
                 AppUserLogger.getInstance().log(Clicked.GroupIconChangePicture)
             }
-            groupSettingAvatarViewModel.openCameraDialog()
+            groupSettingImageViewModel.openCameraDialog()
         }
     ) {
         showSaveTip = true
@@ -134,15 +155,16 @@ fun GroupSettingLogoScreen(
             isShowCamera = false,
             quantityLimit = 1,
             onDismiss = {
-                groupSettingAvatarViewModel.closeCameraDialog()
+                groupSettingImageViewModel.closeCameraDialog()
             },
+            //當相簿的照片被選取時
             onAttach = { photoUris ->
                 photoUris.firstOrNull()?.let {
-                    groupSettingAvatarViewModel.setAvatarImage(it)
+                    navController.navigate(LogoCropperScreenDestination(photoUri = it))
                 }
             },
             onFanciClick = {
-                groupSettingAvatarViewModel.closeCameraDialog()
+                groupSettingImageViewModel.closeCameraDialog()
                 navController.navigate(FanciDefaultLogoScreenDestination)
             }
         )
@@ -183,7 +205,7 @@ fun GroupSettingLogoView(
             EditToolbarScreen(
                 title = stringResource(id = R.string.group_logo),
                 saveClick = {
-                    KLog.i(TAG, "on image save click.")
+                    KLog.i(TAG, "on logo save click.")
                     avatarImage?.let {
                         onImageChange.invoke(
                             ImageChangeData(
@@ -227,7 +249,7 @@ fun GroupSettingLogoView(
                         model = imageModel,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(62.dp),
+                            .aspectRatio(375f / 120f),
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                         placeholder = painterResource(id = R.drawable.placeholder)
@@ -237,7 +259,7 @@ fun GroupSettingLogoView(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(62.dp)
+                            .aspectRatio(375f / 120f)
                             .background(colorResource(id = R.color.color_D9D9D9))
                     )
                 }

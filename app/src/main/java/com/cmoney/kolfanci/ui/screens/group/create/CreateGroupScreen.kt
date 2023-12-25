@@ -45,15 +45,16 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.CreateApplyQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingBackgroundScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupSettingLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.TipDialog
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
-import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -138,9 +139,11 @@ fun CreateGroupScreen(
                     KLog.i(TAG, "step2 next click.")
                     AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupOpenness)
                 }
+
                 else -> {
                     KLog.i(TAG, "step3 next click.")
-                    AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupArrangement)
+                    AppUserLogger.getInstance()
+                        .log(Clicked.CreateGroupNextStep, From.GroupArrangement)
                 }
             }
 
@@ -158,9 +161,11 @@ fun CreateGroupScreen(
                     KLog.i(TAG, "step2 back click.")
                     AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupOpenness)
                 }
+
                 else -> {
                     KLog.i(TAG, "step3 back click.")
-                    AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupArrangement)
+                    AppUserLogger.getInstance()
+                        .log(Clicked.CreateGroupBackward, From.GroupArrangement)
                 }
             }
 
@@ -185,7 +190,8 @@ fun CreateGroupScreen(
     if (showDialog.value) {
         TipDialog(
             onAddTopic = {
-                AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.AddQuestion)
+                AppUserLogger.getInstance()
+                    .log(Clicked.CreateGroupAddQuestionPopup, From.AddQuestion)
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
                         keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName,
@@ -412,11 +418,17 @@ private fun CreateGroupScreenView(
                     //step 3.
                     3 -> {
                         Step3Screen(
-                            groupLogo = "", //TODO
+                            groupLogo = settingGroup.logoImageUrl.orEmpty(),
                             groupIcon = settingGroup.thumbnailImageUrl.orEmpty(),
                             groupBackground = settingGroup.coverImageUrl.orEmpty(),
                             fanciColor = fanciColor,
-                            onChangeLogo = {}, //TODO
+                            onChangeLogo = {
+                                navController.navigate(
+                                    GroupSettingLogoScreenDestination(
+                                        group = settingGroup
+                                    )
+                                )
+                            },
                             onChangeIcon = {
                                 navController.navigate(
                                     GroupSettingAvatarScreenDestination(
