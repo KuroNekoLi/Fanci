@@ -113,14 +113,15 @@ object WideItemDefaults {
     @Composable
     fun imageDisplay(
         model: Any?,
-        placeHolder: Painter? = painterResource(id = R.drawable.placeholder)
+        placeHolder: Painter? = painterResource(id = R.drawable.placeholder),
+        modifier: Modifier = Modifier
+            .size(56.dp)
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(8.dp)),
     ): @Composable () -> Unit = @Composable {
         AsyncImage(
             model = model,
-            modifier = Modifier
-                .size(56.dp)
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(8.dp)),
+            modifier = modifier,
             contentScale = ContentScale.Crop,
             contentDescription = null,
             placeholder = placeHolder

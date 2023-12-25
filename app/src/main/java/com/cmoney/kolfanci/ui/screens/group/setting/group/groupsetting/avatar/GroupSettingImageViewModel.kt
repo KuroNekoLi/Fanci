@@ -7,14 +7,23 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.socks.library.KLog
 
+/**
+ * 社團設定頁面的UI State
+ * @param openCameraDialog 選擇照片彈窗是否開啟
+ * @param image 中央圖示的uri
+ * @param coverImageUrl 背景圖示的uri
+ */
 data class UiState(
     val openCameraDialog: Boolean = false,
-    val avatarImage: Uri? = null,
+    val image: Uri? = null,
     val coverImageUrl: Uri? = null
 )
 
-class GroupSettingAvatarViewModel : ViewModel() {
-    private val TAG = GroupSettingAvatarViewModel::class.java.simpleName
+/**
+ * 社團圖示設定的ViewModel
+ */
+class GroupSettingImageViewModel : ViewModel() {
+    private val TAG = GroupSettingImageViewModel::class.java.simpleName
 
     var uiState by mutableStateOf(UiState())
         private set
@@ -49,13 +58,13 @@ class GroupSettingAvatarViewModel : ViewModel() {
 //        )
 
         uiState = uiState.copy(
-            avatarImage = uri
+            image = uri
         )
     }
 
     fun resetCameraUri() {
         uiState = uiState.copy(
-            avatarImage = null
+            image = null
         )
     }
 }

@@ -248,7 +248,11 @@ fun GroupSettingSettingView(
                         .background(LocalColor.current.background)
                         .padding(WideItemDefaults.paddingValues),
                     title = stringResource(id = R.string.group_logo),
-                    displayContent = WideItemDefaults.imageDisplay(model = group.logoImageUrl),
+                    displayContent = WideItemDefaults.imageDisplay(
+                        model = group.logoImageUrl,
+                        modifier = Modifier
+                            .size(width = 125.dp, height = 40.dp)
+                    ),
                     onClick = {
                         KLog.i(TAG, "logo image click")
                         navController.navigate(GroupSettingLogoScreenDestination(group = group))

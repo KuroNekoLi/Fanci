@@ -42,7 +42,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.TransparentButton
 import com.cmoney.kolfanci.ui.destinations.FanciDefaultLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.LogoCropperScreenDestination
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingImageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
@@ -74,7 +74,7 @@ fun GroupSettingLogoScreen(
     navController: DestinationsNavigator,
     group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
-    groupSettingAvatarViewModel: GroupSettingAvatarViewModel = koinViewModel(),
+    groupSettingImageViewModel: GroupSettingImageViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<ImageChangeData>,
     fanciDefaultLogoResult: ResultRecipient<FanciDefaultLogoScreenDestination, String>,
     fanciLogoResult: ResultRecipient<LogoCropperScreenDestination, Uri>
@@ -82,7 +82,7 @@ fun GroupSettingLogoScreen(
     var settingGroup by remember {
         mutableStateOf(group)
     }
-    val uiState = groupSettingAvatarViewModel.uiState
+    val uiState = groupSettingImageViewModel.uiState
 
     var showSaveTip by remember {
         mutableStateOf(false)
@@ -103,7 +103,7 @@ fun GroupSettingLogoScreen(
                 settingGroup = settingGroup.copy(
                     thumbnailImageUrl = fanciUrl
                 )
-                groupSettingAvatarViewModel.resetCameraUri()
+                groupSettingImageViewModel.resetCameraUri()
             }
         }
     }
@@ -144,7 +144,7 @@ fun GroupSettingLogoScreen(
             } else {
                 AppUserLogger.getInstance().log(Clicked.GroupIconChangePicture)
             }
-            groupSettingAvatarViewModel.openCameraDialog()
+            groupSettingImageViewModel.openCameraDialog()
         }
     ) {
         showSaveTip = true
@@ -155,15 +155,16 @@ fun GroupSettingLogoScreen(
             isShowCamera = false,
             quantityLimit = 1,
             onDismiss = {
-                groupSettingAvatarViewModel.closeCameraDialog()
+                groupSettingImageViewModel.closeCameraDialog()
             },
+            //當相簿的照片被選取時
             onAttach = { photoUris ->
                 photoUris.firstOrNull()?.let {
                     navController.navigate(LogoCropperScreenDestination(photoUri = it))
                 }
             },
             onFanciClick = {
-                groupSettingAvatarViewModel.closeCameraDialog()
+                groupSettingImageViewModel.closeCameraDialog()
                 navController.navigate(FanciDefaultLogoScreenDestination)
             }
         )
@@ -204,7 +205,7 @@ fun GroupSettingLogoView(
             EditToolbarScreen(
                 title = stringResource(id = R.string.group_logo),
                 saveClick = {
-                    KLog.i(TAG, "on image save click.")
+                    KLog.i(TAG, "on logo save click.")
                     avatarImage?.let {
                         onImageChange.invoke(
                             ImageChangeData(
