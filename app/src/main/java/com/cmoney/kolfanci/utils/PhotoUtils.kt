@@ -6,9 +6,20 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import okhttp3.internal.closeQuietly
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 object PhotoUtils {
     suspend fun createUploadImage(uri: Uri, context: Context): String? {
@@ -170,5 +181,44 @@ object PhotoUtils {
         val matrix = Matrix()
         matrix.postRotate(rotate)
         return Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true)
+    }
+
+    fun saveBitmapAndGetUri(context: Context, imageBitmap: ImageBitmap): Uri? {
+        val bitmap = imageBitmap.asAndroidBitmap()
+        // 在內部儲存空間中創建一個暫存文件夾
+        val directory = context.cacheDir
+        val fileName = System.currentTimeMillis().toString() + ".png"
+        val file = File(directory, fileName)
+
+        return try {
+            FileOutputStream(file).use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            }
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        } catch (e: Exception) {
+            Log.i("LinLi", "saveBitmapAndGetUri: ${e.printStackTrace()}")
+            e.printStackTrace()
+            null
+        }
+    }
+    fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+        val contentResolver = context.contentResolver
+        var bitmap: Bitmap? = null
+        var inputStream: InputStream? = null
+
+        try {
+            inputStream = contentResolver.openInputStream(uri)
+            bitmap = BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            try {
+                inputStream?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+        return bitmap
     }
 }

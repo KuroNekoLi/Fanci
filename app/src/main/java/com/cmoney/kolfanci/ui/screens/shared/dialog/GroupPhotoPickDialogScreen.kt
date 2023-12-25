@@ -45,7 +45,6 @@ fun GroupPhotoPickDialogScreen(
 ) {
     val TAG = "GroupPhotoPickDialogScreen"
     val context = LocalContext.current
-
     val captureResult =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
@@ -153,7 +152,7 @@ fun GroupPhotoPickDialogScreenPreview() {
     FanciTheme {
         GroupPhotoPickDialogScreen(
             onDismiss = {},
-            onAttach = {}
+            onAttach = {},
         ) {}
     }
 }

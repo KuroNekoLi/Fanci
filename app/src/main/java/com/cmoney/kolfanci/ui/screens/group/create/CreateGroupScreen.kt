@@ -45,6 +45,7 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.CreateApplyQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingBackgroundScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupSettingLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
@@ -416,7 +417,13 @@ private fun CreateGroupScreenView(
                             groupIcon = settingGroup.thumbnailImageUrl.orEmpty(),
                             groupBackground = settingGroup.coverImageUrl.orEmpty(),
                             fanciColor = fanciColor,
-                            onChangeLogo = {}, //TODO
+                            onChangeLogo = {
+                                navController.navigate(
+                                    GroupSettingLogoScreenDestination(
+                                        group = settingGroup
+                                    )
+                                )
+                            },
                             onChangeIcon = {
                                 navController.navigate(
                                     GroupSettingAvatarScreenDestination(

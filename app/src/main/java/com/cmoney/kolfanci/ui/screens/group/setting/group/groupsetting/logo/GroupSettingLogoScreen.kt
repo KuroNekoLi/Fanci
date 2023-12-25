@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.logo
 
 import android.net.Uri
 import android.os.Parcelable
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,6 +42,7 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.TransparentButton
 import com.cmoney.kolfanci.ui.destinations.FanciDefaultLogoScreenDestination
+import com.cmoney.kolfanci.ui.destinations.LogoCropperScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
@@ -71,22 +74,24 @@ fun GroupSettingLogoScreen(
     viewModel: GroupSettingViewModel = koinViewModel(),
     groupSettingAvatarViewModel: GroupSettingAvatarViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<ImageChangeData>,
-    fanciLogoResult: ResultRecipient<FanciDefaultLogoScreenDestination, String> //TODO
-) {
+    fanciDefaultLogoResult: ResultRecipient<FanciDefaultLogoScreenDestination, String> ,
+    fanciLogoResult: ResultRecipient<LogoCropperScreenDestination, Uri>
+    ) {
     var settingGroup by remember {
         mutableStateOf(group)
     }
-
+    val context = LocalContext.current
     val uiState = groupSettingAvatarViewModel.uiState
 
     var showSaveTip by remember {
         mutableStateOf(false)
     }
+    var cropUri by remember{ mutableStateOf<Uri?>(null) }
 
     //是否為建立社團開啟
     val isFromCreate = group.id.isNullOrEmpty()
 
-    fanciLogoResult.onNavResult { result ->
+    fanciDefaultLogoResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
@@ -101,7 +106,19 @@ fun GroupSettingLogoScreen(
             }
         }
     }
+    fanciLogoResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
 
+            is NavResult.Value -> {
+                val resultUri = result.value
+                Log.i("LinLi", "cropUri: $resultUri")
+                cropUri = resultUri
+                //TODO 把setting group的logo屬性設為cropUrl
+            }
+        }
+    }
     GroupSettingLogoView(
         modifier = modifier,
         group = settingGroup,
@@ -116,7 +133,7 @@ fun GroupSettingLogoScreen(
                 it
             )
         },
-        avatarImage = uiState.avatarImage,
+        avatarImage = cropUri,
         openCameraDialog = {
             if (isFromCreate) {
                 AppUserLogger.getInstance().log(Clicked.CreateGroupChangeGroupIconPicture)
@@ -138,7 +155,8 @@ fun GroupSettingLogoScreen(
             },
             onAttach = { photoUris ->
                 photoUris.firstOrNull()?.let {
-                    groupSettingAvatarViewModel.setAvatarImage(it)
+                    navController.navigate(LogoCropperScreenDestination(photoUri = it))
+//                    groupSettingAvatarViewModel.setAvatarImage(it)
                 }
             },
             onFanciClick = {
