@@ -233,7 +233,7 @@ fun GroupSettingLogoView(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val imageModel = image ?: group.thumbnailImageUrl
+                val imageModel = image ?: group.logoImageUrl
 
                 imageModel?.let {
                     AsyncImage(

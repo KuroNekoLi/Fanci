@@ -144,6 +144,7 @@ class GroupUseCase(
         description: String = "",
         isNeedApproval: Boolean,
         coverImageUrl: String,
+        logoImageUrl: String,
         thumbnailImageUrl: String,
         themeId: String
     ) = kotlin.runCatching {
@@ -154,6 +155,7 @@ class GroupUseCase(
                 isNeedApproval = isNeedApproval,
                 coverImageUrl = coverImageUrl,
                 thumbnailImageUrl = thumbnailImageUrl,
+                logoImageUrl = logoImageUrl,
                 colorSchemeGroupKey = ColorTheme.decode(themeId)
             )
         ).checkResponseBody()
@@ -411,24 +413,9 @@ class GroupUseCase(
      * @param group 社團 model
      */
     suspend fun changeGroupBackground(uri: Any, group: Group): Flow<String> {
-        return flow {
-            var imageUrl = ""
-            if (uri is Uri) {
-                val uploadResult = uploadImageUseCase.uploadImage(listOf(uri)).first()
-                imageUrl = uploadResult.second
-                emit(imageUrl)
-            } else if (uri is String) {
-                imageUrl = uri
-                emit(uri)
-            }
-
-            if (imageUrl.isNotEmpty()) {
-                groupApi.apiV1GroupGroupIdPut(
-                    groupId = group.id.orEmpty(),
-                    editGroupParam = createEditGroupParam(group, coverImageUrl = imageUrl)
-                )
-            }
-        }.flowOn(Dispatchers.IO)
+        return changeGroupImage(uri, group) { imageUrl ->
+            createEditGroupParam(group, coverImageUrl = imageUrl)
+        }
     }
 
     /**

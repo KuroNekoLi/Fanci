@@ -33,12 +33,12 @@ import com.cmoney.kolfanci.ui.destinations.GroupSettingLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.item.WideItem
 import com.cmoney.kolfanci.ui.screens.shared.item.WideItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination

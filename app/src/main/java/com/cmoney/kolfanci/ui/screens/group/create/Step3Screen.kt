@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -71,7 +72,7 @@ fun Step3Screen(
                 .weight(1f)
         ) {
             Spacer(modifier = Modifier.height(1.dp))
-            DescWithImage(desc = stringResource(id = R.string.group_logo), groupLogo) {
+            DescWithLogoImage(desc = stringResource(id = R.string.group_logo), groupLogo) {
                 onChangeLogo.invoke()
             }
             Spacer(modifier = Modifier.height(1.dp))
@@ -231,6 +232,42 @@ private fun DescWithImage(desc: String, thumbnail: String, onClick: () -> Unit) 
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun DescWithLogoImage(desc: String, thumbnail: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .background(LocalColor.current.background)
+            .clickable {
+                onClick.invoke()
+            }
+            .padding(top = 15.dp, bottom = 15.dp, start = 24.dp, end = 24.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val imageModel = thumbnail.ifEmpty {
+            R.drawable.group_logo_default
+        }
+
+        Text(
+            modifier = Modifier.weight(1f),
+            text = desc,
+            fontSize = 17.sp,
+            color = LocalColor.current.text.default_100,
+            fontWeight = FontWeight.Bold
+        )
+
+        AsyncImage(
+            model = imageModel,
+            modifier = Modifier
+                .sizeIn(maxWidth = 125.dp, maxHeight = 40.dp),
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
+            placeholder = painterResource(id = R.drawable.placeholder)
+        )
     }
 }
 
