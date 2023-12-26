@@ -72,11 +72,19 @@ fun Step3Screen(
                 .weight(1f)
         ) {
             Spacer(modifier = Modifier.height(1.dp))
-            DescWithLogoImage(desc = stringResource(id = R.string.group_logo), groupLogo) {
+            DescWithLogoImage(
+                desc = stringResource(id = R.string.group_logo),
+                detail = stringResource(id = R.string.group_logo_detail),
+                thumbnail = groupLogo
+            ) {
                 onChangeLogo.invoke()
             }
             Spacer(modifier = Modifier.height(1.dp))
-            DescWithImage(desc = "社團圖示", groupIcon) {
+            DescWithImage(
+                desc = stringResource(id = R.string.group_avatar),
+                detail = stringResource(id = R.string.group_avatar_detail),
+                thumbnail = groupIcon
+            ) {
                 AppUserLogger.getInstance().log(Clicked.CreateGroupGroupIcon)
 
                 AppUserLogger.getInstance()
@@ -85,7 +93,11 @@ fun Step3Screen(
                 onChangeIcon.invoke()
             }
             Spacer(modifier = Modifier.height(1.dp))
-            DescWithImage(desc = "首頁背景", groupBackground) {
+            DescWithImage(
+                desc = stringResource(id = R.string.group_background),
+                detail = stringResource(id = R.string.group_background_detail),
+                thumbnail = groupBackground
+            ) {
                 AppUserLogger.getInstance().log(Clicked.CreateGroupHomeBackground)
 
                 AppUserLogger.getInstance()
@@ -112,15 +124,11 @@ fun Step3Screen(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "主題色彩",
-                    fontSize = 17.sp,
-                    color = LocalColor.current.text.default_100,
-                    fontWeight = FontWeight.Bold
+                ImageInfoColumn(
+                    description = stringResource(id = R.string.group_theme),
+                    detail = stringResource(id = R.string.group_theme_detail),
+                    modifier = Modifier.weight(1f)
                 )
-
                 if (fanciColor != null) {
                     ThemeColorCardScreen(
                         modifier = Modifier
@@ -185,7 +193,12 @@ fun Step3Screen(
 }
 
 @Composable
-private fun DescWithImage(desc: String, thumbnail: String, onClick: () -> Unit) {
+private fun DescWithImage(
+    desc: String,
+    detail: String,
+    thumbnail: String,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .background(LocalColor.current.background)
@@ -198,12 +211,10 @@ private fun DescWithImage(desc: String, thumbnail: String, onClick: () -> Unit) 
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Text(
-            modifier = Modifier.weight(1f),
-            text = desc,
-            fontSize = 17.sp,
-            color = LocalColor.current.text.default_100,
-            fontWeight = FontWeight.Bold
+        ImageInfoColumn(
+            description = desc,
+            detail = detail,
+            modifier = Modifier.weight(1f)
         )
 
         if (thumbnail.isNotEmpty()) {
@@ -236,7 +247,12 @@ private fun DescWithImage(desc: String, thumbnail: String, onClick: () -> Unit) 
 }
 
 @Composable
-private fun DescWithLogoImage(desc: String, thumbnail: String, onClick: () -> Unit) {
+private fun DescWithLogoImage(
+    desc: String,
+    detail: String,
+    thumbnail: String,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .background(LocalColor.current.background)
@@ -248,12 +264,10 @@ private fun DescWithLogoImage(desc: String, thumbnail: String, onClick: () -> Un
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = desc,
-            fontSize = 17.sp,
-            color = LocalColor.current.text.default_100,
-            fontWeight = FontWeight.Bold
+        ImageInfoColumn(
+            description = desc,
+            detail = detail,
+            modifier = Modifier.weight(1f)
         )
         if (thumbnail.isNotEmpty()) {
             AsyncImage(
@@ -299,4 +313,34 @@ fun Step3ScreenPreview() {
             onPre = {}
         )
     }
+}
+
+@Composable
+fun ImageInfoColumn(
+    description: String,
+    detail: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = description,
+            fontSize = 17.sp,
+            color = LocalColor.current.text.default_100,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = detail,
+            fontSize = 12.sp,
+            color = LocalColor.current.text.default_50,
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ImageInfoColumnPreview() {
+    ImageInfoColumn(
+        description = "社團 Logo",
+        detail = stringResource(id = R.string.group_logo_detail),
+    )
 }
