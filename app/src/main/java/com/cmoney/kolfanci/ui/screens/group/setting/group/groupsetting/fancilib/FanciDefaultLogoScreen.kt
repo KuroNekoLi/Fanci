@@ -87,7 +87,7 @@ fun FanciDefaultLogoView(
                     AsyncImage(
                         model = imageUrl[index],
                         modifier = Modifier
-                            .aspectRatio(375f / 120F)
+                            .aspectRatio(1f)
                             .clickable {
                                 onImageClick.invoke(imageUrl[index])
                             },
