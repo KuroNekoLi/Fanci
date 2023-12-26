@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -66,14 +68,21 @@ fun GroupHeaderScreen(
                 .height(55.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = followGroup.logoImageUrl,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.size(125.dp, 40.dp),
-                contentDescription = null,
-                placeholder = painterResource(id = R.drawable.placeholder)
-            )
-
+            Box(
+                modifier = Modifier
+                    .size(120.dp, 40.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                AsyncImage(
+                    model = followGroup.logoImageUrl,
+                    contentScale = ContentScale.Inside,
+                    modifier = Modifier
+                        .wrapContentWidth(Alignment.Start)
+                        .wrapContentHeight(Alignment.CenterVertically),
+                    contentDescription = null,
+                    placeholder = painterResource(id = R.drawable.placeholder)
+                )
+            }
             Row(
                 modifier = Modifier.weight(1f),
                 horizontalArrangement = Arrangement.End,
