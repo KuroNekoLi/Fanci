@@ -83,6 +83,7 @@ fun CreateGroupScreen(
     ),
     resultRecipient: ResultRecipient<CreateApplyQuestionScreenDestination, String>,
     setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
+    setLogoResult: ResultRecipient<GroupSettingLogoScreenDestination, ImageChangeData>,
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>,
     setThemeResult: ResultRecipient<GroupSettingThemeScreenDestination, String>
 ) {
@@ -266,7 +267,18 @@ fun CreateGroupScreen(
             }
         }
     }
+    //更改Logo
+    setLogoResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
 
+            is NavResult.Value -> {
+                val uri = result.value
+                viewModel.changeGroupLogo(uri)
+            }
+        }
+    }
     //更改頭貼
     setAvatarResult.onNavResult { result ->
         when (result) {

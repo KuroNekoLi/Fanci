@@ -23,6 +23,7 @@ data class GroupSettingUiState(
     val settingGroup: Group? = null,
     val isLoading: Boolean = false,
     val groupAvatarLib: List<String> = emptyList(),         //社團 預設大頭貼 清單
+    val groupLogoLib: List<String> = emptyList(),         //社團 預設Logo 清單
     val groupCoverLib: List<String> = emptyList(),          //社團 預設背景 清單
     val groupThemeList: List<GroupTheme> = emptyList(),     //社團 主題色彩
     val previewTheme: GroupTheme? = null,                   //社團 設定主題 Preview
@@ -79,6 +80,24 @@ class GroupSettingViewModel(
             groupApplyUseCase.getUnApplyCount(groupId = groupId).fold({
                 uiState = uiState.copy(
                     unApplyCount = it.count
+                )
+            }, {
+                KLog.e(TAG, it)
+            })
+        }
+    }
+
+    /**
+     * 抓取 預設Logo 清單
+     */
+    fun fetchFanciLogoLib() {
+        KLog.i(TAG, "fetchFanciLogoLib")
+        viewModelScope.launch {
+            loading()
+            groupUseCase.fetchGroupLogoLib().fold({
+                uiState = uiState.copy(
+                    groupLogoLib = it,
+                    isLoading = false
                 )
             }, {
                 KLog.e(TAG, it)

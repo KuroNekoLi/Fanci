@@ -33,12 +33,12 @@ import com.cmoney.kolfanci.ui.destinations.GroupSettingLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.item.WideItem
 import com.cmoney.kolfanci.ui.screens.shared.item.WideItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -60,6 +60,7 @@ fun GroupSettingSettingScreen(
     setNameResult: ResultRecipient<EditInputScreenDestination, String>,
     setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
     setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
+    setLogoResult: ResultRecipient<GroupSettingLogoScreenDestination, ImageChangeData>,
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>,
     group: Group,
 ) {
@@ -72,6 +73,7 @@ fun GroupSettingSettingScreen(
         setNameResult = setNameResult,
         setDescResult = setDescResult,
         setAvatarResult = setAvatarResult,
+        setLogoResult = setLogoResult,
         setBackgroundResult = setBackgroundResult,
         groupViewModel = globalGroupViewModel
     )
@@ -98,6 +100,7 @@ private fun SetCallbackHandle(
     setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
     groupViewModel: GroupViewModel,
     setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
+    setLogoResult: ResultRecipient<GroupSettingLogoScreenDestination, ImageChangeData>,
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>
 ) {
     //更改名字 callback
@@ -125,7 +128,18 @@ private fun SetCallbackHandle(
             }
         }
     }
+    //更改Logo
+    setLogoResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
 
+            is NavResult.Value -> {
+                val uri = result.value
+                groupViewModel.changeGroupLogo(uri)
+            }
+        }
+    }
     //更改頭貼
     setAvatarResult.onNavResult { result ->
         when (result) {

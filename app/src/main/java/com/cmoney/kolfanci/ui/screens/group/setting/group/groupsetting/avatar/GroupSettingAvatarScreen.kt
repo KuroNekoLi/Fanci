@@ -138,7 +138,7 @@ fun GroupSettingAvatarScreen(
             },
             onAttach = { photoUris ->
                 photoUris.firstOrNull()?.let {
-                    groupSettingImageViewModel.setAvatarImage(it)
+                    groupSettingImageViewModel.setImage(it)
                 }
             },
             onFanciClick = {
