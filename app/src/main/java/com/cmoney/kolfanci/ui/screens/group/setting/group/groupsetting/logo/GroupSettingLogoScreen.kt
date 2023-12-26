@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
@@ -82,8 +83,6 @@ fun GroupSettingLogoScreen(
     var showSaveTip by remember {
         mutableStateOf(false)
     }
-    var cropUri by remember { mutableStateOf<Uri?>(null) } //擷取後圖片的uri
-
     //是否為建立社團開啟
     val isFromCreate = group.id.isNullOrEmpty()
 
@@ -239,9 +238,9 @@ fun GroupSettingLogoView(
                     AsyncImage(
                         model = imageModel,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .width(200.dp)
                             .aspectRatio(375f / 120f),
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.FillBounds,
                         contentDescription = null,
                         placeholder = painterResource(id = R.drawable.placeholder)
                     )

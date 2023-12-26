@@ -248,10 +248,6 @@ private fun DescWithLogoImage(desc: String, thumbnail: String, onClick: () -> Un
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val imageModel = thumbnail.ifEmpty {
-            R.drawable.group_logo_default
-        }
-
         Text(
             modifier = Modifier.weight(1f),
             text = desc,
@@ -259,15 +255,30 @@ private fun DescWithLogoImage(desc: String, thumbnail: String, onClick: () -> Un
             color = LocalColor.current.text.default_100,
             fontWeight = FontWeight.Bold
         )
-
-        AsyncImage(
-            model = imageModel,
-            modifier = Modifier
-                .sizeIn(maxWidth = 125.dp, maxHeight = 40.dp),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            placeholder = painterResource(id = R.drawable.placeholder)
-        )
+        if (thumbnail.isNotEmpty()) {
+            AsyncImage(
+                model = thumbnail,
+                modifier = Modifier
+                    .sizeIn(maxWidth = 125.dp, maxHeight = 40.dp),
+                contentScale = ContentScale.FillBounds,
+                contentDescription = null,
+                placeholder = painterResource(id = R.drawable.placeholder)
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(55.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(LocalColor.current.background)
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(22.dp)
+                        .align(Alignment.Center),
+                    painter = painterResource(id = R.drawable.plus_white), contentDescription = null
+                )
+            }
+        }
     }
 }
 

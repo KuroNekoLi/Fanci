@@ -102,7 +102,7 @@ class CreateGroupViewModel(
             }
 
             2 -> {
-                prepareDefaultAvatarAndCoverAndTheme()
+                prepareDefaultImagesAndTheme()
             }
         }
 
@@ -119,17 +119,25 @@ class CreateGroupViewModel(
         )
     }
 
-    private fun prepareDefaultAvatarAndCoverAndTheme() {
+    private fun prepareDefaultImagesAndTheme() {
         viewModelScope.launch {
-            // 預設第一個 avatar, cover
+            // 預設第一個 avatar, cover, logo
+            val logoImageUrl = groupUseCase.fetchGroupLogoLib()
+                .getOrNull()
+                ?.firstOrNull()
             val thumbnailImageUrl = groupUseCase.fetchGroupAvatarLib()
                 .getOrNull()
                 ?.firstOrNull()
             val coverImageUrl = groupUseCase.fetchGroupCoverLib()
                 .getOrNull()
                 ?.firstOrNull()
+            KLog.i(TAG,"coverImageUrl: $coverImageUrl, thumbnailImageUrl: $thumbnailImageUrl, logoImageUrl: $logoImageUrl")
             _group.update { old ->
-                old.copy(coverImageUrl = coverImageUrl, thumbnailImageUrl = thumbnailImageUrl)
+                old.copy(
+                    coverImageUrl = coverImageUrl,
+                    thumbnailImageUrl = thumbnailImageUrl,
+                    logoImageUrl = logoImageUrl
+                )
             }
             // 預設 theme 為 ColorTheme.themeFanciBlue
             setGroupTheme(ColorTheme.themeFanciBlue.value)
@@ -228,7 +236,10 @@ class CreateGroupViewModel(
     ) {
         val preCreateGroup = _group.value
         KLog.i(TAG, "onCreateGroup:$preCreateGroup")
-
+        if (_group.value.logoImageUrl.isNullOrEmpty()) {
+            sendErrorMsg("請選擇Logo")
+            return
+        }
         if (_group.value.thumbnailImageUrl.isNullOrEmpty()) {
             sendErrorMsg("請選擇圖示")
             return

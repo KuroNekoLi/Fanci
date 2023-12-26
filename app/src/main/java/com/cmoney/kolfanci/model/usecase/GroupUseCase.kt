@@ -29,6 +29,7 @@ import com.cmoney.kolfanci.extension.checkResponseBody
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.mock.MockData
 import com.cmoney.kolfanci.ui.screens.follow.model.GroupItem
+import com.socks.library.KLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -389,6 +390,21 @@ class GroupUseCase(
      */
     suspend fun fetchGroupRole(groupId: String) = kotlin.runCatching {
         groupApi.apiV1GroupGroupIdRoleGet(groupId).checkResponseBody()
+    }
+
+    /**
+     * 抓取 預設 社團Logo圖庫
+     */
+    suspend fun fetchGroupLogoLib() = kotlin.runCatching {
+        KLog.i(
+            "CreateGroupViewModel",
+            "body: ${
+                (defaultImageApi.apiV1DefaultImageGet()
+                    .checkResponseBody().defaultImages).toString()
+            }"
+        )
+        defaultImageApi.apiV1DefaultImageGet().checkResponseBody().defaultImages?.get("003")
+            ?: emptyList()
     }
 
     /**
