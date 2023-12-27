@@ -37,6 +37,7 @@ import com.socks.library.KLog
 fun GroupPhotoPickDialogScreen(
     modifier: Modifier = Modifier,
     isShowFanciPic: Boolean = true,
+    isShowCamera: Boolean = true,
     quantityLimit: Int = AttachImageDefault.getQuantityLimit(),
     onDismiss: () -> Unit,
     onAttach: (List<Uri>) -> Unit,
@@ -110,18 +111,18 @@ fun GroupPhotoPickDialogScreen(
                 ) {
                     startImagePicker()
                 }
-
-                GrayButton(
-                    text = "打開相機",
-                    shape = if (isShowFanciPic) {
-                        RoundedCornerShape(0.dp)
-                    } else {
-                        RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                if (isShowCamera) {
+                    GrayButton(
+                        text = "打開相機",
+                        shape = if (isShowFanciPic) {
+                            RoundedCornerShape(0.dp)
+                        } else {
+                            RoundedCornerShape(bottomStart = 15.dp, bottomEnd = 15.dp)
+                        }
+                    ) {
+                        startCameraPicker()
                     }
-                ) {
-                    startCameraPicker()
                 }
-
                 if (isShowFanciPic) {
                     GrayButton(
                         text = "從Fanci圖庫中選取圖片",

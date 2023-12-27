@@ -29,15 +29,16 @@ import com.cmoney.kolfanci.ui.destinations.EditInputScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingBackgroundScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingDescScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupSettingLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItem
 import com.cmoney.kolfanci.ui.screens.shared.item.NarrowItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.item.WideItem
 import com.cmoney.kolfanci.ui.screens.shared.item.WideItemDefaults
 import com.cmoney.kolfanci.ui.screens.shared.theme.ThemeColorCardScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -59,6 +60,7 @@ fun GroupSettingSettingScreen(
     setNameResult: ResultRecipient<EditInputScreenDestination, String>,
     setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
     setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
+    setLogoResult: ResultRecipient<GroupSettingLogoScreenDestination, ImageChangeData>,
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>,
     group: Group,
 ) {
@@ -71,6 +73,7 @@ fun GroupSettingSettingScreen(
         setNameResult = setNameResult,
         setDescResult = setDescResult,
         setAvatarResult = setAvatarResult,
+        setLogoResult = setLogoResult,
         setBackgroundResult = setBackgroundResult,
         groupViewModel = globalGroupViewModel
     )
@@ -97,6 +100,7 @@ private fun SetCallbackHandle(
     setDescResult: ResultRecipient<GroupSettingDescScreenDestination, String>,
     groupViewModel: GroupViewModel,
     setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
+    setLogoResult: ResultRecipient<GroupSettingLogoScreenDestination, ImageChangeData>,
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>
 ) {
     //更改名字 callback
@@ -104,6 +108,7 @@ private fun SetCallbackHandle(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val changeName = result.value
                 groupViewModel.changeGroupName(name = changeName)
@@ -116,18 +121,31 @@ private fun SetCallbackHandle(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val desc = result.value
                 groupViewModel.changeGroupDesc(desc = desc)
             }
         }
     }
+    //更改Logo
+    setLogoResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
 
+            is NavResult.Value -> {
+                val uri = result.value
+                groupViewModel.changeGroupLogo(uri)
+            }
+        }
+    }
     //更改頭貼
     setAvatarResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val uri = result.value
                 groupViewModel.changeGroupAvatar(uri)
@@ -140,6 +158,7 @@ private fun SetCallbackHandle(
         when (result) {
             is NavResult.Canceled -> {
             }
+
             is NavResult.Value -> {
                 val uri = result.value
                 groupViewModel.changeGroupCover(uri)
@@ -235,7 +254,25 @@ fun GroupSettingSettingView(
                     }
                 )
             }
-
+            //========== 社團Logo ==========
+            item {
+                WideItem(
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .background(LocalColor.current.background)
+                        .padding(WideItemDefaults.paddingValues),
+                    title = stringResource(id = R.string.group_logo),
+                    displayContent = WideItemDefaults.imageDisplay(
+                        model = group.logoImageUrl,
+                        modifier = Modifier
+                            .size(width = 125.dp, height = 40.dp)
+                    ),
+                    onClick = {
+                        KLog.i(TAG, "logo image click")
+                        navController.navigate(GroupSettingLogoScreenDestination(group = group))
+                    }
+                )
+            }
             //========== 社團圖示 ==========
             item {
                 WideItem(

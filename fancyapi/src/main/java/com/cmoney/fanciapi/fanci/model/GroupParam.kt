@@ -29,6 +29,7 @@ import kotlinx.parcelize.Parcelize
  * @param isNeedApproval true: 非公開(需審核)  false: 公開(不用審核)
  * @param coverImageUrl 社團封面
  * @param thumbnailImageUrl 社團縮圖
+ * @param logoImageUrl 社團logo
  * @param colorSchemeGroupKey 
  */
 @Parcelize
@@ -55,6 +56,10 @@ data class GroupParam (
     /* 社團縮圖 */
     @Json(name = "thumbnailImageUrl")
     val thumbnailImageUrl: kotlin.String? = null,
+
+    /* 社團logo */
+    @Json(name = "logoImageUrl")
+    val logoImageUrl: kotlin.String? = null,
 
     @Json(name = "colorSchemeGroupKey")
     val colorSchemeGroupKey: ColorTheme? = null

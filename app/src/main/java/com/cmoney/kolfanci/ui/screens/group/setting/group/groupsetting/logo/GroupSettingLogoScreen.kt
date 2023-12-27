@@ -1,7 +1,6 @@
-package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar
+package com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.logo
 
 import android.net.Uri
-import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,11 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
@@ -26,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -41,7 +39,10 @@ import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.common.TransparentButton
-import com.cmoney.kolfanci.ui.destinations.FanciDefaultAvatarScreenDestination
+import com.cmoney.kolfanci.ui.destinations.FanciDefaultLogoScreenDestination
+import com.cmoney.kolfanci.ui.destinations.LogoCropperScreenDestination
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingImageViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.dialog.GroupPhotoPickDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
@@ -54,40 +55,37 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.socks.library.KLog
-import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 
-@Parcelize
-data class ImageChangeData(
-    val uri: Uri?,
-    val url: String?
-) : Parcelable
-
+/**
+ * 設定社團logo頁
+ * @param fanciDefaultLogoResult 預設圖庫的回調
+ */
 @Destination
 @Composable
-fun GroupSettingAvatarScreen(
+fun GroupSettingLogoScreen(
     modifier: Modifier = Modifier,
     navController: DestinationsNavigator,
     group: Group,
     viewModel: GroupSettingViewModel = koinViewModel(),
     groupSettingImageViewModel: GroupSettingImageViewModel = koinViewModel(),
     resultNavigator: ResultBackNavigator<ImageChangeData>,
-    fanciAvatarResult: ResultRecipient<FanciDefaultAvatarScreenDestination, String>
+    fanciDefaultLogoResult: ResultRecipient<FanciDefaultLogoScreenDestination, String>,
+    fanciLogoResult: ResultRecipient<LogoCropperScreenDestination, Uri>
 ) {
+    val TAG = "GroupSettingLogoScreen"
     var settingGroup by remember {
         mutableStateOf(group)
     }
-
     val uiState = groupSettingImageViewModel.uiState
 
     var showSaveTip by remember {
         mutableStateOf(false)
     }
-
     //是否為建立社團開啟
     val isFromCreate = group.id.isNullOrEmpty()
 
-    fanciAvatarResult.onNavResult { result ->
+    fanciDefaultLogoResult.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {
             }
@@ -96,14 +94,25 @@ fun GroupSettingAvatarScreen(
                 val fanciUrl = result.value
 
                 settingGroup = settingGroup.copy(
-                    thumbnailImageUrl = fanciUrl
+                    logoImageUrl = fanciUrl
                 )
                 groupSettingImageViewModel.resetCameraUri()
             }
         }
     }
+    fanciLogoResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
 
-    GroupSettingAvatarView(
+            is NavResult.Value -> {
+                val resultUri = result.value
+                groupSettingImageViewModel.setImage(resultUri)
+                KLog.i(TAG, "value: ${groupSettingImageViewModel.uiState.image}")
+            }
+        }
+    }
+    GroupSettingLogoView(
         modifier = modifier,
         group = settingGroup,
         isLoading = viewModel.uiState.isLoading,
@@ -114,10 +123,10 @@ fun GroupSettingAvatarScreen(
                 AppUserLogger.getInstance().log(Clicked.Confirm, From.EditGroupIcon)
             }
             resultNavigator.navigateBack(
-                it
+                result = it
             )
         },
-        avatarImage = uiState.image,
+        image = uiState.image,
         openCameraDialog = {
             if (isFromCreate) {
                 AppUserLogger.getInstance().log(Clicked.CreateGroupChangeGroupIconPicture)
@@ -132,18 +141,20 @@ fun GroupSettingAvatarScreen(
 
     if (uiState.openCameraDialog) {
         GroupPhotoPickDialogScreen(
+            isShowCamera = false,
             quantityLimit = 1,
             onDismiss = {
                 groupSettingImageViewModel.closeCameraDialog()
             },
+            //當相簿的照片被選取時
             onAttach = { photoUris ->
                 photoUris.firstOrNull()?.let {
-                    groupSettingImageViewModel.setImage(it)
+                    navController.navigate(LogoCropperScreenDestination(photoUri = it))
                 }
             },
             onFanciClick = {
                 groupSettingImageViewModel.closeCameraDialog()
-                navController.navigate(FanciDefaultAvatarScreenDestination)
+                navController.navigate(FanciDefaultLogoScreenDestination)
             }
         )
     }
@@ -166,25 +177,25 @@ fun GroupSettingAvatarScreen(
 }
 
 @Composable
-fun GroupSettingAvatarView(
+fun GroupSettingLogoView(
     modifier: Modifier = Modifier,
     group: Group,
     isLoading: Boolean,
     onImageChange: (ImageChangeData) -> Unit,
-    avatarImage: Uri?,
+    image: Uri?,
     openCameraDialog: () -> Unit,
     onBack: () -> Unit
 ) {
-    val TAG = "GroupSettingAvatarView"
+    val TAG = "GroupSettingLogoView"
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             EditToolbarScreen(
-                title = stringResource(id = R.string.group_avatar),
+                title = stringResource(id = R.string.group_logo),
                 saveClick = {
-                    KLog.i(TAG, "on image save click.")
-                    avatarImage?.let {
+                    KLog.i(TAG, "on logo save click.")
+                    image?.let {
                         onImageChange.invoke(
                             ImageChangeData(
                                 uri = it,
@@ -195,7 +206,7 @@ fun GroupSettingAvatarView(
                         onImageChange.invoke(
                             ImageChangeData(
                                 uri = null,
-                                url = group.thumbnailImageUrl.orEmpty()
+                                url = group.logoImageUrl.orEmpty()
                             )
                         )
                     }
@@ -220,16 +231,14 @@ fun GroupSettingAvatarView(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val imageModel = avatarImage ?: group.thumbnailImageUrl
+                val imageModel = image ?: group.logoImageUrl
 
                 imageModel?.let {
                     AsyncImage(
                         model = imageModel,
                         modifier = Modifier
-                            .size(182.dp)
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(60.dp)),
-                        contentScale = ContentScale.Crop,
+                            .aspectRatio(375f / 120f),
+                        contentScale = ContentScale.FillBounds,
                         contentDescription = null,
                         placeholder = painterResource(id = R.drawable.placeholder)
                     )
@@ -237,9 +246,8 @@ fun GroupSettingAvatarView(
                     //Empty View
                     Box(
                         modifier = Modifier
-                            .size(182.dp)
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(60.dp))
+                            .fillMaxWidth()
+                            .aspectRatio(375f / 120f)
                             .background(colorResource(id = R.color.color_D9D9D9))
                     )
                 }
@@ -255,7 +263,7 @@ fun GroupSettingAvatarView(
 
             //========== 儲存 ==========
             TransparentButton(
-                text = "更換圖片"
+                text = "變更圖片"
             ) {
                 KLog.i(TAG, "button click.")
                 openCameraDialog.invoke()
@@ -266,16 +274,15 @@ fun GroupSettingAvatarView(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun GroupSettingAvatarScreenPreview() {
+fun GroupSettingLogoScreenPreview() {
     FanciTheme {
-        GroupSettingAvatarView(
+        GroupSettingLogoView(
             group = Group(),
             isLoading = true,
             onImageChange = {},
-            avatarImage = null,
+            image = null,
             openCameraDialog = {}
         ) {}
     }

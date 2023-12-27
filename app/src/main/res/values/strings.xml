@@ -341,4 +341,10 @@
     <string name="chat_attachment_limit_text">若需要多種檔案\n請分成多則訊息</string>
 
     <string name="voting_end">投票已結束</string>
+    <string name="group_logo">社團 Logo</string>
+    <string name="group_logo_detail">側欄的圖示，讓社團成員一眼就認出你</string>
+    <string name="group_avatar_detail">社團主頁的背景，把社團佈置的漂漂亮亮亮亮</string>
+    <string name="group_theme">佈景主題</string>
+    <string name="group_theme_detail">多種顏色的佈景主題，打造你的獨一無二</string>
+    <string name="group_background_detail">社團主頁的背景，把社團佈置的漂漂亮亮</string>
 </resources>

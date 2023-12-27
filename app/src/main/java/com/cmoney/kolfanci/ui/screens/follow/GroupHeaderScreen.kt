@@ -10,7 +10,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -68,12 +66,14 @@ fun GroupHeaderScreen(
                 .height(55.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.fanci),
+            AsyncImage(
+                model = followGroup.logoImageUrl,
+                contentScale = ContentScale.Inside,
+                alignment = Alignment.CenterStart,
+                modifier = Modifier
+                    .size(120.dp, 40.dp),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(
-                    color = LocalColor.current.primary
-                )
+                placeholder = painterResource(id = R.drawable.placeholder)
             )
 
             Row(

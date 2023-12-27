@@ -1,17 +1,14 @@
 package com.cmoney.fanciapi.fanci.api
 
-import com.cmoney.fanciapi.infrastructure.CollectionFormats.*
-import retrofit2.http.*
-import retrofit2.Response
-import okhttp3.RequestBody
-import com.squareup.moshi.Json
-
 import com.cmoney.fanciapi.fanci.model.FanciRole
 import com.cmoney.fanciapi.fanci.model.GroupMember
 import com.cmoney.fanciapi.fanci.model.GroupMemberRoleInfos
 import com.cmoney.fanciapi.fanci.model.PurchasedRole
 import com.cmoney.fanciapi.fanci.model.RoleIdsParam
 import com.cmoney.fanciapi.fanci.model.UseridsParam
+import com.cmoney.fanciapi.infrastructure.CollectionFormats.*
+import retrofit2.Response
+import retrofit2.http.*
 
 interface RoleUserApi {
     /**
@@ -78,7 +75,7 @@ interface RoleUserApi {
      * @param roleIdsParam 使用者清單 (optional)
      * @return [Unit]
      */
-    @HTTP(method = "DELETE", path = "api/v1/RoleUser/Group/{groupId}/Member/{userId}", hasBody = true)
+    @DELETE("api/v1/RoleUser/Group/{groupId}/Member/{userId}")
     suspend fun apiV1RoleUserGroupGroupIdMemberUserIdDelete(@Path("groupId") groupId: kotlin.String, @Path("userId") userId: kotlin.String, @Body roleIdsParam: RoleIdsParam? = null): Response<Unit>
 
     /**
