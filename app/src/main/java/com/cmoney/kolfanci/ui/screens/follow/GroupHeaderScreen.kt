@@ -67,7 +67,7 @@ fun GroupHeaderScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = followGroup.logoImageUrl,
+                model = if (followGroup.logoImageUrl.isNullOrEmpty()) R.drawable.group_logo_default else followGroup.logoImageUrl,
                 contentScale = ContentScale.Inside,
                 alignment = Alignment.CenterStart,
                 modifier = Modifier
