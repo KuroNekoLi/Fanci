@@ -66,27 +66,15 @@ fun GroupHeaderScreen(
                 .height(55.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (followGroup.logoImageUrl.isNullOrEmpty()) {
-                AsyncImage(
-                    model = R.drawable.group_logo_default,
-                    contentScale = ContentScale.Inside,
-                    alignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .size(91.dp, 27.dp),
-                    contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.placeholder)
-                )
-            } else {
-                AsyncImage(
-                    model = followGroup.logoImageUrl,
-                    contentScale = ContentScale.Inside,
-                    alignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .size(120.dp, 40.dp),
-                    contentDescription = null,
-                    placeholder = painterResource(id = R.drawable.placeholder)
-                )
-            }
+            AsyncImage(
+                model = if (followGroup.logoImageUrl.isNullOrEmpty()) R.drawable.group_logo_default else followGroup.logoImageUrl,
+                contentScale = ContentScale.Inside,
+                alignment = Alignment.CenterStart,
+                modifier = Modifier
+                    .size(120.dp, 40.dp),
+                contentDescription = null,
+                placeholder = painterResource(id = R.drawable.placeholder)
+            )
 
             Row(
                 modifier = Modifier.weight(1f),
