@@ -334,6 +334,40 @@ class GroupViewModel(
     }
 
     /**
+     * 更換社團 Logo
+     */
+    fun changeGroupLogo(data: ImageChangeData) {
+        KLog.i(TAG, "changeGroupLogo")
+        val group = _currentGroup.value ?: return
+        viewModelScope.launch {
+            var uri: Any? = data.uri
+            if (uri == null) {
+                uri = data.url
+            }
+            uri?.let {
+                groupUseCase.changeGroupLogo(uri, group).collect {
+                    _currentGroup.value = group.copy(
+                        logoImageUrl = it
+                    )
+
+                    //refresh group list
+                    _myGroupList.value = _myGroupList.value.map { groupItem ->
+                        if (groupItem.groupModel.id == group.id) {
+                            groupItem.copy(
+                                groupModel = groupItem.groupModel.copy(
+                                    logoImageUrl = it
+                                )
+                            )
+                        } else {
+                            groupItem
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 更換社團 頭貼
      */
     fun changeGroupAvatar(data: ImageChangeData) {

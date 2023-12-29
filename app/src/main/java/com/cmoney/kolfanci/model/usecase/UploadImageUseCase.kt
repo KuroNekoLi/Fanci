@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.model.usecase
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import com.cmoney.backend2.centralizedimage.service.CentralizedImageWeb
@@ -8,6 +9,7 @@ import com.cmoney.backend2.centralizedimage.service.api.upload.GenreAndSubGenre
 import com.cmoney.backend2.centralizedimage.service.api.upload.UploadResponseBody
 import com.cmoney.compress_image.CompressSetting
 import com.cmoney.compress_image.resizeAndCompressAndRotateImage
+import com.cmoney.kolfanci.extension.getFileType
 import com.cmoney.kolfanci.extension.toUploadFileItem
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.socks.library.KLog
@@ -17,6 +19,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.util.Calendar
 
 private const val IMAGE_SIZE = 1024 * 1024  //1MB
 
@@ -64,13 +67,26 @@ class UploadImageUseCase(
     private suspend fun fetchImageUrl(uri: Uri): UploadResponseBody? {
         val imageFile = createUploadFile(uri, context)
         imageFile?.let {
-            val compressFile = resizeAndCompressAndRotateImage(
-                setting = CompressSetting(
+            val fileType = uri.getFileType(context)
+            val compressSetting = if (fileType == "image/png") {
+                CompressSetting(
+                    contentFile = imageFile,
+                    format = Bitmap.CompressFormat.PNG,
+                    compressedFileName = "%s.png".format(
+                        "CMoney_${Calendar.getInstance().timeInMillis}"
+                    ),
+                    compressedFolder = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!,
+                    maxImageSize = IMAGE_SIZE
+                )
+            } else {
+                CompressSetting(
                     contentFile = imageFile,
                     compressedFolder = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!,
                     maxImageSize = IMAGE_SIZE
                 )
-            )
+            }
+
+            val compressFile = resizeAndCompressAndRotateImage(compressSetting)
 
             return centralizedImageWeb.upload(
                 GenreAndSubGenre.AttachmentBlog, compressFile
@@ -80,6 +96,7 @@ class UploadImageUseCase(
             throw Exception(errMsg)
         }
     }
+
 
     /**
      * change uri to file.

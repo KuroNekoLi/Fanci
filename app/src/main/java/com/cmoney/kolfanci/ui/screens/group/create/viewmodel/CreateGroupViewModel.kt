@@ -93,15 +93,16 @@ class CreateGroupViewModel(
     fun nextStep() {
         //step1 to next, check group name
         val currentStepValue = _currentStep.value
-        when(currentStepValue) {
+        when (currentStepValue) {
             1 -> {
                 if (_group.value.name.isNullOrEmpty()) {
                     sendErrorMsg("請輸入社團名稱")
                     return
                 }
             }
+
             2 -> {
-                prepareDefaultAvatarAndCoverAndTheme()
+                prepareDefaultImagesAndTheme()
             }
         }
 
@@ -118,20 +119,48 @@ class CreateGroupViewModel(
         )
     }
 
-    private fun prepareDefaultAvatarAndCoverAndTheme() {
+    private fun prepareDefaultImagesAndTheme() {
         viewModelScope.launch {
-            // 預設第一個 avatar, cover
+            // 預設第一個 avatar, cover, logo
+            val logoImageUrl = groupUseCase.fetchGroupLogoLib()
+                .getOrNull()
+                ?.firstOrNull()
             val thumbnailImageUrl = groupUseCase.fetchGroupAvatarLib()
                 .getOrNull()
                 ?.firstOrNull()
             val coverImageUrl = groupUseCase.fetchGroupCoverLib()
                 .getOrNull()
                 ?.firstOrNull()
+            KLog.i(TAG,"coverImageUrl: $coverImageUrl, thumbnailImageUrl: $thumbnailImageUrl, logoImageUrl: $logoImageUrl")
             _group.update { old ->
-                old.copy(coverImageUrl = coverImageUrl, thumbnailImageUrl = thumbnailImageUrl)
+                old.copy(
+                    coverImageUrl = coverImageUrl,
+                    thumbnailImageUrl = thumbnailImageUrl,
+                    logoImageUrl = logoImageUrl
+                )
             }
             // 預設 theme 為 ColorTheme.themeFanciBlue
             setGroupTheme(ColorTheme.themeFanciBlue.value)
+        }
+    }
+
+    /**
+     * 設定 Logo
+     */
+    fun changeGroupLogo(data: ImageChangeData) {
+        KLog.i(TAG, "changeGroupLogo")
+        viewModelScope.launch {
+            var imageUrl = data.url.orEmpty()
+            if (data.uri != null) {
+                imageUrl = withContext(Dispatchers.IO) {
+                    val uploadResult = uploadImageUseCase.uploadImage(listOf(data.uri)).first()
+                    uploadResult.second
+                }
+            }
+
+            _group.value = _group.value.copy(
+                logoImageUrl = imageUrl
+            )
         }
     }
 
@@ -207,7 +236,10 @@ class CreateGroupViewModel(
     ) {
         val preCreateGroup = _group.value
         KLog.i(TAG, "onCreateGroup:$preCreateGroup")
-
+        if (_group.value.logoImageUrl.isNullOrEmpty()) {
+            sendErrorMsg("請選擇Logo")
+            return
+        }
         if (_group.value.thumbnailImageUrl.isNullOrEmpty()) {
             sendErrorMsg("請選擇圖示")
             return
@@ -231,6 +263,7 @@ class CreateGroupViewModel(
                 isNeedApproval = isNeedApproval,
                 coverImageUrl = _group.value.coverImageUrl.orEmpty(),
                 thumbnailImageUrl = _group.value.thumbnailImageUrl.orEmpty(),
+                logoImageUrl = _group.value.logoImageUrl.orEmpty(),
                 themeId = preCreateGroup.colorSchemeGroupKey?.value.orEmpty()
             ).fold({ createdGroup ->
                 KLog.i(TAG, "createGroup success")

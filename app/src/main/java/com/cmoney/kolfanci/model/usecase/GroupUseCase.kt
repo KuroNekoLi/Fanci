@@ -62,8 +62,7 @@ class GroupUseCase(
                 MockData.mockGroupMember,
                 MockData.mockGroupMember
             )
-        }
-        else {
+        } else {
             groupMemberApi.apiV1GroupMemberGroupGroupIdUsersPost(
                 groupId = groupId,
                 useridsParam = UseridsParam(
@@ -145,6 +144,7 @@ class GroupUseCase(
         description: String = "",
         isNeedApproval: Boolean,
         coverImageUrl: String,
+        logoImageUrl: String,
         thumbnailImageUrl: String,
         themeId: String
     ) = kotlin.runCatching {
@@ -155,6 +155,7 @@ class GroupUseCase(
                 isNeedApproval = isNeedApproval,
                 coverImageUrl = coverImageUrl,
                 thumbnailImageUrl = thumbnailImageUrl,
+                logoImageUrl = logoImageUrl,
                 colorSchemeGroupKey = ColorTheme.decode(themeId)
             )
         ).checkResponseBody()
@@ -391,6 +392,14 @@ class GroupUseCase(
     }
 
     /**
+     * 抓取 預設 社團Logo圖庫
+     */
+    suspend fun fetchGroupLogoLib() = kotlin.runCatching {
+        defaultImageApi.apiV1DefaultImageGet().checkResponseBody().defaultImages?.get("003")
+            ?: emptyList()
+    }
+
+    /**
      * 抓取 預設 大頭貼圖庫
      */
     suspend fun fetchGroupAvatarLib() = kotlin.runCatching {
@@ -412,29 +421,9 @@ class GroupUseCase(
      * @param group 社團 model
      */
     suspend fun changeGroupBackground(uri: Any, group: Group): Flow<String> {
-        return flow {
-            var imageUrl = ""
-            if (uri is Uri) {
-                val uploadResult = uploadImageUseCase.uploadImage(listOf(uri)).first()
-                imageUrl = uploadResult.second
-                emit(imageUrl)
-            } else if (uri is String) {
-                imageUrl = uri
-                emit(uri)
-            }
-
-            if (imageUrl.isNotEmpty()) {
-                groupApi.apiV1GroupGroupIdPut(
-                    groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
-                        name = group.name.orEmpty(),
-                        description = group.description,
-                        coverImageUrl = imageUrl,
-                        thumbnailImageUrl = group.thumbnailImageUrl,
-                        colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
-                    )
-                )
-            }
-        }.flowOn(Dispatchers.IO)
+        return changeGroupImage(uri, group) { imageUrl ->
+            createEditGroupParam(group, coverImageUrl = imageUrl)
+        }
     }
 
     /**
@@ -443,29 +432,20 @@ class GroupUseCase(
      * @param group 社團 model
      */
     suspend fun changeGroupAvatar(uri: Any, group: Group): Flow<String> {
-        return flow {
-            var imageUrl = ""
-            if (uri is Uri) {
-                val uploadResult = uploadImageUseCase.uploadImage(listOf(uri)).first()
-                imageUrl = uploadResult.second
-                emit(imageUrl)
-            } else if (uri is String) {
-                imageUrl = uri
-                emit(uri)
-            }
+        return changeGroupImage(uri, group) { imageUrl ->
+            createEditGroupParam(group, thumbnailImageUrl = imageUrl)
+        }
+    }
 
-            if (imageUrl.isNotEmpty()) {
-                groupApi.apiV1GroupGroupIdPut(
-                    groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
-                        name = group.name.orEmpty(),
-                        description = group.description,
-                        coverImageUrl = group.coverImageUrl,
-                        thumbnailImageUrl = imageUrl,
-                        colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
-                    )
-                )
-            }
-        }.flowOn(Dispatchers.IO)
+    /**
+     * 更換 社團 Logo
+     * @param uri 圖片Uri, or 網址 (Fanci 預設)
+     * @param group 社團 model
+     */
+    suspend fun changeGroupLogo(uri: Any, group: Group): Flow<String> {
+        return changeGroupImage(uri, group) { imageUrl ->
+            createEditGroupParam(group, logoImageUrl = imageUrl)
+        }
     }
 
     /**
@@ -475,13 +455,7 @@ class GroupUseCase(
      */
     suspend fun changeGroupDesc(desc: String, group: Group) = kotlin.runCatching {
         groupApi.apiV1GroupGroupIdPut(
-            groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
-                name = group.name.orEmpty(),
-                description = desc,
-                coverImageUrl = group.coverImageUrl,
-                thumbnailImageUrl = group.thumbnailImageUrl,
-                colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
-            )
+            groupId = group.id.orEmpty(), editGroupParam = createEditGroupParam(group, desc = desc)
         ).checkResponseBody()
     }
 
@@ -492,13 +466,7 @@ class GroupUseCase(
      */
     suspend fun changeGroupName(name: String, group: Group) = kotlin.runCatching {
         groupApi.apiV1GroupGroupIdPut(
-            groupId = group.id.orEmpty(), editGroupParam = EditGroupParam(
-                name = name,
-                description = group.description,
-                coverImageUrl = group.coverImageUrl,
-                thumbnailImageUrl = group.thumbnailImageUrl,
-                colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value)
-            )
+            groupId = group.id.orEmpty(), editGroupParam = createEditGroupParam(group, name = name)
         ).checkResponseBody()
     }
 
@@ -573,5 +541,52 @@ class GroupUseCase(
             groupMemberApi.apiV1GroupMemberGroupGroupIdMeDelete(groupId = id)
                 .checkResponseBody()
         }
+    }
+
+    private fun createEditGroupParam(
+        group: Group,
+        name: String? = null,
+        desc: String? = null,
+        coverImageUrl: String? = null,
+        logoImageUrl: String? = null,
+        thumbnailImageUrl: String? = null
+    ): EditGroupParam {
+        return EditGroupParam(
+            name = name ?: group.name.orEmpty(),
+            description = desc ?: group.description,
+            coverImageUrl = coverImageUrl ?: group.coverImageUrl,
+            thumbnailImageUrl = thumbnailImageUrl ?: group.thumbnailImageUrl,
+            colorSchemeGroupKey = ColorTheme.decode(group.colorSchemeGroupKey?.value),
+            logoImageUrl = logoImageUrl ?: group.logoImageUrl
+        )
+    }
+
+    private suspend fun processUriAndGetImageUrl(uri: Any): String {
+        return when (uri) {
+            is Uri -> {
+                val uploadResult = uploadImageUseCase.uploadImage(listOf(uri)).first()
+                uploadResult.second
+            }
+
+            is String -> uri
+            else -> ""
+        }
+    }
+
+    private suspend fun changeGroupImage(
+        uri: Any,
+        group: Group,
+        editParam: (String) -> EditGroupParam
+    ): Flow<String> {
+        return flow {
+            val imageUrl = processUriAndGetImageUrl(uri)
+            if (imageUrl.isNotEmpty()) {
+                emit(imageUrl)
+                groupApi.apiV1GroupGroupIdPut(
+                    groupId = group.id.orEmpty(),
+                    editGroupParam = editParam(imageUrl)
+                )
+            }
+        }.flowOn(Dispatchers.IO)
     }
 }

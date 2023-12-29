@@ -16,8 +16,8 @@ android {
         applicationId "com.cmoney.kolfanci"
         minSdk 24
         targetSdk 34
-        versionCode 11
-        versionName "1.0.14.0"
+        versionCode 12
+        versionName "1.0.15.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -103,6 +103,7 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:2.8.1"
     implementation("androidx.room:room-runtime:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
+    implementation 'androidx.media3:media3-effect:1.2.0'
     ksp("androidx.room:room-compiler:2.5.2")
 
     //==================== Media ====================
@@ -210,6 +211,9 @@ dependencies {
     //=============== Pdf viewer ===============
     implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
 
+    //=============== Image cropper ===============
+    def image_cropper_version = "0.4.0"
+    implementation "com.github.SmartToolFactory:Compose-Cropper:$image_cropper_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

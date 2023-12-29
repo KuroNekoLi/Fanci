@@ -45,15 +45,16 @@ import com.cmoney.kolfanci.model.analytics.AppUserLogger
 import com.cmoney.kolfanci.ui.destinations.CreateApplyQuestionScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingAvatarScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingBackgroundScreenDestination
+import com.cmoney.kolfanci.ui.destinations.GroupSettingLogoScreenDestination
 import com.cmoney.kolfanci.ui.destinations.GroupSettingThemeScreenDestination
 import com.cmoney.kolfanci.ui.destinations.MainScreenDestination
 import com.cmoney.kolfanci.ui.screens.group.create.viewmodel.CreateGroupViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.ImageChangeData
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.TipDialog
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
-import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.EditDialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.SaveConfirmDialogScreen
+import com.cmoney.kolfanci.ui.screens.shared.toolbar.TopBarScreen
 import com.cmoney.kolfanci.ui.theme.FanciColor
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
@@ -82,6 +83,7 @@ fun CreateGroupScreen(
     ),
     resultRecipient: ResultRecipient<CreateApplyQuestionScreenDestination, String>,
     setAvatarResult: ResultRecipient<GroupSettingAvatarScreenDestination, ImageChangeData>,
+    setLogoResult: ResultRecipient<GroupSettingLogoScreenDestination, ImageChangeData>,
     setBackgroundResult: ResultRecipient<GroupSettingBackgroundScreenDestination, ImageChangeData>,
     setThemeResult: ResultRecipient<GroupSettingThemeScreenDestination, String>
 ) {
@@ -138,9 +140,11 @@ fun CreateGroupScreen(
                     KLog.i(TAG, "step2 next click.")
                     AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupOpenness)
                 }
+
                 else -> {
                     KLog.i(TAG, "step3 next click.")
-                    AppUserLogger.getInstance().log(Clicked.CreateGroupNextStep, From.GroupArrangement)
+                    AppUserLogger.getInstance()
+                        .log(Clicked.CreateGroupNextStep, From.GroupArrangement)
                 }
             }
 
@@ -158,9 +162,11 @@ fun CreateGroupScreen(
                     KLog.i(TAG, "step2 back click.")
                     AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupOpenness)
                 }
+
                 else -> {
                     KLog.i(TAG, "step3 back click.")
-                    AppUserLogger.getInstance().log(Clicked.CreateGroupBackward, From.GroupArrangement)
+                    AppUserLogger.getInstance()
+                        .log(Clicked.CreateGroupBackward, From.GroupArrangement)
                 }
             }
 
@@ -185,7 +191,8 @@ fun CreateGroupScreen(
     if (showDialog.value) {
         TipDialog(
             onAddTopic = {
-                AppUserLogger.getInstance().log(Clicked.CreateGroupAddQuestionPopup, From.AddQuestion)
+                AppUserLogger.getInstance()
+                    .log(Clicked.CreateGroupAddQuestionPopup, From.AddQuestion)
                 navigator.navigate(
                     CreateApplyQuestionScreenDestination(
                         keyinTracking = Clicked.CreateGroupQuestionKeyin.eventName,
@@ -260,7 +267,18 @@ fun CreateGroupScreen(
             }
         }
     }
+    //更改Logo
+    setLogoResult.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {
+            }
 
+            is NavResult.Value -> {
+                val uri = result.value
+                viewModel.changeGroupLogo(uri)
+            }
+        }
+    }
     //更改頭貼
     setAvatarResult.onNavResult { result ->
         when (result) {
@@ -412,9 +430,17 @@ private fun CreateGroupScreenView(
                     //step 3.
                     3 -> {
                         Step3Screen(
+                            groupLogo = settingGroup.logoImageUrl.orEmpty(),
                             groupIcon = settingGroup.thumbnailImageUrl.orEmpty(),
                             groupBackground = settingGroup.coverImageUrl.orEmpty(),
                             fanciColor = fanciColor,
+                            onChangeLogo = {
+                                navController.navigate(
+                                    GroupSettingLogoScreenDestination(
+                                        group = settingGroup
+                                    )
+                                )
+                            },
                             onChangeIcon = {
                                 navController.navigate(
                                     GroupSettingAvatarScreenDestination(

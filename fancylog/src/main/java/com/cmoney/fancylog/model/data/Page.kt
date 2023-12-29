@@ -2,7 +2,7 @@ package com.cmoney.fancylog.model.data
 
 /**
  * 頁面事件
- * 
+ *
  * @property eventName 事件名稱
  */
 sealed class Page(val eventName: String) {

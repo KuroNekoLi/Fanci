@@ -16,7 +16,7 @@ import com.cmoney.kolfanci.ui.screens.group.search.viewmodel.DiscoverViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.apply.viewmodel.GroupApplyViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.ban.viewmodel.BanListViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.channel.viewmodel.ChannelSettingViewModel
-import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingAvatarViewModel
+import com.cmoney.kolfanci.ui.screens.group.setting.group.groupsetting.avatar.GroupSettingImageViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.notification.NotificationSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.group.openness.viewmodel.GroupOpennessViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.member.role.viewmodel.RoleManageViewModel
@@ -100,7 +100,7 @@ val viewModule = module {
         )
     }
     viewModel {
-        GroupSettingAvatarViewModel()
+        GroupSettingImageViewModel()
     }
     viewModel {
         RoleViewModel(get(), get(), get())
