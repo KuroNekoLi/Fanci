@@ -1,15 +1,15 @@
 package com.cmoney.kolfanci.utils
 
-import android.net.Uri
 import android.util.Patterns
-import android.webkit.MimeTypeMap
 import androidx.annotation.DrawableRes
-import com.cmoney.kolfanci.R
 import com.cmoney.fanciapi.fanci.model.Emojis
 import com.cmoney.fanciapi.fanci.model.IEmojiCount
 import com.cmoney.fanciapi.fanci.model.ReportReason
+import com.cmoney.kolfanci.R
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import java.util.regex.Matcher
 
 class Utils {
@@ -242,8 +242,7 @@ class Utils {
 
                 val xorResult = performXOR(finalString, key)
                 return xorResult.toInt(2)
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
             return null
@@ -259,6 +258,18 @@ class Utils {
                 result.append(if (bit1 == bit2) '0' else '1')
             }
             return result.toString()
+        }
+
+        /**
+         * 比較兩個Long時間是否在同一分鐘
+         */
+        fun areTimestampsInSameMinute(timestamp1: Long, timestamp2: Long): Boolean {
+            val dateFormat = SimpleDateFormat("yyyyMMddHHmm", Locale.getDefault())
+
+            val dateStr1 = dateFormat.format(Date(timestamp1))
+            val dateStr2 = dateFormat.format(Date(timestamp2))
+
+            return dateStr1 == dateStr2
         }
     }
 }

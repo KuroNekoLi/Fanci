@@ -47,10 +47,7 @@ import com.cmoney.fanciapi.fanci.model.Voting
 import com.cmoney.fancylog.model.data.Clicked
 import com.cmoney.fancylog.model.data.From
 import com.cmoney.kolfanci.R
-import com.cmoney.kolfanci.extension.getDuration
-import com.cmoney.kolfanci.extension.getFileName
 import com.cmoney.kolfanci.extension.goAppStore
-import com.cmoney.kolfanci.extension.toAttachmentType
 import com.cmoney.kolfanci.extension.toColor
 import com.cmoney.kolfanci.extension.toUploadFileItemMap
 import com.cmoney.kolfanci.model.ChatMessageWrapper
@@ -111,6 +108,7 @@ sealed class MessageContentCallback {
 
 /**
  * 聊天內容 item
+ * @param collapsed 此訊息是否應該被折疊
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,7 +119,8 @@ fun MessageContentScreen(
     chatMessageWrapper: ChatMessageWrapper,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onMessageContentCallback: (MessageContentCallback) -> Unit,
-    onReSendClick: (ChatMessageWrapper) -> Unit
+    onReSendClick: (ChatMessageWrapper) -> Unit,
+    collapsed: Boolean = false
 ) {
     val contentPaddingModifier = Modifier.padding(top = 10.dp, start = 40.dp, end = 10.dp)
     val defaultColor = LocalColor.current.env_80
@@ -163,7 +162,7 @@ fun MessageContentScreen(
         }
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .alpha(
                     //發送失敗 淡化訊息
                     if (chatMessageWrapper.isPendingSendMessage) {
@@ -172,7 +171,10 @@ fun MessageContentScreen(
                         1f
                     }
                 )
-                .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
+                .padding(
+                    start = 20.dp,
+                    end = 20.dp
+                )
                 .fillMaxWidth()
         ) {
             when (chatMessageWrapper.messageType) {
@@ -245,30 +247,33 @@ fun MessageContentScreen(
                 }
                 //普通內文
                 ChatMessageWrapper.MessageType.Default -> {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        //大頭貼
-                        messageModel.author?.let {
-                            val firstRoleColorName = it.roleInfos?.firstOrNull()?.color
+                    if (!collapsed) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            //大頭貼
+                            messageModel.author?.let {
+                                val firstRoleColorName = it.roleInfos?.firstOrNull()?.color
 
-                            val roleColor = LocalColor.current.roleColor.colors.filter { color ->
-                                color.name == firstRoleColorName
-                            }.map { fanciColor ->
-                                fanciColor.hexColorCode?.toColor()
-                                    ?: LocalColor.current.text.default_100
-                            }.firstOrNull()
+                                val roleColor =
+                                    LocalColor.current.roleColor.colors.filter { color ->
+                                        color.name == firstRoleColorName
+                                    }.map { fanciColor ->
+                                        fanciColor.hexColorCode?.toColor()
+                                            ?: LocalColor.current.text.default_100
+                                    }.firstOrNull()
 
-                            ChatUsrAvatarScreen(
-                                user = it,
-                                nickNameColor = roleColor ?: LocalColor.current.text.default_100
+                                ChatUsrAvatarScreen(
+                                    user = it,
+                                    nickNameColor = roleColor ?: LocalColor.current.text.default_100
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(10.dp))
+                            //發文時間
+                            ChatTimeText(
+                                Utils.getDisplayTime(
+                                    messageModel.createUnixTime?.times(1000) ?: 0
+                                )
                             )
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        //發文時間
-                        ChatTimeText(
-                            Utils.getDisplayTime(
-                                messageModel.createUnixTime?.times(1000) ?: 0
-                            )
-                        )
                     }
 
                     //Reply

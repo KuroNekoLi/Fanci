@@ -47,6 +47,7 @@ import com.cmoney.kolfanci.ui.screens.shared.dialog.MessageReSendDialogScreen
 import com.cmoney.kolfanci.ui.screens.vote.viewmodel.VoteViewModel
 import com.cmoney.kolfanci.ui.theme.FanciTheme
 import com.cmoney.kolfanci.ui.theme.LocalColor
+import com.cmoney.kolfanci.utils.Utils
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.socks.library.KLog
@@ -155,7 +156,8 @@ fun MessageScreen(
                     messageViewModel.pollingScopeMessage(
                         channelId = channelId,
                         startItemIndex = firstItemIndex,
-                        lastIndex = columnEndPosition)
+                        lastIndex = columnEndPosition
+                    )
                 }
             }
     }
@@ -205,6 +207,7 @@ private fun MessageScreenView(
         LazyColumn(state = listState, reverseLayout = true) {
             if (message.isNotEmpty()) {
                 itemsIndexed(message) { index, chatMessageWrapper ->
+                    var collapsed = false
                     var isBlocking = false
                     chatMessageWrapper.message.author?.id?.let { authUserId ->
                         isBlocking = blockingList.contains(authUserId)
@@ -215,6 +218,20 @@ private fun MessageScreenView(
                         isBlocker = blockerList.contains(authUserId)
                     }
 
+                    if (index < message.size - 1) {
+                        val previousCreatedTime =
+                            message[index + 1].message.createUnixTime?.times(1000) ?: 0
+                        val currentCreatedTime =
+                            message[index].message.createUnixTime?.times(1000) ?: 0
+                        val currentAuthor = message[index].message.author
+                        val previousAuthor = message[index + 1].message.author
+                        val isAuthorTheSame = currentAuthor == previousAuthor
+                        collapsed = Utils.areTimestampsInSameMinute(
+                            currentCreatedTime,
+                            previousCreatedTime
+                        ) && isAuthorTheSame
+                    }
+
                     MessageContentScreen(
                         channelId = channelId,
                         navController = navController,
@@ -222,6 +239,7 @@ private fun MessageScreenView(
                             isBlocking = isBlocking,
                             isBlocker = isBlocker
                         ),
+                        collapsed = collapsed,
                         coroutineScope = coroutineScope,
                         onReSendClick = {
                             onReSendClick.invoke(it)
