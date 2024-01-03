@@ -51,6 +51,7 @@ import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioRecorderBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
@@ -378,15 +379,25 @@ fun ChatRoomScreen(
         )
         messageViewModel.announceRouteDone()
     }
+    //錄音sheet控制
+    var showAudioRecorderBottomSheet by remember { mutableStateOf(false) }
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
         navController = navController,
         state = state,
         selectedAttachment = attachment,
+        onRecord = { showAudioRecorderBottomSheet = true },
         isOnlyPhotoSelector = isOnlyPhotoSelector
     ) {
         attachmentViewModel.attachment(it)
+    }
+
+
+    if (showAudioRecorderBottomSheet) {
+        AudioRecorderBottomSheet() {
+            showAudioRecorderBottomSheet = false
+        }
     }
 }
 

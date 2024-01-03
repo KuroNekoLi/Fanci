@@ -78,6 +78,7 @@ sealed class AttachmentEnv {
  *  @param isOnlyPhotoSelector 是否只有圖片,相機 選擇功能
  *  @param selectedAttachment 已經選擇的檔案
  *  @param onAttach callback
+ *  @param onRecord 錄音按下的callback
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -89,10 +90,10 @@ fun MediaPickerBottomSheet(
     isOnlyPhotoSelector: Boolean = false,
     selectedAttachment: Map<AttachmentType, List<AttachmentInfoItem>>,
     viewModel: MediaPickerBottomSheetViewModel = koinViewModel(),
+    onRecord: () -> Unit,
     onAttach: (List<Uri>) -> Unit
 ) {
     val TAG = "MediaPickerBottomSheet"
-
     val coroutineScope = rememberCoroutineScope()
 
     var showPhotoPicker by remember {
@@ -106,6 +107,10 @@ fun MediaPickerBottomSheet(
     var showFilePicker by remember {
         mutableStateOf(false)
     }
+
+//    var showAudioRecorder by remember {
+//        mutableStateOf(false)
+//    }
 
     var showCreateVote by remember {
         mutableStateOf(false)
@@ -165,8 +170,16 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onRecordClick = {
-                    //TODO 按下邏輯
-
+                    viewModel.RecordCheck(
+                        selectedAttachment = selectedAttachment,
+                        attachmentEnv = attachmentEnv,
+                        onOpen = {
+                            onRecord()
+                        },
+                        onError = { title, desc ->
+                            showAlertDialog = Pair(title, desc)
+                        }
+                    )
                 },
                 onChoiceClick = {
                     viewModel.choiceVoteCheck(
