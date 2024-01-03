@@ -164,6 +164,10 @@ fun MediaPickerBottomSheet(
                         }
                     )
                 },
+                onRecordClick = {
+                    //TODO 按下邏輯
+
+                },
                 onChoiceClick = {
                     viewModel.choiceVoteCheck(
                         selectedAttachment = selectedAttachment,
@@ -263,6 +267,7 @@ fun MediaPickerBottomSheetView(
     onImageClick: () -> Unit,
     onCameraClick: () -> Unit,
     onFileClick: () -> Unit,
+    onRecordClick: () -> Unit,
     onChoiceClick: () -> Unit
 ) {
     Column(
@@ -320,7 +325,21 @@ fun MediaPickerBottomSheetView(
                 color = LocalColor.current.background,
                 thickness = 1.dp
             )
-
+            MediaPickerItem(
+                modifier = Modifier.padding(
+                    top = 10.dp,
+                    bottom = 10.dp,
+                    start = 24.dp,
+                    end = 24.dp
+                ),
+                iconRes = R.drawable.record,
+                text = stringResource(id = R.string.record),
+                onClick = onRecordClick
+            )
+            Divider(
+                color = LocalColor.current.background,
+                thickness = 1.dp
+            )
             MediaPickerItem(
                 modifier = Modifier.padding(
                     top = 10.dp,
@@ -484,6 +503,7 @@ fun MediaPickerBottomSheetPreview() {
             onImageClick = {},
             onCameraClick = {},
             onFileClick = {},
+            onRecordClick = {},
             onChoiceClick = {}
         )
     }
