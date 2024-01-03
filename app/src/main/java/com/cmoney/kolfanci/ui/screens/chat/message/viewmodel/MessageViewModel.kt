@@ -162,7 +162,7 @@ class MessageViewModel(
      * @param channelId 聊天室id
      */
     private fun startPolling(channelId: String?, fromIndex: Long? = null) {
-        KLog.i(TAG, "startPolling:$channelId")
+        KLog.i(TAG, "startPolling:$channelId, fromIndex: $fromIndex")
         viewModelScope.launch {
             if (channelId?.isNotEmpty() == true) {
                 stopPolling()
@@ -176,11 +176,8 @@ class MessageViewModel(
                         ChatMessageWrapper(message = chatMessage)
                     }?.reversed().orEmpty()
 
-//                    KLog.i(TAG, newMessage.map { it.message.content?.text })
-
                     //檢查插入時間 bar
                     val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
-
                     processMessageCombine(timeBarMessage.map { chatMessageWrapper ->
                         MessageUtils.defineMessageType(chatMessageWrapper)
                     })
@@ -212,7 +209,6 @@ class MessageViewModel(
         val pendingSendMessage = _message.value.filter {
             it.isPendingSendMessage
         }
-
         //判斷 要合併的訊息是新訊息 or 歷史訊息, 決定要放在 List 的前面 or 後面
         if ((newChatMessage.firstOrNull()?.message?.serialNumber
                 ?: 0) < (oldMessage.firstOrNull()?.message?.serialNumber ?: 0)
@@ -232,8 +228,10 @@ class MessageViewModel(
                 combineMessage.message.id
             }
         }
-
-        _message.value = distinctMessage
+        val sortedDistinctMessage = distinctMessage.sortedByDescending {
+            it.message.createUnixTime
+        }
+        _message.value = sortedDistinctMessage
     }
 
     /**
@@ -261,7 +259,6 @@ class MessageViewModel(
                         val newMessage = message.map {
                             ChatMessageWrapper(message = it)
                         }.reversed()
-
                         //檢查插入時間 bar
                         val timeBarMessage = MessageUtils.insertTimeBar(newMessage)
 
@@ -842,10 +839,15 @@ class MessageViewModel(
      * @param startItemIndex 畫面第一個 item position
      * @param lastIndex 畫面最後一個 item position
      */
-    fun pollingScopeMessage(channelId: String,
-                            startItemIndex: Int,
-                            lastIndex: Int) {
-        KLog.i(TAG, "pollingScopeMessage:$channelId, startItemIndex:$startItemIndex, lastIndex:$lastIndex")
+    fun pollingScopeMessage(
+        channelId: String,
+        startItemIndex: Int,
+        lastIndex: Int
+    ) {
+        KLog.i(
+            TAG,
+            "pollingScopeMessage:$channelId, startItemIndex:$startItemIndex, lastIndex:$lastIndex"
+        )
 
         pollingJob?.cancel()
         pollingJob = viewModelScope.launch {
