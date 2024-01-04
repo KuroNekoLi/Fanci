@@ -51,7 +51,7 @@ import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
-import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.AudioRecorderBottomSheet
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordAndPlayUIWithPermissionCheck
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
@@ -395,7 +395,7 @@ fun ChatRoomScreen(
 
 
     if (showAudioRecorderBottomSheet) {
-        AudioRecorderBottomSheet() {
+        RecordAndPlayUIWithPermissionCheck() {
             showAudioRecorderBottomSheet = false
         }
     }
