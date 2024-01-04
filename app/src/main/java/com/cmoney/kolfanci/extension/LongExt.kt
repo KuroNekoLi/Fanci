@@ -30,20 +30,14 @@ fun Long.formatDuration(): String {
  */
 fun Long.startOfDayFromTimestamp(): Long {
     // 創建一個 Calendar 實例
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"))
     // 使用提供的時間戳轉換成毫秒，並設置 Calendar 的時間
     calendar.timeInMillis = this * 1000
-
-    // 將 Calendar 轉換為台灣時區
-    calendar.timeZone = TimeZone.getTimeZone("Asia/Taipei")
-
     // 將小時、分、秒和毫秒設置為 0，以獲得當天的 0 點 0 分 0 秒
     calendar.set(Calendar.HOUR_OF_DAY, 0)
     calendar.set(Calendar.MINUTE, 0)
     calendar.set(Calendar.SECOND, 0)
     calendar.set(Calendar.MILLISECOND, 0)
-
     // 返回更新後的時間戳，並將毫秒轉換成秒
-    return calendar.timeInMillis * 1 / 1000
+    return calendar.timeInMillis / 1000
 }
