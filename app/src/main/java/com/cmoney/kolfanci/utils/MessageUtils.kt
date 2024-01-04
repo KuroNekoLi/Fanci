@@ -1,6 +1,7 @@
 package com.cmoney.kolfanci.utils
 
 import com.cmoney.fanciapi.fanci.model.DeleteStatus
+import com.cmoney.kolfanci.extension.startOfDayFromTimestamp
 import com.cmoney.kolfanci.model.ChatMessageWrapper
 
 class MessageUtils {
@@ -23,14 +24,14 @@ class MessageUtils {
             //大於2群, 找出跨日交界並插入time bar
             return if (groupList.size > 1) {
                 val groupMessage = groupList.map {
-                    val newList = it.value.toMutableList()
-                    newList.add(generateTimeBar(it.value.first()))
+                    val newList = it.value.toMutableList() //此list的時間是由新到舊
+                    newList.add(generateTimeBar(it.value.last())) //將當天最早的訊息資料作為參數
                     newList
                 }.flatten().toMutableList()
                 groupMessage
             } else {
                 val newList = newMessage.toMutableList()
-                val timeBarMessage = generateTimeBar(newMessage.first())
+                val timeBarMessage = generateTimeBar(newMessage.last())
                 newList.add(timeBarMessage)
                 return newList
             }
@@ -42,7 +43,8 @@ class MessageUtils {
         private fun generateTimeBar(chatMessageWrapper: ChatMessageWrapper): ChatMessageWrapper {
             return chatMessageWrapper.copy(
                 message = chatMessageWrapper.message.copy(
-                    id = chatMessageWrapper.message.createUnixTime.toString()
+                    id = chatMessageWrapper.message.createUnixTime?.startOfDayFromTimestamp().toString(),
+                    createUnixTime = chatMessageWrapper.message.createUnixTime?.startOfDayFromTimestamp()
                 ),
                 messageType = ChatMessageWrapper.MessageType.TimeBar
             )
