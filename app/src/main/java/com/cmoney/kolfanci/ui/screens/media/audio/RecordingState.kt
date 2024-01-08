@@ -7,12 +7,22 @@ package com.cmoney.kolfanci.ui.screens.media.audio
 data class RecordingState(
     val isDeleteVisible: Boolean,
     val isUploadVisible: Boolean,
-    val isTimerVisible: Boolean,
     val isRecordHintVisible: Boolean,
     val progressIndicator: ProgressIndicator,
     val progress: Float,
     val currentTime: String
-)
+) {
+    companion object {
+        val default = RecordingState(
+            isDeleteVisible = false,
+            isUploadVisible = false,
+            isRecordHintVisible = true,
+            progressIndicator = ProgressIndicator.DEFAULT,
+            progress = 0f,
+            currentTime = "00:00"
+        )
+    }
+}
 
 enum class ProgressIndicator {
     DEFAULT, RECORDING, COMPLETE, PLAYING, PAUSE

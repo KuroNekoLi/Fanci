@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -27,109 +28,113 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
-import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
-import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 import com.cmoney.kolfanci.ui.theme.LocalColor
-import org.koin.androidx.compose.koinViewModel
 
-@Preview
 @Composable
-fun TimerScreen(modifier: Modifier = Modifier) {
-    val viewModel: RecordingViewModel = koinViewModel()
-    val progressIndicator = viewModel.recordingScreenState.value.progressIndicator
-
+fun TimerScreen(
+    time: String,
+    isRecorderHintVisible: Boolean,
+    isDeleteVisible: Boolean,
+    isUploadVisible: Boolean,
+    progress: Float,
+    progressIndicator: ProgressIndicator,
+    onPlayingButtonClick: () -> Unit,
+    onDelete: () -> Unit,
+    onUpload: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = CenterHorizontally
     ) {
-        Text(
-            text = viewModel.recordingScreenState.value.currentTime,
-            fontWeight = FontWeight.Bold,
-            fontSize = 24.sp,
-//            color = Color.Green,
-            color = colorResource(id = R.color.color_FF6DC160)
-        )
+        if (isRecorderHintVisible) DefaultText() else TimerText(time)
         Row(
             verticalAlignment = CenterVertically
         ) {
-            OutlinedIconButton(
-                border = BorderStroke(width = 1.dp, color = Color.Gray),
-                onClick = { /*TODO*/ }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_delete_record),
-                    null,
-                    tint = Color.Red
-                )
+            if (isDeleteVisible) {
+                OutlinedIconButton(
+                    border = BorderStroke(width = 1.dp, color = Color.Gray),
+                    onClick = { onDelete() }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_delete_record),
+                        null,
+                        tint = Color.Red
+                    )
+                }
             }
             when (progressIndicator) {
                 ProgressIndicator.DEFAULT -> {
                     RecorderDefault(Modifier.clickable {
-                        viewModel.onEvent(RecordingScreenEvent.OnButtonClicked)
+                        onPlayingButtonClick()
                     })
                 }
 
                 ProgressIndicator.RECORDING -> {
                     RecorderRecording(Modifier.clickable {
-                        viewModel.onEvent(RecordingScreenEvent.OnButtonClicked)
+                        onPlayingButtonClick()
                     })
                 }
 
                 ProgressIndicator.COMPLETE -> {
                     RecorderComplete(Modifier.clickable {
-                        viewModel.onEvent(RecordingScreenEvent.OnButtonClicked)
+                        onPlayingButtonClick()
                     })
                 }
 
                 ProgressIndicator.PLAYING -> {
                     RecorderPlaying(
-                        progress = viewModel.recordingScreenState.value.progress,
+                        progress = progress,
                         modifier = Modifier
                             .clickable {
-                                viewModel.onEvent(RecordingScreenEvent.OnButtonClicked)
+                                onPlayingButtonClick()
                             }
                     )
                 }
 
                 ProgressIndicator.PAUSE -> {
                     RecorderPause(
-                        progress = viewModel.recordingScreenState.value.progress,
+                        progress = progress,
                         modifier = Modifier
                             .clickable {
-                                viewModel.onEvent(RecordingScreenEvent.OnButtonClicked)
+                                onPlayingButtonClick()
                             }
                     )
                 }
             }
-
-//            RecorderPlaying(
-//                progress = progress,
-//                modifier = Modifier
-//                    .size(127.dp)
-//                    .clickable {
-//                        if (!isRunning && currentTime < maxTime) {
-//                            isRunning = true
-//                        } else if (isRunning) {
-//                            isRunning = false
-//                            recordTime = currentTime
-//                            currentTime = 0f
-//                        }
-//                    },
-//            )
-
-
-            FilledIconButton(
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = LocalColor.current.primary
-                ),
-                onClick = { /*TODO*/
-                }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_arrow_up), null
-                )
+            if (isUploadVisible) {
+                FilledIconButton(
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = LocalColor.current.primary
+                    ),
+                    onClick = { /*TODO*/
+                    }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_arrow_up), null
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun TimerText(time: String) {
+    Text(
+        text = time,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        color = colorResource(id = R.color.color_FF6DC160)
+    )
+}
+
+@Composable
+private fun DefaultText() {
+    Text(
+        text = stringResource(id = R.string.record_hint),
+        fontSize = 16.sp,
+        color = Color.White
+    )
 }
 
 @Composable

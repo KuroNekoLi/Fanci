@@ -348,4 +348,5 @@
     <string name="group_theme_detail">多種顏色的佈景主題，打造你的獨一無二</string>
     <string name="group_background_detail">社團主頁的背景，把社團佈置的漂漂亮亮</string>
     <string name="record">錄音</string>
+    <string name="record_hint">點選以進行錄音</string>
 </resources>

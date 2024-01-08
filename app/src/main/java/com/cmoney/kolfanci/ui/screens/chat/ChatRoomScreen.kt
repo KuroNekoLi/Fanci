@@ -51,6 +51,8 @@ import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordAndPlayUIWithPermissionCheck
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
@@ -85,6 +87,8 @@ fun ChatRoomScreen(
 ) {
     val TAG = "ChatRoomScreen"
 
+    val recordingViewModel: RecordingViewModel = koinViewModel()
+    val recordingScreenState by recordingViewModel.recordingScreenState
     //公告訊息
     val announceMessage by viewModel.announceMessage.collectAsState()
 
@@ -392,12 +396,22 @@ fun ChatRoomScreen(
     ) {
         attachmentViewModel.attachment(it)
     }
-
-
     if (showAudioRecorderBottomSheet) {
-        RecordAndPlayUIWithPermissionCheck() {
-            showAudioRecorderBottomSheet = false
-        }
+        RecordAndPlayUIWithPermissionCheck(
+            isRecorderHintVisible = recordingScreenState.isRecordHintVisible,
+            progressIndicator = recordingScreenState.progressIndicator,
+            time = recordingScreenState.currentTime,
+            isDeleteVisible = recordingScreenState.isDeleteVisible,
+            isUploadVisible = recordingScreenState.isUploadVisible,
+            progress = recordingScreenState.progress,
+            onPlayingButtonClick = { recordingViewModel.onEvent(RecordingScreenEvent.OnButtonClicked) },
+            onDelete = { recordingViewModel.onEvent(RecordingScreenEvent.OnDelete) },
+            onUpload = { recordingViewModel.onEvent(RecordingScreenEvent.OnUpload) },
+            onDismissRequest = {
+                showAudioRecorderBottomSheet = false
+                recordingViewModel.onEvent(RecordingScreenEvent.OnDismiss)
+            }
+        )
     }
 }
 

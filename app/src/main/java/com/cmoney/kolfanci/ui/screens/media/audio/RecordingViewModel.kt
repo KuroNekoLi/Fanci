@@ -16,15 +16,7 @@ private const val TAG = "RecordingViewModel"
 
 class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewModel() {
     private val _recordingScreenState = mutableStateOf(
-        RecordingState(
-            isDeleteVisible = false,
-            isUploadVisible = false,
-            isTimerVisible = false,
-            isRecordHintVisible = true,
-            progressIndicator = ProgressIndicator.DEFAULT,
-            progress = 0f,
-            currentTime = "00:00"
-        )
+        RecordingState.default
     )
     val recordingScreenState: State<RecordingState> = _recordingScreenState
     var passedTime = 0
@@ -35,7 +27,7 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
                 when (progressIndicator) {
                     ProgressIndicator.DEFAULT -> {
                         viewModelScope.launch {
-                            myMediaRecorder.getCurrentMilliseconds().collect {
+                            myMediaRecorder.getRecordingCurrentMilliseconds().collect {
                                 _recordingScreenState.updateState {
                                     copy(
                                         currentTime = changeToTimeText(it)
@@ -48,10 +40,9 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
                         _recordingScreenState.updateState {
                             copy(
                                 progressIndicator = ProgressIndicator.RECORDING,
-                                isDeleteVisible = false,
-                                isUploadVisible = false,
+                                isDeleteVisible = true,
+                                isUploadVisible = true,
                                 isRecordHintVisible = false,
-                                isTimerVisible = true,
                             )
                         }
                     }
@@ -99,7 +90,12 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
             }
 
             RecordingScreenEvent.OnDelete -> {
-                myMediaRecorder.deleteRecording()
+                playingJob().cancel()
+                passedTime = 0
+                myMediaRecorder.dismiss()
+                _recordingScreenState.updateState {
+                    RecordingState.default
+                }
             }
 
             RecordingScreenEvent.OnUpload -> {
@@ -108,28 +104,11 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
             }
 
             RecordingScreenEvent.OnDismiss -> {
-                val progressIndicator = _recordingScreenState.value.progressIndicator
-                when (progressIndicator) {
-                    ProgressIndicator.RECORDING -> {
-                        myMediaRecorder.stopRecording()
-                    }
-
-                    ProgressIndicator.PLAYING -> {
-                        myMediaRecorder.stopPlaying()
-                    }
-
-                    else -> {}
-                }
+                playingJob().cancel()
+                passedTime = 0
+                myMediaRecorder.dismiss()
                 _recordingScreenState.updateState {
-                    copy(
-                        isDeleteVisible = false,
-                        isUploadVisible = false,
-                        isTimerVisible = false,
-                        isRecordHintVisible = true,
-                        progressIndicator = ProgressIndicator.DEFAULT,
-                        currentTime = "00:00:00",
-                        progress = 0f
-                    )
+                    RecordingState.default
                 }
             }
         }
@@ -137,7 +116,7 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
 
     private fun playingJob(): Job {
         return viewModelScope.launch {
-            val duration = myMediaRecorder.getDuration()
+            val duration = myMediaRecorder.getPlayingDuration()
             if (duration == 0) return@launch
             while (recordingScreenState.value.progressIndicator == ProgressIndicator.PLAYING && passedTime < duration) {
                 delay(200L)
@@ -151,7 +130,7 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
                 }
                 Log.i(
                     TAG,
-                    "passedTime: $passedTime,duration: ${myMediaRecorder.getDuration()},equal? ${passedTime == myMediaRecorder.getDuration()},progress: ${recordingScreenState.value.progress}"
+                    "passedTime: $passedTime,duration: ${myMediaRecorder.getPlayingDuration()},equal? ${passedTime == myMediaRecorder.getPlayingDuration()},progress: ${recordingScreenState.value.progress}"
                 )
             }
             //這邊要大於

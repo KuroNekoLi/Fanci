@@ -9,9 +9,8 @@ interface MyMediaRecorder {
     fun pausePlaying()
     fun resumePlaying()
     fun stopPlaying()
-    fun cancelRecording()
-    fun deleteRecording()
-    fun getDuration(): Int
-    fun getCurrentMilliseconds(): StateFlow<Int>
+    fun dismiss()
+    fun getPlayingDuration(): Int
+    fun getRecordingCurrentMilliseconds(): StateFlow<Int>
     fun getRecordingDuration(): Int
 }

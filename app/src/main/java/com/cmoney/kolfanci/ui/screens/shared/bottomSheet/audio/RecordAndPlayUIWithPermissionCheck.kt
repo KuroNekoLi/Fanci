@@ -12,9 +12,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
 
 @Composable
-fun RecordAndPlayUIWithPermissionCheck(onDismissRequest: () -> Unit) {
+fun RecordAndPlayUIWithPermissionCheck(
+    isRecorderHintVisible: Boolean,
+    progressIndicator: ProgressIndicator,
+    time: String,
+    isDeleteVisible: Boolean,
+    isUploadVisible: Boolean,
+    progress: Float,
+    onPlayingButtonClick: () -> Unit,
+    onDelete: () -> Unit,
+    onUpload: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
     val context = LocalContext.current
 
     // State for RECORD_AUDIO permission
@@ -46,6 +58,15 @@ fun RecordAndPlayUIWithPermissionCheck(onDismissRequest: () -> Unit) {
 
     if (permissionToRecordAccepted) {
         AudioRecorderBottomSheet(
+            isRecorderHintVisible = isRecorderHintVisible,
+            progressIndicator = progressIndicator,
+            time = time,
+            isDeleteVisible = isDeleteVisible,
+            isUploadVisible = isUploadVisible,
+            progress = progress,
+            onPlayingButtonClick = onPlayingButtonClick,
+            onDelete = onDelete,
+            onUpload = onUpload,
             onDismissRequest = onDismissRequest
         )
     }

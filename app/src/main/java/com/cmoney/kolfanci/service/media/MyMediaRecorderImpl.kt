@@ -3,9 +3,8 @@ package com.cmoney.kolfanci.service.media
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.net.Uri
 import android.os.Build
-import android.util.Log
+import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,13 +22,23 @@ class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
 
     private var recorder: MediaRecorder? = null
     private var player: MediaPlayer? = null
-    private var uri: Uri? = null
     private var fileName: String? = null
-    private var _currentSeconds = MutableStateFlow(0)
 
+    /**
+     * 目前錄製的秒數
+     */
+    private var _currentRecordSeconds = MutableStateFlow(0)
     private val _progress = MutableStateFlow(0f)
     private var timerJob: Job? = null
+
+    /**
+     * 最大錄音秒數
+     */
     private val maxRecordingDuration = 45000
+
+    /**
+     * 錄音時長
+     */
     private var recordingDuration = 0
 
     val coroutineContext: CoroutineContext
@@ -52,7 +61,7 @@ class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
             try {
                 prepare()
             } catch (e: IOException) {
-                Log.e(TAG, "prepare() failed")
+                KLog.e(TAG, "prepare() failed")
             }
 
             start()
@@ -78,7 +87,7 @@ class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
                 prepare()
                 start()
             } catch (e: IOException) {
-                Log.e(TAG, "prepare() failed")
+                KLog.e(TAG, "prepare() failed")
             }
         }
     }
@@ -101,41 +110,37 @@ class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
     }
 
 
-    override fun cancelRecording() {
+    override fun dismiss() {
+        timerJob?.cancel()
+        _currentRecordSeconds.value = 0
+        recordingDuration = 0
         recorder?.release()
         recorder = null
         player?.release()
         player = null
-    }
-
-    override fun deleteRecording() {
         fileName?.let { File(it).delete() }
-//        stopRecording()
-//        uri?.let {
-//            context.contentResolver.delete(it,null,null)
-//        }
     }
 
-    override fun getDuration(): Int {
+    override fun getPlayingDuration(): Int {
         return player?.duration ?: 0
     }
 
-    override fun getCurrentMilliseconds(): StateFlow<Int> = _currentSeconds
+    override fun getRecordingCurrentMilliseconds(): StateFlow<Int> = _currentRecordSeconds
 
     private fun startRecordingTimer() {
         timerJob = CoroutineScope(coroutineContext).launch {
-            while (_currentSeconds.value < maxRecordingDuration) {
+            while (_currentRecordSeconds.value < maxRecordingDuration) {
                 delay(200L)
-                _currentSeconds.value += 200
-                _progress.value = _currentSeconds.value / maxRecordingDuration.toFloat()
+                _currentRecordSeconds.value += 200
+                _progress.value = _currentRecordSeconds.value / maxRecordingDuration.toFloat()
             }
         }
     }
 
     private fun stopRecordingTimer() {
-        recordingDuration = _currentSeconds.value
+        recordingDuration = _currentRecordSeconds.value
         timerJob?.cancel()
-        _currentSeconds.value = 0
+        _currentRecordSeconds.value = 0
     }
 
     override fun getRecordingDuration() = recordingDuration
