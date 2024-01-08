@@ -31,7 +31,7 @@ import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
 @Composable
-fun TimerScreen(
+fun RecordingScreen(
     time: String,
     isRecorderHintVisible: Boolean,
     isDeleteVisible: Boolean,
@@ -53,13 +53,13 @@ fun TimerScreen(
         ) {
             if (isDeleteVisible) {
                 OutlinedIconButton(
-                    border = BorderStroke(width = 1.dp, color = Color.Gray),
+                    border = BorderStroke(width = 1.dp, color = colorResource(id = R.color.color_FFD1D1D1)),
                     onClick = { onDelete() }
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.icon_delete_record),
                         null,
-                        tint = Color.Red
+                        tint = colorResource(id = R.color.color_FFF46464)
                     )
                 }
             }
@@ -142,10 +142,10 @@ fun RecorderPlaying(
     progress: Float,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = 5.dp,
-    foregroundColor: Color = Color.Green,
+    foregroundColor: Color = colorResource(id = R.color.color_FF6DC160),
 ) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(150.dp)) {
-        BackgroundCircularProgressIndicator(modifier = modifier)
+        BackgroundCircularProgressIndicator(modifier = modifier.size(127.dp))
         CircularProgressIndicator(
             progress = progress,
             color = foregroundColor,
@@ -155,7 +155,7 @@ fun RecorderPlaying(
         Icon(
             painter = painterResource(id = R.drawable.icon_pause),
             contentDescription = null,
-            tint = Color.Green
+            tint = colorResource(id = R.color.color_FF6DC160)
         )
     }
 }
@@ -184,7 +184,7 @@ fun RecorderDefault(modifier: Modifier = Modifier) {
         Icon(
             painter = painterResource(id = R.drawable.icon_start_record),
             contentDescription = null,
-            tint = Color.Red
+            tint = colorResource(id = R.color.color_FFF46464)
         )
     }
 }
@@ -200,7 +200,7 @@ fun RecorderRecording(modifier: Modifier = Modifier) {
             painter = painterResource(id = R.drawable.img_recording_background),
             contentDescription = null,
             modifier = Modifier.size(127.dp),
-            tint = Color.Green,
+            tint = colorResource(id = R.color.color_FF6DC160),
         )
         Icon(
             painter = painterResource(id = R.drawable.img_recording_forground),
@@ -218,12 +218,12 @@ fun RecorderComplete(modifier: Modifier = Modifier) {
     ) {
         BackgroundCircularProgressIndicator(
             modifier = modifier.size(127.dp),
-            backgroundColor = Color.Green
+            backgroundColor = colorResource(id = R.color.color_FF6DC160)
         )
         Icon(
             painter = painterResource(id = R.drawable.icon_play),
             contentDescription = null,
-            tint = Color.Green
+            tint = colorResource(id = R.color.color_FF6DC160)
         )
     }
 }
@@ -233,7 +233,7 @@ fun RecorderPause(
     progress: Float,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = 5.dp,
-    foregroundColor: Color = Color.Green
+    foregroundColor: Color = colorResource(id = R.color.color_FF6DC160)
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -249,7 +249,7 @@ fun RecorderPause(
         Icon(
             painter = painterResource(id = R.drawable.icon_play),
             contentDescription = null,
-            tint = Color.Green
+            tint = colorResource(id = R.color.color_FF6DC160)
         )
     }
 }

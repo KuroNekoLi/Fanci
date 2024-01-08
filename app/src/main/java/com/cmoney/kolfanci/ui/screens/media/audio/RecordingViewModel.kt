@@ -6,28 +6,36 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cmoney.kolfanci.service.media.MyMediaRecorder
+import com.cmoney.kolfanci.service.media.RecorderAndPlayer
 import com.socks.library.KLog
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val TAG = "RecordingViewModel"
 
-class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewModel() {
-    private val _recordingScreenState = mutableStateOf(
-        RecordingState.default
-    )
-    val recordingScreenState: State<RecordingState> = _recordingScreenState
-    var passedTime = 0
+/**
+ * 錄音的ViewModel
+ * @param recorderAndPlayer 錄音與播放介面
+ */
+class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : ViewModel() {
+    private val _recordingScreenState = mutableStateOf(RecordingScreenState.default)
+
+    /**
+     * 錄音狀態
+     */
+    val recordingScreenState: State<RecordingScreenState> = _recordingScreenState
+
+    /**
+     * 使用者事件
+     * @param event RecordingScreen 的事件
+     */
     fun onEvent(event: RecordingScreenEvent) {
         when (event) {
             RecordingScreenEvent.OnButtonClicked -> {
-                val progressIndicator = _recordingScreenState.value.progressIndicator
-                when (progressIndicator) {
+                when (_recordingScreenState.value.progressIndicator) {
                     ProgressIndicator.DEFAULT -> {
                         viewModelScope.launch {
-                            myMediaRecorder.getRecordingCurrentMilliseconds().collect {
+                            recorderAndPlayer.getRecordingCurrentMilliseconds().collect {
                                 _recordingScreenState.updateState {
                                     copy(
                                         currentTime = changeToTimeText(it)
@@ -36,7 +44,7 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
                             }
                         }
 
-                        myMediaRecorder.startRecording()
+                        recorderAndPlayer.startRecording()
                         _recordingScreenState.updateState {
                             copy(
                                 progressIndicator = ProgressIndicator.RECORDING,
@@ -48,17 +56,17 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
                     }
 
                     ProgressIndicator.RECORDING -> {
-                        myMediaRecorder.stopRecording()
+                        recorderAndPlayer.stopRecording()
                         _recordingScreenState.updateState {
                             copy(
                                 progressIndicator = ProgressIndicator.COMPLETE,
-                                currentTime = changeToTimeText(myMediaRecorder.getRecordingDuration())
+                                currentTime = changeToTimeText(recorderAndPlayer.getRecordingDuration())
                             )
                         }
                     }
 
                     ProgressIndicator.COMPLETE -> {
-                        myMediaRecorder.startPlaying()
+                        recorderAndPlayer.startPlaying()
                         _recordingScreenState.updateState {
                             copy(
                                 progressIndicator = ProgressIndicator.PLAYING
@@ -68,7 +76,7 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
                     }
 
                     ProgressIndicator.PLAYING -> {
-                        myMediaRecorder.pausePlaying()
+                        recorderAndPlayer.pausePlaying()
                         _recordingScreenState.updateState {
                             copy(
                                 progressIndicator = ProgressIndicator.PAUSE
@@ -78,7 +86,7 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
                     }
 
                     ProgressIndicator.PAUSE -> {
-                        myMediaRecorder.resumePlaying()
+                        recorderAndPlayer.resumePlaying()
                         _recordingScreenState.updateState {
                             copy(
                                 progressIndicator = ProgressIndicator.PLAYING
@@ -91,10 +99,9 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
 
             RecordingScreenEvent.OnDelete -> {
                 playingJob().cancel()
-                passedTime = 0
-                myMediaRecorder.dismiss()
+                recorderAndPlayer.dismiss()
                 _recordingScreenState.updateState {
-                    RecordingState.default
+                    RecordingScreenState.default
                 }
             }
 
@@ -105,10 +112,9 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
 
             RecordingScreenEvent.OnDismiss -> {
                 playingJob().cancel()
-                passedTime = 0
-                myMediaRecorder.dismiss()
+                recorderAndPlayer.dismiss()
                 _recordingScreenState.updateState {
-                    RecordingState.default
+                    RecordingScreenState.default
                 }
             }
         }
@@ -116,11 +122,9 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
 
     private fun playingJob(): Job {
         return viewModelScope.launch {
-            val duration = myMediaRecorder.getPlayingDuration()
-            if (duration == 0) return@launch
-            while (recordingScreenState.value.progressIndicator == ProgressIndicator.PLAYING && passedTime < duration) {
-                delay(200L)
-                passedTime += 200
+            val duration = recorderAndPlayer.getPlayingDuration()
+            recorderAndPlayer.getPlayingCurrentMilliseconds().collect { passedTime ->
+                Log.i(TAG, "currentPosition: $passedTime")
                 _recordingScreenState.updateState {
                     copy(
                         //(passedTime/duration)如果都是整數不會動
@@ -128,34 +132,28 @@ class RecordingViewModel(private val myMediaRecorder: MyMediaRecorder) : ViewMod
                         currentTime = changeToTimeText(passedTime),
                     )
                 }
-                Log.i(
-                    TAG,
-                    "passedTime: $passedTime,duration: ${myMediaRecorder.getPlayingDuration()},equal? ${passedTime == myMediaRecorder.getPlayingDuration()},progress: ${recordingScreenState.value.progress}"
-                )
-            }
-            //這邊要大於
-            if (passedTime >= duration) {
-                _recordingScreenState.updateState { copy(progressIndicator = ProgressIndicator.COMPLETE) }
-                passedTime = 0
-                Log.i(
-                    TAG,
-                    "passedTime: $passedTime,state: ${_recordingScreenState.value.progressIndicator.name}"
-                )
+                if (passedTime >= duration) {
+                    _recordingScreenState.updateState {
+                        copy(
+                            progressIndicator = ProgressIndicator.COMPLETE
+                        )
+                    }
+                }
             }
         }
     }
-}
 
-fun <T> MutableState<T>.updateState(updateFunc: T.() -> T) {
-    value = value.updateFunc()
-}
+    private fun <T> MutableState<T>.updateState(updateFunc: T.() -> T) {
+        value = value.updateFunc()
+    }
 
-/**
- * 將時間轉換為mm:ss
- * @param time 秒數
- */
-private fun changeToTimeText(time: Int): String {
-    val minutes = (time / 1000 / 60).toString().padStart(2, '0')
-    val seconds = (time / 1000 % 60).toString().padStart(2, '0')
-    return "$minutes:$seconds"
+    /**
+     * 將時間轉換為mm:ss
+     * @param time 毫秒
+     */
+    private fun changeToTimeText(time: Int): String {
+        val minutes = (time / 1000 / 60).toString().padStart(2, '0')
+        val seconds = (time / 1000 % 60).toString().padStart(2, '0')
+        return "$minutes:$seconds"
+    }
 }

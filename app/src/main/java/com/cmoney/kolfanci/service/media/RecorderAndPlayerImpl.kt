@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.Build
+import android.util.Log
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +12,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
@@ -18,33 +20,30 @@ import kotlin.coroutines.CoroutineContext
 
 private const val TAG = "MyMediaRecorderImpl"
 
-class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
+class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     private var recorder: MediaRecorder? = null
     private var player: MediaPlayer? = null
     private var fileName: String? = null
 
-    /**
-     * 目前錄製的秒數
-     */
+    //目前錄製的秒數
     private var _currentRecordSeconds = MutableStateFlow(0)
+    private var _playingCurrentMilliseconds = MutableStateFlow(0)
     private val _progress = MutableStateFlow(0f)
-    private var timerJob: Job? = null
+    private var recordJob: Job? = null
+    private var playingJob: Job? = null
 
-    /**
-     * 最大錄音秒數
-     */
+    //最大錄音秒數
     private val maxRecordingDuration = 45000
 
-    /**
-     * 錄音時長
-     */
+    //錄音時長
     private var recordingDuration = 0
 
-    val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + Job()
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.Default + Job()
 
     override fun startRecording() {
+        _playingCurrentMilliseconds.value = 0
         recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             MediaRecorder(context)
         } else {
@@ -77,6 +76,7 @@ class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
         }
         recorder = null
         stopRecordingTimer()
+        _playingCurrentMilliseconds.value = 0
     }
 
 
@@ -111,7 +111,7 @@ class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
 
 
     override fun dismiss() {
-        timerJob?.cancel()
+        recordJob?.cancel()
         _currentRecordSeconds.value = 0
         recordingDuration = 0
         recorder?.release()
@@ -125,10 +125,24 @@ class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
         return player?.duration ?: 0
     }
 
+    override fun getPlayingCurrentMilliseconds(): StateFlow<Int> {
+        playingJob?.cancel()
+        playingJob = CoroutineScope(coroutineContext).launch {
+            player?.let { mediaPlayer ->
+                while (mediaPlayer.isPlaying) {
+                    val currentPosition = mediaPlayer.currentPosition
+                    Log.i(TAG, "currentPosition: $currentPosition")
+                    _playingCurrentMilliseconds.emit(currentPosition)
+                }
+            }
+        }
+        return _playingCurrentMilliseconds.asStateFlow()
+    }
+
     override fun getRecordingCurrentMilliseconds(): StateFlow<Int> = _currentRecordSeconds
 
     private fun startRecordingTimer() {
-        timerJob = CoroutineScope(coroutineContext).launch {
+        recordJob = CoroutineScope(coroutineContext).launch {
             while (_currentRecordSeconds.value < maxRecordingDuration) {
                 delay(200L)
                 _currentRecordSeconds.value += 200
@@ -139,7 +153,7 @@ class MyMediaRecorderImpl(private val context: Context) : MyMediaRecorder {
 
     private fun stopRecordingTimer() {
         recordingDuration = _currentRecordSeconds.value
-        timerJob?.cancel()
+        recordJob?.cancel()
         _currentRecordSeconds.value = 0
     }
 

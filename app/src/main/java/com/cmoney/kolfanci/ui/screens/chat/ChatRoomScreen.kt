@@ -87,6 +87,7 @@ fun ChatRoomScreen(
 ) {
     val TAG = "ChatRoomScreen"
 
+    //錄音
     val recordingViewModel: RecordingViewModel = koinViewModel()
     val recordingScreenState by recordingViewModel.recordingScreenState
     //公告訊息

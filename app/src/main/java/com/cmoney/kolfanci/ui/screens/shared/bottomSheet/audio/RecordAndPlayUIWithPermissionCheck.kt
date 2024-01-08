@@ -14,6 +14,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
 
+/**
+ * 確認錄音權限
+ * 向使用者要求錄音權限，若成功，則顯示錄音的 BottomSheet
+ */
 @Composable
 fun RecordAndPlayUIWithPermissionCheck(
     isRecorderHintVisible: Boolean,
@@ -39,7 +43,6 @@ fun RecordAndPlayUIWithPermissionCheck(
         )
     }
 
-
     // Launcher for RECORD_AUDIO permission
     val requestRecordPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -52,7 +55,6 @@ fun RecordAndPlayUIWithPermissionCheck(
     LaunchedEffect(Unit) {
         if (!permissionToRecordAccepted) {
             requestRecordPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-
         }
     }
 

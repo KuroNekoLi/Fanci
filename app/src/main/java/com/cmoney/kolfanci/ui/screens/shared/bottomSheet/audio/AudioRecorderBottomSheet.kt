@@ -33,7 +33,7 @@ fun AudioRecorderBottomSheet(
         dragHandle = null,
         containerColor = colorResource(id = R.color.color_20262F)
     ) {
-        TimerScreen(
+        RecordingScreen(
             isRecorderHintVisible = isRecorderHintVisible,
             progressIndicator = progressIndicator,
             time = time,
