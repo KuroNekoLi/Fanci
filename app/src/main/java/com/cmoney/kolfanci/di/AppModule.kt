@@ -8,6 +8,8 @@ import com.cmoney.kolfanci.model.persistence.SettingsDataStore
 import com.cmoney.kolfanci.model.persistence.dataStore
 import com.cmoney.kolfanci.service.media.MusicMediaService
 import com.cmoney.kolfanci.service.media.MusicServiceConnection
+import com.cmoney.kolfanci.service.media.MyMediaRecorder
+import com.cmoney.kolfanci.service.media.MyMediaRecorderImpl
 import com.cmoney.remoteconfig_library.IRemoteConfig
 import com.cmoney.remoteconfig_library.RemoteConfigImpl
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -46,6 +48,11 @@ val appModule = module {
         MusicServiceConnection.getInstance(
             androidContext(),
             ComponentName(androidContext(), MusicMediaService::class.java)
+        )
+    }
+    single<MyMediaRecorder> {
+        MyMediaRecorderImpl(
+            context = androidApplication()
         )
     }
 }

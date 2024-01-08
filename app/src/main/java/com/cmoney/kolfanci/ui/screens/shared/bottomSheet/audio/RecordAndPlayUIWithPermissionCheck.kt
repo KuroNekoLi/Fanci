@@ -16,6 +16,8 @@ import androidx.core.content.ContextCompat
 @Composable
 fun RecordAndPlayUIWithPermissionCheck(onDismissRequest: () -> Unit) {
     val context = LocalContext.current
+
+    // State for RECORD_AUDIO permission
     var permissionToRecordAccepted by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -25,16 +27,20 @@ fun RecordAndPlayUIWithPermissionCheck(onDismissRequest: () -> Unit) {
         )
     }
 
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
+
+    // Launcher for RECORD_AUDIO permission
+    val requestRecordPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted: Boolean ->
             permissionToRecordAccepted = isGranted
         }
     )
 
+
     LaunchedEffect(Unit) {
         if (!permissionToRecordAccepted) {
-            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            requestRecordPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+
         }
     }
 
