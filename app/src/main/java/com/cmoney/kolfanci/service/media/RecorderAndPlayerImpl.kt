@@ -20,6 +20,9 @@ import kotlin.coroutines.CoroutineContext
 
 private const val TAG = "MyMediaRecorderImpl"
 
+/**
+ * 錄音與播放介面的實現
+ */
 class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     private var recorder: MediaRecorder? = null
@@ -76,11 +79,11 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         }
         recorder = null
         stopRecordingTimer()
-        _playingCurrentMilliseconds.value = 0
     }
 
 
     override fun startPlaying() {
+        _playingCurrentMilliseconds.value = 0
         player = MediaPlayer().apply {
             try {
                 setDataSource(fileName)
@@ -107,6 +110,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
     override fun stopPlaying() {
         player?.release()
         player = null
+        _playingCurrentMilliseconds.value = 0
     }
 
 
@@ -129,10 +133,18 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         playingJob?.cancel()
         playingJob = CoroutineScope(coroutineContext).launch {
             player?.let { mediaPlayer ->
-                while (mediaPlayer.isPlaying) {
-                    val currentPosition = mediaPlayer.currentPosition
-                    Log.i(TAG, "currentPosition: $currentPosition")
-                    _playingCurrentMilliseconds.emit(currentPosition)
+                try {
+                    while (mediaPlayer.isPlaying) {
+                        val currentPosition = mediaPlayer.currentPosition
+                        Log.i(TAG, "currentPosition: $currentPosition")
+                        _playingCurrentMilliseconds.emit(currentPosition)
+                        delay(200)
+                    }
+                    if (!mediaPlayer.isPlaying) {
+                        _playingCurrentMilliseconds.emit(mediaPlayer.duration)
+                    }
+                } catch (e: IllegalStateException) {
+                    KLog.e(TAG, "MediaPlayer is in an invalid state", e)
                 }
             }
         }
@@ -148,13 +160,15 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
                 _currentRecordSeconds.value += 200
                 _progress.value = _currentRecordSeconds.value / maxRecordingDuration.toFloat()
             }
+            if (_currentRecordSeconds.value >= maxRecordingDuration) {
+                stopRecording()
+            }
         }
     }
 
     private fun stopRecordingTimer() {
         recordingDuration = _currentRecordSeconds.value
         recordJob?.cancel()
-        _currentRecordSeconds.value = 0
     }
 
     override fun getRecordingDuration() = recordingDuration
