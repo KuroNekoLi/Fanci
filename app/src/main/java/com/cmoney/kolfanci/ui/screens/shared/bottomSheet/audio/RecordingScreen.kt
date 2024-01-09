@@ -53,7 +53,10 @@ fun RecordingScreen(
         ) {
             if (isDeleteVisible) {
                 OutlinedIconButton(
-                    border = BorderStroke(width = 1.dp, color = colorResource(id = R.color.color_FFD1D1D1)),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = colorResource(id = R.color.color_FFD1D1D1)
+                    ),
                     onClick = { onDelete() }
                 ) {
                     Icon(
@@ -110,7 +113,9 @@ fun RecordingScreen(
                     onClick = { /*TODO*/
                     }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.icon_arrow_up), null
+                        painter = painterResource(id = R.drawable.icon_arrow_up),
+                        contentDescription = null,
+                        tint = Color.White
                     )
                 }
             }
