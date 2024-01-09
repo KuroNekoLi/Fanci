@@ -41,6 +41,13 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                                         currentTime = changeToTimeText(it)
                                     )
                                 }
+                                if (it >= 45000) {
+                                    _recordingScreenState.updateState {
+                                        copy(
+                                            progressIndicator = ProgressIndicator.COMPLETE
+                                        )
+                                    }
+                                }
                             }
                         }
 
