@@ -1,6 +1,5 @@
 package com.cmoney.kolfanci.ui.screens.media.audio
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +23,9 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
      * 錄音狀態
      */
     val recordingScreenState: State<RecordingScreenState> = _recordingScreenState
+
+    // 定義 var playingProgressJob，初始為 null
+    private var playingProgressJob: Job? = null
 
     /**
      * 使用者事件
@@ -79,7 +81,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                                 progressIndicator = ProgressIndicator.PLAYING
                             )
                         }
-                        playingJob()
+                        startCollectingPlayingProgressJob()
                     }
 
                     ProgressIndicator.PLAYING -> {
@@ -89,7 +91,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                                 progressIndicator = ProgressIndicator.PAUSE
                             )
                         }
-                        playingJob().cancel()
+                        stopCollectingPlayingProgressJob()
                     }
 
                     ProgressIndicator.PAUSE -> {
@@ -99,13 +101,13 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                                 progressIndicator = ProgressIndicator.PLAYING
                             )
                         }
-                        playingJob()
+                        startCollectingPlayingProgressJob()
                     }
                 }
             }
 
             RecordingScreenEvent.OnDelete -> {
-                playingJob().cancel()
+                stopCollectingPlayingProgressJob()
                 recorderAndPlayer.dismiss()
                 _recordingScreenState.updateState {
                     RecordingScreenState.default
@@ -118,7 +120,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
             }
 
             RecordingScreenEvent.OnDismiss -> {
-                playingJob().cancel()
+                stopCollectingPlayingProgressJob()
                 recorderAndPlayer.dismiss()
                 _recordingScreenState.updateState {
                     RecordingScreenState.default
@@ -127,11 +129,26 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
         }
     }
 
-    private fun playingJob(): Job {
-        return viewModelScope.launch {
+    private fun <T> MutableState<T>.updateState(updateFunc: T.() -> T) {
+        value = value.updateFunc()
+    }
+
+    /**
+     * 將時間轉換為mm:ss
+     * @param time 毫秒
+     */
+    private fun changeToTimeText(time: Int): String {
+        val minutes = (time / 1000 / 60).toString().padStart(2, '0')
+        val seconds = (time / 1000 % 60).toString().padStart(2, '0')
+        return "$minutes:$seconds"
+    }
+
+    // 一個收集正在播放時間的流，並設定State的任務
+    private fun startCollectingPlayingProgressJob() {
+        playingProgressJob?.cancel() // 取消先前的任務（如果存在）
+        playingProgressJob = viewModelScope.launch {
             val duration = recorderAndPlayer.getPlayingDuration()
             recorderAndPlayer.getPlayingCurrentMilliseconds().collect { passedTime ->
-                Log.i(TAG, "currentPosition: $passedTime")
                 _recordingScreenState.updateState {
                     copy(
                         //(passedTime/duration)如果都是整數不會動
@@ -150,17 +167,8 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
         }
     }
 
-    private fun <T> MutableState<T>.updateState(updateFunc: T.() -> T) {
-        value = value.updateFunc()
-    }
-
-    /**
-     * 將時間轉換為mm:ss
-     * @param time 毫秒
-     */
-    private fun changeToTimeText(time: Int): String {
-        val minutes = (time / 1000 / 60).toString().padStart(2, '0')
-        val seconds = (time / 1000 % 60).toString().padStart(2, '0')
-        return "$minutes:$seconds"
+    private fun stopCollectingPlayingProgressJob() {
+        playingProgressJob?.cancel()
+        playingProgressJob = null
     }
 }
