@@ -24,8 +24,8 @@ import kotlinx.parcelize.Parcelize
  * 頻道的權限列表
  *
  * @param canRead 
- * @param canReply 
  * @param canPost 
+ * @param canReply 
  * @param canEmoji 
  * @param canManage 
  * @param canCopy 
@@ -41,11 +41,11 @@ data class ChannelPermission (
     @Json(name = "canRead")
     val canRead: kotlin.Boolean? = null,
 
-    @Json(name = "canReply")
-    val canReply: kotlin.Boolean? = null,
-
     @Json(name = "canPost")
     val canPost: kotlin.Boolean? = null,
+
+    @Json(name = "canReply")
+    val canReply: kotlin.Boolean? = null,
 
     @Json(name = "canEmoji")
     val canEmoji: kotlin.Boolean? = null,

@@ -25,7 +25,6 @@ interface MessageApi {
      *  - 204: 成功
      *  - 404: 找不到訊息
      *
-     * @param messageType 
      * @param messageId 訊息Id
      * @return [Unit]
      */
@@ -42,8 +41,8 @@ interface MessageApi {
      *  - 204: 成功
      *  - 404: 找不到訊息
      *
-     * @param messageType 
-     * @param messageId 
+     * @param messageType
+     * @param messageId
      * @return [Unit]
      */
     @DELETE("api/v2/Message/{messageType}/{messageId}/Emoji")
@@ -59,7 +58,7 @@ interface MessageApi {
      *  - 204: 成功
      *  - 404: 找不到訊息
      *
-     * @param messageType 
+     * @param messageType
      * @param messageId 訊息Id
      * @return [kotlin.collections.Map<kotlin.String, kotlin.collections.List<User>>]
      */
@@ -76,7 +75,7 @@ interface MessageApi {
      *  - 204: 成功
      *  - 404: 找不到訊息
      *
-     * @param messageType 
+     * @param messageType
      * @param messageId 訊息Id
      * @param emojiParam 表情符號參數 (optional)
      * @return [Unit]
@@ -93,7 +92,7 @@ interface MessageApi {
      *  - 403: 沒有權限
      *  - 404: 找不到訊息
      *
-     * @param messageType 
+     * @param messageType
      * @param messageId 訊息id
      * @return [ChatMessage]
      */
@@ -110,7 +109,7 @@ interface MessageApi {
      *  - 204: 成功
      *  - 404: 找不到訊息
      *
-     * @param messageType 
+     * @param messageType
      * @param messageId 訊息Id
      * @param chatMessageParam 異動訊息參數 (optional)
      * @return [Unit]
@@ -128,7 +127,7 @@ interface MessageApi {
      *  - 204: 成功
      *  - 404: 找不到訊息
      *
-     * @param messageType 
+     * @param messageType
      * @param messageId 訊息Id
      * @return [Unit]
      */
@@ -137,7 +136,7 @@ interface MessageApi {
 
     /**
      * 搜尋功能  代入自訂條件搜尋訊息 全部條件取\&quot;交集\&quot; 不需要的條件請移除   有範圍小的條件可以不用代範圍大的條件 (如 有Channel可以不用Group)  TODO:貼文回覆先不要 等前端確定 (聊天回復不影響) __________🔒 已註冊的fanci使用者
-     * 
+     *
      * Responses:
      *  - 200: Success
      *  - 401: Unauthorized
