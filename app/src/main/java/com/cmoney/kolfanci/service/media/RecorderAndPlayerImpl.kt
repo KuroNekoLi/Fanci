@@ -4,7 +4,6 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.Build
-import android.util.Log
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +43,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     private val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + Job()
-
+    @Suppress("DEPRECATION")
     override fun startRecording() {
         _playingCurrentMilliseconds.value = 0
         recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -136,11 +135,10 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
                 try {
                     while (mediaPlayer.isPlaying) {
                         val currentPosition = mediaPlayer.currentPosition
-                        Log.i(TAG, "currentPosition: $currentPosition")
                         _playingCurrentMilliseconds.emit(currentPosition)
                         delay(200)
                     }
-                    if (!mediaPlayer.isPlaying) {
+                    if (mediaPlayer.currentPosition == mediaPlayer.duration) {
                         _playingCurrentMilliseconds.emit(mediaPlayer.duration)
                     }
                 } catch (e: IllegalStateException) {
