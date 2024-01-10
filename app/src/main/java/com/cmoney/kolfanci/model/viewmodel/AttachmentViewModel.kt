@@ -91,6 +91,26 @@ class AttachmentViewModel(
     }
 
     /**
+     * 附加檔案為錄音時，設定它的attachmentType
+     */
+    fun setRecordingAttachmentType(uri: Uri?) {
+        if (uri != null){
+            val oldList = _attachmentList.value.toMutableList()
+            val attachmentType = AttachmentType.VoiceMessage
+            val recordItem = uri.toUploadFileItem(context = context).copy(
+                filename = "錄音"
+            )
+            oldList.add(
+                Pair(attachmentType,recordItem)
+            )
+
+            _attachmentList.update {
+                oldList
+            }
+            KLog.i(TAG,"_attachmentList: ${_attachmentList.value}" )
+        }
+    }
+    /**
      * 移除 附加 檔案
      * @param attachmentInfoItem
      */

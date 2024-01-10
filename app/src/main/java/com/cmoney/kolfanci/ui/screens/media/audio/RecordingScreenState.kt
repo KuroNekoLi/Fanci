@@ -1,5 +1,7 @@
 package com.cmoney.kolfanci.ui.screens.media.audio
 
+import android.net.Uri
+
 /**
  * 錄音Screen的狀態
  * @param isDeleteVisible 刪除按鈕是否可見
@@ -15,7 +17,8 @@ data class RecordingScreenState(
     val isRecordHintVisible: Boolean,
     val progressIndicator: ProgressIndicator,
     val progress: Float,
-    val currentTime: String
+    val currentTime: String,
+    val recordFileUri: Uri?
 ) {
     companion object {
         val default = RecordingScreenState(
@@ -24,7 +27,8 @@ data class RecordingScreenState(
             isRecordHintVisible = true,
             progressIndicator = ProgressIndicator.DEFAULT,
             progress = 0f,
-            currentTime = "00:00"
+            currentTime = "00:00",
+            recordFileUri = null
         )
     }
 }

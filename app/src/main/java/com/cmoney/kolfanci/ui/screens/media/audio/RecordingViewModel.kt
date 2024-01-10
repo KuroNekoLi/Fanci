@@ -109,19 +109,26 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
             RecordingScreenEvent.OnDelete -> {
                 stopCollectingPlayingProgressJob()
                 recorderAndPlayer.dismiss()
+                recorderAndPlayer.deleteFile()
                 _recordingScreenState.updateState {
                     RecordingScreenState.default
                 }
             }
 
             RecordingScreenEvent.OnUpload -> {
-                //TODO 實現上傳
-                KLog.i(TAG, "upload...")
+                _recordingScreenState.updateState {
+                    copy(
+                        recordFileUri = recorderAndPlayer.getFileUri()
+                    )
+                }
+                recorderAndPlayer.dismiss()
+                KLog.i(TAG, "recordFileUri: ${recorderAndPlayer.getFileUri()}")
             }
 
             RecordingScreenEvent.OnDismiss -> {
                 stopCollectingPlayingProgressJob()
                 recorderAndPlayer.dismiss()
+                recorderAndPlayer.deleteFile()
                 _recordingScreenState.updateState {
                     RecordingScreenState.default
                 }

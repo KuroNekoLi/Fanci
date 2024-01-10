@@ -407,7 +407,15 @@ fun ChatRoomScreen(
             progress = recordingScreenState.progress,
             onPlayingButtonClick = { recordingViewModel.onEvent(RecordingScreenEvent.OnButtonClicked) },
             onDelete = { recordingViewModel.onEvent(RecordingScreenEvent.OnDelete) },
-            onUpload = { recordingViewModel.onEvent(RecordingScreenEvent.OnUpload) },
+            onUpload = {
+                showAudioRecorderBottomSheet = false
+                coroutineScope.launch{
+                    state.hide()
+                }
+                recordingViewModel.onEvent(RecordingScreenEvent.OnUpload)
+                KLog.i(TAG,"uri: ${recordingScreenState.recordFileUri}")
+                attachmentViewModel.setRecordingAttachmentType(recordingScreenState.recordFileUri)
+            },
             onDismissRequest = {
                 showAudioRecorderBottomSheet = false
                 recordingViewModel.onEvent(RecordingScreenEvent.OnDismiss)

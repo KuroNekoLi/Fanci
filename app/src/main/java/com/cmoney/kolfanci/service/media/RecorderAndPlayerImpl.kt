@@ -3,6 +3,7 @@ package com.cmoney.kolfanci.service.media
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.net.Uri
 import android.os.Build
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
@@ -53,11 +54,11 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         }
         recorder?.apply {
             fileName =
-                "${context.externalCacheDir?.absolutePath}/錄音_${System.currentTimeMillis()}.3gp"
+                "${context.externalCacheDir?.absolutePath}/錄音_${System.currentTimeMillis()}.aac"
             setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
             setOutputFile(fileName)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
 
             try {
                 prepare()
@@ -121,7 +122,6 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         recorder = null
         player?.release()
         player = null
-        fileName?.let { File(it).delete() }
     }
 
     override fun getPlayingDuration(): Int {
@@ -170,4 +170,12 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
     }
 
     override fun getRecordingDuration() = recordingDuration
+    override fun getFileUri(): Uri? {
+        KLog.i(TAG, "fileName: $fileName, Uri: ${ Uri.fromFile(fileName?.let { File(it) })}")
+        return Uri.fromFile(fileName?.let { File(it) })
+    }
+
+    override fun deleteFile() {
+        fileName?.let { File(it).delete() }
+    }
 }

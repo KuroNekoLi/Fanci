@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.service.media
 
+import android.net.Uri
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -37,7 +38,7 @@ interface RecorderAndPlayer {
     fun stopPlaying()
 
     /**
-     * 停止錄音與播放並刪除錄音檔
+     * 停止錄音與播放
      */
     fun dismiss()
 
@@ -64,4 +65,10 @@ interface RecorderAndPlayer {
      * @return 錄音時長（毫秒）
      */
     fun getRecordingDuration(): Int
+    fun getFileUri(): Uri?
+
+    /**
+     * 刪除錄音檔案
+     */
+    fun deleteFile()
 }

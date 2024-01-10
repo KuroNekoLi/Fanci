@@ -88,6 +88,7 @@ fun Media.getDisplayType() = when (type?.toAttachmentType()) {
     AttachmentType.Txt -> "(檔案)"
     AttachmentType.Unknown -> "(未知)"
     AttachmentType.Choice -> "(選擇題)"
+    AttachmentType.VoiceMessage -> "(錄音)"
     null -> ""
 }
 
@@ -98,6 +99,7 @@ fun IMedia.getDisplayType() = when (type?.toAttachmentType()) {
     AttachmentType.Txt -> "(檔案)"
     AttachmentType.Unknown -> "(未知)"
     AttachmentType.Choice -> "(選擇題)"
+    AttachmentType.VoiceMessage -> "(錄音)"
     null -> ""
 }
 

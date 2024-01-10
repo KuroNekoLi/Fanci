@@ -25,6 +25,15 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
         val fileSize = attachmentInfo.fileSize
 
         when (attachmentType) {
+            AttachmentType.VoiceMessage -> Media(
+                resourceLink = serverUrl,
+                type = AttachmentType.VoiceMessage.name,
+                audio = AudioContent(
+                    fileName = fileName,
+                    fileSize = fileSize,
+                    duration = file.getAudioDuration(context)
+                )
+            )
             AttachmentType.Audio -> Media(
                 resourceLink = serverUrl,
                 type = AttachmentType.Audio.name,
@@ -78,6 +87,11 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
  */
 sealed class AttachmentType {
     abstract val name: String
+
+    object VoiceMessage : AttachmentType() {
+        override val name: String
+            get() = "Record"
+    }
 
     object Image : AttachmentType() {
         override val name: String

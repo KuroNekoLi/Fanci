@@ -358,6 +358,7 @@ fun AttachmentAudioItem(
     isItemClickable: Boolean,
     isItemCanDelete: Boolean,
     isShowResend: Boolean,
+    isRecordFile: Boolean = false,
     onClick: (Uri) -> Unit,
     onDelete: ((Uri) -> Unit)? = null,
     onResend: (() -> Unit)? = null
@@ -395,7 +396,7 @@ fun AttachmentAudioItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.audio_icon),
+                            painter = if(!isRecordFile) painterResource(id = R.drawable.audio_icon) else painterResource(id = R.drawable.icon_record),
                             contentDescription = null
                         )
 
@@ -473,6 +474,7 @@ fun AttachmentAudioItemPreview() {
             displayName = "上課教材.mp3",
             file = Uri.EMPTY,
             duration = 0,
+            isRecordFile = true,
             isItemClickable = true,
             isItemCanDelete = true,
             isShowResend = false,

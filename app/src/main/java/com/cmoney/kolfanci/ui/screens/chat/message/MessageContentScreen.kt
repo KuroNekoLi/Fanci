@@ -477,6 +477,7 @@ fun MediaContent(
         val attachmentInfoItems = entry.value
 
         when (key) {
+            AttachmentType.VoiceMessage,
             AttachmentType.Audio -> {
                 LazyRow(
                     modifier = modifier.then(
