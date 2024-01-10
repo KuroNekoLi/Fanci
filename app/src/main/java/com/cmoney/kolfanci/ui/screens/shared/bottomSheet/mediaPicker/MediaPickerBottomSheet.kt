@@ -108,10 +108,6 @@ fun MediaPickerBottomSheet(
         mutableStateOf(false)
     }
 
-//    var showAudioRecorder by remember {
-//        mutableStateOf(false)
-//    }
-
     var showCreateVote by remember {
         mutableStateOf(false)
     }
@@ -170,7 +166,7 @@ fun MediaPickerBottomSheet(
                     )
                 },
                 onRecordClick = {
-                    viewModel.RecordCheck(
+                    viewModel.recordCheck(
                         selectedAttachment = selectedAttachment,
                         attachmentEnv = attachmentEnv,
                         onOpen = {

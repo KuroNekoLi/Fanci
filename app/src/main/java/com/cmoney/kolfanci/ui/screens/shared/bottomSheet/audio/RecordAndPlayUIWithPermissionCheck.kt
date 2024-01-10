@@ -17,6 +17,8 @@ import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
 /**
  * 確認錄音權限
  * 向使用者要求錄音權限，若成功，則顯示錄音的 BottomSheet
+ * @param onDismissRequest 關閉的回調
+ * 其餘參數參考 [RecordingScreen]
  */
 @Composable
 fun RecordAndPlayUIWithPermissionCheck(

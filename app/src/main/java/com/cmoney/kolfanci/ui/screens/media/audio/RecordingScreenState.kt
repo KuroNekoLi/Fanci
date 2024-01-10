@@ -31,12 +31,26 @@ data class RecordingScreenState(
 
 /**
  * 錄音按鈕的狀態
- * @property DEFAULT 剛開啟錄音的狀態
- * @property RECORDING 錄音中
- * @property COMPLETE 錄音完成
- * @property PLAYING 正在播放錄音
- * @property PAUSE 暫停時
  */
-enum class ProgressIndicator {
-    DEFAULT, RECORDING, COMPLETE, PLAYING, PAUSE
+sealed class ProgressIndicator {
+    /**
+     * 剛開啟錄音的狀態
+     */
+    object DEFAULT : ProgressIndicator()
+    /**
+     * 錄音中
+     */
+    object RECORDING : ProgressIndicator()
+    /**
+     * 錄音完成
+     */
+    object COMPLETE : ProgressIndicator()
+    /**
+     * 正在播放錄音
+     */
+    object PLAYING : ProgressIndicator()
+    /**
+     * 暫停時
+     */
+    object PAUSE : ProgressIndicator()
 }

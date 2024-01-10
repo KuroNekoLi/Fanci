@@ -161,7 +161,7 @@ class MediaPickerBottomSheetViewModel(
         }
     }
 
-    fun RecordCheck(
+    fun recordCheck(
         selectedAttachment: Map<AttachmentType, List<AttachmentInfoItem>>,
         attachmentEnv: AttachmentEnv,
         onOpen: () -> Unit,

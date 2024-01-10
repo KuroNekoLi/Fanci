@@ -30,6 +30,18 @@ import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
 import com.cmoney.kolfanci.ui.theme.LocalColor
 
+/**
+ * 錄音Screen的狀態
+ * @param isDeleteVisible 刪除按鈕是否可見
+ * @param isUploadVisible 上傳按鈕是否可見
+ * @param isRecorderHintVisible 預設提示是否可見
+ * @param progressIndicator 錄音按鈕的狀態
+ * @param progress 播放的進度百分比
+ * @param time 顯示的已播放時間
+ * @param onDelete 按下刪除的回調
+ * @param onUpload 按下上傳的回調
+ * @param onPlayingButtonClick 按下播放按鈕的回調
+ */
 @Composable
 fun RecordingScreen(
     time: String,
@@ -150,7 +162,7 @@ fun RecorderPlaying(
     foregroundColor: Color = colorResource(id = R.color.color_FF6DC160),
 ) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(150.dp)) {
-        BackgroundCircularProgressIndicator(modifier = modifier.size(127.dp))
+        BackgroundCircularProgressIndicator(modifier = Modifier.size(127.dp))
         CircularProgressIndicator(
             progress = progress,
             color = foregroundColor,

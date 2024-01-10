@@ -12,6 +12,11 @@ import androidx.compose.ui.unit.dp
 import com.cmoney.kolfanci.R
 import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
 
+/**
+ * 錄音的底部清單
+ * @param onDismissRequest 關閉的回調
+ * 其餘參數參考 [RecordingScreen]
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AudioRecorderBottomSheet(
