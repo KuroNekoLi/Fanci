@@ -522,6 +522,9 @@ fun PostInfoScreen(
         state = state,
         attachmentEnv = AttachmentEnv.Post,
         selectedAttachment = attachment,
+        onRecord = {
+                   //TODO 這邊可能需要實現
+        },
         isOnlyPhotoSelector = isOnlyPhotoSelector
     ) {
         attachmentViewModel.attachment(it)

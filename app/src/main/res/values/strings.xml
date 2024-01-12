@@ -313,9 +313,9 @@
     <string name="join_group_by_code">透過邀請碼加入社團</string>
 
     <string name="multiple_choice_question">選擇題</string>
-    <string name="upload_file">上傳檔案</string>
-    <string name="open_camera">打開相機</string>
-    <string name="upload_photo">上傳相片</string>
+    <string name="upload_file">檔案</string>
+    <string name="open_camera">相機</string>
+    <string name="upload_photo">圖片</string>
 
     <string name="create_choice">建立選擇題</string>
     <string name="input_choice_question">請輸入選擇題的問題</string>
@@ -347,4 +347,6 @@
     <string name="group_theme">佈景主題</string>
     <string name="group_theme_detail">多種顏色的佈景主題，打造你的獨一無二</string>
     <string name="group_background_detail">社團主頁的背景，把社團佈置的漂漂亮亮</string>
+    <string name="record">錄音</string>
+    <string name="record_hint">點選以進行錄音</string>
 </resources>

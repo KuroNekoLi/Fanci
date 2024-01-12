@@ -51,6 +51,9 @@ import com.cmoney.kolfanci.ui.screens.chat.dialog.ReportUserDialogScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.MessageScreen
 import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordAndPlayUIWithPermissionCheck
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
@@ -84,6 +87,9 @@ fun ChatRoomScreen(
 ) {
     val TAG = "ChatRoomScreen"
 
+    //錄音
+    val recordingViewModel: RecordingViewModel = koinViewModel()
+    val recordingScreenState by recordingViewModel.recordingScreenState
     //公告訊息
     val announceMessage by viewModel.announceMessage.collectAsState()
 
@@ -378,15 +384,35 @@ fun ChatRoomScreen(
         )
         messageViewModel.announceRouteDone()
     }
+    //錄音sheet控制
+    var showAudioRecorderBottomSheet by remember { mutableStateOf(false) }
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
         navController = navController,
         state = state,
         selectedAttachment = attachment,
+        onRecord = { showAudioRecorderBottomSheet = true },
         isOnlyPhotoSelector = isOnlyPhotoSelector
     ) {
         attachmentViewModel.attachment(it)
+    }
+    if (showAudioRecorderBottomSheet) {
+        RecordAndPlayUIWithPermissionCheck(
+            isRecorderHintVisible = recordingScreenState.isRecordHintVisible,
+            progressIndicator = recordingScreenState.progressIndicator,
+            time = recordingScreenState.currentTime,
+            isDeleteVisible = recordingScreenState.isDeleteVisible,
+            isUploadVisible = recordingScreenState.isUploadVisible,
+            progress = recordingScreenState.progress,
+            onPlayingButtonClick = { recordingViewModel.onEvent(RecordingScreenEvent.OnButtonClicked) },
+            onDelete = { recordingViewModel.onEvent(RecordingScreenEvent.OnDelete) },
+            onUpload = { recordingViewModel.onEvent(RecordingScreenEvent.OnUpload) },
+            onDismissRequest = {
+                showAudioRecorderBottomSheet = false
+                recordingViewModel.onEvent(RecordingScreenEvent.OnDismiss)
+            }
+        )
     }
 }
 

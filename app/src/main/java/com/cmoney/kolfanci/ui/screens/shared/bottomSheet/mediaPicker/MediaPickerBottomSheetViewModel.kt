@@ -160,4 +160,44 @@ class MediaPickerBottomSheetViewModel(
             }
         }
     }
+
+    fun recordCheck(
+        selectedAttachment: Map<AttachmentType, List<AttachmentInfoItem>>,
+        attachmentEnv: AttachmentEnv,
+        onOpen: () -> Unit,
+        onError: (String, String) -> Unit
+    ) {
+        when (attachmentEnv) {
+            AttachmentEnv.Chat -> {
+                if (selectedAttachment.isNotEmpty()) {
+                    onError.invoke(
+                        context.getString(R.string.chat_attachment_limit),
+                        context.getString(R.string.chat_attachment_limit_text)
+                    )
+                } else {
+                    onOpen.invoke()
+                }
+            }
+
+            AttachmentEnv.Post -> {
+                val otherFilesCount = selectedAttachment.filter {
+                    it.key != AttachmentType.Image
+                }.size
+
+                if (otherFilesCount >= AttachImageDefault.DEFAULT_QUANTITY_LIMIT
+                ) {
+                    onError.invoke(
+                        context.getString(R.string.post_attachment_file_limit_title)
+                            .format(AttachImageDefault.DEFAULT_QUANTITY_LIMIT),
+                        context.getString(R.string.post_attachment_file_limit_desc).format(
+                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT,
+                            AttachImageDefault.DEFAULT_QUANTITY_LIMIT
+                        )
+                    )
+                } else {
+                    onOpen.invoke()
+                }
+            }
+        }
+    }
 }

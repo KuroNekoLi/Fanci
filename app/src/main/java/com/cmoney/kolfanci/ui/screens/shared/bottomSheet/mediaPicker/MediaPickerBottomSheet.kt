@@ -78,6 +78,7 @@ sealed class AttachmentEnv {
  *  @param isOnlyPhotoSelector 是否只有圖片,相機 選擇功能
  *  @param selectedAttachment 已經選擇的檔案
  *  @param onAttach callback
+ *  @param onRecord 錄音按下的callback
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -89,10 +90,10 @@ fun MediaPickerBottomSheet(
     isOnlyPhotoSelector: Boolean = false,
     selectedAttachment: Map<AttachmentType, List<AttachmentInfoItem>>,
     viewModel: MediaPickerBottomSheetViewModel = koinViewModel(),
+    onRecord: () -> Unit,
     onAttach: (List<Uri>) -> Unit
 ) {
     val TAG = "MediaPickerBottomSheet"
-
     val coroutineScope = rememberCoroutineScope()
 
     var showPhotoPicker by remember {
@@ -158,6 +159,18 @@ fun MediaPickerBottomSheet(
                         attachmentEnv = attachmentEnv,
                         onOpen = {
                             showFilePicker = true
+                        },
+                        onError = { title, desc ->
+                            showAlertDialog = Pair(title, desc)
+                        }
+                    )
+                },
+                onRecordClick = {
+                    viewModel.recordCheck(
+                        selectedAttachment = selectedAttachment,
+                        attachmentEnv = attachmentEnv,
+                        onOpen = {
+                            onRecord()
                         },
                         onError = { title, desc ->
                             showAlertDialog = Pair(title, desc)
@@ -263,6 +276,7 @@ fun MediaPickerBottomSheetView(
     onImageClick: () -> Unit,
     onCameraClick: () -> Unit,
     onFileClick: () -> Unit,
+    onRecordClick: () -> Unit,
     onChoiceClick: () -> Unit
 ) {
     Column(
@@ -320,7 +334,21 @@ fun MediaPickerBottomSheetView(
                 color = LocalColor.current.background,
                 thickness = 1.dp
             )
-
+            MediaPickerItem(
+                modifier = Modifier.padding(
+                    top = 10.dp,
+                    bottom = 10.dp,
+                    start = 24.dp,
+                    end = 24.dp
+                ),
+                iconRes = R.drawable.record,
+                text = stringResource(id = R.string.record),
+                onClick = onRecordClick
+            )
+            Divider(
+                color = LocalColor.current.background,
+                thickness = 1.dp
+            )
             MediaPickerItem(
                 modifier = Modifier.padding(
                     top = 10.dp,
@@ -484,6 +512,7 @@ fun MediaPickerBottomSheetPreview() {
             onImageClick = {},
             onCameraClick = {},
             onFileClick = {},
+            onRecordClick = {},
             onChoiceClick = {}
         )
     }

@@ -24,6 +24,7 @@ import com.cmoney.kolfanci.ui.screens.group.setting.report.viewmodel.GroupReport
 import com.cmoney.kolfanci.ui.screens.group.setting.viewmodel.GroupSettingViewModel
 import com.cmoney.kolfanci.ui.screens.group.setting.vip.viewmodel.VipManagerViewModel
 import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 import com.cmoney.kolfanci.ui.screens.media.txt.TextPreviewViewModel
 import com.cmoney.kolfanci.ui.screens.my.MyScreenViewModel
 import com.cmoney.kolfanci.ui.screens.notification.NotificationCenterViewModel
@@ -203,5 +204,8 @@ val viewModule = module {
             voteUseCase = get(),
             groupUseCase = get()
         )
+    }
+    viewModel {
+        RecordingViewModel(get())
     }
 }
