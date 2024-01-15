@@ -7,6 +7,7 @@ import com.cmoney.fanciapi.fanci.model.ImageContent
 import com.cmoney.fanciapi.fanci.model.Media
 import com.cmoney.fanciapi.fanci.model.PdfContent
 import com.cmoney.fanciapi.fanci.model.TxtContent
+import com.cmoney.fanciapi.fanci.model.VoiceMessageContent
 import com.cmoney.kolfanci.extension.getAudioDuration
 
 /**
@@ -28,12 +29,13 @@ fun List<Pair<AttachmentType, AttachmentInfoItem>>.toUploadMedia(context: Contex
             AttachmentType.VoiceMessage -> Media(
                 resourceLink = serverUrl,
                 type = AttachmentType.VoiceMessage.name,
-                audio = AudioContent(
+                voiceMessage = VoiceMessageContent(
                     fileName = fileName,
                     fileSize = fileSize,
                     duration = file.getAudioDuration(context)
                 )
             )
+
             AttachmentType.Audio -> Media(
                 resourceLink = serverUrl,
                 type = AttachmentType.Audio.name,
@@ -90,7 +92,7 @@ sealed class AttachmentType {
 
     object VoiceMessage : AttachmentType() {
         override val name: String
-            get() = "Record"
+            get() = "VoiceMessage"
     }
 
     object Image : AttachmentType() {

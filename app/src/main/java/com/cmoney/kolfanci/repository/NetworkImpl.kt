@@ -65,7 +65,7 @@ class NetworkImpl(
     override suspend fun uploadFile(uri: Uri): Result<FileUploadResponse> =
         withContext(dispatcher) {
             kotlin.runCatching {
-                val mimeType = uri.getMimeType()
+                val mimeType = uri.getMimeType(context)
                 val file = uri.uriToFile(context)
 
                 val requestBody = file.asRequestBody(

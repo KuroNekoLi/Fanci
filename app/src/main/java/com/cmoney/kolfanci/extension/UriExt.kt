@@ -116,7 +116,7 @@ fun Uri.getFileName(context: Context): String? {
  * 根據 Uri 區分檔案類型
  */
 fun Uri.getAttachmentType(context: Context): AttachmentType {
-    val mimeType = getFileType(context)
+    val mimeType = getMimeType(context) ?: ""
     val lowMimeType = mimeType.lowercase()
     return if (lowMimeType.startsWith("image")) {
         AttachmentType.Image
@@ -129,7 +129,12 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
     } else if (lowMimeType.startsWith("text")) {
         AttachmentType.Txt
     } else if (lowMimeType.startsWith("audio")) {
-        AttachmentType.Audio
+        if (isRecordFile()) {
+            AttachmentType.VoiceMessage
+        } else {
+            AttachmentType.Audio
+        }
+
     } else {
         AttachmentType.Unknown
     }
@@ -139,7 +144,7 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
  * 檔案 上傳時 要傳類型給後端知道
  */
 fun Uri.getUploadFileType(context: Context): String {
-    val mimeType = getMimeType()
+    val mimeType = getMimeType(context)
     val lowMimeType = mimeType?.lowercase()
     return if (lowMimeType != null) {
         if (lowMimeType.startsWith("audio")) {
@@ -165,30 +170,19 @@ fun Uri.getFileType(context: Context): String {
     //    return mimeTypeMap.getExtensionFromMimeType(r.getType(uri))
 }
 
-fun Uri.getMimeType(): String? {
-    var type: String? = null
+/**
+ * 取得音檔類型
+ */
+fun Uri.getMimeType(context: Context): String? {
+    val type: String?
     val extension = MimeTypeMap.getFileExtensionFromUrl(this.toString())
-    if (extension != null) {
-        type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+    type = if (!extension.isNullOrEmpty()) {
+        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+    } else {
+        getFileType(context)
     }
     return type
 }
-
-fun Uri.getMimeType(context: Context): String {
-    val extension: String
-
-    if (this.scheme == ContentResolver.SCHEME_CONTENT) {
-        val mime = MimeTypeMap.getSingleton()
-        extension = mime.getExtensionFromMimeType(context.contentResolver.getType(this)).toString()
-    } else {
-        extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(this.path?.let { File(it) })
-            .toString()
-        )
-    }
-
-    return extension
-}
-
 
 /**
  * 取得音檔長度 字串
@@ -245,3 +239,13 @@ fun Uri.toUploadFileItem(
         duration = this.getAudioDuration(context),
         attachmentType = this.getAttachmentType(context)
     )
+
+/**
+ * 判斷是否為錄音檔
+ */
+fun Uri.isRecordFile(): Boolean {
+    val uriString = this.toString()
+    val isAacFile = uriString.endsWith(".aac")
+    val isInCmoneyPath = uriString.contains("/Android/data/com.cmoney.kolfanci.debug/cache")
+    return isAacFile && isInCmoneyPath
+}

@@ -12,6 +12,7 @@ fun String.toColor(): Color = Color(this.toLong(16))
  */
 fun String.toAttachmentType(): AttachmentType =
     when (this.lowercase()) {
+        "voicemessage" -> AttachmentType.VoiceMessage
         "image" -> AttachmentType.Image
         "video" -> AttachmentType.Unknown
         "audio" -> AttachmentType.Audio

@@ -11,6 +11,7 @@ import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
  */
 fun Media.getFileName(): String {
     return when (this.type?.toAttachmentType()) {
+        AttachmentType.VoiceMessage -> "錄音"
         AttachmentType.Audio -> audio?.fileName.orEmpty()
         AttachmentType.Image -> ""
         AttachmentType.Pdf -> pdf?.fileName.orEmpty()
@@ -25,6 +26,7 @@ fun Media.getFileName(): String {
  */
 fun Media.getFleSize(): Long {
     return when (this.type?.toAttachmentType()) {
+        AttachmentType.VoiceMessage -> voiceMessage?.fileSize ?: 0L
         AttachmentType.Audio -> audio?.fileSize ?: 0L
         AttachmentType.Image -> 0
         AttachmentType.Pdf -> pdf?.fileSize ?: 0L
@@ -39,6 +41,7 @@ fun Media.getFleSize(): Long {
  */
 fun Media.getDuration(): Long {
     return when (this.type?.toAttachmentType()) {
+        AttachmentType.VoiceMessage -> voiceMessage?.duration ?: 0L
         AttachmentType.Audio -> audio?.duration ?: 0L
         AttachmentType.Image -> 0L
         AttachmentType.Pdf -> 0L
