@@ -8,6 +8,7 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
 import java.io.File
@@ -131,7 +132,9 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
     } else if (lowMimeType.startsWith("text")) {
         AttachmentType.Txt
     } else if (lowMimeType.startsWith("audio")) {
-        if (isRecordFile(context)) {
+        val uriString = this.toString()
+        val isRecordFile = Constant.absoluteCachePath.let { uriString.contains(it) }
+        if (isRecordFile) {
             AttachmentType.VoiceMessage
         } else {
             AttachmentType.Audio
@@ -241,16 +244,3 @@ fun Uri.toUploadFileItem(
         duration = this.getAudioDuration(context),
         attachmentType = this.getAttachmentType(context)
     )
-
-/**
- * 判斷是否為錄音檔
- */
-fun Uri.isRecordFile(context: Context): Boolean {
-    val cacheAbsolutePath = context.externalCacheDir?.absolutePath ?: ""
-    val mimeType = getMimeType(context)
-    val lowMimeType = mimeType?.lowercase()
-    val uriString = this.toString()
-    val isAacFile = lowMimeType?.let { uriString.endsWith(it) } ?: false
-    val isInCmoneyPath = cacheAbsolutePath.let { uriString.contains(it) }
-    return isAacFile && isInCmoneyPath
-}

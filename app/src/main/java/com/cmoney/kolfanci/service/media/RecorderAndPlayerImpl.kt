@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
+import com.cmoney.kolfanci.model.Constant
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +55,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         }
         recorder?.apply {
             fileName =
-                "${context.externalCacheDir?.absolutePath}/錄音_${System.currentTimeMillis()}.aac"
+                "${Constant.absoluteCachePath}/錄音_${System.currentTimeMillis()}.aac"
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
             setOutputFile(fileName)
