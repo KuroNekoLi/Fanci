@@ -396,7 +396,7 @@ fun AttachmentAudioItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            painter = if(!isRecordFile) painterResource(id = R.drawable.audio_icon) else painterResource(id = R.drawable.icon_record),
+                            painter = if(isRecordFile) painterResource(id = R.drawable.icon_record) else painterResource(id = R.drawable.audio_icon),
                             contentDescription = null
                         )
 

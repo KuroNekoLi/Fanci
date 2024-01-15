@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.util.Log
 import android.webkit.MimeTypeMap
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
 import com.cmoney.kolfanci.model.attachment.AttachmentType
@@ -117,6 +118,7 @@ fun Uri.getFileName(context: Context): String? {
  */
 fun Uri.getAttachmentType(context: Context): AttachmentType {
     val mimeType = getMimeType(context) ?: ""
+    Log.i("LinLi", "mimeType: $mimeType")
     val lowMimeType = mimeType.lowercase()
     return if (lowMimeType.startsWith("image")) {
         AttachmentType.Image
@@ -129,7 +131,7 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
     } else if (lowMimeType.startsWith("text")) {
         AttachmentType.Txt
     } else if (lowMimeType.startsWith("audio")) {
-        if (isRecordFile()) {
+        if (isRecordFile(context)) {
             AttachmentType.VoiceMessage
         } else {
             AttachmentType.Audio
@@ -243,9 +245,12 @@ fun Uri.toUploadFileItem(
 /**
  * 判斷是否為錄音檔
  */
-fun Uri.isRecordFile(): Boolean {
+fun Uri.isRecordFile(context: Context): Boolean {
+    val cacheAbsolutePath = context.externalCacheDir?.absolutePath ?: ""
+    val mimeType = getMimeType(context)
+    val lowMimeType = mimeType?.lowercase()
     val uriString = this.toString()
-    val isAacFile = uriString.endsWith(".aac")
-    val isInCmoneyPath = uriString.contains("/Android/data/com.cmoney.kolfanci.debug/cache")
+    val isAacFile = lowMimeType?.let { uriString.endsWith(it) } ?: false
+    val isInCmoneyPath = cacheAbsolutePath.let { uriString.contains(it) }
     return isAacFile && isInCmoneyPath
 }
