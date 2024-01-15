@@ -67,14 +67,13 @@ import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
-import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
 import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
-import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordAndPlayUIWithPermissionCheck
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.FilePicker
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
@@ -264,29 +263,19 @@ fun EditPostScreen(
             showAudioRecorderBottomSheet = true
         }
     )
-
+    //顯示錄音
     if (showAudioRecorderBottomSheet) {
-        RecordAndPlayUIWithPermissionCheck(
-            isRecorderHintVisible = recordingScreenState.isRecordHintVisible,
-            progressIndicator = recordingScreenState.progressIndicator,
-            time = recordingScreenState.currentTime,
-            isDeleteVisible = recordingScreenState.isDeleteVisible,
-            isUploadVisible = recordingScreenState.isUploadVisible,
-            progress = recordingScreenState.progress,
-            onPlayingButtonClick = { recordingViewModel.onEvent(RecordingScreenEvent.OnButtonClicked) },
-            onDelete = { recordingViewModel.onEvent(RecordingScreenEvent.OnDelete) },
+        RecordScreen(
+            recordingViewModel = recordingViewModel,
             onUpload = {
                 showAudioRecorderBottomSheet = false
-                recordingViewModel.onEvent(RecordingScreenEvent.OnUpload)
                 attachmentViewModel.setRecordingAttachmentType(recordingScreenState.recordFileUri)
             },
             onDismissRequest = {
                 showAudioRecorderBottomSheet = false
-                recordingViewModel.onEvent(RecordingScreenEvent.OnDismiss)
             }
         )
     }
-
     //Show image picker
     if (showImagePick) {
         PhotoPickDialogScreen(
