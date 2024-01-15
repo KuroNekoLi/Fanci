@@ -10,6 +10,7 @@ import android.net.Uri
  * @param progressIndicator 錄音按鈕的狀態
  * @param progress 播放的進度百分比
  * @param currentTime 顯示的已播放時間
+ * @param recordFileUri 錄音檔案的Uri
  */
 data class RecordingScreenState(
     val isDeleteVisible: Boolean,

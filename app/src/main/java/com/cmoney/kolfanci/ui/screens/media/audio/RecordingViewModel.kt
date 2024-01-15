@@ -116,6 +116,10 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
             }
 
             RecordingScreenEvent.OnUpload -> {
+                stopCollectingPlayingProgressJob()
+                _recordingScreenState.updateState {
+                    RecordingScreenState.default
+                }
                 _recordingScreenState.updateState {
                     copy(
                         recordFileUri = recorderAndPlayer.getFileUri()
