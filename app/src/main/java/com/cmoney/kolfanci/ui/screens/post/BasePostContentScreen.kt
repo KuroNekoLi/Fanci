@@ -259,9 +259,10 @@ fun BasePostContentScreen(
 
                 //========= Other File =========
                 val otherUrl = medias.filter {
-                    it.type != AttachmentType.Image.name && it.type != AttachmentType.Audio.name
+                    it.type != AttachmentType.Image.name
+                            && it.type != AttachmentType.Audio.name
+                            && it.type != AttachmentType.VoiceMessage.name
                 }
-
                 val attachmentInfoItemList = otherUrl.toAttachmentInfoItem()
 
                 LazyRow(
@@ -299,7 +300,7 @@ fun BasePostContentScreen(
 
                 //========= Audio File =========
                 val audioUrl = medias.filter {
-                    it.type == AttachmentType.Audio.name
+                    it.type == AttachmentType.Audio.name || it.type == AttachmentType.VoiceMessage.name
                 }
 
                 val audioUrlAttachmentInfoItemList = audioUrl.toAttachmentInfoItem()
