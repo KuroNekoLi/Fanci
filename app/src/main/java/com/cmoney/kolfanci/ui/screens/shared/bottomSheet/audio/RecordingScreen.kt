@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,6 +57,14 @@ fun RecordingScreen(
     onUpload: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val interactionSource = MutableInteractionSource()
+    val playIconClickableModifier = Modifier.clickable(
+        interactionSource = interactionSource,
+        indication = null
+    ) {
+        onPlayingButtonClick()
+    }
+
     Column(
         modifier = modifier,
         horizontalAlignment = CenterHorizontally
@@ -81,40 +90,28 @@ fun RecordingScreen(
             }
             when (progressIndicator) {
                 ProgressIndicator.DEFAULT -> {
-                    RecorderDefault(Modifier.clickable {
-                        onPlayingButtonClick()
-                    })
+                    RecorderDefault(playIconClickableModifier)
                 }
 
                 ProgressIndicator.RECORDING -> {
-                    RecorderRecording(Modifier.clickable {
-                        onPlayingButtonClick()
-                    })
+                    RecorderRecording(playIconClickableModifier)
                 }
 
                 ProgressIndicator.COMPLETE -> {
-                    RecorderComplete(Modifier.clickable {
-                        onPlayingButtonClick()
-                    })
+                    RecorderComplete(playIconClickableModifier)
                 }
 
                 ProgressIndicator.PLAYING -> {
                     RecorderPlaying(
                         progress = progress,
-                        modifier = Modifier
-                            .clickable {
-                                onPlayingButtonClick()
-                            }
+                        modifier = playIconClickableModifier
                     )
                 }
 
                 ProgressIndicator.PAUSE -> {
                     RecorderPause(
                         progress = progress,
-                        modifier = Modifier
-                            .clickable {
-                                onPlayingButtonClick()
-                            }
+                        modifier = playIconClickableModifier
                     )
                 }
             }
@@ -215,11 +212,11 @@ fun RecorderRecording(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(150.dp)
     ) {
-        BackgroundCircularProgressIndicator(modifier = modifier)
+        BackgroundCircularProgressIndicator(modifier = Modifier)
         Icon(
             painter = painterResource(id = R.drawable.img_recording_background),
             contentDescription = null,
-            modifier = Modifier.size(127.dp),
+            modifier = modifier.size(127.dp),
             tint = colorResource(id = R.color.color_FF6DC160),
         )
         Icon(
