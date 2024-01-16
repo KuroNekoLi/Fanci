@@ -156,6 +156,7 @@ object AttachmentController {
 
     /**
      * 點擊附加檔案預覽
+     * @param onRecordClick 當點擊的是錄音檔的回調，預設為使用player播放器播放。可透過傳遞lambda改為使用錄音的介面播放
      */
     fun onAttachmentClick(
         navController: DestinationsNavigator,
@@ -163,31 +164,34 @@ object AttachmentController {
         context: Context,
         fileName: String = "",
         duration: Long = 0,
-        audioViewModel: AudioViewModel? = null
+        audioViewModel: AudioViewModel? = null,
+        onRecordClick: ()->Unit = {
+            val uri = attachmentInfoItem.uri
+            audioViewModel?.apply {
+                playSilence(
+                    uri = uri,
+                    duration = duration,
+                    title = "錄音"
+                )
+
+                openBottomPlayer()
+            } ?: kotlin.run {
+                navController.navigate(
+                    AudioPreviewScreenDestination(
+                        uri = uri,
+                        duration = duration,
+                        title = "錄音"
+                    )
+                )
+            }
+        }
     ) {
         val type = attachmentInfoItem.attachmentType
         KLog.i(TAG, "onAttachmentClick:$attachmentInfoItem type:$type")
 
         when (type) {
             AttachmentType.VoiceMessage -> {
-                val uri = attachmentInfoItem.uri
-                audioViewModel?.apply {
-                    playSilence(
-                        uri = uri,
-                        duration = duration,
-                        title = "錄音"
-                    )
-
-                    openBottomPlayer()
-                } ?: kotlin.run {
-                    navController.navigate(
-                        AudioPreviewScreenDestination(
-                            uri = uri,
-                            duration = duration,
-                            title = "錄音"
-                        )
-                    )
-                }
+                onRecordClick()
             }
             AttachmentType.Audio -> {
                 val uri = attachmentInfoItem.uri

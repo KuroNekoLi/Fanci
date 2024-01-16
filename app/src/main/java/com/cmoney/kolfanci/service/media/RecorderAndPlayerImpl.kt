@@ -45,6 +45,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     private val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + Job()
+
     @Suppress("DEPRECATION")
     override fun startRecording() {
         _playingCurrentMilliseconds.value = 0
@@ -109,8 +110,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
     }
 
     override fun stopPlaying() {
-        player?.release()
-        player = null
+        player?.stop()
         _playingCurrentMilliseconds.value = 0
     }
 

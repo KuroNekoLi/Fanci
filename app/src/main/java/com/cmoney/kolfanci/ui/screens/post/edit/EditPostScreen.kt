@@ -67,6 +67,7 @@ import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
 import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
@@ -241,6 +242,7 @@ fun EditPostScreen(
         attachment = attachment,
         onDeleteAttach = {
             attachmentViewModel.removeAttach(it)
+            recordingViewModel.onEvent(RecordingScreenEvent.OnDelete)
         },
         onResend = {
             reSendFileClick = it
@@ -249,7 +251,8 @@ fun EditPostScreen(
             AttachmentController.onAttachmentClick(
                 navController = navController,
                 attachmentInfoItem = attachmentInfoItem,
-                context = context
+                context = context,
+                onRecordClick = { showAudioRecorderBottomSheet = true }
             )
         },
         onChoiceClick = {

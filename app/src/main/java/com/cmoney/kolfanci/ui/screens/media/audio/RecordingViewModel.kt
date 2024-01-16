@@ -117,24 +117,33 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
 
             RecordingScreenEvent.OnUpload -> {
                 stopCollectingPlayingProgressJob()
-                _recordingScreenState.updateState {
-                    RecordingScreenState.default
-                }
+                recorderAndPlayer.stopRecording()
+                recorderAndPlayer.stopPlaying()
                 _recordingScreenState.updateState {
                     copy(
+                        isDeleteVisible = false,
+                        isUploadVisible = false,
                         recordFileUri = recorderAndPlayer.getFileUri()
                     )
                 }
-                recorderAndPlayer.dismiss()
+
                 KLog.i(TAG, "recordFileUri: ${recorderAndPlayer.getFileUri()}")
             }
 
             RecordingScreenEvent.OnDismiss -> {
                 stopCollectingPlayingProgressJob()
-                recorderAndPlayer.dismiss()
-                recorderAndPlayer.deleteFile()
-                _recordingScreenState.updateState {
-                    RecordingScreenState.default
+                if (_recordingScreenState.value.isPlayOnly()) {
+                    _recordingScreenState.updateState {
+                        copy(
+                            currentTime = changeToTimeText(recorderAndPlayer.getPlayingDuration()),
+                        )
+                    }
+                } else {
+                    recorderAndPlayer.dismiss()
+                    recorderAndPlayer.deleteFile()
+                    _recordingScreenState.updateState {
+                        RecordingScreenState.default
+                    }
                 }
             }
         }
@@ -170,7 +179,8 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                 if (passedTime >= duration) {
                     _recordingScreenState.updateState {
                         copy(
-                            progressIndicator = ProgressIndicator.COMPLETE
+                            progressIndicator = ProgressIndicator.COMPLETE,
+                            currentTime = changeToTimeText(recorderAndPlayer.getPlayingDuration()),
                         )
                     }
                 }
@@ -181,5 +191,11 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
     private fun stopCollectingPlayingProgressJob() {
         playingProgressJob?.cancel()
         playingProgressJob = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        recorderAndPlayer.dismiss()
+        recorderAndPlayer.deleteFile()
     }
 }

@@ -80,6 +80,7 @@ import com.cmoney.kolfanci.ui.destinations.BaseEditMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
 import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 import com.cmoney.kolfanci.ui.screens.post.BaseDeletedContentScreen
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
@@ -482,6 +483,12 @@ fun PostInfoScreen(
         }
     }
 
+    //錄音sheet控制
+    var showAudioRecorderBottomSheet by remember { mutableStateOf(false) }
+    //錄音
+    val recordingViewModel: RecordingViewModel = koinViewModel()
+    val recordingScreenState by recordingViewModel.recordingScreenState
+
     PostInfoScreenView(
         modifier = modifier,
         channel = channel,
@@ -499,6 +506,7 @@ fun PostInfoScreen(
         isShowLoading = isShowLoading,
         onDeleteAttach = {
             attachmentViewModel.removeAttach(it)
+            recordingViewModel.onEvent(RecordingScreenEvent.OnDelete)
         },
         onAttachImageAddClick = {
             attachmentViewModel.onAttachImageAddClick()
@@ -510,18 +518,14 @@ fun PostInfoScreen(
             AttachmentController.onAttachmentClick(
                 navController = navController,
                 attachmentInfoItem = attachmentInfoItem,
-                context = context
+                context = context,
+                onRecordClick = { showAudioRecorderBottomSheet = true }
             )
         },
         onResend = {
             reSendFileClick = it
         }
     )
-    //錄音sheet控制
-    var showAudioRecorderBottomSheet by remember { mutableStateOf(false) }
-    //錄音
-    val recordingViewModel: RecordingViewModel = koinViewModel()
-    val recordingScreenState by recordingViewModel.recordingScreenState
 
     if (showAudioRecorderBottomSheet) {
         RecordScreen(
