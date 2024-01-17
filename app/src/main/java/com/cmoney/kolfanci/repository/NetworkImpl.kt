@@ -3,7 +3,7 @@ package com.cmoney.kolfanci.repository
 import android.app.Application
 import android.net.Uri
 import com.cmoney.kolfanci.extension.checkResponseBody
-import com.cmoney.kolfanci.extension.getFileType
+import com.cmoney.kolfanci.extension.getMimeType
 import com.cmoney.kolfanci.extension.getUploadFileType
 import com.cmoney.kolfanci.extension.uriToFile
 import com.cmoney.kolfanci.model.notification.NotificationHistory
@@ -65,11 +65,11 @@ class NetworkImpl(
     override suspend fun uploadFile(uri: Uri): Result<FileUploadResponse> =
         withContext(dispatcher) {
             kotlin.runCatching {
-                val mimeType = uri.getFileType(context)
+                val mimeType = uri.getMimeType(context)
                 val file = uri.uriToFile(context)
 
                 val requestBody = file.asRequestBody(
-                    contentType = mimeType.toMediaType()
+                    contentType = mimeType?.toMediaType()
                 )
 
                 val filePart = MultipartBody.Part.createFormData("File", file.name, requestBody)

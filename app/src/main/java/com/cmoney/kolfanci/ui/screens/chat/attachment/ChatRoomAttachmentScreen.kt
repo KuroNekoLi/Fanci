@@ -63,7 +63,7 @@ fun ChatRoomAttachmentScreen(
                     onClick = onClick,
                     onResend = onResend
                 )
-
+                AttachmentType.VoiceMessage,
                 AttachmentType.Audio -> {
                     AttachmentAudioScreen(
                         audioList = attachmentInfoItems,

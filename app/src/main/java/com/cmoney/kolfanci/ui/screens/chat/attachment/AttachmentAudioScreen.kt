@@ -41,6 +41,7 @@ fun AttachmentAudioScreen(
                 modifier = itemModifier,
                 file = file.uri,
                 duration = file.duration ?: 0,
+                isRecordFile = (file.attachmentType == AttachmentType.VoiceMessage),
                 isItemClickable = true,
                 isItemCanDelete = (file.status == AttachmentInfoItem.Status.Undefined),
                 isShowResend = (file.status is AttachmentInfoItem.Status.Failed),

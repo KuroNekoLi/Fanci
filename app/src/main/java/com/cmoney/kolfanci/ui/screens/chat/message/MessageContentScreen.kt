@@ -477,6 +477,41 @@ fun MediaContent(
         val attachmentInfoItems = entry.value
 
         when (key) {
+            AttachmentType.VoiceMessage -> {
+                LazyRow(
+                    modifier = modifier.then(
+                        Modifier.padding(top = 10.dp, end = 10.dp)
+                    ),
+                    state = rememberLazyListState(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(attachmentInfoItems) { attachmentInfoItem ->
+                        val fileUrl = attachmentInfoItem.serverUrl
+                        AttachmentAudioItem(
+                            modifier = Modifier
+                                .width(270.dp)
+                                .height(75.dp),
+                            file = Uri.parse(fileUrl),
+                            duration = attachmentInfoItem.duration ?: 0L,
+                            isItemClickable = true,
+                            isItemCanDelete = false,
+                            isShowResend = false,
+                            isRecordFile = true,
+                            displayName = attachmentInfoItem.filename,
+                            onClick = {
+                                AttachmentController.onAttachmentClick(
+                                    navController = navController,
+                                    attachmentInfoItem = attachmentInfoItem,
+                                    context = context,
+                                    fileName = attachmentInfoItem.filename,
+                                    duration = attachmentInfoItem.duration ?: 0L,
+                                    audioViewModel = audioViewModel
+                                )
+                            }
+                        )
+                    }
+                }
+            }
             AttachmentType.Audio -> {
                 LazyRow(
                     modifier = modifier.then(

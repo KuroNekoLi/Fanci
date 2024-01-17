@@ -42,6 +42,7 @@ import com.cmoney.kolfanci.ui.theme.LocalColor
  * @param onUpload 按下上傳的回調
  * @param onPlayingButtonClick 按下播放按鈕的回調
  */
+private const val TAG = "RecordingScreen"
 @Composable
 fun RecordingScreen(
     time: String,
@@ -122,8 +123,10 @@ fun RecordingScreen(
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = LocalColor.current.primary
                     ),
-                    onClick = { /*TODO*/
-                    }) {
+                    onClick = {
+                        onUpload()
+                    }
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.icon_arrow_up),
                         contentDescription = null,

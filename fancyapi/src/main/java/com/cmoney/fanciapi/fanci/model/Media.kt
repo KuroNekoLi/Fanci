@@ -20,6 +20,7 @@ import com.cmoney.fanciapi.fanci.model.ImageContent
 import com.cmoney.fanciapi.fanci.model.PdfContent
 import com.cmoney.fanciapi.fanci.model.TxtContent
 import com.cmoney.fanciapi.fanci.model.VideoContent
+import com.cmoney.fanciapi.fanci.model.VoiceMessageContent
 
 import com.squareup.moshi.Json
 import android.os.Parcelable
@@ -29,13 +30,14 @@ import kotlinx.parcelize.Parcelize
  * 媒體
  *
  * @param resourceLink 連結
- * @param type 媒體類型 (原本是Enum 但因為新增前端就要做強更 所以改成string彈性較高)<br></br>  圖片 (Image), 影片 (Video), 音檔 (Audio), 文檔 (Txt), PDF檔 (Pdf)
+ * @param type 媒體類型 (原本是Enum 但因為新增前端就要做強更 所以改成string彈性較高)<br></br>  圖片 (Image), 影片 (Video), 音檔 (Audio), 文檔 (Txt), PDF檔 (Pdf), VoiceMessage(語音訊息)
  * @param isNeedAuthenticate 媒體是否需要內部驗證
  * @param image 
  * @param audio 
  * @param video 
  * @param txt 
  * @param pdf 
+ * @param voiceMessage 
  */
 @Parcelize
 
@@ -46,7 +48,7 @@ data class Media (
     @Json(name = "resourceLink")
     val resourceLink: kotlin.String? = null,
 
-    /* 媒體類型 (原本是Enum 但因為新增前端就要做強更 所以改成string彈性較高)<br></br>  圖片 (Image), 影片 (Video), 音檔 (Audio), 文檔 (Txt), PDF檔 (Pdf) */
+    /* 媒體類型 (原本是Enum 但因為新增前端就要做強更 所以改成string彈性較高)<br></br>  圖片 (Image), 影片 (Video), 音檔 (Audio), 文檔 (Txt), PDF檔 (Pdf), VoiceMessage(語音訊息) */
     @Json(name = "type")
     val type: kotlin.String? = null,
 
@@ -67,7 +69,10 @@ data class Media (
     val txt: TxtContent? = null,
 
     @Json(name = "pdf")
-    val pdf: PdfContent? = null
+    val pdf: PdfContent? = null,
+
+    @Json(name = "voiceMessage")
+    val voiceMessage: VoiceMessageContent? = null
 
 ) : Parcelable
 

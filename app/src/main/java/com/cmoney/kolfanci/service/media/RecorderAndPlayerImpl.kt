@@ -3,7 +3,9 @@ package com.cmoney.kolfanci.service.media
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.net.Uri
 import android.os.Build
+import com.cmoney.kolfanci.model.Constant
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +28,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     private var recorder: MediaRecorder? = null
     private var player: MediaPlayer? = null
-    private var fileName: String? = null
+    private var filePath: String? = null
 
     //目前錄製的秒數
     private var _currentRecordSeconds = MutableStateFlow(0)
@@ -52,12 +54,12 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
             MediaRecorder()
         }
         recorder?.apply {
-            fileName =
-                "${context.externalCacheDir?.absolutePath}/錄音_${System.currentTimeMillis()}.3gp"
+            filePath =
+                "${Constant.absoluteCachePath}/錄音_${System.currentTimeMillis()}.aac"
             setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setOutputFile(fileName)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
+            setOutputFile(filePath)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
 
             try {
                 prepare()
@@ -85,7 +87,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         _playingCurrentMilliseconds.value = 0
         player = MediaPlayer().apply {
             try {
-                setDataSource(fileName)
+                setDataSource(filePath)
                 prepare()
                 start()
             } catch (e: IOException) {
@@ -121,7 +123,6 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         recorder = null
         player?.release()
         player = null
-        fileName?.let { File(it).delete() }
     }
 
     override fun getPlayingDuration(): Int {
@@ -170,4 +171,12 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
     }
 
     override fun getRecordingDuration() = recordingDuration
+    override fun getFileUri(): Uri? {
+        KLog.i(TAG, "fileName: $filePath, Uri: ${ Uri.fromFile(filePath?.let { File(it) })}")
+        return Uri.fromFile(filePath?.let { File(it) })
+    }
+
+    override fun deleteFile() {
+        filePath?.let { File(it).delete() }
+    }
 }

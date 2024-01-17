@@ -169,6 +169,26 @@ object AttachmentController {
         KLog.i(TAG, "onAttachmentClick:$attachmentInfoItem type:$type")
 
         when (type) {
+            AttachmentType.VoiceMessage -> {
+                val uri = attachmentInfoItem.uri
+                audioViewModel?.apply {
+                    playSilence(
+                        uri = uri,
+                        duration = duration,
+                        title = "錄音"
+                    )
+
+                    openBottomPlayer()
+                } ?: kotlin.run {
+                    navController.navigate(
+                        AudioPreviewScreenDestination(
+                            uri = uri,
+                            duration = duration,
+                            title = "錄音"
+                        )
+                    )
+                }
+            }
             AttachmentType.Audio -> {
                 val uri = attachmentInfoItem.uri
                 audioViewModel?.apply {

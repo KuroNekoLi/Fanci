@@ -6,8 +6,11 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import com.cmoney.kolfanci.model.attachment.AttachmentType
+import android.util.Log
+import android.webkit.MimeTypeMap
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.model.attachment.AttachmentInfoItem
+import com.cmoney.kolfanci.model.attachment.AttachmentType
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -115,7 +118,8 @@ fun Uri.getFileName(context: Context): String? {
  * 根據 Uri 區分檔案類型
  */
 fun Uri.getAttachmentType(context: Context): AttachmentType {
-    val mimeType = getFileType(context)
+    val mimeType = getMimeType(context) ?: ""
+    Log.i("LinLi", "mimeType: $mimeType")
     val lowMimeType = mimeType.lowercase()
     return if (lowMimeType.startsWith("image")) {
         AttachmentType.Image
@@ -128,7 +132,14 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
     } else if (lowMimeType.startsWith("text")) {
         AttachmentType.Txt
     } else if (lowMimeType.startsWith("audio")) {
-        AttachmentType.Audio
+        val uriString = this.toString()
+        val isRecordFile = Constant.absoluteCachePath.let { uriString.contains(it) }
+        if (isRecordFile) {
+            AttachmentType.VoiceMessage
+        } else {
+            AttachmentType.Audio
+        }
+
     } else {
         AttachmentType.Unknown
     }
@@ -138,14 +149,18 @@ fun Uri.getAttachmentType(context: Context): AttachmentType {
  * 檔案 上傳時 要傳類型給後端知道
  */
 fun Uri.getUploadFileType(context: Context): String {
-    val mimeType = getFileType(context)
-    val lowMimeType = mimeType.lowercase()
-    return if (lowMimeType.startsWith("audio")) {
-        "audio"
-    } else if (lowMimeType.startsWith("video")) {
-        "video"
+    val mimeType = getMimeType(context)
+    val lowMimeType = mimeType?.lowercase()
+    return if (lowMimeType != null) {
+        if (lowMimeType.startsWith("audio")) {
+            "audio"
+        } else if (lowMimeType.startsWith("video")) {
+            "video"
+        } else {
+            "document"
+        }
     } else {
-        "document"
+        ""
     }
 }
 
@@ -158,6 +173,20 @@ fun Uri.getFileType(context: Context): String {
     return cr.getType(this).orEmpty()
     //    val mimeTypeMap = MimeTypeMap.getSingleton()
     //    return mimeTypeMap.getExtensionFromMimeType(r.getType(uri))
+}
+
+/**
+ * 取得音檔類型
+ */
+fun Uri.getMimeType(context: Context): String? {
+    val type: String?
+    val extension = MimeTypeMap.getFileExtensionFromUrl(this.toString())
+    type = if (!extension.isNullOrEmpty()) {
+        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+    } else {
+        getFileType(context)
+    }
+    return type
 }
 
 /**

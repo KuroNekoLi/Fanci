@@ -22,12 +22,13 @@ interface GroupMemberApi {
      *
      * @param groupId 社團id
      * @param search 搜尋用戶暱稱的關鍵字 (optional, default to "")
-     * @param skip 跳脫筆數 (optional, default to 0)
      * @param take 取得筆數 (optional, default to 20)
+     * @param startWeight 起始權重 (optional, default to 0)
+     * @param skip 跳脫筆數（已過時，請改用 startWeight，此參數未來將移除） (optional, default to 0)
      * @return [GroupMemberPaging]
      */
     @GET("api/v1/GroupMember/group/{groupId}")
-    suspend fun apiV1GroupMemberGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("search") search: kotlin.String? = "", @Query("skip") skip: kotlin.Int? = 0, @Query("take") take: kotlin.Int? = 20): Response<GroupMemberPaging>
+    suspend fun apiV1GroupMemberGroupGroupIdGet(@Path("groupId") groupId: kotlin.String, @Query("search") search: kotlin.String? = "", @Query("take") take: kotlin.Int? = 20, @Query("startWeight") startWeight: kotlin.Int? = 0, @Query("skip") skip: kotlin.Int? = 0): Response<GroupMemberPaging>
 
     /**
      * 離開社團
