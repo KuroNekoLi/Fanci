@@ -28,7 +28,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     private var recorder: MediaRecorder? = null
     private var player: MediaPlayer? = null
-    private var fileName: String? = null
+    private var filePath: String? = null
 
     //目前錄製的秒數
     private var _currentRecordSeconds = MutableStateFlow(0)
@@ -54,11 +54,11 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
             MediaRecorder()
         }
         recorder?.apply {
-            fileName =
+            filePath =
                 "${Constant.absoluteCachePath}/錄音_${System.currentTimeMillis()}.aac"
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
-            setOutputFile(fileName)
+            setOutputFile(filePath)
             setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
 
             try {
@@ -87,7 +87,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         _playingCurrentMilliseconds.value = 0
         player = MediaPlayer().apply {
             try {
-                setDataSource(fileName)
+                setDataSource(filePath)
                 prepare()
                 start()
             } catch (e: IOException) {
@@ -172,11 +172,11 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     override fun getRecordingDuration() = recordingDuration
     override fun getFileUri(): Uri? {
-        KLog.i(TAG, "fileName: $fileName, Uri: ${ Uri.fromFile(fileName?.let { File(it) })}")
-        return Uri.fromFile(fileName?.let { File(it) })
+        KLog.i(TAG, "fileName: $filePath, Uri: ${ Uri.fromFile(filePath?.let { File(it) })}")
+        return Uri.fromFile(filePath?.let { File(it) })
     }
 
     override fun deleteFile() {
-        fileName?.let { File(it).delete() }
+        filePath?.let { File(it).delete() }
     }
 }
