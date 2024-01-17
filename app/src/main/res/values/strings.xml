@@ -3,8 +3,6 @@
     <string name="app_client_id">cmkolfanci</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <string name="flurry_api_key">DKFFRQNSDSC3BGN9TD9Q</string>
     <string name="facebook_app_id">807119773957521</string>
     <string name="mixpanel_token">1203044a7c4d51faf75a3721d3458a86</string>
 

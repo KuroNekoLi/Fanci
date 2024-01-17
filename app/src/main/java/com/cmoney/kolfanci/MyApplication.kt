@@ -1,7 +1,6 @@
 package com.cmoney.kolfanci
 
 import android.app.Application
-import android.util.Log
 import com.cmoney.application_user_behavior.AnalyticsAgent
 import com.cmoney.application_user_behavior.di.analyticsModule
 import com.cmoney.backend2.base.model.manager.GlobalBackend2Manager
@@ -21,10 +20,7 @@ import com.cmoney.loginlibrary.di.visitBindRepositoryModule
 import com.cmoney.loginlibrary.di.visitBindViewModelModule
 import com.cmoney.member.application.di.CMoneyMemberServiceLocator
 import com.cmoney.remoteconfig_library.IRemoteConfig
-import com.flurry.android.FlurryAgent
-import com.flurry.android.FlurryPerformance
 import com.google.firebase.FirebaseApp
-import com.socks.library.KLog
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
@@ -69,16 +65,6 @@ class MyApplication : Application() {
 
         FirebaseApp.initializeApp(this)
 
-        if (!BuildConfig.DEBUG) {
-            FlurryAgent.Builder()
-                .withLogEnabled(BuildConfig.DEBUG)
-                .withDataSaleOptOut(false)
-                .withCaptureUncaughtExceptions(true)
-                .withIncludeBackgroundSessionsInMetrics(true)
-                .withLogLevel(Log.VERBOSE)
-                .withPerformanceMetrics(FlurryPerformance.ALL)
-                .build(this, getString(R.string.flurry_api_key))
-        }
         // 設定Backend2
         val remoteConfig = getKoin().get<IRemoteConfig>()
         val cmServer = remoteConfig.getApiConfig().serverUrl.ifBlank {

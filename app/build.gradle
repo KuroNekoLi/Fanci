@@ -148,9 +148,6 @@ dependencies {
         // 忽略constraintlayout版本，使模組版本不要影響到app
     }
 
-    //=============== Flurry ===============
-    implementation 'com.flurry.android:analytics:13.3.0'
-
     //=============== SnackBar ===============
     implementation 'com.radusalagean:info-bar-compose:1.0.0'
 
