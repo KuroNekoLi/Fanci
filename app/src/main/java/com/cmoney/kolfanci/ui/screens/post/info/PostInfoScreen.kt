@@ -548,7 +548,7 @@ fun PostInfoScreen(
     MediaPickerBottomSheet(
         navController = navController,
         state = state,
-        attachmentEnv = AttachmentEnv.Post,
+        attachmentEnv = AttachmentEnv.PostInfo,
         selectedAttachment = attachment,
         onRecord = {
             showAudioRecorderBottomSheet = true

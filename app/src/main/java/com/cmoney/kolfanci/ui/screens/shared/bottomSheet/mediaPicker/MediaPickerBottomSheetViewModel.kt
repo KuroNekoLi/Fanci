@@ -27,6 +27,7 @@ class MediaPickerBottomSheetViewModel(
     ) {
         val attachmentTypes = selectedAttachment.keys
         when (attachmentEnv) {
+            AttachmentEnv.PostInfo,
             AttachmentEnv.Chat -> {
                 if (!attachmentTypes.contains(AttachmentType.Image) && attachmentTypes.isNotEmpty()) {
                     onError.invoke(
@@ -82,6 +83,7 @@ class MediaPickerBottomSheetViewModel(
     ) {
         val attachmentTypes = selectedAttachment.keys
         when (attachmentEnv) {
+            AttachmentEnv.PostInfo,
             AttachmentEnv.Chat -> {
                 if (attachmentTypes.contains(AttachmentType.Image)) {
                     onError.invoke(
@@ -128,6 +130,7 @@ class MediaPickerBottomSheetViewModel(
         onError: (String, String) -> Unit
     ) {
         when (attachmentEnv) {
+            AttachmentEnv.PostInfo,
             AttachmentEnv.Chat -> {
                 if (selectedAttachment.isNotEmpty()) {
                     onError.invoke(
@@ -168,6 +171,7 @@ class MediaPickerBottomSheetViewModel(
         onError: (String, String) -> Unit
     ) {
         when (attachmentEnv) {
+            AttachmentEnv.PostInfo,
             AttachmentEnv.Chat -> {
                 if (selectedAttachment.isNotEmpty()) {
                     onError.invoke(

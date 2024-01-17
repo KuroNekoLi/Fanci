@@ -69,6 +69,10 @@ sealed class AttachmentEnv {
      * 貼文
      */
     object Post : AttachmentEnv()
+    /**
+     * 貼文留言區
+     */
+    object PostInfo : AttachmentEnv()
 }
 
 /**
