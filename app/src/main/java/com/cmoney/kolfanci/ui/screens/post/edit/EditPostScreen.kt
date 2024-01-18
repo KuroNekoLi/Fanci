@@ -560,8 +560,6 @@ private fun EditPostScreenView(
 
                     Spacer(modifier = Modifier.width(10.dp))
                     if (Constant.isShowUploadFile()) {
-                        Spacer(modifier = Modifier.width(15.dp))
-
                         //File picker
                         Row(
                             modifier.clickable {
