@@ -242,7 +242,7 @@ fun EditPostScreen(
         attachment = attachment,
         onDeleteAttach = {
             attachmentViewModel.removeAttach(it)
-            recordingViewModel.onEvent(RecordingScreenEvent.OnDelete)
+            recordingViewModel.onEvent(RecordingScreenEvent.OnPreviewItemDeleted(it.uri))
         },
         onResend = {
             reSendFileClick = it
@@ -252,7 +252,17 @@ fun EditPostScreen(
                 navController = navController,
                 attachmentInfoItem = attachmentInfoItem,
                 context = context,
-                onRecordClick = { showAudioRecorderBottomSheet = true }
+                onRecordClick = {
+                    val uri = attachmentInfoItem.uri
+                    val duration = attachmentInfoItem.duration
+                    recordingViewModel.onEvent(
+                        RecordingScreenEvent.OnPreviewItemClicked(
+                            uri,
+                            duration
+                        )
+                    )
+                    showAudioRecorderBottomSheet = true
+                }
             )
         },
         onChoiceClick = {
@@ -263,6 +273,7 @@ fun EditPostScreen(
         },
         defaultContent = inputContent,
         onRecordClick = {
+            recordingViewModel.onEvent(RecordingScreenEvent.OnOpenSheet)
             showAudioRecorderBottomSheet = true
         }
     )

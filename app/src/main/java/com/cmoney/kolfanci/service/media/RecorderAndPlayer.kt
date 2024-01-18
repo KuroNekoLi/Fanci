@@ -71,4 +71,16 @@ interface RecorderAndPlayer {
      * 刪除錄音檔案
      */
     fun deleteFile()
+
+    /**
+     * 播放給定的錄音檔
+     * @param uri 音檔的uri
+     */
+    fun startPlaying(uri: Uri)
+
+    /**
+     * 刪除給定的錄音檔
+     * @param uri 音檔的uri
+     */
+    fun deleteFile(uri: Uri)
 }

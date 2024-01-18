@@ -83,6 +83,18 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         stopRecordingTimer()
     }
 
+    override fun startPlaying(uri: Uri) {
+        _playingCurrentMilliseconds.value = 0
+        player = MediaPlayer().apply {
+            try {
+                setDataSource(uri.toString())
+                prepare()
+                start()
+            } catch (e: IOException) {
+                KLog.e(TAG, "prepare() failed")
+            }
+        }
+    }
 
     override fun startPlaying() {
         _playingCurrentMilliseconds.value = 0
@@ -172,11 +184,15 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     override fun getRecordingDuration() = recordingDuration
     override fun getFileUri(): Uri? {
-        KLog.i(TAG, "fileName: $filePath, Uri: ${ Uri.fromFile(filePath?.let { File(it) })}")
+        KLog.i(TAG, "fileName: $filePath, Uri: ${Uri.fromFile(filePath?.let { File(it) })}")
         return Uri.fromFile(filePath?.let { File(it) })
     }
 
     override fun deleteFile() {
         filePath?.let { File(it).delete() }
+    }
+
+    override fun deleteFile(uri: Uri) {
+        filePath?.let { File(uri.toString()).delete() }
     }
 }

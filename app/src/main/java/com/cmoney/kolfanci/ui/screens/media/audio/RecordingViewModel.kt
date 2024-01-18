@@ -75,7 +75,13 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                     }
 
                     ProgressIndicator.COMPLETE -> {
-                        recorderAndPlayer.startPlaying()
+                        if (_recordingScreenState.value.isPlayOnly()) {
+                            val uri = _recordingScreenState.value.recordFileUri
+                            uri?.let { recorderAndPlayer.startPlaying(it) }
+                        } else {
+                            recorderAndPlayer.startPlaying()
+                        }
+
                         _recordingScreenState.updateState {
                             copy(
                                 progressIndicator = ProgressIndicator.PLAYING
@@ -133,18 +139,37 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
             RecordingScreenEvent.OnDismiss -> {
                 stopCollectingPlayingProgressJob()
                 if (_recordingScreenState.value.isPlayOnly()) {
+                    recorderAndPlayer.stopPlaying()
                     _recordingScreenState.updateState {
                         copy(
                             currentTime = changeToTimeText(recorderAndPlayer.getPlayingDuration()),
+                            progressIndicator = ProgressIndicator.COMPLETE
                         )
                     }
                 } else {
-                    recorderAndPlayer.dismiss()
+                    initStateAndPlayer()
                     recorderAndPlayer.deleteFile()
-                    _recordingScreenState.updateState {
-                        RecordingScreenState.default
-                    }
                 }
+            }
+
+            is RecordingScreenEvent.OnPreviewItemClicked -> {
+                val duration = event.duration ?: 0
+                _recordingScreenState.updateState {
+                    copy(
+                        progressIndicator = ProgressIndicator.COMPLETE,
+                        progress = 0f,
+                        currentTime = changeToTimeText(duration.toInt()),
+                        recordFileUri = event.uri
+                    )
+                }
+            }
+
+            is RecordingScreenEvent.OnPreviewItemDeleted -> {
+                recorderAndPlayer.deleteFile(event.uri)
+            }
+
+            RecordingScreenEvent.OnOpenSheet -> {
+                initStateAndPlayer()
             }
         }
     }
@@ -197,5 +222,12 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
         super.onCleared()
         recorderAndPlayer.dismiss()
         recorderAndPlayer.deleteFile()
+    }
+
+    fun initStateAndPlayer() {
+        recorderAndPlayer.dismiss()
+        _recordingScreenState.updateState {
+            RecordingScreenState.default
+        }
     }
 }
