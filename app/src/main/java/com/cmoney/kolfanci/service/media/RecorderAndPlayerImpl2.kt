@@ -1,10 +1,16 @@
 package com.cmoney.kolfanci.service.media
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
+import android.support.v4.media.session.PlaybackStateCompat
+import android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED
+import android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING
+import android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
+import androidx.lifecycle.Observer
 import com.cmoney.kolfanci.model.Constant
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
@@ -19,15 +25,39 @@ import java.io.File
 import java.io.IOException
 import kotlin.coroutines.CoroutineContext
 
-private const val TAG = "MyMediaRecorderImpl"
+private const val TAG = "MyMediaRecorderImpl2"
 
 /**
  * 錄音與播放介面的實現
  */
-class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
+class RecorderAndPlayerImpl2(private val context: Context,private val musicServiceConnection:MusicServiceConnection) : RecorderAndPlayer {
+
+    private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
+    private val playbackStateObserver = Observer<PlaybackStateCompat> {
+        playbackState = it
+        val metadata = musicServiceConnection.nowPlaying.value ?: NOTHING_PLAYING
+        when(it.state){
+            STATE_PLAYING -> {
+                CoroutineScope(coroutineContext).launch {
+                    val currentPosition = playbackState.currentPlayBackPosition
+                    _playingCurrentMilliseconds.emit(currentPosition)
+                    delay(200)
+                }
+            }
+            STATE_PAUSED -> {}
+            STATE_STOPPED -> {
+                //正在播的歌曲
+                val nowPlaying = musicServiceConnection.nowPlaying.value
+                val duration = nowPlaying?.duration ?: 0L
+                CoroutineScope(coroutineContext).launch {
+                    _playingCurrentMilliseconds.emit(duration)
+                }
+            }
+            else -> {}
+        }
+    }
 
     private var recorder: MediaRecorder? = null
-    private var player: MediaPlayer? = null
     private var filePath: String? = null
 
     //目前錄製的秒數
@@ -35,7 +65,6 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
     private var _playingCurrentMilliseconds = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0f)
     private var recordJob: Job? = null
-    private var playingJob: Job? = null
 
     //最大錄音秒數
     private val maxRecordingDuration = 45000L
@@ -45,6 +74,12 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     private val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + Job()
+
+    init {
+        musicServiceConnection.also {
+            it.playbackState.observeForever(playbackStateObserver)
+        }
+    }
 
     @Suppress("DEPRECATION")
     override fun startRecording() {
@@ -85,44 +120,59 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     override fun startPlaying(uri: Uri) {
         _playingCurrentMilliseconds.value = 0
-        player = MediaPlayer().apply {
-            try {
-                setDataSource(uri.toString())
-                prepare()
-                start()
-            } catch (e: IOException) {
-                KLog.e(TAG, "prepare() failed")
-            }
+
+        if (musicServiceConnection.isConnected.value == true) {
+
+            val transportControls = musicServiceConnection.transportControls
+            transportControls.playFromUri(uri, null)
+
+        } else {
+            KLog.e(TAG, "musicServiceConnection is not connect.")
         }
+
     }
 
     override fun startPlaying() {
-        _playingCurrentMilliseconds.value = 0
-        player = MediaPlayer().apply {
-            try {
-                setDataSource(filePath)
-                prepare()
-                start()
-            } catch (e: IOException) {
-                KLog.e(TAG, "prepare() failed")
-            }
-        }
+        startPlaying(Uri.parse(filePath))
     }
 
     override fun pausePlaying() {
-        if (player?.isPlaying == true) {
-            player!!.pause()
+        if (musicServiceConnection.isConnected.value == true) {
+            val transportControls = musicServiceConnection.transportControls
+            musicServiceConnection.playbackState.value?.let { playbackState ->
+                when {
+                    playbackState.isPlaying -> transportControls.pause()
+                    playbackState.isPlayEnabled -> transportControls.play()
+                    else -> {
+                        KLog.w(
+                            TAG,
+                            "Playable item clicked but neither play nor pause are enabled!"
+                        )
+                    }
+                }
+            }
         }
     }
 
     override fun resumePlaying() {
-        if (!player?.isPlaying!!) {
-            player?.start()
+        if (musicServiceConnection.isConnected.value == true) {
+            val transportControls = musicServiceConnection.transportControls
+            musicServiceConnection.playbackState.value?.let { playbackState ->
+                when {
+                    playbackState.isPlayEnabled -> transportControls.play()
+                    else -> {
+                        KLog.w(
+                            TAG,
+                            "Playable item clicked but neither play nor pause are enabled!"
+                        )
+                    }
+                }
+            }
         }
     }
 
     override fun stopPlaying() {
-        player?.stop()
+        musicServiceConnection.transportControls.stop()
         _playingCurrentMilliseconds.value = 0
     }
 
@@ -133,32 +183,20 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         recordingDuration = 0
         recorder?.release()
         recorder = null
-        player?.release()
-        player = null
+        musicServiceConnection.transportControls.stop()
+        musicServiceConnection.playbackState.removeObserver(playbackStateObserver)
     }
 
     override fun getPlayingDuration(): Long {
-        return player?.duration?.toLong() ?: 0
+        val mmr = MediaMetadataRetriever()
+        mmr.setDataSource(filePath)
+        val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        val millSecond = durationStr?.toLong() ?: 0L
+
+        return millSecond
     }
 
     override fun getPlayingCurrentMilliseconds(): StateFlow<Long> {
-        playingJob?.cancel()
-        playingJob = CoroutineScope(coroutineContext).launch {
-            player?.let { mediaPlayer ->
-                try {
-                    while (mediaPlayer.isPlaying) {
-                        val currentPosition = mediaPlayer.currentPosition.toLong()
-                        _playingCurrentMilliseconds.emit(currentPosition)
-                        delay(200)
-                    }
-                    if (mediaPlayer.currentPosition == mediaPlayer.duration) {
-                        _playingCurrentMilliseconds.emit(mediaPlayer.duration.toLong())
-                    }
-                } catch (e: IllegalStateException) {
-                    KLog.e(TAG, "MediaPlayer is in an invalid state", e)
-                }
-            }
-        }
         return _playingCurrentMilliseconds.asStateFlow()
     }
 

@@ -158,7 +158,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                     copy(
                         progressIndicator = ProgressIndicator.COMPLETE,
                         progress = 0f,
-                        currentTime = changeToTimeText(duration.toInt()),
+                        currentTime = changeToTimeText(duration),
                         recordFileUri = event.uri
                     )
                 }
@@ -182,7 +182,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
      * 將時間轉換為mm:ss
      * @param time 毫秒
      */
-    private fun changeToTimeText(time: Int): String {
+    private fun changeToTimeText(time: Long): String {
         val minutes = (time / 1000 / 60).toString().padStart(2, '0')
         val seconds = (time / 1000 % 60).toString().padStart(2, '0')
         return "$minutes:$seconds"
