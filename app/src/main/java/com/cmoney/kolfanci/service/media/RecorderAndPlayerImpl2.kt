@@ -11,6 +11,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED
 import android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING
 import android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
+import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import com.cmoney.kolfanci.model.Constant
@@ -34,29 +35,37 @@ private const val TAG = "MyMediaRecorderImpl2"
  */
 class RecorderAndPlayerImpl2(private val context: Context,private val musicServiceConnection:MusicServiceConnection) : RecorderAndPlayer {
 
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
-    private val playbackStateObserver = Observer<PlaybackStateCompat> {
-        playbackState = it
-        val metadata = musicServiceConnection.nowPlaying.value ?: NOTHING_PLAYING
-        when(it.state){
-            STATE_PLAYING -> {
-                CoroutineScope(coroutineContext).launch {
-                    val currentPosition = playbackState.currentPlayBackPosition
-                    _playingCurrentMilliseconds.emit(currentPosition)
-                    delay(200)
-                }
+    private val playbackStateObserver = Observer<PlaybackStateCompat> { playbackState->
+        playingJob?.cancel()
+        playingJob = CoroutineScope(coroutineContext).launch {
+            val nowPlaying = musicServiceConnection.nowPlaying.value
+            val duration = nowPlaying?.duration ?: 0L
+            while (playbackState.state == STATE_PLAYING){
+                val currentPosition = playbackState.currentPlayBackPosition
+                _playingCurrentMilliseconds.emit(currentPosition)
+                delay(200)
             }
-            STATE_PAUSED -> {}
-            STATE_STOPPED -> {
-                //正在播的歌曲
-                val nowPlaying = musicServiceConnection.nowPlaying.value
-                val duration = nowPlaying?.duration ?: 0L
-                CoroutineScope(coroutineContext).launch {
-                    _playingCurrentMilliseconds.emit(duration)
-                }
+            if(playbackState.state == STATE_STOPPED){
+                Log.i("LinLi", "emit,duration: $duration")
+
+                _playingCurrentMilliseconds.emit(getDurationFromRecordFile())
             }
-            else -> {}
         }
+//        val metadata = musicServiceConnection.nowPlaying.value ?: NOTHING_PLAYING
+//        when(it.state){
+//            STATE_PLAYING -> {
+//                Log.i(TAG, "STATE_PLAYING:")
+//            }
+//            STATE_PAUSED -> {
+//                Log.i(TAG, "STATE_PAUSED:")
+//            }
+//            STATE_STOPPED -> {
+//                Log.i(TAG, "STATE_STOPPED:")
+//            }
+//            else -> {}
+//        }
     }
 
     private var recorder: MediaRecorder? = null
@@ -67,7 +76,7 @@ class RecorderAndPlayerImpl2(private val context: Context,private val musicServi
     private var _playingCurrentMilliseconds = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0f)
     private var recordJob: Job? = null
-
+    private var playingJob: Job? = null
     //最大錄音秒數
     private val maxRecordingDuration = 45000L
 

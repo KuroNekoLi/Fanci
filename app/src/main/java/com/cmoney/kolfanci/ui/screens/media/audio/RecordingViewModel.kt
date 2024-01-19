@@ -1,5 +1,6 @@
 package com.cmoney.kolfanci.ui.screens.media.audio
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -200,6 +201,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                 if (isFromRecordFile) recorderAndPlayer.getDurationFromRecordFile() else durationFromAttachmentRecordInfo
                     ?: 0
             recorderAndPlayer.getPlayingCurrentMilliseconds().collect { passedTime ->
+                Log.i("LinLi", "passedTime: $passedTime,duration: $duration")
                 _recordingScreenState.updateState {
                     copy(
                         //(passedTime/duration)如果都是整數不會動
