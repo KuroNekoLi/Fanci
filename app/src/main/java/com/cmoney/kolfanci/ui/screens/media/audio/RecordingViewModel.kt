@@ -18,6 +18,7 @@ private const val TAG = "RecordingViewModel"
  */
 class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : ViewModel() {
     private val _recordingScreenState = mutableStateOf(RecordingScreenState.default)
+    private var durationFromAttachmentRecordInfo: Long? = null
 
     /**
      * 錄音狀態
@@ -78,8 +79,10 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                         if (_recordingScreenState.value.isPlayOnly()) {
                             val uri = _recordingScreenState.value.recordFileUri
                             uri?.let { recorderAndPlayer.startPlaying(it) }
+                            startCollectingPlayingProgressJob(false)
                         } else {
                             recorderAndPlayer.startPlaying()
+                            startCollectingPlayingProgressJob()
                         }
 
                         _recordingScreenState.updateState {
@@ -87,7 +90,6 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                                 progressIndicator = ProgressIndicator.PLAYING
                             )
                         }
-                        startCollectingPlayingProgressJob()
                     }
 
                     ProgressIndicator.PLAYING -> {
@@ -142,7 +144,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                     recorderAndPlayer.stopPlaying()
                     _recordingScreenState.updateState {
                         copy(
-                            currentTime = changeToTimeText(recorderAndPlayer.getPlayingDuration()),
+                            currentTime = changeToTimeText(recorderAndPlayer.getDurationFromRecordFile()),
                             progressIndicator = ProgressIndicator.COMPLETE
                         )
                     }
@@ -153,12 +155,13 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
             }
 
             is RecordingScreenEvent.OnPreviewItemClicked -> {
-                val duration = event.duration ?: 0
+                durationFromAttachmentRecordInfo = event.duration ?: 0
                 _recordingScreenState.updateState {
                     copy(
+                        isRecordHintVisible = false,
                         progressIndicator = ProgressIndicator.COMPLETE,
                         progress = 0f,
-                        currentTime = changeToTimeText(duration.toInt()),
+                        currentTime = changeToTimeText(durationFromAttachmentRecordInfo!!),
                         recordFileUri = event.uri
                     )
                 }
@@ -182,17 +185,19 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
      * 將時間轉換為mm:ss
      * @param time 毫秒
      */
-    private fun changeToTimeText(time: Int): String {
+    private fun changeToTimeText(time: Long): String {
         val minutes = (time / 1000 / 60).toString().padStart(2, '0')
         val seconds = (time / 1000 % 60).toString().padStart(2, '0')
         return "$minutes:$seconds"
     }
 
     // 一個收集正在播放時間的流，並設定State的任務
-    private fun startCollectingPlayingProgressJob() {
+    private fun startCollectingPlayingProgressJob(isFromRecordFile: Boolean = true) {
         playingProgressJob?.cancel() // 取消先前的任務（如果存在）
         playingProgressJob = viewModelScope.launch {
-            val duration = recorderAndPlayer.getPlayingDuration()
+            val duration =
+                if (isFromRecordFile) recorderAndPlayer.getDurationFromRecordFile() else durationFromAttachmentRecordInfo
+                    ?: 0
             recorderAndPlayer.getPlayingCurrentMilliseconds().collect { passedTime ->
                 _recordingScreenState.updateState {
                     copy(
@@ -205,7 +210,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                     _recordingScreenState.updateState {
                         copy(
                             progressIndicator = ProgressIndicator.COMPLETE,
-                            currentTime = changeToTimeText(recorderAndPlayer.getPlayingDuration()),
+                            currentTime = changeToTimeText(recorderAndPlayer.getDurationFromRecordFile()),
                         )
                     }
                 }

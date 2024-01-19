@@ -268,7 +268,10 @@ fun ChatRoomScreen(
                 navController = navController,
                 attachmentInfoItem = attachmentInfoItem,
                 context = context,
-                onRecordClick = { showAudioRecorderBottomSheet = true }
+                onRecordClick = {
+                    showAudioRecorderBottomSheet = true
+                    recordingViewModel.onEvent(RecordingScreenEvent.OnPreviewItemClicked(attachmentInfoItem.uri,attachmentInfoItem.duration))
+                }
             )
         },
         attachment = attachment,
