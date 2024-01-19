@@ -10,6 +10,7 @@ import com.cmoney.kolfanci.service.media.MusicMediaService
 import com.cmoney.kolfanci.service.media.MusicServiceConnection
 import com.cmoney.kolfanci.service.media.RecorderAndPlayer
 import com.cmoney.kolfanci.service.media.RecorderAndPlayerImpl
+import com.cmoney.kolfanci.service.media.RecorderAndPlayerImpl2
 import com.cmoney.remoteconfig_library.IRemoteConfig
 import com.cmoney.remoteconfig_library.RemoteConfigImpl
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -50,9 +51,15 @@ val appModule = module {
             ComponentName(androidContext(), MusicMediaService::class.java)
         )
     }
-    single<RecorderAndPlayer> {
-        RecorderAndPlayerImpl(
-            context = androidApplication()
+//    single<RecorderAndPlayer> {
+//        RecorderAndPlayerImpl(
+//            context = androidApplication()
+//        )
+//    }
+    factory<RecorderAndPlayer> {
+        RecorderAndPlayerImpl2(
+            context = androidApplication(),
+            musicServiceConnection = get()
         )
     }
 }

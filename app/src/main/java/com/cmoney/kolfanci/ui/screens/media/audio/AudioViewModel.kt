@@ -336,4 +336,11 @@ class AudioViewModel(
     fun closeBottomPlayer() {
         _isShowBottomPlayer.update { false }
     }
+    fun addObserver() {
+        musicServiceConnection.playbackState.observeForever(playbackStateObserver)
+    }
+
+    fun removeObserver() {
+        musicServiceConnection.playbackState.removeObserver(playbackStateObserver)
+    }
 }

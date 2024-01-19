@@ -2,6 +2,7 @@ package com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -12,9 +13,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import com.cmoney.kolfanci.ui.main.MainActivity
+import com.cmoney.kolfanci.ui.screens.media.audio.AudioViewModel
 import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
 import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
 import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * 確認錄音權限
@@ -90,6 +95,10 @@ fun RecordScreen(
     onUpload: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
+    val audioViewModel: AudioViewModel = koinViewModel(viewModelStoreOwner = LocalContext.current as MainActivity){
+        parametersOf(Uri.EMPTY)
+    }
+
     val recordingScreenState by recordingViewModel.recordingScreenState
     RecordAndPlayUIWithPermissionCheck(
         isRecorderHintVisible = recordingScreenState.isRecordHintVisible,
@@ -98,14 +107,22 @@ fun RecordScreen(
         isDeleteVisible = recordingScreenState.isDeleteVisible,
         isUploadVisible = recordingScreenState.isUploadVisible,
         progress = recordingScreenState.progress,
-        onPlayingButtonClick = { recordingViewModel.onEvent(RecordingScreenEvent.OnButtonClicked) },
-        onDelete = { recordingViewModel.onEvent(RecordingScreenEvent.OnDelete) },
+        onPlayingButtonClick = {
+            audioViewModel.removeObserver()
+            recordingViewModel.onEvent(RecordingScreenEvent.OnButtonClicked)
+        },
+        onDelete = {
+            audioViewModel.addObserver()
+            recordingViewModel.onEvent(RecordingScreenEvent.OnDelete)
+        },
         onUpload = {
+            audioViewModel.addObserver()
             recordingViewModel.onEvent(RecordingScreenEvent.OnUpload)
             onUpload()
 
         },
         onDismissRequest = {
+            audioViewModel.addObserver()
             recordingViewModel.onEvent(RecordingScreenEvent.OnDismiss)
             onDismissRequest()
         }
