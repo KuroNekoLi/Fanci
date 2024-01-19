@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cmoney.kolfanci.model.Constant
 import com.cmoney.kolfanci.service.media.RecorderAndPlayer
 import com.socks.library.KLog
 import kotlinx.coroutines.Job
@@ -44,7 +45,7 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                                         currentTime = changeToTimeText(it)
                                     )
                                 }
-                                if (it >= 45000) {
+                                if (it >= Constant.maxRecordingDuration) {
                                     _recordingScreenState.updateState {
                                         copy(
                                             progressIndicator = ProgressIndicator.COMPLETE
