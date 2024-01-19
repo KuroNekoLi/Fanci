@@ -80,6 +80,8 @@ import com.cmoney.kolfanci.ui.destinations.BaseEditMessageScreenDestination
 import com.cmoney.kolfanci.ui.destinations.EditPostScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.MessageInput
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 import com.cmoney.kolfanci.ui.screens.post.BaseDeletedContentScreen
 import com.cmoney.kolfanci.ui.screens.post.BasePostContentScreen
 import com.cmoney.kolfanci.ui.screens.post.CommentCount
@@ -93,6 +95,7 @@ import com.cmoney.kolfanci.ui.screens.post.info.model.ReplyData
 import com.cmoney.kolfanci.ui.screens.post.info.model.UiState
 import com.cmoney.kolfanci.ui.screens.post.info.viewmodel.PostInfoViewModel
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.AttachmentEnv
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DeleteConfirmDialogScreen
@@ -480,6 +483,12 @@ fun PostInfoScreen(
         }
     }
 
+    //錄音sheet控制
+    var showAudioRecorderBottomSheet by remember { mutableStateOf(false) }
+    //錄音
+    val recordingViewModel: RecordingViewModel = koinViewModel()
+    val recordingScreenState by recordingViewModel.recordingScreenState
+
     PostInfoScreenView(
         modifier = modifier,
         channel = channel,
@@ -497,6 +506,7 @@ fun PostInfoScreen(
         isShowLoading = isShowLoading,
         onDeleteAttach = {
             attachmentViewModel.removeAttach(it)
+            recordingViewModel.onEvent(RecordingScreenEvent.OnDelete)
         },
         onAttachImageAddClick = {
             attachmentViewModel.onAttachImageAddClick()
@@ -508,13 +518,31 @@ fun PostInfoScreen(
             AttachmentController.onAttachmentClick(
                 navController = navController,
                 attachmentInfoItem = attachmentInfoItem,
-                context = context
+                context = context,
+                onRecordClick = { showAudioRecorderBottomSheet = true }
             )
         },
         onResend = {
             reSendFileClick = it
         }
     )
+
+    if (showAudioRecorderBottomSheet) {
+        RecordScreen(
+            recordingViewModel = recordingViewModel,
+            onUpload = {
+                showAudioRecorderBottomSheet = false
+                coroutineScope.launch {
+                    state.hide()
+                }
+                KLog.i(TAG, "uri: ${recordingScreenState.recordFileUri}")
+                attachmentViewModel.setRecordingAttachmentType(recordingScreenState.recordFileUri)
+            },
+            onDismissRequest = {
+                showAudioRecorderBottomSheet = false
+            }
+        )
+    }
 
     //多媒體檔案選擇
     MediaPickerBottomSheet(
@@ -523,13 +551,12 @@ fun PostInfoScreen(
         attachmentEnv = AttachmentEnv.Post,
         selectedAttachment = attachment,
         onRecord = {
-                   //TODO 這邊可能需要實現
+            showAudioRecorderBottomSheet = true
         },
         isOnlyPhotoSelector = isOnlyPhotoSelector
     ) {
         attachmentViewModel.attachment(it)
     }
-
     //編輯貼文 callback
     editResultRecipient.onNavResult { result ->
         when (result) {

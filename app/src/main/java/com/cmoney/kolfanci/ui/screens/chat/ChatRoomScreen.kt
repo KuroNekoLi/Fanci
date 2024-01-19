@@ -53,7 +53,7 @@ import com.cmoney.kolfanci.ui.screens.chat.message.viewmodel.MessageViewModel
 import com.cmoney.kolfanci.ui.screens.chat.viewmodel.ChatRoomViewModel
 import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
 import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
-import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordAndPlayUIWithPermissionCheck
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.MediaPickerBottomSheet
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.snackbar.FanciSnackBarScreen
@@ -86,10 +86,6 @@ fun ChatRoomScreen(
     choiceRecipient: ResultRecipient<CreateChoiceQuestionScreenDestination, VoteModel>
 ) {
     val TAG = "ChatRoomScreen"
-
-    //錄音
-    val recordingViewModel: RecordingViewModel = koinViewModel()
-    val recordingScreenState by recordingViewModel.recordingScreenState
     //公告訊息
     val announceMessage by viewModel.announceMessage.collectAsState()
 
@@ -219,6 +215,12 @@ fun ChatRoomScreen(
     //是否只有圖片選擇
     val isOnlyPhotoSelector by attachmentViewModel.isOnlyPhotoSelector.collectAsState()
 
+    //錄音sheet控制
+    var showAudioRecorderBottomSheet by remember { mutableStateOf(false) }
+    //錄音
+    val recordingViewModel: RecordingViewModel = koinViewModel()
+    val recordingScreenState by recordingViewModel.recordingScreenState
+
     //主畫面
     ChatRoomScreenView(
         navController = navController,
@@ -234,6 +236,7 @@ fun ChatRoomScreen(
         },
         onDeleteAttach = {
             attachmentViewModel.removeAttach(it)
+            recordingViewModel.onEvent(RecordingScreenEvent.OnDelete)
         },
         onMessageSend = { text ->
             inputContent = text
@@ -264,7 +267,11 @@ fun ChatRoomScreen(
             AttachmentController.onAttachmentClick(
                 navController = navController,
                 attachmentInfoItem = attachmentInfoItem,
-                context = context
+                context = context,
+                onRecordClick = {
+                    showAudioRecorderBottomSheet = true
+                    recordingViewModel.onEvent(RecordingScreenEvent.OnPreviewItemClicked(attachmentInfoItem.uri,attachmentInfoItem.duration))
+                }
             )
         },
         attachment = attachment,
@@ -384,9 +391,22 @@ fun ChatRoomScreen(
         )
         messageViewModel.announceRouteDone()
     }
-    //錄音sheet控制
-    var showAudioRecorderBottomSheet by remember { mutableStateOf(false) }
-
+    if (showAudioRecorderBottomSheet) {
+        RecordScreen(
+            recordingViewModel = recordingViewModel,
+            onUpload = {
+                showAudioRecorderBottomSheet = false
+                coroutineScope.launch {
+                    state.hide()
+                }
+                KLog.i(TAG, "uri: ${recordingScreenState.recordFileUri}")
+                attachmentViewModel.setRecordingAttachmentType(recordingScreenState.recordFileUri)
+            },
+            onDismissRequest = {
+                showAudioRecorderBottomSheet = false
+            }
+        )
+    }
     //多媒體檔案選擇
     MediaPickerBottomSheet(
         navController = navController,
@@ -396,31 +416,6 @@ fun ChatRoomScreen(
         isOnlyPhotoSelector = isOnlyPhotoSelector
     ) {
         attachmentViewModel.attachment(it)
-    }
-    if (showAudioRecorderBottomSheet) {
-        RecordAndPlayUIWithPermissionCheck(
-            isRecorderHintVisible = recordingScreenState.isRecordHintVisible,
-            progressIndicator = recordingScreenState.progressIndicator,
-            time = recordingScreenState.currentTime,
-            isDeleteVisible = recordingScreenState.isDeleteVisible,
-            isUploadVisible = recordingScreenState.isUploadVisible,
-            progress = recordingScreenState.progress,
-            onPlayingButtonClick = { recordingViewModel.onEvent(RecordingScreenEvent.OnButtonClicked) },
-            onDelete = { recordingViewModel.onEvent(RecordingScreenEvent.OnDelete) },
-            onUpload = {
-                showAudioRecorderBottomSheet = false
-                coroutineScope.launch{
-                    state.hide()
-                }
-                recordingViewModel.onEvent(RecordingScreenEvent.OnUpload)
-                KLog.i(TAG,"uri: ${recordingScreenState.recordFileUri}")
-                attachmentViewModel.setRecordingAttachmentType(recordingScreenState.recordFileUri)
-            },
-            onDismissRequest = {
-                showAudioRecorderBottomSheet = false
-                recordingViewModel.onEvent(RecordingScreenEvent.OnDismiss)
-            }
-        )
     }
 }
 

@@ -13,6 +13,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.cmoney.kolfanci.ui.screens.media.audio.ProgressIndicator
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 
 /**
  * 確認錄音權限
@@ -74,4 +76,38 @@ fun RecordAndPlayUIWithPermissionCheck(
             onDismissRequest = onDismissRequest
         )
     }
+}
+
+/**
+ * 錄音的Screen
+ * @param recordingViewModel 錄音的viewModel
+ * @param onUpload 按下上傳的回調
+ * @param onDismissRequest 關掉視窗的回調
+ */
+@Composable
+fun RecordScreen(
+    recordingViewModel: RecordingViewModel,
+    onUpload: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val recordingScreenState by recordingViewModel.recordingScreenState
+    RecordAndPlayUIWithPermissionCheck(
+        isRecorderHintVisible = recordingScreenState.isRecordHintVisible,
+        progressIndicator = recordingScreenState.progressIndicator,
+        time = recordingScreenState.currentTime,
+        isDeleteVisible = recordingScreenState.isDeleteVisible,
+        isUploadVisible = recordingScreenState.isUploadVisible,
+        progress = recordingScreenState.progress,
+        onPlayingButtonClick = { recordingViewModel.onEvent(RecordingScreenEvent.OnButtonClicked) },
+        onDelete = { recordingViewModel.onEvent(RecordingScreenEvent.OnDelete) },
+        onUpload = {
+            recordingViewModel.onEvent(RecordingScreenEvent.OnUpload)
+            onUpload()
+
+        },
+        onDismissRequest = {
+            recordingViewModel.onEvent(RecordingScreenEvent.OnDismiss)
+            onDismissRequest()
+        }
+    )
 }

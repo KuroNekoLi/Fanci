@@ -42,12 +42,14 @@ fun PostOtherAttachmentScreen(
     ) {
         attachment.forEach { (attachmentType, attachmentInfoItem) ->
             when (attachmentType) {
+                AttachmentType.VoiceMessage,
                 AttachmentType.Audio -> {
                     item {
                         AttachmentAudioItem(
                             modifier = itemModifier,
                             file = attachmentInfoItem.uri,
                             duration = attachmentInfoItem.duration ?: 0,
+                            isRecordFile = attachmentType == AttachmentType.VoiceMessage,
                             isItemClickable = attachmentInfoItem.isAttachmentItemClickable(),
                             isItemCanDelete = (attachmentInfoItem.status !is AttachmentInfoItem.Status.Failed),
                             isShowResend = (attachmentInfoItem.status is AttachmentInfoItem.Status.Failed),

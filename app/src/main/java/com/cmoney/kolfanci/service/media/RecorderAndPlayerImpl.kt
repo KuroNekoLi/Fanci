@@ -5,7 +5,9 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
+import com.cmoney.kolfanci.extension.isURL
 import com.cmoney.kolfanci.model.Constant
+import com.cmoney.xlogin.XLoginHelper
 import com.socks.library.KLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,20 +33,21 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
     private var filePath: String? = null
 
     //目前錄製的秒數
-    private var _currentRecordSeconds = MutableStateFlow(0)
-    private var _playingCurrentMilliseconds = MutableStateFlow(0)
+    private var _currentRecordSeconds = MutableStateFlow(0L)
+    private var _playingCurrentMilliseconds = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0f)
     private var recordJob: Job? = null
     private var playingJob: Job? = null
 
     //最大錄音秒數
-    private val maxRecordingDuration = 45000
+    private val maxRecordingDuration = 45000L
 
     //錄音時長
-    private var recordingDuration = 0
+    private var recordingDuration = 0L
 
     private val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + Job()
+
     @Suppress("DEPRECATION")
     override fun startRecording() {
         _playingCurrentMilliseconds.value = 0
@@ -82,6 +85,27 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         stopRecordingTimer()
     }
 
+    override fun startPlaying(uri: Uri) {
+
+        _playingCurrentMilliseconds.value = 0
+
+        player = MediaPlayer().apply {
+            try {
+                if (uri.isURL()) {
+                    val headers = mapOf(
+                        "Authorization" to "Bearer ${XLoginHelper.accessToken}"
+                    )
+                    setDataSource(context, uri, headers)
+                } else {
+                    setDataSource(uri.toString())
+                }
+                prepare()
+                start()
+            } catch (e: Exception) {
+                KLog.e(TAG, "prepare() failed", e)
+            }
+        }
+    }
 
     override fun startPlaying() {
         _playingCurrentMilliseconds.value = 0
@@ -109,8 +133,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
     }
 
     override fun stopPlaying() {
-        player?.release()
-        player = null
+        player?.stop()
         _playingCurrentMilliseconds.value = 0
     }
 
@@ -125,22 +148,22 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         player = null
     }
 
-    override fun getPlayingDuration(): Int {
-        return player?.duration ?: 0
+    override fun getDurationFromRecordFile(): Long {
+        return player?.duration?.toLong() ?: 0
     }
 
-    override fun getPlayingCurrentMilliseconds(): StateFlow<Int> {
+    override fun getPlayingCurrentMilliseconds(): StateFlow<Long> {
         playingJob?.cancel()
         playingJob = CoroutineScope(coroutineContext).launch {
             player?.let { mediaPlayer ->
                 try {
                     while (mediaPlayer.isPlaying) {
-                        val currentPosition = mediaPlayer.currentPosition
+                        val currentPosition = mediaPlayer.currentPosition.toLong()
                         _playingCurrentMilliseconds.emit(currentPosition)
                         delay(200)
                     }
                     if (mediaPlayer.currentPosition == mediaPlayer.duration) {
-                        _playingCurrentMilliseconds.emit(mediaPlayer.duration)
+                        _playingCurrentMilliseconds.emit(mediaPlayer.duration.toLong())
                     }
                 } catch (e: IllegalStateException) {
                     KLog.e(TAG, "MediaPlayer is in an invalid state", e)
@@ -150,7 +173,7 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
         return _playingCurrentMilliseconds.asStateFlow()
     }
 
-    override fun getRecordingCurrentMilliseconds(): StateFlow<Int> = _currentRecordSeconds
+    override fun getRecordingCurrentMilliseconds(): StateFlow<Long> = _currentRecordSeconds
 
     private fun startRecordingTimer() {
         recordJob = CoroutineScope(coroutineContext).launch {
@@ -172,11 +195,15 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     override fun getRecordingDuration() = recordingDuration
     override fun getFileUri(): Uri? {
-        KLog.i(TAG, "fileName: $filePath, Uri: ${ Uri.fromFile(filePath?.let { File(it) })}")
+        KLog.i(TAG, "fileName: $filePath, Uri: ${Uri.fromFile(filePath?.let { File(it) })}")
         return Uri.fromFile(filePath?.let { File(it) })
     }
 
     override fun deleteFile() {
         filePath?.let { File(it).delete() }
+    }
+
+    override fun deleteFile(uri: Uri) {
+        filePath?.let { File(uri.toString()).delete() }
     }
 }

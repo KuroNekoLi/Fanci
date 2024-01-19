@@ -18,6 +18,7 @@ private const val TAG = "RecordingViewModel"
  */
 class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : ViewModel() {
     private val _recordingScreenState = mutableStateOf(RecordingScreenState.default)
+    private var durationFromAttachmentRecordInfo: Long? = null
 
     /**
      * 錄音狀態
@@ -75,13 +76,20 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                     }
 
                     ProgressIndicator.COMPLETE -> {
-                        recorderAndPlayer.startPlaying()
+                        if (_recordingScreenState.value.isPlayOnly()) {
+                            val uri = _recordingScreenState.value.recordFileUri
+                            uri?.let { recorderAndPlayer.startPlaying(it) }
+                            startCollectingPlayingProgressJob(false)
+                        } else {
+                            recorderAndPlayer.startPlaying()
+                            startCollectingPlayingProgressJob()
+                        }
+
                         _recordingScreenState.updateState {
                             copy(
                                 progressIndicator = ProgressIndicator.PLAYING
                             )
                         }
-                        startCollectingPlayingProgressJob()
                     }
 
                     ProgressIndicator.PLAYING -> {
@@ -117,25 +125,54 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
 
             RecordingScreenEvent.OnUpload -> {
                 stopCollectingPlayingProgressJob()
-                _recordingScreenState.updateState {
-                    RecordingScreenState.default
-                }
+                recorderAndPlayer.stopRecording()
+                recorderAndPlayer.stopPlaying()
                 _recordingScreenState.updateState {
                     copy(
+                        isDeleteVisible = false,
+                        isUploadVisible = false,
                         recordFileUri = recorderAndPlayer.getFileUri()
                     )
                 }
-                recorderAndPlayer.dismiss()
+
                 KLog.i(TAG, "recordFileUri: ${recorderAndPlayer.getFileUri()}")
             }
 
             RecordingScreenEvent.OnDismiss -> {
                 stopCollectingPlayingProgressJob()
-                recorderAndPlayer.dismiss()
-                recorderAndPlayer.deleteFile()
-                _recordingScreenState.updateState {
-                    RecordingScreenState.default
+                if (_recordingScreenState.value.isPlayOnly()) {
+                    recorderAndPlayer.stopPlaying()
+                    _recordingScreenState.updateState {
+                        copy(
+                            currentTime = changeToTimeText(recorderAndPlayer.getDurationFromRecordFile()),
+                            progressIndicator = ProgressIndicator.COMPLETE
+                        )
+                    }
+                } else {
+                    initStateAndPlayer()
+                    recorderAndPlayer.deleteFile()
                 }
+            }
+
+            is RecordingScreenEvent.OnPreviewItemClicked -> {
+                durationFromAttachmentRecordInfo = event.duration ?: 0
+                _recordingScreenState.updateState {
+                    copy(
+                        isRecordHintVisible = false,
+                        progressIndicator = ProgressIndicator.COMPLETE,
+                        progress = 0f,
+                        currentTime = changeToTimeText(durationFromAttachmentRecordInfo!!),
+                        recordFileUri = event.uri
+                    )
+                }
+            }
+
+            is RecordingScreenEvent.OnPreviewItemDeleted -> {
+                recorderAndPlayer.deleteFile(event.uri)
+            }
+
+            RecordingScreenEvent.OnOpenSheet -> {
+                initStateAndPlayer()
             }
         }
     }
@@ -148,17 +185,19 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
      * 將時間轉換為mm:ss
      * @param time 毫秒
      */
-    private fun changeToTimeText(time: Int): String {
+    private fun changeToTimeText(time: Long): String {
         val minutes = (time / 1000 / 60).toString().padStart(2, '0')
         val seconds = (time / 1000 % 60).toString().padStart(2, '0')
         return "$minutes:$seconds"
     }
 
     // 一個收集正在播放時間的流，並設定State的任務
-    private fun startCollectingPlayingProgressJob() {
+    private fun startCollectingPlayingProgressJob(isFromRecordFile: Boolean = true) {
         playingProgressJob?.cancel() // 取消先前的任務（如果存在）
         playingProgressJob = viewModelScope.launch {
-            val duration = recorderAndPlayer.getPlayingDuration()
+            val duration =
+                if (isFromRecordFile) recorderAndPlayer.getDurationFromRecordFile() else durationFromAttachmentRecordInfo
+                    ?: 0
             recorderAndPlayer.getPlayingCurrentMilliseconds().collect { passedTime ->
                 _recordingScreenState.updateState {
                     copy(
@@ -170,7 +209,8 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
                 if (passedTime >= duration) {
                     _recordingScreenState.updateState {
                         copy(
-                            progressIndicator = ProgressIndicator.COMPLETE
+                            progressIndicator = ProgressIndicator.COMPLETE,
+                            currentTime = changeToTimeText(recorderAndPlayer.getDurationFromRecordFile()),
                         )
                     }
                 }
@@ -181,5 +221,18 @@ class RecordingViewModel(private val recorderAndPlayer: RecorderAndPlayer) : Vie
     private fun stopCollectingPlayingProgressJob() {
         playingProgressJob?.cancel()
         playingProgressJob = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        recorderAndPlayer.dismiss()
+        recorderAndPlayer.deleteFile()
+    }
+
+    fun initStateAndPlayer() {
+        recorderAndPlayer.dismiss()
+        _recordingScreenState.updateState {
+            RecordingScreenState.default
+        }
     }
 }

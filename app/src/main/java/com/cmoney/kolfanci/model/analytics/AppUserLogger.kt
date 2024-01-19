@@ -11,7 +11,6 @@ import com.cmoney.fancylog.model.data.Page
 import com.cmoney.kolfanci.BuildConfig
 import com.cmoney.kolfanci.model.Constant
 import com.cmoney.xlogin.XLoginHelper
-import com.flurry.android.FlurryAgent
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import org.json.JSONException
 import org.koin.core.component.KoinComponent
@@ -31,7 +30,6 @@ class AppUserLogger : KoinComponent {
     }
 
     fun log(event: UserEvent) {
-        logFlurry(event)
         logMixpanel(event)
         debugLog(event.name, event.getParameters())
     }
@@ -39,7 +37,6 @@ class AppUserLogger : KoinComponent {
     fun log(page: Page, from: From? = null) {
         val descriptions = from?.asParameters()
         val event = PageUserEvent(page = page.eventName, parameters = descriptions)
-//        logFlurry(event)
 //        logMixpanel(event)
         logCM(page)
         debugLog(event.name, event.getParameters())
@@ -143,19 +140,6 @@ class AppUserLogger : KoinComponent {
             name = eventName,
             descriptions = descriptions
         )
-    }
-
-    /**
-     * 紀錄Flurry
-     * limit:500
-     */
-    private fun logFlurry(event: UserEvent) {
-        val parameters = event.getParameters()
-        val parameterMap = mutableMapOf<String, String>()
-        parameters.associateTo(parameterMap) { parameter ->
-            parameter.key to parameter.value
-        }
-        FlurryAgent.logEvent(event.name, parameterMap)
     }
 
     /**

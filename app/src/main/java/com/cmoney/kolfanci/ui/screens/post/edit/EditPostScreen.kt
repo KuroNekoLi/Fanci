@@ -67,11 +67,14 @@ import com.cmoney.kolfanci.model.vote.VoteModel
 import com.cmoney.kolfanci.ui.common.BlueButton
 import com.cmoney.kolfanci.ui.destinations.CreateChoiceQuestionScreenDestination
 import com.cmoney.kolfanci.ui.screens.chat.ReSendFileDialog
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingScreenEvent
+import com.cmoney.kolfanci.ui.screens.media.audio.RecordingViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.attachment.PostAttachmentScreen
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.EditPostViewModel
 import com.cmoney.kolfanci.ui.screens.post.edit.viewmodel.UiState
 import com.cmoney.kolfanci.ui.screens.post.viewmodel.PostViewModel
 import com.cmoney.kolfanci.ui.screens.shared.ChatUsrAvatarScreen
+import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.audio.RecordScreen
 import com.cmoney.kolfanci.ui.screens.shared.bottomSheet.mediaPicker.FilePicker
 import com.cmoney.kolfanci.ui.screens.shared.dialog.DialogScreen
 import com.cmoney.kolfanci.ui.screens.shared.dialog.PhotoPickDialogScreen
@@ -189,6 +192,12 @@ fun EditPostScreen(
         mutableStateOf<ReSendFile?>(null)
     }
 
+    //錄音sheet控制
+    var showAudioRecorderBottomSheet by remember { mutableStateOf(false) }
+    //錄音
+    val recordingViewModel: RecordingViewModel = koinViewModel()
+    val recordingScreenState by recordingViewModel.recordingScreenState
+
     //附加選擇題 callback
     choiceRecipient.onNavResult { result ->
         when (result) {
@@ -233,6 +242,7 @@ fun EditPostScreen(
         attachment = attachment,
         onDeleteAttach = {
             attachmentViewModel.removeAttach(it)
+            recordingViewModel.onEvent(RecordingScreenEvent.OnPreviewItemDeleted(it.uri))
         },
         onResend = {
             reSendFileClick = it
@@ -241,7 +251,18 @@ fun EditPostScreen(
             AttachmentController.onAttachmentClick(
                 navController = navController,
                 attachmentInfoItem = attachmentInfoItem,
-                context = context
+                context = context,
+                onRecordClick = {
+                    val uri = attachmentInfoItem.uri
+                    val duration = attachmentInfoItem.duration
+                    recordingViewModel.onEvent(
+                        RecordingScreenEvent.OnPreviewItemClicked(
+                            uri,
+                            duration
+                        )
+                    )
+                    showAudioRecorderBottomSheet = true
+                }
             )
         },
         onChoiceClick = {
@@ -250,9 +271,25 @@ fun EditPostScreen(
         onValueChange = {
             viewModel.setUserInput(it)
         },
-        defaultContent = inputContent
+        defaultContent = inputContent,
+        onRecordClick = {
+            recordingViewModel.onEvent(RecordingScreenEvent.OnOpenSheet)
+            showAudioRecorderBottomSheet = true
+        }
     )
-
+    //顯示錄音
+    if (showAudioRecorderBottomSheet) {
+        RecordScreen(
+            recordingViewModel = recordingViewModel,
+            onUpload = {
+                showAudioRecorderBottomSheet = false
+                attachmentViewModel.setRecordingAttachmentType(recordingScreenState.recordFileUri)
+            },
+            onDismissRequest = {
+                showAudioRecorderBottomSheet = false
+            }
+        )
+    }
     //Show image picker
     if (showImagePick) {
         PhotoPickDialogScreen(
@@ -383,6 +420,7 @@ private fun EditPostScreenView(
     onShowImagePicker: () -> Unit,
     onAttachmentFilePicker: () -> Unit,
     onPostClick: () -> Unit,
+    onRecordClick: () -> Unit,
     onBack: () -> Unit,
     showLoading: Boolean,
     attachment: List<Pair<AttachmentType, AttachmentInfoItem>>,
@@ -521,9 +559,7 @@ private fun EditPostScreenView(
                     )
 
                     Spacer(modifier = Modifier.width(10.dp))
-                    if(Constant.isShowUploadFile()) {
-                        Spacer(modifier = Modifier.width(15.dp))
-
+                    if (Constant.isShowUploadFile()) {
                         //File picker
                         Row(
                             modifier.clickable {
@@ -549,6 +585,43 @@ private fun EditPostScreenView(
                                 )
                             )
                         }
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(13.dp)
+                            .background(LocalColor.current.component.other)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    //錄音
+                    Row(
+                        modifier.clickable {
+                            onRecordClick()
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = Modifier.size(25.dp),
+                            painter = painterResource(id = R.drawable.record),
+                            colorFilter = ColorFilter.tint(LocalColor.current.text.default_100),
+                            contentDescription = null
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = stringResource(id = R.string.record),
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                lineHeight = 21.sp,
+                                color = LocalColor.current.text.default_80
+                            )
+                        )
                     }
 
                     Spacer(modifier = Modifier.width(10.dp))
@@ -705,6 +778,7 @@ fun EditPostScreenPreview() {
             onResend = {},
             onChoiceClick = {},
             onValueChange = {},
+            onRecordClick = {},
             defaultContent = ""
         )
     }
