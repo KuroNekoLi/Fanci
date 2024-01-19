@@ -39,9 +39,6 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
     private var recordJob: Job? = null
     private var playingJob: Job? = null
 
-    //最大錄音秒數
-    private val maxRecordingDuration = 45000L
-
     //錄音時長
     private var recordingDuration = 0L
 
@@ -177,12 +174,13 @@ class RecorderAndPlayerImpl(private val context: Context) : RecorderAndPlayer {
 
     private fun startRecordingTimer() {
         recordJob = CoroutineScope(coroutineContext).launch {
-            while (_currentRecordSeconds.value < maxRecordingDuration) {
+            while (_currentRecordSeconds.value < Constant.maxRecordingDuration) {
                 delay(200L)
                 _currentRecordSeconds.value += 200
-                _progress.value = _currentRecordSeconds.value / maxRecordingDuration.toFloat()
+                _progress.value =
+                    _currentRecordSeconds.value / Constant.maxRecordingDuration.toFloat()
             }
-            if (_currentRecordSeconds.value >= maxRecordingDuration) {
+            if (_currentRecordSeconds.value >= Constant.maxRecordingDuration) {
                 stopRecording()
             }
         }

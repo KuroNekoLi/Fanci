@@ -13,6 +13,9 @@ import com.cmoney.remoteconfig_library.model.config.AppStatus
 import org.koin.core.context.GlobalContext
 
 object Constant {
+    //最大錄音長度
+    const val maxRecordingDuration = 120000L
+
     //錄音存放的路徑
     val absoluteCachePath =
         MyApplication.instance.applicationContext.externalCacheDir?.absolutePath ?: ""
